@@ -1,0 +1,39 @@
+@charset 'utf-8';
+
+.iconbar {
+  flex: none;
+  width: 3rem;
+  background-color: $mbl-background;
+  
+  .icon-explorer {
+    @extend .las, .la-copy;
+  }
+  .icon-search {
+    @extend .las, .la-search;
+  }
+  .icon-debug {
+    @extend .las, .la-bug;
+  }
+  .icon-changes {
+    @extend .las, .la-save;
+  }
+  .icon-create {
+    @extend .las, .la-plus-circle;
+  }
+  .icon-delete {
+    @extend .las, .la-minus-circle;
+  }
+  .button {
+    color: $mbl-inactive;
+    background: transparent;
+    border: none;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .button:hover {
+    color: $mbl-hover; 
+  }
+  .active {
+    color: $mbl-active;
+  }
+}

@@ -1,0 +1,40 @@
+{
+	"id": "1",
+	"label": "test",
+	"tenant": "testTenant",
+	"values": [{
+		"id": null,
+		"value": null,
+		"type": {
+			"value": "TEST_COMMAND"
+		},
+		"subType": null
+	}, {
+		"id": null,
+		"value": null,
+		"type": {
+			"value": "TEST_COMMAND"
+		},
+		"subType": {
+			"value": "TEST_SUB_COMMAND"
+		}
+	}, {
+		"id": 1,
+		"value": null,
+		"type": {
+			"value": "TEST_COMMAND"
+		},
+		"subType": {
+			"value": "TEST_SUB_COMMAND"
+		}
+	}, {
+		"id": 1,
+		"value": "xxx",
+		"type": {
+			"value": "TEST_COMMAND"
+		},
+		"subType": {
+			"value": "TEST_SUB_COMMAND"
+		}
+	}]
+}

@@ -1,0 +1,14 @@
+{
+	"label": "testing resource",
+	"tenant": "default",
+	"values": [{
+		"id": null,
+		"subType": {
+			"value": "ChangeSubType{value=test sub type}"
+		},
+		"type": {
+			"value": "ChangeType{value=test type}"
+		},
+		"value": null
+	}]
+}

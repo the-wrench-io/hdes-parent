@@ -1,0 +1,1609 @@
+{
+  "tenant": "default",
+  "label": "fl",
+  "values": [{
+    "id": 0,
+    "type": "ADD",
+    "value": "id: selectTime"
+  }, {
+    "id": 1,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 1,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 2,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 2,
+    "type": "SET",
+    "value": "inputs:"
+  }, {
+    "id": 3,
+    "type": "ADD",
+    "value": "  myInputParam:"
+  }, {
+    "id": 4,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 5,
+    "type": "ADD",
+    "value": "    type: STRING"
+  }, {
+    "id": 3,
+    "type": "SET",
+    "value": "  Clinics:"
+  }, {
+    "id": 6,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 6,
+    "type": "SET",
+    "value": "    debugValue: \"HEL1\""
+  }, {
+    "id": 7,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 7,
+    "type": "SET",
+    "value": "  Specialties:"
+  }, {
+    "id": 8,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 9,
+    "type": "ADD",
+    "value": "    type: STRING"
+  }, {
+    "id": 10,
+    "type": "ADD",
+    "value": "    debugValue: YLE"
+  }, {
+    "id": 11,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 11,
+    "type": "SET",
+    "value": "  Date:"
+  }, {
+    "id": 12,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 13,
+    "type": "ADD",
+    "value": "    type: DATE"
+  }, {
+    "id": 14,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 14,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 14,
+    "value": 14,
+    "type": "DELETE"
+  }, {
+    "id": 14,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 14,
+    "type": "SET",
+    "value": "  TimeFrom:"
+  }, {
+    "id": 15,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 16,
+    "type": "ADD",
+    "value": "    type: STRING"
+  }, {
+    "id": 17,
+    "type": "ADD",
+    "value": "    debugValue: 08:00"
+  }, {
+    "id": 18,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 18,
+    "type": "SET",
+    "value": "  TimeTo:"
+  }, {
+    "id": 19,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 20,
+    "type": "ADD",
+    "value": "    type: STRING"
+  }, {
+    "id": 21,
+    "type": "ADD",
+    "value": "    debugValue: 16:00"
+  }, {
+    "id": 22,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 22,
+    "type": "SET",
+    "value": "  PaymentType:"
+  }, {
+    "id": 23,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 24,
+    "type": "ADD",
+    "value": "    type: STRING"
+  }, {
+    "id": 25,
+    "type": "ADD",
+    "value": "    debugValue: Occupational"
+  }, {
+    "id": 26,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 26,
+    "type": "SET",
+    "value": "    "
+  }, {
+    "id": 27,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 27,
+    "type": "SET",
+    "value": "tasks:"
+  }, {
+    "id": 28,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 28,
+    "type": "SET",
+    "value": "  - BasicCheck:"
+  }, {
+    "id": 29,
+    "type": "ADD",
+    "value": "      id: basicCheck"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 32,
+    "type": "ADD",
+    "value": "        ref: BasicCheck"
+  }, {
+    "id": 33,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 34,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 35,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 36,
+    "type": "ADD",
+    "value": "          Type:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 36,
+    "type": "SET",
+    "value": "          Type: Clinics"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "      then: end"
+  }, {
+    "id": 13,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 13,
+    "value": 13,
+    "type": "DELETE"
+  }, {
+    "id": 13,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 13,
+    "type": "SET",
+    "value": "    type: STRING"
+  }, {
+    "id": 7,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 7,
+    "type": "SET",
+    "value": "  Availability:"
+  }, {
+    "id": 8,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 9,
+    "type": "ADD",
+    "value": "    type: INTEGER"
+  }, {
+    "id": 10,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 10,
+    "type": "SET",
+    "value": "    debugValue: 80"
+  }, {
+    "id": 41,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": "          Availability:"
+  }, {
+    "id": 42,
+    "type": "ADD",
+    "value": "          Hrs:"
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": "          Availability: Availability"
+  }, {
+    "id": 42,
+    "type": "SET",
+    "value": "          Hrs: "
+  }, {
+    "id": 18,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 18,
+    "type": "SET",
+    "value": "  TimeSlot:"
+  }, {
+    "id": 19,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 20,
+    "type": "ADD",
+    "value": "    type: INTEGER"
+  }, {
+    "id": 21,
+    "type": "ADD",
+    "value": "    debugValue: 8"
+  }, {
+    "id": 46,
+    "type": "SET",
+    "value": "          Hrs: TimeSlot"
+  }, {
+    "id": 18,
+    "type": "ADD",
+    "value": "    "
+  }, {
+    "id": 18,
+    "type": "SET",
+    "value": "  daysFromToday:"
+  }, {
+    "id": 19,
+    "type": "ADD",
+    "value": "    required: true"
+  }, {
+    "id": 20,
+    "type": "ADD",
+    "value": "    type: INTEGER"
+  }, {
+    "id": 21,
+    "type": "ADD",
+    "value": "    debugValue: 0"
+  }, {
+    "id": 26,
+    "type": "SET",
+    "value": "  "
+  }, {
+    "id": 27,
+    "value": 33,
+    "type": "DELETE"
+  }, {
+    "id": 26,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 26,
+    "value": 26,
+    "type": "DELETE"
+  }, {
+    "id": 42,
+    "type": "SET",
+    "value": "          : TimeSlot"
+  }, {
+    "id": 41,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": "          Slot: TimeSlot"
+  }, {
+    "id": 43,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 43,
+    "value": 43,
+    "type": "DELETE"
+  }, {
+    "id": 32,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 33,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 33,
+    "type": "SET",
+    "value": "  - availableLocations:"
+  }, {
+    "id": 34,
+    "type": "ADD",
+    "value": "      id: availableLocations"
+  }, {
+    "id": 35,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 36,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": "        ref: availableLocations"
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 39,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 40,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 41,
+    "type": "ADD",
+    "value": "          inputColumn:"
+  }, {
+    "id": 42,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 41,
+    "value": 41,
+    "type": "DELETE"
+  }, {
+    "id": 41,
+    "type": "ADD",
+    "value": "        "
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": "          Location: Clinics"
+  }, {
+    "id": 32,
+    "value": 32,
+    "type": "DELETE"
+  }, {
+    "id": 34,
+    "type": "SET",
+    "value": "      then: basicCheck"
+  }, {
+    "id": 32,
+    "type": "SET",
+    "value": "  - Available Locations:"
+  }, {
+    "id": 42,
+    "type": "SET",
+    "value": "  - Basic Check:"
+  }, {
+    "id": 50,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 50,
+    "value": 50,
+    "type": "DELETE"
+  }, {
+    "id": 41,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": "          "
+  }, {
+    "id": 42,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 42,
+    "type": "SET",
+    "value": "  - In Scope:"
+  }, {
+    "id": 43,
+    "type": "ADD",
+    "value": "      id: inScope"
+  }, {
+    "id": 44,
+    "type": "ADD",
+    "value": "      switch:"
+  }, {
+    "id": 45,
+    "type": "ADD",
+    "value": "        - first case, points to next task in order:"
+  }, {
+    "id": 46,
+    "type": "ADD",
+    "value": "            when: \"true\""
+  }, {
+    "id": 47,
+    "type": "ADD",
+    "value": "            then: next"
+  }, {
+    "id": 48,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 46,
+    "type": "SET",
+    "value": "            when: availableLocation.locationActive == true"
+  }, {
+    "id": 47,
+    "type": "SET",
+    "value": "            then: basicCheck"
+  }, {
+    "id": 48,
+    "type": "ADD",
+    "value": "            "
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "            else:"
+  }, {
+    "id": 49,
+    "type": "ADD",
+    "value": "            "
+  }, {
+    "id": 49,
+    "type": "SET",
+    "value": "            then: next"
+  }, {
+    "id": 51,
+    "value": 51,
+    "type": "DELETE"
+  }, {
+    "id": 34,
+    "type": "SET",
+    "value": "      then: inScope"
+  }, {
+    "id": 49,
+    "type": "SET",
+    "value": "            then: end"
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "            else: end"
+  }, {
+    "id": 49,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 48,
+    "value": 48,
+    "type": "DELETE"
+  }, {
+    "id": 48,
+    "type": "ADD",
+    "value": "when: availableLocation.locationActive == true"
+  }, {
+    "id": 49,
+    "type": "ADD",
+    "value": "            then: basicCheck"
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "            when: availableLocation.locationActive == false"
+  }, {
+    "id": 49,
+    "type": "SET",
+    "value": "            then: end"
+  }, {
+    "id": 46,
+    "type": "SET",
+    "value": "            when: \"availableLocation.locationActive == true\""
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "            when: availableLocation.locationActive == false"
+  }, {
+    "id": 46,
+    "type": "SET",
+    "value": "            when: availableLocation.locationActive == true"
+  }, {
+    "id": 51,
+    "value": 51,
+    "type": "DELETE"
+  }, {
+    "id": 48,
+    "type": "ADD",
+    "value": "            "
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "        - default case:"
+  }, {
+    "id": 62,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 62,
+    "type": "SET",
+    "value": "          "
+  }, {
+    "id": 63,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 63,
+    "type": "SET",
+    "value": "  - acceptALL:"
+  }, {
+    "id": 64,
+    "type": "ADD",
+    "value": "      id: acceptALL"
+  }, {
+    "id": 65,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 66,
+    "type": "ADD",
+    "value": "      service:"
+  }, {
+    "id": 67,
+    "type": "ADD",
+    "value": "        ref: AcceptALL"
+  }, {
+    "id": 68,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 69,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 70,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 71,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 50,
+    "type": "SET",
+    "value": "            then: acceptALL"
+  }, {
+    "id": 65,
+    "type": "SET",
+    "value": "      then: end"
+  }, {
+    "id": 15,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 16,
+    "value": 17,
+    "type": "DELETE"
+  }, {
+    "id": 15,
+    "value": 15,
+    "type": "DELETE"
+  }, {
+    "id": 60,
+    "type": "SET",
+    "value": "  "
+  }, {
+    "id": 61,
+    "value": 67,
+    "type": "DELETE"
+  }, {
+    "id": 60,
+    "type": "SET",
+    "value": " "
+  }, {
+    "id": 47,
+    "type": "SET",
+    "value": "            then: end"
+  }, {
+    "id": 43,
+    "type": "SET",
+    "value": "            when: availableLocations.locationActive == true"
+  }, {
+    "id": 46,
+    "type": "SET",
+    "value": "            when: availableLocations.locationActive == false"
+  }, {
+    "id": 46,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 46,
+    "value": 46,
+    "type": "DELETE"
+  }, {
+    "id": 56,
+    "type": "ADD",
+    "value": "        "
+  }, {
+    "id": 56,
+    "type": "SET",
+    "value": "          hrsFormNow: TimeSlot"
+  }, {
+    "id": 56,
+    "type": "SET",
+    "value": "          hrsFromNow: TimeSlot"
+  }, {
+    "id": 47,
+    "type": "SET",
+    "value": "  - Default Check"
+  }, {
+    "id": 48,
+    "type": "ADD",
+    "value": "  "
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "      id: defaultCheck"
+  }, {
+    "id": 49,
+    "type": "ADD",
+    "value": "      "
+  }, {
+    "id": 49,
+    "type": "SET",
+    "value": "      then: end"
+  }, {
+    "id": 46,
+    "type": "SET",
+    "value": "            then: defaultCheck"
+  }, {
+    "id": 50,
+    "type": "ADD",
+    "value": "      "
+  }, {
+    "id": 50,
+    "type": "SET",
+    "value": "      "
+  }, {
+    "id": 47,
+    "type": "ADD",
+    "value": "            "
+  }, {
+    "id": 47,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 47,
+    "value": 47,
+    "type": "DELETE"
+  }, {
+    "id": 47,
+    "type": "ADD",
+    "value": "            "
+  }, {
+    "id": 47,
+    "type": "SET",
+    "value": "            "
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "  - Default Check:"
+  }, {
+    "id": 0,
+    "type": "SET",
+    "value": "id: YLESaatavuudenHallinta"
+  }, {
+    "id": 33,
+    "type": "SET",
+    "value": "        ref: IsUnitUsingRMRules"
+  }, {
+    "id": 43,
+    "type": "SET",
+    "value": "            when: IsUnitUsingRMRules.locationActive == true"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "      id: IsUnitUsingRMRules"
+  }, {
+    "id": 56,
+    "type": "SET",
+    "value": "        ref: RajatAikojenRajoittamiselle"
+  }, {
+    "id": 60,
+    "type": "SET",
+    "value": "          HoursToBooking: TimeSlot"
+  }, {
+    "id": 62,
+    "type": "SET",
+    "value": "          BookingRateLimitForBlockingTimes: Availability"
+  }, {
+    "id": 6,
+    "type": "SET",
+    "value": "    debugValue: \"6SAS\""
+  }, {
+    "id": 15,
+    "type": "SET",
+    "value": "  HoursToBooking:"
+  }, {
+    "id": 3,
+    "type": "SET",
+    "value": "  AjanvarauksenTMP:"
+  }, {
+    "id": 7,
+    "type": "SET",
+    "value": "  BookingRate:"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": " "
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": " - Available Locations:"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  "
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "  - Available Locations:"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "  - Available Locations:"
+  }, {
+    "id": 30,
+    "value": 30,
+    "type": "DELETE"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - Available Locations:"
+  }, {
+    "id": 3,
+    "type": "SET",
+    "value": "  AjanvarauksenTMP:"
+  }, {
+    "id": 7,
+    "type": "SET",
+    "value": "  BookingRate:"
+  }, {
+    "id": 15,
+    "type": "SET",
+    "value": "  HoursToBooking:"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "value": 30,
+    "type": "DELETE"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "  id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "value": 30,
+    "type": "DELETE"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - Available Locations: id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "  id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "value": 30,
+    "type": "DELETE"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "  id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "value": 30,
+    "type": "DELETE"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - Available Locations:id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "  id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 30,
+    "value": 30,
+    "type": "DELETE"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - Available Locations:"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": " "
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 31,
+    "value": 31,
+    "type": "DELETE"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "  \ti"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "      then: inScope"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "  id: IsUnitUsingRMRules"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  "
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "  - Available Locations: id: IsUnitUsingRMRules"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "  - Available Locations: id: IsUnitUsingRMRules"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "  - Available Locations: id: IsUnitUsingRMRules"
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "  - Available Locations: id: IsUnitUsingRMRules"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - YksikonTarkistus:"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "      id: yksikonTarkistus"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 32,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 33,
+    "type": "ADD",
+    "value": "        ref: YksikonTarkistus"
+  }, {
+    "id": 34,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 35,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 36,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": "          inputColumn:"
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": " "
+  }, {
+    "id": 30,
+    "value": 47,
+    "type": "DELETE"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - IsUnitUsingRMRules:"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "      id: isUnitUsingRMRules"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 32,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 33,
+    "type": "ADD",
+    "value": "        ref: IsUnitUsingRMRules"
+  }, {
+    "id": 34,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 35,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 36,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": "          Location:"
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "      then: inScope"
+  }, {
+    "id": 37,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 37,
+    "value": 37,
+    "type": "DELETE"
+  }, {
+    "id": 36,
+    "type": "SET",
+    "value": "        inputs:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": "        "
+  }, {
+    "id": 37,
+    "type": "SET",
+    "value": "        \tAjanvarauksenTMP"
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 38,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 38,
+    "value": 38,
+    "type": "DELETE"
+  }, {
+    "id": 37,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 37,
+    "value": 37,
+    "type": "DELETE"
+  }, {
+    "id": 36,
+    "type": "SET",
+    "value": "        inputs:"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - TarkistetaanYksikko:"
+  }, {
+    "id": 38,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 38,
+    "value": 38,
+    "type": "DELETE"
+  }, {
+    "id": 37,
+    "value": 37,
+    "type": "DELETE"
+  }, {
+    "id": 37,
+    "type": "SET",
+    "value": "          Location: AjanvarauksenTMP"
+  }, {
+    "id": 43,
+    "type": "SET",
+    "value": "            when: IsUnitUsingRMRules.UnitActive == true"
+  }, {
+    "id": 49,
+    "type": "SET",
+    "value": "      id: defaultCheck"
+  }, {
+    "id": 48,
+    "type": "SET",
+    "value": "  - Ei saatavuuden hallintaa:"
+  }, {
+    "id": 52,
+    "type": "SET",
+    "value": "  - Saatavuuden hallinta:"
+  }, {
+    "id": 62,
+    "type": "SET",
+    "value": "          BookingRateLimitForBlockingTimes: BookingRate"
+  }, {
+    "id": 60,
+    "type": "SET",
+    "value": "          HoursLeft: HoursToBooking"
+  }, {
+    "id": 29,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - TarkistetaanErikoisala:"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "      id: tarkistetaanErikoisala"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 32,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 33,
+    "type": "ADD",
+    "value": "        ref: TarkistetaanErikoisala"
+  }, {
+    "id": 34,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 35,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 36,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": "          inputColumn:"
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 39,
+    "type": "SET",
+    "value": "  - isUnitUsingRMRules:"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 30,
+    "value": 38,
+    "type": "DELETE"
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - CheckPaymentType:"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "      id: checkPaymentType"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 32,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 33,
+    "type": "ADD",
+    "value": "        ref: CheckPaymentType"
+  }, {
+    "id": 34,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 35,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 36,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": "          inputColumn:"
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 37,
+    "type": "SET",
+    "value": "          CustomerPaymentType: PaymentType"
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "      then: isUnitUsingRMRules"
+  }, {
+    "id": 39,
+    "type": "SET",
+    "value": "  "
+  }, {
+    "id": 40,
+    "value": 47,
+    "type": "DELETE"
+  }, {
+    "id": 39,
+    "type": "SET",
+    "value": "  - CheckToimipaikka:"
+  }, {
+    "id": 40,
+    "type": "ADD",
+    "value": "      id: checkToimipaikka"
+  }, {
+    "id": 41,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 42,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 43,
+    "type": "ADD",
+    "value": "        ref: CheckToimipaikka"
+  }, {
+    "id": 44,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 45,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 46,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 47,
+    "type": "ADD",
+    "value": "          Location:"
+  }, {
+    "id": 48,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": "      then: inScope"
+  }, {
+    "id": 40,
+    "type": "SET",
+    "value": "      id: CheckToimipaikka"
+  }, {
+    "id": 47,
+    "type": "SET",
+    "value": "          Location: AjanvarauksenTMP"
+  }, {
+    "id": 49,
+    "value": 49,
+    "type": "DELETE"
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "      then: CheckToimipaikka"
+  }, {
+    "id": 38,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 39,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 39,
+    "type": "SET",
+    "value": "  - CheckSpecialty:"
+  }, {
+    "id": 40,
+    "type": "ADD",
+    "value": "      id: checkSpecialty"
+  }, {
+    "id": 41,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 42,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 43,
+    "type": "ADD",
+    "value": "        ref: CheckSpecialty"
+  }, {
+    "id": 44,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 45,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 46,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 47,
+    "type": "ADD",
+    "value": "          inputColumn:"
+  }, {
+    "id": 48,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "      then: CheckSpecialty"
+  }, {
+    "id": 40,
+    "type": "SET",
+    "value": "      id: CheckSpecialty"
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "      id: CheckPaymentType"
+  }, {
+    "id": 47,
+    "type": "SET",
+    "value": "          EtsittyErikoisala: Specialties"
+  }, {
+    "id": 63,
+    "type": "SET",
+    "value": "            when: CheckToimipaikka.UnitActive == true && CheckSpecialty.inScope == True && CheckPaymentType.inScope == True"
+  }, {
+    "id": 29,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 29,
+    "type": "SET",
+    "value": "  - CheckRelevancyForRMRules:"
+  }, {
+    "id": 30,
+    "type": "ADD",
+    "value": "      id: checkRelevancyForRMRules"
+  }, {
+    "id": 31,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 32,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 33,
+    "type": "ADD",
+    "value": "        ref: CheckRelevancyForRMRules"
+  }, {
+    "id": 34,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 35,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 36,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 37,
+    "type": "ADD",
+    "value": "          inputColumn:"
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 30,
+    "type": "SET",
+    "value": "      id: CheckRelevancyForRMRules"
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "      then: next"
+  }, {
+    "id": 37,
+    "type": "SET",
+    "value": "          CustomerPaymentType:  "
+  }, {
+    "id": 38,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 38,
+    "type": "SET",
+    "value": "          SearchedSpecialty: Specialties"
+  }, {
+    "id": 39,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 39,
+    "type": "SET",
+    "value": "          Unit: AjanvarauksenTMP"
+  }, {
+    "id": 41,
+    "value": 69,
+    "type": "DELETE"
+  }, {
+    "id": 40,
+    "value": 40,
+    "type": "DELETE"
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "      then: inScope"
+  }, {
+    "id": 37,
+    "type": "SET",
+    "value": "          CustomerPaymentType: PaymentType"
+  }, {
+    "id": 45,
+    "type": "SET",
+    "value": "            when: CheckRelevancyForRMRules.InScopeForRM == true"
+  }, {
+    "id": 54,
+    "type": "SET",
+    "value": "  - RajatAikojenRajoittamiselle:"
+  }, {
+    "id": 50,
+    "type": "SET",
+    "value": "  - NoRMRulesApplied:"
+  }, {
+    "id": 54,
+    "type": "SET",
+    "value": "  - LimitsForRMRules:"
+  }, {
+    "id": 63,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 63,
+    "value": 63,
+    "type": "DELETE"
+  }, {
+    "id": 64,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 64,
+    "type": "SET",
+    "value": "          "
+  }, {
+    "id": 65,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 65,
+    "type": "SET",
+    "value": "  - finalDecission:"
+  }, {
+    "id": 66,
+    "type": "ADD",
+    "value": "      id: finalDecission"
+  }, {
+    "id": 67,
+    "type": "ADD",
+    "value": "      then: next"
+  }, {
+    "id": 68,
+    "type": "ADD",
+    "value": "      decisionTable:"
+  }, {
+    "id": 69,
+    "type": "ADD",
+    "value": "        ref: finalDecission"
+  }, {
+    "id": 70,
+    "type": "ADD",
+    "value": "        restful: false"
+  }, {
+    "id": 71,
+    "type": "ADD",
+    "value": "        collection: false"
+  }, {
+    "id": 72,
+    "type": "ADD",
+    "value": "        inputs:"
+  }, {
+    "id": 73,
+    "type": "ADD",
+    "value": "          inputColumn:"
+  }, {
+    "id": 74,
+    "type": "ADD",
+    "value": ""
+  }, {
+    "id": 56,
+    "type": "SET",
+    "value": "      then: finalDecission"
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": " "
+  }, {
+    "id": 42,
+    "value": 52,
+    "type": "DELETE"
+  }, {
+    "id": 41,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 41,
+    "value": 41,
+    "type": "DELETE"
+  }, {
+    "id": 40,
+    "value": 40,
+    "type": "DELETE"
+  }, {
+    "id": 31,
+    "type": "SET",
+    "value": "      then: basicCheck"
+  }, {
+    "id": 54,
+    "type": "SET",
+    "value": "      then: end"
+  }, {
+    "id": 60,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 60,
+    "value": 60,
+    "type": "DELETE"
+  }, {
+    "id": 60,
+    "type": "ADD",
+    "value": "        "
+  }, {
+    "id": 60,
+    "type": "SET",
+    "value": "          timeSlotBlocked: basicCheck.ShowTimes"
+  }, {
+    "id": 51,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 51,
+    "type": "SET",
+    "value": "          inScope: CheckRelevancyForRMRules.InScopeForRM"
+  }, {
+    "id": 52,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 52,
+    "type": "SET",
+    "value": ""
+  }, {
+    "id": 52,
+    "value": 52,
+    "type": "DELETE"
+  }, {
+    "id": 52,
+    "type": "ADD",
+    "value": "          "
+  }, {
+    "id": 52,
+    "type": "SET",
+    "value": "          bookingCurveType: CheckRelevancyForRMRules.bookingCurveType"
+  }, {
+    "id": 27,
+    "type": "SET",
+    "value": "   "
+  }]
+}

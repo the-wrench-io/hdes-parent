@@ -1,0 +1,66 @@
+@charset 'utf-8';
+@import 'bulma';
+@import '~bulma-tooltip';
+
+$la-font-path: 'core-styles/fonts';
+@import '../node_modules/line-awesome/dist/line-awesome/scss/line-awesome.scss';
+@import 'core-styles/colors';
+@import 'core-styles/iconbar';
+@import 'core-styles/editor';
+@import 'core-styles/editor-tb';
+@import 'core-styles/editor-dl';
+@import 'core-styles/editor-dt';
+@import 'core-styles/editor-fl';
+@import 'core-styles/explorer';
+@import 'core-styles/explorer-ed';
+@import 'core-styles/explorer-cr';
+@import 'core-styles/explorer-se';
+
+
+$has-text-link:hsl(217, 71%, 53%);
+$has-background-dark: hsl(0, 0%, 21%);
+$has-background-grey: hsl(0, 0%, 29%);
+$has-background-grey-dark: hsl(0, 0%, 29%);
+$has-background-grey-darker: hsl(0, 0%, 21%);
+$has-background-black-ter:hsl(0, 0%, 14%);
+
+$has-text-grey:hsl(0, 0%, 48%);
+$has-text-light:hsl(0, 0%, 96%);
+$has-text-white: hsl(0, 0%, 100%);
+$has-text-primary: hsl(171, 100%, 41%);
+
+$has-text-purple: hsl(283, 44%, 68%);
+$has-text-yellow: hsl(34, 85%, 60%); //hsl(41, 67%, 63%);
+
+
+h1 {
+  opacity: 0.5;
+  font-size: 1em;
+}
+.app {
+  min-height: 100vh;
+  background-color: $has-background-grey-dark;
+}
+
+.init {
+  .title {
+    color: $has-text-light
+  }
+  .log {
+    color: $has-text-primary;
+  }
+}
+
+.is-ide-info {
+  max-height: 3vh;
+  font-size: small;
+  color: $has-text-white;
+
+  .is-ide-info-contents {
+    min-height: 3vh !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+

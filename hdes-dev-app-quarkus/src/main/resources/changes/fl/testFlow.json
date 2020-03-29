@@ -1,0 +1,2012 @@
+{
+  "id": "testFlow",
+  "tenant": "default",
+  "label": "fl",
+  "hash": null,
+  "values": [{
+    "id": 0,
+    "value": "id: selectTime",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 1,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 1,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 2,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 2,
+    "value": "inputs:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 3,
+    "value": "  myInputParam:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 4,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 5,
+    "value": "    type: STRING",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 3,
+    "value": "  Clinics:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 6,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 6,
+    "value": "    debugValue: \"HEL1\"",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 7,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 7,
+    "value": "  Specialties:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 8,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 9,
+    "value": "    type: STRING",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 10,
+    "value": "    debugValue: YLE",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 11,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 11,
+    "value": "  Date:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 12,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 13,
+    "value": "    type: DATE",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 14,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 14,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 14,
+    "value": "14",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 14,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 14,
+    "value": "  TimeFrom:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 15,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 16,
+    "value": "    type: STRING",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 17,
+    "value": "    debugValue: 08:00",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 18,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 18,
+    "value": "  TimeTo:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 19,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 20,
+    "value": "    type: STRING",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 21,
+    "value": "    debugValue: 16:00",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 22,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 22,
+    "value": "  PaymentType:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 23,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 24,
+    "value": "    type: STRING",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 25,
+    "value": "    debugValue: Occupational",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 26,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 26,
+    "value": "    ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 27,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 27,
+    "value": "tasks:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 28,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 28,
+    "value": "  - BasicCheck:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "      id: basicCheck",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "        ref: BasicCheck",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 35,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "          Type:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "          Type: Clinics",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      then: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 13,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 13,
+    "value": "13",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 13,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 13,
+    "value": "    type: STRING",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 7,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 7,
+    "value": "  Availability:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 8,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 9,
+    "value": "    type: INTEGER",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 10,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 10,
+    "value": "    debugValue: 80",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          Availability:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "          Hrs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          Availability: Availability",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "          Hrs: ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 18,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 18,
+    "value": "  TimeSlot:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 19,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 20,
+    "value": "    type: INTEGER",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 21,
+    "value": "    debugValue: 8",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "          Hrs: TimeSlot",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 18,
+    "value": "    ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 18,
+    "value": "  daysFromToday:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 19,
+    "value": "    required: true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 20,
+    "value": "    type: INTEGER",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 21,
+    "value": "    debugValue: 0",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 26,
+    "value": "  ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 27,
+    "value": "33",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 26,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 26,
+    "value": "26",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "          : TimeSlot",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          Slot: TimeSlot",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "43",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "  - availableLocations:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "      id: availableLocations",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 35,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "        ref: availableLocations",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          inputColumn:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "41",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "        ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          Location: Clinics",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "32",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "      then: basicCheck",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "  - Available Locations:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "  - Basic Check:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 50,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 50,
+    "value": "50",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "          ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "  - In Scope:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "      id: inScope",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 44,
+    "value": "      switch:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 45,
+    "value": "        - first case, points to next task in order:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "            when: \"true\"",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "            then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "            when: availableLocation.locationActive == true",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "            then: basicCheck",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "            ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "            else:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "            ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "            then: next",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 51,
+    "value": "51",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "      then: inScope",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "            then: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "            else: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "48",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "when: availableLocation.locationActive == true",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "            then: basicCheck",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "            when: availableLocation.locationActive == false",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "            then: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "            when: \"availableLocation.locationActive == true\"",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "            when: availableLocation.locationActive == false",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "            when: availableLocation.locationActive == true",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 51,
+    "value": "51",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "            ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "        - default case:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 62,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 62,
+    "value": "          ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 63,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 63,
+    "value": "  - acceptALL:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 64,
+    "value": "      id: acceptALL",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 65,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 66,
+    "value": "      service:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 67,
+    "value": "        ref: AcceptALL",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 68,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 69,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 70,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 71,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 50,
+    "value": "            then: acceptALL",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 65,
+    "value": "      then: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 15,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 16,
+    "value": "17",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 15,
+    "value": "15",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": "  ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 61,
+    "value": "67",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": " ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "            then: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "            when: availableLocations.locationActive == true",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "            when: availableLocations.locationActive == false",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "46",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 56,
+    "value": "        ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 56,
+    "value": "          hrsFormNow: TimeSlot",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 56,
+    "value": "          hrsFromNow: TimeSlot",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "  - Default Check",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "  ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "      id: defaultCheck",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "      ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "      then: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "            then: defaultCheck",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 50,
+    "value": "      ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 50,
+    "value": "      ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "            ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "47",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "            ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "            ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "  - Default Check:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 0,
+    "value": "id: YLESaatavuudenHallinta",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "        ref: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "            when: IsUnitUsingRMRules.locationActive == true",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 56,
+    "value": "        ref: RajatAikojenRajoittamiselle",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": "          HoursToBooking: TimeSlot",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 62,
+    "value": "          BookingRateLimitForBlockingTimes: Availability",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 6,
+    "value": "    debugValue: \"6SAS\"",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 15,
+    "value": "  HoursToBooking:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 3,
+    "value": "  AjanvarauksenTMP:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 7,
+    "value": "  BookingRate:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": " ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": " - Available Locations:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  - Available Locations:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  - Available Locations:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "30",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - Available Locations:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 3,
+    "value": "  AjanvarauksenTMP:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 7,
+    "value": "  BookingRate:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 15,
+    "value": "  HoursToBooking:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "30",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  id: IsUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "30",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - Available Locations: id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  id: IsUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "30",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  id: IsUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "30",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - Available Locations:id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  id: IsUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "30",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - Available Locations:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": " ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "31",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  \ti",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: inScope",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  - Available Locations: id: IsUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "  - Available Locations: id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "  - Available Locations: id: IsUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "  - Available Locations: id: IsUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - YksikonTarkistus:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: yksikonTarkistus",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "        ref: YksikonTarkistus",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 35,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          inputColumn:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": " ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "47",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - IsUnitUsingRMRules:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: isUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "        ref: IsUnitUsingRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 35,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          Location:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: inScope",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "37",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "        inputs:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "        ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "        \tAjanvarauksenTMP",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "38",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "37",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "        inputs:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - TarkistetaanYksikko:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "38",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "37",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          Location: AjanvarauksenTMP",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "            when: IsUnitUsingRMRules.UnitActive == true",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "      id: defaultCheck",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "  - Ei saatavuuden hallintaa:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 52,
+    "value": "  - Saatavuuden hallinta:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 62,
+    "value": "          BookingRateLimitForBlockingTimes: BookingRate",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": "          HoursLeft: HoursToBooking",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - TarkistetaanErikoisala:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: tarkistetaanErikoisala",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "        ref: TarkistetaanErikoisala",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 35,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          inputColumn:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "  - isUnitUsingRMRules:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "38",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - CheckPaymentType:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: checkPaymentType",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "        ref: CheckPaymentType",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 35,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          inputColumn:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          CustomerPaymentType: PaymentType",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: isUnitUsingRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "  ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "47",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "  - CheckToimipaikka:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "      id: checkToimipaikka",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "        ref: CheckToimipaikka",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 44,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 45,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "          Location:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "      then: inScope",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "      id: CheckToimipaikka",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "          Location: AjanvarauksenTMP",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 49,
+    "value": "49",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: CheckToimipaikka",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "  - CheckSpecialty:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "      id: checkSpecialty",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 43,
+    "value": "        ref: CheckSpecialty",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 44,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 45,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 46,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "          inputColumn:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 48,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: CheckSpecialty",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "      id: CheckSpecialty",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: CheckPaymentType",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 47,
+    "value": "          EtsittyErikoisala: Specialties",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 63,
+    "value": "            when: CheckToimipaikka.UnitActive == true && CheckSpecialty.inScope == True && CheckPaymentType.inScope == True",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 29,
+    "value": "  - CheckRelevancyForRMRules:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: checkRelevancyForRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 32,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 33,
+    "value": "        ref: CheckRelevancyForRMRules",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 34,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 35,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 36,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          inputColumn:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 30,
+    "value": "      id: CheckRelevancyForRMRules",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: next",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          CustomerPaymentType:  ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 38,
+    "value": "          SearchedSpecialty: Specialties",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 39,
+    "value": "          Unit: AjanvarauksenTMP",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "69",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "40",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: inScope",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 37,
+    "value": "          CustomerPaymentType: PaymentType",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 45,
+    "value": "            when: CheckRelevancyForRMRules.InScopeForRM == true",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 54,
+    "value": "  - RajatAikojenRajoittamiselle:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 50,
+    "value": "  - NoRMRulesApplied:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 54,
+    "value": "  - LimitsForRMRules:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 63,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 63,
+    "value": "63",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 64,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 64,
+    "value": "          ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 65,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 65,
+    "value": "  - finalDecission:",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 66,
+    "value": "      id: finalDecission",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 67,
+    "value": "      then: next",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 68,
+    "value": "      decisionTable:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 69,
+    "value": "        ref: finalDecission",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 70,
+    "value": "        restful: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 71,
+    "value": "        collection: false",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 72,
+    "value": "        inputs:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 73,
+    "value": "          inputColumn:",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 74,
+    "value": "",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 56,
+    "value": "      then: finalDecission",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": " ",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 42,
+    "value": "52",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 41,
+    "value": "41",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 40,
+    "value": "40",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 31,
+    "value": "      then: basicCheck",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 54,
+    "value": "      then: end",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": "60",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": "        ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 60,
+    "value": "          timeSlotBlocked: basicCheck.ShowTimes",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 51,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 51,
+    "value": "          inScope: CheckRelevancyForRMRules.InScopeForRM",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 52,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 52,
+    "value": "",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 52,
+    "value": "52",
+    "type": "DELETE",
+    "subType": null
+  }, {
+    "id": 52,
+    "value": "          ",
+    "type": "ADD",
+    "subType": null
+  }, {
+    "id": 52,
+    "value": "          bookingCurveType: CheckRelevancyForRMRules.bookingCurveType",
+    "type": "SET",
+    "subType": null
+  }, {
+    "id": 27,
+    "value": "   ",
+    "type": "SET",
+    "subType": null
+  }]
+}

@@ -1,0 +1,95 @@
+@charset 'utf-8';
+
+$has-text-link:hsl(217, 71%, 53%);
+$has-background-dark: hsl(0, 0%, 21%);
+$has-background-grey: hsl(0, 0%, 29%);
+$has-background-grey-dark: hsl(0, 0%, 29%);
+$has-background-grey-darker: hsl(0, 0%, 21%);
+$has-background-black-ter:hsl(0, 0%, 14%);
+
+$has-text-grey:hsl(0, 0%, 48%);
+$has-text-light:hsl(0, 0%, 96%);
+$has-text-white: hsl(0, 0%, 100%);
+$has-text-primary: hsl(171, 100%, 41%);
+
+$has-text-purple: hsl(283, 44%, 68%);
+$has-text-yellow: hsl(34, 85%, 60%); //hsl(41, 67%, 63%);
+$has-text-danger:	hsl(348, 100%, 61%);
+
+
+// iconbar-left
+$mbl-background: $has-background-grey-dark;
+$mbl-hover: $has-text-light;
+$mbl-active: $has-text-light;
+$mbl-inactive: $has-text-grey;
+
+// explorer general
+$exp-header-text: '';
+$exp-header-text-color: '';
+$exp-header-text-color-hover: '';
+$exp-content-text: '';
+$exp-content-text-color: '';
+$exp-content-text-color-hover: '';
+$exp-content-text-color-active: '';
+
+// explorer search bar
+$exp-sb-highlight-color-active: '';
+$exp-sb-highlight-color-inactive: '';
+
+// explorer search result
+$exp-sr-text-color: '';
+$exp-sr-highlight-color-hover: '';
+$exp-sr-highlight-color-active: '';
+
+// create bar
+$exp-cr-highlight-color-active: '';
+$exp-cr-highlight-color-inactive: '';
+$exp-cr-type-text-color: '';
+$exp-cr-type-button-color-hover: '';
+$exp-cr-type-button-color-inactive: '';
+$exp-cr-error-notification: '';
+$exp-cr-error-notification-color: '';
+
+//editor-tabs
+$ed-tabs-active-color: '';
+$ed-tabs-inactive-color: '';
+$ed-tabs-hover-color: '';
+
+// dt editor
+$edt-toolbar-color-inactive: $has-text-grey;
+$edt-toolbar-color-active: $has-text-light;
+$edt-toolbar-color-hover: $has-text-light;
+$edt-editbar-background-color: transparent;
+$edt-editbar-border-color-inactive: transparent;
+
+/*
+Editor-icon-color:
+Editor-active-icon-color:
+Editor-inactive-icon-color:
+editor-hover-icon-color:
+
+editor-line:
+line-vertical-highlight:
+line-number-color:
+line-function-description:
+line-function-underline-color
+line-content-description:
+Line-content-underline-color:
+
+Editor-drop-down
+Editor-drop-down-color:
+Editor-drop-down-text-color:
+editor-line-vertical-highlight:
+
+status-bar: 
+status-bar-icon-color:
+status-bar-color:
+Status-bar-unsaved-changes-color:
+
+decision-table
+Table-header
+conditions-outcomes-text-color:
+column-text-a-color
+column-text-b-color:
+column-hover-color:
+*/

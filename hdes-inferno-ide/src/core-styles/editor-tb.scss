@@ -1,0 +1,51 @@
+@charset 'utf-8';
+
+
+.editor-tb {
+  margin-bottom: 1px !important;
+  background-color: $has-background-grey;
+
+  ul {
+    border-bottom: unset;
+    li {
+      a {
+        color: $has-text-grey;
+        border-radius: 0px !important;
+        background-color: $has-background-grey-dark;
+        border-right: 1px solid $has-background-black-ter !important;
+      }
+    }
+    .is-close {
+      visibility: hidden;
+      background-color: transparent;
+    }
+    .is-type {
+      font-weight: bolder;
+      font-size: small;
+    }
+
+    .is-active {
+      a {
+        border-color: transparent !important;
+        background-color: $has-background-black-ter !important;
+        color: $has-text-light !important;
+      }
+      .is-close {
+        visibility: unset;
+      }
+    }
+    
+    a:hover {
+      background-color: transparent !important;
+      color: $has-text-light !important;
+      .is-close {
+        visibility: unset;
+      }
+    }
+    li:last-child {
+      a {
+        border-right: none !important;
+      }
+    }
+  }
+}

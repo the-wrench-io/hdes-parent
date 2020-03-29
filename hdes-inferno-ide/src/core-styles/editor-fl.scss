@@ -1,0 +1,136 @@
+@charset 'utf-8';
+
+
+
+.flow-editor {
+  @extend .basic-editor;
+
+  .is-editor {
+    .field-label, .input {
+      padding-top: unset;
+    }
+    .line {
+      line-height: 1.2rem;
+    }
+    a {
+      margin-left: 3px;
+    }
+    a:hover {
+      background-color: transparent;
+      margin-left: 0px;
+      border-left: 3px solid $has-text-purple;
+    }
+
+    .line-id {
+      margin-right: 0.5rem;
+      padding-left: 20px;
+      text-align: right;
+      flex-grow: unset;
+  
+      label {
+        color: $has-text-grey;
+        width: 20px;
+      }
+    }
+
+    .line-keyword {
+      flex-grow: unset;
+      margin-right: 0.5rem;
+      label {
+        color: $has-text-purple;
+        white-space: nowrap;
+        text-align: left;
+        vertical-align: unset;
+      }
+    }
+  
+    .line-keyword-edit {
+      flex-grow: unset;
+      margin-right: 0.5rem;
+      label {
+        color: $has-text-purple;
+      }
+      .content {
+        white-space: nowrap;
+        display: inline;
+        color: $has-text-purple;
+        line-height: unset;
+        padding-bottom: unset;
+        outline: none;
+        border: transparent;
+        background-color: transparent;
+        text-align: left;
+        vertical-align: unset;
+        border-bottom: 1px solid transparent;
+        cursor: text;
+      }
+      .content:hover, .content:focus, .content:active {
+        border-bottom: 1px solid $has-text-purple;
+      }
+    }
+  
+    .line-value {
+      outline: none;
+    
+      input {
+        color: $has-text-yellow;
+        height: unset;
+        line-height: unset;
+        padding-bottom: unset;
+        outline: none;
+        border: transparent;
+        background-color: transparent;
+        text-align: left;
+        border-bottom: 1px solid transparent;
+      }
+  
+      :hover, :focus, :active {
+        border-bottom: 1px solid $has-text-yellow;
+      }
+    }
+    .line-dropdown {
+      outline: none;
+      .button, .dropdown-trigger {
+        color: $has-text-yellow;
+        height: unset;
+        line-height: unset;
+        padding-top: unset;
+        padding-bottom: unset;
+        outline: none;
+        border: transparent;
+        box-shadow: none;
+        background-color: transparent;
+        border-bottom: 1px solid transparent;
+      }
+      .dropdown-content {
+        background-color: $has-background-grey;
+        
+        .dropdown-item {
+          color: $has-text-yellow; 
+        }
+      }
+      .dropdown-trigger:hover, .dropdown-trigger:focus, .dropdown-trigger:active {
+        border-bottom: 1px solid $has-text-yellow;
+      }
+    }
+  
+    .line-indent-2 {
+      margin-left: 1rem;
+    }
+    .line-indent-4 {
+      margin-left: 2rem;
+    }
+    .line-indent-6 {
+      margin-left: 2rem;
+    }
+    .line-indent-8 {
+      margin-left: 3rem;
+    }
+    .line-indent-10 {
+      margin-left: 4rem;
+    }
+    .line-indent-12 {
+      margin-left: 5rem;
+    }
+  }
+}
