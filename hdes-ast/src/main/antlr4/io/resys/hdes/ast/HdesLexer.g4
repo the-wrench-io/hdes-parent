@@ -4,10 +4,13 @@ ObjectDataType: OBJECT | ARRAY;
 DirectionType: IN | OUT;
 HitPolicyType: ALL | FIRST;
 RequiredType: REQUIRED | OPTIONAL;
+DropDownType: DROP_DOWN_SINGLE | DROP_DOWN_MULTIPLE; 
+StatementType: SHOW | HIDE | ALERT;
+
 DataType
-  : ScalarTypes
+  : ScalarType
   | ObjectDataType;
-ScalarTypes
+ScalarType
   : INTEGER
   | DECIMAL
   | DATE_TIME
@@ -20,7 +23,7 @@ TaskType
   | FLOW_TASK 
   | DT_TASK
   | ST_TASK;
-  
+
 // BETWEEN/AND/OR operators
 BETWEEN: B E T W E E N;
 AND: A N D;
@@ -62,6 +65,17 @@ FIRST: 'FIRST';
 IN: 'IN';
 OUT: 'OUT';
 
+// MANUAL TASK
+CLASS: 'class';
+EXPRESSION: 'expression';
+DROP_DOWN_SINGLE: 'selectOne';
+DROP_DOWN_MULTIPLE: 'selectMultiple'; 
+SHOW: 'SHOW';
+HIDE: 'HIDE';
+ALERT: 'ALERT';
+STATEMENTS: 'statements';
+MESSAGE: 'message';
+
 // FLOW
 INPUTS: 'inputs';
 TASKS: 'tasks';
@@ -71,7 +85,6 @@ OPTIONAL: 'optional';
 MAPPING: 'mapping';
 WHEN: 'when';
 THEN: 'then';
-
 
 // MARKS
 QUESTION_MARK: '?';
@@ -130,8 +143,10 @@ fragment Escape: '\\' [btnfr"'\\];
 
 // naming convention
 Identifier: Letters LettersAndDigits*;
+CssIdentifier: Letters LettersAndDigits* Dash*;
 fragment Letters: [a-zA-Z$_];
 fragment LettersAndDigits: [a-zA-Z0-9$_];
+fragment Dash: '-'+;
 
 // comments and white spaces
 WHITE_SPACE : [ \t\r\n\u000C]+ -> channel(HIDDEN);
