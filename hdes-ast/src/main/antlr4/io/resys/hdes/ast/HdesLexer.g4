@@ -1,24 +1,40 @@
 lexer grammar HdesLexer;
 
-
 ObjectDataType: OBJECT | ARRAY;
-
+DirectionType: IN | OUT;
+HitPolicyType: ALL | FIRST;
+RequiredType: REQUIRED | OPTIONAL;
 DataType
   : ScalarTypes
   | ObjectDataType;
-
 ScalarTypes
   : INTEGER
   | DECIMAL
   | DATE_TIME
+  | DATE
+  | TIME
   | STRING
   | BOOLEAN;
-
 TaskType
   : MANUAL_TASK
   | FLOW_TASK 
   | DT_TASK
   | ST_TASK;
+  
+// BETWEEN/AND/OR operators
+BETWEEN: B E T W E E N;
+AND: A N D;
+OR: O R;
+fragment A : [aA];
+fragment B : [bB];
+fragment D : [dD];
+fragment E : [eE];
+fragment N : [nN];
+fragment O : [oO];
+fragment R : [rR];
+fragment T : [tT];
+fragment W : [wW];
+  
 
 MANUAL_TASK: 'manualTask';
 FLOW_TASK: 'flowTask';
@@ -29,30 +45,62 @@ INTEGER: 'INTEGER';
 DECIMAL: 'DECIMAL';
 DATE_TIME: 'DATE_TIME';
 DATE: 'DATE';
+TIME: 'TIME';
 STRING: 'STRING';
 BOOLEAN: 'BOOLEAN';
 OBJECT: 'OBJECT';
 ARRAY: 'ARRAY';
-TIME: 'TIME';
-
-
-COLON: ':';
-SEMICOLON: ';';
-DOT: '.';
 
 ID: 'id';
 DESC: 'description';
+
+// DT
+HEADERS: 'headers';
+VALUES: 'values';
+ALL: 'ALL';
+FIRST: 'FIRST';
+IN: 'IN';
+OUT: 'OUT';
+
+// FLOW
 INPUTS: 'inputs';
 TASKS: 'tasks';
 DEBUG_VALUE: 'debugValue';
 REQUIRED: 'required';
+OPTIONAL: 'optional';
 MAPPING: 'mapping';
 WHEN: 'when';
 THEN: 'then';
 
+
+// MARKS
+QUESTION_MARK: '?';
+COLON: ':';
+DOT: '.';
+COMMA: ',';
+NOT: '!';
+
+// BLOCKS
+PARENTHESES_START: '(';
+PARENTHESES_END: ')';
 BLOCK_START: '{';
 BLOCK_END: '}';
 
+// mathematical operators
+ADD: '+';
+SUBTRACT: '-';
+MULTIPLY: '*';
+DIVIDE: '/';
+INCREMENT: '++';
+DECREMENT: '--';
+
+// equality operators
+EQ_NOTEQUAL: '!=';
+EQ_EQUAL: '=';
+EQ_LESS: '<';
+EQ_LESS_THEN: '<=';
+EQ_GREATER: '>';
+EQ_GREATER_THEN: '>=';
 
 // integer literal
 IntegerLiteral: '0' | NonZeroDigit (Digits? | Underscores Digits);
@@ -84,7 +132,6 @@ fragment Escape: '\\' [btnfr"'\\];
 Identifier: Letters LettersAndDigits*;
 fragment Letters: [a-zA-Z$_];
 fragment LettersAndDigits: [a-zA-Z0-9$_];
-
 
 // comments and white spaces
 WHITE_SPACE : [ \t\r\n\u000C]+ -> channel(HIDDEN);
