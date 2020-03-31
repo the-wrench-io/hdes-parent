@@ -67,7 +67,6 @@ OUT: 'OUT';
 
 // MANUAL TASK
 CLASS: 'class';
-EXPRESSION: 'expression';
 DROP_DOWN_SINGLE: 'selectOne';
 DROP_DOWN_MULTIPLE: 'selectMultiple'; 
 SHOW: 'SHOW';
@@ -75,6 +74,7 @@ HIDE: 'HIDE';
 ALERT: 'ALERT';
 STATEMENTS: 'statements';
 MESSAGE: 'message';
+DEFAULT_VALUE: 'defaultValue';
 
 // FLOW
 INPUTS: 'inputs';
