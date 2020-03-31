@@ -7,16 +7,17 @@ literal
   | BooleanLiteral
   | StringLiteral;
   
-id: 'id' ':' typeName;
-description: 'description' ':' literal;
-typeName: Identifier | typeName '.' Identifier;
-hitPolicy: HitPolicyType;
-
 dt: id hitPolicy description? headers values EOF;
 
-headers: 'headers' ':' '{' (',' header)* '}';
-values: 'values' ':' '{' (',' value)* '}';
+headers: 'headers' ':' '{' headerArgs? '}';
+headerArgs: header (',' header)*;
+values: 'values' ':' '{' valuesArgs? '}';
+valuesArgs: value (',' value)*;
 
 header: DirectionType ScalarTypes typeName;
 value: literal;
 
+id: 'id' ':' typeName;
+description: 'description' ':' literal;
+typeName: Identifier | typeName '.' Identifier;
+hitPolicy: HitPolicyType;
