@@ -1,16 +1,18 @@
-lexer grammar FlowLexer;
+lexer grammar HdesLexer;
 
 
-MappingDataType: OBJECT | ARRAY;
+ObjectDataType: OBJECT | ARRAY;
 
 DataType
+  : ScalarTypes
+  | ObjectDataType;
+
+ScalarTypes
   : INTEGER
   | DECIMAL
   | DATE_TIME
   | STRING
-  | BOOLEAN
-  | TIME
-  | MappingDataType;
+  | BOOLEAN;
 
 TaskType
   : MANUAL_TASK

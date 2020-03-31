@@ -33,196 +33,173 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.ast.spi.flow.visitors.FlowParserConsoleVisitor;
 
 public class TestFlowAstNodeTest {
-
   @Test
   public void basic() throws IOException {
     parse("id: x description: 'very descriptive value' inputs: {} tasks: {}");
   }
-  
+
   @Test
   public void inputs() throws IOException {
     parse(
-        "id: x\n"+ 
-        "description: 'very descriptive value'\n" + 
-        "inputs: {\n "
-        + "INTEGER arg1.x1\n"
-        + "required INTEGER arg2.x1 debugValue: 10_1000\n" +
-        "}\n" + 
-        "tasks: {" +
-        "}\n"
-        );
+        "id: x\n" +
+            "description: 'very descriptive value'\n" +
+            "inputs: {\n "
+            + "INTEGER arg1.x1\n"
+            + "required INTEGER arg2.x1 debugValue: 10_1000\n" +
+            "}\n" +
+            "tasks: {" +
+            "}\n");
   }
-  
+
   @Test
   public void taskWhenThen() throws IOException {
     parse(
-        "id: x\n"+ 
-        "description: 'descriptive ' \n" + 
-        "inputs: {\n "
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {"
-           + "when: 'arg2.x1 > 10' then: nextTask"
-         +"} " +
-        "}\n"
-        );
+        "id: x\n" +
+            "description: 'descriptive ' \n" +
+            "inputs: {\n "
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {"
+            + "when: 'arg2.x1 > 10' then: nextTask"
+            + "} " +
+            "}\n");
   }
-  
+
   @Test
   public void taskThen() throws IOException {
-    
-    //"if 'xx >= 20' then: end\n" +
-    //"if 'xx < 20' then: secondTask\n" +
-    //"ARRAY \n" +
-    //"then: taskTwo\n" +
-    //"if '10 < x' then: taskTwo\n" + 
-   // "mapping: {\n" +
-    //  "name: arg1.x1\n" + 
-    //  "second: arg2.x1\n" + 
-   // "}\n" +
     parse(
-        "id: x\n"+ 
-        "description: 'descriptive ' \n" + 
-        "inputs: {\n "
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {"
-           + "then: nextTask"
-        + "} " +
-        "}\n"
-        );
+        "id: x\n" +
+            "description: 'descriptive ' \n" +
+            "inputs: {\n "
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {"
+            + "then: nextTask"
+            + "} " +
+            "}\n");
   }
-  
+
   @Test
   public void taskManualTask() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" + 
-        "inputs: {\n"
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {\n"
-           + "then: nextTask\n"
-           + "OBJECT manualTask: bestManualTask mapping: {}\n" 
-        + "}\n" +
-        "}\n"
-        );
+        "id: x description: 'descriptive '\n" +
+            "inputs: {\n"
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {\n"
+            + "then: nextTask\n"
+            + "OBJECT manualTask: bestManualTask mapping: {}\n"
+            + "}\n" +
+            "}\n");
   }
-  
-  
+
   @Test
   public void taskServiceTask() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" + 
-        "inputs: {\n"
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {\n"
-           + "then: nextTask\n"
-           + "OBJECT serviceTask: bestServiceTask mapping: {} \n" 
-        + "}\n" +
-        "}\n"
-        );
+        "id: x description: 'descriptive '\n" +
+            "inputs: {\n"
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {\n"
+            + "then: nextTask\n"
+            + "OBJECT serviceTask: bestServiceTask mapping: {} \n"
+            + "}\n" +
+            "}\n");
   }
+
   @Test
   public void taskFlowTask() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" + 
-        "inputs: {\n"
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {\n"
-           + "then: nextTask\n"
-           + "OBJECT flowTask: bestFlowTask mapping: {} \n" 
-        + "}\n" +
-        "}\n"
-        );
-  }  
-  
+        "id: x description: 'descriptive '\n" +
+            "inputs: {\n"
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {\n"
+            + "then: nextTask\n"
+            + "OBJECT flowTask: bestFlowTask mapping: {} \n"
+            + "}\n" +
+            "}\n");
+  }
+
   @Test
   public void taskDT() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" + 
-        "inputs: {\n"
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {\n"
-           + "then: nextTask\n"
-           + "OBJECT decisionTask: bestDtTask mapping: {} \n" 
-        + "}\n" +
-        "}\n"
-        );
-  }  
-  
+        "id: x description: 'descriptive '\n" +
+            "inputs: {\n"
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {\n"
+            + "then: nextTask\n"
+            + "OBJECT decisionTask: bestDtTask mapping: {} \n"
+            + "}\n" +
+            "}\n");
+  }
+
   @Test
   public void taskDTArray() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" + 
-        "inputs: {\n"
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {\n"
-           + "then: nextTask\n"
-           + "ARRAY decisionTask: bestDtTask mapping: {} \n"
-           + "  \n"
-        + "}\n" +
-        "}\n"
-        );
+        "id: x description: 'descriptive '\n" +
+            "inputs: {\n"
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {\n"
+            + "then: nextTask\n"
+            + "ARRAY decisionTask: bestDtTask mapping: {} \n"
+            + "  \n"
+            + "}\n" +
+            "}\n");
   }
 
   @Test
   public void mapping() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" + 
-        "inputs: {\n"
-        + "INTEGER arg1.x1\n"
-        + "INTEGER arg2.x1\n" +
-        "}\n" + 
-        "tasks: {\n" +
-          "firstTask: {\n"
-           + "then: nextTask\n"
-           + "ARRAY decisionTask: bestDtTask mapping: {\n"
-             +  "input1: arg1.x1\n"
-             +  "input2: arg2.x1\n"
-           + "} \n"
-        + "}\n" +
-        "}\n"
-        );
+        "id: x description: 'descriptive '\n" +
+            "inputs: {\n"
+            + "INTEGER arg1.x1\n"
+            + "INTEGER arg2.x1\n" +
+            "}\n" +
+            "tasks: {\n" +
+            "firstTask: {\n"
+            + "then: nextTask\n"
+            + "ARRAY decisionTask: bestDtTask mapping: {\n"
+            + "input1: arg1.x1\n"
+            + "input2: arg2.x1\n"
+            + "} \n"
+            + "}\n" +
+            "}\n");
   }
-  
+
   public void parse(String value) {
-    FlowLexer lexer = new FlowLexer(CharStreams.fromString(value));
+    HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    
     FlowParser parser = new FlowParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.flow();
     tree.accept(new FlowParserConsoleVisitor());
-    
   }
-  
+
   public static class ErrorListener extends BaseErrorListener {
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer,
-                Object offendingSymbol,
-                int line,
-                int charPositionInLine,
-                String msg,
-                RecognitionException e)
-    {
+        Object offendingSymbol,
+        int line,
+        int charPositionInLine,
+        String msg,
+        RecognitionException e) {
       String error = "line " + line + ":" + charPositionInLine + " " + msg;
       throw new IllegalArgumentException(error);
     }

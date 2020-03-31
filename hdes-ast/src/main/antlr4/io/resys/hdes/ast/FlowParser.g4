@@ -1,5 +1,5 @@
 parser grammar FlowParser;
-options { tokenVocab = FlowLexer; }
+options { tokenVocab = HdesLexer; }
 
 literal
   : IntegerLiteral
@@ -20,7 +20,7 @@ conditionalThen: whenThen* | then;
 whenThen: 'when' ':' StringLiteral then; 
 then: 'then' ':' typeName taskRef?;
 
-taskRef: MappingDataType TaskType ':' typeName mapping;
+taskRef: ObjectDataType TaskType ':' typeName mapping;
 mapping: 'mapping' ':' '{' mappingArg* '}';
 mappingArg: typeName ':' mappingValue;
 mappingValue: typeName | literal;
