@@ -40,10 +40,10 @@ BooleanLiteral: 'true' | 'false' ;
 // string literal
 StringLiteral: '"' Characters? '"' | '\'' Characters? '\'';
 fragment Characters: Character+;
-fragment Character: ~["\\] | Escape;
+fragment Character: ~["\\] | ESC_SEQ;
 
 // things to escape
-fragment Escape: '\\' [btnfr"'\\];
+fragment ESC_SEQ: '\\' [btnfr"'\\];
 
 // separators
 PARENTHESES_START: '(';
@@ -55,7 +55,6 @@ COLON: ':';
 COMMA: ',';
 DOT: '.';
 NOT: '!';
-TIME: 'T';
 
 EQ_NOTEQUAL: '!=';
 EQ_EQUAL: '=';
