@@ -1,4 +1,4 @@
-package io.resys.hdes.ast.spi.flow.visitors;
+package io.resys.hdes.ast.spi.visitors;
 
 /*-
  * #%L

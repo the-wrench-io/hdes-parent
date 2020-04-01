@@ -37,10 +37,6 @@ public interface AstNode {
     int getLine();
     int getCol();
   }
-
-  interface Envir {
-    
-  }
   
   enum NodeDataType {
     STRING, INTEGER, BOOLEAN, DECIMAL,

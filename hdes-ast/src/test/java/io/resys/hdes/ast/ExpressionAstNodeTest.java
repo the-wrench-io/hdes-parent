@@ -30,7 +30,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.ast.spi.flow.visitors.ExpressionParserConsoleVisitor;
+import io.resys.hdes.ast.spi.visitors.ExpressionParserConsoleVisitor;
 
 public class ExpressionAstNodeTest {
   @Test
