@@ -38,6 +38,10 @@ public interface AstNode {
     int getCol();
   }
 
+  interface Envir {
+    
+  }
+  
   enum NodeDataType {
     STRING, INTEGER, BOOLEAN, DECIMAL,
     DATE, DATE_TIME, TIME,
