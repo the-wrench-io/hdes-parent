@@ -30,7 +30,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.ast.spi.flow.visitors.FlowParserConsoleVisitor;
+import io.resys.hdes.ast.spi.flow.visitors.DtParserConsoleVisitor;
 
 public class DtAstNodeTest {
   @Test
@@ -83,7 +83,7 @@ public class DtAstNodeTest {
     DecisionTableParser parser = new DecisionTableParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.dt();
-    tree.accept(new FlowParserConsoleVisitor());
+    tree.accept(new DtParserConsoleVisitor());
   }
 
   public static class ErrorListener extends BaseErrorListener {
