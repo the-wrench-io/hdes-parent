@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.ast.spi.flow.visitors.FlowParserConsoleVisitor;
 
 public class DtAstNodeTest {
- // @Test
+  @Test
   public void basic() throws IOException {
     parse("id: basic "
         + "description: 'very descriptive DT' "
