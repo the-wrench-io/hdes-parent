@@ -1,5 +1,7 @@
 package io.resys.hdes.ast.api.nodes;
 
+import java.util.List;
+
 /*-
  * #%L
  * hdes-ast
@@ -22,6 +24,49 @@ package io.resys.hdes.ast.api.nodes;
 
 import org.immutables.value.Value;
 
-@Value.Immutable
 public interface DecisionTableNode extends AstNode {
+  
+  enum HitPolicyType { FIRST, ALL, MATRIX }
+  enum DirectionType { IN, OUT }
+  
+  interface Rule extends DecisionTableNode {
+    int getHeader();
+  }
+  
+  @Value.Immutable
+  interface DecisionTableBody extends DecisionTableNode {
+    String getId();
+    String getDescription();
+    HitPolicyType getHitPolicy();
+    List<Header> getHeaders();
+    List<Values> getValues();
+  }
+ 
+  @Value.Immutable
+  interface Header extends DecisionTableNode {
+    String getName();
+    NodeDataType getDataType();
+  }
+  
+  @Value.Immutable
+  interface Values extends DecisionTableNode {
+    int getPosition();
+    List<Rule> getRules();
+  }
+  
+  @Value.Immutable
+  interface UndefinedRule extends Rule {
+    
+  }
+  
+  @Value.Immutable
+  interface LiteralRule extends Rule {
+    String getValue();
+  }
+  
+  @Value.Immutable
+  interface ExpressionRule extends Rule {
+    String getValue();
+    ExpressionNode getExpression();
+  }
 }

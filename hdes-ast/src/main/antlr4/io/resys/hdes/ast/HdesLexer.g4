@@ -5,7 +5,7 @@ DirectionType: IN | OUT;
 HitPolicyType: ALL | FIRST | MATRIX;
 RequiredType: REQUIRED | OPTIONAL;
 DropDownType: DROP_DOWN_SINGLE | DROP_DOWN_MULTIPLE; 
-StatementType: SHOW | HIDE | ALERT;
+StatementType: SHOW | HIDE | ALERT | EVALUATE;
 
 ScalarType
   : INTEGER
@@ -71,8 +71,10 @@ DROP_DOWN_MULTIPLE: 'selectMultiple';
 SHOW: 'SHOW';
 HIDE: 'HIDE';
 ALERT: 'ALERT';
+EVALUATE: 'EVALUATE';
 STATEMENTS: 'statements';
 MESSAGE: 'message';
+EXPRESSION: 'expression';
 FORM: 'form';
 GROUPS: 'groups';
 FIELDS: 'fields';

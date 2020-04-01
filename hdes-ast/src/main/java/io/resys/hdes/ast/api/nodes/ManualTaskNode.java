@@ -20,8 +20,85 @@ package io.resys.hdes.ast.api.nodes;
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
+
 import org.immutables.value.Value;
 
-@Value.Immutable
 public interface ManualTaskNode extends AstNode {
+  
+  enum StatementType { SHOW, HIDE, ALERT, EVALUATE }
+  
+  interface FormBody extends ManualTaskNode {}
+  
+  interface ManualTaskDataType extends ManualTaskNode {
+    Boolean getRequired();
+    NodeDataType getDataType();
+    String getName();
+  }
+
+  @Value.Immutable
+  interface ManualTaskInput extends ManualTaskNode {
+    ManualTaskDataType getType();
+  }
+  
+  @Value.Immutable
+  interface ManualTaskBody extends ManualTaskNode {
+    String getId();
+    String getDescription();
+    List<ManualTaskInput> getInputs();
+    List<Statement> getStatement();
+    Form getForm();
+  }
+  
+  @Value.Immutable
+  interface Statement extends ManualTaskNode {
+    WhenStatement getWhen();
+    ThenStatement getThen();
+  }
+  
+  @Value.Immutable
+  interface WhenStatement extends ManualTaskNode {
+    String getValue();
+    AstNode getExpression();
+  }
+  
+  @Value.Immutable
+  interface ThenStatement extends ManualTaskNode {
+    Optional<String> getMessage();
+    Optional<AstNode> getExpression();
+    StatementType getType();
+  }
+  
+  @Value.Immutable
+  interface Form extends ManualTaskNode {
+    FormBody getValue();
+  }
+  
+  @Value.Immutable
+  interface Groups extends FormBody {
+    String getId();
+    List<FormBody> getValues();
+  }
+  
+  @Value.Immutable
+  interface Fields extends FormBody {
+    List<FormField> getValues();
+  }
+  
+  interface FormField extends ManualTaskNode {
+    ManualTaskDataType getType();
+    String getDefaultValue();
+    List<String> getCssClasses();
+  }
+  
+  @Value.Immutable
+  interface DropDownField extends FormField {
+    Boolean getMultiple();
+  }
+  
+  @Value.Immutable
+  interface LiteralField extends FormField {
+    
+  }
 }

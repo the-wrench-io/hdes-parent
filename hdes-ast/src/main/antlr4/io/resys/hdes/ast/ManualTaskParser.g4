@@ -31,10 +31,10 @@ cssClassArgs: CssIdentifier (',' CssIdentifier)*;
 
 statements: 'statements' ':' '{' statementsArgs? '}';
 statementsArgs: statement (',' statement)*;
-statement: typeName ':' '{' when then message '}';
+statement: typeName ':' '{' when then '}';
 
 when: 'when' ':' StringLiteral;
-then: 'then' ':' StatementType;
+then: 'then' ':' StatementType (('expression' ':' StringLiteral) | message)?;
 message: 'message' ':' StringLiteral;
 
 id: 'id' ':' typeName;
