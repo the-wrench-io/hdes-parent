@@ -29,7 +29,6 @@ import io.resys.hdes.ast.ManualTaskParser.DefaultValueContext;
 import io.resys.hdes.ast.ManualTaskParser.DescriptionContext;
 import io.resys.hdes.ast.ManualTaskParser.FieldContext;
 import io.resys.hdes.ast.ManualTaskParser.FieldsContext;
-import io.resys.hdes.ast.ManualTaskParser.GroupContext;
 import io.resys.hdes.ast.ManualTaskParser.GroupsContext;
 import io.resys.hdes.ast.ManualTaskParser.IdContext;
 import io.resys.hdes.ast.ManualTaskParser.InputArgsContext;
@@ -83,12 +82,6 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
   public AstNode visitGroups(GroupsContext ctx) {
     log(ctx);
     return super.visitGroups(ctx);
-  }
-
-  @Override
-  public AstNode visitGroup(GroupContext ctx) {
-    log(ctx);
-    return super.visitGroup(ctx);
   }
 
   @Override

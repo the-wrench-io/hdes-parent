@@ -38,9 +38,33 @@ public class ManualTaskNodeTest {
     parse("id: basic \n"
         + "description: 'very descriptive manual task' \n"
         + "inputs: {} \n"
-        + "groups: {} \n"); 
+        + "statements: {} \n"
+        + "form: { } \n"); 
   }
 
+  @Test
+  public void fields() throws IOException {
+    parse("id: basic \n"
+        + "description: 'very descriptive manual task' \n"
+        + "inputs: {} \n"
+        + "statements: {} \n"
+        + "form: { fields: { } }"); 
+  }
+  @Test
+  public void nestedGroups() throws IOException {
+    parse("id: basic \n"
+        + "description: 'very descriptive manual task' \n"
+        + "inputs: {} \n"
+        + "statements: {} \n"
+        + "form: {\n"
+        +   "groups: {\n"
+        +     "{id: cars fields: {}},\n"
+        +     "{id: boats fields: {}},\n"
+        +     "{id: soups groups: {}}\n"
+        +   "} \n"
+        + "} \n"); 
+  }
+  
   
   public void parse(String value) {
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));

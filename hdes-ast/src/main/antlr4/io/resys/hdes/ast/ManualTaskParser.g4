@@ -10,23 +10,27 @@ dataType
   : ObjectDataType
   | ScalarType;
   
-mt: id description? inputs groups EOF;
+mt: id description? inputs statements form EOF;
 
 inputs: 'inputs' ':' '{' inputArgs? '}';
 inputArgs: input (',' input)*;
 
+form: 'form' ':' '{' (groups | fields)? '}';
 groups: 'groups' ':' '{' groupArgs? '}';
 groupArgs: group (',' group)*;
-group: typeName ':' '{' (groups | fields)? '}';
+group: '{' id (fields | groups)? '}';
 
 fields: 'fields' ':' '{' fieldArgs? '}';
 fieldArgs: field (',' field)*;
+
+
 field: typeName ':' '{' props '}';
 props: input DropDownType? defaultValue? cssClass?;
 cssClass: 'class' ':' '{' cssClassArgs? '}';
 cssClassArgs: CssIdentifier (',' CssIdentifier)*;
 
-statements: 'statements' ':' '{' statement (',' statement)* '}';
+statements: 'statements' ':' '{' statementsArgs? '}';
+statementsArgs: statement (',' statement)*;
 statement: typeName ':' '{' when then message '}';
 
 when: 'when' ':' StringLiteral;

@@ -73,6 +73,7 @@ HIDE: 'HIDE';
 ALERT: 'ALERT';
 STATEMENTS: 'statements';
 MESSAGE: 'message';
+FORM: 'form';
 GROUPS: 'groups';
 FIELDS: 'fields';
 DEFAULT_VALUE: 'defaultValue';
