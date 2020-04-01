@@ -174,15 +174,24 @@ public class TestFlowAstNodeTest {
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
             "tasks: {\n" +
+            
             "firstTask: {\n"
-            + "then: nextTask\n"
+            + "then: endTask\n"
             + "ARRAY decisionTask: bestDtTask \n"
             + "mapping: {\n"
               + "input1: arg1.x1,\n"
               + "input2: arg2.x1\n"
-            + "} \n"
-            + "}\n" +
-            "}\n");
+            + "}\n"
+          + "},\n" + 
+
+          "endTask: {\n"
+          + "END mapping: {\n"
+            + "input1: arg1.x1,\n"
+            + "input2: arg2.x1\n"
+          + "}\n"
+        + "}\n"
+          
+        + "}\n");
   }
 
   public void parse(String value) {

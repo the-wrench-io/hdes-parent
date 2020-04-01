@@ -33,22 +33,33 @@ public interface FlowNode extends AstNode {
     TaskBody getBody();
   }
   
+  /**
+   * Task bodies based on types
+   */
   @Value.Immutable
   interface SwitchBody extends TaskBody {
     List<WhenThen> getValue();
   }
-  
   @Value.Immutable
-  interface WhenThen extends TaskBody {
-    ExpressionNode getWhen();
+  interface EmptyTaskBody extends TaskBody {
+    Then getThen();
+  }
+  @Value.Immutable
+  interface RefTaskBody extends TaskBody {
+    RefNode getRef();
+    List<Mapping> getMapping();
     Then getThen();
   }
   
   @Value.Immutable
-  interface RefTaskBody extends TaskBody {
-    RefTaskType getType();
-    String getRef();
+  interface EndTaskBody extends TaskBody {
     List<Mapping> getMapping();
+  }
+  
+  
+  @Value.Immutable
+  interface WhenThen extends FlowNode {
+    ExpressionNode getWhen();
     Then getThen();
   }
   
@@ -61,5 +72,12 @@ public interface FlowNode extends AstNode {
   interface Mapping extends FlowNode {
     String getLeft();
     String getRight();
+  }
+
+  @Value.Immutable
+  interface RefNode extends FlowNode {
+    RefTaskType getType();
+    String getName();
+    AstNode getValue();
   }
 }

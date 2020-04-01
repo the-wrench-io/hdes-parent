@@ -85,6 +85,7 @@ OPTIONAL: 'optional';
 MAPPING: 'mapping';
 WHEN: 'when';
 THEN: 'then';
+END: 'END';
 
 // MARKS
 QUESTION_MARK: '?';

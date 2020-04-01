@@ -16,10 +16,10 @@ tasks: 'tasks' ':' '{' taskArgs? '}';
 taskArgs: task (',' task)*;
 taskBody: conditionalThen;
 
-conditionalThen: whenThenArgs | then;
+conditionalThen: whenThenArgs | then | endMapping;
 whenThenArgs: whenThen (',' whenThen)*;
 whenThen: 'when' ':' StringLiteral then; 
-then: 'then' ':' typeName taskRef?;
+then: 'then' ':' typeName ('END' | taskRef)?;
 
 taskRef: ObjectDataType TaskType ':' typeName mapping;
 mapping: 'mapping' ':' '{' mappingArgs? '}';
@@ -33,4 +33,6 @@ debugValue: 'debugValue' ':' literal;
 task: typeName ':' '{' taskBody? '}';
 mappingArg: typeName ':' mappingValue;
 mappingValue: typeName | literal;
+endMapping: 'END' mapping;
+
 
