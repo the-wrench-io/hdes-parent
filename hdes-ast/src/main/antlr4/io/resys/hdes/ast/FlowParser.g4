@@ -16,7 +16,8 @@ tasks: 'tasks' ':' '{' taskArgs? '}';
 taskArgs: task (',' task)*;
 taskBody: conditionalThen;
 
-conditionalThen: whenThen* | then;
+conditionalThen: whenThenArgs | then;
+whenThenArgs: whenThen (',' whenThen)*;
 whenThen: 'when' ':' StringLiteral then; 
 then: 'then' ':' typeName taskRef?;
 

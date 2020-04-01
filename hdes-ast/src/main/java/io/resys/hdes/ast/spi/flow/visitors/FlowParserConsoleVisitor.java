@@ -36,8 +36,8 @@ import io.resys.hdes.ast.FlowParser.TaskRefContext;
 import io.resys.hdes.ast.FlowParser.ThenContext;
 import io.resys.hdes.ast.FlowParser.TypeNameContext;
 import io.resys.hdes.ast.FlowParser.WhenThenContext;
+import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.FlowParserBaseVisitor;
-import io.resys.hdes.ast.api.AstNode;
 
 public class FlowParserConsoleVisitor extends FlowParserBaseVisitor<AstNode> {
   @Override

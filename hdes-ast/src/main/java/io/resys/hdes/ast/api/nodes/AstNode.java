@@ -1,5 +1,4 @@
-package io.resys.hdes.ast.api;
-
+package io.resys.hdes.ast.api.nodes;
 /*-
  * #%L
  * hdes-ast
@@ -20,8 +19,27 @@ package io.resys.hdes.ast.api;
  * #L%
  */
 
+import org.immutables.value.Value;
 
 public interface AstNode {
+  Token getToken();
   
+  @Value.Immutable
+  interface ErrorNode {
+    AstNode getTarget();
+    String getMessage();
+  }
   
+  @Value.Immutable
+  interface Token {
+    int getId();
+    String getText();
+    int getLine();
+    int getCol();
+  }
+
+  enum NodeDataType {
+    STRING, INTEGER, BOOLEAN, DECIMAL,
+    DATE, DATE_TIME, TIME,
+  }
 }

@@ -62,7 +62,8 @@ public class TestFlowAstNodeTest {
             "}\n" +
             "tasks: {\n" +
             "firstTask: {"
-            + "when: 'arg2.x1 > 10' then: nextTask"
+            + "when: 'arg2.x1 > 10' then: nextTask,"
+            + "when: 'arg2.x1 < 10' then: nextTask"
             + "} " +
             "}\n");
   }

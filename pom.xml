@@ -39,6 +39,7 @@
     <immutables.version>2.8.2</immutables.version>
     <guava.version>27.0.1-jre</guava.version>
     <freemarker.version>2.3.23</freemarker.version>
+    <findbugs.version>3.0.2</findbugs.version>
 
     <auto-service.version>1.0-rc6</auto-service.version>
     <compile-testing.version>0.18</compile-testing.version>
@@ -62,8 +63,6 @@
   </properties>
 
   <build>
-
-
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -123,6 +122,12 @@
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-runtime</artifactId>
         <version>${antlr.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>jsr305</artifactId>
+        <version>${findbugs.version}</version>
       </dependency>
 
       <!-- Annotation processing -->
