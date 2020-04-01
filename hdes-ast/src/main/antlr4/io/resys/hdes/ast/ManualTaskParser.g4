@@ -15,10 +15,12 @@ mt: id description? inputs groups EOF;
 inputs: 'inputs' ':' '{' inputArgs? '}';
 inputArgs: input (',' input)*;
 
-groups: group (',' group)*;
-group: typeName ':' '{' (groups | fields) '}';
+groups: 'groups' ':' '{' groupArgs? '}';
+groupArgs: group (',' group)*;
+group: typeName ':' '{' (groups | fields)? '}';
 
-fields: field (',' field)*;
+fields: 'fields' ':' '{' fieldArgs? '}';
+fieldArgs: field (',' field)*;
 field: typeName ':' '{' props '}';
 props: input DropDownType? defaultValue? cssClass?;
 cssClass: 'class' ':' '{' cssClassArgs? '}';
