@@ -32,7 +32,6 @@ import io.resys.hdes.ast.DecisionTableParser.IdContext;
 import io.resys.hdes.ast.DecisionTableParser.LiteralContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
 import io.resys.hdes.ast.DecisionTableParser.ValueContext;
-import io.resys.hdes.ast.DecisionTableParser.ValuesContext;
 import io.resys.hdes.ast.DecisionTableParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
@@ -60,12 +59,6 @@ public class DtParserConsoleVisitor extends DecisionTableParserBaseVisitor<AstNo
   public AstNode visitHeaderArgs(HeaderArgsContext ctx) {
     log(ctx);
     return super.visitHeaderArgs(ctx);
-  }
-
-  @Override
-  public AstNode visitValues(ValuesContext ctx) {
-    log(ctx);
-    return super.visitValues(ctx);
   }
 
   @Override

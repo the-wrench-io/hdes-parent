@@ -37,41 +37,36 @@ public class DtAstNodeTest {
   public void basic() throws IOException {
     parse("id: basic "
         + "description: 'very descriptive DT' "
-        + "hitPolicy: MATRIX "
-        + "headers: {} values: {}");
+        + "headers: {} MATRIX: {}");
     
     parse("id: basic "
         + "description: 'very descriptive DT' "
-        + "hitPolicy: FIRST "
-        + "headers: {} values: {}");
+        + "headers: {} FIRST: {}");
     
     parse("id: basic "
         + "description: 'very descriptive DT' "
-        + "hitPolicy: ALL "
-        + "headers: {} values: {}");
+        + "headers: {} ALL: {}");
   }
 
   @Test
   public void headers() throws IOException {
     parse("id: basic \n"
-        + "hitPolicy: MATRIX "
         + "headers: {\n"
         +   "IN STRING name,\n "
         +   "IN STRING lastName, \n"
         +   "OUT INTEGER value \n"
-        + "} values: {\n"
+        + "} MATRIX: {\n"
         + "}");
   }
 
   @Test
   public void values() throws IOException {
     parse("id: basic \n"
-        + "hitPolicy: MATRIX "
         + "headers: {\n"
         +   "IN STRING name,\n "
         +   "IN STRING lastName, \n"
         +   "OUT INTEGER value \n"
-        + "} values: {\n"
+        + "} MATRIX: {\n"
         +   "{ ?, ?, 20 },"
         +   "{ 'bob', 'woman', 20 }"
         + "}");

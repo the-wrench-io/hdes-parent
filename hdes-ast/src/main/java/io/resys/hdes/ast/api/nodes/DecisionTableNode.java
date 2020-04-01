@@ -1,6 +1,7 @@
 package io.resys.hdes.ast.api.nodes;
 
 import java.util.List;
+import java.util.Optional;
 
 /*-
  * #%L
@@ -26,20 +27,22 @@ import org.immutables.value.Value;
 
 public interface DecisionTableNode extends AstNode {
   
-  enum HitPolicyType { FIRST, ALL, MATRIX }
   enum DirectionType { IN, OUT }
   
   interface Rule extends DecisionTableNode {
     int getHeader();
   }
   
+  interface HitPolicy extends DecisionTableNode {
+    int getPosition();
+  }
+  
   @Value.Immutable
   interface DecisionTableBody extends DecisionTableNode {
     String getId();
     String getDescription();
-    HitPolicyType getHitPolicy();
+    HitPolicy getHitPolicy();
     List<Header> getHeaders();
-    List<Values> getValues();
   }
  
   @Value.Immutable
@@ -49,8 +52,23 @@ public interface DecisionTableNode extends AstNode {
   }
   
   @Value.Immutable
-  interface Values extends DecisionTableNode {
-    int getPosition();
+  interface HitPolicyAll extends HitPolicy {
+    List<RuleRow> getRows();
+  }
+
+  @Value.Immutable
+  interface HitPolicyMatrix extends HitPolicy {
+    List<RuleRow> getRows();
+  }
+
+  @Value.Immutable
+  interface HitPolicyFirst extends HitPolicy {
+    RuleRow getValue();
+    Optional<HitPolicyFirst> getNext();
+  }
+  
+  @Value.Immutable
+  interface RuleRow extends DecisionTableNode {
     List<Rule> getRules();
   }
   

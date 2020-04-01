@@ -9,13 +9,18 @@ literal
 
 headerType: ScalarType;
 
-dt: id description? hitPolicy headers values EOF;
+dt: id description? headers hitPolicy EOF;
+
+hitPolicy: first | all | matrix;
+
+first: 'FIRST' ':' '{' rulesets? '}';
+all: 'ALL' ':' '{' rulesets? '}';
+matrix: 'MATRIX' ':' '{' rulesets? '}';
 
 headers: 'headers' ':' '{' headerArgs? '}';
 headerArgs: header (',' header)*;
 header: DirectionType headerType typeName;
 
-values: 'values' ':' '{' rulesets? '}';
 rulesets: ruleset (',' ruleset)*;
 ruleset: '{' rules? '}';
 rules: value (',' value)*;
@@ -23,5 +28,4 @@ rules: value (',' value)*;
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
 typeName: Identifier | typeName '.' Identifier;
-hitPolicy: 'hitPolicy' ':' HitPolicyType;
 value: '?' | literal;

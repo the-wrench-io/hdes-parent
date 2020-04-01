@@ -2,7 +2,6 @@ lexer grammar HdesLexer;
 
 ObjectDataType: OBJECT | ARRAY;
 DirectionType: IN | OUT;
-HitPolicyType: ALL | FIRST | MATRIX;
 RequiredType: REQUIRED | OPTIONAL;
 DropDownType: DROP_DOWN_SINGLE | DROP_DOWN_MULTIPLE; 
 StatementType: SHOW | HIDE | ALERT | EVALUATE;
@@ -56,12 +55,10 @@ DESC: 'description';
 
 // DT
 HEADERS: 'headers';
-VALUES: 'values';
-HIT_POLICY: 'hitPolicy';
-ALL: 'ALL';
-FIRST: 'FIRST';
 IN: 'IN';
 OUT: 'OUT';
+ALL: 'ALL';
+FIRST: 'FIRST';
 MATRIX: 'MATRIX';
 
 // MANUAL TASK
