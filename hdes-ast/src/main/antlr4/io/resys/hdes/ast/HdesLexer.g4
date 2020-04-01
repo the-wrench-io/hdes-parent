@@ -73,6 +73,8 @@ HIDE: 'HIDE';
 ALERT: 'ALERT';
 STATEMENTS: 'statements';
 MESSAGE: 'message';
+GROUPS: 'groups';
+FIELDS: 'fields';
 DEFAULT_VALUE: 'defaultValue';
 
 // FLOW
