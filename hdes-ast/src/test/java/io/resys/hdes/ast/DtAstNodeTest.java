@@ -72,8 +72,8 @@ public class DtAstNodeTest {
         +   "IN STRING lastName, \n"
         +   "OUT INTEGER value \n"
         + "} values: {\n"
-        +   "{ ?, ?, 20},"
-        +   "{ 'bob', 'woman', 20}"
+        +   "{ ?, ?, 20 },"
+        +   "{ 'bob', 'woman', 20 }"
         + "}");
   }
   
