@@ -2,14 +2,11 @@ lexer grammar HdesLexer;
 
 ObjectDataType: OBJECT | ARRAY;
 DirectionType: IN | OUT;
-HitPolicyType: ALL | FIRST;
+HitPolicyType: ALL | FIRST | MATRIX;
 RequiredType: REQUIRED | OPTIONAL;
 DropDownType: DROP_DOWN_SINGLE | DROP_DOWN_MULTIPLE; 
 StatementType: SHOW | HIDE | ALERT;
 
-DataType
-  : ScalarType
-  | ObjectDataType;
 ScalarType
   : INTEGER
   | DECIMAL
@@ -60,10 +57,12 @@ DESC: 'description';
 // DT
 HEADERS: 'headers';
 VALUES: 'values';
+HIT_POLICY: 'hitPolicy';
 ALL: 'ALL';
 FIRST: 'FIRST';
 IN: 'IN';
 OUT: 'OUT';
+MATRIX: 'MATRIX';
 
 // MANUAL TASK
 CLASS: 'class';

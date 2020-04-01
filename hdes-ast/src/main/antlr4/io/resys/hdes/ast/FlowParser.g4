@@ -7,6 +7,10 @@ literal
   | BooleanLiteral
   | StringLiteral;
 
+dataType
+  : ObjectDataType
+  | ScalarType;
+
 flow: id description? inputs tasks EOF;
 
 inputs: 'inputs' ':' '{' inputArgs? '}';
@@ -28,7 +32,7 @@ mappingArgs: mappingArg (',' mappingArg)*;
 typeName : Identifier | typeName '.' Identifier;
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
-input: RequiredType DataType typeName debugValue?;
+input: RequiredType dataType typeName debugValue?;
 debugValue: 'debugValue' ':' literal;
 task: typeName ':' '{' taskBody? '}';
 mappingArg: typeName ':' mappingValue;

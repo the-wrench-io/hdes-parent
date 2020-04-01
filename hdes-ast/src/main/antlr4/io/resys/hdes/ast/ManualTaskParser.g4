@@ -6,7 +6,10 @@ literal
   | DecimalLiteral
   | BooleanLiteral
   | StringLiteral;
-
+dataType
+  : ObjectDataType
+  | ScalarType;
+  
 mt: id description? inputs groups EOF;
 
 inputs: 'inputs' ':' '{' inputArgs? '}';
@@ -31,5 +34,5 @@ message: 'message' ':' StringLiteral;
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
 typeName: Identifier | typeName '.' Identifier;
-input: RequiredType DataType typeName;
+input: RequiredType dataType typeName;
 defaultValue: 'defaultValue' ':' literal;

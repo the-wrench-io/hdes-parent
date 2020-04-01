@@ -6,18 +6,22 @@ literal
   | DecimalLiteral
   | BooleanLiteral
   | StringLiteral;
-  
-dt: id hitPolicy description? headers values EOF;
+
+headerType: ScalarType;
+
+dt: id description? hitPolicy headers values EOF;
 
 headers: 'headers' ':' '{' headerArgs? '}';
 headerArgs: header (',' header)*;
-values: 'values' ':' '{' valuesArgs? '}';
-valuesArgs: value (',' value)*;
+header: DirectionType headerType typeName;
 
-header: DirectionType ScalarTypes typeName;
-value: literal;
+values: 'values' ':' '{' rulesets? '}';
+rulesets: ruleset (',' ruleset)*;
+ruleset: '{' rules? '}';
+rules: value (',' value)*;
 
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
 typeName: Identifier | typeName '.' Identifier;
-hitPolicy: HitPolicyType;
+hitPolicy: 'hitPolicy' ':' HitPolicyType;
+value: '?' | literal;

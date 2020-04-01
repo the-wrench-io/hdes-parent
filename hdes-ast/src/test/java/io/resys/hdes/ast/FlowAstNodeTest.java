@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.ast.spi.flow.visitors.FlowParserConsoleVisitor;
 
-public class TestFlowAstNodeTest {
+public class FlowAstNodeTest {
   //@Test
   public void basic() throws IOException {
     parse("id: x description: 'very descriptive value' inputs: {} tasks: {}");
