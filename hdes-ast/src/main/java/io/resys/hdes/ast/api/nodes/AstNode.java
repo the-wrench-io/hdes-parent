@@ -52,6 +52,24 @@ public interface AstNode {
     int getCol();
   }
   
+  interface DataTypeConversion extends ExpressionNode {
+    ExpressionNode getValue();
+    ScalarType getToType();
+  }
+
+  @Value.Immutable
+  interface DateConversion extends DataTypeConversion { }
+
+  @Value.Immutable
+  interface DateTimeConversion extends DataTypeConversion { }
+
+  @Value.Immutable
+  interface TimeConversion extends DataTypeConversion { }
+
+  @Value.Immutable
+  interface DecimalConversion extends DataTypeConversion { }
+
+  
   enum ScalarType {
     STRING, INTEGER, BOOLEAN, DECIMAL,
     DATE, DATE_TIME, TIME,

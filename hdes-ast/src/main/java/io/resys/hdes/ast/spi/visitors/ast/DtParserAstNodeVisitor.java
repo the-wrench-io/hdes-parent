@@ -115,6 +115,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   @Override
   public Literal visitLiteral(LiteralContext ctx) {
     ScalarType type = null;
+    String value = ctx.getText();
     TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
     switch (terminalNode.getSymbol().getType()) {
     case DecisionTableParser.StringLiteral:
@@ -128,14 +129,20 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
       break;
     case DecisionTableParser.IntegerLiteral:
       type = ScalarType.INTEGER;
+      value = value.replaceAll("_", "");
       break;
     default:
       throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
     }
+    
+    if (type == ScalarType.STRING) {
+      value = value.substring(1, value.length() - 1);
+    }
+    
     return ImmutableLiteral.builder()
         .token(token(ctx))
         .type(type)
-        .value(ctx.getText())
+        .value(value)
         .build();
   }
 

@@ -30,77 +30,80 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
+import io.resys.hdes.ast.spi.visitors.ast.EnParserAstNodeVisitor;
+import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.spi.visitors.loggers.ExpressionParserConsoleVisitor;
 
 public class ExpressionAstNodeTest {
   @Test
   public void complex() throws IOException {
-    parse("x.in('aaa', 'bbb', 'x')");
-    parse("x.in(y, x, z)");
-    parse("sum(y, x, z)");
-    parse("sum(10, 20, 30)");
-    parse("sum(10_0000, 0.20, 30)");
-    parse("sum(true, false)");
-    parse("sum(sum(), sum(sum(10, 20)), x.value, 30, z.value, v.x = 10 ? v.sum(v.sum(10, 20), t) : 100)");
-    parse("x.value.children");
-    parse("x.value.children().value");
-    parse("5 = 10 and 20 = 30");
-    parse("x = 10 or y = 30");
-    parse("x = 10 or sum(y, x, z) = --30");
-    parse("true = false ? 10 : sum(20)");
-    parse("x++");
-    parse("++x + (1-20)");
-    parse("(x*y/20) + 1");
+    parse("x.in('aaa', 'bbb', 'x')", ScalarType.BOOLEAN);
+    parse("x.in(y, x, z)", ScalarType.BOOLEAN);
+    parse("sum(y, x, z)", ScalarType.INTEGER);
+    parse("sum(10, 20, 30)", ScalarType.INTEGER);
+    parse("sum(10_0000, 0.20, 30)", ScalarType.DECIMAL);
+    parse("sum(sum(), sum(sum(10, 20)), x.value, 30, z.value, v.x = 10 ? v.sum(v.sum(10, 20), t) : 100)", ScalarType.DECIMAL);
+    parse("x.value.children", ScalarType.INTEGER);
+    parse("x.value.children().value", ScalarType.INTEGER);
+    parse("5 = 10 and 20 = 30", ScalarType.BOOLEAN);
+    parse("x = 10 or y = 30", ScalarType.BOOLEAN);
+    parse("x = 10 or sum(y, x, z) = --30", ScalarType.BOOLEAN);
+    parse("true = false ? 10 : sum(20)", ScalarType.INTEGER);
+    parse("x++", ScalarType.INTEGER);
+    parse("++x + (1-20)", ScalarType.INTEGER);
+    parse("(x*y/20) + 1", ScalarType.DECIMAL);
   }
   @Test
   public void inclusiveStrings() throws IOException {
-    parse("sum(10, 20, 40)");    
+    parse("sum(10, 20, 40)", ScalarType.INTEGER);    
   }
 
   @Test
   public void literals() throws IOException {
-    parse("-10");
-    parse("-10_000");
-    parse("-10.5");
-    parse("true");
-    parse("false");
-    parse("'words'");
+    parse("-10", ScalarType.INTEGER);
+    parse("-10_000", ScalarType.INTEGER);
+    parse("-10.5", ScalarType.DECIMAL);
+    parse("true", ScalarType.BOOLEAN);
+    parse("false", ScalarType.BOOLEAN);
+    parse("'words'", ScalarType.STRING);
   }
   
   @Test
   public void conditionalExpression() throws IOException {
-    parse("x >= 20 ? 30 : 40 \r\n");
-    parse("x > 20 ? 30 : v");
-    parse("x <= k ? 30 : 40");
-    parse("x < 20 ? 30 : x");
+    parse("x >= 20 ? 30 : 40 \r\n", ScalarType.INTEGER);
+    parse("x > 20 ? 30 : v", ScalarType.INTEGER);
+    parse("x <= k ? 30 : 40", ScalarType.INTEGER);
+    parse("x < 20 ? 30 : x", ScalarType.INTEGER);
   }
 
   @Test
   public void equalityExpression() throws IOException {
-    parse("x = 20");
-    parse("z != 10");
-    parse("z != w");
+    parse("x = 20", ScalarType.BOOLEAN);
+    parse("z != 10", ScalarType.BOOLEAN);
+    parse("z != w", ScalarType.BOOLEAN);
   }
 
   @Test
   public void conditionalAndOrExpression() throws IOException {
-    parse("x > 6 and z < t");
-    parse("x = 20 and y = 10 and z = 100");
-    parse("x = 20 and y = 10 or c > 10");
+    parse("x > 6 and z < t", ScalarType.BOOLEAN);
+    parse("x = 20 and y = 10 and z = 100", ScalarType.BOOLEAN);
+    parse("x = 20 and y = 10 or c > 10", ScalarType.BOOLEAN);
   }
 
   @Test
   public void arithmeticalExpression() throws IOException {
-    parse("x+y/z*89*(x+5)");
+    parse("x+y/z*89*(x+5)", ScalarType.DECIMAL);
   }
   
-  public void parse(String value) {
+  public void parse(String value, ScalarType evalType) {
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     ExpressionParser parser = new ExpressionParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.compilationUnit();
     tree.accept(new ExpressionParserConsoleVisitor());
+    tree.accept(new EnParserAstNodeVisitor(new TokenIdGenerator(), evalType));
   }
 
   public static class ErrorListener extends BaseErrorListener {
