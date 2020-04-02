@@ -8,7 +8,7 @@ literal
   | StringLiteral;
 
 headerType: ScalarType;
-
+directionType: DirectionType;
 dt: id description? headers hitPolicy EOF;
 
 hitPolicy: first | all | matrix;
@@ -19,7 +19,7 @@ matrix: 'MATRIX' ':' '{' rulesets? '}';
 
 headers: 'headers' ':' '{' headerArgs? '}';
 headerArgs: header (',' header)*;
-header: DirectionType headerType typeName;
+header: directionType headerType typeName;
 
 rulesets: ruleset (',' ruleset)*;
 ruleset: '{' rules? '}';
@@ -28,4 +28,5 @@ rules: value (',' value)*;
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
 typeName: Identifier | typeName '.' Identifier;
-value: '?' | literal;
+value: undefinedValue | literal;
+undefinedValue: '?';

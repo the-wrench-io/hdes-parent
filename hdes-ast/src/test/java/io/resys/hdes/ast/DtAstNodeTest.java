@@ -30,6 +30,8 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
+import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor;
+import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.spi.visitors.loggers.DtParserConsoleVisitor;
 
 public class DtAstNodeTest {
@@ -68,7 +70,7 @@ public class DtAstNodeTest {
         +   "OUT INTEGER value \n"
         + "} MATRIX: {\n"
         +   "{ ?, ?, 20 },"
-        +   "{ 'bob', 'woman', 20 }"
+        +   "{ 'bob', 'woman', 4570 }"
         + "}");
   }
   
@@ -79,6 +81,7 @@ public class DtAstNodeTest {
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.dt();
     tree.accept(new DtParserConsoleVisitor());
+    tree.accept(new DtParserAstNodeVisitor(new TokenIdGenerator()));
     
     /*
     ImmutableHdesEnvir.builder().strict()

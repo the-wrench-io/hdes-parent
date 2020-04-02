@@ -47,12 +47,6 @@ public interface ExpressionNode extends AstNode {
   }
 
   @Value.Immutable
-  interface Literal extends ExpressionNode {
-    ScalarType getType();
-    String getValue();
-  }
-  
-  @Value.Immutable
   interface DateConversion extends DataTypeConversion {}
 
   @Value.Immutable

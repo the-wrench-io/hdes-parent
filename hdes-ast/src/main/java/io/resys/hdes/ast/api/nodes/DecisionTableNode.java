@@ -1,7 +1,8 @@
 package io.resys.hdes.ast.api.nodes;
 
 import java.util.List;
-import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 /*-
  * #%L
@@ -28,27 +29,28 @@ import org.immutables.value.Value;
 public interface DecisionTableNode extends AstNode {
   
   enum DirectionType { IN, OUT }
-  
-  interface Rule extends DecisionTableNode {
-    int getHeader();
-  }
-  
-  interface HitPolicy extends DecisionTableNode {
-    int getPosition();
-  }
+  interface HitPolicy extends DecisionTableNode {}
+  interface RuleValue extends DecisionTableNode {}
   
   @Value.Immutable
   interface DecisionTableBody extends DecisionTableNode {
     String getId();
+    @Nullable
     String getDescription();
     HitPolicy getHitPolicy();
-    List<Header> getHeaders();
+    Headers getHeaders();
   }
  
   @Value.Immutable
+  interface Headers extends DecisionTableNode {
+    List<Header> getValues();
+  }
+  
+  @Value.Immutable
   interface Header extends DecisionTableNode {
     String getName();
-    ScalarType getDataType();
+    DirectionType getDirection();
+    ScalarType getType();
   }
   
   @Value.Immutable
@@ -63,8 +65,7 @@ public interface DecisionTableNode extends AstNode {
 
   @Value.Immutable
   interface HitPolicyFirst extends HitPolicy {
-    RuleRow getValue();
-    Optional<HitPolicyFirst> getNext();
+    List<RuleRow> getRows();
   }
   
   @Value.Immutable
@@ -73,17 +74,23 @@ public interface DecisionTableNode extends AstNode {
   }
   
   @Value.Immutable
-  interface UndefinedRule extends Rule {
+  interface Rule extends DecisionTableNode {
+    int getHeader();
+    RuleValue getValue();
+  }
+  
+  @Value.Immutable
+  interface UndefinedValue extends RuleValue {
     
   }
   
   @Value.Immutable
-  interface LiteralRule extends Rule {
-    String getValue();
+  interface LiteralValue extends RuleValue {
+    Literal getValue();
   }
   
   @Value.Immutable
-  interface ExpressionRule extends Rule {
+  interface ExpressionValue extends RuleValue {
     String getValue();
     ExpressionNode getExpression();
   }

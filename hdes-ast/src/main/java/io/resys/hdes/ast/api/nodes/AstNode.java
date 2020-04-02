@@ -25,6 +25,20 @@ public interface AstNode {
   Token getToken();
   
   @Value.Immutable
+  interface TypeName extends AstNode {
+    String getValue();
+  }
+  
+  @Value.Immutable
+  interface Literal extends AstNode {
+    ScalarType getType();
+    String getValue();
+  }
+  
+  @Value.Immutable
+  interface EmptyNode extends AstNode { }
+  
+  @Value.Immutable
   interface ErrorNode {
     AstNode getTarget();
     String getMessage();
@@ -37,9 +51,6 @@ public interface AstNode {
     int getLine();
     int getCol();
   }
-  
-  @Value.Immutable
-  interface EmptyNode extends AstNode { }
   
   enum ScalarType {
     STRING, INTEGER, BOOLEAN, DECIMAL,
