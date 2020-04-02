@@ -30,6 +30,8 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
+import io.resys.hdes.ast.spi.visitors.ast.FlParserAstNodeVisitor;
+import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.spi.visitors.loggers.FlowParserConsoleVisitor;
 
 public class FlowAstNodeTest {
@@ -201,6 +203,7 @@ public class FlowAstNodeTest {
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.flow();
     tree.accept(new FlowParserConsoleVisitor());
+    tree.accept(new FlParserAstNodeVisitor(new TokenIdGenerator()));
   }
 
   public static class ErrorListener extends BaseErrorListener {
