@@ -48,7 +48,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableConditionalExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableEvalNode;
-import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableMethodRefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableMultiplicativeOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableNegateUnaryOperation;
@@ -85,34 +84,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
 
   @Override
   public AstNode visitLiteral(LiteralContext ctx) {
-    String value = ctx.getText();
-    ScalarType type = null;
-    TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
-    switch (terminalNode.getSymbol().getType()) {
-    case ExpressionParser.StringLiteral:
-      type = ScalarType.STRING;
-      break;
-    case ExpressionParser.BooleanLiteral:
-      type = ScalarType.BOOLEAN;
-      break;
-    case ExpressionParser.DecimalLiteral:
-      type = ScalarType.DECIMAL;
-      break;
-    case ExpressionParser.IntegerLiteral:
-      type = ScalarType.INTEGER;
-      value = value.replaceAll("_", "");
-      break;
-    default:
-      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
-    }
-    if (type == ScalarType.STRING) {
-      value = value.substring(1, value.length() - 1);
-    }
-    return ImmutableLiteral.builder()
-        .token(token(ctx))
-        .type(type)
-        .value(value)
-        .build();
+    return Nodes.literal(ctx, token(ctx));
   }
 
   @Override

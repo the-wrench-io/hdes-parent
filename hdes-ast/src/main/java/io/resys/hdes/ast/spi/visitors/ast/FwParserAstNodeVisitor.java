@@ -31,18 +31,17 @@ import io.resys.hdes.ast.FlowParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
 
-public class FlParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
+public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
 
-  public FlParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
+  public FwParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
     super();
     this.tokenIdGenerator = tokenIdGenerator;
   }
   
   @Override
   public AstNode visitLiteral(LiteralContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitLiteral(ctx);
+    return Nodes.literal(ctx, token(ctx));
   }
 
   @Override

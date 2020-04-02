@@ -40,14 +40,11 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     super();
     this.tokenIdGenerator = tokenIdGenerator;
   }
-  
-  
+    
   @Override
   public AstNode visitLiteral(LiteralContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitLiteral(ctx);
+    return Nodes.literal(ctx, token(ctx));
   }
-
 
   @Override
   public AstNode visitDataType(DataTypeContext ctx) {
