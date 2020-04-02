@@ -295,36 +295,6 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
     return c.accept(this);
   }
 
-//  
-//  @Override
-//  public Literal visitLiteral(LiteralContext ctx) {
-//    log("literal", ctx);
-//    String value = ctx.getText();
-//    
-//    LiteralType type = null;
-//    switch (ctx.getStart().getType()) {
-//    case DataTypeParser.StringLiteral:
-//      type = LiteralType.STRING;
-//      break;
-//    case DataTypeParser.BooleanLiteral:
-//      type = LiteralType.BOOLEAN;
-//      break;
-//    case DataTypeParser.DecimalLiteral:
-//      type = LiteralType.DECIMAL;
-//      break;
-//    case DataTypeParser.IntegerLiteral:
-//      type = LiteralType.INTEGER;
-//      value = value.replaceAll("_", "");
-//      break;
-//    default: throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
-//    }
-//    
-//    if (type == LiteralType.STRING && value.length() > 2) {
-//      value = value.substring(1, value.length() - 1);
-//    }
-//    return ImmutableLiteral.builder().pos(createPosition(ctx)).literalType(type).value(value).build();
-//  }
-//  
   private Nodes nodes(ParserRuleContext node) {
     return Nodes.from(node, this);
   }
