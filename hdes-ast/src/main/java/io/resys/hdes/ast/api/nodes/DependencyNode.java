@@ -9,8 +9,9 @@ public interface DependencyNode extends AstNode {
   interface DependencyType extends DependencyNode {}
   
   @Value.Immutable
-  interface TypeDependency extends DependencyNode {
+  interface ReferenceDependency extends DependencyNode {
     String getName();
+    DependencyType getValue();
   }
   
   @Value.Immutable
@@ -22,7 +23,7 @@ public interface DependencyNode extends AstNode {
 
   @Value.Immutable
   interface ServiceDependency extends DependencyNode {
-    TypeDependency getType();
+    ReferenceDependency getType();
     MethodDependency getMethod();
   }
   
