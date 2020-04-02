@@ -35,13 +35,17 @@ public interface FlowNode extends AstNode {
   interface FlowBody extends FlowNode {
     String getId();
     String getDescription();
-    List<FlowInput> getInputs();
+    FlowInputs getInputs();
     Optional<Task> getTask();
   }
 
+  @Value.Immutable
+  interface FlowInputs extends FlowNode {
+    List<FlowInput> getValues();
+  }
+  
   interface FlowInput extends FlowNode {
-    Boolean getRequired();
-    String getDebugValue();    
+    Boolean getRequired();    
     String getName();
   }
   
@@ -57,6 +61,7 @@ public interface FlowNode extends AstNode {
   
   @Value.Immutable
   interface ScalarFlowInput extends FlowInput {
+    String getDebugValue();
     ScalarType getType();
   }
   

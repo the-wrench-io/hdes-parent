@@ -1,10 +1,13 @@
 package io.resys.hdes.ast.spi.visitors.ast;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.immutables.value.Value;
 
 import io.resys.hdes.ast.FlowParser.ConditionalThenContext;
-import io.resys.hdes.ast.FlowParser.DataTypeContext;
 import io.resys.hdes.ast.FlowParser.DebugValueContext;
 import io.resys.hdes.ast.FlowParser.DescriptionContext;
 import io.resys.hdes.ast.FlowParser.EndMappingContext;
@@ -28,7 +31,16 @@ import io.resys.hdes.ast.FlowParser.TypeNameContext;
 import io.resys.hdes.ast.FlowParser.WhenThenArgsContext;
 import io.resys.hdes.ast.FlowParser.WhenThenContext;
 import io.resys.hdes.ast.FlowParserBaseVisitor;
+import io.resys.hdes.ast.ManualTaskParser.DataTypeContext;
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.Literal;
+import io.resys.hdes.ast.api.nodes.FlowNode;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowInput;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
+import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
+import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
+import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor.DtRedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
 
 public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
@@ -37,6 +49,24 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   public FwParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
     super();
     this.tokenIdGenerator = tokenIdGenerator;
+  }
+  
+  // Internal only
+  @Value.Immutable
+  public interface FwRedundentId extends FlowNode {
+    String getValue();
+  }
+  @Value.Immutable
+  public interface FwRedundentDescription extends FlowNode {
+    String getValue();
+  }
+  @Value.Immutable
+  public interface FwRedundentTypeName extends FlowNode {
+    String getValue();
+  }
+  @Value.Immutable
+  public interface FwRedundentInputArgs extends FlowNode {
+    List<FlowInput> getValues();
   }
   
   @Override
@@ -51,23 +81,40 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public AstNode visitFlow(FlowContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitFlow(ctx);
+  public FlowBody visitFlow(FlowContext ctx) {
+    Nodes children = nodes(ctx);
+    return ImmutableFlowBody.builder()
+        .token(token(ctx))
+        .id(children.of(FwRedundentId.class).get().getValue())
+        .description(children.of(FwRedundentDescription.class).map(e -> e.getValue()).orElse(null))
+        .build();
   }
 
   @Override
-  public AstNode visitInputs(InputsContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitInputs(ctx);
+  public FlowInputs visitInputs(InputsContext ctx) {
+    List<FlowInput> values = nodes(ctx).of(FwRedundentInputArgs.class)
+        .map(a -> a.getValues()).orElse(Collections.emptyList());
+    return ImmutableFlowInputs.builder()
+        .token(token(ctx))
+        .values(values)
+        .build();
   }
 
   @Override
   public AstNode visitInputArgs(InputArgsContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitInputArgs(ctx);
+    return ImmutableFwRedundentInputArgs.builder()
+        .token(token(ctx))
+        .values(nodes(ctx).list(FlowInput.class))
+        .build();
   }
 
+  @Override
+  public AstNode visitInput(InputContext ctx) {
+    // TODO Auto-generated method stub
+    return ImmutableFlowIn;
+  }
+
+  
   @Override
   public AstNode visitTasks(TasksContext ctx) {
     // TODO Auto-generated method stub
@@ -129,30 +176,6 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public AstNode visitTypeName(TypeNameContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitTypeName(ctx);
-  }
-
-  @Override
-  public AstNode visitId(IdContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitId(ctx);
-  }
-
-  @Override
-  public AstNode visitDescription(DescriptionContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitDescription(ctx);
-  }
-
-  @Override
-  public AstNode visitInput(InputContext ctx) {
-    // TODO Auto-generated method stub
-    return super.visitInput(ctx);
-  }
-
-  @Override
   public AstNode visitDebugValue(DebugValueContext ctx) {
     // TODO Auto-generated method stub
     return super.visitDebugValue(ctx);
@@ -180,6 +203,29 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   public AstNode visitEndMapping(EndMappingContext ctx) {
     // TODO Auto-generated method stub
     return super.visitEndMapping(ctx);
+  }
+  
+  @Override
+  public FwRedundentId visitId(IdContext ctx) {
+    return ImmutableFwRedundentId.builder()
+        .token(token(ctx))
+        .value(nodes(ctx).of(DtRedundentTypeName.class).get().getValue())
+        .build();
+  }
+
+  @Override
+  public FwRedundentDescription visitDescription(DescriptionContext ctx) {
+    return ImmutableFwRedundentDescription.builder()
+        .token(token(ctx))
+        .value(nodes(ctx).of(Literal.class).get().getValue())
+        .build();
+  }
+  @Override
+  public FwRedundentTypeName visitTypeName(TypeNameContext ctx) {
+    return ImmutableFwRedundentTypeName.builder()
+        .token(token(ctx))
+        .value(ctx.getText())
+        .build();
   }
   
   private AstNode first(ParserRuleContext ctx) {
