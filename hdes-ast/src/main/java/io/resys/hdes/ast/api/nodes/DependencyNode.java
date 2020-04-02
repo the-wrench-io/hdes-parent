@@ -6,6 +6,8 @@ import org.immutables.value.Value;
 
 public interface DependencyNode extends AstNode {
   
+  interface DependencyType extends DependencyNode {}
+  
   @Value.Immutable
   interface TypeDependency extends DependencyNode {
     String getName();
@@ -23,8 +25,6 @@ public interface DependencyNode extends AstNode {
     TypeDependency getType();
     MethodDependency getMethod();
   }
-
-  interface DependencyType extends DependencyNode {}
   
   @Value.Immutable
   interface ObjectDependency extends DependencyNode {
