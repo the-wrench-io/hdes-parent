@@ -35,6 +35,7 @@ import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
@@ -70,32 +71,32 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
 
   // Internal only
   @Value.Immutable
-  public interface RedundentIdNode extends AstNode {
+  public interface RedundentId extends DecisionTableNode {
     String getValue();
   }
 
   @Value.Immutable
-  public interface RedundentDescriptionNode extends AstNode {
+  public interface RedundentDescription extends DecisionTableNode {
     String getValue();
   }
 
   @Value.Immutable
-  public interface RedundentHeaderType extends AstNode {
+  public interface RedundentHeaderType extends DecisionTableNode {
     ScalarType getValue();
   }
   
   @Value.Immutable
-  public interface RedundentTypeName extends AstNode {
+  public interface RedundentTypeName extends DecisionTableNode {
     String getValue();
   }
   
   @Value.Immutable
-  public interface RedundentDirection extends AstNode {
+  public interface RedundentDirection extends DecisionTableNode {
     DirectionType getValue();
   }
 
   @Value.Immutable
-  public interface RedundentRulesets extends AstNode {
+  public interface RedundentRulesets extends DecisionTableNode {
     List<RuleRow> getRows();
   }
 
@@ -104,8 +105,8 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
     Nodes children = nodes(ctx);
     return ImmutableDecisionTableBody.builder()
         .token(token(ctx))
-        .id(children.of(RedundentIdNode.class).get().getValue())
-        .description(children.of(RedundentDescriptionNode.class).map(e -> e.getValue()).orElse(null))
+        .id(children.of(RedundentId.class).get().getValue())
+        .description(children.of(RedundentDescription.class).map(e -> e.getValue()).orElse(null))
         .headers(children.of(Headers.class).get())
         .hitPolicy(children.of(HitPolicy.class).get())
         .build();
@@ -259,16 +260,16 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   }
 
   @Override
-  public RedundentIdNode visitId(IdContext ctx) {
-    return ImmutableRedundentIdNode.builder()
+  public RedundentId visitId(IdContext ctx) {
+    return ImmutableRedundentId.builder()
         .token(token(ctx))
         .value(nodes(ctx).of(RedundentTypeName.class).get().getValue())
         .build();
   }
 
   @Override
-  public RedundentDescriptionNode visitDescription(DescriptionContext ctx) {
-    return ImmutableRedundentDescriptionNode.builder()
+  public RedundentDescription visitDescription(DescriptionContext ctx) {
+    return ImmutableRedundentDescription.builder()
         .token(token(ctx))
         .value(nodes(ctx).of(Literal.class).get().getValue())
         .build();
