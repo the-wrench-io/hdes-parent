@@ -1,6 +1,4 @@
-package io.resys.hdes.ast.spi.visitors;
-
-import static io.resys.hdes.ast.spi.visitors.ParserContextLogger.log;
+package io.resys.hdes.ast.spi.visitors.loggers;
 
 import io.resys.hdes.ast.DecisionTableParser.DescriptionContext;
 import io.resys.hdes.ast.DecisionTableParser.DtContext;
@@ -12,6 +10,9 @@ import io.resys.hdes.ast.DecisionTableParser.IdContext;
 import io.resys.hdes.ast.DecisionTableParser.LiteralContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
 import io.resys.hdes.ast.DecisionTableParser.ValueContext;
+
+import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
+
 import io.resys.hdes.ast.DecisionTableParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 

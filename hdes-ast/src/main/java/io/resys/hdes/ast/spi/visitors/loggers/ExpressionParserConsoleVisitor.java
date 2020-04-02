@@ -1,6 +1,4 @@
-package io.resys.hdes.ast.spi.visitors;
-
-import static io.resys.hdes.ast.spi.visitors.ParserContextLogger.log;
+package io.resys.hdes.ast.spi.visitors.loggers;
 
 import io.resys.hdes.ast.ExpressionParser.AdditiveExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.AndExpressionContext;
@@ -23,6 +21,9 @@ import io.resys.hdes.ast.ExpressionParser.RelationalExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.TypeNameContext;
 import io.resys.hdes.ast.ExpressionParser.UnaryExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.UnaryExpressionNotPlusMinusContext;
+
+import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
+
 import io.resys.hdes.ast.ExpressionParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 

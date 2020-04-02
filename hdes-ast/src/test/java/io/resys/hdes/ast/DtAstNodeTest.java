@@ -30,7 +30,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.ast.spi.visitors.DtParserConsoleVisitor;
+import io.resys.hdes.ast.spi.visitors.loggers.DtParserConsoleVisitor;
 
 public class DtAstNodeTest {
   @Test

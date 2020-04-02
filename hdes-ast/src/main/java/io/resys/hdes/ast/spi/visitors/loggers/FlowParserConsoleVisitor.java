@@ -1,6 +1,6 @@
-package io.resys.hdes.ast.spi.visitors;
+package io.resys.hdes.ast.spi.visitors.loggers;
 
-import static io.resys.hdes.ast.spi.visitors.ParserContextLogger.log;
+import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
 
 import io.resys.hdes.ast.FlowParser;
 import io.resys.hdes.ast.FlowParser.ConditionalThenContext;

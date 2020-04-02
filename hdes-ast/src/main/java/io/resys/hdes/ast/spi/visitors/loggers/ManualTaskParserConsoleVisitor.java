@@ -1,6 +1,4 @@
-package io.resys.hdes.ast.spi.visitors;
-
-import static io.resys.hdes.ast.spi.visitors.ParserContextLogger.log;
+package io.resys.hdes.ast.spi.visitors.loggers;
 
 import io.resys.hdes.ast.ManualTaskParser.CssClassArgsContext;
 import io.resys.hdes.ast.ManualTaskParser.CssClassContext;
@@ -23,6 +21,9 @@ import io.resys.hdes.ast.ManualTaskParser.StatementsContext;
 import io.resys.hdes.ast.ManualTaskParser.ThenContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
 import io.resys.hdes.ast.ManualTaskParser.WhenContext;
+
+import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
+
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
