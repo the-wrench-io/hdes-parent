@@ -39,7 +39,7 @@ public interface ExpressionNode extends AstNode {
 
   interface DataTypeConversion extends ExpressionNode {
     ExpressionNode getValue();
-    NodeDataType getToType();
+    ScalarType getToType();
   }
   
   interface UnaryOperation extends ExpressionNode {
@@ -48,7 +48,7 @@ public interface ExpressionNode extends AstNode {
 
   @Value.Immutable
   interface Literal extends ExpressionNode {
-    NodeDataType getType();
+    ScalarType getType();
     String getValue();
   }
   

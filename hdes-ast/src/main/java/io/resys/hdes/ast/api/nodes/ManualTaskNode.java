@@ -33,7 +33,7 @@ public interface ManualTaskNode extends AstNode {
   
   interface ManualTaskDataType extends ManualTaskNode {
     Boolean getRequired();
-    NodeDataType getDataType();
+    ScalarType getDataType();
     String getName();
   }
 

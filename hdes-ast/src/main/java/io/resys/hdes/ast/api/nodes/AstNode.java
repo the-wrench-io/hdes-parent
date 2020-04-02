@@ -38,7 +38,10 @@ public interface AstNode {
     int getCol();
   }
   
-  enum NodeDataType {
+  @Value.Immutable
+  interface EmptyNode extends AstNode { }
+  
+  enum ScalarType {
     STRING, INTEGER, BOOLEAN, DECIMAL,
     DATE, DATE_TIME, TIME,
   }

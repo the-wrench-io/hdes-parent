@@ -7,23 +7,33 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
 public interface HdesEnvir {
-  HdesEnvirSource getSource();
-  AstNode getNode();
+  Source getSource();
+  List<AstNode> getNodes();
   
   @Value.Immutable
-  interface HdesEnvirSource {
+  interface Source {
     List<String> getFlows();
     List<String> getExpressions();
     List<String> getDecisionTables();
     List<String> getManualTasks();
   }
   
+  interface SourceBuilder<R> {
+    R flow(String src);
+    R expression(String src);
+    R manualTask(String src);
+    R serviceTask();
+    R decisionTable(String src);
+  }
+  
+  interface ExpressionBuilder<R> {
+    
+  }
+  
+  
   interface HdesEnvirBuilder {
     HdesEnvirBuilder from(HdesEnvir envir);
-    HdesEnvirBuilder addFlow(String src);
-    HdesEnvirBuilder addExpression(String src);
-    HdesEnvirBuilder addManualTask(String src);
-    HdesEnvirBuilder addDecisionTable(String src);
+    SourceBuilder<HdesEnvirBuilder> add();
     HdesEnvirBuilder strict();
     HdesEnvir build();
   }

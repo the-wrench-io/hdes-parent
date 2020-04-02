@@ -38,13 +38,26 @@ public interface FlowNode extends AstNode {
     List<FlowInput> getInputs();
     Optional<Task> getTask();
   }
-  
-  @Value.Immutable
+
   interface FlowInput extends FlowNode {
     Boolean getRequired();
-    NodeDataType getDataType();
+    String getDebugValue();    
     String getName();
-    String getDebugValue();
+  }
+  
+  @Value.Immutable
+  interface ObjectFlowInput extends FlowInput {
+    List<FlowInput> getValues();
+  }
+  
+  @Value.Immutable
+  interface ArrayFlowInput extends FlowInput {
+    FlowInput getValue();
+  }
+  
+  @Value.Immutable
+  interface ScalarFlowInput extends FlowInput {
+    ScalarType getType();
   }
   
   @Value.Immutable

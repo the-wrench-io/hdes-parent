@@ -48,7 +48,7 @@ public interface DecisionTableNode extends AstNode {
   @Value.Immutable
   interface Header extends DecisionTableNode {
     String getName();
-    NodeDataType getDataType();
+    ScalarType getDataType();
   }
   
   @Value.Immutable

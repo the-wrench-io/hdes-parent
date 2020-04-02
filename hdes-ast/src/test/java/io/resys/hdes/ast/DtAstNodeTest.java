@@ -79,6 +79,12 @@ public class DtAstNodeTest {
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.dt();
     tree.accept(new DtParserConsoleVisitor());
+    
+    /*
+    ImmutableHdesEnvir.builder().strict()
+    .add().decisionTable(value)
+    .build();*/
+    
   }
 
   public static class ErrorListener extends BaseErrorListener {
