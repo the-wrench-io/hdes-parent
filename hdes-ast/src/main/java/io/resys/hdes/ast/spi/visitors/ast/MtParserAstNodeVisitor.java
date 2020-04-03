@@ -51,7 +51,8 @@ import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
 import io.resys.hdes.ast.ManualTaskParser.WhenContext;
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
-import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;

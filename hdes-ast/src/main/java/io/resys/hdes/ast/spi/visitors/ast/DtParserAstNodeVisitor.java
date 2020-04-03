@@ -66,6 +66,8 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.api.nodes.ImmutableDecisionTableBody;
 import io.resys.hdes.ast.api.nodes.ImmutableHeader;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
@@ -76,7 +78,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableLiteralValue;
 import io.resys.hdes.ast.api.nodes.ImmutableRule;
 import io.resys.hdes.ast.api.nodes.ImmutableRuleRow;
 import io.resys.hdes.ast.api.nodes.ImmutableUndefinedValue;
-import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
 
 public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;

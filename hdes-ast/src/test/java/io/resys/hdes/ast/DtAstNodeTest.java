@@ -31,7 +31,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor;
-import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.spi.visitors.loggers.DtParserConsoleVisitor;
 
 public class DtAstNodeTest {

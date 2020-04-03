@@ -95,7 +95,10 @@ import io.resys.hdes.ast.api.nodes.ImmutableWhen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThenPointer;
 import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor.DtRedundentTypeName;
-import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
+import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser;
+import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser.FwRedundentOrderedTasks;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
@@ -160,13 +163,16 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   @Override
   public FlowBody visitFlow(FlowContext ctx) {
     Nodes children = nodes(ctx);
+    FwRedundentTasks redundentTasks = children.of(FwRedundentTasks.class).get();
+    FwRedundentOrderedTasks tasks = new FlowTreePointerParser().visit(redundentTasks);
     
     return ImmutableFlowBody.builder()
         .token(token(ctx))
         .id(children.of(FwRedundentId.class).get().getValue())
         .description(children.of(FwRedundentDescription.class).map(e -> e.getValue()).orElse(null))
-        .unreachableTasks()
-        .task()
+        .returnType(redundentTasks.getReturnType())
+        .task(tasks.getFirst())
+        .unreachableTasks(tasks.getUnclaimed())
         .build();
   }
 

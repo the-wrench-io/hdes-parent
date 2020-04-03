@@ -1,4 +1,4 @@
-package io.resys.hdes.ast.spi.visitors.ast;
+package io.resys.hdes.ast.spi.visitors.ast.util;
 
 /*-
  * #%L
@@ -82,9 +82,7 @@ public class Nodes {
  
   public static AstNode.Token token(ParserRuleContext context, TokenIdGenerator idGen) {
     Token startToken = context.getStart();
-    Token stopToken = context.getStop();
-    
-    
+    //Token stopToken = context.getStop();
     return ImmutableToken.builder()
         .id(idGen.next())
         .line(startToken.getLine())

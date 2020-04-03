@@ -62,6 +62,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EvalNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodRefNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.TypeRefNode;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.api.nodes.ImmutableAdditiveOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableAndOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
@@ -79,7 +81,6 @@ import io.resys.hdes.ast.api.nodes.ImmutablePostIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutablePreDecrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutablePreIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableTypeRefNode;
-import io.resys.hdes.ast.spi.visitors.ast.Nodes.TokenIdGenerator;
 
 public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
