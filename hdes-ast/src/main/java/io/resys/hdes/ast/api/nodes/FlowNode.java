@@ -85,13 +85,15 @@ public interface FlowNode extends AstNode {
   }
   @Value.Immutable
   interface ThenPointer extends FlowTaskPointer {
-    Then getThen();
+    String getName();
+    // Only possible in invalid tree
+    Optional<FlowTask> getTask();
   }
   
   @Value.Immutable
   interface WhenThen extends FlowNode {
     When getWhen();
-    Then getThen();
+    ThenPointer getThen();
   }
   @Value.Immutable
   interface When extends FlowNode {
@@ -99,12 +101,6 @@ public interface FlowNode extends AstNode {
     Optional<AstNode> getNode();
   }  
   
-  @Value.Immutable
-  interface Then extends FlowNode {
-    String getName();
-    // Only possible in invalid tree
-    Optional<FlowTask> getTask();
-  }
   
   @Value.Immutable
   interface Mapping extends FlowNode {

@@ -77,7 +77,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.ObjectFlowInput;
 import io.resys.hdes.ast.api.nodes.FlowNode.RefTaskType;
 import io.resys.hdes.ast.api.nodes.FlowNode.ScalarFlowInput;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
-import io.resys.hdes.ast.api.nodes.FlowNode.Then;
+import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
@@ -90,11 +90,10 @@ import io.resys.hdes.ast.api.nodes.ImmutableMapping;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectFlowInput;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarFlowInput;
 import io.resys.hdes.ast.api.nodes.ImmutableTaskRef;
-import io.resys.hdes.ast.api.nodes.ImmutableThen;
+import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThenPointer;
-import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor.DtRedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser;
 import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser.FwRedundentOrderedTasks;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
@@ -169,6 +168,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     return ImmutableFlowBody.builder()
         .token(token(ctx))
         .id(children.of(FwRedundentId.class).get().getValue())
+        .inputs(children.of(FlowInputs.class).get())
         .description(children.of(FwRedundentDescription.class).map(e -> e.getValue()).orElse(null))
         .returnType(redundentTasks.getReturnType())
         .task(tasks.getFirst())
@@ -214,8 +214,9 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     return ImmutableScalarFlowInput.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
+        .type(nodes.of(FwRedundentScalarType.class).get().getValue())
         .name(nodes.of(FwRedundentTypeName.class).get().getValue())
-        .debugValue(nodes.of(FwRedundentDebugValue.class).get().getValue())
+        .debugValue(nodes.of(FwRedundentDebugValue.class).map(e -> e.getValue()))
         .build();
   }
 
@@ -317,7 +318,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     return ImmutableWhenThen.builder()
         .token(token(ctx))
         .when(nodes.of(When.class).get())
-        .then(nodes.of(Then.class).get())
+        .then(nodes.of(ThenPointer.class).get())
         .build();
   }
 
@@ -331,8 +332,8 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
   
   @Override
-  public Then visitThen(ThenContext ctx) {
-    return ImmutableThen.builder()
+  public ThenPointer visitThen(ThenContext ctx) {
+    return ImmutableThenPointer.builder()
         .token(token(ctx))
         .name(nodes(ctx).of(FwRedundentTypeName.class).get().getValue())
         .build();
@@ -414,7 +415,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   public FwRedundentId visitId(IdContext ctx) {
     return ImmutableFwRedundentId.builder()
         .token(token(ctx))
-        .value(nodes(ctx).of(DtRedundentTypeName.class).get().getValue())
+        .value(nodes(ctx).of(FwRedundentTypeName.class).get().getValue())
         .build();
   }
 

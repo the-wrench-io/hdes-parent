@@ -12,12 +12,10 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
-import io.resys.hdes.ast.api.nodes.FlowNode.Then;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTask;
-import io.resys.hdes.ast.api.nodes.ImmutableThen;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThenPointer;
@@ -92,28 +90,21 @@ public class FlowTreePointerParser {
         .build());
   }
 
-  private Optional<FlowTaskPointer> visit(ThenPointer pointer) {
-    Optional<Then> then = visit(pointer.getThen());
-    if(!then.isPresent()) {
-      return Optional.empty();
-    }
-    return Optional.of(ImmutableThenPointer.builder().from(pointer).then(then.get()).build());
-  }
   private Optional<WhenThen> visit(WhenThen pointer) {
-    Optional<Then> then = visit(pointer.getThen());
+    Optional<FlowTaskPointer> then = visit(pointer.getThen());
     if(!then.isPresent()) {
       return Optional.empty();
     }
-    return Optional.of(ImmutableWhenThen.builder().from(pointer).then(then.get()).build());
+    return Optional.of(ImmutableWhenThen.builder().from(pointer).then((ThenPointer) then.get()).build());
   }
-  private Optional<Then> visit(Then pointer) {
+  private Optional<FlowTaskPointer> visit(ThenPointer pointer) {
     String taskName = pointer.getName();
     if(createdTasks.containsKey(taskName)) {
-      return Optional.of(ImmutableThen.builder().from(pointer).task(createdTasks.get(taskName)).build());
+      return Optional.of(ImmutableThenPointer.builder().from(pointer).task(createdTasks.get(taskName)).build());
     } else if(sourceTasks.containsKey(taskName)) {
       FlowTask src = sourceTasks.get(taskName);
       FlowTask result = visit(src);
-      return Optional.of(ImmutableThen.builder().from(pointer).task(result).build());
+      return Optional.of(ImmutableThenPointer.builder().from(pointer).task(result).build());
     }
     return Optional.empty();
   }  
