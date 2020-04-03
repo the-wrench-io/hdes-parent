@@ -27,16 +27,23 @@ import org.immutables.value.Value;
 
 public interface FlowNode extends AstNode {
 
-  enum RefTaskType { MANUAL_TASK, DECISION_TABLE, SERVICE_TASK }
+  enum RefTaskType { FLOW_TASK, MANUAL_TASK, DECISION_TABLE, SERVICE_TASK }
   
-  interface TaskBody extends FlowNode {}
+  interface FlowTaskPointer extends FlowNode {}
   
   @Value.Immutable
   interface FlowBody extends FlowNode {
     String getId();
     String getDescription();
     FlowInputs getInputs();
-    Optional<Task> getTask();
+    List<FlowTask> getUnreachableTasks();
+    Optional<FlowTask> getTask();
+    FlowReturnType getReturnType();
+  }
+
+  @Value.Immutable
+  interface FlowReturnType extends FlowNode {
+    List<Mapping> getMapping();
   }
 
   @Value.Immutable
@@ -61,49 +68,42 @@ public interface FlowNode extends AstNode {
   
   @Value.Immutable
   interface ScalarFlowInput extends FlowInput {
-    String getDebugValue();
+    Optional<String> getDebugValue();
     ScalarType getType();
   }
   
   @Value.Immutable
-  interface Task extends FlowNode {
+  interface FlowTask extends FlowNode {
     String getId();
-    TaskBody getBody();
+    Optional<FlowTaskPointer> getNext();
+    Optional<TaskRef> getRef();
   }
   
-  /**
-   * Task bodies based on types
-   */
   @Value.Immutable
-  interface SwitchBody extends TaskBody {
-    List<WhenThen> getValue();
+  interface WhenThenPointer extends FlowTaskPointer {
+    List<WhenThen> getValues();
   }
   @Value.Immutable
-  interface EmptyTaskBody extends TaskBody {
+  interface ThenPointer extends FlowTaskPointer {
     Then getThen();
   }
-  @Value.Immutable
-  interface RefTaskBody extends TaskBody {
-    RefNode getRef();
-    List<Mapping> getMapping();
-    Then getThen();
-  }
-  
-  @Value.Immutable
-  interface EndTaskBody extends TaskBody {
-    List<Mapping> getMapping();
-  }
-  
   
   @Value.Immutable
   interface WhenThen extends FlowNode {
-    ExpressionNode getWhen();
+    When getWhen();
     Then getThen();
   }
+  @Value.Immutable
+  interface When extends FlowNode {
+    String getText();
+    Optional<AstNode> getNode();
+  }  
   
   @Value.Immutable
   interface Then extends FlowNode {
-    Task getTask();
+    String getName();
+    // Only possible in invalid tree
+    Optional<FlowTask> getTask();
   }
   
   @Value.Immutable
@@ -113,9 +113,11 @@ public interface FlowNode extends AstNode {
   }
 
   @Value.Immutable
-  interface RefNode extends FlowNode {
+  interface TaskRef extends FlowNode {
     RefTaskType getType();
-    String getName();
-    AstNode getValue();
+    String getValue();
+    // external
+    Optional<AstNode> getNode();
+    List<Mapping> getMapping();
   }
 }

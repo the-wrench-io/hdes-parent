@@ -1,5 +1,25 @@
 package io.resys.hdes.ast.spi.visitors.ast;
 
+/*-
+ * #%L
+ * hdes-ast
+ * %%
+ * Copyright (C) 2020 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -79,6 +99,7 @@ public class Nodes {
       switch (terminalNode.getSymbol().getType()) {
       case ExpressionParser.StringLiteral:
         type = ScalarType.STRING;
+        value = getStringLiteralValue(ctx);
         break;
       case ExpressionParser.BooleanLiteral:
         type = ScalarType.BOOLEAN;
@@ -93,9 +114,7 @@ public class Nodes {
       default:
         throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
       }
-      if (type == ScalarType.STRING) {
-        value = value.substring(1, value.length() - 1);
-      }
+
       return ImmutableLiteral.builder()
           .token(token)
           .type(type)
@@ -103,6 +122,10 @@ public class Nodes {
           .build();
   }
   
+  public static String getStringLiteralValue(ParserRuleContext ctx) {
+    String value = ctx.getText();
+    return value.substring(1, value.length() - 1);
+  }
   
   public static class TokenIdGenerator {
     private int current = 1;

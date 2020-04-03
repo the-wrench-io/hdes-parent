@@ -7,6 +7,17 @@ literal
   | BooleanLiteral
   | StringLiteral;
 
+taskTypes
+  : MANUAL_TASK
+  | FLOW_TASK 
+  | DT_TASK
+  | ST_TASK;
+
+typeName : Identifier | typeName '.' Identifier;
+id: 'id' ':' typeName;
+description: 'description' ':' literal;
+scalarType: ScalarType;
+
 flow: id description? inputs tasks EOF;
 
 inputs: 'inputs' ':' '{' inputArgs? '}';
@@ -14,30 +25,27 @@ inputArgs: input (',' input)*;
 
 tasks: 'tasks' ':' '{' taskArgs? '}';
 taskArgs: task (',' task)*;
-taskBody: conditionalThen;
+task: endTask | nextTask;
+endTask: END ':' '{' mapping '}';
+nextTask: typeName ':' '{' (pointer taskRef?)? '}';
 
-conditionalThen: whenThenArgs | then | endMapping;
+pointer: whenThenArgs | then;
 whenThenArgs: whenThen (',' whenThen)*;
-whenThen: 'when' ':' StringLiteral then; 
-then: 'then' ':' typeName ('END' | taskRef)?;
+whenThen: 'when' ':' whenExpression then; 
+whenExpression: StringLiteral;
+then: 'then' ':' typeName;
 
-taskRef: ObjectDataType TaskType ':' typeName mapping;
-mapping: 'mapping' ':' '{' mappingArgs? '}';
+taskRef: taskTypes ':' typeName mapping;  
+mapping: ObjectDataType 'mapping' ':' '{' mappingArgs? '}';
 mappingArgs: mappingArg (',' mappingArg)*;
 
-typeName : Identifier | typeName '.' Identifier;
-id: 'id' ':' typeName;
-description: 'description' ':' literal;
-
-input: RequiredType (scalarType | arrayType | objectType);
-scalarType: ScalarType typeName debugValue?;
-arrayType: 'ARRAY' (scalarType | objectType);
+input: RequiredType (simpleType | arrayType | objectType);
+simpleType: scalarType typeName debugValue?;
+arrayType: 'ARRAY' (simpleType | objectType);
 objectType: 'OBJECT' typeName inputs?;
 
 debugValue: 'debugValue' ':' literal;
-task: typeName ':' '{' taskBody? '}';
 mappingArg: typeName ':' mappingValue;
 mappingValue: typeName | literal;
-endMapping: 'END' mapping;
 
 

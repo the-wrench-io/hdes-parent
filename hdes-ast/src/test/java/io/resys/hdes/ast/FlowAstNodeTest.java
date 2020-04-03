@@ -95,7 +95,7 @@ public class FlowAstNodeTest {
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
-            + "OBJECT manualTask: bestManualTask mapping: {}\n"
+            + "manualTask: bestManualTask OBJECT mapping:{}\n"
             + "}\n" +
             "}\n");
   }
@@ -111,7 +111,7 @@ public class FlowAstNodeTest {
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
-            + "OBJECT serviceTask: bestServiceTask mapping: {} \n"
+            + "serviceTask: bestServiceTask OBJECT mapping: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -127,7 +127,7 @@ public class FlowAstNodeTest {
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
-            + "OBJECT flowTask: bestFlowTask mapping: {} \n"
+            + "flowTask: bestFlowTask OBJECT mapping: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -143,7 +143,7 @@ public class FlowAstNodeTest {
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
-            + "OBJECT decisionTask: bestDtTask mapping: {} \n"
+            + "decisionTask: bestDtTask OBJECT mapping: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -159,7 +159,7 @@ public class FlowAstNodeTest {
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
-            + "ARRAY decisionTask: bestDtTask mapping: {} \n"
+            + "decisionTask: bestDtTask ARRAY mapping: {} \n"
             + "  \n"
             + "}\n" +
             "}\n");
@@ -177,15 +177,15 @@ public class FlowAstNodeTest {
             
             "firstTask: {\n"
             + "then: endTask\n"
-            + "ARRAY decisionTask: bestDtTask \n"
-            + "mapping: {\n"
+            + "decisionTask: bestDtTask \n"
+            + "OBJECT mapping: {\n"
               + "input1: arg1.x1,\n"
               + "input2: arg2.x1\n"
             + "}\n"
           + "},\n" + 
 
-          "endTask: {\n"
-          + "END mapping: {\n"
+          "end: {\n"
+          + "OBJECT mapping: {\n"
             + "input1: arg1.x1,\n"
             + "input2: arg2.x1\n"
           + "}\n"

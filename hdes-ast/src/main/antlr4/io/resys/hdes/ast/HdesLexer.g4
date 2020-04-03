@@ -14,16 +14,12 @@ ScalarType
   | TIME
   | STRING
   | BOOLEAN;
-TaskType
-  : MANUAL_TASK
-  | FLOW_TASK 
-  | DT_TASK
-  | ST_TASK;
 
-// BETWEEN/AND/OR operators
+// BETWEEN/AND/OR/END operators
 BETWEEN: B E T W E E N;
 AND: A N D;
 OR: O R;
+END: E N D;
 fragment A : [aA];
 fragment B : [bB];
 fragment D : [dD];
@@ -86,7 +82,6 @@ OPTIONAL: 'optional';
 MAPPING: 'mapping';
 WHEN: 'when';
 THEN: 'then';
-END: 'END';
 
 // MARKS
 QUESTION_MARK: '?';
