@@ -62,33 +62,33 @@ import io.resys.hdes.ast.FlowParser.WhenThenContext;
 import io.resys.hdes.ast.FlowParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.InputNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.FlowNode;
-import io.resys.hdes.ast.api.nodes.FlowNode.ArrayFlowInput;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowInput;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowReturnType;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
-import io.resys.hdes.ast.api.nodes.FlowNode.ObjectFlowInput;
 import io.resys.hdes.ast.api.nodes.FlowNode.RefTaskType;
-import io.resys.hdes.ast.api.nodes.FlowNode.ScalarFlowInput;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
-import io.resys.hdes.ast.api.nodes.ImmutableArrayFlowInput;
+import io.resys.hdes.ast.api.nodes.ImmutableArrayInputNode;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowReturnType;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTask;
 import io.resys.hdes.ast.api.nodes.ImmutableMapping;
-import io.resys.hdes.ast.api.nodes.ImmutableObjectFlowInput;
-import io.resys.hdes.ast.api.nodes.ImmutableScalarFlowInput;
+import io.resys.hdes.ast.api.nodes.ImmutableObjectInputNode;
+import io.resys.hdes.ast.api.nodes.ImmutableScalarInputNode;
 import io.resys.hdes.ast.api.nodes.ImmutableTaskRef;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhen;
@@ -122,7 +122,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
   @Value.Immutable
   public interface FwRedundentInputArgs extends FlowNode {
-    List<FlowInput> getValues();
+    List<InputNode> getValues();
   }
   @Value.Immutable
   public interface FwRedundentScalarType extends FlowNode {
@@ -178,7 +178,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
 
   @Override
   public FlowInputs visitInputs(InputsContext ctx) {
-    List<FlowInput> values = nodes(ctx).of(FwRedundentInputArgs.class)
+    List<InputNode> values = nodes(ctx).of(FwRedundentInputArgs.class)
         .map(a -> a.getValues()).orElse(Collections.emptyList());
     return ImmutableFlowInputs.builder()
         .token(token(ctx))
@@ -190,7 +190,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   public FwRedundentInputArgs visitInputArgs(InputArgsContext ctx) {
     return ImmutableFwRedundentInputArgs.builder()
         .token(token(ctx))
-        .values(nodes(ctx).list(FlowInput.class))
+        .values(nodes(ctx).list(InputNode.class))
         .build();
   }
   
@@ -198,26 +198,6 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   public AstNode visitInput(InputContext ctx) {
     ParseTree c = ctx.getChild(1);
     return c.accept(this);
-  }
-
-  @Override
-  public FwRedundentScalarType visitScalarType(ScalarTypeContext ctx) {
-    return ImmutableFwRedundentScalarType.builder()
-        .token(token(ctx))
-        .value(ScalarType.valueOf(ctx.getText()))
-        .build();
-  }
-
-  @Override
-  public ScalarFlowInput visitSimpleType(SimpleTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableScalarFlowInput.builder()
-        .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .type(nodes.of(FwRedundentScalarType.class).get().getValue())
-        .name(nodes.of(FwRedundentTypeName.class).get().getValue())
-        .debugValue(nodes.of(FwRedundentDebugValue.class).map(e -> e.getValue()))
-        .build();
   }
 
   @Override
@@ -230,22 +210,42 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
   
   @Override
-  public ArrayFlowInput visitArrayType(ArrayTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableArrayFlowInput.builder()
+  public FwRedundentScalarType visitScalarType(ScalarTypeContext ctx) {
+    return ImmutableFwRedundentScalarType.builder()
         .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .value(nodes.of(FlowInput.class).get())
+        .value(ScalarType.valueOf(ctx.getText()))
         .build();
   }
 
   @Override
-  public ObjectFlowInput visitObjectType(ObjectTypeContext ctx) {
+  public ScalarInputNode visitSimpleType(SimpleTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    List<FlowInput> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
+    return ImmutableScalarInputNode.builder()
+        .token(token(ctx))
+        .required(isRequiredInputType(ctx))
+        .type(nodes.of(FwRedundentScalarType.class).get().getValue())
+        .name(nodes.of(FwRedundentTypeName.class).get().getValue())
+        .debugValue(nodes.of(FwRedundentDebugValue.class).map(e -> e.getValue()))
+        .build();
+  }
+  
+  @Override
+  public ArrayInputNode visitArrayType(ArrayTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    return ImmutableArrayInputNode.builder()
+        .token(token(ctx))
+        .required(isRequiredInputType(ctx))
+        .value(nodes.of(InputNode.class).get())
+        .build();
+  }
+
+  @Override
+  public ObjectInputNode visitObjectType(ObjectTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    List<InputNode> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
         .orElse(Collections.emptyList());
     
-    return ImmutableObjectFlowInput.builder()
+    return ImmutableObjectInputNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
         .name(nodes.of(FwRedundentTypeName.class).get().getValue())

@@ -19,6 +19,9 @@ package io.resys.hdes.ast.api.nodes;
  * #L%
  */
 
+import java.util.List;
+import java.util.Optional;
+
 import org.immutables.value.Value;
 
 public interface AstNode {
@@ -69,6 +72,28 @@ public interface AstNode {
   @Value.Immutable
   interface DecimalConversion extends DataTypeConversion { }
 
+  
+  
+  interface InputNode extends AstNode {
+    Boolean getRequired();    
+    String getName();
+  }
+  
+  @Value.Immutable
+  interface ObjectInputNode extends InputNode {
+    List<InputNode> getValues();
+  }
+  
+  @Value.Immutable
+  interface ArrayInputNode extends InputNode {
+    InputNode getValue();
+  }
+  
+  @Value.Immutable
+  interface ScalarInputNode extends InputNode {
+    Optional<String> getDebugValue();
+    ScalarType getType();
+  }
   
   enum ScalarType {
     STRING, INTEGER, BOOLEAN, DECIMAL,

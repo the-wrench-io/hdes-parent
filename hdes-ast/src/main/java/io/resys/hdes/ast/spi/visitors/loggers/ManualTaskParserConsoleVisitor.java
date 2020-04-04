@@ -1,5 +1,7 @@
 package io.resys.hdes.ast.spi.visitors.loggers;
 
+import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
+
 /*-
  * #%L
  * hdes-ast
@@ -22,7 +24,6 @@ package io.resys.hdes.ast.spi.visitors.loggers;
 
 import io.resys.hdes.ast.ManualTaskParser.CssClassArgsContext;
 import io.resys.hdes.ast.ManualTaskParser.CssClassContext;
-import io.resys.hdes.ast.ManualTaskParser.DataTypeContext;
 import io.resys.hdes.ast.ManualTaskParser.DefaultValueContext;
 import io.resys.hdes.ast.ManualTaskParser.DescriptionContext;
 import io.resys.hdes.ast.ManualTaskParser.FieldContext;
@@ -35,15 +36,11 @@ import io.resys.hdes.ast.ManualTaskParser.InputsContext;
 import io.resys.hdes.ast.ManualTaskParser.LiteralContext;
 import io.resys.hdes.ast.ManualTaskParser.MessageContext;
 import io.resys.hdes.ast.ManualTaskParser.MtContext;
-import io.resys.hdes.ast.ManualTaskParser.PropsContext;
 import io.resys.hdes.ast.ManualTaskParser.StatementContext;
 import io.resys.hdes.ast.ManualTaskParser.StatementsContext;
 import io.resys.hdes.ast.ManualTaskParser.ThenContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
 import io.resys.hdes.ast.ManualTaskParser.WhenContext;
-
-import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
-
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
@@ -54,12 +51,6 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
   public AstNode visitLiteral(LiteralContext ctx) {
     log(ctx);
     return super.visitLiteral(ctx);
-  }
-
-  @Override
-  public AstNode visitDataType(DataTypeContext ctx) {
-    log(ctx);
-    return super.visitDataType(ctx);
   }
 
   @Override
@@ -96,12 +87,6 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
   public AstNode visitField(FieldContext ctx) {
     log(ctx);
     return super.visitField(ctx);
-  }
-
-  @Override
-  public AstNode visitProps(PropsContext ctx) {
-    log(ctx);
-    return super.visitProps(ctx);
   }
 
   @Override

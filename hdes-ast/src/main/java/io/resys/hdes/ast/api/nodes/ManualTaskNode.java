@@ -21,38 +21,53 @@ package io.resys.hdes.ast.api.nodes;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.immutables.value.Value;
 
+
 public interface ManualTaskNode extends AstNode {
   
-  enum StatementType { SHOW, HIDE, ALERT, EVALUATE }
+  enum StatementType { SHOW, ALERT, EVALUATE }
   
   interface FormBody extends ManualTaskNode {}
-  
-  interface ManualTaskDataType extends ManualTaskNode {
-    Boolean getRequired();
-    ScalarType getDataType();
-    String getName();
-  }
-
-  @Value.Immutable
-  interface ManualTaskInput extends ManualTaskNode {
-    ManualTaskDataType getType();
-  }
   
   @Value.Immutable
   interface ManualTaskBody extends ManualTaskNode {
     String getId();
     String getDescription();
-    List<ManualTaskInput> getInputs();
-    List<Statement> getStatement();
-    Form getForm();
+    ManualTaskInputs getInputs();
+    ManualTaskDropdowns getDropdowns();
+    ManualTaskStatements getStatements();
+    ManualTaskForm getForm();
+  }
+  
+  @Value.Immutable
+  interface ManualTaskInputs extends ManualTaskNode {
+    List<InputNode> getValues();
+  }  
+  @Value.Immutable
+  interface ManualTaskDropdowns extends ManualTaskNode {
+    List<Dropdown> getValues();
+  }  
+  @Value.Immutable
+  interface ManualTaskStatements extends ManualTaskNode {
+    List<Statement> getValues();
+  }  
+  @Value.Immutable
+  interface ManualTaskForm extends ManualTaskNode {
+    Optional<FormBody> getValue();
+  }
+  @Value.Immutable
+  interface Dropdown extends ManualTaskNode {
+    String getName();
+    Map<String, String> getValues();
   }
   
   @Value.Immutable
   interface Statement extends ManualTaskNode {
+    String getName();
     WhenStatement getWhen();
     ThenStatement getThen();
   }
@@ -60,41 +75,43 @@ public interface ManualTaskNode extends AstNode {
   @Value.Immutable
   interface WhenStatement extends ManualTaskNode {
     String getValue();
-    AstNode getExpression();
+    Optional<AstNode> getExpression();
   }
   
   @Value.Immutable
   interface ThenStatement extends ManualTaskNode {
     Optional<String> getMessage();
-    Optional<AstNode> getExpression();
     StatementType getType();
   }
   
   @Value.Immutable
-  interface Form extends ManualTaskNode {
+  interface Group extends FormBody {
+    String getId();
     FormBody getValue();
   }
-  
+
   @Value.Immutable
   interface Groups extends FormBody {
-    String getId();
-    List<FormBody> getValues();
+    List<Group> getValues();
   }
   
   @Value.Immutable
   interface Fields extends FormBody {
     List<FormField> getValues();
   }
-  
+
   interface FormField extends ManualTaskNode {
-    ManualTaskDataType getType();
-    String getDefaultValue();
+    Boolean getRequired();
+    String getName();
+    ScalarType getType();
+    Optional<String> getDefaultValue();
     List<String> getCssClasses();
   }
   
   @Value.Immutable
-  interface DropDownField extends FormField {
+  interface DropdownField extends FormField {
     Boolean getMultiple();
+    String getSource();
   }
   
   @Value.Immutable

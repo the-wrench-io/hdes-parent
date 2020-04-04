@@ -40,23 +40,43 @@ public class ManualTaskNodeTest {
     parse("id: basic \n"
         + "description: 'very descriptive manual task' \n"
         + "inputs: {} \n"
+        + "dropdowns: {} \n"
         + "statements: {} \n"
         + "form: { } \n"); 
   }
 
   @Test
+  public void emptyFields() throws IOException {
+    parse("id: basic \n"
+        + "description: 'very descriptive manual task' \n"
+        + "inputs: {} \n"
+        + "dropdowns: {} \n"
+        + "statements: {} \n"
+        + "form: { fields: {} }"); 
+  }
+  
+  @Test
   public void fields() throws IOException {
     parse("id: basic \n"
         + "description: 'very descriptive manual task' \n"
         + "inputs: {} \n"
+        + "dropdowns: {\n"
+        +   "gender: { 'f': 'female', 'm': 'male' }"
+        + "} \n"
         + "statements: {} \n"
-        + "form: { fields: { } }"); 
+        + "form: { fields: {\n"
+        + "  required STRING firstName: { },\n"
+        + "  required INTEGER age: { },\n"
+        + "  required INTEGER gender: { single dropdown: genderDropdown }\n"
+        + "\n} }"); 
   }
+  
   @Test
   public void nestedGroups() throws IOException {
     parse("id: basic \n"
         + "description: 'very descriptive manual task' \n"
         + "inputs: {} \n"
+        + "dropdowns: {} \n"
         + "statements: {} \n"
         + "form: {\n"
         +   "groups: {\n"

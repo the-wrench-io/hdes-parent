@@ -3,8 +3,8 @@ lexer grammar HdesLexer;
 ObjectDataType: OBJECT | ARRAY;
 DirectionType: IN | OUT;
 RequiredType: REQUIRED | OPTIONAL;
-DropDownType: DROP_DOWN_SINGLE | DROP_DOWN_MULTIPLE; 
-StatementType: SHOW | HIDE | ALERT | EVALUATE;
+DropdownType: DROPDOWN_SINGLE | DROPDOWN_MULTIPLE; 
+StatementType: SHOW | ALERT | EVALUATE;
 
 ScalarType
   : INTEGER
@@ -59,18 +59,19 @@ MATRIX: 'MATRIX';
 
 // MANUAL TASK
 CLASS: 'class';
-DROP_DOWN_SINGLE: 'selectOne';
-DROP_DOWN_MULTIPLE: 'selectMultiple'; 
+DROPDOWN_SINGLE: 'single';
+DROPDOWN_MULTIPLE: 'multiple'; 
+DROPDOWN: 'dropdown';
+DROPDOWNS: 'dropdowns'; 
 SHOW: 'SHOW';
-HIDE: 'HIDE';
 ALERT: 'ALERT';
 EVALUATE: 'EVALUATE';
 STATEMENTS: 'statements';
 MESSAGE: 'message';
-EXPRESSION: 'expression';
 FORM: 'form';
 GROUPS: 'groups';
 FIELDS: 'fields';
+VALUES: 'values';
 DEFAULT_VALUE: 'defaultValue';
 
 // FLOW
