@@ -7,11 +7,23 @@ import org.immutables.value.Value;
 
 public interface ObjectRepository {
   
+  enum ActionType { DELETED, CREATED, MODIFIED }
+  
+  PullBuilder pull();
+  StatusBuilder status();
   CommitBuilder commit();
   SnapshotBuilder snapshot();
   HistoryBuilder history();
   TagBuilder tags();
 
+  interface StatusBuilder {
+    Status build();
+  }
+  
+  interface PullBuilder {
+    Snapshot build();
+  }
+  
   interface TagBuilder {
     List<Tag> build();
   }
@@ -30,6 +42,21 @@ public interface ObjectRepository {
     CommitBuilder parent(String commitId);
     CommitBuilder author(String author);
     Commit build();
+  }
+
+  
+  @Value.Immutable
+  interface Status {
+    List<StatusEntry> getEntries();
+  }
+  
+  @Value.Immutable
+  interface StatusEntry {
+    String getId();
+    ActionType getAction();
+    String getName();
+    String getNewContent();
+    String getOldContent();
   }
   
   @Value.Immutable
@@ -59,6 +86,7 @@ public interface ObjectRepository {
     String getId();
     String getName();
     String getContentId();
+    ActionType getAction();
   }
   
   @Value.Immutable
@@ -82,4 +110,6 @@ public interface ObjectRepository {
     String getId();
     byte[] getBytes();
   }
+  
+  
 }
