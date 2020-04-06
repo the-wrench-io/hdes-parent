@@ -2,20 +2,30 @@ package io.resys.hdes.object.repo.api;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.immutables.value.Value;
 
+@Value.Immutable
 public interface ObjectRepository {
   
   enum ActionType { DELETED, CREATED, MODIFIED }
   
-  PullBuilder pull();
-  StatusBuilder status();
-  CommitBuilder commit();
-  SnapshotBuilder snapshot();
-  HistoryBuilder history();
-  TagBuilder tags();
-
+  Head getHead();
+  List<Commit> getCommits();
+  List<Tag> getTags();
+  List<Tree> getTrees();
+  Commands commands();
+  
+  interface Commands {
+    PullBuilder pull();
+    StatusBuilder status();
+    CommitBuilder commit();
+    SnapshotBuilder snapshot();
+    HistoryBuilder history();
+    TagBuilder tag();
+  }
+  
   interface StatusBuilder {
     Status build();
   }
@@ -25,7 +35,8 @@ public interface ObjectRepository {
   }
   
   interface TagBuilder {
-    List<Tag> build();
+    TagBuilder name(String name);
+    Tag build();
   }
   
   interface HistoryBuilder {
@@ -72,7 +83,7 @@ public interface ObjectRepository {
   
   @Value.Immutable
   interface Head {
-    String getCommitId();
+    Optional<String> getCommitId();
   }
   
   @Value.Immutable
@@ -110,6 +121,5 @@ public interface ObjectRepository {
     String getId();
     byte[] getBytes();
   }
-  
   
 }
