@@ -16,7 +16,7 @@ public class ObjectRepositoryTest {
 
   @Test
   public void createRepository() {
-    Commit commit = repo.commands().commit().build();
+    Commit commit = repo.commands().commit().add("file 1", "contentxxxx").build();
     Status status = repo.commands().status().build();
   }
 
