@@ -9,12 +9,9 @@ import org.immutables.value.Value;
 
 public interface ObjectRepository {
   
-  interface IsObject {
-    String getId();
-  }
-  interface IsName {
-    String getName();
-  }
+  interface IsObject { String getId(); }
+  interface IsName { String getName(); }
+  
   Objects objects();
   Commands commands();
   
@@ -22,17 +19,29 @@ public interface ObjectRepository {
     PullBuilder pull();
     StatusBuilder status();
     CommitBuilder commit();
-    SnapshotBuilder snapshot();
     HistoryBuilder history();
+    CheckoutBuilder checkout();
+    MergeBuilder merge();
     TagBuilder tag();
   }
   
+  interface MergeBuilder {
+    // Head name from what to merge to "master"
+    MergeBuilder head(String name);
+    Objects build();
+  }
+  
   interface StatusBuilder {
+    StatusBuilder add(String name, String content);
+    StatusBuilder delete(String name);
+    StatusBuilder change(String name, String content);
+    StatusBuilder head(String head);
+    StatusBuilder parent(String commitId);
     Status build();
   }
   
   interface PullBuilder {
-    Snapshot build();
+    ObjectRepository build();
   }
   
   interface TagBuilder {
@@ -44,8 +53,8 @@ public interface ObjectRepository {
     List<Commit> build();
   }
   
-  interface SnapshotBuilder {
-    SnapshotBuilder from(String commitId);
+  interface CheckoutBuilder {
+    CheckoutBuilder from(String name);
     Snapshot build();
   }
   
@@ -61,6 +70,21 @@ public interface ObjectRepository {
     Objects build();
   }
 
+  @Value.Immutable
+  interface Snapshot {
+    Head getHead();
+    Tree getTree();
+    List<Commit> getCommits();
+    List<SnapshotEntry> getValues();
+  }
+  
+  @Value.Immutable
+  interface SnapshotEntry {
+    String getName();
+    String getBlob();
+  }
+  
+  
   @Value.Immutable
   interface Objects {
     Map<String, Head> getHeads();
@@ -82,22 +106,10 @@ public interface ObjectRepository {
   }
   
   @Value.Immutable
-  interface Snapshot {
-    List<SnapshotEntry> getValues();
-  }
-
-  @Value.Immutable
-  interface SnapshotEntry {
-    String getName();
-    String getContent();
-  }
-  
-  @Value.Immutable
   interface TreeEntry {
     String getName();
     String getBlob();
   }
-  
   
   @Value.Immutable
   interface Head extends IsName {
