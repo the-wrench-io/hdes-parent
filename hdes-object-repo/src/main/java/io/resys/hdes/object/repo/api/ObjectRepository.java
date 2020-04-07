@@ -2,19 +2,20 @@ package io.resys.hdes.object.repo.api;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.immutables.value.Value;
 
-@Value.Immutable
 public interface ObjectRepository {
   
-  enum ActionType { DELETED, CREATED, MODIFIED }
-  
-  Head getHead();
-  List<Commit> getCommits();
-  List<Tag> getTags();
-  List<Tree> getTrees();
+  interface IsObject {
+    String getId();
+  }
+  interface IsName {
+    String getName();
+  }
+  Objects objects();
   Commands commands();
   
   interface Commands {
@@ -50,11 +51,22 @@ public interface ObjectRepository {
   
   interface CommitBuilder {
     CommitBuilder add(String name, String content);
+    CommitBuilder delete(String name);
+    CommitBuilder change(String name, String content);
+    
+    CommitBuilder head(String head);
     CommitBuilder parent(String commitId);
     CommitBuilder author(String author);
-    Commit build();
+    CommitBuilder comment(String message);
+    Objects build();
   }
 
+  @Value.Immutable
+  interface Objects {
+    Map<String, Head> getHeads();
+    Map<String, Tag> getTags();
+    Map<String, IsObject> getValues();
+  }
   
   @Value.Immutable
   interface Status {
@@ -64,7 +76,6 @@ public interface ObjectRepository {
   @Value.Immutable
   interface StatusEntry {
     String getId();
-    ActionType getAction();
     String getName();
     String getNewContent();
     String getOldContent();
@@ -82,44 +93,38 @@ public interface ObjectRepository {
   }
   
   @Value.Immutable
-  interface Head {
-    Optional<String> getCommitId();
+  interface TreeEntry {
+    String getName();
+    String getBlob();
   }
   
+  
   @Value.Immutable
-  interface Tree {
-    String getId();
-    List<TreeEntry> getValues();
+  interface Head extends IsName {
+    String getCommit();
   }
 
   @Value.Immutable
-  interface TreeEntry {
-    String getId();
-    String getName();
-    String getContentId();
-    ActionType getAction();
+  interface Tag extends IsName {
+    String getCommit();
   }
   
   @Value.Immutable
-  interface Commit {
-    String getId();
+  interface Tree extends IsObject {
+    Map<String, TreeEntry> getValues();
+  }
+  
+  @Value.Immutable
+  interface Commit extends IsObject {
     String getAuthor();
     LocalDateTime getDateTime();
-    String getParent();
-    String getTreeId();
-  }
-
-  @Value.Immutable
-  interface Tag {
-    String getId();
-    String getName();
-    String getCommitId();
+    String getMessage();
+    Optional<String> getParent();
+    String getTree();
   }
   
   @Value.Immutable
-  interface Content {
-    String getId();
-    byte[] getBytes();
+  interface Blob extends IsObject {
+    String getValue();
   }
-  
 }

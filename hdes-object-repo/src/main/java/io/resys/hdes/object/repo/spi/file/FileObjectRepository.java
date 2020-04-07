@@ -2,39 +2,26 @@ package io.resys.hdes.object.repo.spi.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.List;
+import java.util.Map;
 
-import io.resys.hdes.object.repo.api.ImmutableObjectRepository;
+import io.resys.hdes.object.repo.api.ImmutableObjects;
 import io.resys.hdes.object.repo.api.ObjectRepository;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commands;
-import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
-import io.resys.hdes.object.repo.api.ObjectRepository.CommitBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
-import io.resys.hdes.object.repo.api.ObjectRepository.HistoryBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.PullBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.SnapshotBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.StatusBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
-import io.resys.hdes.object.repo.api.ObjectRepository.TagBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
-import io.resys.hdes.object.repo.spi.GenericObjectRepositoryReader;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryReader;
-import io.resys.hdes.object.repo.spi.file.util.Assert;
+import io.resys.hdes.object.repo.spi.GenericObjectRepositoryMapper;
+import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper;
+import io.resys.hdes.object.repo.spi.ObjectsSerializerAndDeserializer;
+import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils.FileSystemConfig;
 
-public class FileObjectRepository implements Commands {
-  private final ObjectRepository objectRepository;
+public class FileObjectRepository implements Commands, ObjectRepository {
+  private final ObjectRepositoryMapper mapper;
+  private Objects objects;
   
-  public FileObjectRepository(Head head, List<Commit> commits, List<Tag> tags, List<Tree> trees) {
-    this.objectRepository = ImmutableObjectRepository.builder()
-        .commits(commits)
-        .tags(tags)
-        .trees(trees)
-        .head(head)
-        .commands(this)
-        .build();
+  public FileObjectRepository(Objects objects, ObjectRepositoryMapper mapper) {
+    this.objects = objects;
+    this.mapper = mapper;
   }
 
   @Override
@@ -51,8 +38,12 @@ public class FileObjectRepository implements Commands {
 
   @Override
   public CommitBuilder commit() {
-    // TODO Auto-generated method stub
-    return null;
+    return new GenericCommitBuilder(objects, mapper) {
+      @Override
+      protected Objects save(List<Object> input) {
+        return setObjects(mapper.writer(objects).build(input));
+      }
+    };
   }
 
   @Override
@@ -73,8 +64,19 @@ public class FileObjectRepository implements Commands {
     return null;
   }
   
-  public ObjectRepository getObjectRepository() {
-    return objectRepository;
+  @Override
+  public Objects objects() {
+    return objects;
+  }
+
+  @Override
+  public Commands commands() {
+    return this;
+  }
+  
+  private Objects setObjects(Objects objects) {
+    this.objects = objects;
+    return objects;
   }
 
   public static Config config() {
@@ -92,16 +94,25 @@ public class FileObjectRepository implements Commands {
 
     public ObjectRepository build() {
       try {
-        Assert.notNull(directory, () -> "directory must be defined!");
+        RepoAssert.notNull(directory, () -> "directory must be defined!");
         FileSystemConfig fileSystem = FileUtils.createOrGetRepo(directory);
         
-        ObjectRepositoryReader visitor = new GenericObjectRepositoryReader();
-        Head head = visitor.visitHead(Files.readAllBytes(fileSystem.getHead().toPath()));
-        List<Commit> commits = FileUtils.readFiles(fileSystem.getCommits(), (id, content) -> visitor.visitCommit(id, content));
-        List<Tag> tags = FileUtils.readFiles(fileSystem.getTags(), (id, content) -> visitor.visitTag(id, content));
-        List<Tree> trees = FileUtils.readFiles(fileSystem.getTrees(), (id, content) -> visitor.visitTree(id, content));;
+        ObjectsSerializerAndDeserializer serializer = ObjectsSerializerAndDeserializer.INSTANCE;
         
-        return new FileObjectRepository(head, commits, tags, trees).getObjectRepository();
+        Map<String, Head> heads = FileUtils.map(fileSystem.getHeads(), (id, v) -> serializer.visitHead(id, v));
+        Map<String, Tag> tags = FileUtils.map(fileSystem.getTags(), (id, v) -> serializer.visitTag(id, v));
+        Map<String, IsObject> values = FileUtils.map(fileSystem.getObjects(), (id, v) -> serializer.visitObject(id, v));
+        
+        Objects objects = ImmutableObjects.builder()
+        .values(values)
+        .tags(tags)
+        .heads(heads)
+        .build();
+        
+        return new FileObjectRepository(objects, 
+            new GenericObjectRepositoryMapper(
+                serializer, serializer,
+                (v) -> new FileWriter(v, fileSystem, serializer)));
       } catch (IOException e) {
         throw new RuntimeException(e.getMessage(), e);
       }

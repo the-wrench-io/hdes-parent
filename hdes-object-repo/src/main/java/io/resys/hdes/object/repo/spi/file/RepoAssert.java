@@ -1,4 +1,4 @@
-package io.resys.hdes.object.repo.spi.file.util;
+package io.resys.hdes.object.repo.spi.file;
 
 /*-
  * #%L
@@ -22,16 +22,18 @@ package io.resys.hdes.object.repo.spi.file.util;
 
 import java.util.function.Supplier;
 
-public class Assert {
+import io.resys.hdes.object.repo.api.exceptions.RepoException;
+
+public class RepoAssert {
   
   public static void notNull(Object object, Supplier<String> message) {
     if (object == null) {
-      throw new IllegalArgumentException(getMessage(message));
+      throw new RepoException(getMessage(message));
     }
   }
   public static void isTrue(boolean expression, Supplier<String> message) {
     if (!expression) {
-      throw new IllegalArgumentException(getMessage(message));
+      throw new RepoException(getMessage(message));
     }
   }
   private static String getMessage(Supplier<String> supplier) {

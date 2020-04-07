@@ -7,8 +7,6 @@ import java.nio.file.Files;
 import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.object.repo.api.ObjectRepository;
-import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
-import io.resys.hdes.object.repo.api.ObjectRepository.Status;
 import io.resys.hdes.object.repo.spi.file.FileObjectRepository;
 
 public class ObjectRepositoryTest {
@@ -16,8 +14,8 @@ public class ObjectRepositoryTest {
 
   @Test
   public void createRepository() {
-    Commit commit = repo.commands().commit().add("file 1", "contentxxxx").build();
-    Status status = repo.commands().status().build();
+    
+    repo.commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("init").build();
   }
 
   private ObjectRepository create() {
