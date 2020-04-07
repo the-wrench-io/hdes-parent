@@ -26,7 +26,6 @@ import io.resys.hdes.object.repo.spi.file.util.FileUtils.FileSystemConfig;
 
 public class FileWriter implements Writer {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileWriter.class);
-  
   private final FileSystemConfig config;
   private final Serializer serializer;
   private final Objects src;
@@ -57,7 +56,6 @@ public class FileWriter implements Writer {
         throw new RepoException("Unknown object: " + value);
       }
     }
-    
     LOGGER.debug(log.toString());
     Objects result = builder.build();
     return result;
@@ -70,7 +68,6 @@ public class FileWriter implements Writer {
       target = FileUtils.mkFile(target);
       FileOutputStream fileOutputStream = new FileOutputStream(target);
       IOUtils.copy(new ByteArrayInputStream(serializer.visitHead(head)), fileOutputStream);
-      
       log.append("  - ").append(head).append(System.lineSeparator());
       return head;
     } catch (IOException e) {
@@ -100,6 +97,8 @@ public class FileWriter implements Writer {
       return commit;
     }
     try {
+      FileUtils.mkFile(target);
+      
       FileOutputStream fileOutputStream = new FileOutputStream(target);
       IOUtils.copy(new ByteArrayInputStream(serializer.visitObject(commit)), fileOutputStream);
       log.append("  - commit: ").append(target.getPath()).append(System.lineSeparator());
@@ -117,6 +116,8 @@ public class FileWriter implements Writer {
       return blob;
     }
     try {
+      FileUtils.mkFile(target);
+      
       FileOutputStream fileOutputStream = new FileOutputStream(target);
       IOUtils.copy(new ByteArrayInputStream(serializer.visitObject(blob)), fileOutputStream);
       log.append("  - blob: ").append(target.getPath()).append(System.lineSeparator());
@@ -133,7 +134,10 @@ public class FileWriter implements Writer {
       log.append("  - tree reuse: ").append(target.getPath()).append(System.lineSeparator());
       return tree;
     }
+    
     try {
+      FileUtils.mkFile(target);
+      
       FileOutputStream fileOutputStream = new FileOutputStream(target);
       IOUtils.copy(new ByteArrayInputStream(serializer.visitObject(tree)), fileOutputStream);
       log.append("  - tree: ").append(target.getPath()).append(System.lineSeparator());
@@ -144,12 +148,8 @@ public class FileWriter implements Writer {
   }
 
   private File objects(IsObject object) {
-    try {
-      File directory = new File(config.getObjects(), object.getId().substring(0, 2));
-      FileUtils.mkdir(directory);
-      return FileUtils.mkFile(new File(directory, object.getId().substring(2)));
-    } catch (IOException e) {
-      throw new RepoException("Failed to write OBJECT: " + object.getId() + " because: " + e.getMessage() + "!", e);
-    }
+    File directory = new File(config.getObjects(), object.getId().substring(0, 2));
+    FileUtils.mkdir(directory);
+    return new File(directory, object.getId().substring(2));
   }
 }
