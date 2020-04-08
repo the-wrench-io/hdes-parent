@@ -2,6 +2,7 @@ package io.resys.hdes.object.repo.spi.file;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +12,9 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Commands;
 import io.resys.hdes.object.repo.spi.GenericObjectRepositoryMapper;
 import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper;
 import io.resys.hdes.object.repo.spi.ObjectsSerializerAndDeserializer;
+import io.resys.hdes.object.repo.spi.commands.GenericCheckoutBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
+import io.resys.hdes.object.repo.spi.commands.GenericTagBuilder;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils.FileSystemConfig;
 
@@ -25,18 +28,6 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   }
 
   @Override
-  public PullBuilder pull() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public StatusBuilder status() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public CommitBuilder commit() {
     return new GenericCommitBuilder(objects, mapper) {
       @Override
@@ -47,7 +38,24 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   }
 
   @Override
-  public SnapshotBuilder snapshot() {
+  public TagBuilder tag() {
+    return new GenericTagBuilder(objects) {
+      @Override
+      public Tag build() {
+        Tag result = super.build();
+        setObjects(mapper.writer(objects).build(Arrays.asList(result)));
+        return result;
+      }
+    };
+  }
+  
+  @Override
+  public CheckoutBuilder checkout() {
+    return new GenericCheckoutBuilder(objects);
+  }
+  
+  @Override
+  public StatusBuilder status() {
     // TODO Auto-generated method stub
     return null;
   }
@@ -57,9 +65,9 @@ public class FileObjectRepository implements Commands, ObjectRepository {
     // TODO Auto-generated method stub
     return null;
   }
-
+  
   @Override
-  public TagBuilder tag() {
+  public MergeBuilder merge() {
     // TODO Auto-generated method stub
     return null;
   }

@@ -12,6 +12,7 @@ import io.resys.hdes.object.repo.api.ImmutableCommit;
 import io.resys.hdes.object.repo.api.ImmutableHead;
 import io.resys.hdes.object.repo.api.ImmutableTree;
 import io.resys.hdes.object.repo.api.ImmutableTreeEntry;
+import io.resys.hdes.object.repo.api.ObjectRepository;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.CommitBuilder;
@@ -108,7 +109,7 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     if(objects.getHeads().isEmpty()) {
       oldTree = new HashMap<>();
       head = Optional.of(ImmutableHead.builder()
-          .name(newHead == null || newHead.trim().isEmpty() ? "master" : newHead.trim())
+          .name(newHead == null || newHead.trim().isEmpty() ? ObjectRepository.MASTER : newHead.trim())
           .commit(FAKE_ID)
           .build());
       parent = Optional.empty();

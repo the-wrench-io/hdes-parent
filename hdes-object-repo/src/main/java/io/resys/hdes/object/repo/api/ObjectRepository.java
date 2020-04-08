@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.immutables.value.Value;
 
 public interface ObjectRepository {
-  
+  public static final String MASTER = "master";
   interface IsObject { String getId(); }
   interface IsName { String getName(); }
   
@@ -16,7 +16,6 @@ public interface ObjectRepository {
   Commands commands();
   
   interface Commands {
-    PullBuilder pull();
     StatusBuilder status();
     CommitBuilder commit();
     HistoryBuilder history();
@@ -32,20 +31,16 @@ public interface ObjectRepository {
   }
   
   interface StatusBuilder {
-    StatusBuilder add(String name, String content);
-    StatusBuilder delete(String name);
-    StatusBuilder change(String name, String content);
-    StatusBuilder head(String head);
-    StatusBuilder parent(String commitId);
+    // Build overview of all all heads related to 'master' head
     Status build();
   }
   
-  interface PullBuilder {
-    ObjectRepository build();
-  }
-  
   interface TagBuilder {
+    // Name of the tag
     TagBuilder name(String name);
+    // optional commit for what to add tag
+    TagBuilder commit(String commit);
+    // tags can be created only from master
     Tag build();
   }
   
@@ -54,6 +49,7 @@ public interface ObjectRepository {
   }
   
   interface CheckoutBuilder {
+    // tag or commit
     CheckoutBuilder from(String name);
     Snapshot build();
   }
@@ -72,9 +68,8 @@ public interface ObjectRepository {
 
   @Value.Immutable
   interface Snapshot {
-    Head getHead();
+    String getId();
     Tree getTree();
-    List<Commit> getCommits();
     List<SnapshotEntry> getValues();
   }
   
@@ -83,7 +78,6 @@ public interface ObjectRepository {
     String getName();
     String getBlob();
   }
-  
   
   @Value.Immutable
   interface Objects {

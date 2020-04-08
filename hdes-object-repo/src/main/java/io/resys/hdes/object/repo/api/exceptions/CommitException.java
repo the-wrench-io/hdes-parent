@@ -3,6 +3,7 @@ package io.resys.hdes.object.repo.api.exceptions;
 import java.util.Collection;
 
 import io.resys.hdes.object.repo.api.ObjectRepository.Head;
+import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
 
 public class CommitException extends RepoException {
@@ -59,5 +60,35 @@ public class CommitException extends RepoException {
           .append(" is rejected because parent does not exist!")
           .toString();
     }
+    
+    public String notFound(String commit) {
+      return new StringBuilder()
+          .append("Commit: ").append(commit)
+          .append(" does not exist!")
+          .toString();
+    }
+    
+    public String notCommit(IsObject object) {
+      return new StringBuilder()
+          .append("Expecting a commit for id: ").append(object.getId())
+          .append(" but was: ").append(object.getClass())
+          .append("!")
+          .toString();
+    }
+    
+    public String headNotFound(String head) {
+      return new StringBuilder()
+          .append("Head: ").append(head)
+          .append(" does not exist!")
+          .toString();
+    }
+    
+    public String notInHead(String commit, String head) {
+      return new StringBuilder()
+          .append("Commit: ").append(commit)
+          .append(" is not in head: ").append(head)
+          .append("!")
+          .toString();
+    }    
   }
 }
