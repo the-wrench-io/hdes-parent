@@ -12,6 +12,10 @@
   <inceptionYear>2020</inceptionYear>
 
   <modules>
+    <module>hdes-ast</module>
+    <module>hdes-object-repo</module>
+    <module>hdes-object-repo-mongodb</module>
+
     <module>hdes-datatype</module>
     <module>hdes-decisiontable</module>
     <module>hdes-servicetask</module>
@@ -253,6 +257,22 @@
       </dependency>
 
       <!-- Components -->
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-ast</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-object-repo</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-object-repo-mongodb</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-management</artifactId>
