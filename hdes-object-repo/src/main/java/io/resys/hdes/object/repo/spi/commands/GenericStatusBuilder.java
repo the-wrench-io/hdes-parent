@@ -93,7 +93,7 @@ public class GenericStatusBuilder implements StatusBuilder {
           changes.add(ImmutableChanges.builder()
               .action(ChangeAction.CREATED)
               .name(entry.getName())
-              .oldValue(blob.getValue()).build());
+              .newValue(blob.getValue()).build());
           continue;
         }
         
@@ -129,7 +129,7 @@ public class GenericStatusBuilder implements StatusBuilder {
     }
     
     
-    return ImmutableStatus.builder().build();
+    return ImmutableStatus.builder().entries(entries).build();
   }
   
   

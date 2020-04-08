@@ -65,7 +65,7 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   public MergeBuilder merge() {
     return new GenericMergeBuilder(objects, () -> commit()) {
       @Override
-      protected Objects delete(Objects objects, HeadStatus head) {
+      protected Objects delete(HeadStatus head) {
         return setObjects(mapper.delete(objects).build(head)); 
       }
     };

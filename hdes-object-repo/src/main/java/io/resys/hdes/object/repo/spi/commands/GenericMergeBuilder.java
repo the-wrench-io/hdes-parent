@@ -75,9 +75,9 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
       default: throw new CommitException(CommitException.builder().conflicts(head, changes));  
       }
     }
-    
-    return delete(commitBuilder.build(), entry);
+    commitBuilder.build();
+    return delete(entry);
   }
   
-  protected abstract Objects delete(Objects objects, HeadStatus head);
+  protected abstract Objects delete(HeadStatus head);
 }

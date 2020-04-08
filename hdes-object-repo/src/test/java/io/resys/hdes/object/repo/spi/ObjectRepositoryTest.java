@@ -7,18 +7,36 @@ import java.nio.file.Files;
 import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.object.repo.api.ObjectRepository;
+import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.spi.file.FileObjectRepository;
 
 public class ObjectRepositoryTest {
-  private ObjectRepository repo = create();
 
   @Test
   public void createRepository() {
-    
-    repo.commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("init").build();
+    create().commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("init").build();
   }
 
-  private ObjectRepository create() {
+  @Test
+  public void createHead() {
+    ObjectRepository repo = create();
+    Commit firstCommit = repo.commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("first commit").build();
+    
+    Commit commit = repo.commands().commit()
+    .add("file 2", "contentxxxx")
+    .add("file 3", "contentxxxx")
+    .add("file 4", "contentxxxx1")
+    .head("new-head-1")
+    .author("me@me.com")
+    .parent(firstCommit.getId())
+    .comment("init second head").build();
+    
+    repo.commands().merge()
+    .author("merger@me.com")
+    .head("new-head-1").build();
+  }
+  
+  private static ObjectRepository create() {
     try {
       File file = Files.createTempDirectory("test-" + System.currentTimeMillis()).toFile();
       

@@ -4,7 +4,9 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -40,25 +42,31 @@ public class FileWriter implements Writer {
 
   @Override
   public Objects build(List<Object> objects) {
-    ImmutableObjects.Builder builder = ImmutableObjects.builder().from(src);
+    
+    Map<String, Head> heads = new HashMap<>(src.getHeads());
+    Map<String, Tag> tags = new HashMap<>(src.getTags());
+    Map<String, IsObject> values = new HashMap<>(src.getValues());
+    
     for (Object value : objects) {
       if (value instanceof Blob) {
-        builder.putValues(((Blob) value).getId(), visitBlob((Blob) value));
+        values.put(((Blob) value).getId(), visitBlob((Blob) value));
       } else if (value instanceof Commit) {
-        builder.putValues(((Commit) value).getId(), visitCommit((Commit) value));
+        values.put(((Commit) value).getId(), visitCommit((Commit) value));
       } else if (value instanceof Tree) {
-        builder.putValues(((Tree) value).getId(), visitTree((Tree) value));
+        values.put(((Tree) value).getId(), visitTree((Tree) value));
+      
       } else if (value instanceof Head) {
-        builder.putHeads(((Head) value).getName(), visitHead((Head) value));
+        heads.put(((Head) value).getName(), visitHead((Head) value));
+      
       } else if (value instanceof Tag) {
-        builder.putTags(((Tag) value).getName(), visitTag((Tag) value));
+        tags.put(((Tag) value).getName(), visitTag((Tag) value));
+
       } else {
         throw new RepoException("Unknown object: " + value);
       }
     }
     LOGGER.debug(log.toString());
-    Objects result = builder.build();
-    return result;
+    return ImmutableObjects.builder().values(values).heads(heads).tags(tags).build();
   }
 
   @Override

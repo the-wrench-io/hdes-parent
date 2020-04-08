@@ -70,7 +70,7 @@ public interface ObjectRepository {
     CommitBuilder author(String author);
     CommitBuilder comment(String message);
     CommitBuilder merge(String commitId);
-    Objects build();
+    Commit build();
   }
 
   @Value.Immutable

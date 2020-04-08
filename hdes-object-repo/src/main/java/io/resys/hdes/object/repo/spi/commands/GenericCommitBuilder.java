@@ -98,7 +98,7 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     return this;
   }
   @Override
-  public Objects build() {
+  public Commit build() {
     RepoAssert.notNull(author, () -> "author must be defined!");
     RepoAssert.notNull(comment, () -> "comment must be defined!");
     
@@ -124,7 +124,15 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
       if (!parent.isPresent()) {
         throw new CommitException(CommitException.builder().unknownParent(parentId, author));
       }
-      head = objects.getHeads().values().stream().filter(h -> h.getCommit().equals(parentId)).findFirst();
+      if(newHead != null) {
+        head = objects.getHeads().values().stream().filter(h -> h.getName().equals(newHead)).findFirst();
+        if(!head.isPresent()) {
+          head = Optional.of(ImmutableHead.builder().name(newHead).commit(FAKE_ID).build()); 
+        }
+      } else {
+        head = objects.getHeads().values().stream().filter(h -> h.getCommit().equals(parentId)).findFirst();  
+      }
+      
       if (!head.isPresent()) {
         throw new CommitException(CommitException.builder().headDoesNotMatch(parentId, author, objects.getHeads().values()));
       }
@@ -167,7 +175,8 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
         .commit(commit.getId())
         .build());
     
-    return save(newObjects);
+    save(newObjects);
+    return commit;
   }
   
   protected abstract Objects save(List<Object> newObjects);

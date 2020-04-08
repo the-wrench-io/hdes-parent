@@ -37,8 +37,9 @@ public class FileDelete implements Delete {
     Map<String, Tag> tags = new HashMap<>(src.getTags());
     Map<String, IsObject> values = new HashMap<>(src.getValues());
     
-    heads.remove(headStatus.getHead());
     visitHead(heads.get(headStatus.getHead()));
+    heads.remove(headStatus.getHead());
+    
     
     LOGGER.debug(log.toString());
     return ImmutableObjects.builder()
