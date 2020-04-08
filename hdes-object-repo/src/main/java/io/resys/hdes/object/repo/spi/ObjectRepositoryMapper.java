@@ -20,9 +20,7 @@ public interface ObjectRepositoryMapper {
   IdSupplier id();
 
   interface Delete {
-    Blob visitBlob(Blob blob);
-    Tree visitTree(Tree tree);
-    Commit visitCommit(Commit commit);
+    Head visitHead(Head head);
     Objects build(HeadStatus headStatus);
   }
   

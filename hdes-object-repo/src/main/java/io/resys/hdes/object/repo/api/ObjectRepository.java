@@ -28,6 +28,7 @@ public interface ObjectRepository {
   interface MergeBuilder {
     // Head name from what to merge to "master"
     MergeBuilder head(String name);
+    MergeBuilder author(String author);
     Objects build();
   }
   
@@ -68,6 +69,7 @@ public interface ObjectRepository {
     CommitBuilder parent(String commitId);
     CommitBuilder author(String author);
     CommitBuilder comment(String message);
+    CommitBuilder merge(String commitId);
     Objects build();
   }
 
@@ -139,6 +141,7 @@ public interface ObjectRepository {
     LocalDateTime getDateTime();
     String getMessage();
     Optional<String> getParent();
+    Optional<String> getMerge();
     String getTree();
   }
   

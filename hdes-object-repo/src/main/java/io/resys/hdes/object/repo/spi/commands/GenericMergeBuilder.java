@@ -3,6 +3,7 @@ package io.resys.hdes.object.repo.spi.commands;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import io.resys.hdes.object.repo.api.ObjectRepository;
 import io.resys.hdes.object.repo.api.ObjectRepository.ChangeAction;
 import io.resys.hdes.object.repo.api.ObjectRepository.Changes;
 import io.resys.hdes.object.repo.api.ObjectRepository.CommitBuilder;
@@ -16,6 +17,7 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
   private final Objects objects;
   private final Supplier<CommitBuilder> commitBuilder;
   private String head;
+  private String author;
 
   public GenericMergeBuilder(Objects objects, Supplier<CommitBuilder> commitBuilder) {
     super();
@@ -26,6 +28,12 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
   @Override
   public MergeBuilder head(String name) {
     this.head = name;
+    return this;
+  }
+  
+  @Override
+  public MergeBuilder author(String author) {
+    this.author = author;
     return this;
   }
 
@@ -41,7 +49,24 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
     if(conflicts.isPresent()) {
       throw new CommitException(CommitException.builder().conflicts(head));  
     }
-    CommitBuilder commitBuilder = this.commitBuilder.get().comment("merge: " + head);
+    
+    StringBuilder comment = new StringBuilder()
+        .append("Merged from: ").append(head)
+        .append(", authors: ");
+    
+    StringBuilder authors = new StringBuilder();
+    entry.getCommits().stream().forEach(c -> {
+      if(authors.length() > 0) {
+        authors.append(", ");  
+      }
+      authors.append(c.getAuthor());
+    });
+    
+    CommitBuilder commitBuilder = this.commitBuilder.get()
+        .comment(comment.append(authors).toString())
+        .merge(entry.getCommits().get(0).getId())
+        .author(author)
+        .parent(objects.getHeads().get(ObjectRepository.MASTER).getCommit());
     for(Changes changes : entry.getChanges()) {
       switch (changes.getAction()) {
       case CREATED:

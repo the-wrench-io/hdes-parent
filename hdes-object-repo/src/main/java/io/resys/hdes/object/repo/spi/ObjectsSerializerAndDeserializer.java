@@ -4,6 +4,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import io.resys.hdes.object.repo.api.ImmutableBlob;
 import io.resys.hdes.object.repo.api.ImmutableCommit;
@@ -40,22 +41,30 @@ public class ObjectsSerializerAndDeserializer implements Serializer, Deserialize
     String[] parent = value[1].split(" ");
     LocalDateTime dateTime = LocalDateTime.parse(value[2].split(" ")[1]);
     String author = value[3].split(" ")[1];
+    Optional<String> merge = value.length > 3 ? Optional.of(value[4].split(" ")[1]) : Optional.empty();
     return ImmutableCommit.builder()
         .id(id)
         .parent(parent.length > 1 ? parent[1] : null)
         .tree(treeId)
         .dateTime(dateTime)
         .author(author)
+        .merge(merge)
         .build();
   }
   
   private byte[] visitCommit(Commit commit) {
-    return new StringBuilder()
+    
+    StringBuilder result = new StringBuilder()
     .append(TYPE_COMMIT).append(commit.getTree()).append("/n")
     .append("parent ").append(commit.getParent().orElse("")).append("/n")
     .append("localDateTime ").append(commit.getDateTime()).append("/n")
-    .append("author ").append(commit.getAuthor()).append("/n")
-    .toString().getBytes(StandardCharsets.UTF_8);
+    .append("author ").append(commit.getAuthor()).append("/n");
+    
+    if(commit.getMerge().isPresent()) {
+      result.append("merge ").append(commit.getMerge().get()).append("/n");
+    }
+    
+    return result.toString().getBytes(StandardCharsets.UTF_8);
   }
 
   private Blob visitBlob(String id, String content) {

@@ -125,7 +125,8 @@ public class FileObjectRepository implements Commands, ObjectRepository {
         return new FileObjectRepository(objects, 
             new GenericObjectRepositoryMapper(
                 serializer, serializer,
-                (v) -> new FileWriter(v, fileSystem, serializer)));
+                (v) -> new FileWriter(v, fileSystem, serializer),
+                (v) -> new FileDelete(v, fileSystem)));
       } catch (IOException e) {
         throw new RuntimeException(e.getMessage(), e);
       }

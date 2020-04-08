@@ -38,7 +38,7 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
   private String parentId;
   private String author;
   private String comment;
-  
+  private String mergeId;
 
   public GenericCommitBuilder(Objects objects, ObjectRepositoryMapper mapper) {
     super();
@@ -93,6 +93,11 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     return this;
   }
   @Override
+  public CommitBuilder merge(String mergeId) {
+    this.mergeId = mergeId;
+    return this;
+  }
+  @Override
   public Objects build() {
     RepoAssert.notNull(author, () -> "author must be defined!");
     RepoAssert.notNull(comment, () -> "comment must be defined!");
@@ -141,9 +146,7 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
       newTree.remove(entry);
     }
     
-    
     Tree tree = add(mapper.id().id(ImmutableTree.builder().id(FAKE_ID).values(newTree).build()));
-    
     
     Commit commit = add(mapper.id().id(ImmutableCommit.builder()
         .id(FAKE_ID)
@@ -151,6 +154,7 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
         .author(author)
         .dateTime(LocalDateTime.now())
         .message(comment)
+        .merge(Optional.ofNullable(mergeId))
         .parent(parent.map(e -> e.getId()))
         .build()));
     

@@ -8,15 +8,18 @@ public class GenericObjectRepositoryMapper implements ObjectRepositoryMapper {
    
   private final static IdSupplier ID_SUPPLIER = new Sha1IdSupplier();
   private final Function<Objects, Writer> writer;
+  private final Function<Objects, Delete> delete;
   private final Serializer serializer;
   private final Deserializer deserializer;
 
   public GenericObjectRepositoryMapper(
       Serializer serializer,
       Deserializer deserializer,
-      Function<Objects, Writer> writer) {
+      Function<Objects, Writer> writer,
+      Function<Objects, Delete> delete) {
     super();
     this.writer = writer;
+    this.delete = delete;
     this.serializer = serializer;
     this.deserializer = deserializer;
   }
@@ -35,6 +38,7 @@ public class GenericObjectRepositoryMapper implements ObjectRepositoryMapper {
   public Writer writer(Objects objects) {
     return writer.apply(objects);
   }
+  
   @Override
   public IdSupplier id() {
     return ID_SUPPLIER;
@@ -42,7 +46,6 @@ public class GenericObjectRepositoryMapper implements ObjectRepositoryMapper {
 
   @Override
   public Delete delete(Objects from) {
-    // TODO Auto-generated method stub
-    return null;
+    return delete.apply(from);
   }
 }
