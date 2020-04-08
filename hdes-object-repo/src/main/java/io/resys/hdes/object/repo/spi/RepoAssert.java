@@ -1,4 +1,4 @@
-package io.resys.hdes.object.repo.spi.file;
+package io.resys.hdes.object.repo.spi;
 
 /*-
  * #%L

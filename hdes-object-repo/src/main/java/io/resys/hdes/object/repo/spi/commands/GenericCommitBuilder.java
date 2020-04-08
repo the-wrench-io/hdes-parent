@@ -22,7 +22,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
 import io.resys.hdes.object.repo.api.exceptions.CommitException;
 import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper;
-import io.resys.hdes.object.repo.spi.file.RepoAssert;
+import io.resys.hdes.object.repo.spi.RepoAssert;
 
 public abstract class GenericCommitBuilder implements CommitBuilder {
   private final static String FAKE_ID = "!-unknown-atm-!";

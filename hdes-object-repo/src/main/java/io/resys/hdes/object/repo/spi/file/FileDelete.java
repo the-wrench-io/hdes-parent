@@ -17,7 +17,7 @@ import io.resys.hdes.object.repo.api.exceptions.RepoException;
 import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper.Delete;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils.FileSystemConfig;
 
-public class FileDelete implements Delete {
+public class FileDelete implements Delete<File> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileDelete.class);
   private final FileSystemConfig config;
   private final Objects src;
@@ -37,7 +37,9 @@ public class FileDelete implements Delete {
     Map<String, Tag> tags = new HashMap<>(src.getTags());
     Map<String, IsObject> values = new HashMap<>(src.getValues());
     
-    visitHead(heads.get(headStatus.getHead()));
+    Head head = heads.get(headStatus.getHead());
+    File file = new File(config.getHeads(), head.getName());
+    visitHead(file, head);
     heads.remove(headStatus.getHead());
     
     
@@ -50,8 +52,7 @@ public class FileDelete implements Delete {
   }
 
   @Override
-  public Head visitHead(Head head) {
-    File file = new File(config.getHeads(), head.getName());
+  public Head visitHead(File file, Head head) {
     log.append("  - deleting: ").append(file.getPath()).append(" - ").append(head);
     if(!file.delete()) {
       throw new RepoException("Failed to delete file: " + file.getPath() + "!");

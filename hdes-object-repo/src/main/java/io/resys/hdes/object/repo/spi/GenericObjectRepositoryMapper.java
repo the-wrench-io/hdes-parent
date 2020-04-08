@@ -4,19 +4,19 @@ import java.util.function.Function;
 
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 
-public class GenericObjectRepositoryMapper implements ObjectRepositoryMapper {
+public class GenericObjectRepositoryMapper<T> implements ObjectRepositoryMapper<T> {
    
   private final static IdSupplier ID_SUPPLIER = new Sha1IdSupplier();
-  private final Function<Objects, Writer> writer;
-  private final Function<Objects, Delete> delete;
+  private final Function<Objects, Writer<T>> writer;
+  private final Function<Objects, Delete<T>> delete;
   private final Serializer serializer;
   private final Deserializer deserializer;
 
   public GenericObjectRepositoryMapper(
       Serializer serializer,
       Deserializer deserializer,
-      Function<Objects, Writer> writer,
-      Function<Objects, Delete> delete) {
+      Function<Objects, Writer<T>> writer,
+      Function<Objects, Delete<T>> delete) {
     super();
     this.writer = writer;
     this.delete = delete;
@@ -35,7 +35,7 @@ public class GenericObjectRepositoryMapper implements ObjectRepositoryMapper {
   }
 
   @Override
-  public Writer writer(Objects objects) {
+  public Writer<T> writer(Objects objects) {
     return writer.apply(objects);
   }
   
@@ -45,7 +45,7 @@ public class GenericObjectRepositoryMapper implements ObjectRepositoryMapper {
   }
 
   @Override
-  public Delete delete(Objects from) {
+  public Delete<T> delete(Objects from) {
     return delete.apply(from);
   }
 }

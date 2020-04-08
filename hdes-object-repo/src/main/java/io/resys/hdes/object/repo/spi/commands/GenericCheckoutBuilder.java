@@ -14,7 +14,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.SnapshotEntry;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
 import io.resys.hdes.object.repo.api.exceptions.CheckoutException;
-import io.resys.hdes.object.repo.spi.file.RepoAssert;
+import io.resys.hdes.object.repo.spi.RepoAssert;
 
 public class GenericCheckoutBuilder implements CheckoutBuilder {
 

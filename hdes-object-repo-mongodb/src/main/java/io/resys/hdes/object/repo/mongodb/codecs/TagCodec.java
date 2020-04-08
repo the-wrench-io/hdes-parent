@@ -33,7 +33,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 public class TagCodec implements Codec<Tag> {
   
   public static final String ID = "_id";
-  private static final String COMMIT = "commit";
+  public static final String COMMIT = "commit";
   
   @Override
   public void encode(BsonWriter writer, Tag command, EncoderContext encoderContext) {

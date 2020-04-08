@@ -5,7 +5,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.exceptions.CommitException;
-import io.resys.hdes.object.repo.spi.file.RepoAssert;
+import io.resys.hdes.object.repo.spi.RepoAssert;
 
 public class CommitQuery {
   

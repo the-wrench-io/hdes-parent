@@ -26,7 +26,7 @@ import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper.Writer;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils.FileSystemConfig;
 
-public class FileWriter implements Writer {
+public class FileWriter implements Writer<File> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileWriter.class);
   private final FileSystemConfig config;
   private final Serializer serializer;
@@ -49,17 +49,29 @@ public class FileWriter implements Writer {
     
     for (Object value : objects) {
       if (value instanceof Blob) {
-        values.put(((Blob) value).getId(), visitBlob((Blob) value));
+        Blob blob = (Blob) value;
+        File target = objects(blob);
+        values.put(blob.getId(), visitBlob(target, blob));
+      
       } else if (value instanceof Commit) {
-        values.put(((Commit) value).getId(), visitCommit((Commit) value));
+        Commit commit = (Commit) value;
+        File target = objects(commit);
+        values.put(commit.getId(), visitCommit(target, commit));
+      
       } else if (value instanceof Tree) {
-        values.put(((Tree) value).getId(), visitTree((Tree) value));
+        Tree tree = (Tree) value;
+        File target = objects(tree);
+        values.put(tree.getId(), visitTree(target, tree));
       
       } else if (value instanceof Head) {
-        heads.put(((Head) value).getName(), visitHead((Head) value));
+        Head head = (Head) value;
+        File target = new File(config.getHeads(), head.getName());
+        heads.put(head.getName(), visitHead(target, head));
       
       } else if (value instanceof Tag) {
-        tags.put(((Tag) value).getName(), visitTag((Tag) value));
+        Tag tag = (Tag) value;
+        File target = new File(config.getTags(), tag.getName());
+        tags.put(tag.getName(), visitTag(target, tag));
 
       } else {
         throw new RepoException("Unknown object: " + value);
@@ -70,8 +82,7 @@ public class FileWriter implements Writer {
   }
 
   @Override
-  public Head visitHead(Head head) {
-    File target = new File(config.getHeads(), head.getName());
+  public Head visitHead(File target, Head head) {
     try {
       target = FileUtils.mkFile(target);
       FileOutputStream fileOutputStream = new FileOutputStream(target);
@@ -84,8 +95,7 @@ public class FileWriter implements Writer {
   }
 
   @Override
-  public Tag visitTag(Tag tag) {
-    File target = new File(config.getTags(), tag.getName());
+  public Tag visitTag(File target, Tag tag) {
     try {
       target = FileUtils.mkFile(target);
       FileOutputStream fileOutputStream = new FileOutputStream(target);
@@ -98,8 +108,8 @@ public class FileWriter implements Writer {
   }
 
   @Override
-  public Commit visitCommit(Commit commit) {
-    File target = objects(commit);
+  public Commit visitCommit(File target, Commit commit) {
+    
     if (target.exists()) {
       log.append("  - commit reuse: ").append(target.getPath()).append(System.lineSeparator());
       return commit;
@@ -117,8 +127,7 @@ public class FileWriter implements Writer {
   }
 
   @Override
-  public Blob visitBlob(Blob blob) {
-    File target = objects(blob);
+  public Blob visitBlob(File target, Blob blob) {
     if (target.exists()) {
       log.append("  - blob reuse: ").append(target.getPath()).append(System.lineSeparator());
       return blob;
@@ -136,8 +145,7 @@ public class FileWriter implements Writer {
   }
 
   @Override
-  public Tree visitTree(Tree tree) {
-    File target = objects(tree);
+  public Tree visitTree(File target, Tree tree) {
     if (target.exists()) {
       log.append("  - tree reuse: ").append(target.getPath()).append(System.lineSeparator());
       return tree;

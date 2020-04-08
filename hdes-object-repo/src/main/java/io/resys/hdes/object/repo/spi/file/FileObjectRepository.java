@@ -12,6 +12,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Commands;
 import io.resys.hdes.object.repo.spi.GenericObjectRepositoryMapper;
 import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper;
 import io.resys.hdes.object.repo.spi.ObjectsSerializerAndDeserializer;
+import io.resys.hdes.object.repo.spi.RepoAssert;
 import io.resys.hdes.object.repo.spi.commands.GenericCheckoutBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericMergeBuilder;
@@ -21,10 +22,10 @@ import io.resys.hdes.object.repo.spi.file.util.FileUtils;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils.FileSystemConfig;
 
 public class FileObjectRepository implements Commands, ObjectRepository {
-  private final ObjectRepositoryMapper mapper;
+  private final ObjectRepositoryMapper<File> mapper;
   private Objects objects;
   
-  public FileObjectRepository(Objects objects, ObjectRepositoryMapper mapper) {
+  public FileObjectRepository(Objects objects, ObjectRepositoryMapper<File> mapper) {
     this.objects = objects;
     this.mapper = mapper;
   }
@@ -123,7 +124,7 @@ public class FileObjectRepository implements Commands, ObjectRepository {
         .build();
         
         return new FileObjectRepository(objects, 
-            new GenericObjectRepositoryMapper(
+            new GenericObjectRepositoryMapper<File>(
                 serializer, serializer,
                 (v) -> new FileWriter(v, fileSystem, serializer),
                 (v) -> new FileDelete(v, fileSystem)));

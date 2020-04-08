@@ -33,7 +33,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 public class HeadCodec implements Codec<Head> {
   
   public static final String ID = "_id";
-  private static final String COMMIT = "commit";
+  public static final String COMMIT = "commit";
   
   @Override
   public void encode(BsonWriter writer, Head command, EncoderContext encoderContext) {

@@ -11,25 +11,25 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 
-public interface ObjectRepositoryMapper {
+public interface ObjectRepositoryMapper<T> {
 
   Serializer serializer();
   Deserializer deserializer();
-  Writer writer(Objects from);
-  Delete delete(Objects from);
+  Writer<T> writer(Objects from);
+  Delete<T> delete(Objects from);
   IdSupplier id();
 
-  interface Delete {
-    Head visitHead(Head head);
+  interface Delete<T> {
+    Head visitHead(T to, Head head);
     Objects build(HeadStatus headStatus);
   }
   
-  interface Writer {
-    Head visitHead(Head head);
-    Tag visitTag(Tag tag);
-    Commit visitCommit(Commit commit);
-    Blob visitBlob(Blob blob);
-    Tree visitTree(Tree tree);
+  interface Writer<T> {
+    Head visitHead(T to, Head head);
+    Tag visitTag(T to, Tag tag);
+    Commit visitCommit(T to, Commit commit);
+    Blob visitBlob(T to, Blob blob);
+    Tree visitTree(T to, Tree tree);
     Objects build(List<Object> objects);
   }
   
