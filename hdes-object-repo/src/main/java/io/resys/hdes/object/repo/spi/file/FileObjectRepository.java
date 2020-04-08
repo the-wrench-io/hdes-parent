@@ -14,6 +14,8 @@ import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper;
 import io.resys.hdes.object.repo.spi.ObjectsSerializerAndDeserializer;
 import io.resys.hdes.object.repo.spi.commands.GenericCheckoutBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
+import io.resys.hdes.object.repo.spi.commands.GenericMergeBuilder;
+import io.resys.hdes.object.repo.spi.commands.GenericStatusBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericTagBuilder;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils;
 import io.resys.hdes.object.repo.spi.file.util.FileUtils.FileSystemConfig;
@@ -56,18 +58,16 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   
   @Override
   public StatusBuilder status() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public HistoryBuilder history() {
-    // TODO Auto-generated method stub
-    return null;
+    return new GenericStatusBuilder(objects);
   }
   
   @Override
   public MergeBuilder merge() {
+    return new GenericMergeBuilder(objects);
+  }
+  
+  @Override
+  public HistoryBuilder history() {
     // TODO Auto-generated method stub
     return null;
   }

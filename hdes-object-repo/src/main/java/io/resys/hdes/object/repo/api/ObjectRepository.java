@@ -11,6 +11,7 @@ public interface ObjectRepository {
   public static final String MASTER = "master";
   interface IsObject { String getId(); }
   interface IsName { String getName(); }
+  enum ChangeAction { MODIFIED, CREATED, DELETED, CONFLICT }
   
   Objects objects();
   Commands commands();
@@ -88,16 +89,24 @@ public interface ObjectRepository {
   
   @Value.Immutable
   interface Status {
-    List<StatusEntry> getEntries();
+    List<HeadStatus> getEntries();
   }
   
   @Value.Immutable
-  interface StatusEntry {
-    String getId();
-    String getName();
-    String getNewContent();
-    String getOldContent();
+  interface HeadStatus {
+    String getHead();
+    List<Commit> getCommits();
+    List<Changes> getChanges();
   }
+  
+  @Value.Immutable
+  interface Changes {
+    String getName();
+    ChangeAction getAction();
+    Optional<String> getNewValue();
+    Optional<String> getOldValue();
+  }
+  
   
   @Value.Immutable
   interface TreeEntry {
