@@ -32,7 +32,11 @@ public interface ObjectRepository {
   }
   
   interface StatusBuilder {
-    // Build overview of all all heads related to 'master' head
+
+    // optional filter for head
+    StatusBuilder head(String head);
+    
+    // Build overview of other heads related to 'master' head
     Status build();
   }
   

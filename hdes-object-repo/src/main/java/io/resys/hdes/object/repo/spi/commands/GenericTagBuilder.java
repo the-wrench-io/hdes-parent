@@ -6,7 +6,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.api.ObjectRepository.TagBuilder;
-import io.resys.hdes.object.repo.api.exceptions.TagException;
+import io.resys.hdes.object.repo.api.exceptions.HeadException;
 import io.resys.hdes.object.repo.spi.file.RepoAssert;
 
 public class GenericTagBuilder implements TagBuilder {
@@ -34,11 +34,11 @@ public class GenericTagBuilder implements TagBuilder {
     RepoAssert.notNull(name, () -> "name can't be null!");
     
     if(objects.getTags().containsKey(name)) {
-      throw new TagException(TagException.builder().duplicateTag(name));
+      throw new HeadException(HeadException.builder().duplicateTag(name));
     }
     
     if(objects.getHeads().containsKey(name)) {
-      throw new TagException(TagException.builder().headNameMatch(name));
+      throw new HeadException(HeadException.builder().headNameMatch(name));
     }
     
     // tags can be created only from master

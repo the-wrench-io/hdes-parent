@@ -39,4 +39,10 @@ public class GenericObjectRepositoryMapper implements ObjectRepositoryMapper {
   public IdSupplier id() {
     return ID_SUPPLIER;
   }
+
+  @Override
+  public Delete delete(Objects from) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

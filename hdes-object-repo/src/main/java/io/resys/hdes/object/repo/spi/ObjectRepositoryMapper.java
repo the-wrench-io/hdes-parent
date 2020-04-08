@@ -5,6 +5,7 @@ import java.util.List;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.Head;
+import io.resys.hdes.object.repo.api.ObjectRepository.HeadStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
@@ -15,7 +16,15 @@ public interface ObjectRepositoryMapper {
   Serializer serializer();
   Deserializer deserializer();
   Writer writer(Objects from);
+  Delete delete(Objects from);
   IdSupplier id();
+
+  interface Delete {
+    Blob visitBlob(Blob blob);
+    Tree visitTree(Tree tree);
+    Commit visitCommit(Commit commit);
+    Objects build(HeadStatus headStatus);
+  }
   
   interface Writer {
     Head visitHead(Head head);

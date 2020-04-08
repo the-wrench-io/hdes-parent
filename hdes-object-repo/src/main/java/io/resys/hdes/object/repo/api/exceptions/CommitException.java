@@ -2,6 +2,7 @@ package io.resys.hdes.object.repo.api.exceptions;
 
 import java.util.Collection;
 
+import io.resys.hdes.object.repo.api.ObjectRepository.Changes;
 import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
@@ -89,6 +90,25 @@ public class CommitException extends RepoException {
           .append(" is not in head: ").append(head)
           .append("!")
           .toString();
-    }    
+    }
+    public String nothingToMerge(String head) {
+      return new StringBuilder()
+          .append("Head: ").append(head)
+          .append(" commits can't be merged because there are no changes!")
+          .toString();
+    }
+    public String conflicts(String head) {
+      return new StringBuilder()
+          .append("Head: ").append(head)
+          .append(" commits can't be merged because of conflicts, see status command for resolving conflicts!")
+          .toString();
+    }
+    public String conflicts(String head, Changes changes) {
+      return new StringBuilder()
+          .append("Head: ").append(head)
+          .append(" changes: ").append(changes.getName()).append(" ").append(changes.getAction())
+          .append(" can't be merged")
+          .toString();
+    }
   }
 }

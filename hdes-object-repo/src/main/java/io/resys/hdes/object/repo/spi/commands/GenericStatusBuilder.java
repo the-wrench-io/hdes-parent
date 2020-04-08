@@ -1,6 +1,8 @@
 package io.resys.hdes.object.repo.spi.commands;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,14 +22,22 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Status;
 import io.resys.hdes.object.repo.api.ObjectRepository.StatusBuilder;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
+import io.resys.hdes.object.repo.api.exceptions.HeadException;
 
 public class GenericStatusBuilder implements StatusBuilder {
 
   private final Objects objects;
+  private String headFilter;
   
   public GenericStatusBuilder(Objects objects) {
     super();
     this.objects = objects;
+  }
+
+  @Override
+  public StatusBuilder head(String head) {
+    this.headFilter = head;
+    return this;
   }
   @Override
   public Status build() {
@@ -39,8 +49,18 @@ public class GenericStatusBuilder implements StatusBuilder {
     
     Tree masterTree = getTree(objects, master);
     
-    List<HeadStatus> entries = new ArrayList<>();
-    for(Head head : objects.getHeads().values()) {
+    final List<HeadStatus> entries = new ArrayList<>();
+    final Collection<Head> heads;
+    if(this.headFilter != null) {
+      if(!objects.getHeads().containsKey(headFilter)) {
+        throw new HeadException(HeadException.builder().headUnknown(headFilter));
+      }
+      heads = Arrays.asList(objects.getHeads().get(headFilter));
+    } else {
+      heads = objects.getHeads().values();
+    }
+    
+    for(Head head : heads) {
       if(head.getName().equals(ObjectRepository.MASTER)) {
         continue;
       }
