@@ -101,7 +101,7 @@ public interface ObjectRepository {
     Map<String, Ref> getRefs();
     Map<String, Tag> getTags();
     Map<String, IsObject> getValues();
-    Head getHead();
+    Optional<Head> getHead();
   }
   
   @Value.Immutable

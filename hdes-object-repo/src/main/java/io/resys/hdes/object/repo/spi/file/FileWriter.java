@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import io.resys.hdes.object.repo.api.ImmutableObjects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
+import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
@@ -45,6 +47,7 @@ public class FileWriter implements Writer<File> {
     Map<String, Ref> refs = new HashMap<>(src.getRefs());
     Map<String, Tag> tags = new HashMap<>(src.getTags());
     Map<String, IsObject> values = new HashMap<>(src.getValues());
+    Optional<Head> head = src.getHead();
     
     for (Object value : objects) {
       if (value instanceof Blob) {
@@ -72,14 +75,34 @@ public class FileWriter implements Writer<File> {
         File target = new File(config.getTags(), tag.getName());
         tags.put(tag.getName(), visitTag(target, tag));
 
+      } else if (value instanceof Head) {
+        File target = config.getHead();
+        head = Optional.of(visitHead(target, (Head) value));
+
       } else {
         throw new RepoException("Unknown object: " + value);
       }
     }
     LOGGER.debug(log.toString());
-    return ImmutableObjects.builder().values(values).refs(refs).tags(tags).build();
+    return ImmutableObjects.builder()
+        .values(values).refs(refs).tags(tags)
+        .head(head)
+        .build();
   }
 
+  @Override
+  public Head visitHead(File target, Head head) {
+    try {
+      target = FileUtils.mkFile(target);
+      FileOutputStream fileOutputStream = new FileOutputStream(target);
+      IOUtils.copy(new ByteArrayInputStream(serializer.visitHead(head)), fileOutputStream);
+      log.append("  - ").append(head).append(System.lineSeparator());
+      return head;
+    } catch (IOException e) {
+      throw new RepoException("Failed to write HEAD file into " + target.getName() + " because: " + e.getMessage() + "!", e);
+    }
+  }
+  
   @Override
   public Ref visitRef(File target, Ref ref) {
     try {

@@ -8,12 +8,14 @@ import java.util.Optional;
 
 import io.resys.hdes.object.repo.api.ImmutableBlob;
 import io.resys.hdes.object.repo.api.ImmutableCommit;
+import io.resys.hdes.object.repo.api.ImmutableHead;
 import io.resys.hdes.object.repo.api.ImmutableRef;
 import io.resys.hdes.object.repo.api.ImmutableTag;
 import io.resys.hdes.object.repo.api.ImmutableTree;
 import io.resys.hdes.object.repo.api.ImmutableTreeEntry;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
+import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
@@ -66,7 +68,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
     
     return result.toString().getBytes(StandardCharsets.UTF_8);
   }
-
+  
   private Blob visitBlob(String id, String content) {
     return ImmutableBlob.builder().id(id).value(content.substring(TYPE_BLOB.length())).build();
   }
@@ -132,11 +134,17 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
 
   @Override
   public Tag visitTag(String id, byte[] content) {
-    String[] lines = new String(content, StandardCharsets.UTF_8).split("/n");
-    
+    String value = new String(content, StandardCharsets.UTF_8);
     return ImmutableTag.builder()
         .name(id)
-        .commit(lines[1])
+        .commit(value)
+        .build();
+  }
+  
+  @Override
+  public Head visitHead(String id, byte[] content) {
+    return ImmutableHead.builder()
+        .ref(new String(content, StandardCharsets.UTF_8))
         .build();
   }
 
@@ -151,6 +159,11 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
   }
 
   @Override
+  public byte[] visitHead(Head head) {
+    return head.getRef().getBytes(StandardCharsets.UTF_8);
+  }
+  
+  @Override
   public byte[] visitObject(IsObject object) {
     
     if(object instanceof Blob) {
@@ -164,6 +177,4 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
     }
     throw new RepoException("Unknown object: " + object);
   }
-  
-  
 }
