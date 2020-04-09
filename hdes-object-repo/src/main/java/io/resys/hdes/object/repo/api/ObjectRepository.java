@@ -26,6 +26,11 @@ public interface ObjectRepository {
     TagBuilder tag();
   }
   
+  interface RebaseBuilder {
+    RebaseBuilder ref(String refName);
+    Objects build();
+  }
+  
   interface MergeBuilder {
     // ref name from what to merge to "master"
     MergeBuilder ref(String name);
@@ -33,13 +38,12 @@ public interface ObjectRepository {
     Objects build();
   }
   
-  interface StatusBuilder {
-
-    // optional filter for ref
-    StatusBuilder ref(String name);
+  interface StatusBuilder {   
+    // Build overview of other refs related to 'master' ref
+    List<RefStatus> find();
     
-    // Build overview of other reds related to 'master' ref
-    Status build();
+    // Build overview of other ref(name) related to 'master' ref
+    RefStatus get(String name);
   }
   
   interface TagBuilder {
@@ -108,14 +112,9 @@ public interface ObjectRepository {
   }
   
   @Value.Immutable
-  interface Status {
-    List<RefStatus> getEntries();
-  }
-  
-  @Value.Immutable
   interface RefStatus {
     String getName();
-    List<Commit> getCommits();
+    List<String> getCommits();
     List<Changes> getChanges();
   }
   

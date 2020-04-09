@@ -6,11 +6,11 @@ import java.util.function.Supplier;
 import io.resys.hdes.object.repo.api.ObjectRepository;
 import io.resys.hdes.object.repo.api.ObjectRepository.ChangeAction;
 import io.resys.hdes.object.repo.api.ObjectRepository.Changes;
+import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.CommitBuilder;
 import io.resys.hdes.object.repo.api.ObjectRepository.MergeBuilder;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.RefStatus;
-import io.resys.hdes.object.repo.api.ObjectRepository.Status;
 import io.resys.hdes.object.repo.api.exceptions.CommitException;
 
 public abstract class GenericMergeBuilder implements MergeBuilder {
@@ -39,13 +39,12 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
 
   @Override
   public Objects build() {
-    Status status = new GenericStatusBuilder(objects).ref(ref).build();
-    if(status.getEntries().isEmpty()) {
+    RefStatus status = new GenericStatusBuilder(objects).get(ref);
+    if(status.getChanges().isEmpty()) {
       throw new CommitException(CommitException.builder().nothingToMerge(ref));
     }
     
-    RefStatus entry = status.getEntries().get(0);
-    Optional<Changes> conflicts = entry.getChanges().stream().filter(c -> c.getAction() == ChangeAction.CONFLICT).findFirst();
+    Optional<Changes> conflicts = status.getChanges().stream().filter(c -> c.getAction() == ChangeAction.CONFLICT).findFirst();
     if(conflicts.isPresent()) {
       throw new CommitException(CommitException.builder().conflicts(ref));  
     }
@@ -55,19 +54,20 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
         .append(", authors: ");
     
     StringBuilder authors = new StringBuilder();
-    entry.getCommits().stream().forEach(c -> {
+    status.getCommits().stream().forEach(name -> {
       if(authors.length() > 0) {
         authors.append(", ");  
       }
+      Commit c = (Commit) objects.getValues().get(name);
       authors.append(c.getAuthor());
     });
     
     CommitBuilder commitBuilder = this.commitBuilder.get()
         .comment(comment.append(authors).toString())
-        .merge(entry.getCommits().get(0).getId())
+        .merge(status.getCommits().get(0))
         .author(author)
         .parent(objects.getRefs().get(ObjectRepository.MASTER).getCommit());
-    for(Changes changes : entry.getChanges()) {
+    for(Changes changes : status.getChanges()) {
       switch (changes.getAction()) {
       case CREATED:
       case MODIFIED: commitBuilder.add(changes.getName(), changes.getNewValue().get()); break;
@@ -76,7 +76,7 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
       }
     }
     commitBuilder.build();
-    return delete(entry);
+    return delete(status);
   }
   
   protected abstract Objects delete(RefStatus ref);
