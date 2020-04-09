@@ -31,6 +31,8 @@ public class ObjectRepositoryTest {
     .parent(firstCommit.getId())
     .comment("init second ref").build();
     
+    repo.commands().checkout().from("new-ref-1").build();
+    
     repo.commands().merge()
     .author("merger@me.com")
     .ref("new-ref-1").build();

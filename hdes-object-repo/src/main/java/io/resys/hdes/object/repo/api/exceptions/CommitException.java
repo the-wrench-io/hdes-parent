@@ -62,9 +62,9 @@ public class CommitException extends RepoException {
           .toString();
     }
     
-    public String notFound(String commit) {
+    public String notFound(String name) {
       return new StringBuilder()
-          .append("Commit: ").append(commit)
+          .append("Commit, tag or ref with id: ").append(name)
           .append(" does not exist!")
           .toString();
     }

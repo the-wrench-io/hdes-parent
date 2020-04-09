@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
+import io.resys.hdes.object.repo.api.ObjectRepository.SnapshotEntry;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.exceptions.RepoException;
@@ -96,7 +98,17 @@ public class FileWriter implements Writer<File> {
       target = FileUtils.mkFile(target);
       FileOutputStream fileOutputStream = new FileOutputStream(target);
       IOUtils.copy(new ByteArrayInputStream(serializer.visitHead(head)), fileOutputStream);
-      log.append("  - ").append(head).append(System.lineSeparator());
+      
+      log.append("  - checking out").append(head.getValue()).append(System.lineSeparator());
+      log.append("  - ").append(target.getPath()).append(System.lineSeparator());
+      for(SnapshotEntry entry : head.getSnapshot().getValues()) {
+        File rootEntry = new File(config.getRoot(), entry.getName());
+        log.append("  - ").append(rootEntry.getAbsolutePath()).append(System.lineSeparator());
+        IOUtils.copy(
+            new ByteArrayInputStream(entry.getBlob().getBytes(StandardCharsets.UTF_8)), 
+            new FileOutputStream(FileUtils.mkFile(rootEntry))); 
+      }
+      
       return head;
     } catch (IOException e) {
       throw new RepoException("Failed to write HEAD file into " + target.getName() + " because: " + e.getMessage() + "!", e);

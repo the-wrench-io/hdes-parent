@@ -6,28 +6,28 @@ import java.util.List;
 import io.resys.hdes.object.repo.api.ImmutableSnapshot;
 import io.resys.hdes.object.repo.api.ImmutableSnapshotEntry;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
-import io.resys.hdes.object.repo.api.ObjectRepository.CheckoutBuilder;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Snapshot;
+import io.resys.hdes.object.repo.api.ObjectRepository.SnapshotBuilder;
 import io.resys.hdes.object.repo.api.ObjectRepository.SnapshotEntry;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
-import io.resys.hdes.object.repo.api.exceptions.CheckoutException;
+import io.resys.hdes.object.repo.api.exceptions.CommitException;
 import io.resys.hdes.object.repo.spi.RepoAssert;
 
-public class GenericCheckoutBuilder implements CheckoutBuilder {
+public class GenericSnapshotBuilder implements SnapshotBuilder {
 
   private final Objects objects;
   private String name;
 
-  public GenericCheckoutBuilder(Objects objects) {
+  public GenericSnapshotBuilder(Objects objects) {
     super();
     this.objects = objects;
   }
 
   @Override
-  public CheckoutBuilder from(String name) {
+  public SnapshotBuilder from(String name) {
     this.name = name;
     return this;
   }
@@ -44,7 +44,7 @@ public class GenericCheckoutBuilder implements CheckoutBuilder {
     } else if(objects.getValues().containsKey(name)) {
       id = name;
     } else {
-      throw new CheckoutException(CheckoutException.builder().notFound(name));
+      throw new CommitException(CommitException.builder().notFound(name));
     }
     
     Commit commit = CommitQuery.builder(objects).commit(id).get();

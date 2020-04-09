@@ -13,6 +13,7 @@ import io.resys.hdes.object.repo.spi.RepoAssert;
 import io.resys.hdes.object.repo.spi.commands.GenericCheckoutBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericMergeBuilder;
+import io.resys.hdes.object.repo.spi.commands.GenericSnapshotBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericStatusBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericTagBuilder;
 import io.resys.hdes.object.repo.spi.file.FileUtils.FileSystemConfig;
@@ -51,8 +52,8 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   }
   
   @Override
-  public CheckoutBuilder checkout() {
-    return new GenericCheckoutBuilder(objects);
+  public SnapshotBuilder snapshot() {
+    return new GenericSnapshotBuilder(objects);
   }
   
   @Override
@@ -80,6 +81,17 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   public HistoryBuilder history() {
     // TODO Auto-generated method stub
     return null;
+  }
+  
+
+  @Override
+  public CheckoutBuilder checkout() {
+    return new GenericCheckoutBuilder(objects) {
+      @Override
+      protected Objects save(List<Object> newObjects) {
+        return setObjects(mapper.writer(objects).build(newObjects));
+      }
+    };
   }
   
   @Override

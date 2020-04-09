@@ -20,10 +20,12 @@ public interface ObjectRepository {
     StatusBuilder status();
     CommitBuilder commit();
     HistoryBuilder history();
+    SnapshotBuilder snapshot();
     CheckoutBuilder checkout();
     MergeBuilder merge();
     TagBuilder tag();
     PullBuilder pull();
+    
   }
   
   interface PullBuilder {
@@ -60,8 +62,14 @@ public interface ObjectRepository {
   }
   
   interface CheckoutBuilder {
-    // tag or commit
+    // tag/commit/ref
     CheckoutBuilder from(String name);
+    Objects build();
+  }
+  
+  interface SnapshotBuilder {
+    // tag/commit/ref
+    SnapshotBuilder from(String name);
     Snapshot build();
   }
   
@@ -93,7 +101,8 @@ public interface ObjectRepository {
 
   @Value.Immutable
   interface Head {
-    String getRef();
+    String getValue();
+    Snapshot getSnapshot();
   }
   
   @Value.Immutable

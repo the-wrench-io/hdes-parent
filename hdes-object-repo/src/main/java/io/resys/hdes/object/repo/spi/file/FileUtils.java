@@ -24,6 +24,7 @@ public class FileUtils {
 
   @Value.Immutable
   public interface FileSystemConfig {
+    File getRoot();
     File getRepo();
     File getHead();
     File getRefs();
@@ -89,12 +90,14 @@ public class FileUtils {
     
     log.append(System.lineSeparator())
         .append("  - ").append(repo.getAbsolutePath()).append(System.lineSeparator())
+        .append("  - ").append(head.getAbsolutePath()).append(System.lineSeparator())
         .append("  - ").append(refs.getAbsolutePath()).append(System.lineSeparator())
         .append("  - ").append(objects.getAbsolutePath()).append(System.lineSeparator())
         .append("  - ").append(tags.getAbsolutePath()).append(System.lineSeparator());
     LOGGER.debug(log.toString());
     return ImmutableFileSystemConfig.builder()
         .refs(refs)
+        .root(root)
         .repo(repo)
         .objects(objects)
         .tags(tags)

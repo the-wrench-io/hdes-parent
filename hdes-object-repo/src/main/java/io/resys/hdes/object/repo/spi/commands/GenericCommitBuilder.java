@@ -184,5 +184,5 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
   private <T> T add(T object) {
     newObjects.add(object);
     return object;
-  } 
+  }
 }

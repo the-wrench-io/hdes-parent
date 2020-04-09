@@ -14,7 +14,7 @@ import io.resys.hdes.object.repo.mongodb.MongoCommand.MongoDbConfig;
 import io.resys.hdes.object.repo.mongodb.writers.MongoDbDelete;
 import io.resys.hdes.object.repo.mongodb.writers.MongoDbWriter;
 import io.resys.hdes.object.repo.spi.RepoAssert;
-import io.resys.hdes.object.repo.spi.commands.GenericCheckoutBuilder;
+import io.resys.hdes.object.repo.spi.commands.GenericSnapshotBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericMergeBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericStatusBuilder;
@@ -55,8 +55,8 @@ public class MongoDbObjectRepository implements Commands, ObjectRepository {
   }
 
   @Override
-  public CheckoutBuilder checkout() {
-    return new GenericCheckoutBuilder(objects);
+  public SnapshotBuilder snapshot() {
+    return new GenericSnapshotBuilder(objects);
   }
 
   @Override

@@ -144,7 +144,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
   @Override
   public Head visitHead(String id, byte[] content) {
     return ImmutableHead.builder()
-        .ref(new String(content, StandardCharsets.UTF_8))
+        .value(new String(content, StandardCharsets.UTF_8))
         .build();
   }
 
@@ -160,7 +160,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
 
   @Override
   public byte[] visitHead(Head head) {
-    return head.getRef().getBytes(StandardCharsets.UTF_8);
+    return head.getValue().getBytes(StandardCharsets.UTF_8);
   }
   
   @Override
