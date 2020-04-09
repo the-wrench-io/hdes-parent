@@ -8,26 +8,26 @@ import java.util.List;
 import java.util.Map;
 
 import io.resys.hdes.object.repo.api.ImmutableChanges;
-import io.resys.hdes.object.repo.api.ImmutableHeadStatus;
+import io.resys.hdes.object.repo.api.ImmutableRefStatus;
 import io.resys.hdes.object.repo.api.ImmutableStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.ChangeAction;
 import io.resys.hdes.object.repo.api.ObjectRepository.Changes;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
-import io.resys.hdes.object.repo.api.ObjectRepository.HeadStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
+import io.resys.hdes.object.repo.api.ObjectRepository.RefStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository.Status;
 import io.resys.hdes.object.repo.api.ObjectRepository.StatusBuilder;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
-import io.resys.hdes.object.repo.api.exceptions.HeadException;
+import io.resys.hdes.object.repo.api.exceptions.RefException;
 
 public class GenericStatusBuilder implements StatusBuilder {
 
   private final Objects objects;
-  private String headFilter;
+  private String refFilter;
   
   public GenericStatusBuilder(Objects objects) {
     super();
@@ -35,46 +35,46 @@ public class GenericStatusBuilder implements StatusBuilder {
   }
 
   @Override
-  public StatusBuilder head(String head) {
-    this.headFilter = head;
+  public StatusBuilder ref(String refName) {
+    this.refFilter = refName;
     return this;
   }
   @Override
   public Status build() {
-    if(objects.getHeads().isEmpty()) {
+    if(objects.getRefs().isEmpty()) {
       return ImmutableStatus.builder().build();
     }
-    Head master = objects.getHeads().get(ObjectRepository.MASTER);
-    Map<String, Commit> masterCommits = buildHead(objects, master.getCommit(), new HashMap<>());
+    Ref master = objects.getRefs().get(ObjectRepository.MASTER);
+    Map<String, Commit> masterCommits = buildRef(objects, master.getCommit(), new HashMap<>());
     
     Tree masterTree = getTree(objects, master);
     
-    final List<HeadStatus> entries = new ArrayList<>();
-    final Collection<Head> heads;
-    if(this.headFilter != null) {
-      if(!objects.getHeads().containsKey(headFilter)) {
-        throw new HeadException(HeadException.builder().headUnknown(headFilter));
+    final List<RefStatus> entries = new ArrayList<>();
+    final Collection<Ref> refs;
+    if(this.refFilter != null) {
+      if(!objects.getRefs().containsKey(refFilter)) {
+        throw new RefException(RefException.builder().refUnknown(refFilter));
       }
-      heads = Arrays.asList(objects.getHeads().get(headFilter));
+      refs = Arrays.asList(objects.getRefs().get(refFilter));
     } else {
-      heads = objects.getHeads().values();
+      refs = objects.getRefs().values();
     }
     
-    for(Head head : heads) {
-      if(head.getName().equals(ObjectRepository.MASTER)) {
+    for(Ref ref : refs) {
+      if(ref.getName().equals(ObjectRepository.MASTER)) {
         continue;
       }
       
       // No diffs
-      List<Commit> headCommits = buildCommits(objects, head.getCommit(), masterCommits, new ArrayList<>());
-      if(headCommits.isEmpty()) {
-        entries.add(ImmutableHeadStatus.builder().head(head.getName()).build());
+      List<Commit> refCommits = buildCommits(objects, ref.getCommit(), masterCommits, new ArrayList<>());
+      if(refCommits.isEmpty()) {
+        entries.add(ImmutableRefStatus.builder().name(ref.getName()).build());
         continue;
       }
       
-      Tree tree = getTree(objects, head);
+      Tree tree = getTree(objects, ref);
       
-      Commit lastMasterCommit = (Commit) objects.getValues().get(headCommits.get(0).getParent().get());
+      Commit lastMasterCommit = (Commit) objects.getValues().get(refCommits.get(0).getParent().get());
       Tree lastMasterCommitTree = (Tree) objects.getValues().get(lastMasterCommit.getTree());
       
       List<Changes> changes = new ArrayList<>();
@@ -100,17 +100,17 @@ public class GenericStatusBuilder implements StatusBuilder {
         // update / conflict
         boolean noChangesInMaster = latestMasterTreeEntry.getBlob().equals(originalMasterTreeEntry.getBlob());
         
-        // master modified but no changes in head
+        // master modified but no changes in ref
         if(!noChangesInMaster && originalMasterTreeEntry.getBlob().equals(entry.getBlob())) {
           continue;
         }
         
         Blob latestMasterValue = (Blob) objects.getValues().get(latestMasterTreeEntry.getBlob());  
-        Blob headValue = (Blob) objects.getValues().get(entry.getBlob()); 
+        Blob refValue = (Blob) objects.getValues().get(entry.getBlob()); 
         changes.add(ImmutableChanges.builder()
             .action(noChangesInMaster ? ChangeAction.MODIFIED : ChangeAction.CONFLICT)
             .name(entry.getName())
-            .newValue(headValue.getValue())
+            .newValue(refValue.getValue())
             .oldValue(latestMasterValue.getValue()).build());
       }
       
@@ -125,7 +125,7 @@ public class GenericStatusBuilder implements StatusBuilder {
         }
       }
       
-      entries.add(ImmutableHeadStatus.builder().commits(headCommits).head(head.getName()).changes(changes).build());
+      entries.add(ImmutableRefStatus.builder().commits(refCommits).name(ref.getName()).changes(changes).build());
     }
     
     
@@ -133,17 +133,17 @@ public class GenericStatusBuilder implements StatusBuilder {
   }
   
   
-  private static Tree getTree(Objects objects, Head head) {
-    Commit commit = (Commit) objects.getValues().get(head.getCommit());
+  private static Tree getTree(Objects objects, Ref ref) {
+    Commit commit = (Commit) objects.getValues().get(ref.getCommit());
     return (Tree) objects.getValues().get(commit.getTree());
   }
   
-  private static Map<String, Commit> buildHead(Objects objects, String start, Map<String, Commit> result) {
+  private static Map<String, Commit> buildRef(Objects objects, String start, Map<String, Commit> result) {
     Commit commit = (Commit) objects.getValues().get(start);
     result.put(commit.getId(), commit);
   
     if(commit.getParent().isPresent()) {
-      return buildHead(objects, commit.getParent().get(), result);
+      return buildRef(objects, commit.getParent().get(), result);
     }
     return result;
   }

@@ -13,15 +13,15 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Commands;
 import io.resys.hdes.object.repo.mongodb.MongoCommand.MongoDbConfig;
 import io.resys.hdes.object.repo.mongodb.writers.MongoDbDelete;
 import io.resys.hdes.object.repo.mongodb.writers.MongoDbWriter;
-import io.resys.hdes.object.repo.spi.GenericObjectRepositoryMapper;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper;
-import io.resys.hdes.object.repo.spi.ObjectsSerializerAndDeserializer;
 import io.resys.hdes.object.repo.spi.RepoAssert;
 import io.resys.hdes.object.repo.spi.commands.GenericCheckoutBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericMergeBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericStatusBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericTagBuilder;
+import io.resys.hdes.object.repo.spi.file.FileObjectsSerializerAndDeserializer;
+import io.resys.hdes.object.repo.spi.mapper.GenericObjectRepositoryMapper;
+import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper;
 
 public class MongoDbObjectRepository implements Commands, ObjectRepository {
   private final ObjectRepositoryMapper<MongoClient> mapper;
@@ -68,8 +68,8 @@ public class MongoDbObjectRepository implements Commands, ObjectRepository {
   public MergeBuilder merge() {
     return new GenericMergeBuilder(objects, () -> commit()) {
       @Override
-      protected Objects delete(HeadStatus head) {
-        return setObjects(mapper.delete(objects).build(head));
+      protected Objects delete(RefStatus ref) {
+        return setObjects(mapper.delete(objects).build(ref));
       }
     };
   }
@@ -118,16 +118,17 @@ public class MongoDbObjectRepository implements Commands, ObjectRepository {
       if (config == null) {
         config = ImmutableMongoDbConfig.builder()
             .db("repo")
-            .heads("heads")
+            .refs("refs")
             .tags("tags")
             .objects("objects")
             .build();
       }
-      ObjectsSerializerAndDeserializer serializer = ObjectsSerializerAndDeserializer.INSTANCE;
-      Map<String, Head> heads = new HashMap<>();
+      FileObjectsSerializerAndDeserializer serializer = FileObjectsSerializerAndDeserializer.INSTANCE;
+      Map<String, Ref> refs = new HashMap<>();
       Map<String, Tag> tags = new HashMap<>();
       Map<String, IsObject> values = new HashMap<>();
-      Objects objects = ImmutableObjects.builder().values(values).tags(tags).heads(heads).build();
+      Objects objects = ImmutableObjects.builder().values(values).tags(tags).refs(refs).build();
+      
       return new MongoDbObjectRepository(objects,
           new GenericObjectRepositoryMapper<MongoClient>(
               serializer, serializer,

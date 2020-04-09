@@ -29,7 +29,7 @@ public class StorageServiceReadWriteTest {
   }
 
   @Test
-  public void createHead() {
+  public void createRef() {
     MongoDbConfig.instance(command -> {
       
     
@@ -40,14 +40,14 @@ public class StorageServiceReadWriteTest {
     .add("file 2", "contentxxxx")
     .add("file 3", "contentxxxx")
     .add("file 4", "contentxxxx1")
-    .head("new-head-1")
+    .ref("new-ref-1")
     .author("me@me.com")
     .parent(firstCommit.getId())
-    .comment("init second head").build();
+    .comment("init second ref").build();
     
     repo.commands().merge()
     .author("merger@me.com")
-    .head("new-head-1").build();
+    .ref("new-ref-1").build();
     
     });
   }

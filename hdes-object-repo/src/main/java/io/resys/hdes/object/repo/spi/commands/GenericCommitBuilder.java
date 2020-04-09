@@ -9,20 +9,20 @@ import java.util.Optional;
 
 import io.resys.hdes.object.repo.api.ImmutableBlob;
 import io.resys.hdes.object.repo.api.ImmutableCommit;
-import io.resys.hdes.object.repo.api.ImmutableHead;
+import io.resys.hdes.object.repo.api.ImmutableRef;
 import io.resys.hdes.object.repo.api.ImmutableTree;
 import io.resys.hdes.object.repo.api.ImmutableTreeEntry;
 import io.resys.hdes.object.repo.api.ObjectRepository;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.CommitBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
 import io.resys.hdes.object.repo.api.exceptions.CommitException;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper;
 import io.resys.hdes.object.repo.spi.RepoAssert;
+import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper;
 
 public abstract class GenericCommitBuilder implements CommitBuilder {
   private final static String FAKE_ID = "!-unknown-atm-!";
@@ -32,15 +32,15 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
   private final List<String> toDelete = new ArrayList<>();
   
   private final Objects objects;
-  private final ObjectRepositoryMapper mapper;
+  private final ObjectRepositoryMapper<?> mapper;
   
-  private String newHead;
+  private String newRef;
   private String parentId;
   private String author;
   private String comment;
   private String mergeId;
 
-  public GenericCommitBuilder(Objects objects, ObjectRepositoryMapper mapper) {
+  public GenericCommitBuilder(Objects objects, ObjectRepositoryMapper<?> mapper) {
     super();
     this.objects = objects;
     this.mapper = mapper;
@@ -83,8 +83,8 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
   }
 
   @Override
-  public CommitBuilder head(String head) {
-    this.newHead = head;
+  public CommitBuilder ref(String refName) {
+    this.newRef = refName;
     return this;
   }
   @Override
@@ -109,12 +109,12 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     
     // First commit
     Optional<Commit> parent;
-    Optional<Head> head;
+    Optional<Ref> ref;
     Map<String, TreeEntry> oldTree;
-    if(objects.getHeads().isEmpty()) {
+    if(objects.getRefs().isEmpty()) {
       oldTree = new HashMap<>();
-      head = Optional.of(ImmutableHead.builder()
-          .name(newHead == null || newHead.trim().isEmpty() ? ObjectRepository.MASTER : newHead.trim())
+      ref = Optional.of(ImmutableRef.builder()
+          .name(newRef == null || newRef.trim().isEmpty() ? ObjectRepository.MASTER : newRef.trim())
           .commit(FAKE_ID)
           .build());
       parent = Optional.empty();
@@ -124,17 +124,17 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
       if (!parent.isPresent()) {
         throw new CommitException(CommitException.builder().unknownParent(parentId, author));
       }
-      if(newHead != null) {
-        head = objects.getHeads().values().stream().filter(h -> h.getName().equals(newHead)).findFirst();
-        if(!head.isPresent()) {
-          head = Optional.of(ImmutableHead.builder().name(newHead).commit(FAKE_ID).build()); 
+      if(newRef != null) {
+        ref = objects.getRefs().values().stream().filter(h -> h.getName().equals(newRef)).findFirst();
+        if(!ref.isPresent()) {
+          ref = Optional.of(ImmutableRef.builder().name(newRef).commit(FAKE_ID).build()); 
         }
       } else {
-        head = objects.getHeads().values().stream().filter(h -> h.getCommit().equals(parentId)).findFirst();  
+        ref = objects.getRefs().values().stream().filter(h -> h.getCommit().equals(parentId)).findFirst();  
       }
       
-      if (!head.isPresent()) {
-        throw new CommitException(CommitException.builder().headDoesNotMatch(parentId, author, objects.getHeads().values()));
+      if (!ref.isPresent()) {
+        throw new CommitException(CommitException.builder().refDoesNotMatch(parentId, author, objects.getRefs().values()));
       }
       oldTree = ((Tree) objects.getValues().get(parent.get().getTree())).getValues();
     }
@@ -170,8 +170,8 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
       throw new CommitException(CommitException.builder().lastCommitIsIdentical(parentId, author));
     }
     
-    add(ImmutableHead.builder()
-        .from(head.get())
+    add(ImmutableRef.builder()
+        .from(ref.get())
         .commit(commit.getId())
         .build());
     

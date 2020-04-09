@@ -22,7 +22,7 @@ package io.resys.hdes.object.repo.spi.file.exceptions;
 
 import java.io.File;
 
-import io.resys.hdes.object.repo.spi.file.util.FileUtils;
+import io.resys.hdes.object.repo.spi.file.FileUtils;
 
 public class DirectoryCantBeCreatedException extends RuntimeException {
   private static final long serialVersionUID = 9163955084870511877L;

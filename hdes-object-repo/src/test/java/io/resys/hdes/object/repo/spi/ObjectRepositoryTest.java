@@ -18,7 +18,7 @@ public class ObjectRepositoryTest {
   }
 
   @Test
-  public void createHead() {
+  public void createRef() {
     ObjectRepository repo = create();
     Commit firstCommit = repo.commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("first commit").build();
     
@@ -26,14 +26,14 @@ public class ObjectRepositoryTest {
     .add("file 2", "contentxxxx")
     .add("file 3", "contentxxxx")
     .add("file 4", "contentxxxx1")
-    .head("new-head-1")
+    .ref("new-ref-1")
     .author("me@me.com")
     .parent(firstCommit.getId())
-    .comment("init second head").build();
+    .comment("init second ref").build();
     
     repo.commands().merge()
     .author("merger@me.com")
-    .head("new-head-1").build();
+    .ref("new-ref-1").build();
   }
   
   private static ObjectRepository create() {

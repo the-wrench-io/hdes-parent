@@ -7,16 +7,16 @@ import io.resys.hdes.object.repo.api.ObjectRepository;
 import io.resys.hdes.object.repo.api.ObjectRepository.ChangeAction;
 import io.resys.hdes.object.repo.api.ObjectRepository.Changes;
 import io.resys.hdes.object.repo.api.ObjectRepository.CommitBuilder;
-import io.resys.hdes.object.repo.api.ObjectRepository.HeadStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository.MergeBuilder;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
+import io.resys.hdes.object.repo.api.ObjectRepository.RefStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository.Status;
 import io.resys.hdes.object.repo.api.exceptions.CommitException;
 
 public abstract class GenericMergeBuilder implements MergeBuilder {
   private final Objects objects;
   private final Supplier<CommitBuilder> commitBuilder;
-  private String head;
+  private String ref;
   private String author;
 
   public GenericMergeBuilder(Objects objects, Supplier<CommitBuilder> commitBuilder) {
@@ -26,8 +26,8 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
   }
 
   @Override
-  public MergeBuilder head(String name) {
-    this.head = name;
+  public MergeBuilder ref(String name) {
+    this.ref = name;
     return this;
   }
   
@@ -39,19 +39,19 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
 
   @Override
   public Objects build() {
-    Status status = new GenericStatusBuilder(objects).head(head).build();
+    Status status = new GenericStatusBuilder(objects).ref(ref).build();
     if(status.getEntries().isEmpty()) {
-      throw new CommitException(CommitException.builder().nothingToMerge(head));
+      throw new CommitException(CommitException.builder().nothingToMerge(ref));
     }
     
-    HeadStatus entry = status.getEntries().get(0);
+    RefStatus entry = status.getEntries().get(0);
     Optional<Changes> conflicts = entry.getChanges().stream().filter(c -> c.getAction() == ChangeAction.CONFLICT).findFirst();
     if(conflicts.isPresent()) {
-      throw new CommitException(CommitException.builder().conflicts(head));  
+      throw new CommitException(CommitException.builder().conflicts(ref));  
     }
     
     StringBuilder comment = new StringBuilder()
-        .append("Merged from: ").append(head)
+        .append("Merged from: ").append(ref)
         .append(", authors: ");
     
     StringBuilder authors = new StringBuilder();
@@ -66,18 +66,18 @@ public abstract class GenericMergeBuilder implements MergeBuilder {
         .comment(comment.append(authors).toString())
         .merge(entry.getCommits().get(0).getId())
         .author(author)
-        .parent(objects.getHeads().get(ObjectRepository.MASTER).getCommit());
+        .parent(objects.getRefs().get(ObjectRepository.MASTER).getCommit());
     for(Changes changes : entry.getChanges()) {
       switch (changes.getAction()) {
       case CREATED:
       case MODIFIED: commitBuilder.add(changes.getName(), changes.getNewValue().get()); break;
       case DELETED: commitBuilder.delete(changes.getName()); break;
-      default: throw new CommitException(CommitException.builder().conflicts(head, changes));  
+      default: throw new CommitException(CommitException.builder().conflicts(ref, changes));  
       }
     }
     commitBuilder.build();
     return delete(entry);
   }
   
-  protected abstract Objects delete(HeadStatus head);
+  protected abstract Objects delete(RefStatus ref);
 }

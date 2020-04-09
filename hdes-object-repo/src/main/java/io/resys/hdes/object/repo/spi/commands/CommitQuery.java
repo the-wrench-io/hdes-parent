@@ -1,9 +1,9 @@
 package io.resys.hdes.object.repo.spi.commands;
 
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.exceptions.CommitException;
 import io.resys.hdes.object.repo.spi.RepoAssert;
 
@@ -12,7 +12,7 @@ public class CommitQuery {
   private final Objects objects;
   
   private String commit;
-  private String head;
+  private String refName;
 
   private CommitQuery(Objects objects) {
     super();
@@ -23,21 +23,21 @@ public class CommitQuery {
     this.commit = commit;
     return this;
   }
-  public CommitQuery head(String head) {
-    this.head = head;
+  public CommitQuery ref(String refName) {
+    this.refName = refName;
     return this;
   }
 
   public Commit get() {
     
-    // latest head commit
+    // latest ref commit
     if(commit == null) {
-      RepoAssert.notNull(head, () -> "head and commit can't be BOTH null!");
-      Head headObject = objects.getHeads().get(head);
-      if(headObject == null) {
-        throw new CommitException(CommitException.builder().headNotFound(head));
+      RepoAssert.notNull(refName, () -> "ref and commit can't be BOTH null!");
+      Ref refObject = objects.getRefs().get(refName);
+      if(refObject == null) {
+        throw new CommitException(CommitException.builder().refNotFound(refName));
       }
-      return (Commit) objects.getValues().get(headObject.getCommit());
+      return (Commit) objects.getValues().get(refObject.getCommit());
     }
     
     // commit based on id
@@ -48,12 +48,12 @@ public class CommitQuery {
       throw new CommitException(CommitException.builder().notCommit(object));        
     }
     
-    // is commit in specified head
+    // is commit in specified ref
     Commit result = (Commit) object;
-    if(head != null) {
-      Head headObject = objects.getHeads().get(head);
-      if(!containsCommit(objects, headObject.getCommit(), result.getId())) {
-        throw new CommitException(CommitException.builder().notInHead(commit, head));  
+    if(refName != null) {
+      Ref refObject = objects.getRefs().get(refName);
+      if(!containsCommit(objects, refObject.getCommit(), result.getId())) {
+        throw new CommitException(CommitException.builder().notInRef(commit, refName));  
       }
     }
     return result;

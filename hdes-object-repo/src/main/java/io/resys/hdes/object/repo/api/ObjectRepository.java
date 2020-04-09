@@ -23,21 +23,26 @@ public interface ObjectRepository {
     CheckoutBuilder checkout();
     MergeBuilder merge();
     TagBuilder tag();
+    PullBuilder pull();
+  }
+  
+  interface PullBuilder {
+    Objects build();
   }
   
   interface MergeBuilder {
-    // Head name from what to merge to "master"
-    MergeBuilder head(String name);
+    // ref name from what to merge to "master"
+    MergeBuilder ref(String name);
     MergeBuilder author(String author);
     Objects build();
   }
   
   interface StatusBuilder {
 
-    // optional filter for head
-    StatusBuilder head(String head);
+    // optional filter for ref
+    StatusBuilder ref(String name);
     
-    // Build overview of other heads related to 'master' head
+    // Build overview of other reds related to 'master' ref
     Status build();
   }
   
@@ -65,7 +70,7 @@ public interface ObjectRepository {
     CommitBuilder delete(String name);
     CommitBuilder change(String name, String content);
     
-    CommitBuilder head(String head);
+    CommitBuilder ref(String name);
     CommitBuilder parent(String commitId);
     CommitBuilder author(String author);
     CommitBuilder comment(String message);
@@ -88,19 +93,19 @@ public interface ObjectRepository {
   
   @Value.Immutable
   interface Objects {
-    Map<String, Head> getHeads();
+    Map<String, Ref> getRefs();
     Map<String, Tag> getTags();
     Map<String, IsObject> getValues();
   }
   
   @Value.Immutable
   interface Status {
-    List<HeadStatus> getEntries();
+    List<RefStatus> getEntries();
   }
   
   @Value.Immutable
-  interface HeadStatus {
-    String getHead();
+  interface RefStatus {
+    String getName();
     List<Commit> getCommits();
     List<Changes> getChanges();
   }
@@ -121,7 +126,7 @@ public interface ObjectRepository {
   }
   
   @Value.Immutable
-  interface Head extends IsName {
+  interface Ref extends IsName {
     String getCommit();
   }
 

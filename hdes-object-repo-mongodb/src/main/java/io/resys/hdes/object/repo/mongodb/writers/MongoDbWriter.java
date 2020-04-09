@@ -16,9 +16,9 @@ import com.mongodb.client.model.Updates;
 import io.resys.hdes.object.repo.api.ImmutableObjects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.exceptions.RepoException;
@@ -26,10 +26,10 @@ import io.resys.hdes.object.repo.mongodb.MongoCommand;
 import io.resys.hdes.object.repo.mongodb.MongoCommand.MongoDbConfig;
 import io.resys.hdes.object.repo.mongodb.codecs.BlobCodec;
 import io.resys.hdes.object.repo.mongodb.codecs.CommitCodec;
-import io.resys.hdes.object.repo.mongodb.codecs.HeadCodec;
+import io.resys.hdes.object.repo.mongodb.codecs.RefCodec;
 import io.resys.hdes.object.repo.mongodb.codecs.TagCodec;
 import io.resys.hdes.object.repo.mongodb.codecs.TreeCodec;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper.Writer;
+import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper.Writer;
 
 public class MongoDbWriter implements Writer<MongoClient> {
   private static final Logger LOGGER = LoggerFactory.getLogger(MongoDbWriter.class);
@@ -51,7 +51,7 @@ public class MongoDbWriter implements Writer<MongoClient> {
   @Override
   public Objects build(List<Object> objects) {
     return command.accept((client) -> {
-      Map<String, Head> heads = new HashMap<>(src.getHeads());
+      Map<String, Ref> refs = new HashMap<>(src.getRefs());
       Map<String, Tag> tags = new HashMap<>(src.getTags());
       Map<String, IsObject> values = new HashMap<>(src.getValues());
       for (Object value : objects) {
@@ -64,9 +64,9 @@ public class MongoDbWriter implements Writer<MongoClient> {
         } else if (value instanceof Tree) {
           Tree tree = (Tree) value;
           values.put(tree.getId(), visitTree(client, tree));
-        } else if (value instanceof Head) {
-          Head head = (Head) value;
-          heads.put(head.getName(), visitHead(client, head));
+        } else if (value instanceof Ref) {
+          Ref ref = (Ref) value;
+          refs.put(ref.getName(), visitRef(client, ref));
         } else if (value instanceof Tag) {
           Tag tag = (Tag) value;
           tags.put(tag.getName(), visitTag(client, tag));
@@ -75,26 +75,24 @@ public class MongoDbWriter implements Writer<MongoClient> {
         }
       }
       LOGGER.debug(log.toString());
-      return ImmutableObjects.builder().values(values).heads(heads).tags(tags).build();
+      return ImmutableObjects.builder().values(values).refs(refs).tags(tags).build();
     });
   }
 
   @Override
-  public Head visitHead(MongoClient client, Head head) {
-    final MongoCollection<Head> collection = client
-        .getDatabase(mongoDbConfig.getDb()).getCollection(mongoDbConfig.getHeads(), Head.class);
-    Bson filter = Filters.eq(HeadCodec.ID, head.getName());
-    Head value = collection.find(filter).first();
+  public Ref visitRef(MongoClient client, Ref ref) {
+    final MongoCollection<Ref> collection = client
+        .getDatabase(mongoDbConfig.getDb()).getCollection(mongoDbConfig.getRefs(), Ref.class);
+    Bson filter = Filters.eq(RefCodec.ID, ref.getName());
+    Ref value = collection.find(filter).first();
     if(value != null) {
-      collection.updateOne(filter, Updates.set(HeadCodec.COMMIT, head.getCommit()));
-      log.append("  - ").append(head).append(System.lineSeparator());
+      collection.updateOne(filter, Updates.set(RefCodec.COMMIT, ref.getCommit()));
+      log.append("  - ").append(ref).append(System.lineSeparator());
     } else {
-      collection.insertOne(head);
-      log.append("  - ").append(head).append(System.lineSeparator());  
+      collection.insertOne(ref);
+      log.append("  - ").append(ref).append(System.lineSeparator());  
     }
-    
-    
-    return head;
+    return ref;
   }
 
   @Override

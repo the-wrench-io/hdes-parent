@@ -14,7 +14,7 @@ public interface MongoCommand<T> {
   @Value.Immutable
   interface MongoDbConfig {
     String getDb();
-    String getHeads();
+    String getRefs();
     String getTags();
     String getObjects();
   }

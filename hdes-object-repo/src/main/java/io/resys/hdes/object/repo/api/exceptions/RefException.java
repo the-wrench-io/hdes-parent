@@ -1,9 +1,9 @@
 package io.resys.hdes.object.repo.api.exceptions;
 
-public class HeadException extends RepoException {
+public class RefException extends RepoException {
   private static final long serialVersionUID = -2123781385633987779L;
 
-  public HeadException(String msg) {
+  public RefException(String msg) {
     super(msg);
   }
 
@@ -19,16 +19,16 @@ public class HeadException extends RepoException {
           .toString();
     }
 
-    public String headNameMatch(String tag) {
+    public String refNameMatch(String tag) {
       return new StringBuilder()
           .append("Tag with name: ").append(tag)
-          .append(" matches with one of the HEAD names!")
+          .append(" matches with one of the REF names!")
           .toString();
     }
 
-    public String headUnknown(String head) {
+    public String refUnknown(String ref) {
       return new StringBuilder()
-          .append("Head with name: ").append(head)
+          .append("Ref with name: ").append(ref)
           .append(" is unknown!")
           .toString();
     }

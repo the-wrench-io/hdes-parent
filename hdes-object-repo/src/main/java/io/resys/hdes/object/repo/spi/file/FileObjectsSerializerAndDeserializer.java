@@ -1,4 +1,4 @@
-package io.resys.hdes.object.repo.spi;
+package io.resys.hdes.object.repo.spi.file;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -8,29 +8,29 @@ import java.util.Optional;
 
 import io.resys.hdes.object.repo.api.ImmutableBlob;
 import io.resys.hdes.object.repo.api.ImmutableCommit;
-import io.resys.hdes.object.repo.api.ImmutableHead;
+import io.resys.hdes.object.repo.api.ImmutableRef;
 import io.resys.hdes.object.repo.api.ImmutableTag;
 import io.resys.hdes.object.repo.api.ImmutableTree;
 import io.resys.hdes.object.repo.api.ImmutableTreeEntry;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
 import io.resys.hdes.object.repo.api.exceptions.RepoException;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper.Deserializer;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper.Serializer;
+import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper.Deserializer;
+import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper.Serializer;
 
-public class ObjectsSerializerAndDeserializer implements Serializer, Deserializer {
-  public final static ObjectsSerializerAndDeserializer INSTANCE = new ObjectsSerializerAndDeserializer();
+public class FileObjectsSerializerAndDeserializer implements Serializer, Deserializer {
+  public final static FileObjectsSerializerAndDeserializer INSTANCE = new FileObjectsSerializerAndDeserializer();
   
   public static final String TYPE_BLOB = "blob ";
   public static final String TYPE_TREE = "tree ";
   public static final String TYPE_COMMIT = "commit "; 
   
-  private ObjectsSerializerAndDeserializer() {
+  private FileObjectsSerializerAndDeserializer() {
     super();
   }
 
@@ -122,9 +122,9 @@ public class ObjectsSerializerAndDeserializer implements Serializer, Deserialize
   }
   
   @Override
-  public Head visitHead(String id, byte[] content) {
+  public Ref visitRef(String id, byte[] content) {
     String commit = new String(content, StandardCharsets.UTF_8);
-    return ImmutableHead.builder()
+    return ImmutableRef.builder()
         .name(id)
         .commit(commit)
         .build();
@@ -141,8 +141,8 @@ public class ObjectsSerializerAndDeserializer implements Serializer, Deserialize
   }
 
   @Override
-  public byte[] visitHead(Head head) {
-    return head.getCommit().getBytes(StandardCharsets.UTF_8);
+  public byte[] visitRef(Ref ref) {
+    return ref.getCommit().getBytes(StandardCharsets.UTF_8);
   }
 
   @Override

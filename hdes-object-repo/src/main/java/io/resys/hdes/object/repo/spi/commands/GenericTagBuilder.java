@@ -6,7 +6,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.api.ObjectRepository.TagBuilder;
-import io.resys.hdes.object.repo.api.exceptions.HeadException;
+import io.resys.hdes.object.repo.api.exceptions.RefException;
 import io.resys.hdes.object.repo.spi.RepoAssert;
 
 public class GenericTagBuilder implements TagBuilder {
@@ -34,15 +34,15 @@ public class GenericTagBuilder implements TagBuilder {
     RepoAssert.notNull(name, () -> "name can't be null!");
     
     if(objects.getTags().containsKey(name)) {
-      throw new HeadException(HeadException.builder().duplicateTag(name));
+      throw new RefException(RefException.builder().duplicateTag(name));
     }
     
-    if(objects.getHeads().containsKey(name)) {
-      throw new HeadException(HeadException.builder().headNameMatch(name));
+    if(objects.getRefs().containsKey(name)) {
+      throw new RefException(RefException.builder().refNameMatch(name));
     }
     
     // tags can be created only from master
-    Commit commit = CommitQuery.builder(objects).commit(this.commit).head(ObjectRepository.MASTER).get();
+    Commit commit = CommitQuery.builder(objects).commit(this.commit).ref(ObjectRepository.MASTER).get();
     return ImmutableTag.builder().name(name).commit(commit.getId()).build();
   }  
 }

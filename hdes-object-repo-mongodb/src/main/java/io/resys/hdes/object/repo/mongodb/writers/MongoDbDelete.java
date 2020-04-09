@@ -12,15 +12,15 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
 import io.resys.hdes.object.repo.api.ImmutableObjects;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
-import io.resys.hdes.object.repo.api.ObjectRepository.HeadStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
+import io.resys.hdes.object.repo.api.ObjectRepository.RefStatus;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.mongodb.MongoCommand;
 import io.resys.hdes.object.repo.mongodb.MongoCommand.MongoDbConfig;
-import io.resys.hdes.object.repo.mongodb.codecs.HeadCodec;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper.Delete;
+import io.resys.hdes.object.repo.mongodb.codecs.RefCodec;
+import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper.Delete;
 
 public class MongoDbDelete implements Delete<MongoClient> {
   private static final Logger LOGGER = LoggerFactory.getLogger(MongoDbDelete.class);
@@ -40,36 +40,36 @@ public class MongoDbDelete implements Delete<MongoClient> {
   }
 
   @Override
-  public Objects build(HeadStatus headStatus) {
+  public Objects build(RefStatus refStatus) {
     return command.accept((client) -> {
-      Map<String, Head> heads = new HashMap<>(src.getHeads());
+      Map<String, Ref> refs = new HashMap<>(src.getRefs());
       Map<String, Tag> tags = new HashMap<>(src.getTags());
       Map<String, IsObject> values = new HashMap<>(src.getValues());
       
-      Head head = heads.get(headStatus.getHead());
-      visitHead(client, head);
+      Ref ref = refs.get(refStatus.getName());
+      visitRef(client, ref);
       
-      heads.remove(headStatus.getHead());
+      refs.remove(refStatus.getName());
       
       LOGGER.debug(log.toString());
       
       return ImmutableObjects.builder()
           .values(values)
-          .heads(heads)
+          .refs(refs)
           .tags(tags)
           .build();
     });
   }
 
   @Override
-  public Head visitHead(MongoClient client, Head head) {
-    log.append("  - deleting: ").append(head.getName()).append(" - ").append(head);
+  public Ref visitRef(MongoClient client, Ref ref) {
+    log.append("  - deleting: ").append(ref.getName()).append(" - ").append(ref);
     
-    final MongoCollection<Head> collection = client
-        .getDatabase(mongoDbConfig.getDb()).getCollection(mongoDbConfig.getHeads(), Head.class);
-    Bson filter = Filters.eq(HeadCodec.ID, head.getName());
+    final MongoCollection<Ref> collection = client
+        .getDatabase(mongoDbConfig.getDb()).getCollection(mongoDbConfig.getRefs(), Ref.class);
+    Bson filter = Filters.eq(RefCodec.ID, ref.getName());
     collection.deleteOne(filter);
     
-    return head;
+    return ref;
   }
 }

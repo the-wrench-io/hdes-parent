@@ -1,4 +1,4 @@
-package io.resys.hdes.object.repo.spi;
+package io.resys.hdes.object.repo.spi.mapper;
 
 import java.util.function.Function;
 

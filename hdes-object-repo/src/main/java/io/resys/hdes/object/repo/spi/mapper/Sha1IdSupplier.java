@@ -1,4 +1,4 @@
-package io.resys.hdes.object.repo.spi;
+package io.resys.hdes.object.repo.spi.mapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +15,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
-import io.resys.hdes.object.repo.spi.ObjectRepositoryMapper.IdSupplier;
+import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper.IdSupplier;
 
 @SuppressWarnings("deprecation")
 public class Sha1IdSupplier implements IdSupplier {

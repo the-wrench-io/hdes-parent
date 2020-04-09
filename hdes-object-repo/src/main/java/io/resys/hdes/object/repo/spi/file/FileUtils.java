@@ -1,4 +1,4 @@
-package io.resys.hdes.object.repo.spi.file.util;
+package io.resys.hdes.object.repo.spi.file;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,20 +12,21 @@ import org.slf4j.LoggerFactory;
 
 import io.resys.hdes.object.repo.api.ObjectRepository.IsName;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
-import io.resys.hdes.object.repo.spi.file.FileObjectRepository;
 import io.resys.hdes.object.repo.spi.file.exceptions.FileCantBeWrittenException;
 
 public class FileUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(FileObjectRepository.class);
   private static final String REPO_PATH = "repo";
-  private static final String HEAD_PATH = "heads";
+  private static final String REFS_PATH = "refs";
+  private static final String HEAD_PATH = "head";
   private static final String OBJECTS_PATH = "objects";
   private static final String TAGS_PATH = "tags";
 
   @Value.Immutable
   public interface FileSystemConfig {
     File getRepo();
-    File getHeads();
+    File getHead();
+    File getRefs();
     File getObjects();
     File getTags();
   }
@@ -81,21 +82,23 @@ public class FileUtils {
       log.append("No existing repo, init new: ");
     }
     FileUtils.isWritable(repo);
-    File heads = FileUtils.mkdir(new File(repo, HEAD_PATH));
+    File refs = FileUtils.mkdir(new File(repo, REFS_PATH));
+    File head = FileUtils.mkdir(new File(repo, HEAD_PATH));
     File objects = FileUtils.mkdir(new File(repo, OBJECTS_PATH));
     File tags = FileUtils.mkdir(new File(repo, TAGS_PATH));
     
     log.append(System.lineSeparator())
         .append("  - ").append(repo.getAbsolutePath()).append(System.lineSeparator())
-        .append("  - ").append(heads.getAbsolutePath()).append(System.lineSeparator())
+        .append("  - ").append(refs.getAbsolutePath()).append(System.lineSeparator())
         .append("  - ").append(objects.getAbsolutePath()).append(System.lineSeparator())
         .append("  - ").append(tags.getAbsolutePath()).append(System.lineSeparator());
     LOGGER.debug(log.toString());
     return ImmutableFileSystemConfig.builder()
-        .heads(heads)
+        .refs(refs)
         .repo(repo)
         .objects(objects)
         .tags(tags)
+        .head(head)
         .build();
   }
 

@@ -39,8 +39,8 @@ public class GenericCheckoutBuilder implements CheckoutBuilder {
     String id;
     if(objects.getTags().containsKey(name)) {
       id = objects.getTags().get(name).getCommit();
-    } else if(objects.getHeads().containsKey(name)) {
-      id = objects.getHeads().get(name).getCommit();
+    } else if(objects.getRefs().containsKey(name)) {
+      id = objects.getRefs().get(name).getCommit();
     } else if(objects.getValues().containsKey(name)) {
       id = name;
     } else {

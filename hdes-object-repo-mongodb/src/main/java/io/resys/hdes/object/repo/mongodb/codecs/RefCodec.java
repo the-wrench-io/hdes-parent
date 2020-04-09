@@ -26,17 +26,17 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
-import io.resys.hdes.object.repo.api.ImmutableHead;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
+import io.resys.hdes.object.repo.api.ImmutableRef;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 
 
-public class HeadCodec implements Codec<Head> {
+public class RefCodec implements Codec<Ref> {
   
   public static final String ID = "_id";
   public static final String COMMIT = "commit";
   
   @Override
-  public void encode(BsonWriter writer, Head command, EncoderContext encoderContext) {
+  public void encode(BsonWriter writer, Ref command, EncoderContext encoderContext) {
     writer.writeStartDocument();
     writer.writeString(ID, command.getName());
     writer.writeString(COMMIT, command.getCommit());
@@ -44,9 +44,9 @@ public class HeadCodec implements Codec<Head> {
   }
 
   @Override
-  public Head decode(BsonReader reader, DecoderContext decoderContext) {
+  public Ref decode(BsonReader reader, DecoderContext decoderContext) {
     reader.readStartDocument();
-    Head result = ImmutableHead.builder()
+    Ref result = ImmutableRef.builder()
       .name(reader.readString(ID))
       .commit(reader.readString(COMMIT))
       .build();
@@ -55,7 +55,7 @@ public class HeadCodec implements Codec<Head> {
   }
 
   @Override
-  public Class<Head> getEncoderClass() {
-    return Head.class;
+  public Class<Ref> getEncoderClass() {
+    return Ref.class;
   }
 }

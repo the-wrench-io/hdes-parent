@@ -26,7 +26,7 @@ import org.bson.codecs.configuration.CodecRegistry;
 
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tag;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
@@ -39,7 +39,7 @@ public class ObjectRepositoryCodeProvider implements CodecProvider {
   private final TreeCodec tree = new TreeCodec(treeEntry);
   
   private final TagCodec tag = new TagCodec();
-  private final HeadCodec head = new HeadCodec();
+  private final RefCodec ref = new RefCodec();
   
   @SuppressWarnings("unchecked")
   @Override
@@ -60,8 +60,8 @@ public class ObjectRepositoryCodeProvider implements CodecProvider {
     if(Tag.class.isAssignableFrom(clazz)) {
       return (Codec<T>) tag;
     }
-    if(Head.class.isAssignableFrom(clazz)) {
-      return (Codec<T>) head;
+    if(Ref.class.isAssignableFrom(clazz)) {
+      return (Codec<T>) ref;
     }
     return null;
   }

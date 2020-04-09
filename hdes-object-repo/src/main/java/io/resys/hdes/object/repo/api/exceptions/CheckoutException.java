@@ -14,7 +14,7 @@ public class CheckoutException extends RepoException {
   public static class Builder {
     public String notFound(String id) {
       return new StringBuilder()
-          .append("No tag, head or commit with id: ").append(id)
+          .append("No tag, ref or commit with id: ").append(id)
           .append("!")
           .toString();
     }

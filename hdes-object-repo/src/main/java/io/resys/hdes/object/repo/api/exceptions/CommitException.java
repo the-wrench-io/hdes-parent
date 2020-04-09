@@ -3,8 +3,8 @@ package io.resys.hdes.object.repo.api.exceptions;
 import java.util.Collection;
 
 import io.resys.hdes.object.repo.api.ObjectRepository.Changes;
-import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
+import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
 
 public class CommitException extends RepoException {
@@ -27,12 +27,12 @@ public class CommitException extends RepoException {
           .toString();
     }
 
-    public String headDoesNotMatch(String parent, String author, Collection<Head> heads) {
+    public String refDoesNotMatch(String parent, String author, Collection<Ref> refs) {
       return new StringBuilder()
           .append("Commit by: ").append(author)
           .append(" that points to: ").append(parent)
-          .append(" does not match with on of the heads:")
-          .append(" ").append(heads)
+          .append(" does not match with on of the refs:")
+          .append(" ").append(refs)
           .append("!")
           .toString();
     }
@@ -77,35 +77,35 @@ public class CommitException extends RepoException {
           .toString();
     }
     
-    public String headNotFound(String head) {
+    public String refNotFound(String ref) {
       return new StringBuilder()
-          .append("Head: ").append(head)
+          .append("Ref: ").append(ref)
           .append(" does not exist!")
           .toString();
     }
     
-    public String notInHead(String commit, String head) {
+    public String notInRef(String commit, String ref) {
       return new StringBuilder()
           .append("Commit: ").append(commit)
-          .append(" is not in head: ").append(head)
+          .append(" is not in ref: ").append(ref)
           .append("!")
           .toString();
     }
-    public String nothingToMerge(String head) {
+    public String nothingToMerge(String ref) {
       return new StringBuilder()
-          .append("Head: ").append(head)
+          .append("ref: ").append(ref)
           .append(" commits can't be merged because there are no changes!")
           .toString();
     }
-    public String conflicts(String head) {
+    public String conflicts(String ref) {
       return new StringBuilder()
-          .append("Head: ").append(head)
+          .append("ref: ").append(ref)
           .append(" commits can't be merged because of conflicts, see status command for resolving conflicts!")
           .toString();
     }
-    public String conflicts(String head, Changes changes) {
+    public String conflicts(String ref, Changes changes) {
       return new StringBuilder()
-          .append("Head: ").append(head)
+          .append("ref: ").append(ref)
           .append(" changes: ").append(changes.getName()).append(" ").append(changes.getAction())
           .append(" can't be merged")
           .toString();
