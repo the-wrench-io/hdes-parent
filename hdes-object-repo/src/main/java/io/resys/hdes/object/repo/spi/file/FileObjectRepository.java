@@ -72,12 +72,6 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   }
   
   @Override
-  public PullBuilder pull() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  @Override
   public HistoryBuilder history() {
     // TODO Auto-generated method stub
     return null;

@@ -24,11 +24,6 @@ public interface ObjectRepository {
     CheckoutBuilder checkout();
     MergeBuilder merge();
     TagBuilder tag();
-    PullBuilder pull();
-  }
-  
-  interface PullBuilder {
-    Objects build();
   }
   
   interface MergeBuilder {
