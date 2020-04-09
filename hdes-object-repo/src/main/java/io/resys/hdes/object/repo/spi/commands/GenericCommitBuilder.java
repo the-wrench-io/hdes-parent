@@ -63,6 +63,19 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     toAdd.add(ImmutableTreeEntry.builder().blob(blob.getId()).name(name).build());
     return this;
   }
+  @Override
+  public CommitBuilder conflict(String name, String oldValue, String newValue) {
+    StringBuilder content = new StringBuilder()
+        .append("<<<<<<< master").append("/n")
+        .append(oldValue)
+        .append("======= ref").append("/n")
+        .append(newValue)
+        .append(">>>>>>>").append("/n");
+    
+    Blob blob = blob(content.toString());
+    toAdd.add(ImmutableTreeEntry.builder().blob(blob.getId()).name(name).build());
+    return this;
+  }
   
   @Override
   public CommitBuilder delete(String name) {

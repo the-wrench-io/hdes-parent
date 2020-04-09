@@ -27,6 +27,7 @@ public interface ObjectRepository {
   }
   
   interface RebaseBuilder {
+    RebaseBuilder author(String author);
     RebaseBuilder ref(String refName);
     Objects build();
   }
@@ -75,6 +76,7 @@ public interface ObjectRepository {
     CommitBuilder add(String name, String content);
     CommitBuilder delete(String name);
     CommitBuilder change(String name, String content);
+    CommitBuilder conflict(String name, String oldValue, String newValue);
     
     CommitBuilder ref(String name);
     CommitBuilder parent(String commitId);
