@@ -90,12 +90,18 @@ public interface ObjectRepository {
     String getName();
     String getBlob();
   }
+
+  @Value.Immutable
+  interface Head {
+    String getRef();
+  }
   
   @Value.Immutable
   interface Objects {
     Map<String, Ref> getRefs();
     Map<String, Tag> getTags();
     Map<String, IsObject> getValues();
+    Head getHead();
   }
   
   @Value.Immutable
