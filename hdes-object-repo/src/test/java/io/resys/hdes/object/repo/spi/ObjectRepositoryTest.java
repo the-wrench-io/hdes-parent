@@ -22,7 +22,7 @@ public class ObjectRepositoryTest {
     ObjectRepository repo = create();
     Commit firstCommit = repo.commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("first commit").build();
     
-    Commit commit = repo.commands().commit()
+    repo.commands().commit()
     .add("file 2", "contentxxxx")
     .add("file 3", "contentxxxx")
     .add("file 4", "contentxxxx1")
@@ -32,10 +32,7 @@ public class ObjectRepositoryTest {
     .comment("init second ref").build();
     
     repo.commands().checkout().from("new-ref-1").build();
-    
-    repo.commands().merge()
-    .author("merger@me.com")
-    .ref("new-ref-1").build();
+    repo.commands().merge().author("merger@me.com").ref("new-ref-1").build();
   }
   
   private static ObjectRepository create() {
