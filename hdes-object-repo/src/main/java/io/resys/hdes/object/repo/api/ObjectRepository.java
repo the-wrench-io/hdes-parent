@@ -25,7 +25,6 @@ public interface ObjectRepository {
     MergeBuilder merge();
     TagBuilder tag();
     PullBuilder pull();
-    
   }
   
   interface PullBuilder {
