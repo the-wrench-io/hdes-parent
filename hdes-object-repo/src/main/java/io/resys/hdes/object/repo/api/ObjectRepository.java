@@ -22,8 +22,13 @@ public interface ObjectRepository {
     HistoryBuilder history();
     SnapshotBuilder snapshot();
     CheckoutBuilder checkout();
+    PullCommand pull();
     MergeBuilder merge();
     TagBuilder tag();
+  }
+  
+  interface PullCommand {
+    Object build();
   }
   
   interface RebaseBuilder {

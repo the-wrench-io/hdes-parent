@@ -25,10 +25,15 @@ public class FileUtils {
   @Value.Immutable
   public interface FileSystemConfig {
     File getRoot();
+
     File getRepo();
+
     File getHead();
+
     File getRefs();
+
     File getObjects();
+
     File getTags();
   }
 
@@ -47,12 +52,16 @@ public class FileUtils {
     throw new FileCantBeWrittenException(src);
   }
 
-  public static File mkFile(File src) throws IOException {
+  public static File mkFile(File src) {
     if (src.exists()) {
       return isWritable(src);
     }
-    if (src.createNewFile()) {
-      return src;
+    try {
+      if (src.createNewFile()) {
+        return src;
+      }
+    } catch (IOException e) {
+      throw new FileCantBeWrittenException(src);  
     }
     throw new FileCantBeWrittenException(src);
   }
@@ -72,7 +81,7 @@ public class FileUtils {
     }
   }
 
-  public static FileSystemConfig createOrGetRepo(File root) throws IOException {
+  public static FileSystemConfig createOrGetRepo(File root) {
     FileUtils.isWritable(root);
     StringBuilder log = new StringBuilder("Using file based storage. ");
     File repo = new File(root, REPO_PATH);
@@ -87,7 +96,6 @@ public class FileUtils {
     File head = FileUtils.mkFile(new File(repo, HEAD_PATH));
     File objects = FileUtils.mkdir(new File(repo, OBJECTS_PATH));
     File tags = FileUtils.mkdir(new File(repo, TAGS_PATH));
-    
     log.append(System.lineSeparator())
         .append("  - ").append(repo.getAbsolutePath()).append(System.lineSeparator())
         .append("  - ").append(head.getAbsolutePath()).append(System.lineSeparator())
@@ -117,7 +125,7 @@ public class FileUtils {
       } else {
         String id = subDir.getName();
         T object = consumer.read(id, Files.readAllBytes(subDir.toPath()));
-        result.put(((IsName) object).getName(), object);   
+        result.put(((IsName) object).getName(), object);
       }
     }
     return result;

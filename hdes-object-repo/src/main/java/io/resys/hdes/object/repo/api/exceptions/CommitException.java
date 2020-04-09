@@ -19,13 +19,6 @@ public class CommitException extends RepoException {
   }
 
   public static class Builder {
-    public String emptyCommit(String parent, String author) {
-      return new StringBuilder()
-          .append("Commit by: ").append(author)
-          .append(" that points to: ").append(parent)
-          .append(" is rejected because there are no changes!")
-          .toString();
-    }
 
     public String refDoesNotMatch(String parent, String author, Collection<Ref> refs) {
       return new StringBuilder()

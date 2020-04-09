@@ -13,6 +13,7 @@ import io.resys.hdes.object.repo.spi.RepoAssert;
 import io.resys.hdes.object.repo.spi.commands.GenericCheckoutBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericMergeBuilder;
+import io.resys.hdes.object.repo.spi.commands.GenericPullCommand;
 import io.resys.hdes.object.repo.spi.commands.GenericSnapshotBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericStatusBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericTagBuilder;
@@ -22,10 +23,14 @@ import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper;
 
 public class FileObjectRepository implements Commands, ObjectRepository {
   private final ObjectRepositoryMapper<File> mapper;
+  private final FileSystemConfig config;
   private Objects objects;
-  
-  public FileObjectRepository(Objects objects, ObjectRepositoryMapper<File> mapper) {
-    this.objects = objects;
+
+  public FileObjectRepository(
+      FileSystemConfig config,
+      ObjectRepositoryMapper<File> mapper) {
+    this.config = config;
+    this.objects = ImmutableObjects.builder().build();
     this.mapper = mapper;
   }
 
@@ -50,33 +55,51 @@ public class FileObjectRepository implements Commands, ObjectRepository {
       }
     };
   }
-  
+
+  @Override
+  public PullCommand pull() {
+    return new GenericPullCommand(objects) {
+      @Override
+      protected Objects fetch() {
+        try {
+          FileObjectsSerializerAndDeserializer serializer = FileObjectsSerializerAndDeserializer.INSTANCE;
+          Map<String, Ref> refs = FileUtils.map(config.getRefs(), (id, v) -> serializer.visitRef(id, v));
+          Map<String, Tag> tags = FileUtils.map(config.getTags(), (id, v) -> serializer.visitTag(id, v));
+          Map<String, IsObject> values = FileUtils.map(config.getObjects(), (id, v) -> serializer.visitObject(id, v));
+          Objects objects = ImmutableObjects.builder().values(values).tags(tags).refs(refs).build();
+          return setObjects(objects);
+        } catch (IOException e) {
+          throw new RuntimeException(e.getMessage(), e);
+        }
+      }
+    };
+  }
+
   @Override
   public SnapshotBuilder snapshot() {
     return new GenericSnapshotBuilder(objects);
   }
-  
+
   @Override
   public StatusBuilder status() {
     return new GenericStatusBuilder(objects);
   }
-  
+
   @Override
   public MergeBuilder merge() {
     return new GenericMergeBuilder(objects, () -> commit()) {
       @Override
       protected Objects delete(RefStatus ref) {
-        return setObjects(mapper.delete(objects).build(ref)); 
+        return setObjects(mapper.delete(objects).build(ref));
       }
     };
   }
-  
+
   @Override
   public HistoryBuilder history() {
     // TODO Auto-generated method stub
     return null;
   }
-  
 
   @Override
   public CheckoutBuilder checkout() {
@@ -87,7 +110,7 @@ public class FileObjectRepository implements Commands, ObjectRepository {
       }
     };
   }
-  
+
   @Override
   public Objects objects() {
     return objects;
@@ -97,7 +120,7 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   public Commands commands() {
     return this;
   }
-  
+
   private Objects setObjects(Objects objects) {
     this.objects = objects;
     return objects;
@@ -108,39 +131,39 @@ public class FileObjectRepository implements Commands, ObjectRepository {
   }
 
   public static class Config {
-    
     private File directory;
+    private boolean sync;
 
     public Config directory(File directory) {
       this.directory = directory;
       return this;
     }
 
+    // perform sync on checked out branch on startup
+    public Config sync() {
+      this.sync = true;
+      return this;
+    }
+
     public ObjectRepository build() {
-      try {
-        RepoAssert.notNull(directory, () -> "directory must be defined!");
-        FileSystemConfig fileSystem = FileUtils.createOrGetRepo(directory);
+      RepoAssert.notNull(directory, () -> "directory must be defined!");
+      FileSystemConfig fileSystem = FileUtils.createOrGetRepo(directory);
+      FileObjectsSerializerAndDeserializer serializer = FileObjectsSerializerAndDeserializer.INSTANCE;
+      ObjectRepository result = new FileObjectRepository(fileSystem,
+          new GenericObjectRepositoryMapper<File>(
+              serializer, serializer,
+              (v) -> new FileWriter(v, fileSystem, serializer),
+              (v) -> new FileDelete(v, fileSystem)));
+      
+      // Load files
+      result.commands().pull();
+      
+      // sync against checkout
+      if(sync) {
         
-        FileObjectsSerializerAndDeserializer serializer = FileObjectsSerializerAndDeserializer.INSTANCE;
-        
-        Map<String, Ref> refs = FileUtils.map(fileSystem.getRefs(), (id, v) -> serializer.visitRef(id, v));
-        Map<String, Tag> tags = FileUtils.map(fileSystem.getTags(), (id, v) -> serializer.visitTag(id, v));
-        Map<String, IsObject> values = FileUtils.map(fileSystem.getObjects(), (id, v) -> serializer.visitObject(id, v));
-        
-        Objects objects = ImmutableObjects.builder()
-        .values(values)
-        .tags(tags)
-        .refs(refs)
-        .build();
-        
-        return new FileObjectRepository(objects, 
-            new GenericObjectRepositoryMapper<File>(
-                serializer, serializer,
-                (v) -> new FileWriter(v, fileSystem, serializer),
-                (v) -> new FileDelete(v, fileSystem)));
-      } catch (IOException e) {
-        throw new RuntimeException(e.getMessage(), e);
       }
+      
+      return result;
     }
   }
 }

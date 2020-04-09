@@ -21,6 +21,7 @@ import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
 import io.resys.hdes.object.repo.api.ObjectRepository.Tree;
 import io.resys.hdes.object.repo.api.ObjectRepository.TreeEntry;
 import io.resys.hdes.object.repo.api.exceptions.CommitException;
+import io.resys.hdes.object.repo.api.exceptions.EmptyCommitException;
 import io.resys.hdes.object.repo.spi.RepoAssert;
 import io.resys.hdes.object.repo.spi.mapper.ObjectRepositoryMapper;
 
@@ -116,8 +117,8 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     RepoAssert.notNull(comment, () -> "comment must be defined!");
     
     // nothing to commit
-    if (toAdd.isEmpty()) {
-      throw new CommitException(CommitException.builder().emptyCommit(parentId, author));
+    if (toAdd.isEmpty() && toDelete.isEmpty()) {
+      throw new EmptyCommitException(parentId, author);
     }
     
     // First commit
