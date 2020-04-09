@@ -83,7 +83,7 @@ public class FileUtils {
     }
     FileUtils.isWritable(repo);
     File refs = FileUtils.mkdir(new File(repo, REFS_PATH));
-    File head = FileUtils.mkdir(new File(repo, HEAD_PATH));
+    File head = FileUtils.mkFile(new File(repo, HEAD_PATH));
     File objects = FileUtils.mkdir(new File(repo, OBJECTS_PATH));
     File tags = FileUtils.mkdir(new File(repo, TAGS_PATH));
     
