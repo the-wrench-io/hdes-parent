@@ -16,6 +16,7 @@
     <module>hdes-object-repo</module>
     <module>hdes-object-repo-mongodb</module>
 
+    <!-- deprecated -->
     <module>hdes-datatype</module>
     <module>hdes-decisiontable</module>
     <module>hdes-servicetask</module>
