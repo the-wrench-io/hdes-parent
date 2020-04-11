@@ -49,6 +49,12 @@ ARRAY: 'ARRAY';
 ID: 'id';
 DESC: 'description';
 
+// HDES
+DEF: 'def';
+FLOW: 'flow';
+DT: 'decisionTable';
+SERVICE: 'service';
+
 // DT
 HEADERS: 'headers';
 IN: 'IN';
