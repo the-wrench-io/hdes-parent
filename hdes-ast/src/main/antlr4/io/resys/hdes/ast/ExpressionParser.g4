@@ -1,14 +1,8 @@
 parser grammar ExpressionParser;
 options { tokenVocab = HdesLexer; }
+import CommonParser;
 
-// literals
-literal
-  : IntegerLiteral
-  | DecimalLiteral
-  | BooleanLiteral
-  | StringLiteral;
 
-typeName : Identifier | typeName '.' Identifier;
 methodName: Identifier;
 
 // method invocation

@@ -1,23 +1,11 @@
 parser grammar ManualTaskParser;
 options { tokenVocab = HdesLexer; }
+import CommonParser;
 
-literal
-  : IntegerLiteral
-  | DecimalLiteral
-  | BooleanLiteral
-  | StringLiteral;
 
-scalarType: ScalarType;
 dropdownType: DropdownType;
 cssIdentifier: CssIdentifier;
 mt: id description? inputs dropdowns statements form EOF;
-
-inputs: 'inputs' ':' '{' inputArgs? '}';
-inputArgs: input (',' input)*;
-input: RequiredType (simpleType | arrayType | objectType);
-simpleType: scalarType typeName;
-arrayType: 'ARRAY' (simpleType | objectType);
-objectType: 'OBJECT' typeName inputs?;
 
 dropdowns: 'dropdowns' ':' '{' dropdownArgs? '}';
 dropdownArgs: dropdownArg (',' dropdownArg)*;
@@ -47,7 +35,3 @@ when: 'when' ':' StringLiteral;
 then: 'then' ':' statementType message?;
 statementType: StatementType;
 message: 'message' ':' StringLiteral;
-
-id: 'id' ':' typeName;
-description: 'description' ':' literal;
-typeName: Identifier | typeName '.' Identifier;

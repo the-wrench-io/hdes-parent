@@ -28,7 +28,6 @@ import io.resys.hdes.ast.DecisionTableParser.DtContext;
 import io.resys.hdes.ast.DecisionTableParser.FirstContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderArgsContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderContext;
-import io.resys.hdes.ast.DecisionTableParser.HeaderTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.HeadersContext;
 import io.resys.hdes.ast.DecisionTableParser.HitPolicyContext;
 import io.resys.hdes.ast.DecisionTableParser.IdContext;
@@ -37,6 +36,7 @@ import io.resys.hdes.ast.DecisionTableParser.MatrixContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetsContext;
+import io.resys.hdes.ast.DecisionTableParser.ScalarTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
 import io.resys.hdes.ast.DecisionTableParser.UndefinedValueContext;
 import io.resys.hdes.ast.DecisionTableParser.ValueContext;
@@ -52,9 +52,9 @@ public class DtParserConsoleVisitor extends DecisionTableParserBaseVisitor<AstNo
   }
 
   @Override
-  public AstNode visitHeaderType(HeaderTypeContext ctx) {
+  public AstNode visitScalarType(ScalarTypeContext ctx) {
     log(ctx);
-    return super.visitHeaderType(ctx);
+    return super.visitScalarType(ctx);
   }
 
   @Override

@@ -37,7 +37,6 @@ import io.resys.hdes.ast.DecisionTableParser.DtContext;
 import io.resys.hdes.ast.DecisionTableParser.FirstContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderArgsContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderContext;
-import io.resys.hdes.ast.DecisionTableParser.HeaderTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.HeadersContext;
 import io.resys.hdes.ast.DecisionTableParser.HitPolicyContext;
 import io.resys.hdes.ast.DecisionTableParser.IdContext;
@@ -46,6 +45,7 @@ import io.resys.hdes.ast.DecisionTableParser.MatrixContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetsContext;
+import io.resys.hdes.ast.DecisionTableParser.ScalarTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
 import io.resys.hdes.ast.DecisionTableParser.UndefinedValueContext;
 import io.resys.hdes.ast.DecisionTableParser.ValueContext;
@@ -66,8 +66,6 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
-import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
-import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.api.nodes.ImmutableDecisionTableBody;
 import io.resys.hdes.ast.api.nodes.ImmutableHeader;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
@@ -78,6 +76,8 @@ import io.resys.hdes.ast.api.nodes.ImmutableLiteralValue;
 import io.resys.hdes.ast.api.nodes.ImmutableRule;
 import io.resys.hdes.ast.api.nodes.ImmutableRuleRow;
 import io.resys.hdes.ast.api.nodes.ImmutableUndefinedValue;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
@@ -152,7 +152,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   }
 
   @Override
-  public RedundentHeaderType visitHeaderType(HeaderTypeContext ctx) {
+  public RedundentHeaderType visitScalarType(ScalarTypeContext ctx) {
     return ImmutableRedundentHeaderType.builder()
         .token(token(ctx))
         .value(ScalarType.valueOf(ctx.getText()))

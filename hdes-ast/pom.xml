@@ -19,8 +19,8 @@
         <groupId>org.antlr</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
         <configuration>
-
           <visitor>true</visitor>
+          <libDirectory>${basedir}/src/main/antlr4/io/resys/hdes/ast</libDirectory>
         </configuration>
       </plugin>
     </plugins>
