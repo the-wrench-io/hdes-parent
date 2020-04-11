@@ -1,6 +1,5 @@
 parser grammar HdesParser;
 options { tokenVocab = HdesLexer; }
-import CommonParser;
 
 compilationUnit: def EOF;
 
