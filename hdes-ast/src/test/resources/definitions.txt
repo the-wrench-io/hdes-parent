@@ -1,0 +1,54 @@
+def decisionTable: {
+  id: basic
+  headers: {
+    IN STRING name,
+    IN STRING lastName,
+    OUT INTEGER value
+  } MATRIX: {
+    { ?, ?, 20 },
+    { 'bob', 'woman', 4570 }
+  }
+}
+
+def manualTask: {
+  id: basic description: 'very descriptive manual task'
+  inputs: {}
+  dropdowns: {
+    gender: { 'f': 'female', 'm': 'male' }
+  }
+  statements: {}
+  form: { fields: {
+    required STRING firstName: { },
+    required INTEGER age: { },
+    required INTEGER gender: { single dropdown: genderDropdown }
+    } 
+  }
+}
+
+def service: {
+
+}
+
+def flow: {
+  id: x description: 'descriptive'
+  inputs: {
+    optional INTEGER arg1.x1,
+    optional INTEGER arg2.x1
+  }
+  tasks: {
+    firstTask: {
+      then: endTask
+      decisionTask: bestDtTask
+      OBJECT mapping: {
+        input1: arg1.x1,
+        input2: arg2.x1
+      }
+    }, 
+    end: {
+      OBJECT mapping: {
+        input1: arg1.x1,
+        input2: arg2.x1
+      }
+    }
+  }
+}
