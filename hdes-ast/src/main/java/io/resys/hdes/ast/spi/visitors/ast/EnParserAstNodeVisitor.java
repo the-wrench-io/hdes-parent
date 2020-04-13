@@ -31,7 +31,6 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.ExpressionParser;
 import io.resys.hdes.ast.ExpressionParser.AdditiveExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.AndExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.ArgsContext;
 import io.resys.hdes.ast.ExpressionParser.CompilationUnitContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalAndExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalExpressionContext;
@@ -39,6 +38,7 @@ import io.resys.hdes.ast.ExpressionParser.ConditionalOrExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.EqualityExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.LiteralContext;
+import io.resys.hdes.ast.ExpressionParser.MethodArgsContext;
 import io.resys.hdes.ast.ExpressionParser.MethodInvocationContext;
 import io.resys.hdes.ast.ExpressionParser.MethodNameContext;
 import io.resys.hdes.ast.ExpressionParser.MultiplicativeExpressionContext;
@@ -62,8 +62,6 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EvalNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodRefNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.TypeRefNode;
-import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
-import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 import io.resys.hdes.ast.api.nodes.ImmutableAdditiveOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableAndOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
@@ -81,6 +79,8 @@ import io.resys.hdes.ast.api.nodes.ImmutablePostIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutablePreDecrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutablePreIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableTypeRefNode;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
+import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
@@ -135,7 +135,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
   }
 
   @Override
-  public RedundentArgs visitArgs(ArgsContext ctx) {
+  public RedundentArgs visitMethodArgs(MethodArgsContext ctx) {
     Nodes nodes = nodes(ctx);
     return ImmutableRedundentArgs.builder()
         .token(token(ctx))

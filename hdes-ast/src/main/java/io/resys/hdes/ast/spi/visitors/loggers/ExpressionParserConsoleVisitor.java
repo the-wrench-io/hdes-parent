@@ -1,5 +1,7 @@
 package io.resys.hdes.ast.spi.visitors.loggers;
 
+import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
+
 /*-
  * #%L
  * hdes-ast
@@ -22,7 +24,6 @@ package io.resys.hdes.ast.spi.visitors.loggers;
 
 import io.resys.hdes.ast.ExpressionParser.AdditiveExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.AndExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.ArgsContext;
 import io.resys.hdes.ast.ExpressionParser.CompilationUnitContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalAndExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalExpressionContext;
@@ -30,6 +31,7 @@ import io.resys.hdes.ast.ExpressionParser.ConditionalOrExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.EqualityExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.LiteralContext;
+import io.resys.hdes.ast.ExpressionParser.MethodArgsContext;
 import io.resys.hdes.ast.ExpressionParser.MethodInvocationContext;
 import io.resys.hdes.ast.ExpressionParser.MethodNameContext;
 import io.resys.hdes.ast.ExpressionParser.MultiplicativeExpressionContext;
@@ -41,9 +43,6 @@ import io.resys.hdes.ast.ExpressionParser.RelationalExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.TypeNameContext;
 import io.resys.hdes.ast.ExpressionParser.UnaryExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.UnaryExpressionNotPlusMinusContext;
-
-import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
-
 import io.resys.hdes.ast.ExpressionParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
@@ -76,9 +75,9 @@ public class ExpressionParserConsoleVisitor extends ExpressionParserBaseVisitor<
   }
 
   @Override
-  public AstNode visitArgs(ArgsContext ctx) {
+  public AstNode visitMethodArgs(MethodArgsContext ctx) {
     log(ctx);
-    return super.visitArgs(ctx);
+    return super.visitMethodArgs(ctx);
   }
 
   @Override
