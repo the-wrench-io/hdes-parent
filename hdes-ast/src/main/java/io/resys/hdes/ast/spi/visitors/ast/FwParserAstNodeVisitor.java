@@ -36,8 +36,6 @@ import io.resys.hdes.ast.FlowParser.DescriptionContext;
 import io.resys.hdes.ast.FlowParser.EndTaskContext;
 import io.resys.hdes.ast.FlowParser.FlowContext;
 import io.resys.hdes.ast.FlowParser.IdContext;
-import io.resys.hdes.ast.FlowParser.InputArgsContext;
-import io.resys.hdes.ast.FlowParser.InputContext;
 import io.resys.hdes.ast.FlowParser.InputsContext;
 import io.resys.hdes.ast.FlowParser.LiteralContext;
 import io.resys.hdes.ast.FlowParser.MappingArgContext;
@@ -55,6 +53,9 @@ import io.resys.hdes.ast.FlowParser.TaskRefContext;
 import io.resys.hdes.ast.FlowParser.TaskTypesContext;
 import io.resys.hdes.ast.FlowParser.TasksContext;
 import io.resys.hdes.ast.FlowParser.ThenContext;
+import io.resys.hdes.ast.FlowParser.TypeDefArgsContext;
+import io.resys.hdes.ast.FlowParser.TypeDefContext;
+import io.resys.hdes.ast.FlowParser.TypeDefsContext;
 import io.resys.hdes.ast.FlowParser.TypeNameContext;
 import io.resys.hdes.ast.FlowParser.WhenExpressionContext;
 import io.resys.hdes.ast.FlowParser.WhenThenArgsContext;
@@ -185,17 +186,24 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
         .values(values)
         .build();
   }
+  
+  @Override
+  public AstNode visitTypeDefs(TypeDefsContext ctx) {
+    return nodes(ctx).of(ImmutableFwRedundentInputArgs.class).orElseGet(() -> ImmutableFwRedundentInputArgs.builder()
+        .token(token(ctx))
+        .build());
+  }
 
   @Override
-  public FwRedundentInputArgs visitInputArgs(InputArgsContext ctx) {
+  public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
     return ImmutableFwRedundentInputArgs.builder()
         .token(token(ctx))
         .values(nodes(ctx).list(InputNode.class))
         .build();
   }
-  
+
   @Override
-  public AstNode visitInput(InputContext ctx) {
+  public AstNode visitTypeDef(TypeDefContext ctx) {
     ParseTree c = ctx.getChild(1);
     return c.accept(this);
   }

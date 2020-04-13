@@ -34,9 +34,8 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.FlowParser;
 import io.resys.hdes.ast.ManualTaskParser;
 import io.resys.hdes.ast.ManualTaskParser.ArrayTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.CssClassArgsContext;
 import io.resys.hdes.ast.ManualTaskParser.CssClassContext;
-import io.resys.hdes.ast.ManualTaskParser.CssIdentifierContext;
+import io.resys.hdes.ast.ManualTaskParser.DebugValueContext;
 import io.resys.hdes.ast.ManualTaskParser.DefaultValueContext;
 import io.resys.hdes.ast.ManualTaskParser.DescriptionContext;
 import io.resys.hdes.ast.ManualTaskParser.DropdownArgContext;
@@ -54,8 +53,6 @@ import io.resys.hdes.ast.ManualTaskParser.GroupArgsContext;
 import io.resys.hdes.ast.ManualTaskParser.GroupContext;
 import io.resys.hdes.ast.ManualTaskParser.GroupsContext;
 import io.resys.hdes.ast.ManualTaskParser.IdContext;
-import io.resys.hdes.ast.ManualTaskParser.InputArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.InputContext;
 import io.resys.hdes.ast.ManualTaskParser.InputsContext;
 import io.resys.hdes.ast.ManualTaskParser.LiteralContext;
 import io.resys.hdes.ast.ManualTaskParser.MessageContext;
@@ -68,6 +65,9 @@ import io.resys.hdes.ast.ManualTaskParser.StatementTypeContext;
 import io.resys.hdes.ast.ManualTaskParser.StatementsArgsContext;
 import io.resys.hdes.ast.ManualTaskParser.StatementsContext;
 import io.resys.hdes.ast.ManualTaskParser.ThenContext;
+import io.resys.hdes.ast.ManualTaskParser.TypeDefArgsContext;
+import io.resys.hdes.ast.ManualTaskParser.TypeDefContext;
+import io.resys.hdes.ast.ManualTaskParser.TypeDefsContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
 import io.resys.hdes.ast.ManualTaskParser.WhenContext;
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
@@ -118,6 +118,7 @@ import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode> {
+
   private final TokenIdGenerator tokenIdGenerator;
 
   public MtParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
@@ -184,10 +185,6 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     String getValue();
   }
   @Value.Immutable
-  public interface MtRedundentCssClasses extends ManualTaskNode {
-    List<String> getValues();
-  }
-  @Value.Immutable
   public interface MtRedundentStatementArgs extends ManualTaskNode {
     List<Statement> getValues();
   }
@@ -197,6 +194,10 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   }
   @Value.Immutable
   public interface MtRedundentStatementMsg extends ManualTaskNode {
+    String getValue();
+  }
+  @Value.Immutable
+  public interface MtRedundentDebugValue extends ManualTaskNode {
     String getValue();
   }
   
@@ -263,13 +264,45 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .values(values)
         .build();
   }
+  
   @Override
-  public MtRedundentInputArgs visitInputArgs(InputArgsContext ctx) {
+  public AstNode visitCssClass(CssClassContext ctx) {
+    Literal literal = Nodes.literal(ctx, token(ctx));
+    return ImmutableMtRedundentCssClass.builder()
+        .token(token(ctx))
+        .value(literal.getValue())
+        .build();
+  }
+  @Override
+  public AstNode visitTypeDefs(TypeDefsContext ctx) {
+    return nodes(ctx).of(ImmutableMtRedundentInputArgs.class).orElseGet(() -> ImmutableMtRedundentInputArgs.builder()
+        .token(token(ctx))
+        .build());
+  }
+
+  @Override
+  public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
     return ImmutableMtRedundentInputArgs.builder()
         .token(token(ctx))
         .values(nodes(ctx).list(InputNode.class))
         .build();
   }
+
+  @Override
+  public AstNode visitTypeDef(TypeDefContext ctx) {
+    ParseTree c = ctx.getChild(1);
+    return c.accept(this);
+  }
+
+  @Override
+  public MtRedundentDebugValue visitDebugValue(DebugValueContext ctx) {
+    Nodes nodes = nodes(ctx);
+    return ImmutableMtRedundentDebugValue.builder()
+        .token(token(ctx))
+        .value(nodes.of(Literal.class).get().getValue())
+        .build();
+  }
+  
   @Override
   public ScalarInputNode visitSimpleType(SimpleTypeContext ctx) {
     Nodes nodes = nodes(ctx);
@@ -278,6 +311,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .required(isRequiredInputType(ctx))
         .type(nodes.of(MtRedundentScalarType.class).get().getValue())
         .name(nodes.of(MtRedundentTypeName.class).get().getValue())
+        .debugValue(nodes.of(MtRedundentDebugValue.class).get().getValue())
         .build();
   }
   @Override
@@ -416,7 +450,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     String typeName = nodes.of(MtRedundentTypeName.class).get().getValue();
     Optional<MtRedundentDropdown> dropdown = nodes.of(MtRedundentDropdown.class);
     Optional<String> defaultValue = nodes.of(MtRedundentDefaultValue.class).map(e -> e.getValue());
-    List<String> cssClasses = nodes.of(MtRedundentCssClasses.class).map(e -> e.getValues()).orElse(Collections.emptyList());
+    Optional<String> cssClasses = nodes.of(MtRedundentCssClass.class).map(e -> e.getValue());
     
     
     if(dropdown.isPresent()) {
@@ -450,27 +484,6 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .token(token(ctx))
         .type(nodes.of(MtRedundentDropdownType.class).get())
         .refName(typeName)
-        .build();
-  }
-  @Override
-  public MtRedundentCssClasses visitCssClass(CssClassContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return nodes.of(MtRedundentCssClasses.class).orElse(ImmutableMtRedundentCssClasses.builder().token(token(ctx)).build());
-  }
-  @Override
-  public MtRedundentCssClass visitCssIdentifier(CssIdentifierContext ctx) {
-    return ImmutableMtRedundentCssClass.builder()
-        .token(token(ctx))
-        .value(ctx.getText())
-        .build();
-  }
-  @Override
-  public MtRedundentCssClasses visitCssClassArgs(CssClassArgsContext ctx) {
-    Nodes nodes = nodes(ctx);
-
-    return ImmutableMtRedundentCssClasses.builder()
-        .token(token(ctx))
-        .values(nodes.list(MtRedundentCssClass.class).stream().map(c -> c.getValue()).collect(Collectors.toList()))
         .build();
   }
 
@@ -547,11 +560,6 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .value(nodes.of(Literal.class).get().getValue())
         .build();
   }
-
-  @Override
-  public InputNode visitInput(InputContext ctx) {
-    return (InputNode) first(ctx);
-  }
   @Override
   public ManualTaskForm visitForm(FormContext ctx) {
     Nodes nodes = nodes(ctx);
@@ -573,11 +581,6 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   private boolean isRequiredInputType(ParserRuleContext ctx) {
     TerminalNode requirmentType = (TerminalNode) ctx.getParent().getChild(0);
     return requirmentType.getSymbol().getType() == FlowParser.REQUIRED;
-  }
-  
-  private AstNode first(ParserRuleContext ctx) {
-    ParseTree c = ctx.getChild(0);
-    return c.accept(this);
   }
 
   private Nodes nodes(ParserRuleContext node) {

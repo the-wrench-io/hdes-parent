@@ -10,17 +10,20 @@ def decisionTable: {
   }
 }
 
+
+/*
 def manualTask: {
   id: basic description: 'very descriptive manual task'
   inputs: {}
+  statements: {}
   dropdowns: {
     gender: { 'f': 'female', 'm': 'male' }
   }
-  statements: {}
-  form: { fields: {
-    required STRING firstName: { },
-    required INTEGER age: { },
-    required INTEGER gender: { single dropdown: genderDropdown }
+  form: { 
+    fields: {
+      required STRING firstName: { },
+      required INTEGER age: { },
+      required INTEGER gender: { single dropdown: genderDropdown }
     } 
   }
 }
@@ -40,8 +43,8 @@ def flow: {
       then: endTask
       decisionTask: bestDtTask
       OBJECT mapping: {
-        input1: arg1.x1,
-        input2: arg2.x1
+        name: arg1.x1,
+        lastName: arg2.x1
       }
     }, 
     end: {
@@ -51,4 +54,4 @@ def flow: {
       }
     }
   }
-}
+}*/

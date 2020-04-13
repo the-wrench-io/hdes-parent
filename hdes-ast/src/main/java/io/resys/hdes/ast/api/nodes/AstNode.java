@@ -72,7 +72,13 @@ public interface AstNode {
   @Value.Immutable
   interface DecimalConversion extends DataTypeConversion { }
 
-  
+  @Value.Immutable
+  interface CompilationUnit extends AstNode {
+    List<FlowNode> getFlows();
+    List<ManualTaskNode> getManualTasks();
+    List<DecisionTableNode> getDecisionTables();
+    List<AstNode> getServices();
+  }
   
   interface InputNode extends AstNode {
     Boolean getRequired();    

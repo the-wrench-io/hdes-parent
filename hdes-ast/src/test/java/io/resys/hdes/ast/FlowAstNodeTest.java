@@ -54,6 +54,30 @@ public class FlowAstNodeTest {
   }
 
   @Test
+  public void nestedInputs() throws IOException {
+    parse(
+        "id: x\n" +
+            "description: 'very descriptive value'\n" +
+            "inputs: {\n " +
+              "required OBJECT arg0: {} \n" +
+            "}\n" +
+            "tasks: {" +
+            "}\n");
+    
+    parse(
+        "id: x\n" +
+            "description: 'very descriptive value'\n" +
+            "inputs: {\n " +
+              "required OBJECT person: {" +
+                "optional INTEGER firstName,\n" +
+                "required INTEGER lastName\n" +
+              "} \n" +
+            "}\n" +
+            "tasks: {" +
+            "}\n");
+  }
+  
+  @Test
   public void taskWhenThen() throws IOException {
     parse(
         "id: x\n" +

@@ -1,7 +1,5 @@
 package io.resys.hdes.ast.spi.visitors.loggers;
 
-import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
-
 /*-
  * #%L
  * hdes-ast
@@ -22,7 +20,8 @@ import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
  * #L%
  */
 
-import io.resys.hdes.ast.ManualTaskParser.CssClassArgsContext;
+import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
+
 import io.resys.hdes.ast.ManualTaskParser.CssClassContext;
 import io.resys.hdes.ast.ManualTaskParser.DefaultValueContext;
 import io.resys.hdes.ast.ManualTaskParser.DescriptionContext;
@@ -30,8 +29,6 @@ import io.resys.hdes.ast.ManualTaskParser.FieldContext;
 import io.resys.hdes.ast.ManualTaskParser.FieldsContext;
 import io.resys.hdes.ast.ManualTaskParser.GroupsContext;
 import io.resys.hdes.ast.ManualTaskParser.IdContext;
-import io.resys.hdes.ast.ManualTaskParser.InputArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.InputContext;
 import io.resys.hdes.ast.ManualTaskParser.InputsContext;
 import io.resys.hdes.ast.ManualTaskParser.LiteralContext;
 import io.resys.hdes.ast.ManualTaskParser.MessageContext;
@@ -66,12 +63,6 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
   }
 
   @Override
-  public AstNode visitInputArgs(InputArgsContext ctx) {
-    log(ctx);
-    return super.visitInputArgs(ctx);
-  }
-
-  @Override
   public AstNode visitGroups(GroupsContext ctx) {
     log(ctx);
     return super.visitGroups(ctx);
@@ -93,12 +84,6 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
   public AstNode visitCssClass(CssClassContext ctx) {
     log(ctx);
     return super.visitCssClass(ctx);
-  }
-
-  @Override
-  public AstNode visitCssClassArgs(CssClassArgsContext ctx) {
-    log(ctx);
-    return super.visitCssClassArgs(ctx);
   }
 
   @Override
@@ -147,12 +132,6 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
   public AstNode visitTypeName(TypeNameContext ctx) {
     log(ctx);
     return super.visitTypeName(ctx);
-  }
-
-  @Override
-  public AstNode visitInput(InputContext ctx) {
-    log(ctx);
-    return super.visitInput(ctx);
   }
 
   @Override

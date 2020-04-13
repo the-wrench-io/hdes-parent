@@ -4,7 +4,6 @@ import CommonParser;
 
 
 dropdownType: DropdownType;
-cssIdentifier: CssIdentifier;
 mt: id description? inputs dropdowns statements form EOF;
 
 dropdowns: 'dropdowns' ':' '{' dropdownArgs? '}';
@@ -24,8 +23,7 @@ field: RequiredType scalarType typeName ':' '{' dropdown? defaultValue? cssClass
 
 dropdown: dropdownType 'dropdown' ':' typeName;
 defaultValue: 'defaultValue' ':' literal;
-cssClass: 'class' ':' '{' cssClassArgs? '}';
-cssClassArgs: cssIdentifier (',' cssIdentifier)*;
+cssClass: 'class' ':' StringLiteral;
 
 statements: 'statements' ':' '{' statementsArgs? '}';
 statementsArgs: statement (',' statement)*;

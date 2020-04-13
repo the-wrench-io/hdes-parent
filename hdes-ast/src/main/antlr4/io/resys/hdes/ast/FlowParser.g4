@@ -7,6 +7,7 @@ taskTypes
   | FLOW_TASK 
   | DT_TASK
   | ST_TASK;
+objectDataType: OBJECT | ARRAY;
 
 flow: id description? inputs tasks EOF;
 
@@ -23,7 +24,7 @@ whenExpression: StringLiteral;
 then: 'then' ':' typeName;
 
 taskRef: taskTypes ':' typeName mapping;  
-mapping: ObjectDataType 'mapping' ':' '{' mappingArgs? '}';
+mapping: objectDataType 'mapping' ':' '{' mappingArgs? '}';
 mappingArgs: mappingArg (',' mappingArg)*;
 
 mappingArg: typeName ':' mappingValue;

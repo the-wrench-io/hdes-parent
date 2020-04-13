@@ -26,8 +26,6 @@ import io.resys.hdes.ast.FlowParser;
 import io.resys.hdes.ast.FlowParser.ArrayTypeContext;
 import io.resys.hdes.ast.FlowParser.DebugValueContext;
 import io.resys.hdes.ast.FlowParser.EndTaskContext;
-import io.resys.hdes.ast.FlowParser.InputArgsContext;
-import io.resys.hdes.ast.FlowParser.InputContext;
 import io.resys.hdes.ast.FlowParser.LiteralContext;
 import io.resys.hdes.ast.FlowParser.MappingArgContext;
 import io.resys.hdes.ast.FlowParser.MappingArgsContext;
@@ -43,6 +41,9 @@ import io.resys.hdes.ast.FlowParser.TaskContext;
 import io.resys.hdes.ast.FlowParser.TaskRefContext;
 import io.resys.hdes.ast.FlowParser.TaskTypesContext;
 import io.resys.hdes.ast.FlowParser.ThenContext;
+import io.resys.hdes.ast.FlowParser.TypeDefArgsContext;
+import io.resys.hdes.ast.FlowParser.TypeDefContext;
+import io.resys.hdes.ast.FlowParser.TypeDefsContext;
 import io.resys.hdes.ast.FlowParser.TypeNameContext;
 import io.resys.hdes.ast.FlowParser.WhenExpressionContext;
 import io.resys.hdes.ast.FlowParser.WhenThenArgsContext;
@@ -54,6 +55,24 @@ import io.resys.hdes.ast.api.nodes.AstNode;
 public class FlowParserConsoleVisitor extends FlowParserBaseVisitor<AstNode> {
 
   @Override
+  public AstNode visitTypeDefs(TypeDefsContext ctx) {
+    log(ctx);
+    return super.visitTypeDefs(ctx);
+  }
+
+  @Override
+  public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
+    log(ctx);
+    return super.visitTypeDefArgs(ctx);
+  }
+
+  @Override
+  public AstNode visitTypeDef(TypeDefContext ctx) {
+    log(ctx);
+    return super.visitTypeDef(ctx);
+  }
+
+  @Override
   public AstNode visitTaskTypes(TaskTypesContext ctx) {
     log(ctx);
     return super.visitTaskTypes(ctx);
@@ -63,12 +82,6 @@ public class FlowParserConsoleVisitor extends FlowParserBaseVisitor<AstNode> {
   public AstNode visitScalarType(ScalarTypeContext ctx) {
     log(ctx);
     return super.visitScalarType(ctx);
-  }
-
-  @Override
-  public AstNode visitInputArgs(InputArgsContext ctx) {
-    log(ctx);
-    return super.visitInputArgs(ctx);
   }
 
   @Override
@@ -205,12 +218,6 @@ public class FlowParserConsoleVisitor extends FlowParserBaseVisitor<AstNode> {
 
   @Override
   public AstNode visitInputs(FlowParser.InputsContext ctx) {
-    log(ctx);
-    return visitChildren(ctx);
-  }
-
-  @Override
-  public AstNode visitInput(InputContext ctx) {
     log(ctx);
     return visitChildren(ctx);
   }

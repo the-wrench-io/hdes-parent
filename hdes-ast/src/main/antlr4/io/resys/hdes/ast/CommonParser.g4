@@ -12,10 +12,12 @@ typeName : Identifier | typeName '.' Identifier;
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
 
-inputs: 'inputs' ':' '{' inputArgs? '}';
-inputArgs: input (',' input)*;
-input: RequiredType (simpleType | arrayType | objectType);
+inputs: 'inputs' ':' typeDefs;
+typeDefs: '{' typeDefArgs? '}';
+typeDefArgs: typeDef (',' typeDef)*;
+typeDef: RequiredType (arrayType | objectType | simpleType);
+
 simpleType: scalarType typeName debugValue?;
+objectType: 'OBJECT' typeName ':' typeDefs;
 arrayType: 'ARRAY' (simpleType | objectType);
-objectType: 'OBJECT' typeName inputs?;
 debugValue: 'debugValue' ':' literal;

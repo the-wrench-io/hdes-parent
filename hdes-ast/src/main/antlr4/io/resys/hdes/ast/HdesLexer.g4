@@ -1,6 +1,5 @@
 lexer grammar HdesLexer;
 
-ObjectDataType: OBJECT | ARRAY;
 DirectionType: IN | OUT;
 RequiredType: REQUIRED | OPTIONAL;
 DropdownType: DROPDOWN_SINGLE | DROPDOWN_MULTIPLE; 
@@ -48,12 +47,6 @@ ARRAY: 'ARRAY';
 
 ID: 'id';
 DESC: 'description';
-
-// HDES
-DEF: 'def';
-FLOW: 'flow';
-DT: 'decisionTable';
-SERVICE: 'service';
 
 // DT
 HEADERS: 'headers';
@@ -147,10 +140,8 @@ fragment Escape: '\\' [btnfr"'\\];
 
 // naming convention
 Identifier: Letters LettersAndDigits*;
-CssIdentifier: Letters LettersAndDigits* Dash*;
 fragment Letters: [a-zA-Z$_];
 fragment LettersAndDigits: [a-zA-Z0-9$_];
-fragment Dash: '-'+;
 
 // comments and white spaces
 WHITE_SPACE : [ \t\r\n\u000C]+ -> channel(HIDDEN);

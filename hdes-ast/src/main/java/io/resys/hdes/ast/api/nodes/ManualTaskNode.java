@@ -105,7 +105,7 @@ public interface ManualTaskNode extends AstNode {
     String getName();
     ScalarType getType();
     Optional<String> getDefaultValue();
-    List<String> getCssClasses();
+    Optional<String> getCssClasses();
   }
   
   @Value.Immutable
