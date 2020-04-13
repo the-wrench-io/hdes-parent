@@ -1,0 +1,9 @@
+id: basic
+headers: {
+  IN STRING name,
+  IN STRING lastName,
+  OUT INTEGER value
+} MATRIX: {
+  { ?, ?, 20 },
+  { 'bob', 'woman', 4570 }
+}

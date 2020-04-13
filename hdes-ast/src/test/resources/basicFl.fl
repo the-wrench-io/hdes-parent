@@ -1,0 +1,21 @@
+id: x description: 'descriptive'
+inputs: {
+  optional INTEGER arg1.x1,
+  optional INTEGER arg2.x1
+}
+tasks: {
+  firstTask: {
+    then: endTask
+    decisionTask: bestDtTask
+    OBJECT mapping: {
+      name: arg1.x1,
+      lastName: arg2.x1
+    }
+  }, 
+  end: {
+    OBJECT mapping: {
+      input1: arg1.x1,
+      input2: arg2.x1
+    }
+  }
+}
