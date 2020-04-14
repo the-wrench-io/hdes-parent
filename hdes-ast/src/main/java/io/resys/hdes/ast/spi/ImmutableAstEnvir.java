@@ -39,6 +39,7 @@ import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.spi.errors.AntlrErrorListener;
+import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.EnParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.FwParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.MtParserAstNodeVisitor;
@@ -147,7 +148,8 @@ public class ImmutableAstEnvir implements AstEnvir {
       DecisionTableParser parser = new DecisionTableParser(tokens);
       parser.addErrorListener(errorListener());
       ParseTree tree = parser.dt();
-      return parent(tree.accept(new DtParserConsoleVisitor()));
+      tree.accept(new DtParserConsoleVisitor());
+      return parent(tree.accept(new DtParserAstNodeVisitor(new TokenIdGenerator())));
     }
 
     @Override
