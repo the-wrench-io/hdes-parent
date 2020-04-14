@@ -22,34 +22,23 @@ package io.resys.hdes.ast.api;
 
 import java.util.List;
 
-import org.immutables.value.Value;
-
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 
 public interface AstEnvir {
-  AstSources getSource();
-  List<AstNode> getNodes();
+  List<AstNode> getValues();
   
   interface Builder {
     Builder from(AstEnvir envir);
     SourceBuilder<Builder> add();
-    Builder strict();
     AstEnvir build();
   }
   
   interface SourceBuilder<R> {
     SourceBuilder<R> externalId(String externalId);
     R flow(String src);
-    R expression(String src);
+    R expression(String src, ScalarType type);
     R decisionTable(String src);
     R manualTask(String src);
-  }
-  
-  @Value.Immutable
-  interface AstSources {
-    List<String> getFlows();
-    List<String> getExpressions();
-    List<String> getDecisionTables();
-    List<String> getManualTasks();
   }
 }
