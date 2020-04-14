@@ -58,7 +58,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.AdditiveType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.EvalNode;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodRefNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.TypeRefNode;
@@ -67,7 +67,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableAndOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableConditionalExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
-import io.resys.hdes.ast.api.nodes.ImmutableEvalNode;
+import io.resys.hdes.ast.api.nodes.ImmutableExpressionBody;
 import io.resys.hdes.ast.api.nodes.ImmutableMethodRefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableMultiplicativeOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableNegateUnaryOperation;
@@ -157,8 +157,8 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
   }
 
   @Override
-  public EvalNode visitCompilationUnit(CompilationUnitContext ctx) {
-    return ImmutableEvalNode.builder()
+  public ExpressionBody visitCompilationUnit(CompilationUnitContext ctx) {
+    return ImmutableExpressionBody.builder()
         .value(first(ctx))
         .token(token(ctx))
         .type(evalType)
