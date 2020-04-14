@@ -22,21 +22,21 @@ package io.resys.hdes.ast.spi;
 
 import java.util.List;
 
-import io.resys.hdes.ast.api.HdesEnvir;
+import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
-public class ImmutableHdesEnvir implements HdesEnvir {
+public class ImmutableAstEnvir implements AstEnvir {
   
   private final List<AstNode> nodes;
-  private final Source sources;
+  private final AstSources sources;
 
-  public ImmutableHdesEnvir(List<AstNode> nodes, Source sources) {
+  public ImmutableAstEnvir(List<AstNode> nodes, AstSources sources) {
     super();
     this.nodes = nodes;
     this.sources = sources;
   }
   @Override
-  public Source getSource() {
+  public AstSources getSource() {
     return sources;
   }
   @Override
@@ -45,34 +45,34 @@ public class ImmutableHdesEnvir implements HdesEnvir {
   } 
   
   
-  public static HdesEnvirBuilder builder() {
-    return new ImmutableHdesEnvirBuilder();
+  public static Builder builder() {
+    return new GenericBuilder();
   }
   
-  public static class ImmutableHdesEnvirBuilder implements HdesEnvirBuilder {
+  public static class GenericBuilder implements Builder {
 
     private boolean strict;
     
     @Override
-    public HdesEnvirBuilder from(HdesEnvir envir) {
+    public Builder from(AstEnvir envir) {
       // TODO Auto-generated method stub
       return this;
     }
 
     @Override
-    public HdesEnvirBuilder strict() {
+    public Builder strict() {
       strict = true;
       return this;
     }
 
     @Override
-    public HdesEnvir build() {
+    public AstEnvir build() {
       // TODO Auto-generated method stub
       return null;
     }
 
     @Override
-    public SourceBuilder<HdesEnvirBuilder> add() {
+    public SourceBuilder<Builder> add() {
       // TODO Auto-generated method stub
       return null;
     } 

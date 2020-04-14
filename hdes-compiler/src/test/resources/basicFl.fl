@@ -5,7 +5,6 @@ inputs: {
 }
 tasks: {
   firstTask: {
-    then: endTask
     decisionTask: bestDtTask
     OBJECT mapping: {
       name: arg1.x1,

@@ -1,8 +1,8 @@
-package io.resys.hdes.compiler.api;
+package io.resys.hdes.ast.api;
 
 /*-
  * #%L
- * hdes-compiler
+ * hdes-ast
  * %%
  * Copyright (C) 2020 Copyright 2020 ReSys OÜ
  * %%
@@ -24,26 +24,32 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
-public interface HdesCompiler {
-  
-  enum SourceType {FL, MT, DT}
-  
-  Parser parser();
-  
-  interface Parser {
-    Parser add(String fileName, String src);
-    Code build();
-  }
+import io.resys.hdes.ast.api.nodes.AstNode;
 
-  @Value.Immutable
-  interface Code {
-    List<CodeValue> getValues();
+public interface AstEnvir {
+  AstSources getSource();
+  List<AstNode> getNodes();
+  
+  interface Builder {
+    Builder from(AstEnvir envir);
+    SourceBuilder<Builder> add();
+    Builder strict();
+    AstEnvir build();
+  }
+  
+  interface SourceBuilder<R> {
+    SourceBuilder<R> externalId(String externalId);
+    R flow(String src);
+    R expression(String src);
+    R decisionTable(String src);
+    R manualTask(String src);
   }
   
   @Value.Immutable
-  interface CodeValue {
-    SourceType getType();
-    String getSource();
-    String getTarget();
+  interface AstSources {
+    List<String> getFlows();
+    List<String> getExpressions();
+    List<String> getDecisionTables();
+    List<String> getManualTasks();
   }
 }

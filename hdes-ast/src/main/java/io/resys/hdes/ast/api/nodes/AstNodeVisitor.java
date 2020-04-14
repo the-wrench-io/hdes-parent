@@ -1,5 +1,25 @@
 package io.resys.hdes.ast.api.nodes;
 
+/*-
+ * #%L
+ * hdes-ast
+ * %%
+ * Copyright (C) 2020 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
 import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
@@ -78,7 +98,7 @@ public interface AstNodeVisitor<T, R> {
   
   // expression
   interface ExpressionAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> { 
-    T visitExpressionBody(ExpressionBody node);
+    R visitExpressionBody(ExpressionBody node);
     T visitNotUnaryOperation(NotUnaryOperation node);
     T visitNegateUnaryOperation(NegateUnaryOperation node);
     T visitPositiveUnaryOperation(PositiveUnaryOperation node);
@@ -99,7 +119,7 @@ public interface AstNodeVisitor<T, R> {
   
   // dt
   interface DtAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
-    T visitDecisionTableBody(DecisionTableBody node);
+    R visitDecisionTableBody(DecisionTableBody node);
     T visitHeaders(Headers node);
     T visitHeader(Header node);
     T visitHitPolicyAll(HitPolicyAll node);
@@ -114,7 +134,7 @@ public interface AstNodeVisitor<T, R> {
   
   // flow
   interface FlowAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
-    T visitFlowBody(FlowBody node);
+    R visitFlowBody(FlowBody node);
     T visitFlowReturnType(FlowReturnType node);
     T visitFlowInputs(FlowInputs node);
     T visitFlowTask(FlowTask node);
@@ -128,7 +148,7 @@ public interface AstNodeVisitor<T, R> {
   
   // mt
   interface MtAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
-    T visitManualTaskBody(ManualTaskBody node);
+    R visitManualTaskBody(ManualTaskBody node);
     T visitManualTaskInputs(ManualTaskInputs node);
     T visitManualTaskDropdowns(ManualTaskDropdowns node);
     T visitManualTaskStatements(ManualTaskStatements node);

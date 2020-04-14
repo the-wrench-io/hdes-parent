@@ -13,6 +13,7 @@
 
   <modules>
     <module>hdes-ast</module>
+    <module>hdes-compiler</module>
     <module>hdes-object-repo</module>
     <module>hdes-object-repo-mongodb</module>
 
@@ -273,6 +274,12 @@
         <artifactId>hdes-object-repo-mongodb</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-compiler</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
 
       <dependency>
         <groupId>io.resys.hdes</groupId>
