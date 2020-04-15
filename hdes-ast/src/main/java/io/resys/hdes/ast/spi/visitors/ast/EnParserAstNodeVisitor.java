@@ -53,6 +53,7 @@ import io.resys.hdes.ast.ExpressionParser.UnaryExpressionNotPlusMinusContext;
 import io.resys.hdes.ast.ExpressionParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.AdditiveType;
@@ -68,6 +69,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableConditionalExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableExpressionBody;
+import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableMethodRefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableMultiplicativeOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableNegateUnaryOperation;
@@ -105,7 +107,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
 
   @Override
   public AstNode visitLiteral(LiteralContext ctx) {
-    return Nodes.literal(ctx, token(ctx));
+    return literal(ctx, token(ctx));
   }
 
   @Override
@@ -460,4 +462,34 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
   private AstNode.Token token(ParserRuleContext node) {
     return Nodes.token(node, tokenIdGenerator);
   }
+  
+  private Literal literal(ParserRuleContext ctx, AstNode.Token token) {
+    String value = ctx.getText();
+    ScalarType type = null;
+    TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
+    switch (terminalNode.getSymbol().getType()) {
+    case ExpressionParser.StringLiteral:
+      type = ScalarType.STRING;
+      value = Nodes.getStringLiteralValue(ctx);
+      break;
+    case ExpressionParser.BooleanLiteral:
+      type = ScalarType.BOOLEAN;
+      break;
+    case ExpressionParser.DecimalLiteral:
+      type = ScalarType.DECIMAL;
+      break;
+    case ExpressionParser.IntegerLiteral:
+      type = ScalarType.INTEGER;
+      value = value.replaceAll("_", "");
+      break;
+    default:
+      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
+    }
+
+    return ImmutableLiteral.builder()
+        .token(token)
+        .type(type)
+        .value(value)
+        .build();
+}
 }

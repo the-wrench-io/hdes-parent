@@ -86,6 +86,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableDropdownField;
 import io.resys.hdes.ast.api.nodes.ImmutableFields;
 import io.resys.hdes.ast.api.nodes.ImmutableGroup;
 import io.resys.hdes.ast.api.nodes.ImmutableGroups;
+import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteralField;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskDropdowns;
@@ -203,7 +204,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   
   @Override
   public AstNode visitLiteral(LiteralContext ctx) {
-    return Nodes.literal(ctx, token(ctx));
+    return literal(ctx, token(ctx));
   }
   @Override
   public ManualTaskNode visitId(IdContext ctx) {
@@ -267,7 +268,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   
   @Override
   public AstNode visitCssClass(CssClassContext ctx) {
-    Literal literal = Nodes.literal(ctx, token(ctx));
+    Literal literal = literal(ctx, token(ctx));
     return ImmutableMtRedundentCssClass.builder()
         .token(token(ctx))
         .value(literal.getValue())
@@ -589,5 +590,34 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
 
   private AstNode.Token token(ParserRuleContext node) {
     return Nodes.token(node, tokenIdGenerator);
+  }
+  
+  private Literal literal(ParserRuleContext ctx, AstNode.Token token) {
+    String value = ctx.getText();
+    ScalarType type = null;
+    TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
+    switch (terminalNode.getSymbol().getType()) {
+    case ManualTaskParser.StringLiteral:
+      type = ScalarType.STRING;
+      value = Nodes.getStringLiteralValue(ctx);
+      break;
+    case ManualTaskParser.BooleanLiteral:
+      type = ScalarType.BOOLEAN;
+      break;
+    case ManualTaskParser.DecimalLiteral:
+      type = ScalarType.DECIMAL;
+      break;
+    case ManualTaskParser.IntegerLiteral:
+      type = ScalarType.INTEGER;
+      value = value.replaceAll("_", "");
+      break;
+    default:
+      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
+    }
+    return ImmutableLiteral.builder()
+        .token(token)
+        .type(type)
+        .value(value)
+        .build();
   }
 }

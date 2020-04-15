@@ -30,6 +30,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
+import io.resys.hdes.ast.DecisionTableParser;
 import io.resys.hdes.ast.DecisionTableParser.AllContext;
 import io.resys.hdes.ast.DecisionTableParser.DescriptionContext;
 import io.resys.hdes.ast.DecisionTableParser.DirectionTypeContext;
@@ -50,6 +51,7 @@ import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
 import io.resys.hdes.ast.DecisionTableParser.UndefinedValueContext;
 import io.resys.hdes.ast.DecisionTableParser.ValueContext;
 import io.resys.hdes.ast.DecisionTableParserBaseVisitor;
+import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
@@ -72,6 +74,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyAll;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyMatrix;
+import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteralValue;
 import io.resys.hdes.ast.api.nodes.ImmutableRule;
 import io.resys.hdes.ast.api.nodes.ImmutableRuleRow;
@@ -97,18 +100,17 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   public interface DtRedundentDescription extends DecisionTableNode {
     String getValue();
   }
-  
+
   @Value.Immutable
   public interface DtRedundentTypeName extends DecisionTableNode {
     String getValue();
   }
-  
-  
+
   @Value.Immutable
   public interface RedundentHeaderType extends DecisionTableNode {
     ScalarType getValue();
   }
-  
+
   @Value.Immutable
   public interface RedundentDirection extends DecisionTableNode {
     DirectionType getValue();
@@ -133,7 +135,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
 
   @Override
   public Literal visitLiteral(LiteralContext ctx) {
-    return Nodes.literal(ctx, token(ctx));
+    return literal(ctx, token(ctx));
   }
 
   @Override
@@ -280,6 +282,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
         .value(nodes(ctx).of(Literal.class).get().getValue())
         .build();
   }
+
   @Override
   public DtRedundentTypeName visitTypeName(TypeNameContext ctx) {
     return ImmutableDtRedundentTypeName.builder()
@@ -299,5 +302,34 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
 
   private AstNode.Token token(ParserRuleContext node) {
     return Nodes.token(node, tokenIdGenerator);
+  }
+
+  private Literal literal(ParserRuleContext ctx, AstNode.Token token) {
+    String value = ctx.getText();
+    ScalarType type = null;
+    TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
+    switch (terminalNode.getSymbol().getType()) {
+    case DecisionTableParser.StringLiteral:
+      type = ScalarType.STRING;
+      value = Nodes.getStringLiteralValue(ctx);
+      break;
+    case DecisionTableParser.BooleanLiteral:
+      type = ScalarType.BOOLEAN;
+      break;
+    case DecisionTableParser.DecimalLiteral:
+      type = ScalarType.DECIMAL;
+      break;
+    case DecisionTableParser.IntegerLiteral:
+      type = ScalarType.INTEGER;
+      value = value.replaceAll("_", "");
+      break;
+    default:
+      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
+    }
+    return ImmutableLiteral.builder()
+        .token(token)
+        .type(type)
+        .value(value)
+        .build();
   }
 }

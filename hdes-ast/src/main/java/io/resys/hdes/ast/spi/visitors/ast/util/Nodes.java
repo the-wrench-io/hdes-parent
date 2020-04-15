@@ -28,14 +28,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
-import io.resys.hdes.ast.ExpressionParser;
-import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
-import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
-import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableToken;
 
 public class Nodes {
@@ -88,36 +82,6 @@ public class Nodes {
         .line(startToken.getLine())
         .col(startToken.getStartIndex())
         .text(context.getText()).build();
-  }
- 
-  public static Literal literal(ParserRuleContext ctx, AstNode.Token token) {
-      String value = ctx.getText();
-      ScalarType type = null;
-      TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
-      switch (terminalNode.getSymbol().getType()) {
-      case ExpressionParser.StringLiteral:
-        type = ScalarType.STRING;
-        value = getStringLiteralValue(ctx);
-        break;
-      case ExpressionParser.BooleanLiteral:
-        type = ScalarType.BOOLEAN;
-        break;
-      case ExpressionParser.DecimalLiteral:
-        type = ScalarType.DECIMAL;
-        break;
-      case ExpressionParser.IntegerLiteral:
-        type = ScalarType.INTEGER;
-        value = value.replaceAll("_", "");
-        break;
-      default:
-        throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
-      }
-
-      return ImmutableLiteral.builder()
-          .token(token)
-          .type(type)
-          .value(value)
-          .build();
   }
   
   public static String getStringLiteralValue(ParserRuleContext ctx) {

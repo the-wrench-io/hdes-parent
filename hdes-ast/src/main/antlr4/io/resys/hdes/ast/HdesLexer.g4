@@ -19,6 +19,7 @@ BETWEEN: B E T W E E N;
 AND: A N D;
 OR: O R;
 END: E N D;
+NOT_OP: N O T;
 fragment A : [aA];
 fragment B : [bB];
 fragment D : [dD];

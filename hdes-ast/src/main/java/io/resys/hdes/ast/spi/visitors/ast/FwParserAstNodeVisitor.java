@@ -87,6 +87,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowReturnType;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTask;
+import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableMapping;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectInputNode;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarInputNode;
@@ -157,7 +158,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   
   @Override
   public AstNode visitLiteral(LiteralContext ctx) {
-    return Nodes.literal(ctx, token(ctx));
+    return literal(ctx, token(ctx));
   }
 
   @Override
@@ -458,5 +459,34 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
 
   private AstNode.Token token(ParserRuleContext node) {
     return Nodes.token(node, tokenIdGenerator);
+  }
+  
+  private Literal literal(ParserRuleContext ctx, AstNode.Token token) {
+    String value = ctx.getText();
+    ScalarType type = null;
+    TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
+    switch (terminalNode.getSymbol().getType()) {
+    case FlowParser.StringLiteral:
+      type = ScalarType.STRING;
+      value = Nodes.getStringLiteralValue(ctx);
+      break;
+    case FlowParser.BooleanLiteral:
+      type = ScalarType.BOOLEAN;
+      break;
+    case FlowParser.DecimalLiteral:
+      type = ScalarType.DECIMAL;
+      break;
+    case FlowParser.IntegerLiteral:
+      type = ScalarType.INTEGER;
+      value = value.replaceAll("_", "");
+      break;
+    default:
+      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
+    }
+    return ImmutableLiteral.builder()
+        .token(token)
+        .type(type)
+        .value(value)
+        .build();
   }
 }

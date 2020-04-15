@@ -20,5 +20,22 @@ rulesets: ruleset (',' ruleset)*;
 ruleset: '{' rules? '}';
 rules: value (',' value)*;
 
-value: undefinedValue | literal;
+value: undefinedValue | matchingExpression | equalityExpression;
+
+matchingExpression: (NOT_OP)? orExpression;
+orExpression: literal | (OR literal)*;
+
+equalityExpression
+  : relationalExpression 
+  | relationalExpression AND relationalExpression
+  | relationalExpression OR relationalExpression;
+
+relationalExpression
+  : '=' literal
+  | '!=' literal
+  | '<' literal
+  | '<=' literal
+  | '>' literal
+  | '>=' literal;
+
 undefinedValue: '?';
