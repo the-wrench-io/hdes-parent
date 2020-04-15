@@ -42,15 +42,19 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.ExpressionValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.HeaderRefValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicy;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.InOperation;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.LiteralValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpecPair;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
@@ -91,9 +95,14 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         .addStatement("$T result = new $T<>()", returnType, ArrayList.class);
     for (RuleRow row : node.getRows()) {
       DtCodeSpecPair pair = visitRuleRow(row);
-      statements.beginControlFlow("if($L)", pair.getKey());
-      statements.addStatement("result.add($L)", pair.getValue());
-      statements.endControlFlow();
+      
+      if(pair.getKey().isEmpty()) {
+        statements.addStatement("result.add($L)", pair.getValue());  
+      } else {
+        statements.beginControlFlow("if($L)", pair.getKey());
+        statements.addStatement("result.add($L)", pair.getValue());
+        statements.endControlFlow();
+      }
     }
     return ImmutableDtMethodSpec.builder().value(
         MethodSpec.methodBuilder("apply")
@@ -111,12 +120,12 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     CodeBlock.Builder value = CodeBlock.builder().add("Immutable$T.builder()", output);
     boolean and = false;
     for (Rule rule : node.getRules()) {
-      Header header = body.getHeaders().getValues().get(rule.getHeader());
       CodeBlock ruleCode = visitRule(rule).getValue();
       if(ruleCode.isEmpty()) {
         continue;
       }
       
+      Header header = body.getHeaders().getValues().get(rule.getHeader());
       if (header.getDirection() == DirectionType.IN) {
         if (and) {
           key.add(" && ");
@@ -138,23 +147,51 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     if (value instanceof UndefinedValue) {
       return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().build()).build();
     }
-    DtCodeSpec expression;
-    if (value instanceof LiteralValue) {
-      expression = visitLiteral(((LiteralValue) value).getValue());
-    } else {
-      expression = visitExpressionValue((ExpressionValue) value);
-    }
+
     Header header = body.getHeaders().getValues().get(node.getHeader());
     if (header.getDirection() == DirectionType.IN) {
-      return expression;
+      return visitInputRule(node, header);
+    } else {
+      return ImmutableDtCodeSpec.builder()
+          .value(CodeBlock.builder()
+              .add(".").add(header.getName())
+              .add("($L)", visitLiteral(((LiteralValue) value).getValue()).getValue())
+              .build())
+          .build();
     }
-    return ImmutableDtCodeSpec.builder()
-        .value(CodeBlock.builder()
-            .add(".").add(header.getName())
-            .add("($L)", expression.getValue())
-            .build())
-        .build();
   }
+  
+  private DtCodeSpec visitInputRule(Rule node, Header header) {
+    RuleValue value = node.getValue();
+    String getMethod = JavaNaming.getMethod(header.getName());
+    
+    if(value instanceof LiteralValue) {
+      LiteralValue literal = (LiteralValue) value;
+      CodeBlock literalCode = visitLiteral(literal.getValue()).getValue();
+      
+      CodeBlock.Builder exp = CodeBlock.builder();
+      if(literal.getValue().getType() == ScalarType.DECIMAL) {
+        exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
+      } else if(literal.getValue().getType() == ScalarType.DATE) {
+        exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
+      } else if(literal.getValue().getType() == ScalarType.DATE_TIME) {
+        exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
+      } else if(literal.getValue().getType() == ScalarType.TIME) {
+        exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
+      } else if(literal.getValue().getType() == ScalarType.STRING) {
+        exp.add("input.$L().equals($L)", getMethod, literalCode);
+      } else {
+        exp.add("input.$L() == $L", getMethod, literalCode);
+      }
+      return ImmutableDtCodeSpec.builder().value(exp.build()).build();
+      
+    } else if(value instanceof ExpressionValue) {
+      
+    } else if(value instanceof HeaderRefValue) {
+      
+    }
+    throw new IllegalArgumentException("Not implemented rule node: " + node);
+  } 
 
   @Override
   public DtCodeSpec visitExpressionValue(ExpressionValue node) {
@@ -181,8 +218,25 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     } else {
       code.add(node.getValue());
     }
-    
     return ImmutableDtCodeSpec.builder().value(code.build()).build();
+  }
+  
+  @Override
+  public DtJavaSpec visitEqualityOperation(EqualityOperation node) {
+    // TODO Auto-generated method stub
+    return super.visitEqualityOperation(node);
+  }
+  
+  @Override
+  public DtJavaSpec visitInOperation(InOperation node) {
+    // TODO Auto-generated method stub
+    return super.visitInOperation(node);
+  }
+  
+  @Override
+  public DtJavaSpec visitNotOperation(NotUnaryOperation node) {
+    // TODO Auto-generated method stub
+    return super.visitNotOperation(node);
   }
 
   @Override

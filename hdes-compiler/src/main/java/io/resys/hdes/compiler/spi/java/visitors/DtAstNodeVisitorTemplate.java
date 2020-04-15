@@ -37,10 +37,15 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.InOperation;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.LiteralValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.AndOperation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.OrOperation;
 
 public class DtAstNodeVisitorTemplate<T, R> implements DtAstNodeVisitor<T, R> {
 
@@ -154,11 +159,43 @@ public class DtAstNodeVisitorTemplate<T, R> implements DtAstNodeVisitor<T, R> {
 
   @Override
   public T visitLiteralValue(LiteralValue node) {
+    
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
   public T visitExpressionValue(ExpressionValue node) {
+    
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitEqualityOperation(EqualityOperation node) {
+    
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitAndOperation(AndOperation node) {
+    
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitOrOperation(OrOperation node) {
+    
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitInOperation(InOperation node) {
+    
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitNotOperation(NotUnaryOperation node) {
+    
     throw new IllegalArgumentException("Not implemented");
   }
 }
