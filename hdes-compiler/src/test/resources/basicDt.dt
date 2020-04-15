@@ -1,9 +1,9 @@
-id: basic
+id: FirstDT
 headers: {
   IN STRING name,
   IN STRING lastName,
   OUT INTEGER value
-} MATRIX: {
+} ALL: {
   { ?, ?, 20 },
   { 'bob', 'woman', 4570 }
 }

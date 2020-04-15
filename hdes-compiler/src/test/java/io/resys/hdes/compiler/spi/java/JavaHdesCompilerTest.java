@@ -38,7 +38,7 @@ public class JavaHdesCompilerTest {
         .add("basicDt.dt", file("basicDt.dt"))
     .build();
     
-    System.out.println(code.getValues().get(0).getTarget());
+    //System.out.println(code.getValues().get(0).getTarget());
     
   }
 

@@ -27,7 +27,7 @@ import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.java.visitors.JavaAstEnvirVisitor;
 
 public class JavaHdesCompiler implements HdesCompiler {
-
+  
   @Override
   public Parser parser() {
     AstEnvir.Builder builder = ImmutableAstEnvir.builder();

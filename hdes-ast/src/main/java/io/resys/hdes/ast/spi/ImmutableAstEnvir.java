@@ -44,10 +44,6 @@ import io.resys.hdes.ast.spi.visitors.ast.EnParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.FwParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.MtParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
-import io.resys.hdes.ast.spi.visitors.loggers.DtParserConsoleVisitor;
-import io.resys.hdes.ast.spi.visitors.loggers.ExpressionParserConsoleVisitor;
-import io.resys.hdes.ast.spi.visitors.loggers.FlowParserConsoleVisitor;
-import io.resys.hdes.ast.spi.visitors.loggers.ManualTaskParserConsoleVisitor;
 
 public class ImmutableAstEnvir implements AstEnvir {
   
@@ -126,7 +122,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       FlowParser parser = new FlowParser(tokens);
       parser.addErrorListener(errorListener());
       ParseTree tree = parser.flow();
-      tree.accept(new FlowParserConsoleVisitor());
+      //tree.accept(new FlowParserConsoleVisitor());
       return parent(tree.accept(new FwParserAstNodeVisitor(new TokenIdGenerator())));
     }
 
@@ -137,7 +133,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       ExpressionParser parser = new ExpressionParser(tokens);
       parser.addErrorListener(errorListener());
       ParseTree tree = parser.compilationUnit();
-      tree.accept(new ExpressionParserConsoleVisitor());
+      //tree.accept(new ExpressionParserConsoleVisitor());
       return parent(tree.accept(new EnParserAstNodeVisitor(new TokenIdGenerator(), type)));
     }
 
@@ -148,7 +144,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       DecisionTableParser parser = new DecisionTableParser(tokens);
       parser.addErrorListener(errorListener());
       ParseTree tree = parser.dt();
-      tree.accept(new DtParserConsoleVisitor());
+      //tree.accept(new DtParserConsoleVisitor());
       return parent(tree.accept(new DtParserAstNodeVisitor(new TokenIdGenerator())));
     }
 
@@ -159,7 +155,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       ManualTaskParser parser = new ManualTaskParser(tokens);
       parser.addErrorListener(errorListener());
       ParseTree tree = parser.mt();
-      tree.accept(new ManualTaskParserConsoleVisitor());
+      //tree.accept(new ManualTaskParserConsoleVisitor());
       return parent(tree.accept(new MtParserAstNodeVisitor(new TokenIdGenerator())));
     }
 

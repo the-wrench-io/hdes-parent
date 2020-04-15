@@ -1,5 +1,10 @@
 package io.resys.hdes.compiler.api;
 
+import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
+
 /*-
  * #%L
  * hdes-compiler
@@ -56,6 +61,16 @@ public class HdesCompilerException extends RuntimeException {
           .append("Unknown file extension: ").append(filename)
           .append(", supported types are: dt, fl, mt")
           .append("!")
+          .toString();
+    }
+    public String unknownAst(AstNode ast) {
+      return new StringBuilder()
+          .append("Unknown AST: ").append(ast.getClass())
+          .append("  - ").append(ast.getClass()).append(System.lineSeparator())
+          .append("  supported types are: ")
+          .append("    - ").append(DecisionTableBody.class).append(System.lineSeparator())
+          .append("    - ").append(FlowBody.class).append(System.lineSeparator())
+          .append("    - ").append(ManualTaskBody.class).append(System.lineSeparator())
           .toString();
     }
   }
