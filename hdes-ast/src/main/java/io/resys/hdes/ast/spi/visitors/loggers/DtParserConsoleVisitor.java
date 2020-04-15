@@ -28,7 +28,6 @@ import io.resys.hdes.ast.DecisionTableParser.DebugValueContext;
 import io.resys.hdes.ast.DecisionTableParser.DescriptionContext;
 import io.resys.hdes.ast.DecisionTableParser.DirectionTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.DtContext;
-import io.resys.hdes.ast.DecisionTableParser.EqualityExpressionContext;
 import io.resys.hdes.ast.DecisionTableParser.FirstContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderArgsContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderContext;
@@ -37,11 +36,14 @@ import io.resys.hdes.ast.DecisionTableParser.HitPolicyContext;
 import io.resys.hdes.ast.DecisionTableParser.IdContext;
 import io.resys.hdes.ast.DecisionTableParser.InputsContext;
 import io.resys.hdes.ast.DecisionTableParser.LiteralContext;
-import io.resys.hdes.ast.DecisionTableParser.MatchingExpressionContext;
 import io.resys.hdes.ast.DecisionTableParser.MatrixContext;
 import io.resys.hdes.ast.DecisionTableParser.ObjectTypeContext;
-import io.resys.hdes.ast.DecisionTableParser.OrExpressionContext;
-import io.resys.hdes.ast.DecisionTableParser.RelationalExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleEqualityExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleMatchingExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleMatchingOrExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleRelationalExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleUndefinedValueContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleValueContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetsContext;
@@ -51,17 +53,45 @@ import io.resys.hdes.ast.DecisionTableParser.TypeDefArgsContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeDefContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeDefsContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
-import io.resys.hdes.ast.DecisionTableParser.UndefinedValueContext;
-import io.resys.hdes.ast.DecisionTableParser.ValueContext;
 import io.resys.hdes.ast.DecisionTableParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
 public class DtParserConsoleVisitor extends DecisionTableParserBaseVisitor<AstNode> {
 
   @Override
-  public AstNode visitUndefinedValue(UndefinedValueContext ctx) {
+  public AstNode visitRuleValue(RuleValueContext ctx) {
     log(ctx);
-    return super.visitUndefinedValue(ctx);
+    return super.visitRuleValue(ctx);
+  }
+
+  @Override
+  public AstNode visitRuleMatchingExpression(RuleMatchingExpressionContext ctx) {
+    log(ctx);
+    return super.visitRuleMatchingExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitRuleMatchingOrExpression(RuleMatchingOrExpressionContext ctx) {
+    log(ctx);
+    return super.visitRuleMatchingOrExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitRuleEqualityExpression(RuleEqualityExpressionContext ctx) {
+    log(ctx);
+    return super.visitRuleEqualityExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitRuleRelationalExpression(RuleRelationalExpressionContext ctx) {
+    log(ctx);
+    return super.visitRuleRelationalExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitRuleUndefinedValue(RuleUndefinedValueContext ctx) {
+    log(ctx);
+    return super.visitRuleUndefinedValue(ctx);
   }
 
   @Override
@@ -80,30 +110,6 @@ public class DtParserConsoleVisitor extends DecisionTableParserBaseVisitor<AstNo
   public AstNode visitDirectionType(DirectionTypeContext ctx) {
     log(ctx);
     return super.visitDirectionType(ctx);
-  }
-
-  @Override
-  public AstNode visitMatchingExpression(MatchingExpressionContext ctx) {
-    log(ctx);
-    return super.visitMatchingExpression(ctx);
-  }
-
-  @Override
-  public AstNode visitOrExpression(OrExpressionContext ctx) {
-    log(ctx);
-    return super.visitOrExpression(ctx);
-  }
-
-  @Override
-  public AstNode visitEqualityExpression(EqualityExpressionContext ctx) {
-    log(ctx);
-    return super.visitEqualityExpression(ctx);
-  }
-
-  @Override
-  public AstNode visitRelationalExpression(RelationalExpressionContext ctx) {
-    log(ctx);
-    return super.visitRelationalExpression(ctx);
   }
 
   @Override
@@ -212,12 +218,6 @@ public class DtParserConsoleVisitor extends DecisionTableParserBaseVisitor<AstNo
   public AstNode visitHeader(HeaderContext ctx) {
     log(ctx);
     return super.visitHeader(ctx);
-  }
-
-  @Override
-  public AstNode visitValue(ValueContext ctx) {
-    log(ctx);
-    return super.visitValue(ctx);
   }
 
   @Override

@@ -43,13 +43,17 @@ import io.resys.hdes.ast.DecisionTableParser.HitPolicyContext;
 import io.resys.hdes.ast.DecisionTableParser.IdContext;
 import io.resys.hdes.ast.DecisionTableParser.LiteralContext;
 import io.resys.hdes.ast.DecisionTableParser.MatrixContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleEqualityExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleMatchingExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleMatchingOrExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleRelationalExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleUndefinedValueContext;
+import io.resys.hdes.ast.DecisionTableParser.RuleValueContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetsContext;
 import io.resys.hdes.ast.DecisionTableParser.ScalarTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
-import io.resys.hdes.ast.DecisionTableParser.UndefinedValueContext;
-import io.resys.hdes.ast.DecisionTableParser.ValueContext;
 import io.resys.hdes.ast.DecisionTableParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
@@ -68,14 +72,22 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
+import io.resys.hdes.ast.api.nodes.ImmutableAndOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableDecisionTableBody;
+import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
+import io.resys.hdes.ast.api.nodes.ImmutableExpressionValue;
 import io.resys.hdes.ast.api.nodes.ImmutableHeader;
+import io.resys.hdes.ast.api.nodes.ImmutableHeaderRefValue;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyAll;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyMatrix;
+import io.resys.hdes.ast.api.nodes.ImmutableInOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteralValue;
+import io.resys.hdes.ast.api.nodes.ImmutableNotUnaryOperation;
+import io.resys.hdes.ast.api.nodes.ImmutableOrOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableRule;
 import io.resys.hdes.ast.api.nodes.ImmutableRuleRow;
 import io.resys.hdes.ast.api.nodes.ImmutableUndefinedValue;
@@ -84,6 +96,7 @@ import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
+  private Headers headers;
 
   public DtParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
     super();
@@ -124,11 +137,12 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   @Override
   public DecisionTableBody visitDt(DtContext ctx) {
     Nodes children = nodes(ctx);
+    this.headers = children.of(Headers.class).get();
     return ImmutableDecisionTableBody.builder()
         .token(token(ctx))
         .id(children.of(DtRedundentId.class).get().getValue())
         .description(children.of(DtRedundentDescription.class).map(e -> e.getValue()))
-        .headers(children.of(Headers.class).get())
+        .headers(headers)
         .hitPolicy(children.of(HitPolicy.class).get())
         .build();
   }
@@ -139,18 +153,103 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   }
 
   @Override
-  public UndefinedValue visitUndefinedValue(UndefinedValueContext ctx) {
+  public UndefinedValue visitRuleUndefinedValue(RuleUndefinedValueContext ctx) {
     return ImmutableUndefinedValue.builder().token(token(ctx)).build();
   }
 
   @Override
-  public RuleValue visitValue(ValueContext ctx) {
+  public AstNode visitRuleValue(RuleValueContext ctx) {
     AstNode node = first(ctx);
-    return node instanceof RuleValue ? (RuleValue) node
-        : ImmutableLiteralValue.builder()
-            .token(token(ctx))
-            .value((Literal) node)
-            .build();
+    if(node instanceof RuleValue) {
+      return node;
+    } else if(node instanceof Literal) {
+      return ImmutableLiteralValue.builder()
+          .token(token(ctx))
+          .value((Literal) node)
+          .build();      
+    }
+    return ImmutableExpressionValue.builder()
+      .token(token(ctx))
+      .value(ctx.getText())
+      .expression(node)
+      .build();
+  }
+
+  @Override
+  public AstNode visitRuleMatchingExpression(RuleMatchingExpressionContext ctx) {
+    ParseTree tree = ctx.getChild(0);
+    if(tree instanceof TerminalNode && 
+        ((TerminalNode) tree).getSymbol().getType() == DecisionTableParser.NOT_OP) {
+      return ImmutableNotUnaryOperation.builder()
+          .value(nodes(ctx).of(AstNode.class).get())
+          .token(token(ctx))
+          .build();
+    }
+    
+    return nodes(ctx).of(AstNode.class).get();
+  }
+
+  @Override
+  public AstNode visitRuleMatchingOrExpression(RuleMatchingOrExpressionContext ctx) {
+    if(ctx.getChildCount() == 1) {
+      return first(ctx);      
+    }
+    return ImmutableInOperation.builder()
+        .token(token(ctx))
+        .values(nodes(ctx).list(Literal.class))
+        .build();
+  }
+
+  @Override
+  public AstNode visitRuleEqualityExpression(RuleEqualityExpressionContext ctx) {
+    if(ctx.getChildCount() == 1) {
+      return first(ctx);
+    }
+    
+    AstNode left = ctx.getChild(0).accept(this);
+    TerminalNode v = (TerminalNode) ctx.getChild(1);
+    AstNode right = ctx.getChild(2).accept(this);
+    
+    return v.getSymbol().getType() == DecisionTableParser.AND ? 
+        ImmutableAndOperation.builder().token(token(ctx)).left(left).right(right).build() : 
+        ImmutableOrOperation.builder().token(token(ctx)).left(left).right(right).build();
+  }
+
+  @Override
+  public AstNode visitRuleRelationalExpression(RuleRelationalExpressionContext ctx) {
+    String v = ctx.getChild(0).getText();
+    AstNode right = ctx.getChild(1).accept(this);
+    
+    EqualityType type;
+    if (v.equals(EqualityType.NOTEQUAL.getValue())) {
+      type = EqualityType.NOTEQUAL;
+      
+    } else if(v.equals(EqualityType.EQUAL.getValue())) {
+      type = EqualityType.EQUAL;
+    
+    } else if(v.equals(EqualityType.GREATER.getValue())) {
+      type = EqualityType.GREATER;
+    
+    } else if(v.equals(EqualityType.GREATER_THEN.getValue())) {
+      type = EqualityType.GREATER_THEN;
+    
+    } else if(v.equals(EqualityType.LESS.getValue())) {
+      type = EqualityType.LESS;
+    
+    } else if(v.equals(EqualityType.LESS_THEN.getValue())) {
+      type = EqualityType.LESS_THEN;
+    
+    } else {
+      throw new IllegalArgumentException("Not implemented equality type: " + v + "!");
+    }
+    
+    AstNode.Token token = token(ctx);
+    return ImmutableEqualityOperation.builder()
+      .type(type)
+      .token(token)
+      .left(ImmutableHeaderRefValue.builder().token(token).build())
+      .right(right)    
+      .build();
   }
 
   @Override

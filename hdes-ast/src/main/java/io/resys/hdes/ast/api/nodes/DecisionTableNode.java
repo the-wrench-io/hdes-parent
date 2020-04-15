@@ -90,6 +90,15 @@ public interface DecisionTableNode extends AstNode {
   @Value.Immutable
   interface ExpressionValue extends RuleValue {
     String getValue();
-    ExpressionNode getExpression();
+    AstNode getExpression();
+  }
+  
+  @Value.Immutable
+  interface HeaderRefValue extends RuleValue {
+  }
+  
+  @Value.Immutable
+  interface InOperation extends DecisionTableNode {
+    List<Literal> getValues();
   }
 }

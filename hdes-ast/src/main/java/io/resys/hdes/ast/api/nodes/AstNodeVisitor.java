@@ -36,6 +36,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.InOperation;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.LiteralValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
@@ -109,10 +110,10 @@ public interface AstNodeVisitor<T, R> {
     T visitMethodRefNode(MethodRefNode node);
     T visitTypeRefNode(TypeRefNode node);
     T visitEqualityOperation(EqualityOperation node);
-    T visitConditionalExpression(ConditionalExpression node);
-    T visitBetweenExpression(BetweenExpression node);
     T visitAndOperation(AndOperation node);
     T visitOrOperation(OrOperation node);
+    T visitConditionalExpression(ConditionalExpression node);
+    T visitBetweenExpression(BetweenExpression node);
     T visitAdditiveOperation(AdditiveOperation node);
     T visitMultiplicativeOperation(MultiplicativeOperation node);
   }
@@ -130,6 +131,11 @@ public interface AstNodeVisitor<T, R> {
     T visitUndefinedValue(UndefinedValue node);
     T visitLiteralValue(LiteralValue node);
     T visitExpressionValue(ExpressionValue node);
+    T visitEqualityOperation(EqualityOperation node);
+    T visitAndOperation(AndOperation node);
+    T visitOrOperation(OrOperation node);
+    T visitInOperation(InOperation node);
+    T visitNotOperation(NotUnaryOperation node);
   }
   
   // flow

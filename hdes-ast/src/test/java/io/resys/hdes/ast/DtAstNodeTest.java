@@ -32,7 +32,6 @@ import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
-import io.resys.hdes.ast.spi.visitors.loggers.DtParserConsoleVisitor;
 
 public class DtAstNodeTest {
   @Test
@@ -75,16 +74,20 @@ public class DtAstNodeTest {
   }
 
   @Test
-  public void shortExpressions() throws IOException {
+  public void matchExpressions() throws IOException {
     parse("id: basic \n"
         + "headers: {\n"
         +   "IN STRING name,\n "
         +   "IN STRING lastName, \n"
         +   "OUT INTEGER value \n"
         + "} ALL: {\n"
-        +   "{ not 'bob' or 'same' or 'professor', not 'woman', 4570 }\n"
+        +   "{ not 'bob' or 'same' or 'professor', 'woman' or 'man', 4570 }\n"
         + "}");
-    
+  }
+  
+
+  @Test
+  public void equalityExpressions() throws IOException {
     parse("id: basic \n"
         + "headers: {\n"
         +   "IN INTEGER value0,\n "
@@ -98,13 +101,14 @@ public class DtAstNodeTest {
   }
   
   
+  
   public void parse(String value) {
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DecisionTableParser parser = new DecisionTableParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.dt();
-    tree.accept(new DtParserConsoleVisitor());
+    //tree.accept(new DtParserConsoleVisitor());
     tree.accept(new DtParserAstNodeVisitor(new TokenIdGenerator()));
     
     /*

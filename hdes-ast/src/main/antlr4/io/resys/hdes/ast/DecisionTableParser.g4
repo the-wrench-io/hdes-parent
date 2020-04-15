@@ -18,19 +18,19 @@ header: directionType scalarType typeName;
 
 rulesets: ruleset (',' ruleset)*;
 ruleset: '{' rules? '}';
-rules: value (',' value)*;
+rules: ruleValue (',' ruleValue)*;
 
-value: undefinedValue | matchingExpression | equalityExpression;
+ruleValue: ruleUndefinedValue | ruleMatchingExpression | ruleEqualityExpression;
 
-matchingExpression: (NOT_OP)? orExpression;
-orExpression: literal (OR literal)*;
+ruleMatchingExpression: (NOT_OP)? ruleMatchingOrExpression;
+ruleMatchingOrExpression: literal (OR literal)*;
 
-equalityExpression
-  : relationalExpression 
-  | relationalExpression AND relationalExpression
-  | relationalExpression OR relationalExpression;
+ruleEqualityExpression
+  : ruleRelationalExpression 
+  | ruleRelationalExpression AND ruleRelationalExpression
+  | ruleRelationalExpression OR ruleRelationalExpression;
 
-relationalExpression
+ruleRelationalExpression
   : '=' literal
   | '!=' literal
   | '<' literal
@@ -38,4 +38,4 @@ relationalExpression
   | '>' literal
   | '>=' literal;
 
-undefinedValue: '?';
+ruleUndefinedValue: '?';
