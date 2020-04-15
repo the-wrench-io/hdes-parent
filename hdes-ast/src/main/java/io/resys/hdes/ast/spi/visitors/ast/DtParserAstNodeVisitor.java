@@ -125,7 +125,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
     return ImmutableDecisionTableBody.builder()
         .token(token(ctx))
         .id(children.of(DtRedundentId.class).get().getValue())
-        .description(children.of(DtRedundentDescription.class).map(e -> e.getValue()).orElse(null))
+        .description(children.of(DtRedundentDescription.class).map(e -> e.getValue()))
         .headers(children.of(Headers.class).get())
         .hitPolicy(children.of(HitPolicy.class).get())
         .build();
@@ -213,6 +213,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   public RuleRow visitRules(RulesContext ctx) {
     List<Rule> rules = new ArrayList<>();
     int n = ctx.getChildCount();
+    int header = 0;
     for (int i = 0; i < n; i++) {
       ParseTree c = ctx.getChild(i);
       if (c instanceof TerminalNode) {
@@ -221,7 +222,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
       RuleValue childResult = (RuleValue) c.accept(this);
       rules.add(ImmutableRule.builder()
           .token(childResult.getToken())
-          .header(i)
+          .header(header++)
           .value(childResult)
           .build());
     }

@@ -1,8 +1,7 @@
 package io.resys.hdes.ast.api.nodes;
 
 import java.util.List;
-
-import javax.annotation.Nullable;
+import java.util.Optional;
 
 /*-
  * #%L
@@ -35,8 +34,7 @@ public interface DecisionTableNode extends AstNode {
   @Value.Immutable
   interface DecisionTableBody extends DecisionTableNode {
     String getId();
-    @Nullable
-    String getDescription();
+    Optional<String> getDescription();
     HitPolicy getHitPolicy();
     Headers getHeaders();
   }

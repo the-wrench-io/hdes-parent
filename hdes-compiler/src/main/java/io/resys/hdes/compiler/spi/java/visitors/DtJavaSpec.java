@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
@@ -36,5 +37,14 @@ public interface DtJavaSpec {
   @Value.Immutable
   public interface DtTypesSpec extends DtJavaSpec {
     List<TypeSpec> getValues();
+  }
+  @Value.Immutable
+  public interface DtCodeSpecPair extends DtJavaSpec {
+    CodeBlock getKey();
+    CodeBlock getValue();
+  }
+  @Value.Immutable
+  public interface DtCodeSpec extends DtJavaSpec {
+    CodeBlock getValue();
   }
 }

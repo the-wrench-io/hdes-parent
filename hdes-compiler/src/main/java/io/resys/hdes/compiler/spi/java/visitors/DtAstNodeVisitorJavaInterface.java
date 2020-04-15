@@ -1,5 +1,7 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
+import java.util.Collection;
+
 /*-
  * #%L
  * hdes-compiler
@@ -35,28 +37,40 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtTypesSpec;
 
 public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJavaSpec, TypeSpec> {
 
-  private String dtName;
+  private DecisionTableBody body;
   
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {
-    dtName = node.getId();
+    this.body = node;
+    com.squareup.javapoet.TypeName returnType = ClassName.get("", JavaNaming.dtOutput(node.getId()));
+    if(body.getHitPolicy() instanceof HitPolicyAll) {
+      returnType = ParameterizedTypeName.get(ClassName.get(Collection.class), returnType);
+    }
+    
     TypeSpec.Builder interfaceBuilder = TypeSpec.interfaceBuilder(node.getId())
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(ParameterizedTypeName.get(
             ClassName.get(Function.class), 
-            ClassName.get("", JavaNaming.dtInput(dtName)),
-            ClassName.get("", JavaNaming.dtOutput(dtName))))
+            ClassName.get("", JavaNaming.dtInput(node.getId())),
+            returnType))
         .addTypes(visitHeaders(node.getHeaders()).getValues());
-    
     
     return interfaceBuilder.build();
   }
 
+  
+  @Override
+  public DtJavaSpec visitHitPolicyAll(HitPolicyAll node) {
+    
+    return super.visitHitPolicyAll(node);
+  }
+  
   @Override
   public DtTypesSpec visitHeaders(Headers node) {
     Function<String, TypeSpec.Builder> from = (name) -> TypeSpec
@@ -64,8 +78,10 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     
-    TypeSpec.Builder inputBuilder = from.apply(JavaNaming.dtInput(dtName));
-    TypeSpec.Builder outputBuilder = from.apply(JavaNaming.dtOutput(dtName));
+    TypeSpec.Builder inputBuilder = from.apply(JavaNaming.dtInput(body.getId()));
+    TypeSpec.Builder outputBuilder = from.apply(JavaNaming.dtOutput(body.getId()));
+    
+    
     
     for(Header header : node.getValues()) {
       MethodSpec method = visitHeader(header).getValue();
