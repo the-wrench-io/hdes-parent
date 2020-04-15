@@ -23,7 +23,7 @@ rules: value (',' value)*;
 value: undefinedValue | matchingExpression | equalityExpression;
 
 matchingExpression: (NOT_OP)? orExpression;
-orExpression: literal | (OR literal)*;
+orExpression: literal (OR literal)*;
 
 equalityExpression
   : relationalExpression 

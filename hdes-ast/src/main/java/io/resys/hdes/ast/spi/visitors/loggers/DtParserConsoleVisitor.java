@@ -23,20 +23,33 @@ package io.resys.hdes.ast.spi.visitors.loggers;
 import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
 
 import io.resys.hdes.ast.DecisionTableParser.AllContext;
+import io.resys.hdes.ast.DecisionTableParser.ArrayTypeContext;
+import io.resys.hdes.ast.DecisionTableParser.DebugValueContext;
 import io.resys.hdes.ast.DecisionTableParser.DescriptionContext;
+import io.resys.hdes.ast.DecisionTableParser.DirectionTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.DtContext;
+import io.resys.hdes.ast.DecisionTableParser.EqualityExpressionContext;
 import io.resys.hdes.ast.DecisionTableParser.FirstContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderArgsContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderContext;
 import io.resys.hdes.ast.DecisionTableParser.HeadersContext;
 import io.resys.hdes.ast.DecisionTableParser.HitPolicyContext;
 import io.resys.hdes.ast.DecisionTableParser.IdContext;
+import io.resys.hdes.ast.DecisionTableParser.InputsContext;
 import io.resys.hdes.ast.DecisionTableParser.LiteralContext;
+import io.resys.hdes.ast.DecisionTableParser.MatchingExpressionContext;
 import io.resys.hdes.ast.DecisionTableParser.MatrixContext;
+import io.resys.hdes.ast.DecisionTableParser.ObjectTypeContext;
+import io.resys.hdes.ast.DecisionTableParser.OrExpressionContext;
+import io.resys.hdes.ast.DecisionTableParser.RelationalExpressionContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetContext;
 import io.resys.hdes.ast.DecisionTableParser.RulesetsContext;
 import io.resys.hdes.ast.DecisionTableParser.ScalarTypeContext;
+import io.resys.hdes.ast.DecisionTableParser.SimpleTypeContext;
+import io.resys.hdes.ast.DecisionTableParser.TypeDefArgsContext;
+import io.resys.hdes.ast.DecisionTableParser.TypeDefContext;
+import io.resys.hdes.ast.DecisionTableParser.TypeDefsContext;
 import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
 import io.resys.hdes.ast.DecisionTableParser.UndefinedValueContext;
 import io.resys.hdes.ast.DecisionTableParser.ValueContext;
@@ -61,6 +74,84 @@ public class DtParserConsoleVisitor extends DecisionTableParserBaseVisitor<AstNo
   public AstNode visitFirst(FirstContext ctx) {
     log(ctx);
     return super.visitFirst(ctx);
+  }
+
+  @Override
+  public AstNode visitDirectionType(DirectionTypeContext ctx) {
+    log(ctx);
+    return super.visitDirectionType(ctx);
+  }
+
+  @Override
+  public AstNode visitMatchingExpression(MatchingExpressionContext ctx) {
+    log(ctx);
+    return super.visitMatchingExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitOrExpression(OrExpressionContext ctx) {
+    log(ctx);
+    return super.visitOrExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitEqualityExpression(EqualityExpressionContext ctx) {
+    log(ctx);
+    return super.visitEqualityExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitRelationalExpression(RelationalExpressionContext ctx) {
+    log(ctx);
+    return super.visitRelationalExpression(ctx);
+  }
+
+  @Override
+  public AstNode visitInputs(InputsContext ctx) {
+    log(ctx);
+    return super.visitInputs(ctx);
+  }
+
+  @Override
+  public AstNode visitTypeDefs(TypeDefsContext ctx) {
+    log(ctx);
+    return super.visitTypeDefs(ctx);
+  }
+
+  @Override
+  public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
+    log(ctx);
+    return super.visitTypeDefArgs(ctx);
+  }
+
+  @Override
+  public AstNode visitTypeDef(TypeDefContext ctx) {
+    log(ctx);
+    return super.visitTypeDef(ctx);
+  }
+
+  @Override
+  public AstNode visitSimpleType(SimpleTypeContext ctx) {
+    log(ctx);
+    return super.visitSimpleType(ctx);
+  }
+
+  @Override
+  public AstNode visitObjectType(ObjectTypeContext ctx) {
+    log(ctx);
+    return super.visitObjectType(ctx);
+  }
+
+  @Override
+  public AstNode visitArrayType(ArrayTypeContext ctx) {
+    log(ctx);
+    return super.visitArrayType(ctx);
+  }
+
+  @Override
+  public AstNode visitDebugValue(DebugValueContext ctx) {
+    log(ctx);
+    return super.visitDebugValue(ctx);
   }
 
   @Override

@@ -73,6 +73,30 @@ public class DtAstNodeTest {
         +   "{ 'bob', 'woman', 4570 }"
         + "}");
   }
+
+  @Test
+  public void shortExpressions() throws IOException {
+    parse("id: basic \n"
+        + "headers: {\n"
+        +   "IN STRING name,\n "
+        +   "IN STRING lastName, \n"
+        +   "OUT INTEGER value \n"
+        + "} ALL: {\n"
+        +   "{ not 'bob' or 'same' or 'professor', not 'woman', 4570 }\n"
+        + "}");
+    
+    parse("id: basic \n"
+        + "headers: {\n"
+        +   "IN INTEGER value0,\n "
+        +   "IN INTEGER value1, \n"
+        +   "OUT INTEGER value \n"
+        + "} ALL: {\n"
+        +   "{ > 10, <= 20, 4570 },\n"
+        +   "{ > 10, <= 20 and > 10, 4570 },\n"
+        +   "{ = 6, != 20 and > 10, 4570 }\n"
+        + "}");
+  }
+  
   
   public void parse(String value) {
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
