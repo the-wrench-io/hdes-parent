@@ -34,6 +34,10 @@ public interface FlJavaSpec {
     MethodSpec getValue();
     List<TypeSpec> getChildren();
   }
+  @Value.Immutable
+  public interface FlTaskSpec extends FlJavaSpec {
+    List<TypeSpec> getChildren();
+  }
   public interface FlMethodSpec extends FlJavaSpec {
     MethodSpec getValue();
   }

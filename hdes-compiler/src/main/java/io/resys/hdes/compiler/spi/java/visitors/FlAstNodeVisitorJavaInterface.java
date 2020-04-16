@@ -39,9 +39,11 @@ import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.compiler.api.Flow;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlInputSpec;
+import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTypesSpec;
 
 public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
@@ -61,6 +63,10 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
         .addTypes(visitFlowInputs(node.getInputs()).getValues());
     return interfaceBuilder.build();
   }
+  @Override
+    public FlTaskSpec visitFlowTask(FlowTask node) {
+      return super.visitFlowTask(node);
+    }
 
   @Override
   public FlTypesSpec visitFlowInputs(FlowInputs node) {
