@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.lang.model.element.Modifier;
@@ -246,7 +245,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     }
     
     return ImmutableDtCodeSpec.builder().value(CodeBlock.builder()
-        .add("$T.asList($L).contains($L)", Arrays.class, values.toString(), HEADER_REF).build())
+        .add("asList($L).contains($L)", values.toString(), HEADER_REF).build())
         .build();
   }
   
