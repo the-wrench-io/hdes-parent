@@ -67,7 +67,7 @@ public class HdesCompilerException extends RuntimeException {
       return new StringBuilder()
           .append("Unknown AST: ").append(ast.getClass())
           .append("  - ").append(ast.getClass()).append(System.lineSeparator())
-          .append("  supported types are: ")
+          .append("  supported types are: ").append(System.lineSeparator())
           .append("    - ").append(DecisionTableBody.class).append(System.lineSeparator())
           .append("    - ").append(FlowBody.class).append(System.lineSeparator())
           .append("    - ").append(ManualTaskBody.class).append(System.lineSeparator())

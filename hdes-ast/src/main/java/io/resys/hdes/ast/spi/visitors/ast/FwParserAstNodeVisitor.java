@@ -344,7 +344,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   public ThenPointer visitThen(ThenContext ctx) {
     return ImmutableThenPointer.builder()
         .token(token(ctx))
-        .name(nodes(ctx).of(FwRedundentTypeName.class).get().getValue())
+        .name(nodes(ctx).of(FwRedundentTypeName.class).map(e -> e.getValue()).orElse("end"))
         .build();
   }
 

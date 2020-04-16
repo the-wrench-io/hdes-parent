@@ -34,7 +34,8 @@ import io.resys.hdes.ast.api.nodes.ImmutableToken;
 
 public class AntlrErrorListener extends BaseErrorListener {
   private final List<ErrorNode> errors = new ArrayList<>();
-
+  private int id = 1;
+  
   public List<ErrorNode> getErrors() {
     return errors;
   }
@@ -52,6 +53,7 @@ public class AntlrErrorListener extends BaseErrorListener {
     this.errors.add(ImmutableErrorNode.builder()
         .target(ImmutableEmptyNode.builder()
             .token(ImmutableToken.builder()
+                .id(id++)
                 .text(e.getCtx().getText())
                 .line(line)
                 .col(charPositionInLine)

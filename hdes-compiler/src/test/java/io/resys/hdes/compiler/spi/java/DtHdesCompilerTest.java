@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Code;
 
-public class JavaHdesCompilerTest {
+public class DtHdesCompilerTest {
   private final HdesCompiler compiler = JavaHdesCompiler.config().build();
 
   @Test
@@ -50,10 +50,10 @@ public class JavaHdesCompilerTest {
     //System.out.println(code.getValues().get(0).getTarget());
     
   }
-
+  
   public static String file(String name) {
     try {
-      return IOUtils.toString(JavaHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
+      return IOUtils.toString(DtHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

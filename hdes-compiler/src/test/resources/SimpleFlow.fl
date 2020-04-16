@@ -1,10 +1,11 @@
-id: x description: 'descriptive'
+id: SimpleFlow description: 'descriptive'
 inputs: {
   optional INTEGER arg1.x1,
   optional INTEGER arg2.x1
 }
 tasks: {
   firstTask: {
+    then: end
     decisionTask: bestDtTask
     OBJECT mapping: {
       name: arg1.x1,

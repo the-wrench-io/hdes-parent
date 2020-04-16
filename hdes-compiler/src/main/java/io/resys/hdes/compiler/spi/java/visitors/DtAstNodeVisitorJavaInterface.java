@@ -63,13 +63,6 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     
     return interfaceBuilder.build();
   }
-
-  
-  @Override
-  public DtJavaSpec visitHitPolicyAll(HitPolicyAll node) {
-    
-    return super.visitHitPolicyAll(node);
-  }
   
   @Override
   public DtTypesSpec visitHeaders(Headers node) {
