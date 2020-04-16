@@ -33,6 +33,7 @@ import io.resys.hdes.ast.api.nodes.AstNodeVisitor.DtAstNodeVisitor;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.ExpressionValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.HeaderRefValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
@@ -196,6 +197,12 @@ public class DtAstNodeVisitorTemplate<T, R> implements DtAstNodeVisitor<T, R> {
   @Override
   public T visitNotOperation(NotUnaryOperation node) {
     
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitHeaderRefValue(HeaderRefValue node) {
+
     throw new IllegalArgumentException("Not implemented");
   }
 }

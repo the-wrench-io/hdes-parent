@@ -20,12 +20,13 @@ package io.resys.hdes.compiler.spi.java.visitors;
  * #L%
  */
 
-import java.awt.List;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.lang.model.element.Modifier;
 
@@ -36,6 +37,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
+import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
@@ -53,13 +55,17 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.AndOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
+import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpecPair;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
 
 public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec, TypeSpec> {
+  
+  private final static String HEADER_REF = "//header ref to be replaces";
   private DecisionTableBody body;
   private ClassName input;
   private ClassName output;
@@ -99,9 +105,10 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
       if(pair.getKey().isEmpty()) {
         statements.addStatement("result.add($L)", pair.getValue());  
       } else {
-        statements.beginControlFlow("if($L)", pair.getKey());
-        statements.addStatement("result.add($L)", pair.getValue());
-        statements.endControlFlow();
+        statements.add("\r\n/** \r\n * $L \r\n */\r\n", row.getText())
+        .beginControlFlow("if($L)", pair.getKey())
+        .addStatement("result.add($L)", pair.getValue())
+        .endControlFlow();
       }
     }
     return ImmutableDtMethodSpec.builder().value(
@@ -128,7 +135,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
       Header header = body.getHeaders().getValues().get(rule.getHeader());
       if (header.getDirection() == DirectionType.IN) {
         if (and) {
-          key.add(" && ");
+          key.add("\r\n  && ");
         }
         key.add(ruleCode);
         and = true;
@@ -166,19 +173,19 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     String getMethod = JavaNaming.getMethod(header.getName());
     
     if(value instanceof LiteralValue) {
-      LiteralValue literal = (LiteralValue) value;
-      CodeBlock literalCode = visitLiteral(literal.getValue()).getValue();
-      
+      Literal literal = ((LiteralValue) value).getValue();
+      CodeBlock literalCode = visitLiteral(literal).getValue();
+
       CodeBlock.Builder exp = CodeBlock.builder();
-      if(literal.getValue().getType() == ScalarType.DECIMAL) {
+      if(literal.getType() == ScalarType.DECIMAL) {
         exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
-      } else if(literal.getValue().getType() == ScalarType.DATE) {
+      } else if(literal.getType() == ScalarType.DATE) {
         exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
-      } else if(literal.getValue().getType() == ScalarType.DATE_TIME) {
+      } else if(literal.getType() == ScalarType.DATE_TIME) {
         exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
-      } else if(literal.getValue().getType() == ScalarType.TIME) {
+      } else if(literal.getType() == ScalarType.TIME) {
         exp.add("input.$L().compareTo($L) == 0", getMethod, literalCode);
-      } else if(literal.getValue().getType() == ScalarType.STRING) {
+      } else if(literal.getType() == ScalarType.STRING) {
         exp.add("input.$L().equals($L)", getMethod, literalCode);
       } else {
         exp.add("input.$L() == $L", getMethod, literalCode);
@@ -187,20 +194,114 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
       
     } else if(value instanceof ExpressionValue) {
       
-    } else if(value instanceof HeaderRefValue) {
+      DtCodeSpec result = visitExpressionValue(((ExpressionValue) value));
+      String inputName = CodeBlock.builder().add("input.$L()", getMethod).build().toString();
       
+      return ImmutableDtCodeSpec.builder()
+          .value(CodeBlock.builder().add(result.getValue().toString().replaceAll(HEADER_REF, inputName)).build())
+          .build();
     }
     throw new IllegalArgumentException("Not implemented rule node: " + node);
   } 
 
   @Override
   public DtCodeSpec visitExpressionValue(ExpressionValue node) {
+    DtCodeSpec child = visitExpressionRuleValue(node.getExpression());
+    
     return ImmutableDtCodeSpec.builder().value(
         CodeBlock.builder()
+            .add(child.getValue())
             .build())
         .build();
   }
+  
+  @Override
+  public DtCodeSpec visitEqualityOperation(EqualityOperation node) {
+    
+    CodeBlock left = visitExpressionRuleValue(node.getLeft()).getValue();
+    CodeBlock right = visitExpressionRuleValue(node.getRight()).getValue();
+    
+    String operation;
+    switch (node.getType()) {
+    case EQUAL: operation = "eq($L, $L)"; break;
+    case NOTEQUAL: operation = "neq($L, $L)"; break;
+    case GREATER: operation = "gt($L, $L)"; break;
+    case GREATER_THEN: operation = "gte($L, $L)"; break;
+    case LESS: operation = "lt($L, $L)"; break;
+    case LESS_THEN: operation = "lte($L, $L)"; break;
+    default: throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionOperation(node));
+    }
+    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, left, right).build()).build();
+  }
+  
+  @Override
+  public DtCodeSpec visitInOperation(InOperation node) {
+    StringBuilder values = new StringBuilder();
+    
+    for(Literal literal : node.getValues()) {
+      if(values.length() > 0) {
+        values.append(", ");
+      }
+      values.append(visitLiteral(literal).getValue().toString());
+    }
+    
+    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder()
+        .add("$T.asList($L).contains($L)", Arrays.class, values.toString(), HEADER_REF).build())
+        .build();
+  }
+  
+  @Override
+  public DtCodeSpec visitNotOperation(NotUnaryOperation node) {
+    CodeBlock child = visitExpressionRuleValue(node.getValue()).getValue();    
+    return ImmutableDtCodeSpec.builder().value(
+        CodeBlock.builder().add("!").add(child).build())
+        .build();
+  }
 
+  @Override
+  public DtCodeSpec visitHeaderRefValue(HeaderRefValue node) {
+    return ImmutableDtCodeSpec.builder().value(
+        CodeBlock.builder()
+        .add(HEADER_REF)
+        .build())
+    .build();
+  }
+  
+  private DtCodeSpec visitExpressionRuleValue(AstNode node) {
+    if(node instanceof Literal) {
+      return visitLiteral((Literal) node);
+      
+    } else if(node instanceof HeaderRefValue) {
+      return visitHeaderRefValue((HeaderRefValue) node);
+      
+    } else if(node instanceof InOperation) {
+      return visitInOperation((InOperation) node);
+      
+    } else if(node instanceof NotUnaryOperation) {
+      return visitNotOperation((NotUnaryOperation) node);
+      
+    } else if(node instanceof EqualityOperation) {
+      return visitEqualityOperation((EqualityOperation) node);
+      
+    } else if(node instanceof AndOperation) {
+      return visitAndOperation((AndOperation) node);
+    }
+    
+    throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionNode(node));
+  }
+  
+  @Override
+    public DtCodeSpec visitAndOperation(AndOperation node) {
+    CodeBlock left = visitExpressionRuleValue(node.getLeft()).getValue();
+    CodeBlock right = visitExpressionRuleValue(node.getRight()).getValue();
+    
+    return ImmutableDtCodeSpec.builder().value(
+        CodeBlock.builder()
+            .add(left).add("\r\n  && ").add(right)
+            .build())
+        .build();
+    }
+  
   @Override
   public DtCodeSpec visitLiteral(Literal node) {
     CodeBlock.Builder code = CodeBlock.builder();
@@ -221,24 +322,6 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     return ImmutableDtCodeSpec.builder().value(code.build()).build();
   }
   
-  @Override
-  public DtJavaSpec visitEqualityOperation(EqualityOperation node) {
-    // TODO Auto-generated method stub
-    return super.visitEqualityOperation(node);
-  }
-  
-  @Override
-  public DtJavaSpec visitInOperation(InOperation node) {
-    // TODO Auto-generated method stub
-    return super.visitInOperation(node);
-  }
-  
-  @Override
-  public DtJavaSpec visitNotOperation(NotUnaryOperation node) {
-    // TODO Auto-generated method stub
-    return super.visitNotOperation(node);
-  }
-
   @Override
   public DtMethodSpec visitHitPolicyFirst(HitPolicyFirst node) {
     throw new RuntimeException("not implemented");

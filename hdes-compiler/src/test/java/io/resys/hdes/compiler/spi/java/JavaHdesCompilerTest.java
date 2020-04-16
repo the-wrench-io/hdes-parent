@@ -33,9 +33,18 @@ public class JavaHdesCompilerTest {
   private final HdesCompiler compiler = JavaHdesCompiler.config().build();
 
   @Test
-  public void compileDT() {
+  public void simpleDt() {
     Code code = compiler.parser()
-        .add("basicDt.dt", file("basicDt.dt"))
+        .add("SimpleDt.dt", file("SimpleDt.dt"))
+    .build();
+    
+    //System.out.println(code.getValues().get(0).getTarget());
+    
+  }
+  @Test
+  public void expressionDt() {
+    Code code = compiler.parser()
+        .add("ExpressionDt.dt", file("ExpressionDt.dt"))
     .build();
     
     //System.out.println(code.getValues().get(0).getTarget());

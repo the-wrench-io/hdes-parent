@@ -32,6 +32,7 @@ import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.ExpressionValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.HeaderRefValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
@@ -136,6 +137,7 @@ public interface AstNodeVisitor<T, R> {
     T visitOrOperation(OrOperation node);
     T visitInOperation(InOperation node);
     T visitNotOperation(NotUnaryOperation node);
+    T visitHeaderRefValue(HeaderRefValue node);
   }
   
   // flow

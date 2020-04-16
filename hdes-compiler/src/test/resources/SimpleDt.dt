@@ -1,0 +1,13 @@
+id: SimpleDT description: 'uber dt'
+headers: {
+  IN STRING name,
+  IN STRING lastName,
+  OUT INTEGER value
+} ALL: {
+  {             ?,         ?,   20 },
+  {         'bob',   'woman', 4570 },
+  {not 'bob' 
+   or 'same' 
+   or 'professor',   'woman' 
+                    or 'man', 4570 }
+}

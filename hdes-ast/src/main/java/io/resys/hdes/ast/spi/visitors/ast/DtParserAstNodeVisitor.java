@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
@@ -162,12 +163,14 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
     AstNode node = first(ctx);
     if(node instanceof RuleValue) {
       return node;
+      
     } else if(node instanceof Literal) {
       return ImmutableLiteralValue.builder()
           .token(token(ctx))
           .value((Literal) node)
           .build();      
     }
+    
     return ImmutableExpressionValue.builder()
       .token(token(ctx))
       .value(ctx.getText())
@@ -307,7 +310,11 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
     if (ctx.getChildCount() == 3) {
       return (RuleRow) ctx.getChild(1).accept(this);
     }
-    return ImmutableRuleRow.builder().token(token(ctx)).build();
+    
+    return ImmutableRuleRow.builder()
+        .token(token(ctx))
+        .text(ctx.getStart().getInputStream().getText(new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex())))
+        .build();
   }
 
   @Override
@@ -327,8 +334,10 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
           .value(childResult)
           .build());
     }
+    
     return ImmutableRuleRow.builder()
         .token(token(ctx))
+        .text(ctx.getStart().getInputStream().getText(new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex())))
         .rules(rules)
         .build();
   }

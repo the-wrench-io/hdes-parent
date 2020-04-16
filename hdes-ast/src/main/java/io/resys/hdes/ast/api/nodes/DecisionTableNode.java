@@ -69,6 +69,7 @@ public interface DecisionTableNode extends AstNode {
   @Value.Immutable
   interface RuleRow extends DecisionTableNode {
     List<Rule> getRules();
+    String getText();
   }
   
   @Value.Immutable
@@ -94,7 +95,7 @@ public interface DecisionTableNode extends AstNode {
   }
   
   @Value.Immutable
-  interface HeaderRefValue extends RuleValue {
+  interface HeaderRefValue extends DecisionTableNode {
   }
   
   @Value.Immutable
