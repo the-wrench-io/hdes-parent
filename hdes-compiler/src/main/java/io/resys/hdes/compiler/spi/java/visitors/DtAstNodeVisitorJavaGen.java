@@ -57,6 +57,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.AndOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
+import io.resys.hdes.compiler.api.EqualityAssert;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpecPair;
@@ -200,7 +201,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
           .value(CodeBlock.builder().add(result.getValue().toString().replaceAll(HEADER_REF, inputName)).build())
           .build();
     }
-    throw new IllegalArgumentException("Not implemented rule node: " + node);
+    throw new HdesCompilerException(HdesCompilerException.builder().unknownDTInputRule(node));
   } 
 
   @Override
@@ -222,15 +223,15 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     
     String operation;
     switch (node.getType()) {
-    case EQUAL: operation = "eq($L, $L)"; break;
-    case NOTEQUAL: operation = "neq($L, $L)"; break;
-    case GREATER: operation = "gt($L, $L)"; break;
-    case GREATER_THEN: operation = "gte($L, $L)"; break;
-    case LESS: operation = "lt($L, $L)"; break;
-    case LESS_THEN: operation = "lte($L, $L)"; break;
+    case EQUAL: operation = "$T.eq($L, $L)"; break;
+    case NOTEQUAL: operation = "$T.neq($L, $L)"; break;
+    case GREATER: operation = "$T.gt($L, $L)"; break;
+    case GREATER_THEN: operation = "$T.gte($L, $L)"; break;
+    case LESS: operation = "$T.lt($L, $L)"; break;
+    case LESS_THEN: operation = "$T.lte($L, $L)"; break;
     default: throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionOperation(node));
     }
-    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, left, right).build()).build();
+    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, EqualityAssert.class, left, right).build()).build();
   }
   
   @Override

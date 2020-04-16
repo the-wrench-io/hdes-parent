@@ -30,10 +30,13 @@ import com.squareup.javapoet.TypeSpec;
 
 public interface FlJavaSpec {
   @Value.Immutable
+  public interface FlInputSpec extends FlJavaSpec {
+    MethodSpec getValue();
+    List<TypeSpec> getChildren();
+  }
   public interface FlMethodSpec extends FlJavaSpec {
     MethodSpec getValue();
   }
-
   @Value.Immutable
   public interface FlTypesSpec extends FlJavaSpec {
     List<TypeSpec> getValues();

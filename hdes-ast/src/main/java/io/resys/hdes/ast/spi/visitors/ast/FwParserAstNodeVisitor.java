@@ -205,8 +205,8 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
 
   @Override
   public AstNode visitTypeDef(TypeDefContext ctx) {
-    ParseTree c = ctx.getChild(1);
-    return c.accept(this);
+    
+    return nodes(ctx).of(AstNode.class).get();
   }
 
   @Override
@@ -241,17 +241,19 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   @Override
   public ArrayInputNode visitArrayType(ArrayTypeContext ctx) {
     Nodes nodes = nodes(ctx);
+    InputNode input = nodes.of(InputNode.class).get();
     return ImmutableArrayInputNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
-        .value(nodes.of(InputNode.class).get())
+        .name(input.getName())
+        .value(input)
         .build();
   }
 
   @Override
   public ObjectInputNode visitObjectType(ObjectTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    List<InputNode> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
+    List<InputNode> values = nodes.of(FwRedundentInputArgs.class).map((FwRedundentInputArgs i)-> i.getValues())
         .orElse(Collections.emptyList());
     
     return ImmutableObjectInputNode.builder()

@@ -1,15 +1,20 @@
 id: SimpleFlow description: 'descriptive'
 inputs: {
-  optional INTEGER arg1.x1,
-  optional INTEGER arg2.x1
+  optional INTEGER arg1,
+  optional INTEGER arg2,
+  optional ARRAY INTEGER arg3,
+  optional ARRAY OBJECT arg4: {
+    optional INTEGER arg5,
+    optional INTEGER arg6
+  }
 }
 tasks: {
   firstTask: {
     then: end
     decisionTask: bestDtTask
     OBJECT mapping: {
-      name: arg1.x1,
-      lastName: arg2.x1
+      name: arg1,
+      lastName: arg2
     }
   }, 
   end: {

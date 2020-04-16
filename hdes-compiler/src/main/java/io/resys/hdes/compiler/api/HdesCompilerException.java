@@ -85,5 +85,17 @@ public class HdesCompilerException extends RuntimeException {
           .append("  - ").append(ast).append("!")
           .toString();
     }
+    public String unknownDTInputRule(AstNode ast) {
+      return new StringBuilder()
+          .append("Unknown DT input rule AST: ").append(ast.getClass()).append(System.lineSeparator())
+          .append("  - ").append(ast).append("!")
+          .toString();
+    }
+    public String unknownFlInputRule(AstNode ast) {
+      return new StringBuilder()
+          .append("Unknown FLOW input rule AST: ").append(ast.getClass()).append(System.lineSeparator())
+          .append("  - ").append(ast).append("!")
+          .toString();
+    }
   }
 }

@@ -74,8 +74,6 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     TypeSpec.Builder inputBuilder = from.apply(JavaNaming.dtInput(body.getId()));
     TypeSpec.Builder outputBuilder = from.apply(JavaNaming.dtOutput(body.getId()));
     
-    
-    
     for(Header header : node.getValues()) {
       MethodSpec method = visitHeader(header).getValue();
       if(header.getDirection() == DirectionType.IN) {

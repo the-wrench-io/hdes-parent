@@ -28,6 +28,7 @@ import com.squareup.javapoet.TypeSpec;
 import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.compiler.api.HdesCompiler.Code;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.api.ImmutableCode;
@@ -39,6 +40,8 @@ public class JavaAstEnvirVisitor {
     for(AstNode ast : envir.getValues()) {
       if(ast instanceof DecisionTableBody) {
         visit((DecisionTableBody) ast);
+      } else if(ast instanceof FlowBody) {
+        visit((FlowBody) ast);
       } else {
         throw new HdesCompilerException(HdesCompilerException.builder().unknownAst(ast));
       }
@@ -51,6 +54,12 @@ public class JavaAstEnvirVisitor {
     TypeSpec superInterface = visit(new DtAstNodeVisitorJavaInterface().visitDecisionTableBody(body));
     TypeSpec implementation = visit(new DtAstNodeVisitorJavaGen().visitDecisionTableBody(body));
   }
+  private void visit(FlowBody body) {
+    TypeSpec superInterface = visit(new FlAstNodeVisitorJavaInterface().visitFlowBody(body));
+    //TypeSpec implementation = visit(new DtAstNodeVisitorJavaGen().visitDecisionTableBody(body));
+  }
+  
+  
   
   private TypeSpec visit(TypeSpec type) {
     try {
