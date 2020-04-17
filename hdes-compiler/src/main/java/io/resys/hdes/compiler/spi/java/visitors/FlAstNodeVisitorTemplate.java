@@ -30,9 +30,9 @@ import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.AstNodeVisitor.FlowAstNodeVisitor;
+import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowEndMapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
@@ -105,12 +105,6 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public T visitFlowReturnType(FlowEndMapping node) {
-    
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
   public T visitFlowInputs(FlowInputs node) {
     
     throw new IllegalArgumentException("Not implemented");
@@ -160,6 +154,12 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
 
   @Override
   public T visitFlowTaskPointer(FlowTaskPointer node) {
+    
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitEndPointer(EndPointer node) {
     
     throw new IllegalArgumentException("Not implemented");
   }

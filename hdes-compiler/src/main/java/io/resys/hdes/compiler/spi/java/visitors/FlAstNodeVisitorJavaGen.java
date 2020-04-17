@@ -72,7 +72,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         .addParameter(ParameterSpec.builder(ClassName.get("", JavaNaming.flInput(node.getId())), "input").build())
         .returns(flowState)
         .addStatement(visitInit(node))
-        .addStatement(CodeBlock.builder()
+        .addCode(CodeBlock.builder()
             .add(taskImpl.getValue())
             .build())
         .addStatement(CodeBlock.builder().add("return currentState").build())
@@ -107,7 +107,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
           .returns(flowState);
       children.add(visitBuilder.build());
       
-      codeblock.add("currentState = $L(currentState)", visitMethodName);
+      codeblock.addStatement("currentState = $L(currentState)", visitMethodName);
       
       // create input
       
@@ -132,6 +132,11 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   @Override
   public FlTaskImplSpec visitTaskRef(TaskRef node) {
     // TODO Auto-generated method stub
+    
+    //output = factory.dt().myDt().apply(input)
+    //output = factory.st().myServiceTask().apply(input)
+    //output = factory.fl().myFlow().apply(input)
+    
     return ImmutableFlTaskImplSpec.builder().build();
   }
   

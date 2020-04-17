@@ -51,11 +51,8 @@ public class AstNodeException extends RuntimeException {
       result.append("  - ")
       .append("at (")
       .append(error.getTarget().getToken().getLine()).append(":").append(error.getTarget().getToken().getCol())
-      .append("). ")
-      .append(error.getMessage())
-      .append(" -> ")
-      .append(error.getTarget().getToken().getText())
-      .append(System.lineSeparator());
+      .append("). Source: ").append(error.getTarget().getToken().getText()).append(System.lineSeparator())
+      .append(error.getMessage());
     }
     return result.toString();
   }

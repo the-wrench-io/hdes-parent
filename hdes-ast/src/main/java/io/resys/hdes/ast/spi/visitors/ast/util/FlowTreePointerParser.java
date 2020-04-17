@@ -21,6 +21,7 @@ package io.resys.hdes.ast.spi.visitors.ast.util;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
+import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTask;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
@@ -51,7 +53,7 @@ public class FlowTreePointerParser {
 
   private final Map<String, FlowTask> createdTasks = new HashMap<>();
   private Map<String, FlowTask> sourceTasks;
-
+  
   public FwRedundentOrderedTasks visit(FwRedundentTasks redundentTasks) {
     List<FlowTask> tasks = redundentTasks.getValues();
     if (tasks.isEmpty()) {
@@ -62,7 +64,7 @@ public class FlowTreePointerParser {
     FlowTask first = visit(tasks.get(0));
     
     List<FlowTask> unclaimed = sourceTasks.values().stream()
-    .filter(src -> createdTasks.containsKey(src.getId()))
+    .filter(src -> !createdTasks.containsKey(src.getId()))
     .collect(Collectors.toList());
     
     return ImmutableFwRedundentOrderedTasks.builder().first(first).unclaimed(unclaimed).build();
@@ -125,9 +127,26 @@ public class FlowTreePointerParser {
       FlowTask src = sourceTasks.get(taskName);
       FlowTask result = visit(src);
       return Optional.of(ImmutableThenPointer.builder().from(pointer).task(result).build());
+    } else if(taskName.equalsIgnoreCase("end")) {
+      return Optional.empty();
     }
     
-    return Optional.empty();
+    StringBuilder message = new StringBuilder()
+        .append("Unrecognized task reference: ")
+        .append("'").append(taskName).append("'")
+        .append(" used in then!");
+    
+    if(!sourceTasks.values().isEmpty()) {
+      message.append(System.lineSeparator()).append("Expecting one of: ");
+    }
+    for(FlowTask task : sourceTasks.values()) {
+      message.append(System.lineSeparator()).append("  - ").append(task.getId()).append(" (line: ").append(task.getToken().getLine()).append(")");
+    }
+    throw new AstNodeException(Arrays.asList(ImmutableErrorNode.builder()
+        .message(message.toString())
+        .target(pointer)
+        .build()));
+//    return Optional.empty();
   }  
 //  Map<String, FlowTask> tasksById = new HashMap<>();
 //  

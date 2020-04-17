@@ -168,6 +168,10 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     FwRedundentTasks redundentTasks = children.of(FwRedundentTasks.class).get();
     FwRedundentOrderedTasks tasks = new FlowTreePointerParser().visit(redundentTasks);
     
+    for(FlowTask unclaimed : tasks.getUnclaimed()) {
+      break;
+    }
+    
     return ImmutableFlowBody.builder()
         .token(token(ctx))
         .id(children.of(FwRedundentId.class).get().getValue())
