@@ -9,19 +9,19 @@ taskTypes
   | ST_TASK;
 objectDataType: OBJECT | ARRAY;
 
-flow: id description? inputs tasks EOF;
-
+flow: id description? inputs outputDefs tasks EOF;
+outputDefs: OUTPUTS ':' typeDefs;
 tasks: 'tasks' ':' '{' taskArgs? '}';
-taskArgs: task (',' task)*;
-task: endTask | nextTask;
-endTask: END ':' '{' mapping '}';
-nextTask: typeName ':' '{' (pointer taskRef?)? '}';
+taskArgs: nextTask (',' nextTask)*;
+nextTask: typeName ':' '{' pointer taskRef? '}';
 
-pointer: whenThenArgs | then;
+pointer: whenThenArgs | then ;
 whenThenArgs: whenThen (',' whenThen)*;
 whenThen: 'when' ':' whenExpression then; 
 whenExpression: StringLiteral;
-then: 'then' ':' (END | typeName);
+then: 'then' (endMapping | (':' typeName));
+endMapping: 'end' ':' '{' mapping '}';
+
 
 taskRef: taskTypes ':' typeName mapping;  
 mapping: objectDataType 'mapping' ':' '{' mappingArgs? '}';

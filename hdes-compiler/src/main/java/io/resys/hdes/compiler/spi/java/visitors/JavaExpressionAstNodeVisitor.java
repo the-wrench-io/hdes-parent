@@ -20,13 +20,13 @@ package io.resys.hdes.compiler.spi.java.visitors;
  * #L%
  */
 
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.DecimalConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.AstNodeVisitor.ExpressionAstNodeVisitor;
@@ -87,19 +87,19 @@ public class JavaExpressionAstNodeVisitor implements ExpressionAstNodeVisitor {
   }
 
   @Override
-  public Object visitObjectInputNode(ObjectInputNode node) {
+  public Object visitObjectInputNode(ObjectTypeDefNode node) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Object visitArrayInputNode(ArrayInputNode node) {
+  public Object visitArrayInputNode(ArrayTypeDefNode node) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public Object visitScalarInputNode(ScalarInputNode node) {
+  public Object visitScalarInputNode(ScalarTypeDefNode node) {
     // TODO Auto-generated method stub
     return null;
   }

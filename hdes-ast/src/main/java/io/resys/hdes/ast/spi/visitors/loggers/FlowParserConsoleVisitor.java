@@ -25,7 +25,6 @@ import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
 import io.resys.hdes.ast.FlowParser;
 import io.resys.hdes.ast.FlowParser.ArrayTypeContext;
 import io.resys.hdes.ast.FlowParser.DebugValueContext;
-import io.resys.hdes.ast.FlowParser.EndTaskContext;
 import io.resys.hdes.ast.FlowParser.LiteralContext;
 import io.resys.hdes.ast.FlowParser.MappingArgContext;
 import io.resys.hdes.ast.FlowParser.MappingArgsContext;
@@ -37,7 +36,6 @@ import io.resys.hdes.ast.FlowParser.PointerContext;
 import io.resys.hdes.ast.FlowParser.ScalarTypeContext;
 import io.resys.hdes.ast.FlowParser.SimpleTypeContext;
 import io.resys.hdes.ast.FlowParser.TaskArgsContext;
-import io.resys.hdes.ast.FlowParser.TaskContext;
 import io.resys.hdes.ast.FlowParser.TaskRefContext;
 import io.resys.hdes.ast.FlowParser.TaskTypesContext;
 import io.resys.hdes.ast.FlowParser.ThenContext;
@@ -160,18 +158,6 @@ public class FlowParserConsoleVisitor extends FlowParserBaseVisitor<AstNode> {
   public AstNode visitTypeName(TypeNameContext ctx) {
     log(ctx);
     return super.visitTypeName(ctx);
-  }
-
-  @Override
-  public AstNode visitTask(TaskContext ctx) {
-    log(ctx);
-    return super.visitTask(ctx);
-  }
-
-  @Override
-  public AstNode visitEndTask(EndTaskContext ctx) {
-    log(ctx);
-    return super.visitEndTask(ctx);
   }
 
   @Override

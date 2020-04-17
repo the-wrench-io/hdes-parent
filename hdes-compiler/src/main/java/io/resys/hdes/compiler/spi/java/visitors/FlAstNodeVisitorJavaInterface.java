@@ -35,10 +35,10 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.InputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
@@ -131,7 +131,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     List<TypeSpec> nested = new ArrayList<>();
-    for (InputNode input : node.getValues()) {
+    for (TypeDefNode input : node.getValues()) {
       FlInputSpec spec = visitInput(input);
       nested.addAll(spec.getChildren());
       inputBuilder.addMethod(spec.getValue());
@@ -142,19 +142,19 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
         .build();
   }
 
-  private FlInputSpec visitInput(InputNode node) {
-    if (node instanceof ScalarInputNode) {
-      return visitScalarInputNode((ScalarInputNode) node);
-    } else if (node instanceof ArrayInputNode) {
-      return visitArrayInputNode((ArrayInputNode) node);
-    } else if (node instanceof ObjectInputNode) {
-      return visitObjectInputNode((ObjectInputNode) node);
+  private FlInputSpec visitInput(TypeDefNode node) {
+    if (node instanceof ScalarTypeDefNode) {
+      return visitScalarInputNode((ScalarTypeDefNode) node);
+    } else if (node instanceof ArrayTypeDefNode) {
+      return visitArrayInputNode((ArrayTypeDefNode) node);
+    } else if (node instanceof ObjectTypeDefNode) {
+      return visitObjectInputNode((ObjectTypeDefNode) node);
     }
     throw new HdesCompilerException(HdesCompilerException.builder().unknownFlInputRule(node));
   }
 
   @Override
-  public FlInputSpec visitScalarInputNode(ScalarInputNode node) {
+  public FlInputSpec visitScalarInputNode(ScalarTypeDefNode node) {
     Class<?> returnType = JavaNaming.type(node.getType());
     MethodSpec method = MethodSpec.methodBuilder(JavaNaming.getMethod(node.getName()))
         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -164,7 +164,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlInputSpec visitArrayInputNode(ArrayInputNode node) {
+  public FlInputSpec visitArrayInputNode(ArrayTypeDefNode node) {
     FlInputSpec childSpec = visitInput(node.getValue());
     com.squareup.javapoet.TypeName arrayType;
     if (node.getValue().getRequired()) {
@@ -181,13 +181,13 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlInputSpec visitObjectInputNode(ObjectInputNode node) {
+  public FlInputSpec visitObjectInputNode(ObjectTypeDefNode node) {
     TypeSpec.Builder objectBuilder = TypeSpec
         .interfaceBuilder(JavaNaming.flInputNested(body.getId(), node.getName()))
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     List<TypeSpec> nested = new ArrayList<>();
-    for (InputNode input : node.getValues()) {
+    for (TypeDefNode input : node.getValues()) {
       FlInputSpec spec = visitInput(input);
       nested.addAll(spec.getChildren());
       objectBuilder.addMethod(spec.getValue());

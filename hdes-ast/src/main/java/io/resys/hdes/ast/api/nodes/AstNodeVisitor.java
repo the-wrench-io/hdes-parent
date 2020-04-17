@@ -20,13 +20,13 @@ package io.resys.hdes.ast.api.nodes;
  * #L%
  */
 
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.DecimalConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
@@ -59,9 +59,9 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.PostIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.PreDecrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.PreIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.TypeRefNode;
+import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowReturnType;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
@@ -95,9 +95,9 @@ public interface AstNodeVisitor<T, R> {
   T visitDateTimeConversion(DateTimeConversion node);
   T visitTimeConversion(TimeConversion node);
   T visitDecimalConversion(DecimalConversion node);
-  T visitObjectInputNode(ObjectInputNode node);
-  T visitArrayInputNode(ArrayInputNode node);
-  T visitScalarInputNode(ScalarInputNode node);
+  T visitObjectInputNode(ObjectTypeDefNode node);
+  T visitArrayInputNode(ArrayTypeDefNode node);
+  T visitScalarInputNode(ScalarTypeDefNode node);
   
   // expression
   interface ExpressionAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> { 
@@ -144,12 +144,14 @@ public interface AstNodeVisitor<T, R> {
   // flow
   interface FlowAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
     R visitFlowBody(FlowBody node);
-    T visitFlowReturnType(FlowReturnType node);
     T visitFlowInputs(FlowInputs node);
     T visitFlowTask(FlowTask node);
+    
     T visitFlowTaskPointer(FlowTaskPointer node);
     T visitWhenThenPointer(WhenThenPointer node);
     T visitThenPointer(ThenPointer node);
+    T visitEndPointer(EndPointer node);
+    
     T visitWhenThen(WhenThen node);
     T visitWhen(When node);
     T visitMapping(Mapping node);

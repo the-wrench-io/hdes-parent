@@ -33,7 +33,7 @@ import io.resys.hdes.ast.FlowParser;
 import io.resys.hdes.ast.FlowParser.ArrayTypeContext;
 import io.resys.hdes.ast.FlowParser.DebugValueContext;
 import io.resys.hdes.ast.FlowParser.DescriptionContext;
-import io.resys.hdes.ast.FlowParser.EndTaskContext;
+import io.resys.hdes.ast.FlowParser.EndMappingContext;
 import io.resys.hdes.ast.FlowParser.FlowContext;
 import io.resys.hdes.ast.FlowParser.IdContext;
 import io.resys.hdes.ast.FlowParser.InputsContext;
@@ -44,11 +44,11 @@ import io.resys.hdes.ast.FlowParser.MappingContext;
 import io.resys.hdes.ast.FlowParser.MappingValueContext;
 import io.resys.hdes.ast.FlowParser.NextTaskContext;
 import io.resys.hdes.ast.FlowParser.ObjectTypeContext;
+import io.resys.hdes.ast.FlowParser.OutputDefsContext;
 import io.resys.hdes.ast.FlowParser.PointerContext;
 import io.resys.hdes.ast.FlowParser.ScalarTypeContext;
 import io.resys.hdes.ast.FlowParser.SimpleTypeContext;
 import io.resys.hdes.ast.FlowParser.TaskArgsContext;
-import io.resys.hdes.ast.FlowParser.TaskContext;
 import io.resys.hdes.ast.FlowParser.TaskRefContext;
 import io.resys.hdes.ast.FlowParser.TaskTypesContext;
 import io.resys.hdes.ast.FlowParser.TasksContext;
@@ -63,16 +63,17 @@ import io.resys.hdes.ast.FlowParser.WhenThenContext;
 import io.resys.hdes.ast.FlowParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.InputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.FlowNode;
+import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowReturnType;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowOutputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
@@ -82,15 +83,16 @@ import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
-import io.resys.hdes.ast.api.nodes.ImmutableArrayInputNode;
+import io.resys.hdes.ast.api.nodes.ImmutableArrayTypeDefNode;
+import io.resys.hdes.ast.api.nodes.ImmutableEndPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
-import io.resys.hdes.ast.api.nodes.ImmutableFlowReturnType;
+import io.resys.hdes.ast.api.nodes.ImmutableFlowOutputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTask;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableMapping;
-import io.resys.hdes.ast.api.nodes.ImmutableObjectInputNode;
-import io.resys.hdes.ast.api.nodes.ImmutableScalarInputNode;
+import io.resys.hdes.ast.api.nodes.ImmutableObjectTypeDefNode;
+import io.resys.hdes.ast.api.nodes.ImmutableScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableTaskRef;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhen;
@@ -123,8 +125,8 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     String getValue();
   }
   @Value.Immutable
-  public interface FwRedundentInputArgs extends FlowNode {
-    List<InputNode> getValues();
+  public interface FwRedundentTypeDefArgs extends FlowNode {
+    List<TypeDefNode> getValues();
   }
   @Value.Immutable
   public interface FwRedundentScalarType extends FlowNode {
@@ -137,7 +139,6 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   @Value.Immutable
   public interface FwRedundentTasks extends FlowNode {
     List<FlowTask> getValues();
-    FlowReturnType getReturnType();
   }  
   @Value.Immutable
   public interface FwRedundentMapping extends FlowNode {
@@ -171,8 +172,8 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
         .token(token(ctx))
         .id(children.of(FwRedundentId.class).get().getValue())
         .inputs(children.of(FlowInputs.class).get())
+        .outputs(children.of(FlowOutputs.class).get())
         .description(children.of(FwRedundentDescription.class).map(e -> e.getValue()).orElse(null))
-        .returnType(redundentTasks.getReturnType())
         .task(tasks.getFirst())
         .unreachableTasks(tasks.getUnclaimed())
         .build();
@@ -180,7 +181,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
 
   @Override
   public FlowInputs visitInputs(InputsContext ctx) {
-    List<InputNode> values = nodes(ctx).of(FwRedundentInputArgs.class)
+    List<TypeDefNode> values = nodes(ctx).of(ImmutableFwRedundentTypeDefArgs.class)
         .map(a -> a.getValues()).orElse(Collections.emptyList());
     return ImmutableFlowInputs.builder()
         .token(token(ctx))
@@ -189,23 +190,32 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
   
   @Override
+  public FlowOutputs visitOutputDefs(OutputDefsContext ctx) {
+    List<TypeDefNode> values = nodes(ctx).of(ImmutableFwRedundentTypeDefArgs.class)
+        .map(a -> a.getValues()).orElse(Collections.emptyList());
+    return ImmutableFlowOutputs.builder()
+        .token(token(ctx))
+        .values(values)
+        .build();
+  }
+
+  @Override
   public AstNode visitTypeDefs(TypeDefsContext ctx) {
-    return nodes(ctx).of(ImmutableFwRedundentInputArgs.class).orElseGet(() -> ImmutableFwRedundentInputArgs.builder()
+    return nodes(ctx).of(ImmutableFwRedundentTypeDefArgs.class).orElseGet(() -> ImmutableFwRedundentTypeDefArgs.builder()
         .token(token(ctx))
         .build());
   }
 
   @Override
   public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
-    return ImmutableFwRedundentInputArgs.builder()
+    return ImmutableFwRedundentTypeDefArgs.builder()
         .token(token(ctx))
-        .values(nodes(ctx).list(InputNode.class))
+        .values(nodes(ctx).list(TypeDefNode.class))
         .build();
   }
 
   @Override
   public AstNode visitTypeDef(TypeDefContext ctx) {
-    
     return nodes(ctx).of(AstNode.class).get();
   }
 
@@ -227,9 +237,9 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public ScalarInputNode visitSimpleType(SimpleTypeContext ctx) {
+  public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableScalarInputNode.builder()
+    return ImmutableScalarTypeDefNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
         .type(nodes.of(FwRedundentScalarType.class).get().getValue())
@@ -239,10 +249,10 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
   
   @Override
-  public ArrayInputNode visitArrayType(ArrayTypeContext ctx) {
+  public ArrayTypeDefNode visitArrayType(ArrayTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    InputNode input = nodes.of(InputNode.class).get();
-    return ImmutableArrayInputNode.builder()
+    TypeDefNode input = nodes.of(TypeDefNode.class).get();
+    return ImmutableArrayTypeDefNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
         .name(input.getName())
@@ -251,12 +261,12 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public ObjectInputNode visitObjectType(ObjectTypeContext ctx) {
+  public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    List<InputNode> values = nodes.of(FwRedundentInputArgs.class).map((FwRedundentInputArgs i)-> i.getValues())
+    List<TypeDefNode> values = nodes.of(FwRedundentTypeDefArgs.class).map((FwRedundentTypeDefArgs i)-> i.getValues())
         .orElse(Collections.emptyList());
     
-    return ImmutableObjectInputNode.builder()
+    return ImmutableObjectTypeDefNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
         .name(nodes.of(FwRedundentTypeName.class).get().getValue())
@@ -266,11 +276,9 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   
   @Override
   public FwRedundentTasks visitTasks(TasksContext ctx) {
-    AstNode.Token token = token(ctx);
     return nodes(ctx).of(FwRedundentTasks.class).orElse(
         ImmutableFwRedundentTasks.builder()
         .token(token(ctx))
-        .returnType(ImmutableFlowReturnType.builder().token(token).build())
         .build());
   }
 
@@ -281,20 +289,15 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     return ImmutableFwRedundentTasks.builder()
         .token(token)
         .values(nodes.list(FlowTask.class))
-        .returnType(nodes.of(FlowReturnType.class).orElse(ImmutableFlowReturnType.builder().token(token).build()))
         .build();
   }
 
   @Override
-  public AstNode visitTask(TaskContext ctx) {
-    return first(ctx);
-  }
-
-  @Override
-  public FlowReturnType visitEndTask(EndTaskContext ctx) {
-    return ImmutableFlowReturnType.builder()
+  public EndPointer visitEndMapping(EndMappingContext ctx) {
+    return ImmutableEndPointer.builder()
         .token(token(ctx))
-        .mapping(nodes(ctx).of(FwRedundentMapping.class).get().getValues())
+        .name("end")
+        .values(nodes(ctx).of(FwRedundentMapping.class).get().getValues())
         .build();
   }
 

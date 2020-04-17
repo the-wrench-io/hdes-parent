@@ -40,7 +40,7 @@ public interface FlJavaSpec {
   }
   @Value.Immutable
   public interface FlTaskImplSpec extends FlJavaSpec {
-    CodeBlock getStatement();
+    CodeBlock getValue();
     List<MethodSpec> getChildren();
   }
   public interface FlMethodSpec extends FlJavaSpec {

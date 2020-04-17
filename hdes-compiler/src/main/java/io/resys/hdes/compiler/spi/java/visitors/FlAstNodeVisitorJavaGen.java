@@ -1,5 +1,8 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*-
  * #%L
  * hdes-compiler
@@ -38,6 +41,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
+import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskImplSpec;
 
 public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
   
@@ -59,15 +63,25 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(ClassName.get("", node.getId()));
 
+    FlTaskImplSpec taskImpl = node.getTask().map(n -> visitFlowTask(n)).orElseGet(() ->
+      ImmutableFlTaskImplSpec.builder().value(CodeBlock.builder().add("// not tasks described ").build()).build()
+    );
+    
     MethodSpec applyMethod = MethodSpec.methodBuilder("apply")
         .addModifiers(Modifier.PUBLIC)
         .addParameter(ParameterSpec.builder(ClassName.get("", JavaNaming.flInput(node.getId())), "input").build())
         .returns(flowState)
         .addStatement(visitInit(node))
+        .addStatement(CodeBlock.builder()
+            .add(taskImpl.getValue())
+            .build())
         .addStatement(CodeBlock.builder().add("return currentState").build())
         .build();
  
-    return flowBuilder.addMethod(applyMethod).build();
+    return flowBuilder
+        .addMethod(applyMethod)
+        .addMethods(taskImpl.getChildren())
+        .build();
   }
   
   private CodeBlock visitInit(FlowBody node) {
@@ -77,21 +91,64 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   }
   
   @Override
-  public FlJavaSpec visitFlowTask(FlowTask node) {
-    // TODO Auto-generated method stub
-    return super.visitFlowTask(node);
+  public FlTaskImplSpec visitFlowTask(FlowTask node) {
+    List<MethodSpec> children = new ArrayList<>();
+    CodeBlock.Builder codeblock = CodeBlock.builder();
+    ClassName inputType = ClassName.get("", JavaNaming.flTaskInput(body.getId(), node.getId()));
+    ClassName outputType = ClassName.get("", JavaNaming.flTaskOutput(body.getId(), node.getId()));
+    
+    // visit method
+    if(node.getRef().isPresent()) {
+      String visitMethodName = JavaNaming.flVisitTask(node.getId());
+      MethodSpec.Builder visitBuilder = MethodSpec
+          .methodBuilder(visitMethodName)
+          .addModifiers(Modifier.PRIVATE)
+          .addParameter(ParameterSpec.builder(flowState, "currentState").build())
+          .returns(flowState);
+      children.add(visitBuilder.build());
+      
+      codeblock.add("currentState = $L(currentState)", visitMethodName);
+      
+      // create input
+      
+      // call ref
+      
+      // create output
+    }
+    
+    // tasks body
+    if(node.getNext().isPresent()) {
+      FlTaskImplSpec next = visitFlowTaskPointer(node.getNext().get());
+      codeblock.add(next.getValue());
+      children.addAll(next.getChildren());
+    }
+    
+    return ImmutableFlTaskImplSpec.builder()
+        .value(codeblock.build())
+        .addAllChildren(children)
+        .build();
   }
   
   @Override
-  public FlJavaSpec visitTaskRef(TaskRef node) {
+  public FlTaskImplSpec visitTaskRef(TaskRef node) {
     // TODO Auto-generated method stub
-    return super.visitTaskRef(node);
+    return ImmutableFlTaskImplSpec.builder().build();
   }
   
   @Override
-  public FlJavaSpec visitFlowTaskPointer(FlowTaskPointer node) {
-    // TODO Auto-generated method stub
-    return super.visitFlowTaskPointer(node);
+  public FlTaskImplSpec visitFlowTaskPointer(FlowTaskPointer node) {
+    // if / else
+    
+    
+    // next
+    if(node instanceof ThenPointer) {
+      ThenPointer then = (ThenPointer) node;
+      if(then.getTask().isPresent()) {
+        return visitFlowTask(then.getTask().get());
+      }
+    }
+    
+    return ImmutableFlTaskImplSpec.builder().build();
   }
   
   @Override

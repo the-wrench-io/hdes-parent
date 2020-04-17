@@ -28,6 +28,10 @@ import java.time.LocalTime;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 
 public class JavaNaming {
+  
+  public static String flVisitTask(String taskId) {
+    return "visit" + taskId;
+  }  
   public static String flTask(String flId, String taskId) {
     return flId + taskId;
   }

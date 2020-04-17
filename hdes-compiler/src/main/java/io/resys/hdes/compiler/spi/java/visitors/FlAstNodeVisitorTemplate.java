@@ -20,19 +20,19 @@ package io.resys.hdes.compiler.spi.java.visitors;
  * #L%
  */
 
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.DecimalConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.AstNodeVisitor.FlowAstNodeVisitor;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowReturnType;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowEndMapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
@@ -81,19 +81,19 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public T visitObjectInputNode(ObjectInputNode node) {
+  public T visitObjectInputNode(ObjectTypeDefNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitArrayInputNode(ArrayInputNode node) {
+  public T visitArrayInputNode(ArrayTypeDefNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitScalarInputNode(ScalarInputNode node) {
+  public T visitScalarInputNode(ScalarTypeDefNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
@@ -105,7 +105,7 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public T visitFlowReturnType(FlowReturnType node) {
+  public T visitFlowReturnType(FlowEndMapping node) {
     
     throw new IllegalArgumentException("Not implemented");
   }

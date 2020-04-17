@@ -37,7 +37,7 @@ import io.resys.hdes.ast.spi.visitors.loggers.FlowParserConsoleVisitor;
 public class FlowAstNodeTest {
   @Test
   public void basic() throws IOException {
-    parse("id: x description: 'very descriptive value' inputs: {} tasks: {}");
+    parse("id: x description: 'very descriptive value' inputs: {} outputs: {} tasks: {}");
   }
 
   @Test
@@ -49,6 +49,7 @@ public class FlowAstNodeTest {
               "required INTEGER arg1.x1 , \n" +
               "required INTEGER arg2.x1 \n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {" +
             "}\n");
   }
@@ -61,6 +62,7 @@ public class FlowAstNodeTest {
             "inputs: {\n " +
               "required OBJECT arg0: {} \n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {" +
             "}\n");
     
@@ -73,6 +75,7 @@ public class FlowAstNodeTest {
                 "required INTEGER lastName\n" +
               "} \n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {" +
             "}\n");
   }
@@ -86,6 +89,7 @@ public class FlowAstNodeTest {
             + "optional INTEGER arg1.x1,\n"
             + "required INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {"
             + "when: 'arg2.x1 > 10' then: nextTask,"
@@ -103,7 +107,9 @@ public class FlowAstNodeTest {
             + "required INTEGER arg1.x1,\n"
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {\n" +
+            
             "firstTask: {"
             + "then: nextTask"
             + "} " +
@@ -118,6 +124,7 @@ public class FlowAstNodeTest {
             + "optional INTEGER arg1.x1,\n"
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
@@ -134,6 +141,7 @@ public class FlowAstNodeTest {
             + "optional INTEGER arg1.x1,\n"
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" + 
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
@@ -150,6 +158,7 @@ public class FlowAstNodeTest {
             + "optional INTEGER arg1.x1,\n"
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
@@ -166,6 +175,7 @@ public class FlowAstNodeTest {
             + "optional INTEGER arg1.x1,\n"
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
@@ -182,6 +192,7 @@ public class FlowAstNodeTest {
             + "optional INTEGER arg1.x1,\n"
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: nextTask\n"
@@ -199,25 +210,23 @@ public class FlowAstNodeTest {
             + "optional INTEGER arg1.x1,\n"
             + "optional INTEGER arg2.x1\n" +
             "}\n" +
+            "outputs: {} \n" +
             "tasks: {\n" +
-            
             "firstTask: {\n"
-            + "then: endTask\n"
+
+            + "then end: {\n"
+            + "OBJECT mapping: {\n"
+              + "input1: arg1.x1,\n"
+              + "input2: arg2.x1\n"
+            + "}}\n"
+
             + "decisionTask: bestDtTask \n"
             + "OBJECT mapping: {\n"
               + "input1: arg1.x1,\n"
               + "input2: arg2.x1\n"
-            + "}\n"
-          + "},\n" + 
+            + "}\n"  
 
-          "end: {\n"
-          + "OBJECT mapping: {\n"
-            + "input1: arg1.x1,\n"
-            + "input2: arg2.x1\n"
-          + "}\n"
-        + "}\n"
-          
-        + "}\n");
+        + "}}\n");
   }
   
   

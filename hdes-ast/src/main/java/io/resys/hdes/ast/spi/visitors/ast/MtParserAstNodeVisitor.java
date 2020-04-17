@@ -73,14 +73,14 @@ import io.resys.hdes.ast.ManualTaskParser.WhenContext;
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.InputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectInputNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.ImmutableArrayInputNode;
+import io.resys.hdes.ast.api.nodes.ImmutableArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdown;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdownField;
 import io.resys.hdes.ast.api.nodes.ImmutableFields;
@@ -93,8 +93,8 @@ import io.resys.hdes.ast.api.nodes.ImmutableManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskInputs;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskStatements;
-import io.resys.hdes.ast.api.nodes.ImmutableObjectInputNode;
-import io.resys.hdes.ast.api.nodes.ImmutableScalarInputNode;
+import io.resys.hdes.ast.api.nodes.ImmutableObjectTypeDefNode;
+import io.resys.hdes.ast.api.nodes.ImmutableScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableStatement;
 import io.resys.hdes.ast.api.nodes.ImmutableThenStatement;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenStatement;
@@ -149,7 +149,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   }
   @Value.Immutable
   public interface MtRedundentInputArgs extends ManualTaskNode {
-    List<InputNode> getValues();
+    List<TypeDefNode> getValues();
   }
   @Value.Immutable
   public interface MtRedundentDropdownArgs extends ManualTaskNode {
@@ -258,7 +258,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   @Override
   public ManualTaskInputs visitInputs(InputsContext ctx) {
     Nodes nodes = nodes(ctx);
-    List<InputNode> values = nodes.of(MtRedundentInputArgs.class)
+    List<TypeDefNode> values = nodes.of(MtRedundentInputArgs.class)
         .map(a -> a.getValues()).orElse(Collections.emptyList());
     return ImmutableManualTaskInputs.builder()
         .token(token(ctx))
@@ -285,7 +285,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
     return ImmutableMtRedundentInputArgs.builder()
         .token(token(ctx))
-        .values(nodes(ctx).list(InputNode.class))
+        .values(nodes(ctx).list(TypeDefNode.class))
         .build();
   }
 
@@ -305,9 +305,9 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   }
   
   @Override
-  public ScalarInputNode visitSimpleType(SimpleTypeContext ctx) {
+  public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableScalarInputNode.builder()
+    return ImmutableScalarTypeDefNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
         .type(nodes.of(MtRedundentScalarType.class).get().getValue())
@@ -316,20 +316,20 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .build();
   }
   @Override
-  public ArrayInputNode visitArrayType(ArrayTypeContext ctx) {
+  public ArrayTypeDefNode visitArrayType(ArrayTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableArrayInputNode.builder()
+    return ImmutableArrayTypeDefNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
-        .value(nodes.of(InputNode.class).get())
+        .value(nodes.of(TypeDefNode.class).get())
         .build();
   }
   @Override
-  public ObjectInputNode visitObjectType(ObjectTypeContext ctx) {
+  public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    List<InputNode> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
+    List<TypeDefNode> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
         .orElse(Collections.emptyList()); 
-    return ImmutableObjectInputNode.builder()
+    return ImmutableObjectTypeDefNode.builder()
         .token(token(ctx))
         .required(isRequiredInputType(ctx))
         .name(nodes.of(FwRedundentTypeName.class).get().getValue())

@@ -14,11 +14,10 @@ ScalarType
   | STRING
   | BOOLEAN;
 
-// BETWEEN/AND/OR/END operators
+// BETWEEN/AND/OR operators
 BETWEEN: B E T W E E N;
 AND: A N D;
 OR: O R;
-END: E N D;
 NOT_OP: N O T;
 fragment A : [aA];
 fragment B : [bB];
@@ -76,6 +75,7 @@ DEFAULT_VALUE: 'defaultValue';
 
 // FLOW
 INPUTS: 'inputs';
+OUTPUTS: 'outputs';
 TASKS: 'tasks';
 DEBUG_VALUE: 'debugValue';
 REQUIRED: 'required';
@@ -83,6 +83,7 @@ OPTIONAL: 'optional';
 MAPPING: 'mapping';
 WHEN: 'when';
 THEN: 'then';
+END: 'end';
 
 // MARKS
 QUESTION_MARK: '?';

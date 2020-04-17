@@ -44,7 +44,7 @@ public interface ManualTaskNode extends AstNode {
   
   @Value.Immutable
   interface ManualTaskInputs extends ManualTaskNode {
-    List<InputNode> getValues();
+    List<TypeDefNode> getValues();
   }  
   @Value.Immutable
   interface ManualTaskDropdowns extends ManualTaskNode {

@@ -84,23 +84,23 @@ public interface AstNode {
     List<AstNode> getServices();
   }
   
-  interface InputNode extends AstNode {
+  interface TypeDefNode extends AstNode {
     Boolean getRequired();    
     String getName();
   }
   
   @Value.Immutable
-  interface ObjectInputNode extends InputNode {
-    List<InputNode> getValues();
+  interface ObjectTypeDefNode extends TypeDefNode {
+    List<TypeDefNode> getValues();
   }
   
   @Value.Immutable
-  interface ArrayInputNode extends InputNode {
-    InputNode getValue();
+  interface ArrayTypeDefNode extends TypeDefNode {
+    TypeDefNode getValue();
   }
   
   @Value.Immutable
-  interface ScalarInputNode extends InputNode {
+  interface ScalarTypeDefNode extends TypeDefNode {
     Optional<String> getDebugValue();
     ScalarType getType();
   }
