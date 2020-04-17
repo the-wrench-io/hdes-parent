@@ -46,6 +46,9 @@ public class JavaNaming {
   public static String flState(String flId) {
     return flId + "State";
   }
+  public static String flImpl(String flId) {
+    return "Gen" + flId;
+  }
   
   public static String dtImpl(String dtId) {
     return "Gen" + dtId;

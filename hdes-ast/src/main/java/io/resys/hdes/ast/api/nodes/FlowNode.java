@@ -62,6 +62,7 @@ public interface FlowNode extends AstNode {
   interface WhenThenPointer extends FlowTaskPointer {
     List<WhenThen> getValues();
   }
+  
   @Value.Immutable
   interface ThenPointer extends FlowTaskPointer {
     String getName();

@@ -56,11 +56,9 @@ public class JavaAstEnvirVisitor {
   }
   private void visit(FlowBody body) {
     TypeSpec superInterface = visit(new FlAstNodeVisitorJavaInterface().visitFlowBody(body));
-    //TypeSpec implementation = visit(new DtAstNodeVisitorJavaGen().visitDecisionTableBody(body));
+    TypeSpec implementation = visit(new FlAstNodeVisitorJavaGen().visitFlowBody(body));
   }
-  
-  
-  
+
   private TypeSpec visit(TypeSpec type) {
     try {
       JavaFile file = JavaFile.builder(JavaAstEnvirVisitor.class.getPackage().getName(), type).build();
