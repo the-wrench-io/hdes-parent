@@ -34,14 +34,13 @@ import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.api.ImmutableCode;
 
 public class JavaAstEnvirVisitor {
-  
   public Code visit(AstEnvir envir) {
     
     for(AstNode ast : envir.getValues()) {
       if(ast instanceof DecisionTableBody) {
         visit((DecisionTableBody) ast);
       } else if(ast instanceof FlowBody) {
-        visit((FlowBody) ast);
+        visit((FlowBody) ast, envir);
       } else {
         throw new HdesCompilerException(HdesCompilerException.builder().unknownAst(ast));
       }
@@ -54,9 +53,9 @@ public class JavaAstEnvirVisitor {
     TypeSpec superInterface = visit(new DtAstNodeVisitorJavaInterface().visitDecisionTableBody(body));
     TypeSpec implementation = visit(new DtAstNodeVisitorJavaGen().visitDecisionTableBody(body));
   }
-  private void visit(FlowBody body) {
+  private void visit(FlowBody body, AstEnvir envir) {
     TypeSpec superInterface = visit(new FlAstNodeVisitorJavaInterface().visitFlowBody(body));
-    TypeSpec implementation = visit(new FlAstNodeVisitorJavaGen().visitFlowBody(body));
+    TypeSpec implementation = visit(new FlAstNodeVisitorJavaGen(envir).visitFlowBody(body));
   }
 
   private TypeSpec visit(TypeSpec type) {

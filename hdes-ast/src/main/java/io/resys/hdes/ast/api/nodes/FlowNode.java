@@ -32,8 +32,7 @@ public interface FlowNode extends AstNode {
   interface FlowTaskPointer extends FlowNode {}
   
   @Value.Immutable
-  interface FlowBody extends FlowNode {
-    String getId();
+  interface FlowBody extends FlowNode, BodyNode {
     String getDescription();
     FlowInputs getInputs();
     List<FlowTask> getUnreachableTasks();
@@ -92,7 +91,7 @@ public interface FlowNode extends AstNode {
   interface TaskRef extends FlowNode {
     RefTaskType getType();
     String getValue();
-    // external
+    // external flow/dt/mt
     Optional<AstNode> getNode();
     List<Mapping> getMapping();
   }

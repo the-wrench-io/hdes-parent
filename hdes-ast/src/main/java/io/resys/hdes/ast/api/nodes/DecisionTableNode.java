@@ -32,8 +32,7 @@ public interface DecisionTableNode extends AstNode {
   interface RuleValue extends DecisionTableNode {}
   
   @Value.Immutable
-  interface DecisionTableBody extends DecisionTableNode {
-    String getId();
+  interface DecisionTableBody extends DecisionTableNode, BodyNode {
     Optional<String> getDescription();
     HitPolicy getHitPolicy();
     Headers getHeaders();

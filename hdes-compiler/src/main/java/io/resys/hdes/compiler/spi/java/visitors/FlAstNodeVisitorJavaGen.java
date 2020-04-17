@@ -28,6 +28,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
@@ -39,8 +40,15 @@ import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 
 public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
+  
+  private final AstEnvir envir;
   private FlowBody body;
   private ClassName flowState;
+  
+  public FlAstNodeVisitorJavaGen(AstEnvir envir) {
+    super();
+    this.envir = envir;
+  }
   
   @Override
   public TypeSpec visitFlowBody(FlowBody node) {

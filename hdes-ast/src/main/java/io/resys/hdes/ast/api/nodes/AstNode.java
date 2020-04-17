@@ -27,6 +27,10 @@ import org.immutables.value.Value;
 public interface AstNode {
   Token getToken();
   
+  interface BodyNode extends AstNode {
+    String getId();
+  }
+  
   @Value.Immutable
   interface TypeName extends AstNode {
     String getValue();
