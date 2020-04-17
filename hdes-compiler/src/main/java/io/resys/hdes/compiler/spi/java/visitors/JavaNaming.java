@@ -28,7 +28,15 @@ import java.time.LocalTime;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 
 public class JavaNaming {
-
+  public static String flTask(String flId, String taskId) {
+    return flId + taskId;
+  }
+  public static String flTaskInput(String flId, String taskId) {
+    return flId + taskId + "Input";
+  }
+  public static String flTaskOutput(String flId, String taskId) {
+    return flId + taskId + "Output";
+  }
   public static String flInput(String flId) {
     return flId + "Input";
   }

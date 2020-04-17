@@ -1,6 +1,7 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +27,7 @@ import java.util.Optional;
 
 import javax.lang.model.element.Modifier;
 
+import org.immutables.value.Value;
 import org.immutables.value.Value.Immutable;
 
 import com.squareup.javapoet.ClassName;
@@ -40,7 +42,10 @@ import io.resys.hdes.ast.api.nodes.AstNode.ScalarInputNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.compiler.api.Flow;
+import io.resys.hdes.compiler.api.Flow.FlowState;
+import io.resys.hdes.compiler.api.Flow.FlowTaskState;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlInputSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskSpec;
@@ -54,19 +59,70 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
     this.body = node;
     ClassName inputType = ClassName.get("", JavaNaming.flInput(node.getId()));
     ClassName stateType = ClassName.get("", JavaNaming.flState(node.getId()));
-    TypeSpec.Builder interfaceBuilder = TypeSpec.interfaceBuilder(node.getId())
+    TypeSpec.Builder flowBuilder = TypeSpec.interfaceBuilder(node.getId())
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(ParameterizedTypeName.get(
             ClassName.get(Flow.class),
             inputType,
             stateType))
         .addTypes(visitFlowInputs(node.getInputs()).getValues());
-    return interfaceBuilder.build();
-  }
-  @Override
-    public FlTaskSpec visitFlowTask(FlowTask node) {
-      return super.visitFlowTask(node);
+
+    // State
+    TypeSpec.Builder stateBuilder = TypeSpec.interfaceBuilder(stateType)
+        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addAnnotation(Value.Immutable.class)
+        .addSuperinterface(ParameterizedTypeName.get(
+            ClassName.get(FlowState.class),
+            inputType));
+    // tasks
+    if (node.getTask().isPresent()) {
+      FlTaskSpec taskSpecs = visitFlowTask(node.getTask().get());
+      
+      for(TypeSpec task : taskSpecs.getChildren()) {
+        stateBuilder.addMethod(MethodSpec
+            .methodBuilder(JavaNaming.getMethod(task.name.substring(body.getId().length())))
+            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+            .returns(ParameterizedTypeName.get(
+                ClassName.get(Optional.class),
+                ClassName.get("", task.name)))
+            .build()
+            );
+      }
+      
+      flowBuilder.addTypes(taskSpecs.getChildren());
     }
+    return flowBuilder.addType(stateBuilder.build()).build();
+  }
+
+  @Override
+  public FlTaskSpec visitFlowTask(FlowTask node) {
+    ClassName inputType = ClassName.get("", JavaNaming.flTaskInput(body.getId(), node.getId()));
+    ClassName outputType = ClassName.get("", JavaNaming.flTaskOutput(body.getId(), node.getId()));
+
+    TypeSpec.Builder stateBuilder = TypeSpec.interfaceBuilder(JavaNaming.flTask(body.getId(), node.getId()))
+        .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+        .addAnnotation(Value.Immutable.class)
+        .addSuperinterface(ParameterizedTypeName.get(
+            ClassName.get(FlowTaskState.class),
+            inputType, outputType));
+
+    List<TypeSpec> children = node.getNext()
+        .map(e -> visitFlowTaskPointer(e).getChildren())
+        .orElse(Collections.emptyList());
+
+    return ImmutableFlTaskSpec.builder()
+        .addAllChildren(children)
+        .addChildren(stateBuilder.build())
+        .build();
+  }
+
+  @Override
+  public FlTaskSpec visitFlowTaskPointer(FlowTaskPointer node) {
+    return ImmutableFlTaskSpec.builder()
+        //.addAllChildren(children)
+        //.addChildren(stateBuilder.build())
+        .build();
+  }
 
   @Override
   public FlTypesSpec visitFlowInputs(FlowInputs node) {
@@ -74,54 +130,48 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
         .interfaceBuilder(JavaNaming.flInput(body.getId()))
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-    
     List<TypeSpec> nested = new ArrayList<>();
-    for(InputNode input : node.getValues()) {
+    for (InputNode input : node.getValues()) {
       FlInputSpec spec = visitInput(input);
       nested.addAll(spec.getChildren());
       inputBuilder.addMethod(spec.getValue());
     }
-    
     return ImmutableFlTypesSpec.builder()
         .addValues(inputBuilder.build())
         .addAllValues(nested)
         .build();
   }
-  
+
   private FlInputSpec visitInput(InputNode node) {
-    if(node instanceof ScalarInputNode) {
+    if (node instanceof ScalarInputNode) {
       return visitScalarInputNode((ScalarInputNode) node);
-    } else if(node instanceof ArrayInputNode) {
+    } else if (node instanceof ArrayInputNode) {
       return visitArrayInputNode((ArrayInputNode) node);
-    } else if(node instanceof ObjectInputNode) {
+    } else if (node instanceof ObjectInputNode) {
       return visitObjectInputNode((ObjectInputNode) node);
     }
     throw new HdesCompilerException(HdesCompilerException.builder().unknownFlInputRule(node));
   }
-  
+
   @Override
   public FlInputSpec visitScalarInputNode(ScalarInputNode node) {
     Class<?> returnType = JavaNaming.type(node.getType());
-    
     MethodSpec method = MethodSpec.methodBuilder(JavaNaming.getMethod(node.getName()))
         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
         .returns(node.getRequired() ? ClassName.get(returnType) : ParameterizedTypeName.get(Optional.class, returnType))
         .build();
-    
     return ImmutableFlInputSpec.builder().value(method).build();
   }
 
   @Override
   public FlInputSpec visitArrayInputNode(ArrayInputNode node) {
     FlInputSpec childSpec = visitInput(node.getValue());
-    
     com.squareup.javapoet.TypeName arrayType;
-    if(node.getValue().getRequired()) {
+    if (node.getValue().getRequired()) {
       arrayType = childSpec.getValue().returnType;
     } else {
       arrayType = ((ParameterizedTypeName) childSpec.getValue().returnType).typeArguments.get(0);
     }
-    
     return ImmutableFlInputSpec.builder()
         .value(childSpec.getValue().toBuilder()
             .returns(ParameterizedTypeName.get(ClassName.get(List.class), arrayType))
@@ -136,25 +186,22 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
         .interfaceBuilder(JavaNaming.flInputNested(body.getId(), node.getName()))
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-    
     List<TypeSpec> nested = new ArrayList<>();
-    for(InputNode input : node.getValues()) {
+    for (InputNode input : node.getValues()) {
       FlInputSpec spec = visitInput(input);
       nested.addAll(spec.getChildren());
       objectBuilder.addMethod(spec.getValue());
     }
     TypeSpec objectType = objectBuilder.build();
     ClassName objectTypeName = ClassName.get("", objectType.name);
-    
     nested.add(objectType);
     return ImmutableFlInputSpec.builder()
         .children(nested)
         .value(
             MethodSpec.methodBuilder(JavaNaming.getMethod(node.getName()))
-            .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-            .returns(node.getRequired() ? objectTypeName : ParameterizedTypeName.get(ClassName.get(Optional.class), objectTypeName))
-            .build()
-            )
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .returns(node.getRequired() ? objectTypeName : ParameterizedTypeName.get(ClassName.get(Optional.class), objectTypeName))
+                .build())
         .build();
   }
 }
