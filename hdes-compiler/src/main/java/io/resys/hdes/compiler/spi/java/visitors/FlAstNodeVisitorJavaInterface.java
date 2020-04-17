@@ -88,7 +88,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
             .build()
             );
       }
-      
+
       flowBuilder.addTypes(taskSpecs.getChildren());
     }
     return flowBuilder.addType(stateBuilder.build()).build();
