@@ -33,7 +33,7 @@ import io.resys.hdes.ast.api.nodes.AstNodeVisitor.FlowAstNodeVisitor;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
@@ -111,7 +111,7 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public T visitFlowTask(FlowTask node) {
+  public T visitFlowTask(FlowTaskNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }

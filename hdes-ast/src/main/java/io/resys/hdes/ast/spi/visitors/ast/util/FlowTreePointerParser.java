@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
 import io.resys.hdes.ast.api.AstNodeException;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
@@ -46,31 +46,31 @@ import io.resys.hdes.ast.spi.visitors.ast.FwParserAstNodeVisitor.FwRedundentTask
 public class FlowTreePointerParser {
   @Value.Immutable
   public interface FwRedundentOrderedTasks {
-    Optional<FlowTask> getFirst();
+    Optional<FlowTaskNode> getFirst();
 
-    List<FlowTask> getUnclaimed();
+    List<FlowTaskNode> getUnclaimed();
   }
 
-  private final Map<String, FlowTask> createdTasks = new HashMap<>();
-  private Map<String, FlowTask> sourceTasks;
+  private final Map<String, FlowTaskNode> createdTasks = new HashMap<>();
+  private Map<String, FlowTaskNode> sourceTasks;
   
   public FwRedundentOrderedTasks visit(FwRedundentTasks redundentTasks) {
-    List<FlowTask> tasks = redundentTasks.getValues();
+    List<FlowTaskNode> tasks = redundentTasks.getValues();
     if (tasks.isEmpty()) {
       return ImmutableFwRedundentOrderedTasks.builder().build();
     }
     sourceTasks = redundentTasks.getValues().stream()
         .collect(Collectors.toMap(e -> e.getId(), e -> e));
-    FlowTask first = visit(tasks.get(0));
+    FlowTaskNode first = visit(tasks.get(0));
     
-    List<FlowTask> unclaimed = sourceTasks.values().stream()
+    List<FlowTaskNode> unclaimed = sourceTasks.values().stream()
     .filter(src -> !createdTasks.containsKey(src.getId()))
     .collect(Collectors.toList());
     
     return ImmutableFwRedundentOrderedTasks.builder().first(first).unclaimed(unclaimed).build();
   }
 
-  private FlowTask visit(FlowTask task) {
+  private FlowTaskNode visit(FlowTaskNode task) {
     if (createdTasks.containsKey(task.getId())) {
       return createdTasks.get(task.getId());
     }
@@ -80,7 +80,7 @@ public class FlowTreePointerParser {
       return task;
     }
     next = visit(next.get());
-    FlowTask clone = ImmutableFlowTask.builder().from(task).next(next).build();
+    FlowTaskNode clone = ImmutableFlowTask.builder().from(task).next(next).build();
     createdTasks.put(clone.getId(), clone);
     return clone;
   }
@@ -124,8 +124,8 @@ public class FlowTreePointerParser {
     if(createdTasks.containsKey(taskName)) {
       return Optional.of(ImmutableThenPointer.builder().from(pointer).task(createdTasks.get(taskName)).build());
     } else if(sourceTasks.containsKey(taskName)) {
-      FlowTask src = sourceTasks.get(taskName);
-      FlowTask result = visit(src);
+      FlowTaskNode src = sourceTasks.get(taskName);
+      FlowTaskNode result = visit(src);
       return Optional.of(ImmutableThenPointer.builder().from(pointer).task(result).build());
     } else if(taskName.equalsIgnoreCase("end")) {
       return Optional.empty();
@@ -139,7 +139,7 @@ public class FlowTreePointerParser {
     if(!sourceTasks.values().isEmpty()) {
       message.append(System.lineSeparator()).append("Expecting one of: ");
     }
-    for(FlowTask task : sourceTasks.values()) {
+    for(FlowTaskNode task : sourceTasks.values()) {
       message.append(System.lineSeparator()).append("  - ").append(task.getId()).append(" (line: ").append(task.getToken().getLine()).append(")");
     }
     throw new AstNodeException(Arrays.asList(ImmutableErrorNode.builder()

@@ -59,6 +59,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
 import io.resys.hdes.compiler.api.EqualityAssert;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpecPair;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
@@ -66,10 +67,16 @@ import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
 public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec, TypeSpec> {
   
   private final static String HEADER_REF = "//header ref to be replaces";
+  private final NamingContext naming;
   private DecisionTableBody body;
   private ClassName input;
   private ClassName output;
   
+  public DtAstNodeVisitorJavaGen(NamingContext naming) {
+    super();
+    this.naming = naming;
+  }
+
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {
     this.body = node;

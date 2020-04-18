@@ -31,27 +31,9 @@ public class JavaNaming {
   
   public static String flVisitTask(String taskId) {
     return "visit" + taskId;
-  }  
-  public static String flTask(String flId, String taskId) {
-    return flId + taskId;
-  }
-  public static String flTaskInput(String flId, String taskId) {
-    return flId + taskId + "Input";
-  }
-  public static String flTaskOutput(String flId, String taskId) {
-    return flId + taskId + "Output";
-  }
-  public static String flInput(String flId) {
-    return flId + "Input";
-  }
+  } 
   public static String flInputNested(String flId, String inputName) {
     return flId + capitalize(inputName) + "Input";
-  }
-  public static String flState(String flId) {
-    return flId + "State";
-  }
-  public static String flImpl(String flId) {
-    return "Gen" + flId;
   }
   
   public static String dtImpl(String dtId) {

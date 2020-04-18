@@ -38,12 +38,19 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
+import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtTypesSpec;
 
 public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJavaSpec, TypeSpec> {
 
+  private final NamingContext naming;
   private DecisionTableBody body;
+
+  public DtAstNodeVisitorJavaInterface(NamingContext naming) {
+    super();
+    this.naming = naming;
+  }
   
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {

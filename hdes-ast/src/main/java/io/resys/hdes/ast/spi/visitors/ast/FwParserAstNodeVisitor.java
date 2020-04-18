@@ -74,7 +74,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowOutputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.RefTaskType;
@@ -138,7 +138,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }  
   @Value.Immutable
   public interface FwRedundentTasks extends FlowNode {
-    List<FlowTask> getValues();
+    List<FlowTaskNode> getValues();
   }  
   @Value.Immutable
   public interface FwRedundentMapping extends FlowNode {
@@ -168,7 +168,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     FwRedundentTasks redundentTasks = children.of(FwRedundentTasks.class).get();
     FwRedundentOrderedTasks tasks = new FlowTreePointerParser().visit(redundentTasks);
     
-    for(FlowTask unclaimed : tasks.getUnclaimed()) {
+    for(FlowTaskNode unclaimed : tasks.getUnclaimed()) {
       break;
     }
     
@@ -292,7 +292,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     AstNode.Token token = token(ctx);
     return ImmutableFwRedundentTasks.builder()
         .token(token)
-        .values(nodes.list(FlowTask.class))
+        .values(nodes.list(FlowTaskNode.class))
         .build();
   }
 
@@ -306,7 +306,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public FlowTask visitNextTask(NextTaskContext ctx) {
+  public FlowTaskNode visitNextTask(NextTaskContext ctx) {
     Nodes nodes = nodes(ctx);
     return ImmutableFlowTask.builder()
         .token(token(ctx))

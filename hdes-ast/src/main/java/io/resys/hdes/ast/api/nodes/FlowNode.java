@@ -36,8 +36,8 @@ public interface FlowNode extends AstNode {
     String getDescription();
     FlowInputs getInputs();
     FlowOutputs getOutputs(); 
-    List<FlowTask> getUnreachableTasks();
-    Optional<FlowTask> getTask();
+    List<FlowTaskNode> getUnreachableTasks();
+    Optional<FlowTaskNode> getTask();
   }
 
   @Value.Immutable
@@ -52,7 +52,7 @@ public interface FlowNode extends AstNode {
   
   
   @Value.Immutable
-  interface FlowTask extends FlowNode {
+  interface FlowTaskNode extends FlowNode {
     String getId();
     Optional<FlowTaskPointer> getNext();
     Optional<TaskRef> getRef();
@@ -67,7 +67,7 @@ public interface FlowNode extends AstNode {
   interface ThenPointer extends FlowTaskPointer {
     String getName();
     // Only possible in invalid tree
-    Optional<FlowTask> getTask();
+    Optional<FlowTaskNode> getTask();
   }
 
   @Value.Immutable

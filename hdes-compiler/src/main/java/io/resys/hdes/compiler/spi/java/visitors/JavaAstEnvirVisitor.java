@@ -32,10 +32,13 @@ import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.compiler.api.HdesCompiler.Code;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.api.ImmutableCode;
+import io.resys.hdes.compiler.spi.NamingContext;
+import io.resys.hdes.compiler.spi.java.JavaNamingContext;
 
 public class JavaAstEnvirVisitor {
+  private final NamingContext naming = JavaNamingContext.config().build();
+  
   public Code visit(AstEnvir envir) {
-    
     for(AstNode ast : envir.getValues()) {
       if(ast instanceof DecisionTableBody) {
         visit((DecisionTableBody) ast);
@@ -50,12 +53,12 @@ public class JavaAstEnvirVisitor {
   }
   
   private void visit(DecisionTableBody body) {
-    TypeSpec superInterface = visit(new DtAstNodeVisitorJavaInterface().visitDecisionTableBody(body));
-    TypeSpec implementation = visit(new DtAstNodeVisitorJavaGen().visitDecisionTableBody(body));
+    TypeSpec superInterface = visit(new DtAstNodeVisitorJavaInterface(naming).visitDecisionTableBody(body));
+    TypeSpec implementation = visit(new DtAstNodeVisitorJavaGen(naming).visitDecisionTableBody(body));
   }
   private void visit(FlowBody body, AstEnvir envir) {
-    TypeSpec superInterface = visit(new FlAstNodeVisitorJavaInterface().visitFlowBody(body));
-    TypeSpec implementation = visit(new FlAstNodeVisitorJavaGen(envir).visitFlowBody(body));
+    TypeSpec superInterface = visit(new FlAstNodeVisitorJavaInterface(naming).visitFlowBody(body));
+    TypeSpec implementation = visit(new FlAstNodeVisitorJavaGen(envir, naming).visitFlowBody(body));
   }
 
   private TypeSpec visit(TypeSpec type) {

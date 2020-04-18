@@ -33,7 +33,7 @@ import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
@@ -41,25 +41,28 @@ import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
+import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskImplSpec;
 
 public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
   
   private final AstEnvir envir;
+  private final NamingContext naming;
   private FlowBody body;
   private ClassName flowState;
   
-  public FlAstNodeVisitorJavaGen(AstEnvir envir) {
+  public FlAstNodeVisitorJavaGen(AstEnvir envir, NamingContext naming) {
     super();
     this.envir = envir;
+    this.naming = naming;
   }
   
   @Override
   public TypeSpec visitFlowBody(FlowBody node) {
     this.body = node;
-    this.flowState = ClassName.get("", JavaNaming.flState(node.getId()));
+    this.flowState = naming.fl().state(node);
     
-    TypeSpec.Builder flowBuilder = TypeSpec.classBuilder(ClassName.get("", JavaNaming.flImpl(node.getId())))
+    TypeSpec.Builder flowBuilder = TypeSpec.classBuilder(naming.fl().impl(node))
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(ClassName.get("", node.getId()));
 
@@ -69,7 +72,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     
     MethodSpec applyMethod = MethodSpec.methodBuilder("apply")
         .addModifiers(Modifier.PUBLIC)
-        .addParameter(ParameterSpec.builder(ClassName.get("", JavaNaming.flInput(node.getId())), "input").build())
+        .addParameter(ParameterSpec.builder(naming.fl().input(node), "input").build())
         .returns(flowState)
         .addStatement(visitInit(node))
         .addCode(CodeBlock.builder()
@@ -91,11 +94,11 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   }
   
   @Override
-  public FlTaskImplSpec visitFlowTask(FlowTask node) {
+  public FlTaskImplSpec visitFlowTask(FlowTaskNode node) {
     List<MethodSpec> children = new ArrayList<>();
     CodeBlock.Builder codeblock = CodeBlock.builder();
-    ClassName inputType = ClassName.get("", JavaNaming.flTaskInput(body.getId(), node.getId()));
-    ClassName outputType = ClassName.get("", JavaNaming.flTaskOutput(body.getId(), node.getId()));
+    ClassName inputType = naming.fl().taskInput(body, node);
+    ClassName outputType = naming.fl().taskOutput(body, node);
     
     // visit method
     if(node.getRef().isPresent()) {

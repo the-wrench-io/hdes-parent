@@ -36,44 +36,44 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
-import io.resys.hdes.compiler.api.Flow;
-import io.resys.hdes.compiler.api.Flow.FlowState;
-import io.resys.hdes.compiler.api.Flow.FlowTaskState;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlInputSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTypesSpec;
 
 public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
+  private final NamingContext naming;
   private FlowBody body;
+
+  public FlAstNodeVisitorJavaInterface(NamingContext naming) {
+    super();
+    this.naming = naming;
+  }
 
   @Override
   public TypeSpec visitFlowBody(FlowBody node) {
     this.body = node;
-    ClassName inputType = ClassName.get("", JavaNaming.flInput(node.getId()));
-    ClassName stateType = ClassName.get("", JavaNaming.flState(node.getId()));
+    
     TypeSpec.Builder flowBuilder = TypeSpec.interfaceBuilder(node.getId())
         .addModifiers(Modifier.PUBLIC)
-        .addSuperinterface(ParameterizedTypeName.get(
-            ClassName.get(Flow.class),
-            inputType,
-            stateType))
+        .addSuperinterface(naming.fl().superinterface(node))
         .addTypes(visitFlowInputs(node.getInputs()).getValues());
 
     // State
-    TypeSpec.Builder stateBuilder = TypeSpec.interfaceBuilder(stateType)
+    TypeSpec.Builder stateBuilder = TypeSpec
+        .interfaceBuilder(naming.fl().state(node))
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .addAnnotation(Value.Immutable.class)
-        .addSuperinterface(ParameterizedTypeName.get(
-            ClassName.get(FlowState.class),
-            inputType));
+        .addSuperinterface(naming.fl().stateSuperinterface(node));
+    
     // tasks
     if (node.getTask().isPresent()) {
       FlTaskSpec taskSpecs = visitFlowTask(node.getTask().get());
@@ -95,16 +95,11 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlTaskSpec visitFlowTask(FlowTask node) {
-    ClassName inputType = ClassName.get("", JavaNaming.flTaskInput(body.getId(), node.getId()));
-    ClassName outputType = ClassName.get("", JavaNaming.flTaskOutput(body.getId(), node.getId()));
-
-    TypeSpec.Builder stateBuilder = TypeSpec.interfaceBuilder(JavaNaming.flTask(body.getId(), node.getId()))
+  public FlTaskSpec visitFlowTask(FlowTaskNode node) {
+    TypeSpec.Builder stateBuilder = TypeSpec.interfaceBuilder(naming.fl().taskState(body, node))
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .addAnnotation(Value.Immutable.class)
-        .addSuperinterface(ParameterizedTypeName.get(
-            ClassName.get(FlowTaskState.class),
-            inputType, outputType));
+        .addSuperinterface(naming.fl().taskStateSuperinterface(body, node));
 
     List<TypeSpec> children = node.getNext()
         .map(e -> visitFlowTaskPointer(e).getChildren())
@@ -127,7 +122,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   @Override
   public FlTypesSpec visitFlowInputs(FlowInputs node) {
     TypeSpec.Builder inputBuilder = TypeSpec
-        .interfaceBuilder(JavaNaming.flInput(body.getId()))
+        .interfaceBuilder(naming.fl().input(body))
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     List<TypeSpec> nested = new ArrayList<>();

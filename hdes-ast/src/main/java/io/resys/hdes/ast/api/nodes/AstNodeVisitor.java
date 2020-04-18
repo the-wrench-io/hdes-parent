@@ -62,7 +62,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.TypeRefNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowTask;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
@@ -145,7 +145,7 @@ public interface AstNodeVisitor<T, R> {
   interface FlowAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
     R visitFlowBody(FlowBody node);
     T visitFlowInputs(FlowInputs node);
-    T visitFlowTask(FlowTask node);
+    T visitFlowTask(FlowTaskNode node);
     
     T visitFlowTaskPointer(FlowTaskPointer node);
     T visitWhenThenPointer(WhenThenPointer node);
