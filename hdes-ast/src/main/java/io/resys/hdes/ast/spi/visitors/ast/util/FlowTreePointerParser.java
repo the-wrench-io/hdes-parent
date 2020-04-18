@@ -37,7 +37,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
-import io.resys.hdes.ast.api.nodes.ImmutableFlowTask;
+import io.resys.hdes.ast.api.nodes.ImmutableFlowTaskNode;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThenPointer;
@@ -80,7 +80,7 @@ public class FlowTreePointerParser {
       return task;
     }
     next = visit(next.get());
-    FlowTaskNode clone = ImmutableFlowTask.builder().from(task).next(next).build();
+    FlowTaskNode clone = ImmutableFlowTaskNode.builder().from(task).next(next).build();
     createdTasks.put(clone.getId(), clone);
     return clone;
   }

@@ -53,17 +53,27 @@ public class JavaAstEnvirVisitor {
   }
   
   private void visit(DecisionTableBody body) {
-    TypeSpec superInterface = visit(new DtAstNodeVisitorJavaInterface(naming).visitDecisionTableBody(body));
-    TypeSpec implementation = visit(new DtAstNodeVisitorJavaGen(naming).visitDecisionTableBody(body));
+    TypeSpec superInterface = visitDt(new DtAstNodeVisitorJavaInterface(naming).visitDecisionTableBody(body));
+    TypeSpec implementation = visitDt(new DtAstNodeVisitorJavaGen(naming).visitDecisionTableBody(body));
   }
   private void visit(FlowBody body, AstEnvir envir) {
-    TypeSpec superInterface = visit(new FlAstNodeVisitorJavaInterface(naming).visitFlowBody(body));
-    TypeSpec implementation = visit(new FlAstNodeVisitorJavaGen(envir, naming).visitFlowBody(body));
+    TypeSpec superInterface = visitFlow(new FlAstNodeVisitorJavaInterface(naming).visitFlowBody(body));
+    TypeSpec implementation = visitFlow(new FlAstNodeVisitorJavaGen(envir, naming).visitFlowBody(body));
   }
 
-  private TypeSpec visit(TypeSpec type) {
+  private TypeSpec visitFlow(TypeSpec type) {
     try {
-      JavaFile file = JavaFile.builder(JavaAstEnvirVisitor.class.getPackage().getName(), type).build();
+      JavaFile file = JavaFile.builder(naming.fl().pkg(), type).build();
+      file.writeTo(System.out);
+      return type;
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+  
+  private TypeSpec visitDt(TypeSpec type) {
+    try {
+      JavaFile file = JavaFile.builder(naming.fl().pkg(), type).build();
       file.writeTo(System.out);
       return type;
     } catch (IOException e) {

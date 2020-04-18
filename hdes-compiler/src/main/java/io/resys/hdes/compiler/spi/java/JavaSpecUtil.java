@@ -1,4 +1,4 @@
-package io.resys.hdes.compiler.spi.java.visitors;
+package io.resys.hdes.compiler.spi.java;
 
 /*-
  * #%L
@@ -27,25 +27,9 @@ import java.time.LocalTime;
 
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 
-public class JavaNaming {
+public class JavaSpecUtil {
   
-  public static String flVisitTask(String taskId) {
-    return "visit" + taskId;
-  } 
-  public static String flInputNested(String flId, String inputName) {
-    return flId + capitalize(inputName) + "Input";
-  }
-  
-  public static String dtImpl(String dtId) {
-    return "Gen" + dtId;
-  }
-  public static String dtInput(String dtId) {
-    return dtId + "Input";
-  }
-  public static String dtOutput(String dtId) {
-    return dtId + "Output";
-  }
-
+ 
   public static String getMethod(String name) {
     return new StringBuilder()
         .append("get")

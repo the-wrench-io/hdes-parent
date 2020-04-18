@@ -1,7 +1,5 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
-import java.util.Collection;
-
 /*-
  * #%L
  * hdes-compiler
@@ -30,15 +28,14 @@ import org.immutables.value.Value.Immutable;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.compiler.spi.NamingContext;
+import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtTypesSpec;
 
@@ -55,31 +52,21 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {
     this.body = node;
-    com.squareup.javapoet.TypeName returnType = ClassName.get("", JavaNaming.dtOutput(node.getId()));
-    if(body.getHitPolicy() instanceof HitPolicyAll) {
-      returnType = ParameterizedTypeName.get(ClassName.get(Collection.class), returnType);
-    }
-    
-    TypeSpec.Builder interfaceBuilder = TypeSpec.interfaceBuilder(node.getId())
+    return TypeSpec.interfaceBuilder(naming.dt().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
-        .addSuperinterface(ParameterizedTypeName.get(
-            ClassName.get(Function.class), 
-            ClassName.get("", JavaNaming.dtInput(node.getId())),
-            returnType))
-        .addTypes(visitHeaders(node.getHeaders()).getValues());
-    
-    return interfaceBuilder.build();
+        .addSuperinterface(naming.dt().superinterface(node))
+        .addTypes(visitHeaders(node.getHeaders()).getValues()).build();
   }
   
   @Override
   public DtTypesSpec visitHeaders(Headers node) {
-    Function<String, TypeSpec.Builder> from = (name) -> TypeSpec
+    Function<ClassName, TypeSpec.Builder> from = (name) -> TypeSpec
         .interfaceBuilder(name)
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     
-    TypeSpec.Builder inputBuilder = from.apply(JavaNaming.dtInput(body.getId()));
-    TypeSpec.Builder outputBuilder = from.apply(JavaNaming.dtOutput(body.getId()));
+    TypeSpec.Builder inputBuilder = from.apply(naming.dt().input(body));
+    TypeSpec.Builder outputBuilder = from.apply(naming.dt().output(body));
     
     for(Header header : node.getValues()) {
       MethodSpec method = visitHeader(header).getValue();
@@ -96,9 +83,9 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
 
   @Override
   public DtMethodSpec visitHeader(Header node) {
-    MethodSpec method = MethodSpec.methodBuilder(JavaNaming.getMethod(node.getName()))
+    MethodSpec method = MethodSpec.methodBuilder(JavaSpecUtil.getMethod(node.getName()))
         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-        .returns(JavaNaming.type(node.getType()))
+        .returns(JavaSpecUtil.type(node.getType()))
         .build();
     return ImmutableDtMethodSpec.builder().value(method).build();
   }

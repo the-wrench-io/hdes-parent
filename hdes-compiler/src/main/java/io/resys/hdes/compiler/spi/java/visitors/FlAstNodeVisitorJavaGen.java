@@ -64,7 +64,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     
     TypeSpec.Builder flowBuilder = TypeSpec.classBuilder(naming.fl().impl(node))
         .addModifiers(Modifier.PUBLIC)
-        .addSuperinterface(ClassName.get("", node.getId()));
+        .addSuperinterface(naming.fl().interfaze(node));
 
     FlTaskImplSpec taskImpl = node.getTask().map(n -> visitFlowTask(n)).orElseGet(() ->
       ImmutableFlTaskImplSpec.builder().value(CodeBlock.builder().add("// not tasks described ").build()).build()
@@ -97,12 +97,10 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   public FlTaskImplSpec visitFlowTask(FlowTaskNode node) {
     List<MethodSpec> children = new ArrayList<>();
     CodeBlock.Builder codeblock = CodeBlock.builder();
-    ClassName inputType = naming.fl().taskInput(body, node);
-    ClassName outputType = naming.fl().taskOutput(body, node);
     
     // visit method
     if(node.getRef().isPresent()) {
-      String visitMethodName = JavaNaming.flVisitTask(node.getId());
+      String visitMethodName = "visit" + node.getId();
       MethodSpec.Builder visitBuilder = MethodSpec
           .methodBuilder(visitMethodName)
           .addModifiers(Modifier.PRIVATE)

@@ -60,6 +60,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
 import io.resys.hdes.compiler.api.EqualityAssert;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.NamingContext;
+import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpecPair;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
@@ -80,14 +81,15 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {
     this.body = node;
-    this.input = ClassName.get("", JavaNaming.dtInput(body.getId()));
-    this.output = ClassName.get("", JavaNaming.dtOutput(body.getId()));
+    this.input = naming.dt().input(node);
+    this.output = naming.dt().output(node);
     
-    return TypeSpec.classBuilder(JavaNaming.dtImpl(node.getId()))
+    return TypeSpec.classBuilder(naming.dt().impl(node))
         .addModifiers(Modifier.PUBLIC)
-        .addSuperinterface(ClassName.get("", node.getId()))
+        .addSuperinterface(naming.dt().interfaze(node))
         .addJavadoc(node.getDescription().orElse(""))
         .addMethod(visitHitPolicy(node.getHitPolicy()).getValue())
+        .addMethod(visitEqualityAsset(node))
         .build();
   }
 
@@ -177,7 +179,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
   
   private DtCodeSpec visitInputRule(Rule node, Header header) {
     RuleValue value = node.getValue();
-    String getMethod = JavaNaming.getMethod(header.getName());
+    String getMethod = JavaSpecUtil.getMethod(header.getName());
     
     if(value instanceof LiteralValue) {
       Literal literal = ((LiteralValue) value).getValue();
@@ -227,18 +229,26 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     
     CodeBlock left = visitExpressionRuleValue(node.getLeft()).getValue();
     CodeBlock right = visitExpressionRuleValue(node.getRight()).getValue();
-    
+
     String operation;
     switch (node.getType()) {
-    case EQUAL: operation = "$T.eq($L, $L)"; break;
-    case NOTEQUAL: operation = "$T.neq($L, $L)"; break;
-    case GREATER: operation = "$T.gt($L, $L)"; break;
-    case GREATER_THEN: operation = "$T.gte($L, $L)"; break;
-    case LESS: operation = "$T.lt($L, $L)"; break;
-    case LESS_THEN: operation = "$T.lte($L, $L)"; break;
+    case EQUAL: operation = "$L.eq($L, $L)"; break;
+    case NOTEQUAL: operation = "$L.neq($L, $L)"; break;
+    case GREATER: operation = "$L.gt($L, $L)"; break;
+    case GREATER_THEN: operation = "$L.gte($L, $L)"; break;
+    case LESS: operation = "$L.lt($L, $L)"; break;
+    case LESS_THEN: operation = "$L.lte($L, $L)"; break;
     default: throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionOperation(node));
     }
-    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, EqualityAssert.class, left, right).build()).build();
+    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, "when()", left, right).build()).build();
+  }
+  
+  private MethodSpec visitEqualityAsset(DecisionTableBody node) {
+    return MethodSpec.methodBuilder("when")
+        .addModifiers(Modifier.PROTECTED)
+        .returns(EqualityAssert.class)
+        .addStatement("return $T.get()", EqualityAssert.class)
+        .build();
   }
   
   @Override

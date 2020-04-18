@@ -45,6 +45,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.NamingContext;
+import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlInputSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTypesSpec;
@@ -62,7 +63,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   public TypeSpec visitFlowBody(FlowBody node) {
     this.body = node;
     
-    TypeSpec.Builder flowBuilder = TypeSpec.interfaceBuilder(node.getId())
+    TypeSpec.Builder flowBuilder = TypeSpec.interfaceBuilder(naming.fl().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(naming.fl().superinterface(node))
         .addTypes(visitFlowInputs(node.getInputs()).getValues());
@@ -80,7 +81,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
       
       for(TypeSpec task : taskSpecs.getChildren()) {
         stateBuilder.addMethod(MethodSpec
-            .methodBuilder(JavaNaming.getMethod(task.name.substring(body.getId().length())))
+            .methodBuilder(JavaSpecUtil.getMethod(task.name.substring(body.getId().length())))
             .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
             .returns(ParameterizedTypeName.get(
                 ClassName.get(Optional.class),
@@ -150,8 +151,8 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
 
   @Override
   public FlInputSpec visitScalarInputNode(ScalarTypeDefNode node) {
-    Class<?> returnType = JavaNaming.type(node.getType());
-    MethodSpec method = MethodSpec.methodBuilder(JavaNaming.getMethod(node.getName()))
+    Class<?> returnType = JavaSpecUtil.type(node.getType());
+    MethodSpec method = MethodSpec.methodBuilder(JavaSpecUtil.getMethod(node.getName()))
         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
         .returns(node.getRequired() ? ClassName.get(returnType) : ParameterizedTypeName.get(Optional.class, returnType))
         .build();
@@ -177,8 +178,9 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
 
   @Override
   public FlInputSpec visitObjectInputNode(ObjectTypeDefNode node) {
+    ClassName typeName = naming.fl().input(body, node);
     TypeSpec.Builder objectBuilder = TypeSpec
-        .interfaceBuilder(JavaNaming.flInputNested(body.getId(), node.getName()))
+        .interfaceBuilder(typeName)
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     List<TypeSpec> nested = new ArrayList<>();
@@ -188,15 +190,15 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
       objectBuilder.addMethod(spec.getValue());
     }
     TypeSpec objectType = objectBuilder.build();
-    ClassName objectTypeName = ClassName.get("", objectType.name);
     nested.add(objectType);
     return ImmutableFlInputSpec.builder()
         .children(nested)
         .value(
-            MethodSpec.methodBuilder(JavaNaming.getMethod(node.getName()))
+            MethodSpec.methodBuilder(JavaSpecUtil.getMethod(node.getName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .returns(node.getRequired() ? objectTypeName : ParameterizedTypeName.get(ClassName.get(Optional.class), objectTypeName))
+                .returns(node.getRequired() ? typeName : ParameterizedTypeName.get(ClassName.get(Optional.class), typeName))
                 .build())
         .build();
   }
+  
 }

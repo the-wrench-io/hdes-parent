@@ -88,7 +88,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableEndPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowOutputs;
-import io.resys.hdes.ast.api.nodes.ImmutableFlowTask;
+import io.resys.hdes.ast.api.nodes.ImmutableFlowTaskNode;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableMapping;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectTypeDefNode;
@@ -308,7 +308,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   @Override
   public FlowTaskNode visitNextTask(NextTaskContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableFlowTask.builder()
+    return ImmutableFlowTaskNode.builder()
         .token(token(ctx))
         .id(nodes.of(FwRedundentTypeName.class).get().getValue())
         .next(nodes.of(FlowTaskPointer.class))

@@ -1,11 +1,16 @@
 package io.resys.hdes.compiler.spi.java;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 
+import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.compiler.api.Flow;
@@ -18,6 +23,7 @@ public class JavaNamingContext implements NamingContext {
   private final String fl;
   private final String dt;
   private final JavaFlNamingContext flNaming;
+  private final JavaDtNamingContext dtNaming;
   
   public JavaNamingContext(String root, String fl, String dt) {
     super();
@@ -25,13 +31,56 @@ public class JavaNamingContext implements NamingContext {
     this.fl = root + "." + fl;
     this.dt = root + "." + dt;
     this.flNaming = new JavaFlNamingContext(this);
+    this.dtNaming = new JavaDtNamingContext(this);
   }
 
   @Override
   public FlNamingContext fl() {
     return flNaming;
   }
- 
+  
+  @Override
+  public DtNamingContext dt() {
+    return dtNaming;
+  }
+  
+  public static class JavaDtNamingContext implements DtNamingContext {
+    private final JavaNamingContext parent;
+    
+    public JavaDtNamingContext(JavaNamingContext parent) {
+      super();
+      this.parent = parent;
+    }
+    @Override
+    public String pkg() {
+      return parent.dt;
+    }
+    @Override
+    public TypeName superinterface(DecisionTableBody node) {
+      TypeName returnType = output(node);
+      if(node.getHitPolicy() instanceof HitPolicyAll) {
+        returnType = ParameterizedTypeName.get(ClassName.get(Collection.class), returnType);
+      }
+      return ParameterizedTypeName.get(ClassName.get(Function.class), input(node), returnType);
+    }
+    @Override
+    public ClassName impl(DecisionTableBody node) {
+      return ClassName.get(parent.dt, "Gen" + node.getId());
+    }
+    @Override
+    public ClassName input(DecisionTableBody node) {
+      return ClassName.get(parent.dt, node.getId() + "Input");
+    }
+    @Override
+    public ClassName output(DecisionTableBody node) {
+      return ClassName.get(parent.dt, node.getId() + "Output");
+    }
+    @Override
+    public ClassName interfaze(DecisionTableBody node) {
+      return ClassName.get(parent.dt, node.getId());
+    }
+  }
+  
   public static class JavaFlNamingContext implements FlNamingContext {
     private final JavaNamingContext parent;
     
@@ -39,6 +88,11 @@ public class JavaNamingContext implements NamingContext {
       super();
       this.parent = parent;
     }
+    @Override
+    public String pkg() {
+      return parent.fl;
+    }
+    
     @Override
     public ClassName interfaze(FlowBody node) {
       return ClassName.get(parent.fl, node.getId());
@@ -84,6 +138,10 @@ public class JavaNamingContext implements NamingContext {
       return ParameterizedTypeName.get(
           ClassName.get(FlowTaskState.class),
           taskInput(body, task), taskOutput(body, task));
+    }
+    @Override
+    public ClassName input(FlowBody node, ObjectTypeDefNode object) {
+      return ClassName.get(parent.fl, node.getId() + JavaSpecUtil.capitalize(object.getName()) + "Input");
     }
   }
   
