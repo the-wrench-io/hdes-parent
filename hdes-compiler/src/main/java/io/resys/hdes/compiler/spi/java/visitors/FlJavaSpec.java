@@ -43,6 +43,10 @@ public interface FlJavaSpec {
     CodeBlock getValue();
     List<MethodSpec> getChildren();
   }
+  @Value.Immutable
+  public interface FlTaskRefSpec extends FlJavaSpec {
+    MethodSpec getMethod();
+  }
   public interface FlMethodSpec extends FlJavaSpec {
     MethodSpec getValue();
   }

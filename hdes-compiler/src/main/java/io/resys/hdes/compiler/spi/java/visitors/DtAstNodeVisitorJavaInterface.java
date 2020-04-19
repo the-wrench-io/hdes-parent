@@ -65,8 +65,11 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
         .addAnnotation(Immutable.class)
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     
-    TypeSpec.Builder inputBuilder = from.apply(naming.dt().input(body));
-    TypeSpec.Builder outputBuilder = from.apply(naming.dt().output(body));
+    TypeSpec.Builder inputBuilder = from.apply(naming.dt().input(body))
+        .addSuperinterface(naming.dt().inputSuperinterface(body));
+
+    TypeSpec.Builder outputBuilder = from.apply(naming.dt().output(body))
+        .addSuperinterface(naming.dt().outputSuperinterface(body));
     
     for(Header header : node.getValues()) {
       MethodSpec method = visitHeader(header).getValue();

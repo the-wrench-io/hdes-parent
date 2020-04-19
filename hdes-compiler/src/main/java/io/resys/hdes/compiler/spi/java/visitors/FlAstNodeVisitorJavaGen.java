@@ -2,6 +2,7 @@ package io.resys.hdes.compiler.spi.java.visitors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /*-
  * #%L
@@ -41,8 +42,13 @@ import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
+import io.resys.hdes.compiler.api.Flow.FlowExecutionLog;
+import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.api.ImmutableFlowExecutionLog;
 import io.resys.hdes.compiler.spi.NamingContext;
+import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskImplSpec;
+import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskRefSpec;
 
 public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
   
@@ -67,7 +73,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         .addSuperinterface(naming.fl().interfaze(node));
 
     FlTaskImplSpec taskImpl = node.getTask().map(n -> visitFlowTask(n)).orElseGet(() ->
-      ImmutableFlTaskImplSpec.builder().value(CodeBlock.builder().add("// not tasks described ").build()).build()
+      ImmutableFlTaskImplSpec.builder().value(CodeBlock.builder().add("// no tasks described ").build()).build()
     );
     
     MethodSpec applyMethod = MethodSpec.methodBuilder("apply")
@@ -100,28 +106,21 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     
     // visit method
     if(node.getRef().isPresent()) {
-      String visitMethodName = "visit" + node.getId();
-      MethodSpec.Builder visitBuilder = MethodSpec
-          .methodBuilder(visitMethodName)
-          .addModifiers(Modifier.PRIVATE)
-          .addParameter(ParameterSpec.builder(flowState, "currentState").build())
-          .returns(flowState);
-      children.add(visitBuilder.build());
-      
-      codeblock.addStatement("currentState = $L(currentState)", visitMethodName);
-      
-      // create input
-      
-      // call ref
-      
-      // create output
+      FlTaskRefSpec ref = visitTaskRef(node);
+      children.add(ref.getMethod());
+      codeblock.addStatement("currentState = $L(currentState)", ref.getMethod().name);
     }
     
-    // tasks body
+    // next
     if(node.getNext().isPresent()) {
       FlTaskImplSpec next = visitFlowTaskPointer(node.getNext().get());
       codeblock.add(next.getValue());
-      children.addAll(next.getChildren());
+      
+      for(MethodSpec method : next.getChildren()) {
+        if(!children.stream().filter(m -> m.name.equals(method.name)).findFirst().isPresent()) {
+          children.add(method);          
+        }
+      }
     }
     
     return ImmutableFlTaskImplSpec.builder()
@@ -131,14 +130,64 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   }
   
   @Override
-  public FlTaskImplSpec visitTaskRef(TaskRef node) {
-    // TODO Auto-generated method stub
+  public FlTaskRefSpec visitTaskRef(FlowTaskNode parent) {
+    TaskRef node = parent.getRef().get(); 
     
-    //output = factory.dt().myDt().apply(input)
-    //output = factory.st().myServiceTask().apply(input)
-    //output = factory.fl().myFlow().apply(input)
+    MethodSpec.Builder visitBuilder = MethodSpec
+        .methodBuilder("visit" + parent.getId())
+        .addModifiers(Modifier.PRIVATE)
+        .addParameter(ParameterSpec.builder(flowState, "currentState").build())
+        .returns(flowState);
+
+    ClassName input = naming.fl().refInput(node);
     
-    return ImmutableFlTaskImplSpec.builder().build();
+    CodeBlock.Builder body = CodeBlock.builder()
+        .addStatement("long start = System.currentTimeMillis()").add("\r\n")
+        
+        .add("$T input = $T.builder()", input, naming.immutable(input))
+        .addStatement(visitMapping(node.getMapping()))
+        .addStatement(".build()")
+        .add("$T output = ", naming.fl().refOutput(node));
+    switch (node.getType()) {
+    case DECISION_TABLE: body.addStatement("$L.apply(input)", naming.fl().refMethod(node)); break;
+    case FLOW_TASK: body.addStatement("$L.apply(input)", naming.fl().refMethod(node)); break;
+    case MANUAL_TASK: body.addStatement("$L().apply(input)", naming.fl().refMethod(node)); break;
+    case SERVICE_TASK: body.addStatement("$L().apply(input)", naming.fl().refMethod(node)); break;
+    default: throw new HdesCompilerException(HdesCompilerException.builder().unknownFlTaskRef(node));
+    }
+    
+    body.add("\r\n").addStatement("long end = System.currentTimeMillis()");
+
+    CodeBlock executionLog = CodeBlock.builder()
+      .add("$T log = $T.builder()", FlowExecutionLog.class, ImmutableFlowExecutionLog.class)
+      .add("\r\n").add(".id($S)", parent.getId())
+      .add("\r\n").add(".parent(currentState.getLog())")
+      .add("\r\n").add(".start(start)")
+      .add("\r\n").add(".end(end)")
+      .add("\r\n").add(".duration(end - start)")
+      .add("\r\n").add(".build()").build();
+    
+    body
+      .addStatement(executionLog).add("\r\n")
+      .add("return $T.builder()", naming.immutable(naming.fl().state(this.body))).add("\r\n")
+      .add(".from(currentState).input(input).output(output)").add("\r\n")
+      .add(".log($T.ofNullable(log)).build()", Optional.class);
+      
+    return ImmutableFlTaskRefSpec.builder().method(visitBuilder.addCode(body.build()).build()).build();
+  }
+  
+  private CodeBlock visitMapping(List<Mapping> mappings) {
+    CodeBlock.Builder body = CodeBlock.builder();
+    
+    for(Mapping mapping : mappings) {
+      String[] src = mapping.getRight().split("\\.");
+      StringBuilder right = new StringBuilder();
+      for(String target : src) {
+        right.append(".").append(JavaSpecUtil.getMethod(target)).append("()");
+      }
+      body.add("\r\n").add(".$L(currentState$L)", mapping.getLeft(), right.toString());
+    }
+    return body.build();
   }
   
   @Override

@@ -12,7 +12,7 @@ outputs: {}
 tasks: {
   firstTask: {
     then: secondTask
-    decisionTask: bestDtTask
+    decisionTask: BestDt
     OBJECT mapping: {
       name: arg1,
       lastName: arg2
@@ -20,7 +20,7 @@ tasks: {
   }, 
   secondTask: {
     then end: { OBJECT mapping: { } }
-    decisionTask: best2DtTask
+    decisionTask: Best2Dt
     OBJECT mapping: {
       name: arg1,
       lastName: arg2

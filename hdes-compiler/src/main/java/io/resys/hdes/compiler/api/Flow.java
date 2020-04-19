@@ -33,32 +33,31 @@ public interface Flow<I extends FlowInput, S extends FlowState<I>> {
   
   enum ExecutionStatusType { COMPLETED, PENDING, ERROR }
   interface FlowInput {}
-  interface FlowTaskInput {}
-  interface FlowTaskOutput {}
   
   S apply(I input);
-  S apply(S old, FlowTaskOutput output);
+  //S apply(S old, ? output);
   
   interface FlowState<I> {
     I getInput();
     ExecutionStatusType getType();
     List<FlowError> getErrors();
-    FlowExecutionLog getLog();
+    Optional<FlowExecutionLog> getLog();
     String getHead();
   }
   
-  interface FlowTaskState<I extends FlowTaskInput, R extends FlowTaskOutput> {
+  interface FlowTaskState<I, R> {
     String getId();
     Optional<R> getOutput();
     I getInput();
   }
-  
+
   @Value.Immutable
   interface FlowExecutionLog {
     String getId();
-    Optional<String> getParent();
-    Optional<Long> getDuration();
+    String getSrcId();
     LocalDateTime getStart();
+    Optional<FlowExecutionLog> getParent();
+    Optional<Long> getDuration();
     Optional<LocalDateTime> getEnd();
   }
 
@@ -70,7 +69,7 @@ public interface Flow<I extends FlowInput, S extends FlowState<I>> {
   }
   
   @FunctionalInterface
-  interface FlowTask<S extends FlowState<?>, I extends FlowTaskInput, R extends FlowTaskOutput> {
+  interface FlowTask<S extends FlowState<?>, I, R> {
     R apply(S state, I input);
   }
 }

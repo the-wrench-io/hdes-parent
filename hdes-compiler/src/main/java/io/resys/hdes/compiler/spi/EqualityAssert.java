@@ -1,4 +1,4 @@
-package io.resys.hdes.compiler.api;
+package io.resys.hdes.compiler.spi;
 
 /*-
  * #%L

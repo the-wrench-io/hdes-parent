@@ -98,8 +98,6 @@ public interface FlowNode extends AstNode {
   interface TaskRef extends FlowNode {
     RefTaskType getType();
     String getValue();
-    // external flow/dt/mt
-    Optional<AstNode> getNode();
     List<Mapping> getMapping();
   }
 }
