@@ -1,8 +1,8 @@
 id: basic
 headers: {
-  IN STRING name,
-  IN STRING lastName,
-  OUT INTEGER value
+  name STRING IN,
+  lastName STRING IN,
+  value INTEGER OUT 
 } MATRIX: {
   { ?, ?, 20 },
   { not 'bob' or 'sam', 'woman', 4570 }

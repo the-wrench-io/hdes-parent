@@ -1,10 +1,9 @@
 id: MatrixDT
 headers: {
-  IN STRING name,
-  IN STRING lastName,
-  
-  OUT INTEGER value,
-  OUT FORMULA INTEGER total: 'sum(outputs)/size(outputs) + 10/50' 
+  name STRING IN,
+  lastName STRING IN,
+  value INTEGER OUT,
+  total: 'sum(outputs)/size(outputs) + 10/50' INTEGER OUT FORMULA  
 } MATRIX: {
             { 'BOB', 'SAM', ? }
   name:     {  10,    20,   30 },

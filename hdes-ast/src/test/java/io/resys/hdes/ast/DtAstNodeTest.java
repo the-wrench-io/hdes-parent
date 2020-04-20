@@ -53,9 +53,9 @@ public class DtAstNodeTest {
   public void headers() throws IOException {
     parse("id: basic \n"
         + "headers: {\n"
-        +   "IN STRING name,\n "
-        +   "IN STRING lastName, \n"
-        +   "OUT INTEGER value \n"
+        +   "name STRING IN,\n "
+        +   "lastName STRING IN, \n"
+        +   "value INTEGER OUT\n"
         + "} MATRIX: {\n"
         + "}");
   }
@@ -64,9 +64,9 @@ public class DtAstNodeTest {
   public void values() throws IOException {
     parse("id: basic \n"
         + "headers: {\n"
-        +   "IN STRING name,\n "
-        +   "IN STRING lastName, \n"
-        +   "OUT INTEGER value \n"
+        +   "name STRING IN,\n "
+        +   "lastName STRING IN, \n"
+        +   "value INTEGER OUT\n"
         + "} MATRIX: {\n"
         +   "{ ?, ?, 20 },"
         +   "{ 'bob', 'woman', 4570 }"
@@ -77,9 +77,9 @@ public class DtAstNodeTest {
   public void matchExpressions() throws IOException {
     parse("id: basic \n"
         + "headers: {\n"
-        +   "IN STRING name,\n "
-        +   "IN STRING lastName, \n"
-        +   "OUT INTEGER value \n"
+        +   "name STRING IN,\n "
+        +   "lastName STRING IN, \n"
+        +   "value INTEGER OUT\n"
         + "} ALL: {\n"
         +   "{ not 'bob' or 'same' or 'professor', 'woman' or 'man', 4570 }\n"
         + "}");
@@ -90,9 +90,9 @@ public class DtAstNodeTest {
   public void equalityExpressions() throws IOException {
     parse("id: basic \n"
         + "headers: {\n"
-        +   "IN INTEGER value0,\n "
-        +   "IN INTEGER value1, \n"
-        +   "OUT INTEGER value \n"
+        +   "value0 INTEGER IN,\n "
+        +   "value1 INTEGER IN, \n"
+        +   "value INTEGER OUT\n"
         + "} ALL: {\n"
         +   "{ > 10, <= 20, 4570 },\n"
         +   "{ > 10, <= 20 and > 10, 4570 },\n"

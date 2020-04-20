@@ -14,7 +14,7 @@ matrix: 'MATRIX' ':' '{' rulesets? '}';
 
 headers: 'headers' ':' '{' headerArgs? '}';
 headerArgs: header (',' header)*;
-header: directionType scalarType typeName;
+header: typeName scalarType directionType;
 
 rulesets: ruleset (',' ruleset)*;
 ruleset: '{' rules? '}';
