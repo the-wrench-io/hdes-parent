@@ -286,7 +286,10 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   }
   
   private MtRedundentTypeName getDefTypeName(ParserRuleContext ctx) {
-    return (MtRedundentTypeName) ctx.getParent().getChild(0).accept(this);
+    if(ctx.getParent() instanceof TypeDefContext) {
+      return (MtRedundentTypeName) ctx.getParent().getChild(0).accept(this);
+    }
+    return (MtRedundentTypeName) ctx.getParent().getParent().getChild(0).accept(this);
   }
   
   

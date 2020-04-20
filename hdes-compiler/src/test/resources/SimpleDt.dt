@@ -1,8 +1,8 @@
 id: SimpleDT description: 'uber dt'
 headers: {
-  IN STRING name,
-  IN STRING lastName,
-  OUT INTEGER value
+  name STRING IN,
+  lastName STRING IN,
+  value INTEGER OUT
 } ALL: {
   {             ?,         ?,   20 },
   {         'bob',   'woman', 4570 },

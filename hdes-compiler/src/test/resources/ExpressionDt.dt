@@ -1,8 +1,8 @@
 id: ExpressionDT description: 'uber dt'
 headers: {
-  IN INTEGER value0,
-  IN INTEGER value1,
-  OUT INTEGER value
+  value0 INTEGER IN,
+  value1 INTEGER IN,
+  value INTEGER OUT
 } ALL: {
   { > 10, <= 20,          4570 },
   { > 10, <= 20 and > 10, 4570 },

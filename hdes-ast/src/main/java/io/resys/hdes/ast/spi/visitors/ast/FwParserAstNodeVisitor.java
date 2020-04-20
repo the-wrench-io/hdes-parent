@@ -227,7 +227,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     ParseTree c = ctx.getChild(1);
     return c.accept(this);
   }
-
+  
   @Override
   public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
     TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
@@ -462,7 +462,11 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
   
   private FwRedundentTypeName getDefTypeName(ParserRuleContext ctx) {
-    return (FwRedundentTypeName) ctx.getParent().getChild(0).accept(this);
+    
+    if(ctx.getParent() instanceof TypeDefContext) {
+      return (FwRedundentTypeName) ctx.getParent().getChild(0).accept(this);
+    }
+    return (FwRedundentTypeName) ctx.getParent().getParent().getChild(0).accept(this);
   }
 
   private AstNode first(ParserRuleContext ctx) {

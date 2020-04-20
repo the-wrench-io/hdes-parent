@@ -1,27 +1,25 @@
 id: SimpleFlow description: 'descriptive'
 inputs: {
-  optional INTEGER arg1,
-  optional INTEGER arg2,
-  optional ARRAY INTEGER arg3,
-  optional ARRAY OBJECT arg4: {
-    optional INTEGER arg5,
-    optional INTEGER arg6
+  arg1 INTEGER optional,
+  arg2 INTEGER optional,
+  arg3 ARRAY INTEGER optional,
+  arg4 ARRAY OBJECT optional: {
+    arg5 INTEGER optional,
+    arg6 INTEGER optional 
   }
 }
 outputs: {}
 tasks: {
   firstTask: {
     then: secondTask
-    decisionTask: BestDt
-    OBJECT mapping: {
+    decisionTask: BestDt mapping OBJECT: {
       name: arg1,
       lastName: arg2
     }
   }, 
   secondTask: {
-    then end: { OBJECT mapping: { } }
-    decisionTask: Best2Dt
-    OBJECT mapping: {
+    then end: { mapping OBJECT: { } }
+    decisionTask: Best2Dt mapping OBJECT: {
       name: arg1,
       lastName: arg2
     }
