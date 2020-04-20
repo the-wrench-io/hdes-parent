@@ -15,9 +15,9 @@ description: 'description' ':' literal;
 inputs: 'inputs' ':' typeDefs;
 typeDefs: '{' typeDefArgs? '}';
 typeDefArgs: typeDef (',' typeDef)*;
-typeDef: RequiredType (arrayType | objectType | simpleType);
+typeDef: typeName (arrayType | objectType | simpleType);
 
-simpleType: scalarType typeName debugValue?;
-objectType: 'OBJECT' typeName ':' typeDefs;
+simpleType: scalarType RequiredType debugValue?;
+objectType: 'OBJECT' RequiredType ':' typeDefs;
 arrayType: 'ARRAY' (simpleType | objectType);
 debugValue: 'debugValue' ':' literal;

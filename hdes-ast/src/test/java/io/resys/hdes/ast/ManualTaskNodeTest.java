@@ -65,9 +65,9 @@ public class ManualTaskNodeTest {
         + "} \n"
         + "statements: {} \n"
         + "form: { fields: {\n"
-        + "  required STRING firstName: { },\n"
-        + "  required INTEGER age: { },\n"
-        + "  required INTEGER gender: { single dropdown: genderDropdown }\n"
+        + "  firstName STRING required: { },\n"
+        + "  age INTEGER required: { },\n"
+        + "  gender INTEGER required: { single dropdown: genderDropdown }\n"
         + "\n} }"); 
   }
   

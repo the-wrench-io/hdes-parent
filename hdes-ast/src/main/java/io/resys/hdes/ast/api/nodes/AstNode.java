@@ -43,7 +43,9 @@ public interface AstNode {
   }
   
   @Value.Immutable
-  interface EmptyNode extends AstNode { }
+  interface EmptyNode extends AstNode { 
+    Optional<String> getValue();
+  }
   
   @Value.Immutable
   interface ErrorNode {

@@ -19,7 +19,7 @@ group: '{' id (fields | groups)? '}';
 
 fields: 'fields' ':' '{' fieldArgs? '}';
 fieldArgs: field (',' field)*;
-field: RequiredType scalarType typeName ':' '{' dropdown? defaultValue? cssClass? '}';
+field: typeName scalarType RequiredType ':' '{' dropdown? defaultValue? cssClass? '}';
 
 dropdown: dropdownType 'dropdown' ':' typeName;
 defaultValue: 'defaultValue' ':' literal;

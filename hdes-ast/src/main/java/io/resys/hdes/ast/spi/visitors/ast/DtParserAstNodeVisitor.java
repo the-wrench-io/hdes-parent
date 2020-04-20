@@ -21,6 +21,7 @@ package io.resys.hdes.ast.spi.visitors.ast;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -76,7 +77,9 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ImmutableAndOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableDecisionTableBody;
+import io.resys.hdes.ast.api.nodes.ImmutableEmptyNode;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
+import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
 import io.resys.hdes.ast.api.nodes.ImmutableExpressionValue;
 import io.resys.hdes.ast.api.nodes.ImmutableHeader;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaderRefValue;
@@ -432,7 +435,10 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
       value = value.replaceAll("_", "");
       break;
     default:
-      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
+      throw new AstNodeException(Arrays.asList(ImmutableErrorNode.builder()
+          .message("Unknown literal: " + ctx.getText() + "!")
+          .target(ImmutableEmptyNode.builder().value(ctx.getText()).token(token).build())
+          .build()));
     }
     return ImmutableLiteral.builder()
         .token(token)

@@ -5,5 +5,5 @@ headers: {
   OUT INTEGER value
 } MATRIX: {
   { ?, ?, 20 },
-  { not 'bob' or/and 'sam', 'woman', 4570 }
+  { not 'bob' or 'sam', 'woman', 4570 }
 }

@@ -1,5 +1,7 @@
 package io.resys.hdes.ast.spi.visitors.ast;
 
+import java.util.Arrays;
+
 /*-
  * #%L
  * hdes-ast
@@ -84,7 +86,9 @@ import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableArrayTypeDefNode;
+import io.resys.hdes.ast.api.nodes.ImmutableEmptyNode;
 import io.resys.hdes.ast.api.nodes.ImmutableEndPointer;
+import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowOutputs;
@@ -220,9 +224,52 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
 
   @Override
   public AstNode visitTypeDef(TypeDefContext ctx) {
-    return nodes(ctx).of(AstNode.class).get();
+    ParseTree c = ctx.getChild(1);
+    return c.accept(this);
   }
 
+  @Override
+  public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
+    TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
+    Nodes nodes = nodes(ctx);
+    return ImmutableScalarTypeDefNode.builder()
+        .token(token(ctx))
+        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .name(getDefTypeName(ctx).getValue())
+        .type(nodes.of(FwRedundentScalarType.class).get().getValue())
+        .debugValue(nodes.of(FwRedundentDebugValue.class).map(e -> e.getValue()))
+        .build();
+  }
+  
+  @Override
+  public ArrayTypeDefNode visitArrayType(ArrayTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    TypeDefNode input = nodes.of(TypeDefNode.class).get();
+    
+    return ImmutableArrayTypeDefNode.builder()
+        .token(token(ctx))
+        .required(input.getRequired())
+        .name(input.getName())
+        .value(input)
+        .build();
+  }
+
+  @Override
+  public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    List<TypeDefNode> values = nodes.of(FwRedundentTypeDefArgs.class).map((FwRedundentTypeDefArgs i)-> i.getValues())
+        .orElse(Collections.emptyList());
+    TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
+    
+    return ImmutableObjectTypeDefNode.builder()
+        .token(token(ctx))
+        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .name(getDefTypeName(ctx).getValue())
+        .values(values)
+        .build();
+  }
+  
+  
   @Override
   public FwRedundentDebugValue visitDebugValue(DebugValueContext ctx) {
     Nodes nodes = nodes(ctx);
@@ -240,44 +287,6 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
         .build();
   }
 
-  @Override
-  public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableScalarTypeDefNode.builder()
-        .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .type(nodes.of(FwRedundentScalarType.class).get().getValue())
-        .name(nodes.of(FwRedundentTypeName.class).get().getValue())
-        .debugValue(nodes.of(FwRedundentDebugValue.class).map(e -> e.getValue()))
-        .build();
-  }
-  
-  @Override
-  public ArrayTypeDefNode visitArrayType(ArrayTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    TypeDefNode input = nodes.of(TypeDefNode.class).get();
-    return ImmutableArrayTypeDefNode.builder()
-        .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .name(input.getName())
-        .value(input)
-        .build();
-  }
-
-  @Override
-  public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    List<TypeDefNode> values = nodes.of(FwRedundentTypeDefArgs.class).map((FwRedundentTypeDefArgs i)-> i.getValues())
-        .orElse(Collections.emptyList());
-    
-    return ImmutableObjectTypeDefNode.builder()
-        .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .name(nodes.of(FwRedundentTypeName.class).get().getValue())
-        .values(values)
-        .build();
-  }
-  
   @Override
   public FwRedundentTasks visitTasks(TasksContext ctx) {
     return nodes(ctx).of(FwRedundentTasks.class).orElse(
@@ -452,11 +461,10 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
         .build();
   }
   
-  private boolean isRequiredInputType(ParserRuleContext ctx) {
-    TerminalNode requirmentType = (TerminalNode) ctx.getParent().getChild(0);
-    return requirmentType.getSymbol().getType() == FlowParser.REQUIRED;
+  private FwRedundentTypeName getDefTypeName(ParserRuleContext ctx) {
+    return (FwRedundentTypeName) ctx.getParent().getChild(0).accept(this);
   }
-  
+
   private AstNode first(ParserRuleContext ctx) {
     ParseTree c = ctx.getChild(0);
     return c.accept(this);
@@ -490,7 +498,10 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
       value = value.replaceAll("_", "");
       break;
     default:
-      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
+      throw new AstNodeException(Arrays.asList(ImmutableErrorNode.builder()
+          .message("Unknown literal: " + ctx.getText() + "!")
+          .target(ImmutableEmptyNode.builder().value(ctx.getText()).token(token).build())
+          .build()));
     }
     return ImmutableLiteral.builder()
         .token(token)

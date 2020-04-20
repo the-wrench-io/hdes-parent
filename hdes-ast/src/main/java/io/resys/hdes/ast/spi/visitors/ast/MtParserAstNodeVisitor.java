@@ -114,7 +114,6 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.Statement;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.StatementType;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenStatement;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenStatement;
-import io.resys.hdes.ast.spi.visitors.ast.FwParserAstNodeVisitor.FwRedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
@@ -227,6 +226,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .value(ctx.getText())
         .build();
   }
+  
   @Override
   public MtRedundentScalarType visitScalarType(ScalarTypeContext ctx) {
     return ImmutableMtRedundentScalarType.builder()
@@ -234,6 +234,48 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .value(ScalarType.valueOf(ctx.getText()))
         .build();
   }
+  
+  @Override
+  public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
+    
+    return ImmutableScalarTypeDefNode.builder()
+        .token(token(ctx))
+        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .type(nodes.of(MtRedundentScalarType.class).get().getValue())
+        .name(getDefTypeName(ctx).getValue())
+        .name(nodes.of(MtRedundentTypeName.class).get().getValue())
+        .debugValue(nodes.of(MtRedundentDebugValue.class).get().getValue())
+        .build();
+  }
+  @Override
+  public ArrayTypeDefNode visitArrayType(ArrayTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    TypeDefNode value = nodes.of(TypeDefNode.class).get();
+    
+    return ImmutableArrayTypeDefNode.builder()
+        .token(token(ctx))
+        .required(value.getRequired())
+        .value(value)
+        .build();
+  }
+  
+  @Override
+  public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    List<TypeDefNode> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
+        .orElse(Collections.emptyList());
+    TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
+    
+    return ImmutableObjectTypeDefNode.builder()
+        .token(token(ctx))
+        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .name(getDefTypeName(ctx).getValue())
+        .values(values)
+        .build();
+  }
+  
   @Override
   public MtRedundentDropdownType visitDropdownType(DropdownTypeContext ctx) {
     TerminalNode node = (TerminalNode) ctx.getChild(0);
@@ -242,6 +284,12 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .multiple(node.getSymbol().getType() == ManualTaskParser.DROPDOWN_MULTIPLE)
         .build();
   }
+  
+  private MtRedundentTypeName getDefTypeName(ParserRuleContext ctx) {
+    return (MtRedundentTypeName) ctx.getParent().getChild(0).accept(this);
+  }
+  
+  
   @Override
   public ManualTaskBody visitMt(MtContext ctx) {
     Nodes nodes = nodes(ctx);
@@ -301,39 +349,6 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     return ImmutableMtRedundentDebugValue.builder()
         .token(token(ctx))
         .value(nodes.of(Literal.class).get().getValue())
-        .build();
-  }
-  
-  @Override
-  public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableScalarTypeDefNode.builder()
-        .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .type(nodes.of(MtRedundentScalarType.class).get().getValue())
-        .name(nodes.of(MtRedundentTypeName.class).get().getValue())
-        .debugValue(nodes.of(MtRedundentDebugValue.class).get().getValue())
-        .build();
-  }
-  @Override
-  public ArrayTypeDefNode visitArrayType(ArrayTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableArrayTypeDefNode.builder()
-        .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .value(nodes.of(TypeDefNode.class).get())
-        .build();
-  }
-  @Override
-  public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    List<TypeDefNode> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
-        .orElse(Collections.emptyList()); 
-    return ImmutableObjectTypeDefNode.builder()
-        .token(token(ctx))
-        .required(isRequiredInputType(ctx))
-        .name(nodes.of(FwRedundentTypeName.class).get().getValue())
-        .values(values)
         .build();
   }
   
@@ -446,7 +461,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   @Override
   public FormField visitField(FieldContext ctx) {
     Nodes nodes = nodes(ctx);
-    boolean required = ((TerminalNode) ctx.getChild(0)).getSymbol().getType() == ManualTaskParser.REQUIRED;
+    boolean required = ((TerminalNode) ctx.getChild(2)).getSymbol().getType() == ManualTaskParser.REQUIRED;
     ScalarType scalarType = nodes.of(MtRedundentScalarType.class).get().getValue();
     String typeName = nodes.of(MtRedundentTypeName.class).get().getValue();
     Optional<MtRedundentDropdown> dropdown = nodes.of(MtRedundentDropdown.class);
@@ -577,11 +592,6 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .token(token(ctx))
         .value(nodes.of(Literal.class).get().getValue())
         .build();
-  }
-
-  private boolean isRequiredInputType(ParserRuleContext ctx) {
-    TerminalNode requirmentType = (TerminalNode) ctx.getParent().getChild(0);
-    return requirmentType.getSymbol().getType() == FlowParser.REQUIRED;
   }
 
   private Nodes nodes(ParserRuleContext node) {

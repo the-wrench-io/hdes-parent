@@ -24,7 +24,7 @@ endMapping: 'end' ':' '{' mapping '}';
 
 
 taskRef: taskTypes ':' typeName mapping;  
-mapping: objectDataType 'mapping' ':' '{' mappingArgs? '}';
+mapping: 'mapping' objectDataType ':' '{' mappingArgs? '}';
 mappingArgs: mappingArg (',' mappingArg)*;
 
 mappingArg: typeName ':' mappingValue;

@@ -46,8 +46,8 @@ public class FlowAstNodeTest {
         "id: x\n" +
             "description: 'very descriptive value'\n" +
             "inputs: {\n " +
-              "required INTEGER arg1.x1 , \n" +
-              "required INTEGER arg2.x1 \n" +
+              "arg1.x1 INTEGER required, \n" +
+              "arg2.x1 INTEGER required\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {" +
@@ -60,7 +60,7 @@ public class FlowAstNodeTest {
         "id: x\n" +
             "description: 'very descriptive value'\n" +
             "inputs: {\n " +
-              "required OBJECT arg0: {} \n" +
+              "arg0 OBJECT required: {} \n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {" +
@@ -70,9 +70,9 @@ public class FlowAstNodeTest {
         "id: x\n" +
             "description: 'very descriptive value'\n" +
             "inputs: {\n " +
-              "required OBJECT person: {" +
-                "optional INTEGER firstName,\n" +
-                "required INTEGER lastName\n" +
+              "person OBJECT required: {" +
+                "firstName INTEGER optional,\n" +
+                "lastName INTEGER required\n" +
               "} \n" +
             "}\n" +
             "outputs: {} \n" +
@@ -86,15 +86,19 @@ public class FlowAstNodeTest {
         "id: x\n" +
             "description: 'descriptive ' \n" +
             "inputs: {\n "
-            + "optional INTEGER arg1.x1,\n"
-            + "required INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER required\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {"
             + "when: 'arg2.x1 > 10' then: nextTask,"
-            + "when: 'arg2.x1 < 10' then: nextTask"
-            + "} " +
+            + "when: 'arg2.x1 < 10' then: nextTask" +
+            "}, " +
+            "nextTask: {"
+            + "then end: { mapping OBJECT: {} }" +
+            "} " +
+            
             "}\n");
   }
 
@@ -104,15 +108,18 @@ public class FlowAstNodeTest {
         "id: x\n" +
             "description: 'descriptive ' \n" +
             "inputs: {\n "
-            + "required INTEGER arg1.x1,\n"
-            + "optional INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER required\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {\n" +
             
             "firstTask: {"
             + "then: nextTask"
-            + "} " +
+            + "}, " +
+            "nextTask: {"
+            + "then end: { mapping OBJECT: {} }" +
+            "} " +
             "}\n");
   }
 
@@ -121,14 +128,14 @@ public class FlowAstNodeTest {
     parse(
         "id: x description: 'descriptive '\n" +
             "inputs: {\n"
-            + "optional INTEGER arg1.x1,\n"
-            + "optional INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER required\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: nextTask\n"
-            + "manualTask: bestManualTask OBJECT mapping:{}\n"
+            + "then end: { mapping OBJECT: {} }"
+            + "manualTask: bestManualTask mapping OBJECT:{}\n"
             + "}\n" +
             "}\n");
   }
@@ -138,14 +145,14 @@ public class FlowAstNodeTest {
     parse(
         "id: x description: 'descriptive '\n" +
             "inputs: {\n"
-            + "optional INTEGER arg1.x1,\n"
-            + "optional INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER optional\n" +
             "}\n" +
             "outputs: {} \n" + 
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: nextTask\n"
-            + "serviceTask: bestServiceTask OBJECT mapping: {} \n"
+            + "then end: { mapping OBJECT: {} }"
+            + "serviceTask: bestServiceTask mapping OBJECT: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -155,14 +162,14 @@ public class FlowAstNodeTest {
     parse(
         "id: x description: 'descriptive '\n" +
             "inputs: {\n"
-            + "optional INTEGER arg1.x1,\n"
-            + "optional INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER optional\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: nextTask\n"
-            + "flowTask: bestFlowTask OBJECT mapping: {} \n"
+            + "then end: { mapping OBJECT: {} }"
+            + "flowTask: bestFlowTask mapping OBJECT: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -172,14 +179,14 @@ public class FlowAstNodeTest {
     parse(
         "id: x description: 'descriptive '\n" +
             "inputs: {\n"
-            + "optional INTEGER arg1.x1,\n"
-            + "optional INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER optional\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: nextTask\n"
-            + "decisionTask: bestDtTask OBJECT mapping: {} \n"
+            + "then end: { mapping OBJECT: {} }"
+            + "decisionTask: bestDtTask mapping OBJECT: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -189,14 +196,14 @@ public class FlowAstNodeTest {
     parse(
         "id: x description: 'descriptive '\n" +
             "inputs: {\n"
-            + "optional INTEGER arg1.x1,\n"
-            + "optional INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER optional\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: nextTask\n"
-            + "decisionTask: bestDtTask ARRAY mapping: {} \n"
+            + "then end: { mapping OBJECT: {} }"
+            + "decisionTask: bestDtTask mapping ARRAY: {} \n"
             + "  \n"
             + "}\n" +
             "}\n");
@@ -207,21 +214,21 @@ public class FlowAstNodeTest {
     parse(
         "id: x description: 'descriptive '\n" +
             "inputs: {\n"
-            + "optional INTEGER arg1.x1,\n"
-            + "optional INTEGER arg2.x1\n" +
+            + "arg1.x1 INTEGER optional,\n"
+            + "arg2.x1 INTEGER optional\n" +
             "}\n" +
             "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
 
             + "then end: {\n"
-            + "OBJECT mapping: {\n"
+            + "mapping OBJECT: {\n"
               + "input1: arg1.x1,\n"
               + "input2: arg2.x1\n"
             + "}}\n"
 
             + "decisionTask: bestDtTask \n"
-            + "OBJECT mapping: {\n"
+            + "mapping OBJECT: {\n"
               + "input1: arg1.x1,\n"
               + "input2: arg2.x1\n"
             + "}\n"  

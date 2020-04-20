@@ -1,13 +1,13 @@
 id: basic description: 'very descriptive manual task'
 inputs: {}
-statements: {}
 dropdowns: {
   gender: { 'f': 'female', 'm': 'male' }
 }
+statements: {}
 form: { 
   fields: {
-    required STRING firstName: { },
-    required INTEGER age: { },
-    required INTEGER gender: { single dropdown: genderDropdown }
+    firstName STRING required: { },
+    age INTEGER required: { },
+    gender INTEGER optional: { single dropdown: genderDropdown }
   } 
 }
