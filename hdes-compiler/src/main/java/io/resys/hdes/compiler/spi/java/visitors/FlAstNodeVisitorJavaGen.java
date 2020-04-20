@@ -32,7 +32,6 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 
-import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
@@ -52,14 +51,12 @@ import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskRefSpec;
 
 public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
   
-  private final AstEnvir envir;
   private final NamingContext naming;
   private FlowBody body;
   private ClassName flowState;
   
-  public FlAstNodeVisitorJavaGen(AstEnvir envir, NamingContext naming) {
+  public FlAstNodeVisitorJavaGen(NamingContext naming) {
     super();
-    this.envir = envir;
     this.naming = naming;
   }
   
@@ -84,7 +81,18 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         .addCode(CodeBlock.builder()
             .add(taskImpl.getValue())
             .build())
-        .addStatement(CodeBlock.builder().add("return currentState").build())
+        .addCode(CodeBlock.builder()
+            .add("\r\n").addStatement("long end = System.currentTimeMillis()")
+            .build())
+        .addStatement(CodeBlock.builder()
+            .add("return $T.builder()", naming.immutable(flowState))
+            .add("\r\n").add(".from(currentState)")
+            .add("\r\n").add(".id($S)", node.getId())
+            .add("\r\n").add(".parent(currentState.getLog())")
+            .add("\r\n").add(".start(start)").add(".end(end)")
+            .add("\r\n").add(".duration(end - start)")
+            .add("\r\n").add(".build()")
+            .build())
         .build();
  
     return flowBuilder
@@ -162,8 +170,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
       .add("$T log = $T.builder()", FlowExecutionLog.class, ImmutableFlowExecutionLog.class)
       .add("\r\n").add(".id($S)", parent.getId())
       .add("\r\n").add(".parent(currentState.getLog())")
-      .add("\r\n").add(".start(start)")
-      .add("\r\n").add(".end(end)")
+      .add("\r\n").add(".start(start)").add(".end(end)")
       .add("\r\n").add(".duration(end - start)")
       .add("\r\n").add(".build()").build();
     

@@ -58,7 +58,7 @@ public class JavaAstEnvirVisitor {
   }
   private void visit(FlowBody body, AstEnvir envir) {
     TypeSpec superInterface = visitFlow(new FlAstNodeVisitorJavaInterface(naming).visitFlowBody(body));
-    TypeSpec implementation = visitFlow(new FlAstNodeVisitorJavaGen(envir, naming).visitFlowBody(body));
+    TypeSpec implementation = visitFlow(new FlAstNodeVisitorJavaGen(naming).visitFlowBody(body));
   }
 
   private TypeSpec visitFlow(TypeSpec type) {
