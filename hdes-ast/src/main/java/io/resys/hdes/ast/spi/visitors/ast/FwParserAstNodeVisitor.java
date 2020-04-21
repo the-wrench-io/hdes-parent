@@ -31,38 +31,38 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
-import io.resys.hdes.ast.FlowParser;
-import io.resys.hdes.ast.FlowParser.ArrayTypeContext;
-import io.resys.hdes.ast.FlowParser.DebugValueContext;
-import io.resys.hdes.ast.FlowParser.DescriptionContext;
-import io.resys.hdes.ast.FlowParser.EndMappingContext;
-import io.resys.hdes.ast.FlowParser.FlBodyContext;
-import io.resys.hdes.ast.FlowParser.IdContext;
-import io.resys.hdes.ast.FlowParser.InputsContext;
-import io.resys.hdes.ast.FlowParser.LiteralContext;
-import io.resys.hdes.ast.FlowParser.MappingArgContext;
-import io.resys.hdes.ast.FlowParser.MappingArgsContext;
-import io.resys.hdes.ast.FlowParser.MappingContext;
-import io.resys.hdes.ast.FlowParser.MappingValueContext;
-import io.resys.hdes.ast.FlowParser.NextTaskContext;
-import io.resys.hdes.ast.FlowParser.ObjectTypeContext;
-import io.resys.hdes.ast.FlowParser.OutputDefsContext;
-import io.resys.hdes.ast.FlowParser.PointerContext;
-import io.resys.hdes.ast.FlowParser.ScalarTypeContext;
-import io.resys.hdes.ast.FlowParser.SimpleTypeContext;
-import io.resys.hdes.ast.FlowParser.TaskArgsContext;
-import io.resys.hdes.ast.FlowParser.TaskRefContext;
-import io.resys.hdes.ast.FlowParser.TaskTypesContext;
-import io.resys.hdes.ast.FlowParser.TasksContext;
-import io.resys.hdes.ast.FlowParser.ThenContext;
-import io.resys.hdes.ast.FlowParser.TypeDefArgsContext;
-import io.resys.hdes.ast.FlowParser.TypeDefContext;
-import io.resys.hdes.ast.FlowParser.TypeDefsContext;
-import io.resys.hdes.ast.FlowParser.TypeNameContext;
-import io.resys.hdes.ast.FlowParser.WhenExpressionContext;
-import io.resys.hdes.ast.FlowParser.WhenThenArgsContext;
-import io.resys.hdes.ast.FlowParser.WhenThenContext;
-import io.resys.hdes.ast.FlowParserBaseVisitor;
+import io.resys.hdes.ast.HdesParser;
+import io.resys.hdes.ast.HdesParser.ArrayTypeContext;
+import io.resys.hdes.ast.HdesParser.DebugValueContext;
+import io.resys.hdes.ast.HdesParser.DescriptionContext;
+import io.resys.hdes.ast.HdesParser.EndMappingContext;
+import io.resys.hdes.ast.HdesParser.FlBodyContext;
+import io.resys.hdes.ast.HdesParser.IdContext;
+import io.resys.hdes.ast.HdesParser.InputsContext;
+import io.resys.hdes.ast.HdesParser.LiteralContext;
+import io.resys.hdes.ast.HdesParser.MappingArgContext;
+import io.resys.hdes.ast.HdesParser.MappingArgsContext;
+import io.resys.hdes.ast.HdesParser.MappingContext;
+import io.resys.hdes.ast.HdesParser.MappingValueContext;
+import io.resys.hdes.ast.HdesParser.NextTaskContext;
+import io.resys.hdes.ast.HdesParser.ObjectTypeContext;
+import io.resys.hdes.ast.HdesParser.OutputDefsContext;
+import io.resys.hdes.ast.HdesParser.PointerContext;
+import io.resys.hdes.ast.HdesParser.ScalarTypeContext;
+import io.resys.hdes.ast.HdesParser.SimpleTypeContext;
+import io.resys.hdes.ast.HdesParser.TaskArgsContext;
+import io.resys.hdes.ast.HdesParser.TaskRefContext;
+import io.resys.hdes.ast.HdesParser.TaskTypesContext;
+import io.resys.hdes.ast.HdesParser.TasksContext;
+import io.resys.hdes.ast.HdesParser.ThenContext;
+import io.resys.hdes.ast.HdesParser.TypeDefArgsContext;
+import io.resys.hdes.ast.HdesParser.TypeDefContext;
+import io.resys.hdes.ast.HdesParser.TypeDefsContext;
+import io.resys.hdes.ast.HdesParser.TypeNameContext;
+import io.resys.hdes.ast.HdesParser.WhenExpressionContext;
+import io.resys.hdes.ast.HdesParser.WhenThenArgsContext;
+import io.resys.hdes.ast.HdesParser.WhenThenContext;
+import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
@@ -107,7 +107,7 @@ import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser.FwRedundent
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
-public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
+public class FwParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
   
 
@@ -235,7 +235,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     Nodes nodes = nodes(ctx);
     return ImmutableScalarTypeDefNode.builder()
         .token(token(ctx))
-        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
         .name(getDefTypeName(ctx).getValue())
         .type(nodes.of(FwRedundentScalarType.class).get().getValue())
         .debugValue(nodes.of(FwRedundentDebugValue.class).map(e -> e.getValue()))
@@ -264,7 +264,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     
     return ImmutableObjectTypeDefNode.builder()
         .token(token(ctx))
-        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
         .name(getDefTypeName(ctx).getValue())
         .values(values)
         .build();
@@ -427,10 +427,10 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
     RefTaskType type = null;
     switch(terminalNode.getSymbol().getType()) {
-    case FlowParser.MANUAL_TASK: type = RefTaskType.MANUAL_TASK; break;
-    case FlowParser.FLOW_TASK: type = RefTaskType.FLOW_TASK; break;
-    case FlowParser.ST_TASK: type = RefTaskType.SERVICE_TASK; break;
-    case FlowParser.DT_TASK: type = RefTaskType.DECISION_TABLE; break;
+    case HdesParser.MANUAL_TASK: type = RefTaskType.MANUAL_TASK; break;
+    case HdesParser.FLOW_TASK: type = RefTaskType.FLOW_TASK; break;
+    case HdesParser.ST_TASK: type = RefTaskType.SERVICE_TASK; break;
+    case HdesParser.DT_TASK: type = RefTaskType.DECISION_TABLE; break;
     default: throw new AstNodeException("Unknown task type: " + ctx.getText() + "!");
     }
     return ImmutableFwRedundentRefTaskType.builder()
@@ -488,17 +488,17 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
     ScalarType type = null;
     TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
     switch (terminalNode.getSymbol().getType()) {
-    case FlowParser.StringLiteral:
+    case HdesParser.StringLiteral:
       type = ScalarType.STRING;
       value = Nodes.getStringLiteralValue(ctx);
       break;
-    case FlowParser.BooleanLiteral:
+    case HdesParser.BooleanLiteral:
       type = ScalarType.BOOLEAN;
       break;
-    case FlowParser.DecimalLiteral:
+    case HdesParser.DecimalLiteral:
       type = ScalarType.DECIMAL;
       break;
-    case FlowParser.IntegerLiteral:
+    case HdesParser.IntegerLiteral:
       type = ScalarType.INTEGER;
       value = value.replaceAll("_", "");
       break;

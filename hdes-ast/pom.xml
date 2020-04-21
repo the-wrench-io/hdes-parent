@@ -11,7 +11,7 @@
   <build>
     <resources>
       <resource>
-        <directory>src/main/antlr4/io/resys/hdes/ast</directory>
+        <directory>src/main/antlr4</directory>
       </resource>
     </resources>
     <plugins>
@@ -20,7 +20,16 @@
         <artifactId>antlr4-maven-plugin</artifactId>
         <configuration>
           <visitor>true</visitor>
-          <libDirectory>${basedir}/src/main/antlr4/io/resys/hdes/ast</libDirectory>
+          <sourceDirectory>${basedir}/src/main/antlr4</sourceDirectory>
+          <libDirectory>${basedir}/src/main/antlr4/imports</libDirectory>
+          <outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
+          
+          <arguments>
+            <argument>-package</argument>
+            <argument>io.resys.hdes.ast</argument>
+            <argument>-o</argument>
+            <argument>${project.build.directory}/generated-sources/antlr4/io/resys/hdes/ast</argument>
+          </arguments>
         </configuration>
       </plugin>
     </plugins>

@@ -31,46 +31,45 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
-import io.resys.hdes.ast.FlowParser;
-import io.resys.hdes.ast.ManualTaskParser;
-import io.resys.hdes.ast.ManualTaskParser.ActionBodyThenContext;
-import io.resys.hdes.ast.ManualTaskParser.ActionBodyWhenContext;
-import io.resys.hdes.ast.ManualTaskParser.ActionContext;
-import io.resys.hdes.ast.ManualTaskParser.ActionTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.ActionsArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.ActionsContext;
-import io.resys.hdes.ast.ManualTaskParser.ArrayTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.CssClassContext;
-import io.resys.hdes.ast.ManualTaskParser.DebugValueContext;
-import io.resys.hdes.ast.ManualTaskParser.DefaultValueContext;
-import io.resys.hdes.ast.ManualTaskParser.DescriptionContext;
-import io.resys.hdes.ast.ManualTaskParser.DropdownArgContext;
-import io.resys.hdes.ast.ManualTaskParser.DropdownArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.DropdownContext;
-import io.resys.hdes.ast.ManualTaskParser.DropdownKeyAndValueContext;
-import io.resys.hdes.ast.ManualTaskParser.DropdownKeysAndValuesContext;
-import io.resys.hdes.ast.ManualTaskParser.DropdownTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.DropdownsContext;
-import io.resys.hdes.ast.ManualTaskParser.FieldArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.FieldContext;
-import io.resys.hdes.ast.ManualTaskParser.FieldsContext;
-import io.resys.hdes.ast.ManualTaskParser.FormContext;
-import io.resys.hdes.ast.ManualTaskParser.GroupArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.GroupContext;
-import io.resys.hdes.ast.ManualTaskParser.GroupsContext;
-import io.resys.hdes.ast.ManualTaskParser.IdContext;
-import io.resys.hdes.ast.ManualTaskParser.InputsContext;
-import io.resys.hdes.ast.ManualTaskParser.LiteralContext;
-import io.resys.hdes.ast.ManualTaskParser.MessageContext;
-import io.resys.hdes.ast.ManualTaskParser.MtBodyContext;
-import io.resys.hdes.ast.ManualTaskParser.ObjectTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.ScalarTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.SimpleTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.TypeDefArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.TypeDefContext;
-import io.resys.hdes.ast.ManualTaskParser.TypeDefsContext;
-import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
-import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
+import io.resys.hdes.ast.HdesParser;
+import io.resys.hdes.ast.HdesParser.ActionBodyThenContext;
+import io.resys.hdes.ast.HdesParser.ActionBodyWhenContext;
+import io.resys.hdes.ast.HdesParser.ActionContext;
+import io.resys.hdes.ast.HdesParser.ActionTypeContext;
+import io.resys.hdes.ast.HdesParser.ActionsArgsContext;
+import io.resys.hdes.ast.HdesParser.ActionsContext;
+import io.resys.hdes.ast.HdesParser.ArrayTypeContext;
+import io.resys.hdes.ast.HdesParser.CssClassContext;
+import io.resys.hdes.ast.HdesParser.DebugValueContext;
+import io.resys.hdes.ast.HdesParser.DefaultValueContext;
+import io.resys.hdes.ast.HdesParser.DescriptionContext;
+import io.resys.hdes.ast.HdesParser.DropdownArgContext;
+import io.resys.hdes.ast.HdesParser.DropdownArgsContext;
+import io.resys.hdes.ast.HdesParser.DropdownContext;
+import io.resys.hdes.ast.HdesParser.DropdownKeyAndValueContext;
+import io.resys.hdes.ast.HdesParser.DropdownKeysAndValuesContext;
+import io.resys.hdes.ast.HdesParser.DropdownTypeContext;
+import io.resys.hdes.ast.HdesParser.DropdownsContext;
+import io.resys.hdes.ast.HdesParser.FieldArgsContext;
+import io.resys.hdes.ast.HdesParser.FieldContext;
+import io.resys.hdes.ast.HdesParser.FieldsContext;
+import io.resys.hdes.ast.HdesParser.FormContext;
+import io.resys.hdes.ast.HdesParser.GroupArgsContext;
+import io.resys.hdes.ast.HdesParser.GroupContext;
+import io.resys.hdes.ast.HdesParser.GroupsContext;
+import io.resys.hdes.ast.HdesParser.IdContext;
+import io.resys.hdes.ast.HdesParser.InputsContext;
+import io.resys.hdes.ast.HdesParser.LiteralContext;
+import io.resys.hdes.ast.HdesParser.MessageContext;
+import io.resys.hdes.ast.HdesParser.MtBodyContext;
+import io.resys.hdes.ast.HdesParser.ObjectTypeContext;
+import io.resys.hdes.ast.HdesParser.ScalarTypeContext;
+import io.resys.hdes.ast.HdesParser.SimpleTypeContext;
+import io.resys.hdes.ast.HdesParser.TypeDefArgsContext;
+import io.resys.hdes.ast.HdesParser.TypeDefContext;
+import io.resys.hdes.ast.HdesParser.TypeDefsContext;
+import io.resys.hdes.ast.HdesParser.TypeNameContext;
+import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
@@ -117,7 +116,7 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
-public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode> {
+public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
 
   private final TokenIdGenerator tokenIdGenerator;
 
@@ -242,7 +241,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     
     return ImmutableScalarTypeDefNode.builder()
         .token(token(ctx))
-        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
         .type(nodes.of(MtRedundentScalarType.class).get().getValue())
         .name(getDefTypeName(ctx).getValue())
         .name(nodes.of(MtRedundentTypeName.class).get().getValue())
@@ -270,7 +269,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     
     return ImmutableObjectTypeDefNode.builder()
         .token(token(ctx))
-        .required(requirmentType.getSymbol().getType() == FlowParser.REQUIRED)
+        .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
         .name(getDefTypeName(ctx).getValue())
         .values(values)
         .build();
@@ -281,7 +280,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     TerminalNode node = (TerminalNode) ctx.getChild(0);
     return ImmutableMtRedundentDropdownType.builder()
         .token(token(ctx))
-        .multiple(node.getSymbol().getType() == ManualTaskParser.DROPDOWN_MULTIPLE)
+        .multiple(node.getSymbol().getType() == HdesParser.DROPDOWN_MULTIPLE)
         .build();
   }
   
@@ -464,7 +463,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   @Override
   public FormField visitField(FieldContext ctx) {
     Nodes nodes = nodes(ctx);
-    boolean required = ((TerminalNode) ctx.getChild(2)).getSymbol().getType() == ManualTaskParser.REQUIRED;
+    boolean required = ((TerminalNode) ctx.getChild(2)).getSymbol().getType() == HdesParser.REQUIRED;
     ScalarType scalarType = nodes.of(MtRedundentScalarType.class).get().getValue();
     String typeName = nodes.of(MtRedundentTypeName.class).get().getValue();
     Optional<MtRedundentDropdown> dropdown = nodes.of(MtRedundentDropdown.class);
@@ -560,9 +559,9 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     TerminalNode node = (TerminalNode) ctx.getChild(0);
     ActionType type;
     switch (node.getSymbol().getType()) {
-    case ManualTaskParser.ALERT: type = ActionType.ALERT; break;
-    case ManualTaskParser.SHOW: type = ActionType.SHOW; break;
-    case ManualTaskParser.EVALUATE: type = ActionType.ALERT; break;
+    case HdesParser.ALERT: type = ActionType.ALERT; break;
+    case HdesParser.SHOW: type = ActionType.SHOW; break;
+    case HdesParser.EVALUATE: type = ActionType.ALERT; break;
     default: throw new AstNodeException("Unknown Action type: " + ctx.getText() + "!");
     }
     return ImmutableMtRedundentActionType.builder()
@@ -610,17 +609,17 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     ScalarType type = null;
     TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
     switch (terminalNode.getSymbol().getType()) {
-    case ManualTaskParser.StringLiteral:
+    case HdesParser.StringLiteral:
       type = ScalarType.STRING;
       value = Nodes.getStringLiteralValue(ctx);
       break;
-    case ManualTaskParser.BooleanLiteral:
+    case HdesParser.BooleanLiteral:
       type = ScalarType.BOOLEAN;
       break;
-    case ManualTaskParser.DecimalLiteral:
+    case HdesParser.DecimalLiteral:
       type = ScalarType.DECIMAL;
       break;
-    case ManualTaskParser.IntegerLiteral:
+    case HdesParser.IntegerLiteral:
       type = ScalarType.INTEGER;
       value = value.replaceAll("_", "");
       break;

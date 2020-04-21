@@ -28,7 +28,12 @@ fragment O : [oO];
 fragment R : [rR];
 fragment T : [tT];
 fragment W : [wW];
-  
+
+DEFINE: 'define';
+DEF_FL: 'flow';
+DEF_DT: 'decision-table';
+DEF_MT: 'manual-task';
+DEF_EN: 'expression';
 
 MANUAL_TASK: 'manualTask';
 FLOW_TASK: 'flowTask';

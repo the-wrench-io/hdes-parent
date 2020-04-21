@@ -28,29 +28,29 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
-import io.resys.hdes.ast.ExpressionParser;
-import io.resys.hdes.ast.ExpressionParser.AdditiveExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.AndExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.ConditionalAndExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.ConditionalExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.ConditionalOrExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.EnBodyContext;
-import io.resys.hdes.ast.ExpressionParser.EqualityExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.ExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.LiteralContext;
-import io.resys.hdes.ast.ExpressionParser.MethodArgsContext;
-import io.resys.hdes.ast.ExpressionParser.MethodInvocationContext;
-import io.resys.hdes.ast.ExpressionParser.MethodNameContext;
-import io.resys.hdes.ast.ExpressionParser.MultiplicativeExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.PostfixExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.PreDecrementExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.PreIncrementExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.PrimaryContext;
-import io.resys.hdes.ast.ExpressionParser.RelationalExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.TypeNameContext;
-import io.resys.hdes.ast.ExpressionParser.UnaryExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.UnaryExpressionNotPlusMinusContext;
-import io.resys.hdes.ast.ExpressionParserBaseVisitor;
+import io.resys.hdes.ast.HdesParser;
+import io.resys.hdes.ast.HdesParser.AdditiveExpressionContext;
+import io.resys.hdes.ast.HdesParser.AndExpressionContext;
+import io.resys.hdes.ast.HdesParser.ConditionalAndExpressionContext;
+import io.resys.hdes.ast.HdesParser.ConditionalExpressionContext;
+import io.resys.hdes.ast.HdesParser.ConditionalOrExpressionContext;
+import io.resys.hdes.ast.HdesParser.EnBodyContext;
+import io.resys.hdes.ast.HdesParser.EqualityExpressionContext;
+import io.resys.hdes.ast.HdesParser.ExpressionContext;
+import io.resys.hdes.ast.HdesParser.LiteralContext;
+import io.resys.hdes.ast.HdesParser.MethodArgsContext;
+import io.resys.hdes.ast.HdesParser.MethodInvocationContext;
+import io.resys.hdes.ast.HdesParser.MethodNameContext;
+import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
+import io.resys.hdes.ast.HdesParser.PostfixExpressionContext;
+import io.resys.hdes.ast.HdesParser.PreDecrementExpressionContext;
+import io.resys.hdes.ast.HdesParser.PreIncrementExpressionContext;
+import io.resys.hdes.ast.HdesParser.PrimaryContext;
+import io.resys.hdes.ast.HdesParser.RelationalExpressionContext;
+import io.resys.hdes.ast.HdesParser.TypeNameContext;
+import io.resys.hdes.ast.HdesParser.UnaryExpressionContext;
+import io.resys.hdes.ast.HdesParser.UnaryExpressionNotPlusMinusContext;
+import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
@@ -84,7 +84,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableTypeRefNode;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
-public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode> {
+public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
   private final ScalarType evalType;
 
@@ -195,7 +195,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
     AstNode right = ctx.getChild(4).accept(this);
     ParseTree first = ctx.getChild(1);
     if (first instanceof TerminalNode &&
-        ((TerminalNode) first).getSymbol().getType() == ExpressionParser.BETWEEN) {
+        ((TerminalNode) first).getSymbol().getType() == HdesParser.BETWEEN) {
       return ImmutableBetweenExpression.builder()
           .token(token(ctx))
           .value(condition)
@@ -312,7 +312,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
     TerminalNode sign = (TerminalNode) ctx.getChild(1);
     return ImmutableAdditiveOperation.builder()
         .token(token(ctx))
-        .type(sign.getSymbol().getType() == ExpressionParser.ADD ? AdditiveType.ADD : AdditiveType.SUBSTRACT)
+        .type(sign.getSymbol().getType() == HdesParser.ADD ? AdditiveType.ADD : AdditiveType.SUBSTRACT)
         .left(left).right(right).build();
   }
 
@@ -328,7 +328,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
     TerminalNode sign = (TerminalNode) ctx.getChild(1);
     return ImmutableMultiplicativeOperation.builder()
         .token(token(ctx))
-        .type(sign.getSymbol().getType() == ExpressionParser.MULTIPLY ? MultiplicativeType.MULTIPLY : MultiplicativeType.DIVIDE)
+        .type(sign.getSymbol().getType() == HdesParser.MULTIPLY ? MultiplicativeType.MULTIPLY : MultiplicativeType.DIVIDE)
         .left(left).right(right).build();
   }
 
@@ -351,7 +351,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
       childResult = c.accept(this);
     }
     
-    if(terminalNode.getSymbol().getType() == ExpressionParser.ADD) {
+    if(terminalNode.getSymbol().getType() == HdesParser.ADD) {
       return ImmutablePositiveUnaryOperation.builder()
           .token(token(ctx))
           .value(childResult).build();
@@ -440,7 +440,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
       }
       childResult = c.accept(this);
     }
-    if(terminalNode.getSymbol().getType() == ExpressionParser.INCREMENT) {
+    if(terminalNode.getSymbol().getType() == HdesParser.INCREMENT) {
       return ImmutablePostIncrementUnaryOperation.builder()
         .token(token(ctx))
         .value(childResult).build();
@@ -468,17 +468,17 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
     ScalarType type = null;
     TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
     switch (terminalNode.getSymbol().getType()) {
-    case ExpressionParser.StringLiteral:
+    case HdesParser.StringLiteral:
       type = ScalarType.STRING;
       value = Nodes.getStringLiteralValue(ctx);
       break;
-    case ExpressionParser.BooleanLiteral:
+    case HdesParser.BooleanLiteral:
       type = ScalarType.BOOLEAN;
       break;
-    case ExpressionParser.DecimalLiteral:
+    case HdesParser.DecimalLiteral:
       type = ScalarType.DECIMAL;
       break;
-    case ExpressionParser.IntegerLiteral:
+    case HdesParser.IntegerLiteral:
       type = ScalarType.INTEGER;
       value = value.replaceAll("_", "");
       break;

@@ -32,31 +32,31 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
-import io.resys.hdes.ast.DecisionTableParser;
-import io.resys.hdes.ast.DecisionTableParser.AllContext;
-import io.resys.hdes.ast.DecisionTableParser.DescriptionContext;
-import io.resys.hdes.ast.DecisionTableParser.DirectionTypeContext;
-import io.resys.hdes.ast.DecisionTableParser.DtBodyContext;
-import io.resys.hdes.ast.DecisionTableParser.FirstContext;
-import io.resys.hdes.ast.DecisionTableParser.HeaderArgsContext;
-import io.resys.hdes.ast.DecisionTableParser.HeaderContext;
-import io.resys.hdes.ast.DecisionTableParser.HeadersContext;
-import io.resys.hdes.ast.DecisionTableParser.HitPolicyContext;
-import io.resys.hdes.ast.DecisionTableParser.IdContext;
-import io.resys.hdes.ast.DecisionTableParser.LiteralContext;
-import io.resys.hdes.ast.DecisionTableParser.MatrixContext;
-import io.resys.hdes.ast.DecisionTableParser.RuleEqualityExpressionContext;
-import io.resys.hdes.ast.DecisionTableParser.RuleMatchingExpressionContext;
-import io.resys.hdes.ast.DecisionTableParser.RuleMatchingOrExpressionContext;
-import io.resys.hdes.ast.DecisionTableParser.RuleRelationalExpressionContext;
-import io.resys.hdes.ast.DecisionTableParser.RuleUndefinedValueContext;
-import io.resys.hdes.ast.DecisionTableParser.RuleValueContext;
-import io.resys.hdes.ast.DecisionTableParser.RulesContext;
-import io.resys.hdes.ast.DecisionTableParser.RulesetContext;
-import io.resys.hdes.ast.DecisionTableParser.RulesetsContext;
-import io.resys.hdes.ast.DecisionTableParser.ScalarTypeContext;
-import io.resys.hdes.ast.DecisionTableParser.TypeNameContext;
-import io.resys.hdes.ast.DecisionTableParserBaseVisitor;
+import io.resys.hdes.ast.HdesParser;
+import io.resys.hdes.ast.HdesParser.AllContext;
+import io.resys.hdes.ast.HdesParser.DescriptionContext;
+import io.resys.hdes.ast.HdesParser.DirectionTypeContext;
+import io.resys.hdes.ast.HdesParser.DtBodyContext;
+import io.resys.hdes.ast.HdesParser.FirstContext;
+import io.resys.hdes.ast.HdesParser.HeaderArgsContext;
+import io.resys.hdes.ast.HdesParser.HeaderContext;
+import io.resys.hdes.ast.HdesParser.HeadersContext;
+import io.resys.hdes.ast.HdesParser.HitPolicyContext;
+import io.resys.hdes.ast.HdesParser.IdContext;
+import io.resys.hdes.ast.HdesParser.LiteralContext;
+import io.resys.hdes.ast.HdesParser.MatrixContext;
+import io.resys.hdes.ast.HdesParser.RuleEqualityExpressionContext;
+import io.resys.hdes.ast.HdesParser.RuleMatchingExpressionContext;
+import io.resys.hdes.ast.HdesParser.RuleMatchingOrExpressionContext;
+import io.resys.hdes.ast.HdesParser.RuleRelationalExpressionContext;
+import io.resys.hdes.ast.HdesParser.RuleUndefinedValueContext;
+import io.resys.hdes.ast.HdesParser.RuleValueContext;
+import io.resys.hdes.ast.HdesParser.RulesContext;
+import io.resys.hdes.ast.HdesParser.RulesetContext;
+import io.resys.hdes.ast.HdesParser.RulesetsContext;
+import io.resys.hdes.ast.HdesParser.ScalarTypeContext;
+import io.resys.hdes.ast.HdesParser.TypeNameContext;
+import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
@@ -98,7 +98,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableUndefinedValue;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
-public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNode> {
+public class DtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
   private Headers headers;
 
@@ -185,7 +185,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   public AstNode visitRuleMatchingExpression(RuleMatchingExpressionContext ctx) {
     ParseTree tree = ctx.getChild(0);
     if(tree instanceof TerminalNode && 
-        ((TerminalNode) tree).getSymbol().getType() == DecisionTableParser.NOT_OP) {
+        ((TerminalNode) tree).getSymbol().getType() == HdesParser.NOT_OP) {
       return ImmutableNotUnaryOperation.builder()
           .value(nodes(ctx).of(AstNode.class).get())
           .token(token(ctx))
@@ -216,7 +216,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
     TerminalNode v = (TerminalNode) ctx.getChild(1);
     AstNode right = ctx.getChild(2).accept(this);
     
-    return v.getSymbol().getType() == DecisionTableParser.AND ? 
+    return v.getSymbol().getType() == HdesParser.AND ? 
         ImmutableAndOperation.builder().token(token(ctx)).left(left).right(right).build() : 
         ImmutableOrOperation.builder().token(token(ctx)).left(left).right(right).build();
   }
@@ -420,17 +420,17 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
     ScalarType type = null;
     TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
     switch (terminalNode.getSymbol().getType()) {
-    case DecisionTableParser.StringLiteral:
+    case HdesParser.StringLiteral:
       type = ScalarType.STRING;
       value = Nodes.getStringLiteralValue(ctx);
       break;
-    case DecisionTableParser.BooleanLiteral:
+    case HdesParser.BooleanLiteral:
       type = ScalarType.BOOLEAN;
       break;
-    case DecisionTableParser.DecimalLiteral:
+    case HdesParser.DecimalLiteral:
       type = ScalarType.DECIMAL;
       break;
-    case DecisionTableParser.IntegerLiteral:
+    case HdesParser.IntegerLiteral:
       type = ScalarType.INTEGER;
       value = value.replaceAll("_", "");
       break;
