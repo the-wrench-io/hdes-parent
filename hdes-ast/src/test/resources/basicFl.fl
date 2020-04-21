@@ -13,8 +13,6 @@ tasks: {
     }
   }, 
   endTask: {
-    then end: {
-      mapping OBJECT: { input1: arg1.x1, input2: arg2.x1 }
-    }
+    then: end mapping OBJECT: { input1: arg1.x1, input2: arg2.x1 }
   }
 }

@@ -19,8 +19,8 @@ pointer: whenThenArgs | then ;
 whenThenArgs: whenThen (',' whenThen)*;
 whenThen: 'when' ':' whenExpression then; 
 whenExpression: StringLiteral;
-then: 'then' (endMapping | (':' typeName));
-endMapping: 'end' ':' '{' mapping '}';
+then: 'then' ':' (endMapping | typeName);
+endMapping: 'end' mapping;
 
 
 taskRef: taskTypes ':' typeName mapping;  

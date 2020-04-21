@@ -16,9 +16,16 @@ tasks: {
       name: arg1,
       lastName: arg2
     }
-  }, 
+  },
+  switch: {
+    when: '' then: secondTask,
+    when: '' then: end mapping OBJECT: {
+      name: arg1,
+      lastName: arg2
+    }
+  },
   secondTask: {
-    then end: { mapping OBJECT: { } }
+    then: end mapping OBJECT: { }
     decisionTask: Best2Dt mapping OBJECT: {
       name: arg1,
       lastName: arg2
