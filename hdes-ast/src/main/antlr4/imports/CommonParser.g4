@@ -12,7 +12,6 @@ typeName : Identifier | typeName '.' Identifier;
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
 
-inputs: 'inputs' ':' typeDefs;
 typeDefs: '{' typeDefArgs? '}';
 typeDefArgs: typeDef (',' typeDef)*;
 typeDef: typeName (arrayType | objectType | simpleType);

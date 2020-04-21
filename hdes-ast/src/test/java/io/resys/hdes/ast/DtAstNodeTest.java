@@ -30,7 +30,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.ast.spi.visitors.ast.DtParserAstNodeVisitor;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class DtAstNodeTest {
@@ -105,11 +105,11 @@ public class DtAstNodeTest {
   public void parse(String value) {
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    DecisionTableParser parser = new DecisionTableParser(tokens);
+    HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.dtBody();
     //tree.accept(new DtParserConsoleVisitor());
-    tree.accept(new DtParserAstNodeVisitor(new TokenIdGenerator()));
+    tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
     
     /*
     ImmutableHdesEnvir.builder().strict()

@@ -31,9 +31,9 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
-import io.resys.hdes.ast.spi.visitors.ast.EnParserAstNodeVisitor;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
-import io.resys.hdes.ast.spi.visitors.loggers.ExpressionParserConsoleVisitor;
+import io.resys.hdes.ast.spi.visitors.loggers.HdesParserConsoleVisitor;
 
 public class ExpressionAstNodeTest {
   @Test
@@ -99,11 +99,11 @@ public class ExpressionAstNodeTest {
   public void parse(String value, ScalarType evalType) {
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    ExpressionParser parser = new ExpressionParser(tokens);
+    HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.enBody();
-    tree.accept(new ExpressionParserConsoleVisitor());
-    tree.accept(new EnParserAstNodeVisitor(new TokenIdGenerator(), evalType));
+    tree.accept(new HdesParserConsoleVisitor());
+    tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
   }
 
   public static class ErrorListener extends BaseErrorListener {

@@ -37,24 +37,19 @@ import io.resys.hdes.ast.HdesParser.ConditionalOrExpressionContext;
 import io.resys.hdes.ast.HdesParser.EnBodyContext;
 import io.resys.hdes.ast.HdesParser.EqualityExpressionContext;
 import io.resys.hdes.ast.HdesParser.ExpressionContext;
-import io.resys.hdes.ast.HdesParser.LiteralContext;
 import io.resys.hdes.ast.HdesParser.MethodArgsContext;
 import io.resys.hdes.ast.HdesParser.MethodInvocationContext;
-import io.resys.hdes.ast.HdesParser.MethodNameContext;
 import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
 import io.resys.hdes.ast.HdesParser.PostfixExpressionContext;
 import io.resys.hdes.ast.HdesParser.PreDecrementExpressionContext;
 import io.resys.hdes.ast.HdesParser.PreIncrementExpressionContext;
 import io.resys.hdes.ast.HdesParser.PrimaryContext;
 import io.resys.hdes.ast.HdesParser.RelationalExpressionContext;
-import io.resys.hdes.ast.HdesParser.TypeNameContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionNotPlusMinusContext;
 import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
-import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.AdditiveType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
@@ -69,7 +64,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableConditionalExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableExpressionBody;
-import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableMethodRefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableMultiplicativeOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableNegateUnaryOperation;
@@ -80,19 +74,13 @@ import io.resys.hdes.ast.api.nodes.ImmutablePostDecrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutablePostIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutablePreDecrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutablePreIncrementUnaryOperation;
-import io.resys.hdes.ast.api.nodes.ImmutableTypeRefNode;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
-  private final TokenIdGenerator tokenIdGenerator;
-  private final ScalarType evalType;
 
-  public EnParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator, ScalarType evalType) {
-    super();
-    this.tokenIdGenerator = tokenIdGenerator;
-    this.evalType = evalType;
-  }
+  protected final TokenIdGenerator tokenIdGenerator;
+  //private final ScalarType evalType;
 
   // Internal only
   @Value.Immutable
@@ -104,25 +92,10 @@ public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   public interface RedundentArgs extends ExpressionNode {
     List<AstNode> getValues();
   }
-
-  @Override
-  public AstNode visitLiteral(LiteralContext ctx) {
-    return literal(ctx, token(ctx));
-  }
-
-  @Override
-  public TypeRefNode visitTypeName(TypeNameContext ctx) {
-    return ImmutableTypeRefNode.builder()
-        .token(token(ctx))
-        .name(ctx.getText()).build();
-  }
-
-  @Override
-  public RedundentMethodName visitMethodName(MethodNameContext ctx) {
-    return ImmutableRedundentMethodName.builder()
-        .token(token(ctx))
-        .value(ctx.getText())
-        .build();
+  
+  public EnParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
+    super();
+    this.tokenIdGenerator = tokenIdGenerator;
   }
 
   @Override
@@ -163,7 +136,7 @@ public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     return ImmutableExpressionBody.builder()
         .value(first(ctx))
         .token(token(ctx))
-        .type(evalType)
+        //.type(evalType)
         .build();
   }
 
@@ -449,47 +422,18 @@ public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
         .token(token(ctx))
         .value(childResult).build();
   }
-
-  private AstNode first(ParserRuleContext ctx) {
+ 
+  
+  protected final AstNode first(ParserRuleContext ctx) {
     ParseTree c = ctx.getChild(0);
     return c.accept(this);
   }
 
-  private Nodes nodes(ParserRuleContext node) {
+  protected final Nodes nodes(ParserRuleContext node) {
     return Nodes.from(node, this);
   }
 
-  private AstNode.Token token(ParserRuleContext node) {
+  protected final AstNode.Token token(ParserRuleContext node) {
     return Nodes.token(node, tokenIdGenerator);
   }
-  
-  private Literal literal(ParserRuleContext ctx, AstNode.Token token) {
-    String value = ctx.getText();
-    ScalarType type = null;
-    TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
-    switch (terminalNode.getSymbol().getType()) {
-    case HdesParser.StringLiteral:
-      type = ScalarType.STRING;
-      value = Nodes.getStringLiteralValue(ctx);
-      break;
-    case HdesParser.BooleanLiteral:
-      type = ScalarType.BOOLEAN;
-      break;
-    case HdesParser.DecimalLiteral:
-      type = ScalarType.DECIMAL;
-      break;
-    case HdesParser.IntegerLiteral:
-      type = ScalarType.INTEGER;
-      value = value.replaceAll("_", "");
-      break;
-    default:
-      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
-    }
-
-    return ImmutableLiteral.builder()
-        .token(token)
-        .type(type)
-        .value(value)
-        .build();
-}
 }

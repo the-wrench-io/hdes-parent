@@ -9,9 +9,10 @@ taskTypes
   | ST_TASK;
 objectDataType: OBJECT | ARRAY;
 
-flBody: id description? inputs outputDefs tasks EOF;
+flBody: id description? flowInputs flowOutputs tasks EOF;
 
-outputDefs: OUTPUTS ':' typeDefs;
+flowInputs: 'inputs' ':' typeDefs;
+flowOutputs: 'outputs' ':' typeDefs;
 
 tasks: 'tasks' ':' '{' taskArgs? '}';
 taskArgs: nextTask (',' nextTask)*;

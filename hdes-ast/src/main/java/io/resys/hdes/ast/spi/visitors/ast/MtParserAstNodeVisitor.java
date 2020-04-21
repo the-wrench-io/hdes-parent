@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
  */
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
@@ -38,11 +37,8 @@ import io.resys.hdes.ast.HdesParser.ActionContext;
 import io.resys.hdes.ast.HdesParser.ActionTypeContext;
 import io.resys.hdes.ast.HdesParser.ActionsArgsContext;
 import io.resys.hdes.ast.HdesParser.ActionsContext;
-import io.resys.hdes.ast.HdesParser.ArrayTypeContext;
 import io.resys.hdes.ast.HdesParser.CssClassContext;
-import io.resys.hdes.ast.HdesParser.DebugValueContext;
 import io.resys.hdes.ast.HdesParser.DefaultValueContext;
-import io.resys.hdes.ast.HdesParser.DescriptionContext;
 import io.resys.hdes.ast.HdesParser.DropdownArgContext;
 import io.resys.hdes.ast.HdesParser.DropdownArgsContext;
 import io.resys.hdes.ast.HdesParser.DropdownContext;
@@ -57,35 +53,22 @@ import io.resys.hdes.ast.HdesParser.FormContext;
 import io.resys.hdes.ast.HdesParser.GroupArgsContext;
 import io.resys.hdes.ast.HdesParser.GroupContext;
 import io.resys.hdes.ast.HdesParser.GroupsContext;
-import io.resys.hdes.ast.HdesParser.IdContext;
-import io.resys.hdes.ast.HdesParser.InputsContext;
-import io.resys.hdes.ast.HdesParser.LiteralContext;
 import io.resys.hdes.ast.HdesParser.MessageContext;
 import io.resys.hdes.ast.HdesParser.MtBodyContext;
-import io.resys.hdes.ast.HdesParser.ObjectTypeContext;
-import io.resys.hdes.ast.HdesParser.ScalarTypeContext;
+import io.resys.hdes.ast.HdesParser.MtInputsContext;
 import io.resys.hdes.ast.HdesParser.SimpleTypeContext;
-import io.resys.hdes.ast.HdesParser.TypeDefArgsContext;
 import io.resys.hdes.ast.HdesParser.TypeDefContext;
-import io.resys.hdes.ast.HdesParser.TypeDefsContext;
-import io.resys.hdes.ast.HdesParser.TypeNameContext;
-import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.ImmutableArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdown;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdownField;
 import io.resys.hdes.ast.api.nodes.ImmutableFields;
 import io.resys.hdes.ast.api.nodes.ImmutableGroup;
 import io.resys.hdes.ast.api.nodes.ImmutableGroups;
-import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteralField;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskAction;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskActions;
@@ -93,7 +76,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskInputs;
-import io.resys.hdes.ast.api.nodes.ImmutableObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableThenAction;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenAction;
@@ -113,34 +95,20 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskInputs;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenAction;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDebugValue;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentId;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentScalarType;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
-public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
-
-  private final TokenIdGenerator tokenIdGenerator;
+public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
 
   public MtParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
-    super();
-    this.tokenIdGenerator = tokenIdGenerator;
+    super(tokenIdGenerator);
   }
-  
-  @Value.Immutable
-  public interface MtRedundentId extends ManualTaskNode {
-    String getValue();
-  }
-  @Value.Immutable
-  public interface MtRedundentDescription extends ManualTaskNode {
-    String getValue();
-  }
-  @Value.Immutable
-  public interface MtRedundentTypeName extends ManualTaskNode {
-    String getValue();
-  }
-  @Value.Immutable
-  public interface MtRedundentScalarType extends ManualTaskNode {
-    ScalarType getValue();
-  }
+
   @Value.Immutable
   public interface MtRedundentDropdownType extends ManualTaskNode {
     Boolean getMultiple();
@@ -195,44 +163,6 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   public interface MtRedundentActionMsg extends ManualTaskNode {
     String getValue();
   }
-  @Value.Immutable
-  public interface MtRedundentDebugValue extends ManualTaskNode {
-    String getValue();
-  }
-  
-  @Override
-  public AstNode visitLiteral(LiteralContext ctx) {
-    return literal(ctx, token(ctx));
-  }
-  @Override
-  public ManualTaskNode visitId(IdContext ctx) {
-    return ImmutableMtRedundentId.builder()
-        .token(token(ctx))
-        .value(nodes(ctx).of(MtRedundentTypeName.class).get().getValue())
-        .build();
-  }
-  @Override
-  public ManualTaskNode visitDescription(DescriptionContext ctx) {
-    return ImmutableMtRedundentDescription.builder()
-        .token(token(ctx))
-        .value(nodes(ctx).of(Literal.class).get().getValue())
-        .build();
-  }
-  @Override
-  public ManualTaskNode visitTypeName(TypeNameContext ctx) {
-    return ImmutableMtRedundentTypeName.builder()
-        .token(token(ctx))
-        .value(ctx.getText())
-        .build();
-  }
-  
-  @Override
-  public MtRedundentScalarType visitScalarType(ScalarTypeContext ctx) {
-    return ImmutableMtRedundentScalarType.builder()
-        .token(token(ctx))
-        .value(ScalarType.valueOf(ctx.getText()))
-        .build();
-  }
   
   @Override
   public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
@@ -242,39 +172,13 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     return ImmutableScalarTypeDefNode.builder()
         .token(token(ctx))
         .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
-        .type(nodes.of(MtRedundentScalarType.class).get().getValue())
+        .type(nodes.of(RedundentScalarType.class).get().getValue())
         .name(getDefTypeName(ctx).getValue())
-        .name(nodes.of(MtRedundentTypeName.class).get().getValue())
-        .debugValue(nodes.of(MtRedundentDebugValue.class).get().getValue())
+        .name(nodes.of(RedundentTypeName.class).get().getValue())
+        .debugValue(nodes.of(RedundentDebugValue.class).get().getValue())
         .build();
   }
-  @Override
-  public ArrayTypeDefNode visitArrayType(ArrayTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    TypeDefNode value = nodes.of(TypeDefNode.class).get();
-    
-    return ImmutableArrayTypeDefNode.builder()
-        .token(token(ctx))
-        .required(value.getRequired())
-        .value(value)
-        .build();
-  }
-  
-  @Override
-  public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    List<TypeDefNode> values = nodes.of(FlowInputs.class).map((FlowInputs i)-> i.getValues())
-        .orElse(Collections.emptyList());
-    TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
-    
-    return ImmutableObjectTypeDefNode.builder()
-        .token(token(ctx))
-        .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
-        .name(getDefTypeName(ctx).getValue())
-        .values(values)
-        .build();
-  }
-  
+
   @Override
   public MtRedundentDropdownType visitDropdownType(DropdownTypeContext ctx) {
     TerminalNode node = (TerminalNode) ctx.getChild(0);
@@ -284,11 +188,11 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
         .build();
   }
   
-  private MtRedundentTypeName getDefTypeName(ParserRuleContext ctx) {
+  protected final RedundentTypeName getDefTypeName(ParserRuleContext ctx) {
     if(ctx.getParent() instanceof TypeDefContext) {
-      return (MtRedundentTypeName) ctx.getParent().getChild(0).accept(this);
+      return (RedundentTypeName) ctx.getParent().getChild(0).accept(this);
     }
-    return (MtRedundentTypeName) ctx.getParent().getParent().getChild(0).accept(this);
+    return (RedundentTypeName) ctx.getParent().getParent().getChild(0).accept(this);
   }
   
   
@@ -297,8 +201,8 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     Nodes nodes = nodes(ctx);
     return ImmutableManualTaskBody.builder()
         .token(token(ctx))
-        .id(nodes.of(MtRedundentId.class).get().getValue())
-        .description(nodes.of(MtRedundentDescription.class).get().getValue())
+        .id(nodes.of(RedundentId.class).get().getValue())
+        .description(nodes.of(RedundentDescription.class).get().getValue())
         .form(nodes.of(ManualTaskForm.class).get())
         .dropdowns(nodes.of(ManualTaskDropdowns.class).get())
         .actions(nodes.of(ManualTaskActions.class).get())
@@ -306,7 +210,7 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
         .build();
   }
   @Override
-  public ManualTaskInputs visitInputs(InputsContext ctx) {
+  public ManualTaskInputs visitMtInputs(MtInputsContext ctx) {
     Nodes nodes = nodes(ctx);
     List<TypeDefNode> values = nodes.of(MtRedundentInputArgs.class)
         .map(a -> a.getValues()).orElse(Collections.emptyList());
@@ -318,39 +222,10 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   
   @Override
   public AstNode visitCssClass(CssClassContext ctx) {
-    Literal literal = literal(ctx, token(ctx));
+    Literal literal = Nodes.literal(ctx, token(ctx));
     return ImmutableMtRedundentCssClass.builder()
         .token(token(ctx))
         .value(literal.getValue())
-        .build();
-  }
-  @Override
-  public AstNode visitTypeDefs(TypeDefsContext ctx) {
-    return nodes(ctx).of(ImmutableMtRedundentInputArgs.class).orElseGet(() -> ImmutableMtRedundentInputArgs.builder()
-        .token(token(ctx))
-        .build());
-  }
-
-  @Override
-  public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
-    return ImmutableMtRedundentInputArgs.builder()
-        .token(token(ctx))
-        .values(nodes(ctx).list(TypeDefNode.class))
-        .build();
-  }
-
-  @Override
-  public AstNode visitTypeDef(TypeDefContext ctx) {
-    ParseTree c = ctx.getChild(1);
-    return c.accept(this);
-  }
-
-  @Override
-  public MtRedundentDebugValue visitDebugValue(DebugValueContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableMtRedundentDebugValue.builder()
-        .token(token(ctx))
-        .value(nodes.of(Literal.class).get().getValue())
         .build();
   }
   
@@ -378,7 +253,7 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     Nodes nodes = nodes(ctx);
     return ImmutableDropdown.builder()
         .token(token(ctx))
-        .name(nodes.of(MtRedundentTypeName.class).get().getValue())
+        .name(nodes.of(RedundentTypeName.class).get().getValue())
         .values(nodes.of(MtRedundentDropdownKeysAndValues.class).get().getValues())
         .build();
   }
@@ -442,7 +317,7 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   @Override
   public Group visitGroup(GroupContext ctx) {
     Nodes nodes = nodes(ctx);
-    String id = nodes.of(MtRedundentId.class).get().getValue();
+    String id = nodes.of(RedundentId.class).get().getValue();
     
     Optional<Fields> fields = nodes.of(Fields.class);
     if(fields.isPresent()) {
@@ -464,8 +339,8 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   public FormField visitField(FieldContext ctx) {
     Nodes nodes = nodes(ctx);
     boolean required = ((TerminalNode) ctx.getChild(2)).getSymbol().getType() == HdesParser.REQUIRED;
-    ScalarType scalarType = nodes.of(MtRedundentScalarType.class).get().getValue();
-    String typeName = nodes.of(MtRedundentTypeName.class).get().getValue();
+    ScalarType scalarType = nodes.of(RedundentScalarType.class).get().getValue();
+    String typeName = nodes.of(RedundentTypeName.class).get().getValue();
     Optional<MtRedundentDropdown> dropdown = nodes.of(MtRedundentDropdown.class);
     Optional<String> defaultValue = nodes.of(MtRedundentDefaultValue.class).map(e -> e.getValue());
     Optional<String> cssClasses = nodes.of(MtRedundentCssClass.class).map(e -> e.getValue());
@@ -497,7 +372,7 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
   @Override
   public MtRedundentDropdown visitDropdown(DropdownContext ctx) {
     Nodes nodes = nodes(ctx);
-    String typeName = nodes.of(MtRedundentTypeName.class).get().getValue();
+    String typeName = nodes.of(RedundentTypeName.class).get().getValue();
     return ImmutableMtRedundentDropdown.builder()
         .token(token(ctx))
         .type(nodes.of(MtRedundentDropdownType.class).get())
@@ -529,7 +404,7 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     Nodes nodes = nodes(ctx);
     return ImmutableManualTaskAction.builder()
         .token(token(ctx))
-        .name(nodes.of(MtRedundentTypeName.class).get().getValue())
+        .name(nodes.of(RedundentTypeName.class).get().getValue())
         .when(nodes.of(WhenAction.class).get())
         .then(nodes.of(ThenAction.class).get())
         .build();
@@ -593,43 +468,6 @@ public class MtParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     return ImmutableMtRedundentDefaultValue.builder()
         .token(token(ctx))
         .value(nodes.of(Literal.class).get().getValue())
-        .build();
-  }
-
-  private Nodes nodes(ParserRuleContext node) {
-    return Nodes.from(node, this);
-  }
-
-  private AstNode.Token token(ParserRuleContext node) {
-    return Nodes.token(node, tokenIdGenerator);
-  }
-  
-  private Literal literal(ParserRuleContext ctx, AstNode.Token token) {
-    String value = ctx.getText();
-    ScalarType type = null;
-    TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
-    switch (terminalNode.getSymbol().getType()) {
-    case HdesParser.StringLiteral:
-      type = ScalarType.STRING;
-      value = Nodes.getStringLiteralValue(ctx);
-      break;
-    case HdesParser.BooleanLiteral:
-      type = ScalarType.BOOLEAN;
-      break;
-    case HdesParser.DecimalLiteral:
-      type = ScalarType.DECIMAL;
-      break;
-    case HdesParser.IntegerLiteral:
-      type = ScalarType.INTEGER;
-      value = value.replaceAll("_", "");
-      break;
-    default:
-      throw new AstNodeException("Unknown literal: " + ctx.getText() + "!");
-    }
-    return ImmutableLiteral.builder()
-        .token(token)
-        .type(type)
-        .value(value)
         .build();
   }
 }

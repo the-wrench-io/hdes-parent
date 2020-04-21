@@ -30,9 +30,9 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.ast.spi.visitors.ast.MtParserAstNodeVisitor;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
-import io.resys.hdes.ast.spi.visitors.loggers.ManualTaskParserConsoleVisitor;
+import io.resys.hdes.ast.spi.visitors.loggers.HdesParserConsoleVisitor;
 
 public class ManualTaskNodeTest {
   @Test
@@ -91,11 +91,11 @@ public class ManualTaskNodeTest {
   public void parse(String value) {
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
-    ManualTaskParser parser = new ManualTaskParser(tokens);
+    HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.mtBody();
-    tree.accept(new ManualTaskParserConsoleVisitor());
-    tree.accept(new MtParserAstNodeVisitor(new TokenIdGenerator()));
+    tree.accept(new HdesParserConsoleVisitor());
+    tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
   }
 
   public static class ErrorListener extends BaseErrorListener {

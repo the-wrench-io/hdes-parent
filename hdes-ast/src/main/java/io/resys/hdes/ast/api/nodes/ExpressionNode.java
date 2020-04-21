@@ -47,7 +47,7 @@ public interface ExpressionNode extends AstNode {
   @Value.Immutable
   interface ExpressionBody extends ExpressionNode {
     AstNode getValue();
-    ScalarType getType();
+    // ScalarType getType();
   }
 
   /*
