@@ -1,8 +1,8 @@
-id: ExpressionDT description: 'uber dt'
+define decision-table: ExpressionDT description: 'uber dt'
 headers: {
-  value0 INTEGER IN,
-  value1 INTEGER IN,
-  value INTEGER OUT
+  value0 INTEGER required IN,
+  value1 INTEGER required IN,
+  value INTEGER required OUT
 } ALL: {
   { > 10, <= 20,          4570 },
   { > 10, <= 20 and > 10, 4570 },

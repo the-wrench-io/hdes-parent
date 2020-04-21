@@ -1,14 +1,13 @@
-id: SimpleFlow description: 'descriptive'
-inputs: {
-  arg1 INTEGER optional,
-  arg2 INTEGER optional,
-  arg3 ARRAY INTEGER optional,
-  arg4 ARRAY OBJECT optional: {
-    arg5 INTEGER optional,
-    arg6 INTEGER optional 
+define flow: SimpleFlow description: 'descriptive'
+headers: {
+  arg1 INTEGER optional IN,
+  arg2 INTEGER optional IN,
+  arg3 ARRAY INTEGER optional IN,
+  arg4 ARRAY OBJECT optional IN: {
+    arg5 INTEGER optional IN,
+    arg6 INTEGER optional IN
   }
 }
-outputs: {}
 tasks: {
   firstTask: {
     then: secondTask

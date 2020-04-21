@@ -47,7 +47,6 @@ import io.resys.hdes.ast.HdesParser.TypeNameContext;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
-import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
@@ -142,7 +141,8 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
   }
   @Override
   public AstNode visitHeaders(HeadersContext ctx) {
-    return nodes(ctx).of(Headers.class)
+    return nodes(ctx).of(RedundentTypeDefArgs.class)
+        .map(args -> ImmutableHeaders.builder().token(token(ctx)).values(args.getValues()).build())
         .orElse(ImmutableHeaders.builder().token(token(ctx)).build());
   }
 
@@ -198,7 +198,7 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
         .token(token(ctx))
         .required(input.getRequired())
         .name(input.getName())
-        .direction(nodes.of(RedundentDirection.class).get().getValue())
+        .direction(input.getDirection())
         .value(input)
         .build();
   }

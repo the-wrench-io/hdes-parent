@@ -141,7 +141,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         continue;
       }
       
-      ScalarTypeDefNode header = body.getHeaders().getValues().get(rule.getHeader());
+      ScalarTypeDefNode header = (ScalarTypeDefNode) body.getHeaders().getValues().get(rule.getHeader());
       if (header.getDirection() == DirectionType.IN) {
         if (and) {
           key.add("\r\n  && ");
@@ -164,7 +164,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
       return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().build()).build();
     }
 
-    ScalarTypeDefNode header = body.getHeaders().getValues().get(node.getHeader());
+    ScalarTypeDefNode header = (ScalarTypeDefNode) body.getHeaders().getValues().get(node.getHeader());
     if (header.getDirection() == DirectionType.IN) {
       return visitInputRule(node, header);
     } else {
