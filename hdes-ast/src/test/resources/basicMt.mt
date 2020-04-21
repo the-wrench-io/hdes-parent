@@ -1,5 +1,5 @@
-id: basic description: 'very descriptive manual task'
-inputs: {}
+define manual-task: basic description: 'very descriptive manual task'
+headers: {}
 dropdowns: {
   gender: { 'f': 'female', 'm': 'male' }
 }

@@ -39,6 +39,7 @@ import io.resys.hdes.ast.HdesParser.EqualityExpressionContext;
 import io.resys.hdes.ast.HdesParser.ExpressionContext;
 import io.resys.hdes.ast.HdesParser.MethodArgsContext;
 import io.resys.hdes.ast.HdesParser.MethodInvocationContext;
+import io.resys.hdes.ast.HdesParser.MethodNameContext;
 import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
 import io.resys.hdes.ast.HdesParser.PostfixExpressionContext;
 import io.resys.hdes.ast.HdesParser.PreDecrementExpressionContext;
@@ -108,7 +109,13 @@ public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
         .values(nodes.of(RedundentArgs.class).map(a -> a.getValues()).orElse(Collections.emptyList()))
         .build();
   }
-
+  @Override
+  public RedundentMethodName visitMethodName(MethodNameContext ctx) {
+    return ImmutableRedundentMethodName.builder()
+        .token(token(ctx))
+        .value(ctx.getText())
+        .build();
+  }
   @Override
   public RedundentArgs visitMethodArgs(MethodArgsContext ctx) {
     Nodes nodes = nodes(ctx);

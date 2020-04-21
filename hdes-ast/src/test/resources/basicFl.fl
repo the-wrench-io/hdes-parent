@@ -1,9 +1,8 @@
-id: x description: 'descriptive'
-inputs: {
-  arg1.x1 INTEGER optional,
-  arg2.x1 INTEGER required
+define flow: x description: 'descriptive'
+headers: {
+  arg1.x1 INTEGER optional IN,
+  arg2.x1 INTEGER required IN
 }
-outputs: {}
 tasks: {
   firstTask: {
     then: endTask

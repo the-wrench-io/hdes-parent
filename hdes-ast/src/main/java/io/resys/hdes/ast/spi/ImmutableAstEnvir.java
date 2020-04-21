@@ -124,7 +124,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       HdesParser parser = new HdesParser(tokens);
       parser.addErrorListener(errorListener());
-      ParseTree tree = parser.flBody();
+      ParseTree tree = parser.hdesBody();
       //tree.accept(new FlowParserConsoleVisitor());
       return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
     }
@@ -135,7 +135,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       HdesParser parser = new HdesParser(tokens);
       parser.addErrorListener(errorListener());
-      ParseTree tree = parser.enBody();
+      ParseTree tree = parser.hdesBody();
       //tree.accept(new ExpressionParserConsoleVisitor());
       return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
     }
@@ -146,7 +146,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       HdesParser parser = new HdesParser(tokens);
       parser.addErrorListener(errorListener());
-      ParseTree tree = parser.dtBody();
+      ParseTree tree = parser.hdesBody();
       //tree.accept(new DtParserConsoleVisitor());
       return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
     }
@@ -157,7 +157,7 @@ public class ImmutableAstEnvir implements AstEnvir {
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       HdesParser parser = new HdesParser(tokens);
       parser.addErrorListener(errorListener());
-      ParseTree tree = parser.mtBody();
+      ParseTree tree = parser.hdesBody();
       //tree.accept(new ManualTaskParserConsoleVisitor());
       return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
     }

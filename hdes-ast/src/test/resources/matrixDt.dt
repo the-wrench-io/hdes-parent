@@ -1,4 +1,4 @@
-id: MatrixDT
+define decision-table: MatrixDT
 headers: {
   name STRING IN,
   lastName STRING IN,

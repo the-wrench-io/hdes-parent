@@ -1,8 +1,8 @@
-id: basic
+define decision-table: basic
 headers: {
-  name STRING IN,
-  lastName STRING IN,
-  value INTEGER OUT 
+  name STRING required IN,
+  lastName STRING required IN,
+  value INTEGER required OUT 
 } MATRIX: {
   { ?, ?, 20 },
   { not 'bob' or 'sam', 'woman', 4570 }
