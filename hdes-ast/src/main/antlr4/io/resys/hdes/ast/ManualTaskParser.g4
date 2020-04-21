@@ -4,7 +4,7 @@ import CommonParser;
 
 
 dropdownType: DropdownType;
-mt: id description? inputs dropdowns statements form EOF;
+mt: id description? inputs dropdowns actions form EOF;
 
 dropdowns: 'dropdowns' ':' '{' dropdownArgs? '}';
 dropdownArgs: dropdownArg (',' dropdownArg)*;
@@ -25,11 +25,11 @@ dropdown: dropdownType 'dropdown' ':' typeName;
 defaultValue: 'defaultValue' ':' literal;
 cssClass: 'class' ':' StringLiteral;
 
-statements: 'statements' ':' '{' statementsArgs? '}';
-statementsArgs: statement (',' statement)*;
-statement: typeName ':' '{' when then '}';
+actions: 'actions' ':' '{' actionsArgs? '}';
+actionsArgs: action (',' action)*;
+action: typeName ':' '{' actionBodyWhen actionBodyThen '}';
 
-when: 'when' ':' StringLiteral;
-then: 'then' ':' statementType message?;
-statementType: StatementType;
+actionBodyWhen: 'when' ':' StringLiteral;
+actionBodyThen: 'then' ':' actionType message?;
+actionType: StatementType;
 message: 'message' ':' StringLiteral;

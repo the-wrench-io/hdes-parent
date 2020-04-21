@@ -33,6 +33,12 @@ import org.immutables.value.Value;
 
 import io.resys.hdes.ast.FlowParser;
 import io.resys.hdes.ast.ManualTaskParser;
+import io.resys.hdes.ast.ManualTaskParser.ActionBodyThenContext;
+import io.resys.hdes.ast.ManualTaskParser.ActionBodyWhenContext;
+import io.resys.hdes.ast.ManualTaskParser.ActionContext;
+import io.resys.hdes.ast.ManualTaskParser.ActionTypeContext;
+import io.resys.hdes.ast.ManualTaskParser.ActionsArgsContext;
+import io.resys.hdes.ast.ManualTaskParser.ActionsContext;
 import io.resys.hdes.ast.ManualTaskParser.ArrayTypeContext;
 import io.resys.hdes.ast.ManualTaskParser.CssClassContext;
 import io.resys.hdes.ast.ManualTaskParser.DebugValueContext;
@@ -60,16 +66,10 @@ import io.resys.hdes.ast.ManualTaskParser.MtContext;
 import io.resys.hdes.ast.ManualTaskParser.ObjectTypeContext;
 import io.resys.hdes.ast.ManualTaskParser.ScalarTypeContext;
 import io.resys.hdes.ast.ManualTaskParser.SimpleTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.StatementContext;
-import io.resys.hdes.ast.ManualTaskParser.StatementTypeContext;
-import io.resys.hdes.ast.ManualTaskParser.StatementsArgsContext;
-import io.resys.hdes.ast.ManualTaskParser.StatementsContext;
-import io.resys.hdes.ast.ManualTaskParser.ThenContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeDefArgsContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeDefContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeDefsContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
-import io.resys.hdes.ast.ManualTaskParser.WhenContext;
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
@@ -88,32 +88,32 @@ import io.resys.hdes.ast.api.nodes.ImmutableGroup;
 import io.resys.hdes.ast.api.nodes.ImmutableGroups;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteralField;
+import io.resys.hdes.ast.api.nodes.ImmutableManualTaskAction;
+import io.resys.hdes.ast.api.nodes.ImmutableManualTaskActions;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskInputs;
-import io.resys.hdes.ast.api.nodes.ImmutableManualTaskStatements;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarTypeDefNode;
-import io.resys.hdes.ast.api.nodes.ImmutableStatement;
-import io.resys.hdes.ast.api.nodes.ImmutableThenStatement;
-import io.resys.hdes.ast.api.nodes.ImmutableWhenStatement;
+import io.resys.hdes.ast.api.nodes.ImmutableThenAction;
+import io.resys.hdes.ast.api.nodes.ImmutableWhenAction;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ActionType;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.Dropdown;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.Fields;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.FormBody;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.FormField;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.Group;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.Groups;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskAction;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskActions;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskInputs;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskStatements;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.Statement;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.StatementType;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenStatement;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenStatement;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenAction;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
@@ -185,15 +185,15 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
     String getValue();
   }
   @Value.Immutable
-  public interface MtRedundentStatementArgs extends ManualTaskNode {
-    List<Statement> getValues();
+  public interface MtRedundentActionArgs extends ManualTaskNode {
+    List<ManualTaskAction> getValues();
   }
   @Value.Immutable
-  public interface MtRedundentStatementType extends ManualTaskNode {
-    StatementType getValue();
+  public interface MtRedundentActionType extends ManualTaskNode {
+    ActionType getValue();
   }
   @Value.Immutable
-  public interface MtRedundentStatementMsg extends ManualTaskNode {
+  public interface MtRedundentActionMsg extends ManualTaskNode {
     String getValue();
   }
   @Value.Immutable
@@ -302,7 +302,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
         .description(nodes.of(MtRedundentDescription.class).get().getValue())
         .form(nodes.of(ManualTaskForm.class).get())
         .dropdowns(nodes.of(ManualTaskDropdowns.class).get())
-        .statements(nodes.of(ManualTaskStatements.class).get())
+        .actions(nodes.of(ManualTaskActions.class).get())
         .inputs(nodes.of(ManualTaskInputs.class).get())
         .build();
   }
@@ -507,74 +507,74 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   }
 
   @Override
-  public ManualTaskStatements visitStatements(StatementsContext ctx) {
+  public ManualTaskActions visitActions(ActionsContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableManualTaskStatements.builder()
+    return ImmutableManualTaskActions.builder()
         .token(token(ctx))
-        .values(nodes.of(MtRedundentStatementArgs.class).map(s -> s.getValues()).orElse(Collections.emptyList()))
+        .values(nodes.of(MtRedundentActionArgs.class).map(s -> s.getValues()).orElse(Collections.emptyList()))
         .build();
   }
   
 
   @Override
-  public MtRedundentStatementArgs visitStatementsArgs(StatementsArgsContext ctx) {
+  public MtRedundentActionArgs visitActionsArgs(ActionsArgsContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableMtRedundentStatementArgs.builder()
+    return ImmutableMtRedundentActionArgs.builder()
         .token(token(ctx))
-        .values(nodes.list(Statement.class))
+        .values(nodes.list(ManualTaskAction.class))
         .build();
   }
   
   @Override
-  public Statement visitStatement(StatementContext ctx) {
+  public ManualTaskAction visitAction(ActionContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableStatement.builder()
+    return ImmutableManualTaskAction.builder()
         .token(token(ctx))
         .name(nodes.of(MtRedundentTypeName.class).get().getValue())
-        .when(nodes.of(WhenStatement.class).get())
-        .then(nodes.of(ThenStatement.class).get())
+        .when(nodes.of(WhenAction.class).get())
+        .then(nodes.of(ThenAction.class).get())
         .build();
   }
 
   @Override
-  public WhenStatement visitWhen(WhenContext ctx) {
+  public WhenAction visitActionBodyWhen(ActionBodyWhenContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableWhenStatement.builder()
+    return ImmutableWhenAction.builder()
         .token(token(ctx))
         .value(nodes.of(Literal.class).get().getValue())
         .build();
   }
 
   @Override
-  public ThenStatement visitThen(ThenContext ctx) {
+  public ThenAction visitActionBodyThen(ActionBodyThenContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableThenStatement.builder()
+    return ImmutableThenAction.builder()
         .token(token(ctx))
-        .type(nodes.of(MtRedundentStatementType.class).get().getValue())
-        .message(nodes.of(MtRedundentStatementMsg.class).get().getValue())
+        .type(nodes.of(MtRedundentActionType.class).get().getValue())
+        .message(nodes.of(MtRedundentActionMsg.class).get().getValue())
         .build();
   }
 
   @Override
-  public MtRedundentStatementType visitStatementType(StatementTypeContext ctx) {
+  public MtRedundentActionType visitActionType(ActionTypeContext ctx) {
     TerminalNode node = (TerminalNode) ctx.getChild(0);
-    StatementType type;
+    ActionType type;
     switch (node.getSymbol().getType()) {
-    case ManualTaskParser.ALERT: type = StatementType.ALERT; break;
-    case ManualTaskParser.SHOW: type = StatementType.SHOW; break;
-    case ManualTaskParser.EVALUATE: type = StatementType.ALERT; break;
-    default: throw new AstNodeException("Unknown statement type: " + ctx.getText() + "!");
+    case ManualTaskParser.ALERT: type = ActionType.ALERT; break;
+    case ManualTaskParser.SHOW: type = ActionType.SHOW; break;
+    case ManualTaskParser.EVALUATE: type = ActionType.ALERT; break;
+    default: throw new AstNodeException("Unknown Action type: " + ctx.getText() + "!");
     }
-    return ImmutableMtRedundentStatementType.builder()
+    return ImmutableMtRedundentActionType.builder()
         .token(token(ctx))
         .value(type)
         .build();
   }
   
   @Override
-  public MtRedundentStatementMsg visitMessage(MessageContext ctx) {
+  public MtRedundentActionMsg visitMessage(MessageContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableMtRedundentStatementMsg.builder()
+    return ImmutableMtRedundentActionMsg.builder()
         .token(token(ctx))
         .value(nodes.of(Literal.class).get().getValue())
         .build();

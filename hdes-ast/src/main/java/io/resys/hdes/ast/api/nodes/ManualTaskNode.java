@@ -29,7 +29,7 @@ import org.immutables.value.Value;
 
 public interface ManualTaskNode extends AstNode {
   
-  enum StatementType { SHOW, ALERT, EVALUATE }
+  enum ActionType { SHOW, ALERT, EVALUATE }
   
   interface FormBody extends ManualTaskNode {}
   
@@ -38,7 +38,7 @@ public interface ManualTaskNode extends AstNode {
     String getDescription();
     ManualTaskInputs getInputs();
     ManualTaskDropdowns getDropdowns();
-    ManualTaskStatements getStatements();
+    ManualTaskActions getActions();
     ManualTaskForm getForm();
   }
   
@@ -51,8 +51,8 @@ public interface ManualTaskNode extends AstNode {
     List<Dropdown> getValues();
   }  
   @Value.Immutable
-  interface ManualTaskStatements extends ManualTaskNode {
-    List<Statement> getValues();
+  interface ManualTaskActions extends ManualTaskNode {
+    List<ManualTaskAction> getValues();
   }  
   @Value.Immutable
   interface ManualTaskForm extends ManualTaskNode {
@@ -65,22 +65,22 @@ public interface ManualTaskNode extends AstNode {
   }
   
   @Value.Immutable
-  interface Statement extends ManualTaskNode {
+  interface ManualTaskAction extends ManualTaskNode {
     String getName();
-    WhenStatement getWhen();
-    ThenStatement getThen();
+    WhenAction getWhen();
+    ThenAction getThen();
   }
   
   @Value.Immutable
-  interface WhenStatement extends ManualTaskNode {
+  interface WhenAction extends ManualTaskNode {
     String getValue();
     Optional<AstNode> getExpression();
   }
   
   @Value.Immutable
-  interface ThenStatement extends ManualTaskNode {
+  interface ThenAction extends ManualTaskNode {
     Optional<String> getMessage();
-    StatementType getType();
+    ActionType getType();
   }
   
   @Value.Immutable

@@ -10,7 +10,9 @@ taskTypes
 objectDataType: OBJECT | ARRAY;
 
 flow: id description? inputs outputDefs tasks EOF;
+
 outputDefs: OUTPUTS ':' typeDefs;
+
 tasks: 'tasks' ':' '{' taskArgs? '}';
 taskArgs: nextTask (',' nextTask)*;
 nextTask: typeName ':' '{' pointer taskRef? '}';

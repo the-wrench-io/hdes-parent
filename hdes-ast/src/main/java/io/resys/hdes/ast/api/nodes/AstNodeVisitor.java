@@ -79,10 +79,10 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskInputs;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskStatements;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.Statement;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenStatement;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenStatement;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskActions;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskAction;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenAction;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
 
 public interface AstNodeVisitor<T, R> {
   
@@ -161,12 +161,12 @@ public interface AstNodeVisitor<T, R> {
     R visitManualTaskBody(ManualTaskBody node);
     T visitManualTaskInputs(ManualTaskInputs node);
     T visitManualTaskDropdowns(ManualTaskDropdowns node);
-    T visitManualTaskStatements(ManualTaskStatements node);
+    T visitManualTaskStatements(ManualTaskActions node);
     T visitManualTaskForm(ManualTaskForm node);
     T visitDropdown(Dropdown node);
-    T visitStatement(Statement node);
-    T visitWhenStatement(WhenStatement node);
-    T visitThenStatement(ThenStatement node);
+    T visitStatement(ManualTaskAction node);
+    T visitWhenStatement(WhenAction node);
+    T visitThenStatement(ThenAction node);
     T visitGroup(Group node);
     T visitGroups(Groups node);
     T visitFields(Fields node);

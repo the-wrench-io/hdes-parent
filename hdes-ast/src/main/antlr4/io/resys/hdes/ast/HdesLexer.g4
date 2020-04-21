@@ -65,7 +65,7 @@ DROPDOWNS: 'dropdowns';
 SHOW: 'SHOW';
 ALERT: 'ALERT';
 EVALUATE: 'EVALUATE';
-STATEMENTS: 'statements';
+STATEMENTS: 'actions';
 MESSAGE: 'message';
 FORM: 'form';
 GROUPS: 'groups';

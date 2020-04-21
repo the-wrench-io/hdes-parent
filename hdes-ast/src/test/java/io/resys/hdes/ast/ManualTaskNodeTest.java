@@ -41,7 +41,7 @@ public class ManualTaskNodeTest {
         + "description: 'very descriptive manual task' \n"
         + "inputs: {} \n"
         + "dropdowns: {} \n"
-        + "statements: {} \n"
+        + "actions: {} \n"
         + "form: { } \n"); 
   }
 
@@ -51,7 +51,7 @@ public class ManualTaskNodeTest {
         + "description: 'very descriptive manual task' \n"
         + "inputs: {} \n"
         + "dropdowns: {} \n"
-        + "statements: {} \n"
+        + "actions: {} \n"
         + "form: { fields: {} }"); 
   }
   
@@ -63,7 +63,7 @@ public class ManualTaskNodeTest {
         + "dropdowns: {\n"
         +   "gender: { 'f': 'female', 'm': 'male' }"
         + "} \n"
-        + "statements: {} \n"
+        + "actions: {} \n"
         + "form: { fields: {\n"
         + "  firstName STRING required: { },\n"
         + "  age INTEGER required: { },\n"
@@ -77,7 +77,7 @@ public class ManualTaskNodeTest {
         + "description: 'very descriptive manual task' \n"
         + "inputs: {} \n"
         + "dropdowns: {} \n"
-        + "statements: {} \n"
+        + "actions: {} \n"
         + "form: {\n"
         +   "groups: {\n"
         +     "{id: cars fields: {}},\n"

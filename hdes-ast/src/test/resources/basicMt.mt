@@ -3,7 +3,7 @@ inputs: {}
 dropdowns: {
   gender: { 'f': 'female', 'm': 'male' }
 }
-statements: {}
+actions: {}
 form: { 
   fields: {
     firstName STRING required: { },

@@ -33,11 +33,7 @@ import io.resys.hdes.ast.ManualTaskParser.InputsContext;
 import io.resys.hdes.ast.ManualTaskParser.LiteralContext;
 import io.resys.hdes.ast.ManualTaskParser.MessageContext;
 import io.resys.hdes.ast.ManualTaskParser.MtContext;
-import io.resys.hdes.ast.ManualTaskParser.StatementContext;
-import io.resys.hdes.ast.ManualTaskParser.StatementsContext;
-import io.resys.hdes.ast.ManualTaskParser.ThenContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
-import io.resys.hdes.ast.ManualTaskParser.WhenContext;
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
@@ -85,31 +81,7 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
     log(ctx);
     return super.visitCssClass(ctx);
   }
-
-  @Override
-  public AstNode visitStatements(StatementsContext ctx) {
-    log(ctx);
-    return super.visitStatements(ctx);
-  }
-
-  @Override
-  public AstNode visitStatement(StatementContext ctx) {
-    log(ctx);
-    return super.visitStatement(ctx);
-  }
-
-  @Override
-  public AstNode visitWhen(WhenContext ctx) {
-    log(ctx);
-    return super.visitWhen(ctx);
-  }
-
-  @Override
-  public AstNode visitThen(ThenContext ctx) {
-    log(ctx);
-    return super.visitThen(ctx);
-  }
-
+  
   @Override
   public AstNode visitMessage(MessageContext ctx) {
     log(ctx);
