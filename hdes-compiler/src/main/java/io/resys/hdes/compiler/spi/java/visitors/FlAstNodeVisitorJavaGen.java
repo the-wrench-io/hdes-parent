@@ -77,33 +77,26 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         .addModifiers(Modifier.PUBLIC)
         .addParameter(ParameterSpec.builder(naming.fl().input(node), "input").build())
         .returns(flowState)
-        .addStatement(visitInit(node))
+        
+        .addCode(CodeBlock.builder().addStatement("long start = System.currentTimeMillis()").add("\r\n").build())
+        .addStatement("$T currentState = $T.builder().input(input).build()", flowState, naming.immutable(flowState))
+        .addCode(taskImpl.getValue())
+        .addCode(CodeBlock.builder().add("\r\n").addStatement("long end = System.currentTimeMillis()").build())
+        
         .addCode(CodeBlock.builder()
-            .add(taskImpl.getValue())
-            .build())
-        .addCode(CodeBlock.builder()
-            .add("\r\n").addStatement("long end = System.currentTimeMillis()")
-            .build())
-        .addStatement(CodeBlock.builder()
             .add("return $T.builder()", naming.immutable(flowState))
-            .add("\r\n").add(".from(currentState)")
-            .add("\r\n").add(".id($S)", node.getId())
-            .add("\r\n").add(".parent(currentState.getLog())")
-            .add("\r\n").add(".start(start)").add(".end(end)")
-            .add("\r\n").add(".duration(end - start)")
-            .add("\r\n").add(".build()")
+            .add("\r\n  ").add(".from(currentState)")
+            .add("\r\n  ").add(".id($S)", node.getId())
+            .add("\r\n  ").add(".parent(currentState.getLog())")
+            .add("\r\n  ").add(".start(start)").add(".end(end)")
+            .add("\r\n  ").add(".duration(end - start)")
+            .add("\r\n  ").add(".build()")
             .build())
         .build();
  
     return flowBuilder
         .addMethod(applyMethod)
         .addMethods(taskImpl.getChildren())
-        .build();
-  }
-  
-  private CodeBlock visitInit(FlowBody node) {
-    return CodeBlock.builder()
-        .add("$T currentState = Immutable$T.builder().input(input).build()", flowState, flowState)
         .build();
   }
   
@@ -139,8 +132,6 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   
   @Override
   public FlTaskRefSpec visitTaskRef(FlowTaskNode parent) {
-    TaskRef node = parent.getRef().get(); 
-    
     MethodSpec.Builder visitBuilder = MethodSpec
         .methodBuilder("visit" + parent.getId())
         .addModifiers(Modifier.PRIVATE)
@@ -149,17 +140,17 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     
     CodeBlock logBlock = CodeBlock.builder().add("\r\n")
       .add("$T log = $T.builder()", FlowExecutionLog.class, ImmutableFlowExecutionLog.class)
-      .add("\r\n").add(".id($S)", parent.getId())
-      .add("\r\n").add(".parent(currentState.getLog())")
-      .add("\r\n").add(".start(start)").add(".end(end)")
-      .add("\r\n").add(".duration(end - start)")
-      .add("\r\n").addStatement(".build()").build();
+      .add("\r\n  ").add(".id($S)", parent.getId())
+      .add("\r\n  ").add(".parent(currentState.getLog())")
+      .add("\r\n  ").add(".start(start)").add(".end(end)")
+      .add("\r\n  ").add(".duration(end - start)")
+      .add("\r\n  ").addStatement(".build()").build();
     
     CodeBlock returnBlock = CodeBlock.builder()
         .add("\r\n")
-        .add("return $T.builder()", naming.immutable(naming.fl().state(this.body))).add("\r\n")
-        .add(".from(currentState).input(input).output(output)").add("\r\n")
-        .addStatement(".log(log).build()").build(); 
+        .add("return $T.builder()", naming.immutable(naming.fl().state(this.body)))
+        .add("\r\n  ").add(".from(currentState).input(input).output(output)")
+        .add("\r\n  ").addStatement(".log(log).build()").build(); 
     
     return ImmutableFlTaskRefSpec.builder().method(
         visitBuilder
@@ -188,7 +179,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
       for(String target : src) {
         right.append(".").append(JavaSpecUtil.getMethod(target)).append("()");
       }
-      codeBlock.add("\r\n").add(".$L(currentState$L)", mapping.getLeft(), right.toString());
+      codeBlock.add("\r\n  ").add(".$L(currentState$L)", mapping.getLeft(), right.toString());
     }
     
     codeBlock
