@@ -50,7 +50,6 @@ public interface FlowNode extends AstNode {
     List<TypeDefNode> getValues();
   }
   
-  
   @Value.Immutable
   interface FlowTaskNode extends FlowNode {
     String getId();

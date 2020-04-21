@@ -55,15 +55,13 @@ import io.resys.hdes.ast.HdesParser.GroupContext;
 import io.resys.hdes.ast.HdesParser.GroupsContext;
 import io.resys.hdes.ast.HdesParser.MessageContext;
 import io.resys.hdes.ast.HdesParser.MtBodyContext;
-import io.resys.hdes.ast.HdesParser.MtInputsContext;
-import io.resys.hdes.ast.HdesParser.SimpleTypeContext;
 import io.resys.hdes.ast.HdesParser.TypeDefContext;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
+import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdown;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdownField;
 import io.resys.hdes.ast.api.nodes.ImmutableFields;
@@ -76,7 +74,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskInputs;
-import io.resys.hdes.ast.api.nodes.ImmutableScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableThenAction;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenAction;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode;
@@ -92,10 +89,8 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskActions;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskForm;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskInputs;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenAction;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
-import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDebugValue;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentId;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentScalarType;
@@ -112,10 +107,6 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
   @Value.Immutable
   public interface MtRedundentDropdownType extends ManualTaskNode {
     Boolean getMultiple();
-  }
-  @Value.Immutable
-  public interface MtRedundentInputArgs extends ManualTaskNode {
-    List<TypeDefNode> getValues();
   }
   @Value.Immutable
   public interface MtRedundentDropdownArgs extends ManualTaskNode {
@@ -163,21 +154,6 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
   public interface MtRedundentActionMsg extends ManualTaskNode {
     String getValue();
   }
-  
-  @Override
-  public ScalarTypeDefNode visitSimpleType(SimpleTypeContext ctx) {
-    Nodes nodes = nodes(ctx);
-    TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
-    
-    return ImmutableScalarTypeDefNode.builder()
-        .token(token(ctx))
-        .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
-        .type(nodes.of(RedundentScalarType.class).get().getValue())
-        .name(getDefTypeName(ctx).getValue())
-        .name(nodes.of(RedundentTypeName.class).get().getValue())
-        .debugValue(nodes.of(RedundentDebugValue.class).get().getValue())
-        .build();
-  }
 
   @Override
   public MtRedundentDropdownType visitDropdownType(DropdownTypeContext ctx) {
@@ -199,27 +175,23 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
   @Override
   public ManualTaskBody visitMtBody(MtBodyContext ctx) {
     Nodes nodes = nodes(ctx);
+    Headers headers = nodes.of(Headers.class).get();
+    
     return ImmutableManualTaskBody.builder()
         .token(token(ctx))
-        .id(nodes.of(RedundentId.class).get().getValue())
+        .id(nodes.of(RedundentTypeName.class).get().getValue())
         .description(nodes.of(RedundentDescription.class).get().getValue())
         .form(nodes.of(ManualTaskForm.class).get())
         .dropdowns(nodes.of(ManualTaskDropdowns.class).get())
         .actions(nodes.of(ManualTaskActions.class).get())
-        .inputs(nodes.of(ManualTaskInputs.class).get())
+        .inputs(ImmutableManualTaskInputs.builder()
+            .token(token(ctx))
+            .values(headers.getValues().stream()
+                .filter(t -> t.getDirection() == DirectionType.IN).collect(Collectors.toList()))
+            .build())
         .build();
   }
-  @Override
-  public ManualTaskInputs visitMtInputs(MtInputsContext ctx) {
-    Nodes nodes = nodes(ctx);
-    List<TypeDefNode> values = nodes.of(MtRedundentInputArgs.class)
-        .map(a -> a.getValues()).orElse(Collections.emptyList());
-    return ImmutableManualTaskInputs.builder()
-        .token(token(ctx))
-        .values(values)
-        .build();
-  }
-  
+
   @Override
   public AstNode visitCssClass(CssClassContext ctx) {
     Literal literal = Nodes.literal(ctx, token(ctx));

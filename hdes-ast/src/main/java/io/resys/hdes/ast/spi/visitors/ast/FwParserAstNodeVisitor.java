@@ -23,6 +23,7 @@ package io.resys.hdes.ast.spi.visitors.ast;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
@@ -30,8 +31,6 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.HdesParser.EndMappingContext;
 import io.resys.hdes.ast.HdesParser.FlBodyContext;
-import io.resys.hdes.ast.HdesParser.FlowInputsContext;
-import io.resys.hdes.ast.HdesParser.FlowOutputsContext;
 import io.resys.hdes.ast.HdesParser.MappingArgContext;
 import io.resys.hdes.ast.HdesParser.MappingArgsContext;
 import io.resys.hdes.ast.HdesParser.MappingContext;
@@ -48,13 +47,12 @@ import io.resys.hdes.ast.HdesParser.WhenThenArgsContext;
 import io.resys.hdes.ast.HdesParser.WhenThenContext;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
+import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.FlowNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowOutputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
@@ -76,7 +74,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableWhen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThenPointer;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
-import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentId;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser;
 import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser.FwRedundentOrderedTasks;
@@ -90,10 +87,6 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
   }
   
   // Internal only
-  @Value.Immutable
-  public interface FwRedundentTypeDefArgs extends FlowNode {
-    List<TypeDefNode> getValues();
-  }
   @Value.Immutable
   public interface FwRedundentTasks extends FlowNode {
     List<FlowTaskNode> getValues();
@@ -125,34 +118,25 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
       break;
     }
     
+    Headers headers = children.of(Headers.class).get();
     return ImmutableFlowBody.builder()
+        .inputs(ImmutableFlowInputs.builder()
+            .token(headers.getToken())
+            .values(headers.getValues().stream()
+                .filter(t -> t.getDirection() == DirectionType.IN).collect(Collectors.toList()))
+            .build())
+        
+        .outputs(ImmutableFlowOutputs.builder()
+            .token(token(ctx))
+            .values(headers.getValues().stream()
+                .filter(t -> t.getDirection() == DirectionType.OUT).collect(Collectors.toList()))
+            .build())
+        
         .token(token(ctx))
-        .id(children.of(RedundentId.class).get().getValue())
-        .inputs(children.of(FlowInputs.class).get())
-        .outputs(children.of(FlowOutputs.class).get())
+        .id(children.of(RedundentTypeName.class).get().getValue())
         .description(children.of(RedundentDescription.class).map(e -> e.getValue()).orElse(null))
         .task(tasks.getFirst())
         .unreachableTasks(tasks.getUnclaimed())
-        .build();
-  }
-
-  @Override
-  public FlowInputs visitFlowInputs(FlowInputsContext ctx) {
-    List<TypeDefNode> values = nodes(ctx).of(ImmutableFwRedundentTypeDefArgs.class)
-        .map(a -> a.getValues()).orElse(Collections.emptyList());
-    return ImmutableFlowInputs.builder()
-        .token(token(ctx))
-        .values(values)
-        .build();
-  }
-  
-  @Override
-  public FlowOutputs visitFlowOutputs(FlowOutputsContext ctx) {
-    List<TypeDefNode> values = nodes(ctx).of(ImmutableFwRedundentTypeDefArgs.class)
-        .map(a -> a.getValues()).orElse(Collections.emptyList());
-    return ImmutableFlowOutputs.builder()
-        .token(token(ctx))
-        .values(values)
         .build();
   }
 

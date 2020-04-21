@@ -86,8 +86,14 @@ public interface AstNode {
     List<AstNode> getServices();
   }
   
+  @Value.Immutable
+  interface Headers extends AstNode {
+    List<TypeDefNode> getValues();
+  }
+  
   interface TypeDefNode extends AstNode {
-    Boolean getRequired();    
+    Boolean getRequired();
+    DirectionType getDirection();
     String getName();
   }
   
@@ -106,6 +112,8 @@ public interface AstNode {
     Optional<String> getDebugValue();
     ScalarType getType();
   }
+  
+  enum DirectionType { IN, OUT }
   
   enum ScalarType {
     STRING, INTEGER, BOOLEAN, DECIMAL,

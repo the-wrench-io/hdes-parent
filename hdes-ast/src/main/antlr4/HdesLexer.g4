@@ -52,9 +52,9 @@ ARRAY: 'ARRAY';
 
 ID: 'id';
 DESC: 'description';
+HEADERS: 'headers';
 
 // DT
-HEADERS: 'headers';
 IN: 'IN';
 OUT: 'OUT';
 ALL: 'ALL';
@@ -79,8 +79,6 @@ VALUES: 'values';
 DEFAULT_VALUE: 'defaultValue';
 
 // FLOW
-INPUTS: 'inputs';
-OUTPUTS: 'outputs';
 TASKS: 'tasks';
 DEBUG_VALUE: 'debugValue';
 REQUIRED: 'required';

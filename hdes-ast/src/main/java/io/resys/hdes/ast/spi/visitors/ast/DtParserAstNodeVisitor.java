@@ -32,12 +32,8 @@ import org.immutables.value.Value;
 
 import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.HdesParser.AllContext;
-import io.resys.hdes.ast.HdesParser.DirectionTypeContext;
 import io.resys.hdes.ast.HdesParser.DtBodyContext;
 import io.resys.hdes.ast.HdesParser.FirstContext;
-import io.resys.hdes.ast.HdesParser.HeaderArgsContext;
-import io.resys.hdes.ast.HdesParser.HeaderContext;
-import io.resys.hdes.ast.HdesParser.HeadersContext;
 import io.resys.hdes.ast.HdesParser.HitPolicyContext;
 import io.resys.hdes.ast.HdesParser.MatrixContext;
 import io.resys.hdes.ast.HdesParser.RuleEqualityExpressionContext;
@@ -50,12 +46,10 @@ import io.resys.hdes.ast.HdesParser.RulesContext;
 import io.resys.hdes.ast.HdesParser.RulesetContext;
 import io.resys.hdes.ast.HdesParser.RulesetsContext;
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicy;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
@@ -69,9 +63,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableAndOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableDecisionTableBody;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableExpressionValue;
-import io.resys.hdes.ast.api.nodes.ImmutableHeader;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaderRefValue;
-import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyAll;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyMatrix;
@@ -83,7 +75,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableRule;
 import io.resys.hdes.ast.api.nodes.ImmutableRuleRow;
 import io.resys.hdes.ast.api.nodes.ImmutableUndefinedValue;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
-import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentId;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
@@ -96,17 +87,7 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
   }
 
   @Value.Immutable
-  public interface RedundentHeaderType extends DecisionTableNode {
-    ScalarType getValue();
-  }
-
-  @Value.Immutable
-  public interface RedundentDirection extends DecisionTableNode {
-    DirectionType getValue();
-  }
-
-  @Value.Immutable
-  public interface RedundentRulesets extends DecisionTableNode {
+  public interface DtRedundentRulesets extends DecisionTableNode {
     List<RuleRow> getRows();
   }
 
@@ -116,7 +97,7 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
     this.headers = children.of(Headers.class).get();
     return ImmutableDecisionTableBody.builder()
         .token(token(ctx))
-        .id(children.of(RedundentId.class).get().getValue())
+        .id(children.of(RedundentTypeName.class).get().getValue())
         .description(children.of(RedundentDescription.class).map(e -> e.getValue()))
         .headers(headers)
         .hitPolicy(children.of(HitPolicy.class).get())
@@ -232,7 +213,7 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
 
   @Override
   public HitPolicyFirst visitFirst(FirstContext ctx) {
-    List<RuleRow> rulesets = nodes(ctx).of(RedundentRulesets.class).map(e -> e.getRows()).orElse(Collections.emptyList());
+    List<RuleRow> rulesets = nodes(ctx).of(DtRedundentRulesets.class).map(e -> e.getRows()).orElse(Collections.emptyList());
     return ImmutableHitPolicyFirst.builder()
         .token(token(ctx))
         .rows(rulesets)
@@ -241,7 +222,7 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
 
   @Override
   public HitPolicyAll visitAll(AllContext ctx) {
-    List<RuleRow> rulesets = nodes(ctx).of(RedundentRulesets.class).map(e -> e.getRows()).orElse(Collections.emptyList());
+    List<RuleRow> rulesets = nodes(ctx).of(DtRedundentRulesets.class).map(e -> e.getRows()).orElse(Collections.emptyList());
     return ImmutableHitPolicyAll.builder()
         .token(token(ctx))
         .rows(rulesets)
@@ -250,7 +231,7 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
 
   @Override
   public HitPolicyMatrix visitMatrix(MatrixContext ctx) {
-    List<RuleRow> rulesets = nodes(ctx).of(RedundentRulesets.class).map(e -> e.getRows()).orElse(Collections.emptyList());
+    List<RuleRow> rulesets = nodes(ctx).of(DtRedundentRulesets.class).map(e -> e.getRows()).orElse(Collections.emptyList());
     return ImmutableHitPolicyMatrix.builder()
         .token(token(ctx))
         .rows(rulesets)
@@ -258,8 +239,8 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
   }
 
   @Override
-  public RedundentRulesets visitRulesets(RulesetsContext ctx) {
-    return ImmutableRedundentRulesets.builder()
+  public DtRedundentRulesets visitRulesets(RulesetsContext ctx) {
+    return ImmutableDtRedundentRulesets.builder()
         .token(token(ctx))
         .rows(nodes(ctx).list(RuleRow.class).stream()
             .filter(r -> !r.getRules().isEmpty())
@@ -301,39 +282,6 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
         .token(token(ctx))
         .text(ctx.getStart().getInputStream().getText(new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex())))
         .rules(rules)
-        .build();
-  }
-
-  @Override
-  public AstNode visitHeaders(HeadersContext ctx) {
-    return nodes(ctx).of(Headers.class)
-        .orElse(ImmutableHeaders.builder().token(token(ctx)).build());
-  }
-
-  @Override
-  public Headers visitHeaderArgs(HeaderArgsContext ctx) {
-    return ImmutableHeaders.builder()
-        .token(token(ctx))
-        .values(nodes(ctx).list(Header.class))
-        .build();
-  }
-
-  @Override
-  public Header visitHeader(HeaderContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableHeader.builder()
-        .token(token(ctx))
-        .name(nodes.of(RedundentTypeName.class).get().getValue())
-        .type(nodes.of(RedundentHeaderType.class).get().getValue())
-        .direction(nodes.of(RedundentDirection.class).get().getValue())
-        .build();
-  }
-
-  @Override
-  public RedundentDirection visitDirectionType(DirectionTypeContext ctx) {
-    return ImmutableRedundentDirection.builder()
-        .token(token(ctx))
-        .value(DirectionType.valueOf(ctx.getText()))
         .build();
   }
 }

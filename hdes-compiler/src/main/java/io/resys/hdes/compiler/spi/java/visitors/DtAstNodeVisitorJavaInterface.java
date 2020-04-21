@@ -30,9 +30,10 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
@@ -71,7 +72,7 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     TypeSpec.Builder outputBuilder = from.apply(naming.dt().output(body))
         .addSuperinterface(naming.dt().outputSuperinterface(body));
     
-    for(Header header : node.getValues()) {
+    for(TypeDefNode header : node.getValues()) {
       MethodSpec method = visitHeader(header).getValue();
       if(header.getDirection() == DirectionType.IN) {
         inputBuilder.addMethod(method);
@@ -85,10 +86,11 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
   }
 
   @Override
-  public DtMethodSpec visitHeader(Header node) {
+  public DtMethodSpec visitHeader(TypeDefNode node) {
+    ScalarTypeDefNode scalar = (ScalarTypeDefNode) node;
     MethodSpec method = MethodSpec.methodBuilder(JavaSpecUtil.getMethod(node.getName()))
         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-        .returns(JavaSpecUtil.type(node.getType()))
+        .returns(JavaSpecUtil.type(scalar.getType()))
         .build();
     return ImmutableDtMethodSpec.builder().value(method).build();
   }

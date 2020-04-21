@@ -11,7 +11,9 @@ import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.HdesParser.ArrayTypeContext;
 import io.resys.hdes.ast.HdesParser.DebugValueContext;
 import io.resys.hdes.ast.HdesParser.DescriptionContext;
+import io.resys.hdes.ast.HdesParser.DirectionTypeContext;
 import io.resys.hdes.ast.HdesParser.HdesBodyContext;
+import io.resys.hdes.ast.HdesParser.HeadersContext;
 import io.resys.hdes.ast.HdesParser.IdContext;
 import io.resys.hdes.ast.HdesParser.LiteralContext;
 import io.resys.hdes.ast.HdesParser.ObjectTypeContext;
@@ -44,12 +46,15 @@ import io.resys.hdes.ast.HdesParser.TypeNameContext;
 
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
+import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableArrayTypeDefNode;
+import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode;
@@ -79,6 +84,14 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
   @Value.Immutable
   public interface RedundentDebugValue extends ManualTaskNode {
     String getValue();
+  }
+  @Value.Immutable
+  public interface RedundentDirection extends AstNode {
+    DirectionType getValue();
+  }
+  @Value.Immutable
+  public interface RedundentTypeDefArgs extends ManualTaskNode {
+    List<TypeDefNode> getValues();
   }
   
   public HdesParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
@@ -127,18 +140,30 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
         .value(ScalarType.valueOf(ctx.getText()))
         .build();
   }
- 
+  @Override
+  public AstNode visitHeaders(HeadersContext ctx) {
+    return nodes(ctx).of(Headers.class)
+        .orElse(ImmutableHeaders.builder().token(token(ctx)).build());
+  }
+
+  @Override
+  public RedundentDirection visitDirectionType(DirectionTypeContext ctx) {
+    return ImmutableRedundentDirection.builder()
+        .token(token(ctx))
+        .value(DirectionType.valueOf(ctx.getText()))
+        .build();
+  }
   
   @Override
   public AstNode visitTypeDefs(TypeDefsContext ctx) {
-    return nodes(ctx).of(ImmutableMtRedundentInputArgs.class).orElseGet(() -> ImmutableMtRedundentInputArgs.builder()
+    return nodes(ctx).of(RedundentTypeDefArgs.class).orElseGet(() -> ImmutableRedundentTypeDefArgs.builder()
         .token(token(ctx))
         .build());
   }
 
   @Override
   public AstNode visitTypeDefArgs(TypeDefArgsContext ctx) {
-    return ImmutableMtRedundentInputArgs.builder()
+    return ImmutableRedundentTypeDefArgs.builder()
         .token(token(ctx))
         .values(nodes(ctx).list(TypeDefNode.class))
         .build();
@@ -159,6 +184,7 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
         .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
         .name(getDefTypeName(ctx).getValue())
         .type(nodes.of(RedundentScalarType.class).get().getValue())
+        .direction(nodes.of(RedundentDirection.class).get().getValue())
         .debugValue(nodes.of(RedundentDebugValue.class).map(e -> e.getValue()))
         .build();
   }
@@ -172,6 +198,7 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
         .token(token(ctx))
         .required(input.getRequired())
         .name(input.getName())
+        .direction(nodes.of(RedundentDirection.class).get().getValue())
         .value(input)
         .build();
   }
@@ -179,7 +206,7 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
   @Override
   public ObjectTypeDefNode visitObjectType(ObjectTypeContext ctx) {
     Nodes nodes = nodes(ctx);
-    List<TypeDefNode> values = nodes.of(FwRedundentTypeDefArgs.class).map((FwRedundentTypeDefArgs i)-> i.getValues())
+    List<TypeDefNode> values = nodes.of(RedundentTypeDefArgs.class).map((RedundentTypeDefArgs i)-> i.getValues())
         .orElse(Collections.emptyList());
     TerminalNode requirmentType = (TerminalNode) ctx.getChild(1);
     
@@ -187,6 +214,7 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
         .token(token(ctx))
         .required(requirmentType.getSymbol().getType() == HdesParser.REQUIRED)
         .name(getDefTypeName(ctx).getValue())
+        .direction(nodes.of(RedundentDirection.class).get().getValue())
         .values(values)
         .build();
   }

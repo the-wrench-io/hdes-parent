@@ -37,9 +37,9 @@ import io.resys.hdes.ast.spi.visitors.loggers.HdesParserConsoleVisitor;
 public class ManualTaskNodeTest {
   @Test
   public void basic() throws IOException {
-    parse("id: basic \n"
+    parse("define manual-task: basic \n"
         + "description: 'very descriptive manual task' \n"
-        + "inputs: {} \n"
+        + "headers: {} \n"
         + "dropdowns: {} \n"
         + "actions: {} \n"
         + "form: { } \n"); 
@@ -47,9 +47,9 @@ public class ManualTaskNodeTest {
 
   @Test
   public void emptyFields() throws IOException {
-    parse("id: basic \n"
+    parse("define manual-task: basic \n"
         + "description: 'very descriptive manual task' \n"
-        + "inputs: {} \n"
+        + "headers: {} \n"
         + "dropdowns: {} \n"
         + "actions: {} \n"
         + "form: { fields: {} }"); 
@@ -57,9 +57,9 @@ public class ManualTaskNodeTest {
   
   @Test
   public void fields() throws IOException {
-    parse("id: basic \n"
+    parse("define manual-task: basic \n"
         + "description: 'very descriptive manual task' \n"
-        + "inputs: {} \n"
+        + "headers: {} \n"
         + "dropdowns: {\n"
         +   "gender: { 'f': 'female', 'm': 'male' }"
         + "} \n"
@@ -73,9 +73,9 @@ public class ManualTaskNodeTest {
   
   @Test
   public void nestedGroups() throws IOException {
-    parse("id: basic \n"
+    parse("define manual-task: basic \n"
         + "description: 'very descriptive manual task' \n"
-        + "inputs: {} \n"
+        + "headers: {} \n"
         + "dropdowns: {} \n"
         + "actions: {} \n"
         + "form: {\n"
@@ -93,7 +93,7 @@ public class ManualTaskNodeTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
-    ParseTree tree = parser.mtBody();
+    ParseTree tree = parser.hdesBody();
     tree.accept(new HdesParserConsoleVisitor());
     tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
   }

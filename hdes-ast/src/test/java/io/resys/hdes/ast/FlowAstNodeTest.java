@@ -37,19 +37,18 @@ import io.resys.hdes.ast.spi.visitors.loggers.HdesParserConsoleVisitor;
 public class FlowAstNodeTest {
   @Test
   public void basic() throws IOException {
-    parse("id: x description: 'very descriptive value' inputs: {} outputs: {} tasks: {}");
+    parse("define flow: x description: 'very descriptive value' headers: {} tasks: {}");
   }
 
   @Test
   public void inputs() throws IOException {
     parse(
-        "id: x\n" +
+        "define flow: x\n" +
             "description: 'very descriptive value'\n" +
-            "inputs: {\n " +
-              "arg1.x1 INTEGER required, \n" +
-              "arg2.x1 INTEGER required\n" +
+            "headers: {\n " +
+              "arg1.x1 INTEGER required IN, \n" +
+              "arg2.x1 INTEGER required IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {" +
             "}\n");
   }
@@ -57,25 +56,23 @@ public class FlowAstNodeTest {
   @Test
   public void nestedInputs() throws IOException {
     parse(
-        "id: x\n" +
+        "define flow: x\n" +
             "description: 'very descriptive value'\n" +
-            "inputs: {\n " +
-              "arg0 OBJECT required: {} \n" +
+            "headers: {\n " +
+              "arg0 OBJECT required IN: {} \n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {" +
             "}\n");
     
     parse(
-        "id: x\n" +
+        "define flow: x\n" +
             "description: 'very descriptive value'\n" +
-            "inputs: {\n " +
-              "person OBJECT required: {" +
-                "firstName INTEGER optional,\n" +
-                "lastName INTEGER required\n" +
+            "headers: {\n " +
+              "person OBJECT required IN: {" +
+                "firstName INTEGER optional IN,\n" +
+                "lastName INTEGER required IN\n" +
               "} \n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {" +
             "}\n");
   }
@@ -83,13 +80,12 @@ public class FlowAstNodeTest {
   @Test
   public void taskWhenThen() throws IOException {
     parse(
-        "id: x\n" +
+        "define flow: x\n" +
             "description: 'descriptive ' \n" +
-            "inputs: {\n "
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER required\n" +
+            "headers: {\n "
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER required IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {"
             + "when: 'arg2.x1 > 10' then: nextTask,"
@@ -105,13 +101,12 @@ public class FlowAstNodeTest {
   @Test
   public void taskThen() throws IOException {
     parse(
-        "id: x\n" +
+        "define flow: x\n" +
             "description: 'descriptive ' \n" +
-            "inputs: {\n "
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER required\n" +
+            "headers: {\n "
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER required IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {\n" +
             
             "firstTask: {"
@@ -126,12 +121,11 @@ public class FlowAstNodeTest {
   @Test
   public void taskManualTask() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" +
-            "inputs: {\n"
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER required\n" +
+        "define flow: x description: 'descriptive '\n" +
+            "headers: {\n"
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER required IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: end mapping OBJECT: {}"
@@ -143,12 +137,11 @@ public class FlowAstNodeTest {
   @Test
   public void taskServiceTask() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" +
-            "inputs: {\n"
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER optional\n" +
-            "}\n" +
-            "outputs: {} \n" + 
+        "define flow: x description: 'descriptive '\n" +
+            "headers: {\n"
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER optional IN\n" +
+            "}\n" + 
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: end mapping OBJECT: {}"
@@ -160,12 +153,11 @@ public class FlowAstNodeTest {
   @Test
   public void taskFlowTask() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" +
-            "inputs: {\n"
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER optional\n" +
+        "define flow: x description: 'descriptive '\n" +
+            "headers: {\n"
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER optional IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: end mapping OBJECT: {}"
@@ -177,12 +169,11 @@ public class FlowAstNodeTest {
   @Test
   public void taskDT() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" +
-            "inputs: {\n"
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER optional\n" +
+        "define flow: x description: 'descriptive '\n" +
+            "headers: {\n"
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER optional IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: end mapping OBJECT: {}"
@@ -194,12 +185,11 @@ public class FlowAstNodeTest {
   @Test
   public void taskDTArray() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" +
-            "inputs: {\n"
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER optional\n" +
+        "define flow: x description: 'descriptive '\n" +
+            "headers: {\n"
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER optional IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: end mapping OBJECT: {}"
@@ -212,12 +202,11 @@ public class FlowAstNodeTest {
   @Test
   public void mapping() throws IOException {
     parse(
-        "id: x description: 'descriptive '\n" +
-            "inputs: {\n"
-            + "arg1.x1 INTEGER optional,\n"
-            + "arg2.x1 INTEGER optional\n" +
+        "define flow: x description: 'descriptive '\n" +
+            "headers: {\n"
+            + "arg1.x1 INTEGER optional IN,\n"
+            + "arg2.x1 INTEGER optional IN\n" +
             "}\n" +
-            "outputs: {} \n" +
             "tasks: {\n" +
             "firstTask: {\n"
 
@@ -243,7 +232,7 @@ public class FlowAstNodeTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
-    ParseTree tree = parser.flBody();
+    ParseTree tree = parser.hdesBody();
     tree.accept(new HdesParserConsoleVisitor());
     tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
   }

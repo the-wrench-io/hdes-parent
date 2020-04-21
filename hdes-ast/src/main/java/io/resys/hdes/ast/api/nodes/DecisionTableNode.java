@@ -27,7 +27,6 @@ import org.immutables.value.Value;
 
 public interface DecisionTableNode extends AstNode {
   
-  enum DirectionType { IN, OUT }
   interface HitPolicy extends DecisionTableNode {}
   interface RuleValue extends DecisionTableNode {}
   
@@ -38,18 +37,6 @@ public interface DecisionTableNode extends AstNode {
     Headers getHeaders();
   }
  
-  @Value.Immutable
-  interface Headers extends DecisionTableNode {
-    List<Header> getValues();
-  }
-  
-  @Value.Immutable
-  interface Header extends DecisionTableNode {
-    String getName();
-    DirectionType getDirection();
-    ScalarType getType();
-  }
-  
   @Value.Immutable
   interface HitPolicyAll extends HitPolicy {
     List<RuleRow> getRows();

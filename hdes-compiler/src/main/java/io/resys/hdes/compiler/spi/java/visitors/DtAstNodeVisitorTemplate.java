@@ -28,11 +28,11 @@ import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.AstNodeVisitor.DtAstNodeVisitor;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.ExpressionValue;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HeaderRefValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Headers;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
@@ -117,7 +117,7 @@ public class DtAstNodeVisitorTemplate<T, R> implements DtAstNodeVisitor<T, R> {
   }
 
   @Override
-  public T visitHeader(Header node) {
+  public T visitHeader(TypeDefNode node) {
 
     throw new IllegalArgumentException("Not implemented");
   }

@@ -36,37 +36,37 @@ import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 public class DtAstNodeTest {
   @Test
   public void basic() throws IOException {
-    parse("id: basic "
+    parse("define decision-table: basic "
         + "description: 'very descriptive DT' "
         + "headers: {} MATRIX: {}");
     
-    parse("id: basic "
+    parse("define decision-table: basic "
         + "description: 'very descriptive DT' "
         + "headers: {} FIRST: {}");
     
-    parse("id: basic "
+    parse("define decision-table: basic "
         + "description: 'very descriptive DT' "
         + "headers: {} ALL: {}");
   }
 
   @Test
   public void headers() throws IOException {
-    parse("id: basic \n"
+    parse("define decision-table: basic \n"
         + "headers: {\n"
-        +   "name STRING IN,\n "
-        +   "lastName STRING IN, \n"
-        +   "value INTEGER OUT\n"
+        +   "name STRING required IN,\n "
+        +   "lastName STRING required IN, \n"
+        +   "value INTEGER required OUT\n"
         + "} MATRIX: {\n"
         + "}");
   }
 
   @Test
   public void values() throws IOException {
-    parse("id: basic \n"
+    parse("define decision-table: basic \n"
         + "headers: {\n"
-        +   "name STRING IN,\n "
-        +   "lastName STRING IN, \n"
-        +   "value INTEGER OUT\n"
+        +   "name STRING required IN,\n "
+        +   "lastName STRING required IN, \n"
+        +   "value INTEGER required OUT\n"
         + "} MATRIX: {\n"
         +   "{ ?, ?, 20 },"
         +   "{ 'bob', 'woman', 4570 }"
@@ -75,11 +75,11 @@ public class DtAstNodeTest {
 
   @Test
   public void matchExpressions() throws IOException {
-    parse("id: basic \n"
+    parse("define decision-table: basic \n"
         + "headers: {\n"
-        +   "name STRING IN,\n "
-        +   "lastName STRING IN, \n"
-        +   "value INTEGER OUT\n"
+        +   "name STRING required IN,\n "
+        +   "lastName STRING required IN, \n"
+        +   "value INTEGER required OUT\n"
         + "} ALL: {\n"
         +   "{ not 'bob' or 'same' or 'professor', 'woman' or 'man', 4570 }\n"
         + "}");
@@ -88,11 +88,11 @@ public class DtAstNodeTest {
 
   @Test
   public void equalityExpressions() throws IOException {
-    parse("id: basic \n"
+    parse("define decision-table: basic \n"
         + "headers: {\n"
-        +   "value0 INTEGER IN,\n "
-        +   "value1 INTEGER IN, \n"
-        +   "value INTEGER OUT\n"
+        +   "value0 INTEGER required IN,\n "
+        +   "value1 INTEGER required IN, \n"
+        +   "value INTEGER required OUT\n"
         + "} ALL: {\n"
         +   "{ > 10, <= 20, 4570 },\n"
         +   "{ > 10, <= 20 and > 10, 4570 },\n"
@@ -107,15 +107,8 @@ public class DtAstNodeTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
-    ParseTree tree = parser.dtBody();
-    //tree.accept(new DtParserConsoleVisitor());
+    ParseTree tree = parser.hdesBody();
     tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
-    
-    /*
-    ImmutableHdesEnvir.builder().strict()
-    .add().decisionTable(value)
-    .build();*/
-    
   }
 
   public static class ErrorListener extends BaseErrorListener {

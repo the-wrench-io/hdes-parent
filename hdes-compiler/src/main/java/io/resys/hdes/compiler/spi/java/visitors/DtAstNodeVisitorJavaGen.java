@@ -37,12 +37,12 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.nodes.AstNode;
+import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
+import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.ExpressionValue;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.Header;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HeaderRefValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicy;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
@@ -141,7 +141,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         continue;
       }
       
-      Header header = body.getHeaders().getValues().get(rule.getHeader());
+      ScalarTypeDefNode header = body.getHeaders().getValues().get(rule.getHeader());
       if (header.getDirection() == DirectionType.IN) {
         if (and) {
           key.add("\r\n  && ");
@@ -164,7 +164,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
       return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().build()).build();
     }
 
-    Header header = body.getHeaders().getValues().get(node.getHeader());
+    ScalarTypeDefNode header = body.getHeaders().getValues().get(node.getHeader());
     if (header.getDirection() == DirectionType.IN) {
       return visitInputRule(node, header);
     } else {
@@ -177,7 +177,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     }
   }
   
-  private DtCodeSpec visitInputRule(Rule node, Header header) {
+  private DtCodeSpec visitInputRule(Rule node, ScalarTypeDefNode header) {
     RuleValue value = node.getValue();
     String getMethod = JavaSpecUtil.getMethod(header.getName());
     

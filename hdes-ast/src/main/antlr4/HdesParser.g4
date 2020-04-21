@@ -6,4 +6,4 @@ hdesBody: 'define'
   ( DEF_FL ':' flBody
   | DEF_DT ':'dtBody
   | DEF_MT ':' mtBody
-  | DEF_EN ':' enBody);
+  | DEF_EN ':' enBody) EOF;

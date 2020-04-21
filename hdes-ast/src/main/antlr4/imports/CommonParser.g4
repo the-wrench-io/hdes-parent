@@ -7,16 +7,19 @@ literal
   | BooleanLiteral
   | StringLiteral;
 
+directionType: DirectionType;
 scalarType: ScalarType;
 typeName : Identifier | typeName '.' Identifier;
 id: 'id' ':' typeName;
 description: 'description' ':' literal;
 
+headers: 'headers' ':' typeDefs;
+
 typeDefs: '{' typeDefArgs? '}';
 typeDefArgs: typeDef (',' typeDef)*;
 typeDef: typeName (arrayType | objectType | simpleType);
 
-simpleType: scalarType RequiredType debugValue?;
-objectType: 'OBJECT' RequiredType ':' typeDefs;
+simpleType: scalarType RequiredType directionType debugValue?;
+objectType: 'OBJECT' RequiredType directionType ':' typeDefs;
 arrayType: 'ARRAY' (simpleType | objectType);
 debugValue: 'debugValue' ':' literal;

@@ -57,15 +57,11 @@ import io.resys.hdes.ast.HdesParser.FieldContext;
 import io.resys.hdes.ast.HdesParser.FieldsContext;
 import io.resys.hdes.ast.HdesParser.FirstContext;
 import io.resys.hdes.ast.HdesParser.FlBodyContext;
-import io.resys.hdes.ast.HdesParser.FlowInputsContext;
-import io.resys.hdes.ast.HdesParser.FlowOutputsContext;
 import io.resys.hdes.ast.HdesParser.FormContext;
 import io.resys.hdes.ast.HdesParser.GroupArgsContext;
 import io.resys.hdes.ast.HdesParser.GroupContext;
 import io.resys.hdes.ast.HdesParser.GroupsContext;
 import io.resys.hdes.ast.HdesParser.HdesBodyContext;
-import io.resys.hdes.ast.HdesParser.HeaderArgsContext;
-import io.resys.hdes.ast.HdesParser.HeaderContext;
 import io.resys.hdes.ast.HdesParser.HeadersContext;
 import io.resys.hdes.ast.HdesParser.HitPolicyContext;
 import io.resys.hdes.ast.HdesParser.IdContext;
@@ -80,7 +76,6 @@ import io.resys.hdes.ast.HdesParser.MethodArgsContext;
 import io.resys.hdes.ast.HdesParser.MethodInvocationContext;
 import io.resys.hdes.ast.HdesParser.MethodNameContext;
 import io.resys.hdes.ast.HdesParser.MtBodyContext;
-import io.resys.hdes.ast.HdesParser.MtInputsContext;
 import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
 import io.resys.hdes.ast.HdesParser.NextTaskContext;
 import io.resys.hdes.ast.HdesParser.ObjectDataTypeContext;
@@ -326,18 +321,6 @@ public class HdesParserConsoleVisitor extends HdesParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public AstNode visitFlowInputs(FlowInputsContext ctx) {
-    log(ctx);
-    return super.visitFlowInputs(ctx);
-  }
-
-  @Override
-  public AstNode visitFlowOutputs(FlowOutputsContext ctx) {
-    log(ctx);
-    return super.visitFlowOutputs(ctx);
-  }
-
-  @Override
   public AstNode visitTasks(TasksContext ctx) {
     log(ctx);
     return super.visitTasks(ctx);
@@ -431,12 +414,6 @@ public class HdesParserConsoleVisitor extends HdesParserBaseVisitor<AstNode> {
   public AstNode visitMtBody(MtBodyContext ctx) {
     log(ctx);
     return super.visitMtBody(ctx);
-  }
-
-  @Override
-  public AstNode visitMtInputs(MtInputsContext ctx) {
-    log(ctx);
-    return super.visitMtInputs(ctx);
   }
 
   @Override
@@ -647,18 +624,6 @@ public class HdesParserConsoleVisitor extends HdesParserBaseVisitor<AstNode> {
   public AstNode visitHeaders(HeadersContext ctx) {
     log(ctx);
     return super.visitHeaders(ctx);
-  }
-
-  @Override
-  public AstNode visitHeaderArgs(HeaderArgsContext ctx) {
-    log(ctx);
-    return super.visitHeaderArgs(ctx);
-  }
-
-  @Override
-  public AstNode visitHeader(HeaderContext ctx) {
-    log(ctx);
-    return super.visitHeader(ctx);
   }
 
   @Override

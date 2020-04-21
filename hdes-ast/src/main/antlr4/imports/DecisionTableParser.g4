@@ -3,18 +3,13 @@ options { tokenVocab = HdesLexer; }
 import CommonParser;
 
 
-directionType: DirectionType;
-dtBody: id description? headers hitPolicy EOF;
+dtBody: typeName description? headers hitPolicy;
 
 hitPolicy: first | all | matrix;
 
 first: 'FIRST' ':' '{' rulesets? '}';
 all: 'ALL' ':' '{' rulesets? '}';
 matrix: 'MATRIX' ':' '{' rulesets? '}';
-
-headers: 'headers' ':' '{' headerArgs? '}';
-headerArgs: header (',' header)*;
-header: typeName scalarType directionType;
 
 rulesets: ruleset (',' ruleset)*;
 ruleset: '{' rules? '}';
