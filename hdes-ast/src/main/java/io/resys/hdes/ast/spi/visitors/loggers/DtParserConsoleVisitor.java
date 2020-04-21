@@ -27,7 +27,6 @@ import io.resys.hdes.ast.DecisionTableParser.ArrayTypeContext;
 import io.resys.hdes.ast.DecisionTableParser.DebugValueContext;
 import io.resys.hdes.ast.DecisionTableParser.DescriptionContext;
 import io.resys.hdes.ast.DecisionTableParser.DirectionTypeContext;
-import io.resys.hdes.ast.DecisionTableParser.DtContext;
 import io.resys.hdes.ast.DecisionTableParser.FirstContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderArgsContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderContext;
@@ -194,12 +193,6 @@ public class DtParserConsoleVisitor extends DecisionTableParserBaseVisitor<AstNo
   public AstNode visitLiteral(LiteralContext ctx) {
     log(ctx);
     return super.visitLiteral(ctx);
-  }
-
-  @Override
-  public AstNode visitDt(DtContext ctx) {
-    log(ctx);
-    return super.visitDt(ctx);
   }
 
   @Override

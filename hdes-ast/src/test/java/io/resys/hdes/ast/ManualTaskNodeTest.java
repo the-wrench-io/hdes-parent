@@ -93,7 +93,7 @@ public class ManualTaskNodeTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     ManualTaskParser parser = new ManualTaskParser(tokens);
     parser.addErrorListener(new ErrorListener());
-    ParseTree tree = parser.mt();
+    ParseTree tree = parser.mtBody();
     tree.accept(new ManualTaskParserConsoleVisitor());
     tree.accept(new MtParserAstNodeVisitor(new TokenIdGenerator()));
   }

@@ -101,7 +101,7 @@ public class ExpressionAstNodeTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     ExpressionParser parser = new ExpressionParser(tokens);
     parser.addErrorListener(new ErrorListener());
-    ParseTree tree = parser.compilationUnit();
+    ParseTree tree = parser.enBody();
     tree.accept(new ExpressionParserConsoleVisitor());
     tree.accept(new EnParserAstNodeVisitor(new TokenIdGenerator(), evalType));
   }

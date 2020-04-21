@@ -36,7 +36,7 @@ import io.resys.hdes.ast.DecisionTableParser;
 import io.resys.hdes.ast.DecisionTableParser.AllContext;
 import io.resys.hdes.ast.DecisionTableParser.DescriptionContext;
 import io.resys.hdes.ast.DecisionTableParser.DirectionTypeContext;
-import io.resys.hdes.ast.DecisionTableParser.DtContext;
+import io.resys.hdes.ast.DecisionTableParser.DtBodyContext;
 import io.resys.hdes.ast.DecisionTableParser.FirstContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderArgsContext;
 import io.resys.hdes.ast.DecisionTableParser.HeaderContext;
@@ -139,7 +139,7 @@ public class DtParserAstNodeVisitor extends DecisionTableParserBaseVisitor<AstNo
   }
 
   @Override
-  public DecisionTableBody visitDt(DtContext ctx) {
+  public DecisionTableBody visitDtBody(DtBodyContext ctx) {
     Nodes children = nodes(ctx);
     this.headers = children.of(Headers.class).get();
     return ImmutableDecisionTableBody.builder()

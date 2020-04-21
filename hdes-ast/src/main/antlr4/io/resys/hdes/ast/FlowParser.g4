@@ -9,7 +9,7 @@ taskTypes
   | ST_TASK;
 objectDataType: OBJECT | ARRAY;
 
-flow: id description? inputs outputDefs tasks EOF;
+flBody: id description? inputs outputDefs tasks EOF;
 
 outputDefs: OUTPUTS ':' typeDefs;
 

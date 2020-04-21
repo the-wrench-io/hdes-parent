@@ -36,7 +36,7 @@ import io.resys.hdes.ast.FlowParser.ArrayTypeContext;
 import io.resys.hdes.ast.FlowParser.DebugValueContext;
 import io.resys.hdes.ast.FlowParser.DescriptionContext;
 import io.resys.hdes.ast.FlowParser.EndMappingContext;
-import io.resys.hdes.ast.FlowParser.FlowContext;
+import io.resys.hdes.ast.FlowParser.FlBodyContext;
 import io.resys.hdes.ast.FlowParser.IdContext;
 import io.resys.hdes.ast.FlowParser.InputsContext;
 import io.resys.hdes.ast.FlowParser.LiteralContext;
@@ -168,7 +168,7 @@ public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public FlowBody visitFlow(FlowContext ctx) {
+  public FlowBody visitFlBody(FlBodyContext ctx) {
     Nodes children = nodes(ctx);
     FwRedundentTasks redundentTasks = children.of(FwRedundentTasks.class).get();
     FwRedundentOrderedTasks tasks = new FlowTreePointerParser().visit(redundentTasks);

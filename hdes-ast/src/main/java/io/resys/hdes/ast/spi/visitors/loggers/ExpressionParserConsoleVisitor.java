@@ -24,7 +24,6 @@ import static io.resys.hdes.ast.spi.visitors.loggers.ParserContextLogger.log;
 
 import io.resys.hdes.ast.ExpressionParser.AdditiveExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.AndExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.CompilationUnitContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalAndExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalOrExpressionContext;
@@ -84,12 +83,6 @@ public class ExpressionParserConsoleVisitor extends ExpressionParserBaseVisitor<
   public AstNode visitPrimary(PrimaryContext ctx) {
     log(ctx);
     return super.visitPrimary(ctx);
-  }
-
-  @Override
-  public AstNode visitCompilationUnit(CompilationUnitContext ctx) {
-    log(ctx);
-    return super.visitCompilationUnit(ctx);
   }
 
   @Override

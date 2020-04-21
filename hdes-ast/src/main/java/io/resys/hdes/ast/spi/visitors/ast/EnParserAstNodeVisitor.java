@@ -31,10 +31,10 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.ExpressionParser;
 import io.resys.hdes.ast.ExpressionParser.AdditiveExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.AndExpressionContext;
-import io.resys.hdes.ast.ExpressionParser.CompilationUnitContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalAndExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ConditionalOrExpressionContext;
+import io.resys.hdes.ast.ExpressionParser.EnBodyContext;
 import io.resys.hdes.ast.ExpressionParser.EqualityExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.ExpressionContext;
 import io.resys.hdes.ast.ExpressionParser.LiteralContext;
@@ -159,7 +159,7 @@ public class EnParserAstNodeVisitor extends ExpressionParserBaseVisitor<AstNode>
   }
 
   @Override
-  public ExpressionBody visitCompilationUnit(CompilationUnitContext ctx) {
+  public ExpressionBody visitEnBody(EnBodyContext ctx) {
     return ImmutableExpressionBody.builder()
         .value(first(ctx))
         .token(token(ctx))

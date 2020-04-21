@@ -32,7 +32,6 @@ import io.resys.hdes.ast.ManualTaskParser.IdContext;
 import io.resys.hdes.ast.ManualTaskParser.InputsContext;
 import io.resys.hdes.ast.ManualTaskParser.LiteralContext;
 import io.resys.hdes.ast.ManualTaskParser.MessageContext;
-import io.resys.hdes.ast.ManualTaskParser.MtContext;
 import io.resys.hdes.ast.ManualTaskParser.TypeNameContext;
 import io.resys.hdes.ast.ManualTaskParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
@@ -46,11 +45,6 @@ public class ManualTaskParserConsoleVisitor extends ManualTaskParserBaseVisitor<
     return super.visitLiteral(ctx);
   }
 
-  @Override
-  public AstNode visitMt(MtContext ctx) {
-    log(ctx);
-    return super.visitMt(ctx);
-  }
 
   @Override
   public AstNode visitInputs(InputsContext ctx) {

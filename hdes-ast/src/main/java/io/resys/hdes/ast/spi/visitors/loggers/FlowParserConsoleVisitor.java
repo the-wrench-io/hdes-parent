@@ -214,9 +214,4 @@ public class FlowParserConsoleVisitor extends FlowParserBaseVisitor<AstNode> {
     return visitChildren(ctx);
   }
 
-  @Override
-  public AstNode visitFlow(FlowParser.FlowContext ctx) {
-    log(ctx);
-    return visitChildren(ctx);
-  }
 }

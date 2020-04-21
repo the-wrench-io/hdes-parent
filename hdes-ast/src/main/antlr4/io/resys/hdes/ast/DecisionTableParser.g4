@@ -4,7 +4,7 @@ import CommonParser;
 
 
 directionType: DirectionType;
-dt: id description? headers hitPolicy EOF;
+dtBody: id description? headers hitPolicy EOF;
 
 hitPolicy: first | all | matrix;
 

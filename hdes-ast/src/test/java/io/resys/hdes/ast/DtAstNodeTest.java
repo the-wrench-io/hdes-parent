@@ -107,7 +107,7 @@ public class DtAstNodeTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     DecisionTableParser parser = new DecisionTableParser(tokens);
     parser.addErrorListener(new ErrorListener());
-    ParseTree tree = parser.dt();
+    ParseTree tree = parser.dtBody();
     //tree.accept(new DtParserConsoleVisitor());
     tree.accept(new DtParserAstNodeVisitor(new TokenIdGenerator()));
     

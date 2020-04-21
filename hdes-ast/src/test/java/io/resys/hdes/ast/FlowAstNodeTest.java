@@ -243,7 +243,7 @@ public class FlowAstNodeTest {
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     FlowParser parser = new FlowParser(tokens);
     parser.addErrorListener(new ErrorListener());
-    ParseTree tree = parser.flow();
+    ParseTree tree = parser.flBody();
     tree.accept(new FlowParserConsoleVisitor());
     tree.accept(new FwParserAstNodeVisitor(new TokenIdGenerator()));
   }

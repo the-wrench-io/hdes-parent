@@ -4,7 +4,7 @@ import CommonParser;
 
 
 dropdownType: DropdownType;
-mt: id description? inputs dropdowns actions form EOF;
+mtBody: id description? inputs dropdowns actions form EOF;
 
 dropdowns: 'dropdowns' ':' '{' dropdownArgs? '}';
 dropdownArgs: dropdownArg (',' dropdownArg)*;

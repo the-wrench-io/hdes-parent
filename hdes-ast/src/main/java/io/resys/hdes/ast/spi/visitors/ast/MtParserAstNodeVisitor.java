@@ -62,7 +62,7 @@ import io.resys.hdes.ast.ManualTaskParser.IdContext;
 import io.resys.hdes.ast.ManualTaskParser.InputsContext;
 import io.resys.hdes.ast.ManualTaskParser.LiteralContext;
 import io.resys.hdes.ast.ManualTaskParser.MessageContext;
-import io.resys.hdes.ast.ManualTaskParser.MtContext;
+import io.resys.hdes.ast.ManualTaskParser.MtBodyContext;
 import io.resys.hdes.ast.ManualTaskParser.ObjectTypeContext;
 import io.resys.hdes.ast.ManualTaskParser.ScalarTypeContext;
 import io.resys.hdes.ast.ManualTaskParser.SimpleTypeContext;
@@ -294,7 +294,7 @@ public class MtParserAstNodeVisitor extends ManualTaskParserBaseVisitor<AstNode>
   
   
   @Override
-  public ManualTaskBody visitMt(MtContext ctx) {
+  public ManualTaskBody visitMtBody(MtBodyContext ctx) {
     Nodes nodes = nodes(ctx);
     return ImmutableManualTaskBody.builder()
         .token(token(ctx))
