@@ -109,6 +109,7 @@ import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class FwParserAstNodeVisitor extends FlowParserBaseVisitor<AstNode> {
   private final TokenIdGenerator tokenIdGenerator;
+  
 
   public FwParserAstNodeVisitor(TokenIdGenerator tokenIdGenerator) {
     super();

@@ -167,6 +167,5 @@ public class ImmutableAstEnvir implements AstEnvir {
       //tree.accept(new ManualTaskParserConsoleVisitor());
       return parent((BodyNode) tree.accept(new MtParserAstNodeVisitor(new TokenIdGenerator())));
     }
-
   }
 }
