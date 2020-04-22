@@ -18,7 +18,7 @@ primary
   | methodInvocation;
 
 // final output
-enBody: expression EOF;
+enBody: expression;
 
 // expressions
 expression: conditionalExpression | primary;

@@ -87,9 +87,9 @@ public class FlowAstNodeTest {
             + "arg2.x1 INTEGER required IN\n" +
             "}\n" +
             "tasks: {\n" +
-            "firstTask: {"
-            + "when: 'arg2.x1 > 10' then: nextTask,"
-            + "when: 'arg2.x1 < 10' then: nextTask" +
+            "firstTask: {\n"
+            + "when: arg2.x1 > 10 then: nextTask,\n"
+            + "when: ? then: nextTask\n" +
             "}, " +
             "nextTask: {"
             + "then: end mapping OBJECT: {}" +

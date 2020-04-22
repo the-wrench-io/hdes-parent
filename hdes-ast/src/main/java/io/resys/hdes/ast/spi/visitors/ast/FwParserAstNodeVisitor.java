@@ -22,7 +22,6 @@ package io.resys.hdes.ast.spi.visitors.ast;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -36,20 +35,20 @@ import io.resys.hdes.ast.HdesParser.MappingArgsContext;
 import io.resys.hdes.ast.HdesParser.MappingContext;
 import io.resys.hdes.ast.HdesParser.MappingValueContext;
 import io.resys.hdes.ast.HdesParser.NextTaskContext;
-import io.resys.hdes.ast.HdesParser.PointerContext;
 import io.resys.hdes.ast.HdesParser.TaskArgsContext;
+import io.resys.hdes.ast.HdesParser.TaskPointerContext;
 import io.resys.hdes.ast.HdesParser.TaskRefContext;
 import io.resys.hdes.ast.HdesParser.TaskTypesContext;
 import io.resys.hdes.ast.HdesParser.TasksContext;
-import io.resys.hdes.ast.HdesParser.ThenContext;
-import io.resys.hdes.ast.HdesParser.WhenExpressionContext;
-import io.resys.hdes.ast.HdesParser.WhenThenArgsContext;
-import io.resys.hdes.ast.HdesParser.WhenThenContext;
+import io.resys.hdes.ast.HdesParser.ThenPointerContext;
+import io.resys.hdes.ast.HdesParser.WhenThenPointerArgsContext;
+import io.resys.hdes.ast.HdesParser.WhenThenPointerContext;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.FlowNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
@@ -59,7 +58,6 @@ import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.RefTaskType;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
-import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableEndPointer;
@@ -70,7 +68,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableFlowTaskNode;
 import io.resys.hdes.ast.api.nodes.ImmutableMapping;
 import io.resys.hdes.ast.api.nodes.ImmutableTaskRef;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
-import io.resys.hdes.ast.api.nodes.ImmutableWhen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThenPointer;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
@@ -179,12 +176,12 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
   }
   
   @Override
-  public FlowTaskPointer visitPointer(PointerContext ctx) {
+  public FlowTaskPointer visitTaskPointer(TaskPointerContext ctx) {
     return (FlowTaskPointer) first(ctx);
   }
   
   @Override
-  public WhenThenPointer visitWhenThenArgs(WhenThenArgsContext ctx) {
+  public WhenThenPointer visitWhenThenPointerArgs(WhenThenPointerArgsContext ctx) {
     Nodes nodes = nodes(ctx);
     return ImmutableWhenThenPointer.builder()
         .token(token(ctx))
@@ -193,32 +190,23 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
   }
 
   @Override
-  public WhenThen visitWhenThen(WhenThenContext ctx) {
+  public WhenThen visitWhenThenPointer(WhenThenPointerContext ctx) {
     Nodes nodes = nodes(ctx);
     return ImmutableWhenThen.builder()
         .token(token(ctx))
-        .when(nodes.of(When.class).get())
+        .when(nodes.of(ExpressionBody.class))
         .then(nodes.of(ThenPointer.class).get())
         .build();
   }
 
   @Override
-  public When visitWhenExpression(WhenExpressionContext ctx) {
-    return ImmutableWhen.builder()
-        .token(token(ctx))
-        .node(Optional.empty())
-        .text(Nodes.getStringLiteralValue(ctx))
-        .build();
-  }
-  
-  @Override
-  public ThenPointer visitThen(ThenContext ctx) {
+  public ThenPointer visitThenPointer(ThenPointerContext ctx) {
     return ImmutableThenPointer.builder()
         .token(token(ctx))
         .name(nodes(ctx).of(RedundentTypeName.class).map(e -> e.getValue()).orElse("end"))
         .build();
   }
-
+  
   @Override
   public TaskRef visitTaskRef(TaskRefContext ctx) {
     Nodes nodes = nodes(ctx);

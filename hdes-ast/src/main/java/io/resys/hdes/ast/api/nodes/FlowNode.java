@@ -25,6 +25,8 @@ import java.util.Optional;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
+
 public interface FlowNode extends AstNode {
 
   enum RefTaskType { FLOW_TASK, MANUAL_TASK, DECISION_TABLE, SERVICE_TASK }
@@ -77,14 +79,9 @@ public interface FlowNode extends AstNode {
   
   @Value.Immutable
   interface WhenThen extends FlowNode {
-    When getWhen();
+    Optional<ExpressionBody> getWhen();
     ThenPointer getThen();
   }
-  @Value.Immutable
-  interface When extends FlowNode {
-    String getText();
-    Optional<AstNode> getNode();
-  }  
   
   
   @Value.Immutable

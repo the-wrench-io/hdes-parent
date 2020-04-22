@@ -13,17 +13,15 @@ flBody: typeName description? headers tasks;
 
 tasks: 'tasks' ':' '{' taskArgs? '}';
 taskArgs: nextTask (',' nextTask)*;
-nextTask: typeName ':' '{' pointer taskRef? '}';
+nextTask: typeName ':' '{' taskPointer taskRef? '}';
 
-pointer: whenThenArgs | then ;
-whenThenArgs: whenThen (',' whenThen)*;
-whenThen: 'when' ':' whenExpression then; 
-whenExpression: StringLiteral;
-then: 'then' ':' (endMapping | typeName);
-endMapping: 'end' mapping;
-
+taskPointer: whenThenPointerArgs | thenPointer;
+whenThenPointerArgs: whenThenPointer (',' whenThenPointer)*;
+whenThenPointer: 'when' ':' ('?' | enBody) thenPointer;
+thenPointer: 'then' ':' (endMapping | typeName);
 
 taskRef: taskTypes ':' typeName mapping;  
+endMapping: 'end' mapping;
 mapping: 'mapping' objectDataType ':' '{' mappingArgs? '}';
 mappingArgs: mappingArg (',' mappingArg)*;
 

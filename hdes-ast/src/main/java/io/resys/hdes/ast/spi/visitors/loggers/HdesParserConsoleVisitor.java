@@ -80,7 +80,6 @@ import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
 import io.resys.hdes.ast.HdesParser.NextTaskContext;
 import io.resys.hdes.ast.HdesParser.ObjectDataTypeContext;
 import io.resys.hdes.ast.HdesParser.ObjectTypeContext;
-import io.resys.hdes.ast.HdesParser.PointerContext;
 import io.resys.hdes.ast.HdesParser.PostfixExpressionContext;
 import io.resys.hdes.ast.HdesParser.PreDecrementExpressionContext;
 import io.resys.hdes.ast.HdesParser.PreIncrementExpressionContext;
@@ -101,16 +100,12 @@ import io.resys.hdes.ast.HdesParser.TaskArgsContext;
 import io.resys.hdes.ast.HdesParser.TaskRefContext;
 import io.resys.hdes.ast.HdesParser.TaskTypesContext;
 import io.resys.hdes.ast.HdesParser.TasksContext;
-import io.resys.hdes.ast.HdesParser.ThenContext;
 import io.resys.hdes.ast.HdesParser.TypeDefArgsContext;
 import io.resys.hdes.ast.HdesParser.TypeDefContext;
 import io.resys.hdes.ast.HdesParser.TypeDefsContext;
 import io.resys.hdes.ast.HdesParser.TypeNameContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionNotPlusMinusContext;
-import io.resys.hdes.ast.HdesParser.WhenExpressionContext;
-import io.resys.hdes.ast.HdesParser.WhenThenArgsContext;
-import io.resys.hdes.ast.HdesParser.WhenThenContext;
 import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.nodes.AstNode;
 
@@ -336,36 +331,6 @@ public class HdesParserConsoleVisitor extends HdesParserBaseVisitor<AstNode> {
   public AstNode visitNextTask(NextTaskContext ctx) {
     log(ctx);
     return super.visitNextTask(ctx);
-  }
-
-  @Override
-  public AstNode visitPointer(PointerContext ctx) {
-    log(ctx);
-    return super.visitPointer(ctx);
-  }
-
-  @Override
-  public AstNode visitWhenThenArgs(WhenThenArgsContext ctx) {
-    log(ctx);
-    return super.visitWhenThenArgs(ctx);
-  }
-
-  @Override
-  public AstNode visitWhenThen(WhenThenContext ctx) {
-    log(ctx);
-    return super.visitWhenThen(ctx);
-  }
-
-  @Override
-  public AstNode visitWhenExpression(WhenExpressionContext ctx) {
-    log(ctx);
-    return super.visitWhenExpression(ctx);
-  }
-
-  @Override
-  public AstNode visitThen(ThenContext ctx) {
-    log(ctx);
-    return super.visitThen(ctx);
   }
 
   @Override
