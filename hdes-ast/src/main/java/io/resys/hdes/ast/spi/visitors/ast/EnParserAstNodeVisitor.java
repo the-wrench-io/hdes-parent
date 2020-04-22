@@ -135,6 +135,7 @@ public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
       }
       return c.accept(this);
     }
+    // TODO:: error handling
     throw new AstNodeException("unknown primary node: " + ctx.getText() + "!");
   }
 
@@ -155,6 +156,7 @@ public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     }
     ParseTree c = ctx.getChild(0);
     AstNode childResult = c.accept(this);
+    // TODO:: error handling
     throw new AstNodeException("Unknown node: '" + childResult + "', '" + c.getText() + "'");
   }
 
@@ -213,6 +215,8 @@ public class EnParserAstNodeVisitor extends HdesParserBaseVisitor<AstNode> {
     }
     ParseTree c = ctx.getChild(0);
     AstNode childResult = c.accept(this);
+    
+    // TODO:: error handling
     throw new AstNodeException("Unknown node: '" + childResult + "', '" + c.getText() + "'");
   }
 

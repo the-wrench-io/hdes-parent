@@ -112,6 +112,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     FwRedundentOrderedTasks tasks = new FlowTreePointerParser().visit(redundentTasks);
     
     for(FlowTaskNode unclaimed : tasks.getUnclaimed()) {
+      // TODO:: error handling
       break;
     }
     
@@ -253,6 +254,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     } else if(first instanceof RedundentTypeName) {
       value = ((RedundentTypeName) first).getValue();
     } else {
+      // TODO:: error handling
       throw new AstNodeException("Unknown mapping value: " + ctx.getText() + "!");
     }
     
@@ -271,6 +273,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     case HdesParser.FLOW_TASK: type = RefTaskType.FLOW_TASK; break;
     case HdesParser.ST_TASK: type = RefTaskType.SERVICE_TASK; break;
     case HdesParser.DT_TASK: type = RefTaskType.DECISION_TABLE; break;
+    // TODO:: error handling
     default: throw new AstNodeException("Unknown task type: " + ctx.getText() + "!");
     }
     return ImmutableFwRedundentRefTaskType.builder()

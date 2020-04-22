@@ -45,6 +45,7 @@ import io.resys.hdes.ast.HdesParser.RuleValueContext;
 import io.resys.hdes.ast.HdesParser.RulesContext;
 import io.resys.hdes.ast.HdesParser.RulesetContext;
 import io.resys.hdes.ast.HdesParser.RulesetsContext;
+import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
@@ -194,7 +195,8 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
       type = EqualityType.LESS_THEN;
     
     } else {
-      throw new IllegalArgumentException("Not implemented equality type: " + v + "!");
+      // TODO:: error handling
+      throw new AstNodeException("Not implemented equality type: " + v + "!");
     }
     
     AstNode.Token token = token(ctx);
