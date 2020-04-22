@@ -22,6 +22,7 @@ package io.resys.hdes.ast.spi.visitors.ast;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -58,7 +59,6 @@ import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.RefTaskType;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
-import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableEndPointer;
@@ -196,17 +196,23 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     return ImmutableWhenThen.builder()
         .token(token(ctx))
         .when(nodes.of(ExpressionBody.class))
-        .then(nodes.of(ThenPointer.class).get())
+        .then(nodes.of(FlowTaskPointer.class).get())
         .build();
   }
 
   @Override
-  public ThenPointer visitThenPointer(ThenPointerContext ctx) {
+  public FlowTaskPointer visitThenPointer(ThenPointerContext ctx) {
+    Nodes nodes = nodes(ctx);
+    Optional<EndPointer> endPointer = nodes.of(EndPointer.class);
+    if(endPointer.isPresent()) {
+      return endPointer.get();
+    }
     return ImmutableThenPointer.builder()
-        .token(token(ctx))
-        .name(nodes(ctx).of(TypeName.class).map(e -> e.getValue()).orElse("end"))
-        .build();
+      .token(token(ctx))
+      .name(nodes.of(TypeName.class).map(e -> e.getValue()).get())
+      .build();
   }
+  
   
   @Override
   public TaskRef visitTaskRef(TaskRefContext ctx) {

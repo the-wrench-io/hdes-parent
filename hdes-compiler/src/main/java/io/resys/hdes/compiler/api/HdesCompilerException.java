@@ -105,6 +105,12 @@ public class HdesCompilerException extends RuntimeException {
           .append("  - ").append(ast).append("!")
           .toString();
     }
+    public String unknownFlTaskPointer(FlowTaskPointer ast) {
+      return new StringBuilder()
+          .append("Unknown FLOW task pointer AST: ").append(ast.getClass()).append(System.lineSeparator())
+          .append("  - ").append(ast).append("!")
+          .toString();
+    }
     public String wildcardUnknownFlTaskWhenThen(FlowTaskPointer ast) {
       return new StringBuilder()
           .append("Unknown FLOW when/then(wildcard '?' can be only present as the last element) AST: ").append(System.lineSeparator())

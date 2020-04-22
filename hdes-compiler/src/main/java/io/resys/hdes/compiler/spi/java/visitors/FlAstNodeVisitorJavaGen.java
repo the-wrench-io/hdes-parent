@@ -32,6 +32,7 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
@@ -213,9 +214,15 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     if(node instanceof ThenPointer) {
       ThenPointer then = (ThenPointer) node;
       return visitThenPointer(then);
-    }
+    } 
     
-    return ImmutableFlTaskImplSpec.builder().build();
+    // end
+    if(node instanceof EndPointer) {
+      EndPointer then = (EndPointer) node;
+      return visitEndPointer(then);
+    } 
+    throw new HdesCompilerException(HdesCompilerException.builder().unknownFlTaskPointer(node));
+  
   }
   
   @Override
@@ -235,11 +242,20 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   
   @Override
   public FlWhenThenSpec visitWhenThen(WhenThen node) {
+    FlTaskImplSpec spec = visitFlowTaskPointer(node.getThen());
+    
     return ImmutableFlWhenThenSpec.builder()
         .when(node.getWhen().map(w -> visitWhen(w).getValue()))
-        .then(visitThenPointer(node.getThen()))
+        .then(spec)
         .build();
   }
+  
+  @Override
+  public FlTaskImplSpec visitEndPointer(EndPointer node) {
+    // TODO Auto-generated method stub
+    return super.visitEndPointer(node);
+  }
+
   @Override
   public FlTaskImplSpec visitWhenThenPointer(WhenThenPointer pointer) {
     List<MethodSpec> methods = new ArrayList<>();

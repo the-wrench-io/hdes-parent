@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
 import io.resys.hdes.ast.api.AstNodeException;
+import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
@@ -90,18 +91,23 @@ public class FlowTreePointerParser {
       return visit((WhenThenPointer) pointer);
     } else if(pointer instanceof ThenPointer) {
       return visit((ThenPointer) pointer);
+    } else if(pointer instanceof EndPointer) {
+      return Optional.of(pointer);
     }
     // TODO : error handling
     throw new AstNodeException("Unknown pointer: " + pointer + "!");
   }
-
+  
   private Optional<FlowTaskPointer> visit(WhenThenPointer pointer) {
     List<WhenThen> values = new ArrayList<>();    
     for(WhenThen src : pointer.getValues()) {
       Optional<WhenThen> result = visit(src);
+      
+      // TODO : error handling
       if(result.isPresent()) {
         values.add(result.get());
       }
+      
     }
     if(values.isEmpty()) {
       return Optional.empty();
@@ -115,10 +121,11 @@ public class FlowTreePointerParser {
 
   private Optional<WhenThen> visit(WhenThen pointer) {
     Optional<FlowTaskPointer> then = visit(pointer.getThen());
-    return Optional.of(ImmutableWhenThen.builder().from(pointer).then((ThenPointer) then.get()).build());
+    return Optional.of(ImmutableWhenThen.builder().from(pointer).then(then.get()).build());
   }
   private Optional<FlowTaskPointer> visit(ThenPointer pointer) {
     String taskName = pointer.getName();
+    
     if(createdTasks.containsKey(taskName)) {
       return Optional.of(ImmutableThenPointer.builder().from(pointer).task(createdTasks.get(taskName)).build());
     } else if(sourceTasks.containsKey(taskName)) {
@@ -126,7 +133,7 @@ public class FlowTreePointerParser {
       FlowTaskNode result = visit(src);
       return Optional.of(ImmutableThenPointer.builder().from(pointer).task(result).build());
     } else if(taskName.equalsIgnoreCase("end")) {
-      return Optional.of(ImmutableThenPointer.builder().from(pointer).task(Optional.empty()).build());
+      return Optional.of(pointer);
     }
     
     StringBuilder message = new StringBuilder()

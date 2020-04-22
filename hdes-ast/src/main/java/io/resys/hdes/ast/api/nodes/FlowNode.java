@@ -80,7 +80,7 @@ public interface FlowNode extends AstNode {
   @Value.Immutable
   interface WhenThen extends FlowNode {
     Optional<ExpressionBody> getWhen();
-    ThenPointer getThen();
+    FlowTaskPointer getThen();
   }
   
   
