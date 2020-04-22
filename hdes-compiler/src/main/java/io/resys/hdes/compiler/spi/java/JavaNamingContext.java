@@ -40,7 +40,10 @@ public class JavaNamingContext implements NamingContext {
   public ClassName immutable(ClassName src) {
     return ClassName.get(src.packageName(), "Immutable" + src.simpleName());
   }
-  
+  @Override
+  public ClassName immutableBuilder(ClassName src) {
+    return ClassName.get(src.packageName(), "Immutable" + src.simpleName() + ".Builder");
+  }  
   @Override
   public FlNamingContext fl() {
     return flNaming;

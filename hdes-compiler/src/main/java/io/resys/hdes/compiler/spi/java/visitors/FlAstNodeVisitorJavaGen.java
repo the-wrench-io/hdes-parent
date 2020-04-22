@@ -82,30 +82,50 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     FlTaskImplSpec taskImpl = node.getTask().map(n -> visitFlowTask(n)).orElseGet(() ->
       ImmutableFlTaskImplSpec.builder().value(CodeBlock.builder().add("// no tasks described ").build()).build()
     );
-    
-    MethodSpec applyMethod = MethodSpec.methodBuilder("apply")
-        .addModifiers(Modifier.PUBLIC)
-        .addParameter(ParameterSpec.builder(naming.fl().input(node), "input").build())
-        .returns(flowState)
-        
-        .addCode(CodeBlock.builder().addStatement("long start = System.currentTimeMillis()").add("\r\n").build())
-        .addStatement("$T currentState = $T.builder().input(input).build()", flowState, naming.immutable(flowState))
-        .addCode(taskImpl.getValue())
-        .addCode(CodeBlock.builder().add("\r\n").addStatement("long end = System.currentTimeMillis()").build())
-        
-        .addCode(CodeBlock.builder()
+
+    // End method
+    MethodSpec endMethod = MethodSpec.methodBuilder("end")
+        .addModifiers(Modifier.PROTECTED)
+        .addParameter(ParameterSpec.builder(Long.class, "start").build())
+        .addParameter(ParameterSpec.builder(flowState, "currentState").build())
+        .returns(naming.immutableBuilder(flowState))
+        .addCode(CodeBlock.builder().addStatement("long end = System.currentTimeMillis()").build())
+        .addCode(
+            CodeBlock.builder()
             .add("return $T.builder()", naming.immutable(flowState))
             .add("\r\n  ").add(".from(currentState)")
             .add("\r\n  ").add(".id($S)", node.getId())
             .add("\r\n  ").add(".parent(currentState.getLog())")
             .add("\r\n  ").add(".start(start)").add(".end(end)")
             .add("\r\n  ").add(".duration(end - start)")
-            .add("\r\n  ").add(".build()")
-            .build())
+            .build()
+            )
         .build();
+        
+    
+    MethodSpec applyMethod = MethodSpec.methodBuilder("apply")
+      .addModifiers(Modifier.PUBLIC)
+      .addParameter(ParameterSpec.builder(naming.fl().input(node), "input").build())
+      .returns(flowState)
+      
+      .addCode(CodeBlock.builder().addStatement("long start = System.currentTimeMillis()").add("\r\n").build())
+      .addStatement("$T currentState = $T.builder().input(input).build()", flowState, naming.immutable(flowState))
+      .addCode(taskImpl.getValue())
+      
+      .addCode(CodeBlock.builder()
+          .add("return $T.builder()", naming.immutable(flowState))
+          .add("\r\n  ").add(".from(currentState)")
+          .add("\r\n  ").add(".id($S)", node.getId())
+          .add("\r\n  ").add(".parent(currentState.getLog())")
+          .add("\r\n  ").add(".start(start)").add(".end(end)")
+          .add("\r\n  ").add(".duration(end - start)")
+          .add("\r\n  ").add(".build()")
+          .build())
+      .build();
  
     return flowBuilder
         .addMethod(applyMethod)
+        .addMethod(endMethod)
         .addMethods(taskImpl.getChildren())
         .build();
   }
@@ -252,8 +272,13 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   
   @Override
   public FlTaskImplSpec visitEndPointer(EndPointer node) {
-    // TODO Auto-generated method stub
-    return super.visitEndPointer(node);
+    List<MethodSpec> methods = new ArrayList<>();
+    CodeBlock.Builder codeBlock = CodeBlock.builder();
+    codeBlock.addStatement("//trigger end");
+    return ImmutableFlTaskImplSpec.builder()
+        .value(codeBlock.build())
+        .addAllChildren(methods)
+        .build();
   }
 
   @Override

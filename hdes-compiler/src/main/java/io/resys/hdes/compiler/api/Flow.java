@@ -27,18 +27,24 @@ import java.util.Optional;
 import org.immutables.value.Value;
 
 import io.resys.hdes.compiler.api.Flow.FlowInput;
+import io.resys.hdes.compiler.api.Flow.FlowOutput;
 import io.resys.hdes.compiler.api.Flow.FlowState;
 
-public interface Flow<I extends FlowInput, S extends FlowState<I>> {
+public interface Flow<
+  I extends FlowInput,
+  O extends FlowOutput,
+  S extends FlowState<I, O>> {
   
   enum ExecutionStatusType { COMPLETED, PENDING, ERROR }
   interface FlowInput {}
+  interface FlowOutput {}
   
   S apply(I input);
   //S apply(S old, ? output);
   
-  interface FlowState<I> {
+  interface FlowState<I, O> {
     I getInput();
+    O getOutput();
     ExecutionStatusType getType();
     List<FlowError> getErrors();
     Optional<FlowExecutionLog> getLog();
@@ -69,7 +75,7 @@ public interface Flow<I extends FlowInput, S extends FlowState<I>> {
   }
   
   @FunctionalInterface
-  interface FlowTask<S extends FlowState<?>, I, R> {
+  interface FlowTask<S extends FlowState<?, ?>, I, R> {
     R apply(S state, I input);
   }
 }
