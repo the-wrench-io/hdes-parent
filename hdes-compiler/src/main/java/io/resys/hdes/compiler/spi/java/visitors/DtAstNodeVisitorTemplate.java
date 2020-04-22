@@ -21,14 +21,10 @@ package io.resys.hdes.compiler.spi.java.visitors;
  */
 
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DecimalConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.AstNodeVisitor.DtAstNodeVisitor;
@@ -63,43 +59,19 @@ public class DtAstNodeVisitorTemplate<T, R> implements DtAstNodeVisitor<T, R> {
   }
 
   @Override
-  public T visitDateConversion(DateConversion node) {
+  public T visitObjectDef(ObjectTypeDefNode node) {
 
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitDateTimeConversion(DateTimeConversion node) {
+  public T visitArrayDef(ArrayTypeDefNode node) {
 
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitTimeConversion(TimeConversion node) {
-
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitDecimalConversion(DecimalConversion node) {
-
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitObjectInputNode(ObjectTypeDefNode node) {
-
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitArrayInputNode(ArrayTypeDefNode node) {
-
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitScalarInputNode(ScalarTypeDefNode node) {
+  public T visitScalarDef(ScalarTypeDefNode node) {
 
     throw new IllegalArgumentException("Not implemented");
   }

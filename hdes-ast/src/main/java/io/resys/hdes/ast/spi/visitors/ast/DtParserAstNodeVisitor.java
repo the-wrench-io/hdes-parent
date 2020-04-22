@@ -49,6 +49,7 @@ import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicy;
@@ -76,7 +77,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableRule;
 import io.resys.hdes.ast.api.nodes.ImmutableRuleRow;
 import io.resys.hdes.ast.api.nodes.ImmutableUndefinedValue;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
-import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
@@ -98,7 +98,7 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
     this.headers = children.of(Headers.class).get();
     return ImmutableDecisionTableBody.builder()
         .token(token(ctx))
-        .id(children.of(RedundentTypeName.class).get().getValue())
+        .id(children.of(TypeName.class).get().getValue())
         .description(children.of(RedundentDescription.class).map(e -> e.getValue()))
         .headers(headers)
         .hitPolicy(children.of(HitPolicy.class).get())

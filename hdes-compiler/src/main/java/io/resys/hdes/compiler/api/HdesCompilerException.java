@@ -3,6 +3,7 @@ package io.resys.hdes.compiler.api;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
 
@@ -101,6 +102,24 @@ public class HdesCompilerException extends RuntimeException {
     public String unknownFlTaskRef(TaskRef ast) {
       return new StringBuilder()
           .append("Unknown FLOW task reference AST: ").append(ast.getValue()).append(System.lineSeparator())
+          .append("  - ").append(ast).append("!")
+          .toString();
+    }
+    public String wildcardUnknownFlTaskWhenThen(FlowTaskPointer ast) {
+      return new StringBuilder()
+          .append("Unknown FLOW when/then(wildcard '?' can be only present as the last element) AST: ").append(System.lineSeparator())
+          .append("  - ").append(ast).append("!")
+          .toString();
+    }
+    public String unknownExpressionNode(AstNode ast) {
+      return new StringBuilder()
+          .append("Unknown EXPRESSION AST: ").append(ast.getClass()).append(System.lineSeparator())
+          .append("  - ").append(ast).append("!")
+          .toString();
+    }
+    public String unknownExpressionOperation(AstNode ast) {
+      return new StringBuilder()
+          .append("Unknown EXPRESSION operation AST: ").append(ast.getClass()).append(System.lineSeparator())
           .append("  - ").append(ast).append("!")
           .toString();
     }

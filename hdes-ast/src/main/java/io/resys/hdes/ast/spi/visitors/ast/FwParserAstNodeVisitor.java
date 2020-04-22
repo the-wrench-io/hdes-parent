@@ -48,6 +48,7 @@ import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.FlowNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
@@ -71,7 +72,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThenPointer;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
-import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser;
 import io.resys.hdes.ast.spi.visitors.ast.util.FlowTreePointerParser.FwRedundentOrderedTasks;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
@@ -131,7 +131,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
             .build())
         
         .token(token(ctx))
-        .id(children.of(RedundentTypeName.class).get().getValue())
+        .id(children.of(TypeName.class).get().getValue())
         .description(children.of(RedundentDescription.class).map(e -> e.getValue()).orElse(null))
         .task(tasks.getFirst())
         .unreachableTasks(tasks.getUnclaimed())
@@ -170,7 +170,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     Nodes nodes = nodes(ctx);
     return ImmutableFlowTaskNode.builder()
         .token(token(ctx))
-        .id(nodes.of(RedundentTypeName.class).get().getValue())
+        .id(nodes.of(TypeName.class).get().getValue())
         .next(nodes.of(FlowTaskPointer.class))
         .ref(nodes.of(TaskRef.class))
         .build();
@@ -204,7 +204,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
   public ThenPointer visitThenPointer(ThenPointerContext ctx) {
     return ImmutableThenPointer.builder()
         .token(token(ctx))
-        .name(nodes(ctx).of(RedundentTypeName.class).map(e -> e.getValue()).orElse("end"))
+        .name(nodes(ctx).of(TypeName.class).map(e -> e.getValue()).orElse("end"))
         .build();
   }
   
@@ -214,7 +214,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     return ImmutableTaskRef.builder()
         .token(token(ctx))
         .type(nodes.of(FwRedundentRefTaskType.class).get().getValue())
-        .value(nodes.of(RedundentTypeName.class).get().getValue())
+        .value(nodes.of(TypeName.class).get().getValue())
         .mapping(nodes.of(FwRedundentMapping.class).get().getValues())
         .build();
   }
@@ -240,7 +240,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     Nodes nodes = nodes(ctx);
     return ImmutableMapping.builder()
         .token(token(ctx))
-        .left(nodes.of(RedundentTypeName.class).get().getValue())
+        .left(nodes.of(TypeName.class).get().getValue())
         .right(nodes.of(FwRedundentMappingValue.class).get().getValue())
         .build();
   }
@@ -251,8 +251,8 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     String value;
     if(first instanceof Literal) {
       value = ((Literal) first).getValue();
-    } else if(first instanceof RedundentTypeName) {
-      value = ((RedundentTypeName) first).getValue();
+    } else if(first instanceof TypeName) {
+      value = ((TypeName) first).getValue();
     } else {
       // TODO:: error handling
       throw new AstNodeException("Unknown mapping value: " + ctx.getText() + "!");

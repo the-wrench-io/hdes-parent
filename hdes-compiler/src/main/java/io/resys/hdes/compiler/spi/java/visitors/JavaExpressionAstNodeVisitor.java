@@ -1,33 +1,6 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
-/*-
- * #%L
- * hdes-compiler
- * %%
- * Copyright (C) 2020 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DecimalConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
-import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.AstNodeVisitor.ExpressionAstNodeVisitor;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.AdditiveOperation;
@@ -58,48 +31,6 @@ public class JavaExpressionAstNodeVisitor implements ExpressionAstNodeVisitor {
 
   @Override
   public Object visitLiteral(Literal node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object visitDateConversion(DateConversion node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object visitDateTimeConversion(DateTimeConversion node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object visitTimeConversion(TimeConversion node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object visitDecimalConversion(DecimalConversion node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object visitObjectInputNode(ObjectTypeDefNode node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object visitArrayInputNode(ArrayTypeDefNode node) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Object visitScalarInputNode(ScalarTypeDefNode node) {
     // TODO Auto-generated method stub
     return null;
   }

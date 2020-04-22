@@ -21,14 +21,10 @@ package io.resys.hdes.ast.api.nodes;
  */
 
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DecimalConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
@@ -85,16 +81,27 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
 
 public interface AstNodeVisitor<T, R> {
   
+  @FunctionalInterface
+  interface TypeNameRef {
+    String get(TypeName node);
+  }
+  
   // basic
   T visitTypeName(TypeName node);
   T visitLiteral(Literal node);
+
+  /* conversions
   T visitDateConversion(DateConversion node);
   T visitDateTimeConversion(DateTimeConversion node);
   T visitTimeConversion(TimeConversion node);
   T visitDecimalConversion(DecimalConversion node);
-  T visitObjectInputNode(ObjectTypeDefNode node);
-  T visitArrayInputNode(ArrayTypeDefNode node);
-  T visitScalarInputNode(ScalarTypeDefNode node);
+  */
+  
+  interface TypeDefVisitor<T, R> extends AstNodeVisitor<T, R>{
+    T visitObjectDef(ObjectTypeDefNode node);
+    T visitArrayDef(ArrayTypeDefNode node);
+    T visitScalarDef(ScalarTypeDefNode node);
+  }
   
   // expression
   interface ExpressionAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> { 
@@ -118,7 +125,7 @@ public interface AstNodeVisitor<T, R> {
   }
   
   // dt
-  interface DtAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
+  interface DtAstNodeVisitor<T, R> extends TypeDefVisitor<T, R> {
     R visitDecisionTableBody(DecisionTableBody node);
     T visitHeaders(Headers node);
     T visitHeader(TypeDefNode node);
@@ -139,7 +146,7 @@ public interface AstNodeVisitor<T, R> {
   }
   
   // flow
-  interface FlowAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
+  interface FlowAstNodeVisitor<T, R> extends TypeDefVisitor<T, R> {
     R visitFlowBody(FlowBody node);
     T visitFlowInputs(FlowInputs node);
     T visitFlowTask(FlowTaskNode node);
@@ -156,7 +163,7 @@ public interface AstNodeVisitor<T, R> {
   }
   
   // mt
-  interface MtAstNodeVisitor<T, R> extends AstNodeVisitor<T, R> {
+  interface MtAstNodeVisitor<T, R> extends TypeDefVisitor<T, R> {
     R visitManualTaskBody(ManualTaskBody node);
     T visitManualTaskInputs(ManualTaskInputs node);
     T visitManualTaskDropdowns(ManualTaskDropdowns node);

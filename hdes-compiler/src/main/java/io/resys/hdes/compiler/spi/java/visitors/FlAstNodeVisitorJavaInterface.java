@@ -81,7 +81,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
       
       for(TypeSpec task : taskSpecs.getChildren()) {
         stateBuilder.addMethod(MethodSpec
-            .methodBuilder(JavaSpecUtil.getMethod(task.name.substring(body.getId().length())))
+            .methodBuilder(JavaSpecUtil.getMethodName(task.name.substring(body.getId().length())))
             .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
             .returns(ParameterizedTypeName.get(
                 ClassName.get(Optional.class),
@@ -140,19 +140,19 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
 
   private FlInputSpec visitInput(TypeDefNode node) {
     if (node instanceof ScalarTypeDefNode) {
-      return visitScalarInputNode((ScalarTypeDefNode) node);
+      return visitScalarDef((ScalarTypeDefNode) node);
     } else if (node instanceof ArrayTypeDefNode) {
-      return visitArrayInputNode((ArrayTypeDefNode) node);
+      return visitArrayDef((ArrayTypeDefNode) node);
     } else if (node instanceof ObjectTypeDefNode) {
-      return visitObjectInputNode((ObjectTypeDefNode) node);
+      return visitObjectDef((ObjectTypeDefNode) node);
     }
     throw new HdesCompilerException(HdesCompilerException.builder().unknownFlInputRule(node));
   }
 
   @Override
-  public FlInputSpec visitScalarInputNode(ScalarTypeDefNode node) {
+  public FlInputSpec visitScalarDef(ScalarTypeDefNode node) {
     Class<?> returnType = JavaSpecUtil.type(node.getType());
-    MethodSpec method = MethodSpec.methodBuilder(JavaSpecUtil.getMethod(node.getName()))
+    MethodSpec method = MethodSpec.methodBuilder(JavaSpecUtil.getMethodName(node.getName()))
         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
         .returns(node.getRequired() ? ClassName.get(returnType) : ParameterizedTypeName.get(Optional.class, returnType))
         .build();
@@ -160,7 +160,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlInputSpec visitArrayInputNode(ArrayTypeDefNode node) {
+  public FlInputSpec visitArrayDef(ArrayTypeDefNode node) {
     FlInputSpec childSpec = visitInput(node.getValue());
     com.squareup.javapoet.TypeName arrayType;
     if (node.getValue().getRequired()) {
@@ -177,7 +177,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlInputSpec visitObjectInputNode(ObjectTypeDefNode node) {
+  public FlInputSpec visitObjectDef(ObjectTypeDefNode node) {
     ClassName typeName = naming.fl().input(body, node);
     TypeSpec.Builder objectBuilder = TypeSpec
         .interfaceBuilder(typeName)
@@ -194,7 +194,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
     return ImmutableFlInputSpec.builder()
         .children(nested)
         .value(
-            MethodSpec.methodBuilder(JavaSpecUtil.getMethod(node.getName()))
+            MethodSpec.methodBuilder(JavaSpecUtil.getMethodName(node.getName()))
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .returns(node.getRequired() ? typeName : ParameterizedTypeName.get(ClassName.get(Optional.class), typeName))
                 .build())

@@ -179,7 +179,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
   
   private DtCodeSpec visitInputRule(Rule node, ScalarTypeDefNode header) {
     RuleValue value = node.getValue();
-    String getMethod = JavaSpecUtil.getMethod(header.getName());
+    String getMethod = JavaSpecUtil.getMethodName(header.getName());
     
     if(value instanceof LiteralValue) {
       Literal literal = ((LiteralValue) value).getValue();
@@ -238,6 +238,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     case GREATER_THEN: operation = "$L.gte($L, $L)"; break;
     case LESS: operation = "$L.lt($L, $L)"; break;
     case LESS_THEN: operation = "$L.lte($L, $L)"; break;
+    // TODO: error handling
     default: throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionOperation(node));
     }
     return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, "when()", left, right).build()).build();

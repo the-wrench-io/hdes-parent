@@ -28,13 +28,27 @@ import java.time.LocalTime;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 
 public class JavaSpecUtil {
-  public static String getMethod(String name) {
+  
+  
+  public static String getMethodCall(String name) {
+    String[] src = name.split("\\.");
+    StringBuilder result = new StringBuilder();
+    for(String target : src) {
+      if(result.length() > 0) {
+        result.append(".");
+      }
+      result.append("get").append(capitalize(target)).append("()");
+    }
+    return result.toString();
+  }
+  
+  public static String getMethodName(String name) {
     return new StringBuilder()
         .append("get")
         .append(capitalize(name))
         .toString();
   }
-  
+ 
   public static String method(String name) {
     return new StringBuilder()
         .append(decapitalize(name))

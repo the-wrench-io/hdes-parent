@@ -10,15 +10,15 @@ headers: {
 }
 tasks: {
   firstTask: {
-    then: secondTask
+    then: switch
     decisionTask: BestDt mapping OBJECT: {
       name: arg1,
       lastName: arg2
     }
   },
   switch: {
-    when: '' then: secondTask,
-    when: '' then: end mapping OBJECT: {
+    when: arg1 > 10 then: secondTask,
+    when: ? then: end mapping OBJECT: {
       name: arg1,
       lastName: arg2
     }

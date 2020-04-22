@@ -31,13 +31,13 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
-import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.compiler.api.Flow.FlowExecutionLog;
@@ -48,10 +48,19 @@ import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskImplSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskRefSpec;
+import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlWhenThenSpec;
 
 public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
   
   private final NamingContext naming;
+  private final TypeNameRef typeNameRef = (v) -> {
+    String value = v.getValue();
+    if(value.contains(".")) {
+      return "currentState." + JavaSpecUtil.getMethodCall(value);
+    }
+    return "input." + JavaSpecUtil.getMethodCall(value);
+  };
+  
   private FlowBody body;
   private ClassName flowState;
   
@@ -174,12 +183,8 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     CodeBlock.Builder codeBlock = CodeBlock.builder()
         .add("$T input = $T.builder()", input, naming.immutable(input));
     for(Mapping mapping : ref.getMapping()) {
-      String[] src = mapping.getRight().split("\\.");
-      StringBuilder right = new StringBuilder();
-      for(String target : src) {
-        right.append(".").append(JavaSpecUtil.getMethod(target)).append("()");
-      }
-      codeBlock.add("\r\n  ").add(".$L(currentState$L)", mapping.getLeft(), right.toString());
+      String right = JavaSpecUtil.getMethodCall(mapping.getRight());
+      codeBlock.add("\r\n  ").add(".$L(currentState.$L)", mapping.getLeft(), right);
     }
     
     codeBlock
@@ -199,40 +204,67 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   @Override
   public FlTaskImplSpec visitFlowTaskPointer(FlowTaskPointer node) {
     // if / else
-    
+    if(node instanceof WhenThenPointer) {
+      WhenThenPointer pointer = (WhenThenPointer) node;
+      return visitWhenThenPointer(pointer);
+    }
     
     // next
     if(node instanceof ThenPointer) {
       ThenPointer then = (ThenPointer) node;
-      if(then.getTask().isPresent()) {
-        return visitFlowTask(then.getTask().get());
-      }
+      return visitThenPointer(then);
     }
     
     return ImmutableFlTaskImplSpec.builder().build();
   }
   
   @Override
-  public FlJavaSpec visitWhen(When node) {
-    // TODO Auto-generated method stub
-    return super.visitWhen(node);
+  public FlCodeSpec visitWhen(ExpressionBody node) {
+    return ImmutableFlCodeSpec.builder()
+        .value(new EnAstNodeJavaCodeBlock(typeNameRef).visitExpressionBody(node))
+        .build();
   }
   
   @Override
-  public FlJavaSpec visitThenPointer(ThenPointer node) {
-    // TODO Auto-generated method stub
-    return super.visitThenPointer(node);
+  public FlTaskImplSpec visitThenPointer(ThenPointer node) {
+    if(node.getTask().isPresent()) {
+      return visitFlowTask(node.getTask().get());
+    }
+    return null;
   }
   
-  
   @Override
-  public FlJavaSpec visitWhenThen(WhenThen node) {
-    // TODO Auto-generated method stub
-    return super.visitWhenThen(node);
+  public FlWhenThenSpec visitWhenThen(WhenThen node) {
+    return ImmutableFlWhenThenSpec.builder()
+        .when(node.getWhen().map(w -> visitWhen(w).getValue()))
+        .then(visitThenPointer(node.getThen()))
+        .build();
   }
   @Override
-  public FlJavaSpec visitWhenThenPointer(WhenThenPointer node) {
-    // TODO Auto-generated method stub
-    return super.visitWhenThenPointer(node);
+  public FlTaskImplSpec visitWhenThenPointer(WhenThenPointer pointer) {
+    List<MethodSpec> methods = new ArrayList<>();
+    CodeBlock.Builder codeBlock = CodeBlock.builder();
+    boolean first = true;
+    boolean last = false;
+
+    for(WhenThen whenThen : pointer.getValues()) {
+      if(last) {
+        throw new HdesCompilerException(HdesCompilerException.builder().wildcardUnknownFlTaskWhenThen(pointer));
+      }
+
+      FlWhenThenSpec spec = visitWhenThen(whenThen);
+      if(first && spec.getWhen().isPresent()) {
+        codeBlock.beginControlFlow("if($L)", spec.getWhen().get());
+        first = false;
+      } else if(spec.getWhen().isPresent()) {
+        codeBlock.beginControlFlow("else if($L)", spec.getWhen().get());
+      } else {
+        codeBlock.beginControlFlow("else");
+        last = true;
+      }
+      codeBlock.add(spec.getThen().getValue()).endControlFlow();
+      methods.addAll(spec.getThen().getChildren());
+    }
+    return ImmutableFlTaskImplSpec.builder().value(codeBlock.build()).addAllChildren(methods).build();
   }
 }

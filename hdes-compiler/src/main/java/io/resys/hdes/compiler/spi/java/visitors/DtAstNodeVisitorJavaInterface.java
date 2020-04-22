@@ -88,7 +88,7 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
   @Override
   public DtMethodSpec visitHeader(TypeDefNode node) {
     ScalarTypeDefNode scalar = (ScalarTypeDefNode) node;
-    MethodSpec method = MethodSpec.methodBuilder(JavaSpecUtil.getMethod(node.getName()))
+    MethodSpec method = MethodSpec.methodBuilder(JavaSpecUtil.getMethodName(node.getName()))
         .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
         .returns(JavaSpecUtil.type(scalar.getType()))
         .build();

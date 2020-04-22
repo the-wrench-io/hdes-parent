@@ -91,6 +91,7 @@ public class FlowTreePointerParser {
     } else if(pointer instanceof ThenPointer) {
       return visit((ThenPointer) pointer);
     }
+    // TODO : error handling
     throw new AstNodeException("Unknown pointer: " + pointer + "!");
   }
 
@@ -114,9 +115,6 @@ public class FlowTreePointerParser {
 
   private Optional<WhenThen> visit(WhenThen pointer) {
     Optional<FlowTaskPointer> then = visit(pointer.getThen());
-    if(!then.isPresent()) {
-      return Optional.empty();
-    }
     return Optional.of(ImmutableWhenThen.builder().from(pointer).then((ThenPointer) then.get()).build());
   }
   private Optional<FlowTaskPointer> visit(ThenPointer pointer) {
@@ -128,7 +126,7 @@ public class FlowTreePointerParser {
       FlowTaskNode result = visit(src);
       return Optional.of(ImmutableThenPointer.builder().from(pointer).task(result).build());
     } else if(taskName.equalsIgnoreCase("end")) {
-      return Optional.empty();
+      return Optional.of(ImmutableThenPointer.builder().from(pointer).task(Optional.empty()).build());
     }
     
     StringBuilder message = new StringBuilder()

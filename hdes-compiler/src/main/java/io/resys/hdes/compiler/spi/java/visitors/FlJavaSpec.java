@@ -21,6 +21,7 @@ package io.resys.hdes.compiler.spi.java.visitors;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.immutables.value.Value;
 
@@ -42,6 +43,11 @@ public interface FlJavaSpec {
   public interface FlTaskImplSpec extends FlJavaSpec {
     CodeBlock getValue();
     List<MethodSpec> getChildren();
+  }
+  @Value.Immutable
+  public interface FlWhenThenSpec extends FlJavaSpec {
+    Optional<CodeBlock> getWhen();
+    FlTaskImplSpec getThen();
   }
   @Value.Immutable
   public interface FlTaskRefSpec extends FlJavaSpec {

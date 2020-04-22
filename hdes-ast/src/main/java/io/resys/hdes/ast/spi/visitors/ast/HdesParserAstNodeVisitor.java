@@ -52,10 +52,12 @@ import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.ImmutableArrayTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarTypeDefNode;
+import io.resys.hdes.ast.api.nodes.ImmutableTypeName;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
@@ -70,10 +72,6 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
   }
   @Value.Immutable
   public interface RedundentDescription extends AstNode {
-    String getValue();
-  }
-  @Value.Immutable
-  public interface RedundentTypeName extends AstNode {
     String getValue();
   }
   @Value.Immutable
@@ -112,7 +110,7 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
   public RedundentId visitId(IdContext ctx) {
     return ImmutableRedundentId.builder()
         .token(token(ctx))
-        .value(nodes(ctx).of(RedundentTypeName.class).get().getValue())
+        .value(nodes(ctx).of(TypeName.class).get().getValue())
         .build();
   }
 
@@ -125,8 +123,8 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
   }
 
   @Override
-  public RedundentTypeName visitTypeName(TypeNameContext ctx) {
-    return ImmutableRedundentTypeName.builder()
+  public TypeName visitTypeName(TypeNameContext ctx) {
+    return ImmutableTypeName.builder()
         .token(token(ctx))
         .value(ctx.getText())
         .build();

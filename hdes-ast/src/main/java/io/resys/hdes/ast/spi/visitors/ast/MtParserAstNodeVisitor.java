@@ -62,6 +62,7 @@ import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
 import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
+import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdown;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdownField;
 import io.resys.hdes.ast.api.nodes.ImmutableFields;
@@ -94,7 +95,6 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentId;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentScalarType;
-import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentTypeName;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
@@ -164,11 +164,11 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
         .build();
   }
   
-  protected final RedundentTypeName getDefTypeName(ParserRuleContext ctx) {
+  protected final TypeName getDefTypeName(ParserRuleContext ctx) {
     if(ctx.getParent() instanceof TypeDefContext) {
-      return (RedundentTypeName) ctx.getParent().getChild(0).accept(this);
+      return (TypeName) ctx.getParent().getChild(0).accept(this);
     }
-    return (RedundentTypeName) ctx.getParent().getParent().getChild(0).accept(this);
+    return (TypeName) ctx.getParent().getParent().getChild(0).accept(this);
   }
   
   
@@ -179,7 +179,7 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
     
     return ImmutableManualTaskBody.builder()
         .token(token(ctx))
-        .id(nodes.of(RedundentTypeName.class).get().getValue())
+        .id(nodes.of(TypeName.class).get().getValue())
         .description(nodes.of(RedundentDescription.class).get().getValue())
         .form(nodes.of(ManualTaskForm.class).get())
         .dropdowns(nodes.of(ManualTaskDropdowns.class).get())
@@ -225,7 +225,7 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
     Nodes nodes = nodes(ctx);
     return ImmutableDropdown.builder()
         .token(token(ctx))
-        .name(nodes.of(RedundentTypeName.class).get().getValue())
+        .name(nodes.of(TypeName.class).get().getValue())
         .values(nodes.of(MtRedundentDropdownKeysAndValues.class).get().getValues())
         .build();
   }
@@ -312,7 +312,7 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
     Nodes nodes = nodes(ctx);
     boolean required = ((TerminalNode) ctx.getChild(2)).getSymbol().getType() == HdesParser.REQUIRED;
     ScalarType scalarType = nodes.of(RedundentScalarType.class).get().getValue();
-    String typeName = nodes.of(RedundentTypeName.class).get().getValue();
+    String typeName = nodes.of(TypeName.class).get().getValue();
     Optional<MtRedundentDropdown> dropdown = nodes.of(MtRedundentDropdown.class);
     Optional<String> defaultValue = nodes.of(MtRedundentDefaultValue.class).map(e -> e.getValue());
     Optional<String> cssClasses = nodes.of(MtRedundentCssClass.class).map(e -> e.getValue());
@@ -344,7 +344,7 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
   @Override
   public MtRedundentDropdown visitDropdown(DropdownContext ctx) {
     Nodes nodes = nodes(ctx);
-    String typeName = nodes.of(RedundentTypeName.class).get().getValue();
+    String typeName = nodes.of(TypeName.class).get().getValue();
     return ImmutableMtRedundentDropdown.builder()
         .token(token(ctx))
         .type(nodes.of(MtRedundentDropdownType.class).get())
@@ -376,7 +376,7 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
     Nodes nodes = nodes(ctx);
     return ImmutableManualTaskAction.builder()
         .token(token(ctx))
-        .name(nodes.of(RedundentTypeName.class).get().getValue())
+        .name(nodes.of(TypeName.class).get().getValue())
         .when(nodes.of(WhenAction.class).get())
         .then(nodes.of(ThenAction.class).get())
         .build();

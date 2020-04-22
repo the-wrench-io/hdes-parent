@@ -21,22 +21,18 @@ package io.resys.hdes.compiler.spi.java.visitors;
  */
 
 import io.resys.hdes.ast.api.nodes.AstNode.ArrayTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.DateConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DateTimeConversion;
-import io.resys.hdes.ast.api.nodes.AstNode.DecimalConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ObjectTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
-import io.resys.hdes.ast.api.nodes.AstNode.TimeConversion;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
 import io.resys.hdes.ast.api.nodes.AstNodeVisitor.FlowAstNodeVisitor;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
-import io.resys.hdes.ast.api.nodes.FlowNode.When;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 
@@ -55,43 +51,19 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public T visitDateConversion(DateConversion node) {
+  public T visitObjectDef(ObjectTypeDefNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitDateTimeConversion(DateTimeConversion node) {
+  public T visitArrayDef(ArrayTypeDefNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitTimeConversion(TimeConversion node) {
-    
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitDecimalConversion(DecimalConversion node) {
-    
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitObjectInputNode(ObjectTypeDefNode node) {
-    
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitArrayInputNode(ArrayTypeDefNode node) {
-    
-    throw new IllegalArgumentException("Not implemented");
-  }
-
-  @Override
-  public T visitScalarInputNode(ScalarTypeDefNode node) {
+  public T visitScalarDef(ScalarTypeDefNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
@@ -133,7 +105,7 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public T visitWhen(When node) {
+  public T visitWhen(ExpressionBody node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
