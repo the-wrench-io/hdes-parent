@@ -82,8 +82,7 @@ public interface FlowNode extends AstNode {
     Optional<ExpressionBody> getWhen();
     FlowTaskPointer getThen();
   }
-  
-  
+
   @Value.Immutable
   interface Mapping extends FlowNode {
     String getLeft();

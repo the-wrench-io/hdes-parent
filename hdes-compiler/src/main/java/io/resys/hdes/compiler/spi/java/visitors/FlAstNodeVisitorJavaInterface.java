@@ -60,13 +60,13 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public TypeSpec visitFlowBody(FlowBody node) {
+  public TypeSpec visitBody(FlowBody node) {
     this.body = node;
     
     TypeSpec.Builder flowBuilder = TypeSpec.interfaceBuilder(naming.fl().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(naming.fl().superinterface(node))
-        .addTypes(visitFlowInputs(node.getInputs()).getValues());
+        .addTypes(visitInputs(node.getInputs()).getValues());
 
     // State
     TypeSpec.Builder stateBuilder = TypeSpec
@@ -77,7 +77,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
     
     // tasks
     if (node.getTask().isPresent()) {
-      FlTaskSpec taskSpecs = visitFlowTask(node.getTask().get());
+      FlTaskSpec taskSpecs = visitTask(node.getTask().get());
       
       for(TypeSpec task : taskSpecs.getChildren()) {
         stateBuilder.addMethod(MethodSpec
@@ -96,14 +96,14 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlTaskSpec visitFlowTask(FlowTaskNode node) {
+  public FlTaskSpec visitTask(FlowTaskNode node) {
     TypeSpec.Builder stateBuilder = TypeSpec.interfaceBuilder(naming.fl().taskState(body, node))
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
         .addAnnotation(Value.Immutable.class)
         .addSuperinterface(naming.fl().taskStateSuperinterface(body, node));
 
     List<TypeSpec> children = node.getNext()
-        .map(e -> visitFlowTaskPointer(e).getChildren())
+        .map(e -> visitTaskPointer(e).getChildren())
         .orElse(Collections.emptyList());
 
     return ImmutableFlTaskSpec.builder()
@@ -113,7 +113,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlTaskSpec visitFlowTaskPointer(FlowTaskPointer node) {
+  public FlTaskSpec visitTaskPointer(FlowTaskPointer node) {
     return ImmutableFlTaskSpec.builder()
         //.addAllChildren(children)
         //.addChildren(stateBuilder.build())
@@ -121,7 +121,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
   }
 
   @Override
-  public FlTypesSpec visitFlowInputs(FlowInputs node) {
+  public FlTypesSpec visitInputs(FlowInputs node) {
     TypeSpec.Builder inputBuilder = TypeSpec
         .interfaceBuilder(naming.fl().input(body))
         .addAnnotation(Immutable.class)

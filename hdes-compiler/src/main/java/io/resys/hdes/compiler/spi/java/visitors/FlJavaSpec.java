@@ -30,6 +30,7 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
 public interface FlJavaSpec {
+  
   @Value.Immutable
   public interface FlInputSpec extends FlJavaSpec {
     MethodSpec getValue();
@@ -40,25 +41,22 @@ public interface FlJavaSpec {
     List<TypeSpec> getChildren();
   }
   @Value.Immutable
-  public interface FlTaskImplSpec extends FlJavaSpec {
+  public interface FlTypesSpec extends FlJavaSpec {
+    List<TypeSpec> getValues();
+  }
+  
+  @Value.Immutable
+  public interface FlTaskVisitSpec extends FlJavaSpec {
     CodeBlock getValue();
-    List<MethodSpec> getChildren();
+    List<MethodSpec> getValues();
   }
   @Value.Immutable
   public interface FlWhenThenSpec extends FlJavaSpec {
     Optional<CodeBlock> getWhen();
-    FlTaskImplSpec getThen();
-  }
-  @Value.Immutable
-  public interface FlTaskRefSpec extends FlJavaSpec {
-    MethodSpec getMethod();
+    FlTaskVisitSpec getThen();
   }
   public interface FlMethodSpec extends FlJavaSpec {
     MethodSpec getValue();
-  }
-  @Value.Immutable
-  public interface FlTypesSpec extends FlJavaSpec {
-    List<TypeSpec> getValues();
   }
   @Value.Immutable
   public interface FlCodeSpecPair extends FlJavaSpec {

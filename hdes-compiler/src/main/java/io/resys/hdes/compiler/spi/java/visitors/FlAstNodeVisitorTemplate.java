@@ -69,19 +69,19 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public R visitFlowBody(FlowBody node) {
+  public R visitBody(FlowBody node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitFlowInputs(FlowInputs node) {
+  public T visitInputs(FlowInputs node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
 
   @Override
-  public T visitFlowTask(FlowTaskNode node) {
+  public T visitTask(FlowTaskNode node) {
     
     throw new IllegalArgumentException("Not implemented");
   }
@@ -123,7 +123,7 @@ public class FlAstNodeVisitorTemplate<T, R> implements FlowAstNodeVisitor<T, R> 
   }
 
   @Override
-  public T visitFlowTaskPointer(FlowTaskPointer node) {
+  public T visitTaskPointer(FlowTaskPointer node) {
     
     throw new IllegalArgumentException("Not implemented");
   }

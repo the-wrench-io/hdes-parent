@@ -1,26 +1,5 @@
 package io.resys.hdes.compiler.api;
 
-/*-
- * #%L
- * hdes-compiler
- * %%
- * Copyright (C) 2020 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +14,7 @@ public interface Flow<
   O extends FlowOutput,
   S extends FlowState<I, O>> {
   
-  enum ExecutionStatusType { COMPLETED, PENDING, ERROR }
+  enum ExecutionStatusType { COMPLETED, RUNNING, PENDING, ERROR }
   interface FlowInput {}
   interface FlowOutput {}
   
@@ -43,12 +22,12 @@ public interface Flow<
   //S apply(S old, ? output);
   
   interface FlowState<I, O> {
+    String getId();
     I getInput();
-    O getOutput();
+    Optional<O> getOutput();
     ExecutionStatusType getType();
     List<FlowError> getErrors();
-    Optional<FlowExecutionLog> getLog();
-    String getHead();
+    FlowExecutionLog getLog();
   }
   
   interface FlowTaskState<I, R> {
@@ -60,11 +39,10 @@ public interface Flow<
   @Value.Immutable
   interface FlowExecutionLog {
     String getId();
-    String getSrcId();
-    LocalDateTime getStart();
+    Long getStart();
     Optional<FlowExecutionLog> getParent();
     Optional<Long> getDuration();
-    Optional<LocalDateTime> getEnd();
+    Optional<Long> getEnd();
   }
 
   @Value.Immutable

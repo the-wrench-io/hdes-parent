@@ -41,14 +41,14 @@ import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
+import io.resys.hdes.compiler.api.Flow.ExecutionStatusType;
 import io.resys.hdes.compiler.api.Flow.FlowExecutionLog;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.api.ImmutableFlowExecutionLog;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlCodeSpec;
-import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskImplSpec;
-import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskRefSpec;
+import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskVisitSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlWhenThenSpec;
 
 public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec, TypeSpec> {
@@ -57,13 +57,13 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   private final TypeNameRef typeNameRef = (v) -> {
     String value = v.getValue();
     if(value.contains(".")) {
-      return "currentState." + JavaSpecUtil.getMethodCall(value);
+      return "after." + JavaSpecUtil.getMethodCall(value);
     }
-    return "input." + JavaSpecUtil.getMethodCall(value);
+    return "after.getInput()." + JavaSpecUtil.getMethodCall(value);
   };
   
-  private FlowBody body;
   private ClassName flowState;
+  private ClassName flowOutput;
   
   public FlAstNodeVisitorJavaGen(NamingContext naming) {
     super();
@@ -71,129 +71,134 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   }
   
   @Override
-  public TypeSpec visitFlowBody(FlowBody node) {
-    this.body = node;
+  public TypeSpec visitBody(FlowBody node) {
     this.flowState = naming.fl().state(node);
+    this.flowOutput = naming.fl().output(node);
     
     TypeSpec.Builder flowBuilder = TypeSpec.classBuilder(naming.fl().impl(node))
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(naming.fl().interfaze(node));
 
-    FlTaskImplSpec taskImpl = node.getTask().map(n -> visitFlowTask(n)).orElseGet(() ->
-      ImmutableFlTaskImplSpec.builder().value(CodeBlock.builder().add("// no tasks described ").build()).build()
-    );
+    FlTaskVisitSpec taskImpl = node.getTask().map(n -> visitTask(n)).orElseGet(() -> 
+      ImmutableFlTaskVisitSpec.builder().value(CodeBlock.builder().add("no tasks nothing to do").build()).build());
 
-    // End method
-    MethodSpec endMethod = MethodSpec.methodBuilder("end")
-        .addModifiers(Modifier.PROTECTED)
-        .addParameter(ParameterSpec.builder(Long.class, "start").build())
-        .addParameter(ParameterSpec.builder(flowState, "currentState").build())
-        .returns(naming.immutableBuilder(flowState))
-        .addCode(CodeBlock.builder().addStatement("long end = System.currentTimeMillis()").build())
-        .addCode(
-            CodeBlock.builder()
-            .add("return $T.builder()", naming.immutable(flowState))
-            .add("\r\n  ").add(".from(currentState)")
-            .add("\r\n  ").add(".id($S)", node.getId())
-            .add("\r\n  ").add(".parent(currentState.getLog())")
-            .add("\r\n  ").add(".start(start)").add(".end(end)")
-            .add("\r\n  ").add(".duration(end - start)")
-            .build()
-            )
-        .build();
-        
-    
     MethodSpec applyMethod = MethodSpec.methodBuilder("apply")
       .addModifiers(Modifier.PUBLIC)
       .addParameter(ParameterSpec.builder(naming.fl().input(node), "input").build())
       .returns(flowState)
-      
-      .addCode(CodeBlock.builder().addStatement("long start = System.currentTimeMillis()").add("\r\n").build())
-      .addStatement("$T currentState = $T.builder().input(input).build()", flowState, naming.immutable(flowState))
+      .addStatement("$T after = start(input)", flowState)
       .addCode(taskImpl.getValue())
-      
-      .addCode(CodeBlock.builder()
-          .add("return $T.builder()", naming.immutable(flowState))
-          .add("\r\n  ").add(".from(currentState)")
-          .add("\r\n  ").add(".id($S)", node.getId())
-          .add("\r\n  ").add(".parent(currentState.getLog())")
-          .add("\r\n  ").add(".start(start)").add(".end(end)")
-          .add("\r\n  ").add(".duration(end - start)")
-          .add("\r\n  ").add(".build()")
-          .build())
       .build();
  
     return flowBuilder
         .addMethod(applyMethod)
-        .addMethod(endMethod)
-        .addMethods(taskImpl.getChildren())
+        .addMethod(startMethod(node))
+        .addMethod(endMethod(node))
+        .addMethods(taskImpl.getValues())
         .build();
   }
   
+  protected MethodSpec startMethod(FlowBody node) {
+    return MethodSpec.methodBuilder("start")
+      .addModifiers(Modifier.PROTECTED)
+      .addParameter(ParameterSpec.builder(naming.fl().input(node), "input").build())
+      .returns(naming.immutableBuilder(flowState))
+      .addCode(CodeBlock.builder()
+          .add("return $T.builder()", naming.immutable(flowState))
+          .add("\r\n  ").add(".id($S)", node.getId())
+          .add("\r\n  ").add(".type($T.RUNNING)", ExecutionStatusType.class)
+          .add("\r\n  ").add(".input(input)")
+          .add("\r\n  ").add(".log($L)", CodeBlock.builder()
+          .add("$T.builder()", ImmutableFlowExecutionLog.class)
+          .add("\r\n    ").add(".id($S)", "start")
+          .add("\r\n    ").add(".start(System.currentTimeMillis())")
+          .add("\r\n    ").add(".build()").build())
+          .add("\r\n  ").addStatement(".build()")
+          .build())
+      .build();
+  }
+
+  protected MethodSpec endMethod(FlowBody node) {
+    // End method
+    return MethodSpec.methodBuilder("end")
+        .addModifiers(Modifier.PROTECTED)
+        .addParameter(ParameterSpec.builder(flowState, "currentState").build())
+        .returns(naming.immutableBuilder(flowState))
+        .addStatement("long end = System.currentTimeMillis()")
+        .addCode(CodeBlock.builder()
+            .add("return $T.builder()", naming.immutable(flowState))
+            .add("\r\n  ").add(".from(currentState)")
+            .add("\r\n  ").add(".log($L)", CodeBlock.builder()
+                .add("$T.builder()", ImmutableFlowExecutionLog.class)
+                .add("\r\n    ").add(".id($S)", "end")
+                .add("\r\n    ").add(".duration(end - start)")
+                .add("\r\n    ").add(".end(end)")
+                .add("\r\n    ").add(".parent(currentState.getLog())")
+                .add("\r\n    ").addStatement(".build()").build())
+            .build()).build();
+  }
+  
   @Override
-  public FlTaskImplSpec visitFlowTask(FlowTaskNode node) {
-    List<MethodSpec> children = new ArrayList<>();
+  public FlTaskVisitSpec visitTask(FlowTaskNode node) {
     CodeBlock.Builder codeblock = CodeBlock.builder();
     
     // visit method
     if(node.getRef().isPresent()) {
-      FlTaskRefSpec ref = visitTaskRef(node);
-      children.add(ref.getMethod());
-      codeblock.addStatement("currentState = $L(currentState)", ref.getMethod().name);
+      codeblock.add(visitTaskRef(node).getValue());
+    } else {
+      codeblock.addStatement("$T after = before", flowState);
     }
     
     // next
+    String methodName = "visit" + node.getId();
+    List<MethodSpec> children = new ArrayList<>();
     if(node.getNext().isPresent()) {
-      FlTaskImplSpec next = visitFlowTaskPointer(node.getNext().get());
+      FlTaskVisitSpec next = visitTaskPointer(node.getNext().get());
       codeblock.add(next.getValue());
-      
-      for(MethodSpec method : next.getChildren()) {
+      for(MethodSpec method : next.getValues()) {
         if(!children.stream().filter(m -> m.name.equals(method.name)).findFirst().isPresent()) {
           children.add(method);          
         }
       }
     }
-    
-    return ImmutableFlTaskImplSpec.builder()
-        .value(codeblock.build())
-        .addAllChildren(children)
-        .build();
+    return ImmutableFlTaskVisitSpec.builder()
+        .value(CodeBlock.builder().addStatement("return $L(after)", methodName).build())
+        .addValues(MethodSpec
+          .methodBuilder(methodName)
+          .addModifiers(Modifier.PRIVATE)
+          .addParameter(ParameterSpec.builder(flowState, "before").build())
+          .addCode(codeblock.build())
+          .returns(flowState).build())
+        .addAllValues(children).build();
   }
   
   @Override
-  public FlTaskRefSpec visitTaskRef(FlowTaskNode parent) {
-    MethodSpec.Builder visitBuilder = MethodSpec
-        .methodBuilder("visit" + parent.getId())
-        .addModifiers(Modifier.PRIVATE)
-        .addParameter(ParameterSpec.builder(flowState, "currentState").build())
-        .returns(flowState);
-    
-    CodeBlock logBlock = CodeBlock.builder().add("\r\n")
+  public FlCodeSpec visitTaskRef(FlowTaskNode parent) {
+    return ImmutableFlCodeSpec.builder().value(CodeBlock.builder()
+      // Create mapping in/out from the task
+      .addStatement("long start = System.currentTimeMillis()")
+      .add(visitMapping(parent).getValue())
+      .addStatement("long end = System.currentTimeMillis()")
+      
+      // build execution log
+      .add("\r\n")
       .add("$T log = $T.builder()", FlowExecutionLog.class, ImmutableFlowExecutionLog.class)
       .add("\r\n  ").add(".id($S)", parent.getId())
-      .add("\r\n  ").add(".parent(currentState.getLog())")
+      .add("\r\n  ").add(".parent(before.getLog())")
       .add("\r\n  ").add(".start(start)").add(".end(end)")
       .add("\r\n  ").add(".duration(end - start)")
-      .add("\r\n  ").addStatement(".build()").build();
+      .add("\r\n  ").addStatement(".build()")
     
-    CodeBlock returnBlock = CodeBlock.builder()
-        .add("\r\n")
-        .add("return $T.builder()", naming.immutable(naming.fl().state(this.body)))
-        .add("\r\n  ").add(".from(currentState).input(input).output(output)")
-        .add("\r\n  ").addStatement(".log(log).build()").build(); 
-    
-    return ImmutableFlTaskRefSpec.builder().method(
-        visitBuilder
-        
-          .addStatement("long start = System.currentTimeMillis()")
-          .addCode(visitMapping(parent).getValue())
-          .addStatement("long end = System.currentTimeMillis()")
-          
-          .addCode(logBlock)
-          .addCode(returnBlock)
-
-          .build())
-        .build();
+      // create new state
+      .add("\r\n")
+      .add("$T after = $T.builder()", flowState, naming.immutable(flowState))
+      .add("\r\n  ").add(".from(before)")
+      .add("\r\n  ").add(".input(input)")
+      .add("\r\n  ").add(".output(output)")
+      .add("\r\n  ").add(".log(log)")
+      .add("\r\n  ").addStatement(".build()")
+      .add("\r\n").build()
+    ).build(); 
   }
   
   @Override
@@ -205,7 +210,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         .add("$T input = $T.builder()", input, naming.immutable(input));
     for(Mapping mapping : ref.getMapping()) {
       String right = JavaSpecUtil.getMethodCall(mapping.getRight());
-      codeBlock.add("\r\n  ").add(".$L(currentState.$L)", mapping.getLeft(), right);
+      codeBlock.add("\r\n  ").add(".$L(before.$L)", mapping.getLeft(), right);
     }
     
     codeBlock
@@ -223,7 +228,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   }
   
   @Override
-  public FlTaskImplSpec visitFlowTaskPointer(FlowTaskPointer node) {
+  public FlTaskVisitSpec visitTaskPointer(FlowTaskPointer node) {
     // if / else
     if(node instanceof WhenThenPointer) {
       WhenThenPointer pointer = (WhenThenPointer) node;
@@ -253,16 +258,16 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   }
   
   @Override
-  public FlTaskImplSpec visitThenPointer(ThenPointer node) {
+  public FlTaskVisitSpec visitThenPointer(ThenPointer node) {
     if(node.getTask().isPresent()) {
-      return visitFlowTask(node.getTask().get());
+      return visitTask(node.getTask().get());
     }
     return null;
   }
   
   @Override
   public FlWhenThenSpec visitWhenThen(WhenThen node) {
-    FlTaskImplSpec spec = visitFlowTaskPointer(node.getThen());
+    FlTaskVisitSpec spec = visitTaskPointer(node.getThen());
     
     return ImmutableFlWhenThenSpec.builder()
         .when(node.getWhen().map(w -> visitWhen(w).getValue()))
@@ -271,18 +276,23 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   }
   
   @Override
-  public FlTaskImplSpec visitEndPointer(EndPointer node) {
-    List<MethodSpec> methods = new ArrayList<>();
-    CodeBlock.Builder codeBlock = CodeBlock.builder();
-    codeBlock.addStatement("//trigger end");
-    return ImmutableFlTaskImplSpec.builder()
-        .value(codeBlock.build())
-        .addAllChildren(methods)
-        .build();
+  public FlTaskVisitSpec visitEndPointer(EndPointer node) {
+    
+    CodeBlock.Builder codeBlock = CodeBlock.builder()
+        .add("$T end = $T.builder()", flowOutput, naming.immutable(flowOutput));
+    for(Mapping mapping : node.getValues()) {
+      String right = JavaSpecUtil.getMethodCall(mapping.getRight());
+      codeBlock.add("\r\n  ").add(".$L(after.$L)", mapping.getLeft(), right);
+    }
+    codeBlock.add("\r\n")
+    .addStatement("  .build()")
+    .addStatement("return end(after).output(end).build()");
+
+    return ImmutableFlTaskVisitSpec.builder().value(codeBlock.build()).build();
   }
 
   @Override
-  public FlTaskImplSpec visitWhenThenPointer(WhenThenPointer pointer) {
+  public FlTaskVisitSpec visitWhenThenPointer(WhenThenPointer pointer) {
     List<MethodSpec> methods = new ArrayList<>();
     CodeBlock.Builder codeBlock = CodeBlock.builder();
     boolean first = true;
@@ -304,8 +314,8 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         last = true;
       }
       codeBlock.add(spec.getThen().getValue()).endControlFlow();
-      methods.addAll(spec.getThen().getChildren());
+      methods.addAll(spec.getThen().getValues());
     }
-    return ImmutableFlTaskImplSpec.builder().value(codeBlock.build()).addAllChildren(methods).build();
+    return ImmutableFlTaskVisitSpec.builder().value(codeBlock.build()).addAllValues(methods).build();
   }
 }

@@ -147,11 +147,11 @@ public interface AstNodeVisitor<T, R> {
   
   // flow
   interface FlowAstNodeVisitor<T, R> extends TypeDefVisitor<T, R> {
-    R visitFlowBody(FlowBody node);
-    T visitFlowInputs(FlowInputs node);
-    T visitFlowTask(FlowTaskNode node);
+    R visitBody(FlowBody node);
+    T visitInputs(FlowInputs node);
+    T visitTask(FlowTaskNode node);
     
-    T visitFlowTaskPointer(FlowTaskPointer node);
+    T visitTaskPointer(FlowTaskPointer node);
     T visitWhenThenPointer(WhenThenPointer node);
     T visitThenPointer(ThenPointer node);
     T visitEndPointer(EndPointer node);
