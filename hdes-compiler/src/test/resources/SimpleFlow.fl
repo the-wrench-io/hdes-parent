@@ -16,7 +16,7 @@ tasks: {
     then: switch
     
     // decision/service/flow
-    decision: BestDt uses: {
+    decision-table: BestDt uses: {
       name: arg1,
       lastName: arg2
     }
@@ -39,7 +39,7 @@ tasks: {
     then: end as: { }
     
     // decision/service/flow
-    decision: Best2Dt uses: {
+    decision-table: Best2Dt uses: {
       name: arg1,
       lastName: arg2
     }
