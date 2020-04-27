@@ -15,9 +15,9 @@ dropdowns: {
 
 actions: { 
   when validateAge:     age > 30   then show error message: 'you are too old',  // context params: 0 - validateAge, 1 - age, 2 - 30, message - 'you are to old'
-  when validateAge:     age > 30    then show info message: 'you are too old',
-  when otherGender:     gender = 2         then show group: subGenderGroup,
-  when otherMaleGender: gender = 1         then show field: subGenderGroup
+  when validateAge:     age > 30   then show info message:  'you are too old',
+  when otherGender:     gender = 2 then show group:         subGenderGroup,
+  when otherMaleGender: gender = 1 then show field:         subGenderGroup
 }
 
 form of groups: { 
