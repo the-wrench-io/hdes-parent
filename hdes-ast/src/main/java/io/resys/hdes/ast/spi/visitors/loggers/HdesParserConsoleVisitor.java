@@ -70,14 +70,12 @@ import io.resys.hdes.ast.HdesParser.MappingArgsContext;
 import io.resys.hdes.ast.HdesParser.MappingContext;
 import io.resys.hdes.ast.HdesParser.MappingValueContext;
 import io.resys.hdes.ast.HdesParser.MatrixContext;
-import io.resys.hdes.ast.HdesParser.MessageContext;
 import io.resys.hdes.ast.HdesParser.MethodArgsContext;
 import io.resys.hdes.ast.HdesParser.MethodInvocationContext;
 import io.resys.hdes.ast.HdesParser.MethodNameContext;
 import io.resys.hdes.ast.HdesParser.MtBodyContext;
 import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
 import io.resys.hdes.ast.HdesParser.NextTaskContext;
-import io.resys.hdes.ast.HdesParser.ObjectDataTypeContext;
 import io.resys.hdes.ast.HdesParser.ObjectTypeContext;
 import io.resys.hdes.ast.HdesParser.PostfixExpressionContext;
 import io.resys.hdes.ast.HdesParser.PreDecrementExpressionContext;
@@ -303,12 +301,6 @@ public class HdesParserConsoleVisitor extends HdesParserBaseVisitor<AstNode> {
   }
 
   @Override
-  public AstNode visitObjectDataType(ObjectDataTypeContext ctx) {
-    log(ctx);
-    return super.visitObjectDataType(ctx);
-  }
-
-  @Override
   public AstNode visitFlBody(FlBodyContext ctx) {
     log(ctx);
     return super.visitFlBody(ctx);
@@ -504,12 +496,6 @@ public class HdesParserConsoleVisitor extends HdesParserBaseVisitor<AstNode> {
   public AstNode visitActionType(ActionTypeContext ctx) {
     log(ctx);
     return super.visitActionType(ctx);
-  }
-
-  @Override
-  public AstNode visitMessage(MessageContext ctx) {
-    log(ctx);
-    return super.visitMessage(ctx);
   }
 
   @Override

@@ -53,8 +53,9 @@ import io.resys.hdes.ast.HdesParser.FormContext;
 import io.resys.hdes.ast.HdesParser.GroupArgsContext;
 import io.resys.hdes.ast.HdesParser.GroupContext;
 import io.resys.hdes.ast.HdesParser.GroupsContext;
-import io.resys.hdes.ast.HdesParser.MessageContext;
 import io.resys.hdes.ast.HdesParser.MtBodyContext;
+import io.resys.hdes.ast.HdesParser.ShowGroupOrFieldContext;
+import io.resys.hdes.ast.HdesParser.ShowMessageContext;
 import io.resys.hdes.ast.HdesParser.TypeDefContext;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode;
@@ -63,6 +64,7 @@ import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.Literal;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeName;
+import io.resys.hdes.ast.api.nodes.ExpressionNode;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdown;
 import io.resys.hdes.ast.api.nodes.ImmutableDropdownField;
 import io.resys.hdes.ast.api.nodes.ImmutableFields;
@@ -75,10 +77,12 @@ import io.resys.hdes.ast.api.nodes.ImmutableManualTaskBody;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskDropdowns;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ImmutableManualTaskInputs;
-import io.resys.hdes.ast.api.nodes.ImmutableThenAction;
+import io.resys.hdes.ast.api.nodes.ImmutableThenActionShowField;
+import io.resys.hdes.ast.api.nodes.ImmutableThenActionShowGroup;
+import io.resys.hdes.ast.api.nodes.ImmutableThenActionShowMsg;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenAction;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ActionType;
+import io.resys.hdes.ast.api.nodes.ManualTaskNode.ActionMessageType;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.Dropdown;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.Fields;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.FormBody;
@@ -144,14 +148,6 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
   @Value.Immutable
   public interface MtRedundentActionArgs extends ManualTaskNode {
     List<ManualTaskAction> getValues();
-  }
-  @Value.Immutable
-  public interface MtRedundentActionType extends ManualTaskNode {
-    ActionType getValue();
-  }
-  @Value.Immutable
-  public interface MtRedundentActionMsg extends ManualTaskNode {
-    String getValue();
   }
 
   @Override
@@ -376,7 +372,6 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
     Nodes nodes = nodes(ctx);
     return ImmutableManualTaskAction.builder()
         .token(token(ctx))
-        .name(nodes.of(TypeName.class).get().getValue())
         .when(nodes.of(WhenAction.class).get())
         .then(nodes.of(ThenAction.class).get())
         .build();
@@ -387,46 +382,61 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
     Nodes nodes = nodes(ctx);
     return ImmutableWhenAction.builder()
         .token(token(ctx))
-        .value(nodes.of(Literal.class).get().getValue())
+        .id(nodes.of(TypeName.class).get().getValue())
+        .value(nodes.of(ExpressionNode.class).get())
         .build();
   }
 
   @Override
   public ThenAction visitActionBodyThen(ActionBodyThenContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableThenAction.builder()
-        .token(token(ctx))
-        .type(nodes.of(MtRedundentActionType.class).get().getValue())
-        .message(nodes.of(MtRedundentActionMsg.class).get().getValue())
-        .build();
+    return nodes.of(ThenAction.class).get();
   }
 
   @Override
-  public MtRedundentActionType visitActionType(ActionTypeContext ctx) {
+  public ThenAction visitActionType(ActionTypeContext ctx) {
+    Nodes nodes = nodes(ctx);
+    return nodes.of(ThenAction.class).get();
+  }
+
+  @Override
+  public ThenAction visitShowGroupOrField(ShowGroupOrFieldContext ctx) {
+    AstNode.Token token = token(ctx);
+    Nodes nodes = nodes(ctx);
+    String typeName = nodes.of(TypeName.class).get().getValue();
+    
     TerminalNode node = (TerminalNode) ctx.getChild(0);
-    ActionType type;
     switch (node.getSymbol().getType()) {
-    case HdesParser.ALERT: type = ActionType.ALERT; break;
-    case HdesParser.SHOW: type = ActionType.SHOW; break;
-    case HdesParser.EVALUATE: type = ActionType.ALERT; break;
+    case HdesParser.GROUP: return ImmutableThenActionShowGroup.builder().token(token).value(typeName).build();
+    case HdesParser.FIELD: return ImmutableThenActionShowField.builder().token(token).value(typeName).build();
     
     // TODO:: error handling
-    default: throw new AstNodeException("Unknown Action type: " + ctx.getText() + "!");
+    default: throw new AstNodeException("Unknown Action visibility type: " + ctx.getText() + "!");
     }
-    return ImmutableMtRedundentActionType.builder()
-        .token(token(ctx))
-        .value(type)
-        .build();
+    
   }
   
   @Override
-  public MtRedundentActionMsg visitMessage(MessageContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableMtRedundentActionMsg.builder()
+  public ThenAction visitShowMessage(ShowMessageContext ctx) {
+    
+    TerminalNode node = (TerminalNode) ctx.getChild(0);
+    ActionMessageType messageType;
+    switch (node.getSymbol().getType()) {
+    case HdesParser.MESSAGE_ERROR: messageType = ActionMessageType.ERROR; break;
+    case HdesParser.MESSAGE_INFO: messageType = ActionMessageType.INFO; break;
+    case HdesParser.MESSAGE_WARNING: messageType = ActionMessageType.WARNING; break;
+    
+    // TODO:: error handling
+    default: throw new AstNodeException("Unknown Action message type: " + ctx.getText() + "!");
+    }
+    
+    return ImmutableThenActionShowMsg.builder()
         .token(token(ctx))
-        .value(nodes.of(Literal.class).get().getValue())
+        .messageType(messageType)
+        .value(Nodes.getStringLiteralValue(ctx.getChild(ctx.getChildCount()-1)))
         .build();
   }
+  
   @Override
   public ManualTaskForm visitForm(FormContext ctx) {
     Nodes nodes = nodes(ctx);

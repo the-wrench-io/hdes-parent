@@ -54,7 +54,7 @@ public class AntlrErrorListener extends BaseErrorListener {
         .target(ImmutableEmptyNode.builder()
             .token(ImmutableToken.builder()
                 .id(id++)
-                .text(e.getCtx().getText())
+                .text(e == null ? "" : e.getCtx().getText())
                 .line(line)
                 .col(charPositionInLine)
                 .build())

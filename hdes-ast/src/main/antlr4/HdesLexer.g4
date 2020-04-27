@@ -2,8 +2,7 @@ lexer grammar HdesLexer;
 
 DirectionType: IN | OUT;
 RequiredType: REQUIRED | OPTIONAL;
-DropdownType: DROPDOWN_SINGLE | DROPDOWN_MULTIPLE; 
-StatementType: SHOW | ALERT | EVALUATE;
+DropdownType: DROPDOWN_SINGLE | DROPDOWN_MULTIPLE;
 
 ScalarType
   : INTEGER
@@ -34,11 +33,7 @@ DEF_FL: 'flow';
 DEF_DT: 'decision-table';
 DEF_MT: 'manual-task';
 DEF_EN: 'expression';
-
-MANUAL_TASK: 'manualTask';
-FLOW_TASK: 'flowTask';
-DT_TASK: 'decisionTask';
-ST_TASK: 'serviceTask';
+DEF_SE: 'service';
 
 INTEGER: 'INTEGER';
 DECIMAL: 'DECIMAL';
@@ -52,6 +47,10 @@ ARRAY: 'ARRAY';
 
 DESC: 'description';
 HEADERS: 'headers';
+OF: 'of';
+AS: 'as';
+
+FORMULA: 'formula';
 
 // DT
 IN: 'IN';
@@ -62,27 +61,32 @@ MATRIX: 'MATRIX';
 
 // MANUAL TASK
 CLASS: 'class';
-DROPDOWN_SINGLE: 'single';
-DROPDOWN_MULTIPLE: 'multiple'; 
+DROPDOWN_SINGLE: 'single-choice';
+DROPDOWN_MULTIPLE: 'multiple-choice'; 
 DROPDOWN: 'dropdown';
 DROPDOWNS: 'dropdowns'; 
-SHOW: 'SHOW';
-ALERT: 'ALERT';
-EVALUATE: 'EVALUATE';
-STATEMENTS: 'actions';
+
+SHOW: 'show';
+ACTIONS: 'actions';
 MESSAGE: 'message';
+MESSAGE_ERROR: 'error';
+MESSAGE_INFO: 'info';
+MESSAGE_WARNING: 'warning';
+
 FORM: 'form';
+FROM: 'from';
 GROUPS: 'groups';
+GROUP: 'group';
 FIELDS: 'fields';
-VALUES: 'values';
-DEFAULT_VALUE: 'defaultValue';
+FIELD: 'field';
+DEFAULT_VALUE: 'default-value';
 
 // FLOW
 TASKS: 'tasks';
-DEBUG_VALUE: 'debugValue';
+DEBUG_VALUE: 'debug-value';
 REQUIRED: 'required';
 OPTIONAL: 'optional';
-MAPPING: 'mapping';
+USES: 'uses';
 WHEN: 'when';
 THEN: 'then';
 END: 'end';

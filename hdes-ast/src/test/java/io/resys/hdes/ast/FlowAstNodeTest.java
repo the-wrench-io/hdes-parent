@@ -92,7 +92,7 @@ public class FlowAstNodeTest {
             + "when: ? then: nextTask\n" +
             "}, " +
             "nextTask: {"
-            + "then: end mapping OBJECT: {}" +
+            + "then: end as: {}" +
             "} " +
             
             "}\n");
@@ -113,7 +113,7 @@ public class FlowAstNodeTest {
             + "then: nextTask"
             + "}, " +
             "nextTask: {"
-            + "then: end mapping OBJECT: {}" +
+            + "then: end as: {}" +
             "} " +
             "}\n");
   }
@@ -122,16 +122,19 @@ public class FlowAstNodeTest {
   public void taskManualTask() throws IOException {
     parse(
         "define flow: x description: 'descriptive '\n" +
-            "headers: {\n"
-            + "arg1.x1 INTEGER optional IN,\n"
-            + "arg2.x1 INTEGER required IN\n" +
+          
+          "headers: {\n"
+          + "arg1.x1 INTEGER optional IN,\n"
+          + "arg2.x1 INTEGER required IN\n" +
+          "}\n" +
+          
+          "tasks: {\n" +
+            "firstTask: {\n" +
+              "then: end as: {}" +
+              "manual-task: bestManualTask uses: {}\n" + 
             "}\n" +
-            "tasks: {\n" +
-            "firstTask: {\n"
-            + "then: end mapping OBJECT: {}"
-            + "manualTask: bestManualTask mapping OBJECT:{}\n"
-            + "}\n" +
-            "}\n");
+
+          "}\n");
   }
 
   @Test
@@ -144,8 +147,8 @@ public class FlowAstNodeTest {
             "}\n" + 
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: end mapping OBJECT: {}"
-            + "serviceTask: bestServiceTask mapping OBJECT: {} \n"
+            + "then: end as: {}"
+            + "service: bestServiceTask uses: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -160,8 +163,8 @@ public class FlowAstNodeTest {
             "}\n" +
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: end mapping OBJECT: {}"
-            + "flowTask: bestFlowTask mapping OBJECT: {} \n"
+            + "then: end as: {}"
+            + "service: bestFlowTask uses: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -176,8 +179,8 @@ public class FlowAstNodeTest {
             "}\n" +
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: end mapping OBJECT: {}"
-            + "decisionTask: bestDtTask mapping OBJECT: {} \n"
+            + "then: end as: {}"
+            + "decision-table: bestDtTask uses: {} \n"
             + "}\n" +
             "}\n");
   }
@@ -192,8 +195,8 @@ public class FlowAstNodeTest {
             "}\n" +
             "tasks: {\n" +
             "firstTask: {\n"
-            + "then: end mapping OBJECT: {}"
-            + "decisionTask: bestDtTask mapping ARRAY: {} \n"
+            + "then: end as: {}"
+            + "decision-table: bestDtTask uses: {} \n"
             + "  \n"
             + "}\n" +
             "}\n");
@@ -211,13 +214,13 @@ public class FlowAstNodeTest {
             "firstTask: {\n"
 
             + "then: end \n"
-            + "mapping OBJECT: {\n"
+            + "as: {\n"
               + "input1: arg1.x1,\n"
               + "input2: arg2.x1\n"
             + "}\n"
 
-            + "decisionTask: bestDtTask \n"
-            + "mapping OBJECT: {\n"
+            + "decision-table: bestDtTask \n"
+            + "uses: {\n"
               + "input1: arg1.x1,\n"
               + "input2: arg2.x1\n"
             + "}\n"  

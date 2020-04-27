@@ -42,7 +42,7 @@ public class ManualTaskNodeTest {
         + "headers: {} \n"
         + "dropdowns: {} \n"
         + "actions: {} \n"
-        + "form: { } \n"); 
+        + "form of fields: {} from ?");
   }
 
   @Test
@@ -52,7 +52,7 @@ public class ManualTaskNodeTest {
         + "headers: {} \n"
         + "dropdowns: {} \n"
         + "actions: {} \n"
-        + "form: { fields: {} }"); 
+        + "form of fields: {} from ?"); 
   }
   
   @Test
@@ -64,11 +64,11 @@ public class ManualTaskNodeTest {
         +   "gender: { 'f': 'female', 'm': 'male' }"
         + "} \n"
         + "actions: {} \n"
-        + "form: { fields: {\n"
-        + "  firstName STRING required: { defaultValue: 'BOB' class: 'pretty-style-1 pretty-style-2'},\n"
+        + "form of fields: {\n"
+        + "  firstName STRING required: { default-value: 'BOB' class: 'pretty-style-1 pretty-style-2'},\n"
         + "  age INTEGER required: { },\n"
-        + "  gender INTEGER required: { single dropdown: genderDropdown defaultValue: 'm' }\n"
-        + "\n} }"); 
+        + "  gender INTEGER required: { single-choice dropdown: genderDropdown default-value: 'm' }\n"
+        + "\n} from ?"); 
   }
   
   @Test
@@ -78,13 +78,12 @@ public class ManualTaskNodeTest {
         + "headers: {} \n"
         + "dropdowns: {} \n"
         + "actions: {} \n"
-        + "form: {\n"
-        +   "groups: {\n"
-        +     "cars: { fields: {}},\n"
-        +     "boats: { fields: {}},\n"
-        +     "soups: { groups: {}}\n"
-        +   "} \n"
-        + "} \n"); 
+        + "form of groups: {\n"
+        +   "cars: { fields: {}},\n"
+        +   "boats: { fields: {}},\n"
+        +   "soups: { groups: {}}\n"
+        + "}\n"
+        + "from ? \n"); 
   }
   
   

@@ -12,7 +12,8 @@ dropdownArg: typeName ':' '{' dropdownKeysAndValues? '}';
 dropdownKeysAndValues: dropdownKeyAndValue (',' dropdownKeyAndValue)*;
 dropdownKeyAndValue: literal ':' literal;
 
-form: 'form' ':' '{' (groups | fields)? '}';
+form: 'form' 'of' (groups | fields)? from;
+from: 'from' (typeName | '?');
 groups: 'groups' ':' '{' groupArgs? '}';
 groupArgs: group (',' group)*;
 group: typeName ':' '{' (fields | groups)? '}';
@@ -22,14 +23,16 @@ fieldArgs: field (',' field)*;
 field: typeName scalarType RequiredType ':' '{' dropdown? defaultValue? cssClass? '}';
 
 dropdown: dropdownType 'dropdown' ':' typeName;
-defaultValue: 'defaultValue' ':' literal;
+defaultValue: 'default-value' ':' literal;
 cssClass: 'class' ':' StringLiteral;
 
 actions: 'actions' ':' '{' actionsArgs? '}';
 actionsArgs: action (',' action)*;
-action: typeName ':' '{' actionBodyWhen actionBodyThen '}';
+action: actionBodyWhen actionBodyThen;
 
-actionBodyWhen: 'when' ':' StringLiteral;
-actionBodyThen: 'then' ':' actionType message?;
-actionType: StatementType;
-message: 'message' ':' StringLiteral;
+actionBodyWhen: 'when' typeName ':' enBody;
+actionBodyThen: 'then' actionType;
+actionType: 'show' (showMessage | showGroupOrField);
+
+showGroupOrField: ('group' | 'field') ':' typeName;
+showMessage: ('error' | 'info' | 'warning') 'message' ':' StringLiteral;

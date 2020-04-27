@@ -3,11 +3,10 @@ options { tokenVocab = HdesLexer; }
 import CommonParser;
 
 taskTypes
-  : MANUAL_TASK
-  | FLOW_TASK 
-  | DT_TASK
-  | ST_TASK;
-objectDataType: OBJECT | ARRAY;
+  : DEF_FL
+  | DEF_DT
+  | DEF_MT
+  | DEF_SE;
 
 flBody: typeName description? headers tasks;
 
@@ -20,9 +19,10 @@ whenThenPointerArgs: whenThenPointer (',' whenThenPointer)*;
 whenThenPointer: 'when' ':' ('?' | enBody) thenPointer;
 thenPointer: 'then' ':' (endMapping | typeName);
 
-taskRef: taskTypes ':' typeName mapping;  
-endMapping: 'end' mapping;
-mapping: 'mapping' objectDataType ':' '{' mappingArgs? '}';
+taskRef: taskTypes ':' typeName 'uses' mapping;
+endMapping: 'end' 'as' mapping;
+
+mapping: ':' '{' mappingArgs? '}';
 mappingArgs: mappingArg (',' mappingArg)*;
 
 mappingArg: typeName ':' mappingValue;

@@ -275,10 +275,10 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     TerminalNode terminalNode = (TerminalNode) ctx.getChild(0);
     RefTaskType type = null;
     switch(terminalNode.getSymbol().getType()) {
-    case HdesParser.MANUAL_TASK: type = RefTaskType.MANUAL_TASK; break;
-    case HdesParser.FLOW_TASK: type = RefTaskType.FLOW_TASK; break;
-    case HdesParser.ST_TASK: type = RefTaskType.SERVICE_TASK; break;
-    case HdesParser.DT_TASK: type = RefTaskType.DECISION_TABLE; break;
+    case HdesParser.DEF_MT: type = RefTaskType.MANUAL_TASK; break;
+    case HdesParser.DEF_FL: type = RefTaskType.FLOW_TASK; break;
+    case HdesParser.DEF_SE: type = RefTaskType.SERVICE_TASK; break;
+    case HdesParser.DEF_DT: type = RefTaskType.DECISION_TABLE; break;
     // TODO:: error handling
     default: throw new AstNodeException("Unknown task type: " + ctx.getText() + "!");
     }

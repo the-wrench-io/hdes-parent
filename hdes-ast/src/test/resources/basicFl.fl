@@ -6,12 +6,12 @@ headers: {
 tasks: {
   firstTask: {
     then: endTask
-    decisionTask: bestDtTask mapping OBJECT: {
+    decision-table: bestDtTask uses: {
       name: arg1.x1,
       lastName: arg2.x1
     }
   }, 
   endTask: {
-    then: end mapping OBJECT: { input1: arg1.x1, input2: arg2.x1 }
+    then: end as: { input1: arg1.x1, input2: arg2.x1 }
   }
 }

@@ -1,6 +1,6 @@
 parser grammar ExpressionParser;
 options { tokenVocab = HdesLexer; }
-import CommonParser;
+import LiteralParser;
 
 
 methodName: Identifier;

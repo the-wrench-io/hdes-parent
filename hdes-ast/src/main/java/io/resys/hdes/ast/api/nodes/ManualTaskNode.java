@@ -29,8 +29,9 @@ import org.immutables.value.Value;
 
 public interface ManualTaskNode extends AstNode {
   
-  enum ActionType { SHOW, ALERT, EVALUATE }
+  enum ActionMessageType { ERROR, INFO, WARNING }
   
+  interface ThenAction extends ManualTaskNode { }
   interface FormBody extends ManualTaskNode {}
   
   @Value.Immutable
@@ -66,21 +67,30 @@ public interface ManualTaskNode extends AstNode {
   
   @Value.Immutable
   interface ManualTaskAction extends ManualTaskNode {
-    String getName();
     WhenAction getWhen();
     ThenAction getThen();
   }
   
   @Value.Immutable
   interface WhenAction extends ManualTaskNode {
-    String getValue();
-    Optional<AstNode> getExpression();
+    String getId();
+    ExpressionNode getValue();
   }
   
   @Value.Immutable
-  interface ThenAction extends ManualTaskNode {
-    Optional<String> getMessage();
-    ActionType getType();
+  public interface ThenActionShowMsg extends ThenAction {
+    String getValue();
+    ActionMessageType getMessageType();
+  }
+  
+  @Value.Immutable
+  public interface ThenActionShowGroup extends ThenAction {
+    String getValue();
+  }
+
+  @Value.Immutable
+  public interface ThenActionShowField extends ThenAction {
+    String getValue();
   }
   
   @Value.Immutable
