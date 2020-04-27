@@ -50,7 +50,6 @@ BOOLEAN: 'BOOLEAN';
 OBJECT: 'OBJECT';
 ARRAY: 'ARRAY';
 
-ID: 'id';
 DESC: 'description';
 HEADERS: 'headers';
 

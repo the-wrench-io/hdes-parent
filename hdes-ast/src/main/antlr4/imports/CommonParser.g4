@@ -10,7 +10,6 @@ literal
 directionType: DirectionType;
 scalarType: ScalarType;
 typeName : Identifier | typeName '.' Identifier;
-id: 'id' ':' typeName;
 description: 'description' ':' literal;
 
 headers: 'headers' ':' typeDefs;

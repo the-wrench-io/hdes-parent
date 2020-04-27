@@ -15,7 +15,7 @@ dropdownKeyAndValue: literal ':' literal;
 form: 'form' ':' '{' (groups | fields)? '}';
 groups: 'groups' ':' '{' groupArgs? '}';
 groupArgs: group (',' group)*;
-group: '{' id (fields | groups)? '}';
+group: typeName ':' '{' (fields | groups)? '}';
 
 fields: 'fields' ':' '{' fieldArgs? '}';
 fieldArgs: field (',' field)*;

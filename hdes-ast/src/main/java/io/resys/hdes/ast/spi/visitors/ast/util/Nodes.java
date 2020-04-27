@@ -122,7 +122,7 @@ public class Nodes {
   }
   
   
-  public static String getStringLiteralValue(ParserRuleContext ctx) {
+  public static String getStringLiteralValue(ParseTree ctx) {
     String value = ctx.getText();
     return value.substring(1, value.length() - 1);
   }

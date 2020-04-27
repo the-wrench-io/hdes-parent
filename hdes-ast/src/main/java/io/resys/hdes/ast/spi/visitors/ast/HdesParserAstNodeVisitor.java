@@ -14,7 +14,6 @@ import io.resys.hdes.ast.HdesParser.DescriptionContext;
 import io.resys.hdes.ast.HdesParser.DirectionTypeContext;
 import io.resys.hdes.ast.HdesParser.HdesBodyContext;
 import io.resys.hdes.ast.HdesParser.HeadersContext;
-import io.resys.hdes.ast.HdesParser.IdContext;
 import io.resys.hdes.ast.HdesParser.LiteralContext;
 import io.resys.hdes.ast.HdesParser.ObjectTypeContext;
 import io.resys.hdes.ast.HdesParser.ScalarTypeContext;
@@ -67,10 +66,6 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
 
   // Internal only
   @Value.Immutable
-  public interface RedundentId extends AstNode {
-    String getValue();
-  }
-  @Value.Immutable
   public interface RedundentDescription extends AstNode {
     String getValue();
   }
@@ -104,14 +99,6 @@ public class HdesParserAstNodeVisitor extends FwParserAstNodeVisitor {
   @Override
   public AstNode visitLiteral(LiteralContext ctx) {
     return Nodes.literal(ctx, token(ctx));
-  }
-
-  @Override
-  public RedundentId visitId(IdContext ctx) {
-    return ImmutableRedundentId.builder()
-        .token(token(ctx))
-        .value(nodes(ctx).of(TypeName.class).get().getValue())
-        .build();
   }
 
   @Override

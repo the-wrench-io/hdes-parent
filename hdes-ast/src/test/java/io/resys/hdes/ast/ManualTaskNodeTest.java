@@ -65,9 +65,9 @@ public class ManualTaskNodeTest {
         + "} \n"
         + "actions: {} \n"
         + "form: { fields: {\n"
-        + "  firstName STRING required: { },\n"
+        + "  firstName STRING required: { defaultValue: 'BOB' class: 'pretty-style-1 pretty-style-2'},\n"
         + "  age INTEGER required: { },\n"
-        + "  gender INTEGER required: { single dropdown: genderDropdown }\n"
+        + "  gender INTEGER required: { single dropdown: genderDropdown defaultValue: 'm' }\n"
         + "\n} }"); 
   }
   
@@ -80,9 +80,9 @@ public class ManualTaskNodeTest {
         + "actions: {} \n"
         + "form: {\n"
         +   "groups: {\n"
-        +     "{id: cars fields: {}},\n"
-        +     "{id: boats fields: {}},\n"
-        +     "{id: soups groups: {}}\n"
+        +     "cars: { fields: {}},\n"
+        +     "boats: { fields: {}},\n"
+        +     "soups: { groups: {}}\n"
         +   "} \n"
         + "} \n"); 
   }

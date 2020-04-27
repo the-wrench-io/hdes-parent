@@ -93,7 +93,6 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskForm;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenAction;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
-import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentId;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentScalarType;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
@@ -194,10 +193,11 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
 
   @Override
   public AstNode visitCssClass(CssClassContext ctx) {
-    Literal literal = Nodes.literal(ctx, token(ctx));
+    TerminalNode stringLiteral = (TerminalNode) ctx.getChild(2);
+    String value = Nodes.getStringLiteralValue(stringLiteral);
     return ImmutableMtRedundentCssClass.builder()
         .token(token(ctx))
-        .value(literal.getValue())
+        .value(value)
         .build();
   }
   
@@ -289,7 +289,7 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
   @Override
   public Group visitGroup(GroupContext ctx) {
     Nodes nodes = nodes(ctx);
-    String id = nodes.of(RedundentId.class).get().getValue();
+    String id = nodes.of(TypeName.class).get().getValue();
     
     Optional<Fields> fields = nodes.of(Fields.class);
     if(fields.isPresent()) {

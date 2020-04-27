@@ -34,7 +34,6 @@ import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.spi.errors.AntlrErrorListener;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
@@ -119,46 +118,12 @@ public class ImmutableAstEnvir implements AstEnvir {
     }
 
     @Override
-    public Builder flow(String src) {
+    public Builder src(String src) {
       HdesLexer lexer = new HdesLexer(CharStreams.fromString(src));
       CommonTokenStream tokens = new CommonTokenStream(lexer);
       HdesParser parser = new HdesParser(tokens);
       parser.addErrorListener(errorListener());
       ParseTree tree = parser.hdesBody();
-      //tree.accept(new FlowParserConsoleVisitor());
-      return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
-    }
-
-    @Override
-    public Builder expression(String src, ScalarType type) {
-      HdesLexer lexer = new HdesLexer(CharStreams.fromString(src));
-      CommonTokenStream tokens = new CommonTokenStream(lexer);
-      HdesParser parser = new HdesParser(tokens);
-      parser.addErrorListener(errorListener());
-      ParseTree tree = parser.hdesBody();
-      //tree.accept(new ExpressionParserConsoleVisitor());
-      return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
-    }
-
-    @Override
-    public Builder decisionTable(String src) {
-      HdesLexer lexer = new HdesLexer(CharStreams.fromString(src));
-      CommonTokenStream tokens = new CommonTokenStream(lexer);
-      HdesParser parser = new HdesParser(tokens);
-      parser.addErrorListener(errorListener());
-      ParseTree tree = parser.hdesBody();
-      //tree.accept(new DtParserConsoleVisitor());
-      return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
-    }
-
-    @Override
-    public Builder manualTask(String src) {
-      HdesLexer lexer = new HdesLexer(CharStreams.fromString(src));
-      CommonTokenStream tokens = new CommonTokenStream(lexer);
-      HdesParser parser = new HdesParser(tokens);
-      parser.addErrorListener(errorListener());
-      ParseTree tree = parser.hdesBody();
-      //tree.accept(new ManualTaskParserConsoleVisitor());
       return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
     }
   }

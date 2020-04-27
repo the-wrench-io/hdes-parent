@@ -64,7 +64,6 @@ import io.resys.hdes.ast.HdesParser.GroupsContext;
 import io.resys.hdes.ast.HdesParser.HdesBodyContext;
 import io.resys.hdes.ast.HdesParser.HeadersContext;
 import io.resys.hdes.ast.HdesParser.HitPolicyContext;
-import io.resys.hdes.ast.HdesParser.IdContext;
 import io.resys.hdes.ast.HdesParser.LiteralContext;
 import io.resys.hdes.ast.HdesParser.MappingArgContext;
 import io.resys.hdes.ast.HdesParser.MappingArgsContext;
@@ -589,12 +588,6 @@ public class HdesParserConsoleVisitor extends HdesParserBaseVisitor<AstNode> {
   public AstNode visitHeaders(HeadersContext ctx) {
     log(ctx);
     return super.visitHeaders(ctx);
-  }
-
-  @Override
-  public AstNode visitId(IdContext ctx) {
-    log(ctx);
-    return super.visitId(ctx);
   }
 
   @Override

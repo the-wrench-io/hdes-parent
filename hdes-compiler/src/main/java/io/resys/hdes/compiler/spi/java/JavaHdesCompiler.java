@@ -23,7 +23,6 @@ package io.resys.hdes.compiler.spi.java;
 import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.spi.ImmutableAstEnvir;
 import io.resys.hdes.compiler.api.HdesCompiler;
-import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.java.visitors.JavaAstEnvirVisitor;
 
 public class JavaHdesCompiler implements HdesCompiler {
@@ -38,15 +37,7 @@ public class JavaHdesCompiler implements HdesCompiler {
       }
       @Override
       public Parser add(String filename, String src) {
-        if(filename.endsWith(".dt")) {
-          builder.add().externalId(filename).decisionTable(src);
-        } else if(filename.endsWith(".fl")) {
-          builder.add().externalId(filename).flow(src);
-        } else if(filename.endsWith(".mt")) {
-          builder.add().externalId(filename).manualTask(src);
-        } else {
-          throw new HdesCompilerException(HdesCompilerException.builder().unknownFileExtension(filename));
-        }         
+        builder.add().externalId(filename).src(src);
         return this;
       }
     };

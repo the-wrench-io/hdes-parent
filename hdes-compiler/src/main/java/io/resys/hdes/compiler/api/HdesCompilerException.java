@@ -57,14 +57,6 @@ public class HdesCompilerException extends RuntimeException {
   }
 
   public static class Builder {
-
-    public String unknownFileExtension(String filename) {
-      return new StringBuilder()
-          .append("Unknown file extension: ").append(filename)
-          .append(", supported types are: dt, fl, mt")
-          .append("!")
-          .toString();
-    }
     public String unknownAst(AstNode ast) {
       return new StringBuilder()
           .append("Unknown AST: ").append(ast.getClass())
