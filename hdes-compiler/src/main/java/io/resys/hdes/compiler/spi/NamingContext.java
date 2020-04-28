@@ -37,7 +37,7 @@ public interface NamingContext {
   ClassName immutableBuilder(ClassName src);
   
   interface DtNamingContext {
-    String pkg();
+    String pkg(DecisionTableBody body);
     ClassName interfaze(DecisionTableBody node);
     TypeName superinterface(DecisionTableBody node);
     ClassName impl(DecisionTableBody node);
@@ -50,7 +50,7 @@ public interface NamingContext {
   }
  
   interface FlNamingContext {
-    String pkg();
+    String pkg(FlowBody body);
     
     ClassName ref(TaskRef ref);
     ClassName refInput(TaskRef ref);

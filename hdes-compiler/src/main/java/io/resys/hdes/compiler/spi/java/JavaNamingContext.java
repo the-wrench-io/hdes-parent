@@ -83,7 +83,7 @@ public class JavaNamingContext implements NamingContext {
     }
 
     @Override
-    public String pkg() {
+    public String pkg(DecisionTableBody node) {
       return parent.dt;
     }
 
@@ -98,7 +98,7 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public ClassName impl(DecisionTableBody node) {
-      return ClassName.get(parent.dt, "Gen" + node.getId());
+      return ClassName.get(parent.dt, node.getId() + "Gen");
     }
 
     @Override
@@ -146,7 +146,7 @@ public class JavaNamingContext implements NamingContext {
     }
 
     @Override
-    public String pkg() {
+    public String pkg(FlowBody node) {
       return parent.fl;
     }
 
@@ -157,7 +157,7 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public ClassName impl(FlowBody node) {
-      return ClassName.get(parent.fl, "Gen" + node.getId());
+      return ClassName.get(parent.fl, node.getId() + "Gen");
     }
 
     @Override

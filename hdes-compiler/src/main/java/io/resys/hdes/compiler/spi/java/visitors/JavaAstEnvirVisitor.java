@@ -1,6 +1,9 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -29,9 +32,12 @@ import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Code;
+import io.resys.hdes.compiler.api.HdesCompiler.CodeValue;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.api.ImmutableCode;
+import io.resys.hdes.compiler.api.ImmutableCodeValue;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaNamingContext;
 
@@ -39,42 +45,79 @@ public class JavaAstEnvirVisitor {
   private final NamingContext naming = JavaNamingContext.config().build();
   
   public Code visit(AstEnvir envir) {
+    List<CodeValue> values = new ArrayList<>();
     for(AstNode ast : envir.getValues()) {
+      
       if(ast instanceof DecisionTableBody) {
-        visit((DecisionTableBody) ast);
+        values.addAll(visit((DecisionTableBody) ast));
       } else if(ast instanceof FlowBody) {
-        visit((FlowBody) ast, envir);
+        values.addAll(visit((FlowBody) ast, envir));
       } else {
         throw new HdesCompilerException(HdesCompilerException.builder().unknownAst(ast));
       }
+      
     }
     
-    return ImmutableCode.builder().build();
+    return ImmutableCode.builder().values(values).build();
   }
   
-  private void visit(DecisionTableBody body) {
-    TypeSpec superInterface = visitDt(new DtAstNodeVisitorJavaInterface(naming).visitDecisionTableBody(body));
-    TypeSpec implementation = visitDt(new DtAstNodeVisitorJavaGen(naming).visitDecisionTableBody(body));
+  private List<CodeValue> visit(DecisionTableBody body) {
+    StringBuilder interfaceBuilder = new StringBuilder();
+    StringBuilder implementationBuilder = new StringBuilder();
+    
+    TypeSpec superInterface = visitDt(body, new DtAstNodeVisitorJavaInterface(naming).visitDecisionTableBody(body), interfaceBuilder);
+    TypeSpec implementation = visitDt(body, new DtAstNodeVisitorJavaGen(naming).visitDecisionTableBody(body), implementationBuilder);
+    return Arrays.asList(
+        ImmutableCodeValue.builder().type(HdesCompiler.SourceType.DT)
+          .source(body.getToken().getText())
+          .target(interfaceBuilder.toString())
+          .simpleName(superInterface.name)
+          .packageName(naming.dt().pkg(body))
+          .build(),
+        ImmutableCodeValue.builder().type(HdesCompiler.SourceType.DT)
+          .source(body.getToken().getText())
+          .target(implementationBuilder.toString())
+          .simpleName(implementation.name)
+          .packageName(naming.dt().pkg(body))
+          .build()
+        );
   }
-  private void visit(FlowBody body, AstEnvir envir) {
-    TypeSpec superInterface = visitFlow(new FlAstNodeVisitorJavaInterface(naming).visitBody(body));
-    TypeSpec implementation = visitFlow(new FlAstNodeVisitorJavaGen(naming).visitBody(body));
+  private List<CodeValue> visit(FlowBody body, AstEnvir envir) {
+    StringBuilder interfaceBuilder = new StringBuilder();
+    StringBuilder implementationBuilder = new StringBuilder();
+    TypeSpec superInterface = visitFlow(body, new FlAstNodeVisitorJavaInterface(naming).visitBody(body), interfaceBuilder);
+    TypeSpec implementation = visitFlow(body, new FlAstNodeVisitorJavaGen(naming).visitBody(body), implementationBuilder);
+    
+    return Arrays.asList(
+        ImmutableCodeValue.builder().type(HdesCompiler.SourceType.FL)
+          .source(body.getToken().getText())
+          .target(interfaceBuilder.toString())
+          .simpleName(superInterface.name)
+          .packageName(naming.fl().pkg(body))
+          .build(),
+        ImmutableCodeValue.builder().type(HdesCompiler.SourceType.FL)
+          .source(body.getToken().getText())
+          .target(implementationBuilder.toString())
+          .simpleName(implementation.name)
+          .packageName(naming.fl().pkg(body))
+          .build()
+        );
   }
 
-  private TypeSpec visitFlow(TypeSpec type) {
+  private TypeSpec visitFlow(FlowBody body, TypeSpec type, Appendable appendable) {
     try {
-      JavaFile file = JavaFile.builder(naming.fl().pkg(), type).build();
-      file.writeTo(System.out);
+      JavaFile file = JavaFile.builder(naming.fl().pkg(body), type).build();
+      file.writeTo(appendable);
       return type;
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
   
-  private TypeSpec visitDt(TypeSpec type) {
+  private TypeSpec visitDt(DecisionTableBody body, TypeSpec type, Appendable appendable) {
     try {
-      JavaFile file = JavaFile.builder(naming.fl().pkg(), type).build();
-      file.writeTo(System.out);
+      JavaFile file = JavaFile.builder(naming.dt().pkg(body), type).build();
+      file.writeTo(appendable);
       return type;
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);

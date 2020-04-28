@@ -1,5 +1,7 @@
 package io.resys.hdes.aproc;
 
+import java.io.BufferedWriter;
+
 /*-
  * #%L
  * hdes-maven-plugin
@@ -22,10 +24,10 @@ package io.resys.hdes.aproc;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URI;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Set;
 
@@ -85,30 +87,33 @@ public class HdesMojo extends AbstractMojo {
     for (CodeValue value : code.getValues()) {
       createFile(value, outputDirectory, sourceEncoding);
     }
+    
+    if (project != null) {
+      project.addCompileSourceRoot(outputDirectory.getPath());
+    }
   }
 
   private void createFile(CodeValue value, File outputDirectory, String sourceEncoding) throws MojoExecutionException {
-    FileOutputStream file = null;
     try {
-      File packageDirectory = new File(outputDirectory, value.getPackageName().replaceAll(".", File.separator));
+      File packageDirectory = new File(outputDirectory, value.getPackageName().replace(".", File.separator));
       if(!packageDirectory.exists()) {
         packageDirectory.mkdirs();
       } 
-      file = new FileOutputStream(new File(packageDirectory, value.getSimpleName()));
+      File outputFile = new File(packageDirectory, value.getSimpleName() + ".java");
+      URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
+      getLog().info("Writing file: " + relativePath);
+      OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
       
-      IOUtils.write(value.getTarget().getBytes(StandardCharsets.UTF_8), file);
+      BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, sourceEncoding));
+      
+      writer.write(value.getTarget());
+      writer.flush();
+      writer.close();
+      
     } catch (Exception e) {
 
       getLog().error(e);
       throw new MojoExecutionException("Failed to write file: " + value.getPackageName() + "." + value.getSimpleName() + " because of: " + e.getMessage(), e);
-    } finally {
-      try {
-        if(file != null) {
-          file.close();
-        }
-      } catch(IOException ioe) { 
-        getLog().error(ioe);
-      }
     }
   }
 

@@ -125,7 +125,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
         .addParameter(ParameterSpec.builder(flowState, "currentState").build())
         .returns(naming.immutableBuilder(flowState))
         .addStatement("long end = System.currentTimeMillis()")
-        .addCode(CodeBlock.builder()
+        .addStatement(CodeBlock.builder()
             .add("return $T.builder()", naming.immutable(flowState))
             .add("\r\n  ").add(".from(currentState)")
             .add("\r\n  ").add(".log($L)", CodeBlock.builder()
@@ -134,7 +134,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
                 .add("\r\n    ").add(".duration(end - start)")
                 .add("\r\n    ").add(".end(end)")
                 .add("\r\n    ").add(".parent(currentState.getLog())")
-                .add("\r\n    ").addStatement(".build()").build())
+                .add("\r\n    ").add(".build()").build())
             .build()).build();
   }
   

@@ -38,7 +38,7 @@ public class DtHdesCompilerTest {
         .add("SimpleDt.dt", file("SimpleDt.dt"))
     .build();
     
-    //System.out.println(code.getValues().get(0).getTarget());
+    System.out.println(code.getValues().get(0).getTarget());
     
   }
   @Test
@@ -47,7 +47,7 @@ public class DtHdesCompilerTest {
         .add("ExpressionDt.dt", file("ExpressionDt.dt"))
     .build();
     
-    //System.out.println(code.getValues().get(0).getTarget());
+    System.out.println(code.getValues().get(0).getTarget());
     
   }
   
