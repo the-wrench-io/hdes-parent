@@ -43,6 +43,8 @@ public interface HdesCompiler {
   @Value.Immutable
   interface CodeValue {
     SourceType getType();
+    String getPackageName();
+    String getSimpleName();
     String getSource();
     String getTarget();
   }

@@ -33,9 +33,9 @@ public class AstEnvirTest {
   @Test
   public void simpleFlow() {
     ImmutableAstEnvir.builder()
-//    .add().src(file("basicDt.dt"))
-//    .add().src(file("basicFl.fl"))
-    .add().src(file("basicMt.mt"))
+    .add().src(file("basicDt.hdes"))
+    .add().src(file("basicFl.hdes"))
+    .add().src(file("basicMt.hdes"))
     //.add().src(file("matrixDt.dt"))
     .build();
   }

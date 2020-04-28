@@ -14,6 +14,8 @@
   <modules>
     <module>hdes-ast</module>
     <module>hdes-compiler</module>
+    <module>hdes-maven-plugin</module>
+    <module>hdes-maven-plugin-test</module>
     <module>hdes-object-repo</module>
     <module>hdes-object-repo-mongodb</module>
 
@@ -107,19 +109,24 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.5</version>
       </plugin>
-      <plugin>
-        <groupId>org.antlr</groupId>
-        <artifactId>antlr4-maven-plugin</artifactId>
-        <version>${antlr.version}</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>antlr4</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
+
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-maven-plugin</artifactId>
+          <version>${antlr.version}</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>antlr4</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <dependencyManagement>
@@ -279,8 +286,13 @@
         <artifactId>hdes-compiler</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-maven-plugin</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-
+      <!-- deprecated -->
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-management</artifactId>

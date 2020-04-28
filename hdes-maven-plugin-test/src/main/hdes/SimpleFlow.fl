@@ -1,0 +1,47 @@
+
+define flow: SimpleFlow description: 'descriptive'
+
+headers: {
+  arg1 INTEGER optional IN,
+  arg2 INTEGER optional IN,
+  arg3 ARRAY of INTEGER optional IN,
+  arg4 ARRAY of OBJECT optional IN: {
+    arg5 INTEGER optional IN,
+    arg6 INTEGER optional IN
+  }
+}
+tasks: {
+// task 1
+  firstTask: {
+    then: switch
+    
+    // decision/service/flow
+    decision-table: BestDt uses: {
+      name: arg1,
+      lastName: arg2
+    }
+    
+  },
+  
+// task 2
+  switch: {
+    when: arg1 > 10 then: secondTask,
+    
+    when: ? then: end as: {
+      name: arg1,
+      lastName: arg2
+    }
+    
+  },
+
+// task 3
+  secondTask: {
+    then: end as: { }
+    
+    // decision/service/flow
+    decision-table: Best2Dt uses: {
+      name: arg1,
+      lastName: arg2
+    }
+  }
+}
