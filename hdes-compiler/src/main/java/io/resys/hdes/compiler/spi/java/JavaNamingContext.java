@@ -20,7 +20,6 @@ package io.resys.hdes.compiler.spi.java;
  * #L%
  */
 
-import java.util.Collection;
 import java.util.Optional;
 
 import com.squareup.javapoet.ClassName;
@@ -90,9 +89,6 @@ public class JavaNamingContext implements NamingContext {
     @Override
     public TypeName superinterface(DecisionTableBody node) {
       TypeName returnType = output(node);
-      if (node.getHitPolicy() instanceof HitPolicyAll) {
-        returnType = ParameterizedTypeName.get(ClassName.get(Collection.class), returnType);
-      }
       return ParameterizedTypeName.get(ClassName.get(DecisionTable.class), input(node), returnType);
     }
 
@@ -134,6 +130,14 @@ public class JavaNamingContext implements NamingContext {
     }
     public ClassName output(String node) {
       return ClassName.get(parent.dt + "." + node, node + "Output");
+    }
+
+    @Override
+    public ClassName outputEntry(DecisionTableBody node) {
+      if (node.getHitPolicy() instanceof HitPolicyAll) {
+        return ClassName.get(parent.dt + "." + node.getId(), node.getId() + "OutputEntry");        
+      }
+      return output(node);
     } 
   }
 

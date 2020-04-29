@@ -35,11 +35,23 @@ public class FlJavaHdesCompilerTest {
   @Test
   public void simpleFlow() {
     Code code = compiler.parser()
-        .add("SimpleFlow.fl", file("SimpleFlow.fl"))
+        .add("SimpleFlow.hdes", file("SimpleFlow.hdes"))
     .build();
     
+    System.out.println(code.getValues().get(0).getTarget());
+    //System.out.println(code.getValues().get(1).getTarget());
   }
 
+  @Test
+  public void arrayFlow() {
+    Code code = compiler.parser()
+        .add("ArrayFlow.hdes", file("ArrayFlow.hdes"))
+    .build();
+    
+    System.out.println(code.getValues().get(0).getTarget());
+    //System.out.println(code.getValues().get(1).getTarget());
+  }
+  
   public static String file(String name) {
     try {
       return IOUtils.toString(FlJavaHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);

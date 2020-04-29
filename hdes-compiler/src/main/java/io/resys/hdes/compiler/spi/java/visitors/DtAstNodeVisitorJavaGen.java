@@ -31,9 +31,9 @@ import javax.lang.model.element.Modifier;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
-import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.nodes.AstNode;
@@ -58,7 +58,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.AndOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
 import io.resys.hdes.compiler.api.HdesCompilerException;
-import io.resys.hdes.compiler.spi.EqualityAssert;
+import io.resys.hdes.compiler.api.HdesWhen;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
@@ -70,8 +70,6 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
   private final static String HEADER_REF = "//header ref to be replaces";
   private final NamingContext naming;
   private DecisionTableBody body;
-  private ClassName input;
-  private ClassName output;
   
   public DtAstNodeVisitorJavaGen(NamingContext naming) {
     super();
@@ -81,15 +79,18 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {
     this.body = node;
-    this.input = naming.dt().input(node);
-    this.output = naming.dt().output(node);
     
     return TypeSpec.classBuilder(naming.dt().impl(node))
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(naming.dt().interfaze(node))
         .addJavadoc(node.getDescription().orElse(""))
+        .addMethod(MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(ParameterSpec.builder(HdesWhen.class, "when").build())
+            .addStatement("this.when = when")
+            .build())
+        .addField(FieldSpec.builder(HdesWhen.class, "when", Modifier.PRIVATE, Modifier.FINAL).build())
         .addMethod(visitHitPolicy(node.getHitPolicy()).getValue())
-        .addMethod(visitEqualityAsset(node))
         .build();
   }
 
@@ -104,10 +105,9 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
 
   @Override
   public DtMethodSpec visitHitPolicyAll(HitPolicyAll node) {
-
-    ParameterizedTypeName returnType = ParameterizedTypeName.get(ClassName.get(List.class), output);
+    
     CodeBlock.Builder statements = CodeBlock.builder()
-        .addStatement("$T result = new $T<>()", returnType, ArrayList.class);
+        .addStatement("$T result = new $T<>()", List.class, ArrayList.class);
     for (RuleRow row : node.getRows()) {
       DtCodeSpecPair pair = visitRuleRow(row);
       
@@ -120,20 +120,21 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         .endControlFlow();
       }
     }
+    ClassName returnType = naming.dt().output(body);
     return ImmutableDtMethodSpec.builder().value(
         MethodSpec.methodBuilder("apply")
           .addAnnotation(Override.class)
           .addModifiers(Modifier.PUBLIC)
-          .addParameter(ParameterSpec.builder(input, "input").build())
+          .addParameter(ParameterSpec.builder(naming.dt().input(body), "input").build())
           .returns(returnType)
-          .addCode(statements.addStatement("return result").build())
+          .addCode(statements.addStatement("return $T.builder().values(result).build()", naming.immutable(returnType)).build())
           .build()).build();
   }
 
   @Override
   public DtCodeSpecPair visitRuleRow(RuleRow node) {
     CodeBlock.Builder key = CodeBlock.builder();
-    CodeBlock.Builder value = CodeBlock.builder().add("Immutable$T.builder()", output);
+    CodeBlock.Builder value = CodeBlock.builder().add("Immutable$T.builder()", naming.dt().outputEntry(body));
     boolean and = false;
     for (Rule rule : node.getRules()) {
       CodeBlock ruleCode = visitRule(rule).getValue();
@@ -241,15 +242,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     // TODO: error handling
     default: throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionOperation(node));
     }
-    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, "when()", left, right).build()).build();
-  }
-  
-  private MethodSpec visitEqualityAsset(DecisionTableBody node) {
-    return MethodSpec.methodBuilder("when")
-        .addModifiers(Modifier.PROTECTED)
-        .returns(EqualityAssert.class)
-        .addStatement("return $T.get()", EqualityAssert.class)
-        .build();
+    return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(operation, "when", left, right).build()).build();
   }
   
   @Override

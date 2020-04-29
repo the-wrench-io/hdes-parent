@@ -35,7 +35,7 @@ public class DtHdesCompilerTest {
   @Test
   public void simpleDt() {
     Code code = compiler.parser()
-        .add("SimpleDt.dt", file("SimpleDt.dt"))
+        .add("SimpleDt.hdes", file("SimpleDt.hdes"))
     .build();
     
     System.out.println(code.getValues().get(0).getTarget());
@@ -44,10 +44,11 @@ public class DtHdesCompilerTest {
   @Test
   public void expressionDt() {
     Code code = compiler.parser()
-        .add("ExpressionDt.dt", file("ExpressionDt.dt"))
+        .add("ExpressionDt.hdes", file("ExpressionDt.hdes"))
     .build();
     
-    System.out.println(code.getValues().get(0).getTarget());
+    //System.out.println(code.getValues().get(0).getTarget());
+    System.out.println(code.getValues().get(1).getTarget());
     
   }
   

@@ -110,7 +110,8 @@ public class FlowAstNodeTest {
             "tasks: {\n" +
             
             "firstTask: {"
-            + "then: nextTask"
+            + "then: nextTask \n"
+            + "decision-table: XXX uses: {}"
             + "}, " +
             "nextTask: {"
             + "then: end as: {}" +
@@ -154,35 +155,48 @@ public class FlowAstNodeTest {
   }
 
   @Test
-  public void taskFlowTask() throws IOException {
+  public void taskFlowTaskOverArray() throws IOException {
     parse(
         "define flow: x description: 'descriptive '\n" +
             "headers: {\n"
             + "arg1.x1 INTEGER optional IN,\n"
-            + "arg2.x1 INTEGER optional IN\n" +
+            + "arg2.x1 INTEGER optional IN,\n"
+            + "x ARRAY of INTEGER required IN\n" +
             "}\n" +
             "tasks: {\n" +
             "firstTask: {\n"
             + "then: end as: {}"
             + "service: bestFlowTask uses: {} \n"
-            + "}\n" +
+            + "} from x then: end as: {} \n" +
             "}\n");
   }
 
   @Test
-  public void taskDT() throws IOException {
+  public void taskOverDTOutputArray() throws IOException {
     parse(
         "define flow: x description: 'descriptive '\n" +
             "headers: {\n"
             + "arg1.x1 INTEGER optional IN,\n"
-            + "arg2.x1 INTEGER optional IN\n" +
-            "}\n" +
-            "tasks: {\n" +
-            "firstTask: {\n"
-            + "then: end as: {}"
-            + "decision-table: bestDtTask uses: {} \n"
+            + "arg2.x1 INTEGER optional IN,\n"
+            + "code INTEGER optional OUT,\n"
+            + "summary ARRAY of OBJECT required OUT: {\n"
+            + "  value INTEGER required OUT\n"
             + "}\n" +
-            "}\n");
+            "}\n" +
+
+          "tasks: {\n" +
+            
+            "firstTask: {\n"
+            + "then: nextTask \n"
+            + "decision-table: bestDtTask uses: {} \n"
+            + "},\n" +
+            
+            "nextTask: {\n"
+            + "then: end as: { summary: { key: firstTask.value, value: nextTask.value } }\n"
+            + "service: DoSmth uses: { value : firstTask.key } \n"
+            + "} from firstTask then: end as: { code: 5 } \n" +
+            
+          "}\n");
   }
 
   @Test
@@ -197,7 +211,6 @@ public class FlowAstNodeTest {
             "firstTask: {\n"
             + "then: end as: {}"
             + "decision-table: bestDtTask uses: {} \n"
-            + "  \n"
             + "}\n" +
             "}\n");
   }

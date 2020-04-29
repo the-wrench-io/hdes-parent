@@ -1,5 +1,9 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 /*-
  * #%L
  * hdes-compiler
@@ -28,6 +32,7 @@ import org.immutables.value.Value.Immutable;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.nodes.AstNode.DirectionType;
@@ -35,6 +40,7 @@ import io.resys.hdes.ast.api.nodes.AstNode.Headers;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
@@ -68,8 +74,8 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     
     TypeSpec.Builder inputBuilder = from.apply(naming.dt().input(body))
         .addSuperinterface(naming.dt().inputSuperinterface(body));
-
-    TypeSpec.Builder outputBuilder = from.apply(naming.dt().output(body))
+    
+    TypeSpec.Builder outputBuilder = from.apply(naming.dt().outputEntry(body))
         .addSuperinterface(naming.dt().outputSuperinterface(body));
     
     for(TypeDefNode header : node.getValues()) {
@@ -80,9 +86,25 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
         outputBuilder.addMethod(method);        
       }
     }
-    return ImmutableDtTypesSpec.builder()
-        .addValues(inputBuilder.build(), outputBuilder.build())
-        .build();
+    
+    List<TypeSpec> values = new ArrayList<>();
+    values.add(inputBuilder.build());
+    values.add(outputBuilder.build());
+    
+    boolean isCollection = body.getHitPolicy() instanceof HitPolicyAll;
+    if (isCollection) {
+      ParameterizedTypeName returnType = ParameterizedTypeName.get(ClassName.get(Collection.class), naming.dt().outputEntry(body));
+      TypeSpec collectionOutput = from.apply(naming.dt().output(body))
+        .addSuperinterface(naming.dt().outputSuperinterface(body))
+        .addMethod(MethodSpec.methodBuilder(JavaSpecUtil.getMethodName("values"))
+          .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+          .returns(returnType)
+          .build()).build();
+      values.add(collectionOutput);
+    }
+    
+    
+    return ImmutableDtTypesSpec.builder().addAllValues(values).build();
   }
 
   @Override

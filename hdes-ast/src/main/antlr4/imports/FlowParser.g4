@@ -12,19 +12,20 @@ flBody: typeName description? headers tasks;
 
 tasks: 'tasks' ':' '{' taskArgs? '}';
 taskArgs: nextTask (',' nextTask)*;
-nextTask: typeName ':' '{' taskPointer taskRef? '}';
+nextTask: typeName ':' '{' taskPointer taskRef? '}' fromPointer?;
 
 taskPointer: whenThenPointerArgs | thenPointer;
 whenThenPointerArgs: whenThenPointer (',' whenThenPointer)*;
 whenThenPointer: 'when' ':' ('?' | enBody) thenPointer;
 thenPointer: 'then' ':' (endMapping | typeName);
+fromPointer: 'from' typeName thenPointer;
 
-taskRef: taskTypes ':' typeName 'uses' mapping;
-endMapping: 'end' 'as' mapping;
+taskRef: taskTypes ':' typeName 'uses' ':' mapping;
+endMapping: 'end' 'as' ':' mapping;
 
-mapping: ':' '{' mappingArgs? '}';
+mapping: '{' mappingArgs? '}';
 mappingArgs: mappingArg (',' mappingArg)*;
 
-mappingArg: typeName ':' mappingValue;
+mappingArg: typeName ':' (mapping | mappingValue);
 mappingValue: typeName | literal;
 

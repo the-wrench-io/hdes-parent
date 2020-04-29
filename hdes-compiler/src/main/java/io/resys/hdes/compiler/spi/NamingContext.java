@@ -46,6 +46,7 @@ public interface NamingContext {
     ClassName inputSuperinterface(DecisionTableBody node);
     
     ClassName output(DecisionTableBody node);
+    ClassName outputEntry(DecisionTableBody node);
     ClassName outputSuperinterface(DecisionTableBody node);
   }
  

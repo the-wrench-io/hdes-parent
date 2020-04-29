@@ -24,9 +24,11 @@
         </configuration>
         <executions>
           <execution>
+          <phase>generate-resources</phase>
             <goals>
               <goal>hdes</goal>
             </goals>
+            
           </execution>
         </executions>
       </plugin>
@@ -37,6 +39,11 @@
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-maven-plugin</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.immutables</groupId>
+      <artifactId>value</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
