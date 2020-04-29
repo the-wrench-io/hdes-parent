@@ -86,9 +86,26 @@ public interface FlowNode extends AstNode {
   @Value.Immutable
   interface Mapping extends FlowNode {
     String getLeft();
-    String getRight();
+    MappingValue getRight();
+  }
+  
+  interface MappingValue extends FlowNode { }
+  
+  @Value.Immutable  
+  interface MappingArray extends MappingValue {
+    List<Mapping> getValues();
   }
 
+  @Value.Immutable  
+  interface MappingLiteral extends MappingValue {
+    Literal getValue();
+  }
+
+  @Value.Immutable  
+  interface MappingTypeName extends MappingValue {
+    TypeName getValue();    
+  }
+  
   @Value.Immutable
   interface TaskRef extends FlowNode {
     RefTaskType getType();

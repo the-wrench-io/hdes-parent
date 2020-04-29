@@ -26,6 +26,6 @@ endMapping: 'end' 'as' ':' mapping;
 mapping: '{' mappingArgs? '}';
 mappingArgs: mappingArg (',' mappingArg)*;
 
-mappingArg: typeName ':' (mapping | mappingValue);
-mappingValue: typeName | literal;
+mappingArg: typeName ':' mappingValue;
+mappingValue: mapping | typeName | literal;
 

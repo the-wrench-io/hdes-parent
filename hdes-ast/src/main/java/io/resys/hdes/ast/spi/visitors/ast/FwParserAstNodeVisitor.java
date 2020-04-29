@@ -57,6 +57,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
+import io.resys.hdes.ast.api.nodes.FlowNode.MappingValue;
 import io.resys.hdes.ast.api.nodes.FlowNode.RefTaskType;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
@@ -67,6 +68,9 @@ import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowOutputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTaskNode;
 import io.resys.hdes.ast.api.nodes.ImmutableMapping;
+import io.resys.hdes.ast.api.nodes.ImmutableMappingArray;
+import io.resys.hdes.ast.api.nodes.ImmutableMappingLiteral;
+import io.resys.hdes.ast.api.nodes.ImmutableMappingTypeName;
 import io.resys.hdes.ast.api.nodes.ImmutableTaskRef;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
@@ -93,17 +97,9 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     List<Mapping> getValues();
   }
   @Value.Immutable
-  public interface FwRedundentMappingArgs extends FlowNode {
-    List<Mapping> getValues();
-  }    
-  @Value.Immutable
   public interface FwRedundentRefTaskType extends FlowNode {
     RefTaskType getValue();
   }
-  @Value.Immutable
-  public interface FwRedundentMappingValue extends FlowNode {
-    String getValue();
-  } 
 
   @Override
   public FlowBody visitFlBody(FlBodyContext ctx) {
@@ -229,13 +225,13 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
   public FwRedundentMapping visitMapping(MappingContext ctx) {
     return ImmutableFwRedundentMapping.builder()
         .token(token(ctx))
-        .values(nodes(ctx).of(FwRedundentMappingArgs.class).map(e -> e.getValues()).orElse(Collections.emptyList()))
+        .values(nodes(ctx).of(FwRedundentMapping.class).map(e -> e.getValues()).orElse(Collections.emptyList()))
         .build();
   }
 
   @Override
-  public FwRedundentMappingArgs visitMappingArgs(MappingArgsContext ctx) {
-    return ImmutableFwRedundentMappingArgs.builder()
+  public FwRedundentMapping visitMappingArgs(MappingArgsContext ctx) {
+    return ImmutableFwRedundentMapping.builder()
         .token(token(ctx))
         .values(nodes(ctx).list(Mapping.class))
         .build();
@@ -247,27 +243,25 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     return ImmutableMapping.builder()
         .token(token(ctx))
         .left(nodes.of(TypeName.class).get().getValue())
-        .right(nodes.of(FwRedundentMappingValue.class).get().getValue())
+        .right(nodes.of(MappingValue.class).get())
         .build();
   }
 
   @Override
-  public FwRedundentMappingValue visitMappingValue(MappingValueContext ctx) {
-    AstNode first = first(ctx);
-    String value;
-    if(first instanceof Literal) {
-      value = ((Literal) first).getValue();
-    } else if(first instanceof TypeName) {
-      value = ((TypeName) first).getValue();
+  public MappingValue visitMappingValue(MappingValueContext ctx) {
+    Nodes nodes = nodes(ctx);
+    AstNode.Token token = token(ctx);
+    
+    if(nodes.of(Literal.class).isPresent()) {
+      return ImmutableMappingLiteral.builder().token(token).value(nodes.of(Literal.class).get()).build();
+    } else if(nodes.of(TypeName.class).isPresent()) {
+      return ImmutableMappingTypeName.builder().token(token).value(nodes.of(TypeName.class).get()).build();
+    } else if(nodes.of(FwRedundentMapping.class).isPresent()) {
+      return ImmutableMappingArray.builder().token(token).values(nodes.of(FwRedundentMapping.class).get().getValues()).build();
     } else {
       // TODO:: error handling
       throw new AstNodeException("Unknown mapping value: " + ctx.getText() + "!");
     }
-    
-    return ImmutableFwRedundentMappingValue.builder()
-        .token(token(ctx))
-        .value(value)
-        .build();
   }
 
   @Override
