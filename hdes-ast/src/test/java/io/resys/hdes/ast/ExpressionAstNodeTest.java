@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
-import io.resys.hdes.ast.spi.visitors.loggers.HdesParserConsoleVisitor;
 
 public class ExpressionAstNodeTest {
   @Test
@@ -102,7 +101,7 @@ public class ExpressionAstNodeTest {
     HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.enBody();
-    tree.accept(new HdesParserConsoleVisitor());
+    //tree.accept(new HdesParserConsoleVisitor());
     tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
   }
 

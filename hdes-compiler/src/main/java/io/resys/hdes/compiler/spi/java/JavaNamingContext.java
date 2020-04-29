@@ -103,18 +103,8 @@ public class JavaNamingContext implements NamingContext {
     }
 
     @Override
-    public ClassName inputSuperinterface(DecisionTableBody node) {
-      return ClassName.get(DecisionTable.DecisionTableInput.class);
-    }
-
-    @Override
     public ClassName output(DecisionTableBody node) {
       return output(node.getId());
-    }
-
-    @Override
-    public ClassName outputSuperinterface(DecisionTableBody node) {
-      return ClassName.get(DecisionTable.DecisionTableOutput.class);
     }
 
     @Override
@@ -126,10 +116,10 @@ public class JavaNamingContext implements NamingContext {
       return ClassName.get(parent.dt, node);
     }
     public ClassName input(String node) {
-      return ClassName.get(parent.dt + "." + node, node + "Input");
+      return ClassName.get(parent.dt + "." + node, node + "In");
     }
     public ClassName output(String node) {
-      return ClassName.get(parent.dt + "." + node, node + "Output");
+      return ClassName.get(parent.dt + "." + node, node + "Out");
     }
 
     @Override
@@ -171,12 +161,12 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public ClassName input(FlowBody node) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + "Input");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId() + "In");
     }
 
     @Override
     public ClassName output(FlowBody node) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + "Output");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId() + "Out");
     }
 
     @Override
@@ -186,12 +176,12 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public TypeName superinterface(FlowBody node) {
-      return ParameterizedTypeName.get(ClassName.get(Flow.class), input(node), state(node));
+      return ParameterizedTypeName.get(ClassName.get(Flow.class), input(node), output(node), state(node));
     }
 
     @Override
     public TypeName stateSuperinterface(FlowBody node) {
-      return ParameterizedTypeName.get(ClassName.get(FlowState.class), input(node));
+      return ParameterizedTypeName.get(ClassName.get(FlowState.class), input(node), output(node));
     }
 
     @Override
@@ -203,7 +193,12 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public ClassName input(FlowBody node, ObjectTypeDefNode object) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + JavaSpecUtil.capitalize(object.getName()) + "Input");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId() + JavaSpecUtil.capitalize(object.getName()) + "In");
+    }
+    
+    @Override
+    public ClassName output(FlowBody node, ObjectTypeDefNode object) {
+      return ClassName.get(interfaze(node).canonicalName(), node.getId() + JavaSpecUtil.capitalize(object.getName()) + "Out");
     }
 
     @Override

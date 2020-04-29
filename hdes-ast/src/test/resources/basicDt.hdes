@@ -2,8 +2,9 @@ define decision-table: basic
 headers: {
   name STRING required IN,
   lastName STRING required IN,
+  type INTEGER required IN,
   value INTEGER required OUT 
 } MATRIX: {
-  { ?, ?, 20 },
-  { not 'bob' or 'sam', 'woman', 4570 }
+  { ?, ?, between 1 and 30, 20 },
+  { not 'bob' or 'sam', 'woman', ?, 4570 }
 }

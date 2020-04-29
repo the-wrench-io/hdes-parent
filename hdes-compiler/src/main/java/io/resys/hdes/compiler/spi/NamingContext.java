@@ -43,11 +43,11 @@ public interface NamingContext {
     ClassName impl(DecisionTableBody node);
     
     ClassName input(DecisionTableBody node);
-    ClassName inputSuperinterface(DecisionTableBody node);
+   // ClassName inputSuperinterface(DecisionTableBody node);
     
     ClassName output(DecisionTableBody node);
     ClassName outputEntry(DecisionTableBody node);
-    ClassName outputSuperinterface(DecisionTableBody node);
+    //ClassName outputSuperinterface(DecisionTableBody node);
   }
  
   interface FlNamingContext {
@@ -65,10 +65,12 @@ public interface NamingContext {
     TypeName stateSuperinterface(FlowBody node);
     
     ClassName impl(FlowBody node);
+    
     ClassName input(FlowBody node);
     ClassName input(FlowBody node, ObjectTypeDefNode object);
     
     ClassName output(FlowBody node);
+    ClassName output(FlowBody node, ObjectTypeDefNode object);
     
     ClassName taskState(FlowBody body, FlowTaskNode task);
     TypeName taskStateSuperinterface(FlowBody body, FlowTaskNode task);

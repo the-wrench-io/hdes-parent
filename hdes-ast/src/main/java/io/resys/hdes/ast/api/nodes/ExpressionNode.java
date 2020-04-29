@@ -28,7 +28,10 @@ import org.immutables.value.Value;
 public interface ExpressionNode extends AstNode {
   enum AdditiveType { ADD, SUBSTRACT }
   enum MultiplicativeType { DIVIDE, MULTIPLY }
-  enum EqualityType { NOTEQUAL("!="), EQUAL("="), LESS("<"), LESS_THEN("<="), GREATER(">"), GREATER_THEN(">=");
+  enum EqualityType { 
+    NOTEQUAL("!="), EQUAL("="), 
+    LESS("<"), LESS_THEN("<="), 
+    GREATER(">"), GREATER_THEN(">=");
     
     private final String value;
     

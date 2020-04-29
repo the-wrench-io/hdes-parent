@@ -24,11 +24,9 @@
         </configuration>
         <executions>
           <execution>
-          <phase>generate-resources</phase>
             <goals>
               <goal>hdes</goal>
             </goals>
-            
           </execution>
         </executions>
       </plugin>

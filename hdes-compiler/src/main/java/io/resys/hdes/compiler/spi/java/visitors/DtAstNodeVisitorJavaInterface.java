@@ -41,6 +41,7 @@ import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
+import io.resys.hdes.compiler.api.DecisionTable;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
@@ -73,10 +74,10 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
         .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
     
     TypeSpec.Builder inputBuilder = from.apply(naming.dt().input(body))
-        .addSuperinterface(naming.dt().inputSuperinterface(body));
+        .addSuperinterface(DecisionTable.DecisionTableInput.class);
     
     TypeSpec.Builder outputBuilder = from.apply(naming.dt().outputEntry(body))
-        .addSuperinterface(naming.dt().outputSuperinterface(body));
+        .addSuperinterface(DecisionTable.DecisionTableOutput.class);
     
     for(TypeDefNode header : node.getValues()) {
       MethodSpec method = visitHeader(header).getValue();
@@ -95,7 +96,7 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     if (isCollection) {
       ParameterizedTypeName returnType = ParameterizedTypeName.get(ClassName.get(Collection.class), naming.dt().outputEntry(body));
       TypeSpec collectionOutput = from.apply(naming.dt().output(body))
-        .addSuperinterface(naming.dt().outputSuperinterface(body))
+        .addSuperinterface(DecisionTable.DecisionTableOutput.class)
         .addMethod(MethodSpec.methodBuilder(JavaSpecUtil.getMethodName("values"))
           .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
           .returns(returnType)

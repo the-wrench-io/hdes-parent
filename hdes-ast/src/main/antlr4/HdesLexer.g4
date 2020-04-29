@@ -17,7 +17,8 @@ ScalarType
 BETWEEN: B E T W E E N;
 AND: A N D;
 OR: O R;
-NOT_OP: N O T;
+NOT_OP: 'not';
+
 fragment A : [aA];
 fragment B : [bB];
 fragment D : [dD];

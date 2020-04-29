@@ -17,20 +17,22 @@ rules: ruleValue (',' ruleValue)*;
 
 ruleValue: ruleUndefinedValue | ruleMatchingExpression | ruleEqualityExpression;
 
-ruleMatchingExpression: (NOT_OP)? ruleMatchingOrExpression;
+ruleMatchingExpression: 'not'? ruleMatchingOrExpression;
 ruleMatchingOrExpression: literal (OR literal)*;
 
 ruleEqualityExpression
   : ruleRelationalExpression 
   | ruleRelationalExpression AND ruleRelationalExpression
-  | ruleRelationalExpression OR ruleRelationalExpression;
+  | ruleRelationalExpression OR ruleRelationalExpression
+  | BETWEEN ruleUnaryExpression AND ruleUnaryExpression;
 
 ruleRelationalExpression
-  : '=' literal
-  | '!=' literal
-  | '<' literal
-  | '<=' literal
-  | '>' literal
-  | '>=' literal;
+  : '=' ruleUnaryExpression
+  | '!=' ruleUnaryExpression
+  | '<' ruleUnaryExpression
+  | '<=' ruleUnaryExpression
+  | '>' ruleUnaryExpression
+  | '>=' ruleUnaryExpression;
 
+ruleUnaryExpression:  '-' ruleUnaryExpression | literal;
 ruleUndefinedValue: '?';

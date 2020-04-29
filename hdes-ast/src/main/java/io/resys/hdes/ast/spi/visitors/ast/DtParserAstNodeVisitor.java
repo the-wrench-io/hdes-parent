@@ -62,6 +62,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ImmutableAndOperation;
+import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableDecisionTableBody;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableExpressionValue;
@@ -161,7 +162,18 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
       return first(ctx);
     }
     
-    AstNode left = ctx.getChild(0).accept(this);
+    ParseTree first = ctx.getChild(0);
+    if (first instanceof TerminalNode &&
+        ((TerminalNode) first).getSymbol().getType() == HdesParser.BETWEEN) {      
+      AstNode.Token token = token(ctx);
+      return ImmutableBetweenExpression.builder()
+          .token(token)
+          .value(ImmutableHeaderRefValue.builder().token(token).build())
+          .left(ctx.getChild(1).accept(this)).right(ctx.getChild(3).accept(this))
+          .build();
+    }
+    
+    AstNode left = first.accept(this);
     TerminalNode v = (TerminalNode) ctx.getChild(1);
     AstNode right = ctx.getChild(2).accept(this);
     
