@@ -11,37 +11,15 @@ headers: {
   }
 }
 tasks: {
-// task 1
   firstTask: {
     then: switch
-    
-    // decision/service/flow
-    decision-table: BestDt uses: {
-      name: arg1,
-      lastName: arg2
-    }
-    
-  },
+    decision-table: BestDt uses: { name: arg1, lastName: arg2 } },
   
-// task 2
   switch: {
     when: arg1 > 10 then: secondTask,
-    
-    when: ? then: end as: {
-      name: arg1,
-      lastName: arg2
-    }
-    
-  },
+    when: ? then: end as: { name: arg1, lastName: arg2 } },
 
-// task 3
   secondTask: {
     then: end as: { }
-    
-    // decision/service/flow
-    decision-table: Best2Dt uses: {
-      name: arg1,
-      lastName: arg2
-    }
-  }
+    decision-table: Best2Dt uses: { name: arg1, lastName: arg2 } }
 }

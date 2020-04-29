@@ -37,6 +37,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
+import io.resys.hdes.ast.api.nodes.FlowNode.MappingValue;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
@@ -209,8 +210,8 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     CodeBlock.Builder codeBlock = CodeBlock.builder()
         .add("$T input = $T.builder()", input, naming.immutable(input));
     for(Mapping mapping : ref.getMapping()) {
-      String right = JavaSpecUtil.getMethodCall(mapping.getRight());
-      codeBlock.add("\r\n  ").add(".$L(before.$L)", mapping.getLeft(), right);
+      //String right = JavaSpecUtil.getMethodCall(mapping.getRight());
+      //codeBlock.add("\r\n  ").add(".$L(before.$L)", mapping.getLeft(), right);
     }
     
     codeBlock
@@ -281,8 +282,8 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     CodeBlock.Builder codeBlock = CodeBlock.builder()
         .add("$T end = $T.builder()", flowOutput, naming.immutable(flowOutput));
     for(Mapping mapping : node.getValues()) {
-      String right = JavaSpecUtil.getMethodCall(mapping.getRight());
-      codeBlock.add("\r\n  ").add(".$L(after.$L)", mapping.getLeft(), right);
+      //String right = JavaSpecUtil.getMethodCall(mapping.getRight());
+      //codeBlock.add("\r\n  ").add(".$L(after.$L)", mapping.getLeft(), right);
     }
     codeBlock.add("\r\n")
     .addStatement("  .build()")
@@ -317,5 +318,11 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
       methods.addAll(spec.getThen().getValues());
     }
     return ImmutableFlTaskVisitSpec.builder().value(codeBlock.build()).addAllValues(methods).build();
+  }
+  
+  @Override
+  public FlJavaSpec visitMappingValue(MappingValue node) {
+    // TODO Auto-generated method stub
+    return super.visitMappingValue(node);
   }
 }

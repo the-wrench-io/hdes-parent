@@ -25,31 +25,19 @@ headers: {
 tasks: {
   DetermineInvoiceAction: {
     then: HandleInvoiceActionType
-    decision-table: InvoiceActionDt uses: {
-      dueDate: dueDate,
-      targetDate: invoices.targetDate
-    }
-  } from invoices then end as: { resultId: 'super good' }
+    decision-table: InvoiceActionDt uses: { dueDate: dueDate, targetDate: invoices.targetDate }
+  } from invoices then: end as: { resultId: 'super good' },
   
   HandleInvoiceActionType: {
     when: InvoiceAction.type = 'overdue' then: HandleOverdue,
     when: InvoiceAction.type = 'reminder' then: HandleReminder,
     when: InvoiceAction.type = 'cutoff' then: HandleCutoff,
-    when: ? then: end as: {
-      name: arg1,
-      lastName: arg2
-    }
-  }
+    when: ? then: end as: { name: arg1, lastName: arg2 } },
 
   HandleOverdue: {
-    then: end as: { result: { id: invoice.id, action: InvoiceAction.type, clientId: clientId } }
-  }
+    then: end as: { result: { id: invoice.id, action: InvoiceAction.type, clientId: clientId } } },
   
-  HandleReminder: {
-    then: end as: { }
-  }
+  HandleReminder: { then: end as: { } },
   
-  HandleCutoff: {
-    then: end as: { }
-  }
+  HandleCutoff: { then: end as: { } }
 }
