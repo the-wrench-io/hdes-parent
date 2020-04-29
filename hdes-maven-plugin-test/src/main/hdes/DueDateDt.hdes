@@ -1,0 +1,12 @@
+define decision-table: DueDateDT description: 'uber dt'
+headers: {
+  targetDate      DATE required IN,
+  dueDate         DATE required IN,
+  daysTilDueDate  INTEGER optional IN FORMULA: targetDate - dueDate,
+  type            STRING required OUT
+} ALL: {
+  { ?, ?, > 10,              'cutoff'   },
+  { ?, ?, < 10,              'overdue'  },
+  { ?, ?, between -5 and -2, 'reminder' },
+  { ?, ?, ?,                 'normal'   }
+}
