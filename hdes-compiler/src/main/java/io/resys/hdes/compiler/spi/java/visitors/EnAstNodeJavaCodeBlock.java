@@ -98,7 +98,7 @@ public class EnAstNodeJavaCodeBlock implements ExpressionAstNodeVisitor<CodeBloc
     default: throw new HdesCompilerException(HdesCompilerException.builder().unknownExpressionOperation(node));
     }
     return CodeBlock.builder()
-        .add(operation, "when()", visit(node.getLeft()), visit(node.getRight()))
+        .add(operation, "when", visit(node.getLeft()), visit(node.getRight()))
         .build();
   }
 
@@ -119,7 +119,7 @@ public class EnAstNodeJavaCodeBlock implements ExpressionAstNodeVisitor<CodeBloc
 
   @Override
   public CodeBlock visitBetweenExpression(BetweenExpression node) {
-    return CodeBlock.builder().add("when().between($L, $L, $L)", 
+    return CodeBlock.builder().add("when.between($L, $L, $L)", 
         visit(node.getValue()), 
         visit(node.getLeft()), 
         visit(node.getRight())).build();

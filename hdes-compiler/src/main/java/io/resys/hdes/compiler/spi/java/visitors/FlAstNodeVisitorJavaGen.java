@@ -27,6 +27,7 @@ import javax.lang.model.element.Modifier;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeSpec;
@@ -45,8 +46,10 @@ import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.compiler.api.Flow.ExecutionStatusType;
 import io.resys.hdes.compiler.api.Flow.FlowExecutionLog;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.api.HdesWhen;
 import io.resys.hdes.compiler.api.ImmutableFlowExecutionLog;
 import io.resys.hdes.compiler.spi.NamingContext;
+import io.resys.hdes.compiler.spi.java.FlowUtil;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.FlJavaSpec.FlTaskVisitSpec;
@@ -58,7 +61,11 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   private final TypeNameRef typeNameRef = (v) -> {
     String value = v.getValue();
     if(value.contains(".")) {
-      return "after." + JavaSpecUtil.getMethodCall(value);
+      int first = value.indexOf(".");
+      return "after." + 
+          JavaSpecUtil.getMethodCall(value.substring(0, first)) + 
+          ".get().getOutput().get()." + 
+          JavaSpecUtil.getMethodCall(value.substring(first + 1));
     }
     return "after.getInput()." + JavaSpecUtil.getMethodCall(value);
   };
@@ -87,11 +94,18 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
       .addModifiers(Modifier.PUBLIC)
       .addParameter(ParameterSpec.builder(naming.fl().input(node), "input").build())
       .returns(flowState)
-      .addStatement("$T after = start(input)", flowState)
+      .addStatement("$T after = start(input).build()", flowState)
       .addCode(taskImpl.getValue())
       .build();
  
     return flowBuilder
+        .addMethod(MethodSpec.constructorBuilder()
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(ParameterSpec.builder(HdesWhen.class, "when").build())
+            .addStatement("this.when = when")
+            .build())
+        .addField(FieldSpec.builder(HdesWhen.class, "when", Modifier.PRIVATE, Modifier.FINAL).build())
+        
         .addMethod(applyMethod)
         .addMethod(startMethod(node))
         .addMethod(endMethod(node))
@@ -114,7 +128,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
           .add("\r\n    ").add(".id($S)", "start")
           .add("\r\n    ").add(".start(System.currentTimeMillis())")
           .add("\r\n    ").add(".build()").build())
-          .add("\r\n  ").addStatement(".build()")
+          .addStatement("")
           .build())
       .build();
   }
@@ -132,7 +146,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
             .add("\r\n  ").add(".log($L)", CodeBlock.builder()
                 .add("$T.builder()", ImmutableFlowExecutionLog.class)
                 .add("\r\n    ").add(".id($S)", "end")
-                .add("\r\n    ").add(".duration(end - start)")
+                .add("\r\n    ").add(".duration(end - $T.getStart(currentState.getLog()))", FlowUtil.class)
                 .add("\r\n    ").add(".end(end)")
                 .add("\r\n    ").add(".parent(currentState.getLog())")
                 .add("\r\n    ").add(".build()").build())

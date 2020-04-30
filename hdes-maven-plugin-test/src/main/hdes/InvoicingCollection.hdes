@@ -26,16 +26,16 @@ tasks: {
 
   DetermineInvoiceAction: {
     then: HandleInvoiceAction
-    decision-table: InvoiceActionDt uses: {
+    decision-table: DueDateDT uses: {
       dueDate: dueDate,
       targetDate: invoices.targetDate
     }
   } from invoices then: end as: { resultId: 'super good' },
   
   HandleInvoiceAction: {
-    when: InvoiceAction.type = 'overdue' then: HandleOverdue,
-    when: InvoiceAction.type = 'reminder' then: HandleReminder,
-    when: InvoiceAction.type = 'cutoff' then: HandleCutoff,
+    when: DetermineInvoiceAction.type = 'overdue' then: HandleOverdue,
+    when: DetermineInvoiceAction.type = 'reminder' then: HandleReminder,
+    when: DetermineInvoiceAction.type = 'cutoff' then: HandleCutoff,
     when: ? then: end as: {
       name: arg1,
       lastName: arg2
