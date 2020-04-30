@@ -1,17 +1,27 @@
 define flow: x description: 'descriptive'
 headers: {
-  arg1.x1 INTEGER optional IN,
-  arg2.x1 INTEGER required IN
+  id INTEGER optional IN,
+  externalId INTEGER required IN,
+  elements ARRAY of OBJECT required IN: {
+    value STRING required IN
+  },
+  output ARRAY of OBJECT required OUT: {
+    value STRING required OUT
+  }
 }
 tasks: {
-  firstTask: {
-    then: endTask
+  FirstTask: {
+    then: HandleElement
     decision-table: bestDtTask uses: {
-      name: arg1.x1,
-      lastName: arg2.x1
+      name: elements.value
     }
-  }, 
-  endTask: {
+  } from elements then: EndTask,
+  
+  HandleElement: {
+    then: end as: { output: { value: FirstTask.dtOutput }}
+  },
+  
+  EndTask: {
     then: end as: { input1: arg1.x1, input2: arg2.x1 }
   }
 }

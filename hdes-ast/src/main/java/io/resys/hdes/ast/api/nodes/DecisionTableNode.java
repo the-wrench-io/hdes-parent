@@ -73,6 +73,11 @@ public interface DecisionTableNode extends AstNode {
   interface LiteralValue extends RuleValue {
     Literal getValue();
   }
+
+  @Value.Immutable
+  interface NegateLiteralValue extends RuleValue {
+    Literal getValue();
+  }
   
   @Value.Immutable
   interface ExpressionValue extends RuleValue {

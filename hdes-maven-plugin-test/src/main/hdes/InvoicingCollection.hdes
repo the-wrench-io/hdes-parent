@@ -4,14 +4,14 @@ define flow: InvoicingCollection description: 'Flow for overdue/reminder invoice
 headers: {
   clientId STRING optional IN,
   clientName STRING optional IN,
-  targetDate: DATE_TIME optional IN,
+  targetDate DATE_TIME optional IN,
   
   invoices ARRAY of OBJECT optional IN: {
     id STRING required IN,
     type STRING required IN,
     amount DECIMAL required IN,
     dueDate DATE_TIME optional IN
-  }
+  },
   
   resultId STRING optional OUT,
   
@@ -23,13 +23,14 @@ headers: {
 }
 
 tasks: {
+
   DetermineInvoiceAction: {
     then: HandleInvoiceAction
     decision-table: InvoiceActionDt uses: {
       dueDate: dueDate,
       targetDate: invoices.targetDate
     }
-  } from invoices then end as: { resultId: 'super good' }
+  } from invoices then: end as: { resultId: 'super good' },
   
   HandleInvoiceAction: {
     when: InvoiceAction.type = 'overdue' then: HandleOverdue,
@@ -43,11 +44,11 @@ tasks: {
 
   HandleOverdue: {
     then: end as: { result: { id: invoice.id, action: InvoiceAction.type, clientId: clientId } }
-  }
+  },
   
   HandleReminder: {
     then: end as: { }
-  }
+  },
   
   HandleCutoff: {
     then: end as: { }

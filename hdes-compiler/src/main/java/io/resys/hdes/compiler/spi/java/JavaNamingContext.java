@@ -57,11 +57,14 @@ public class JavaNamingContext implements NamingContext {
   
   @Override
   public ClassName immutable(ClassName src) {
-    return ClassName.get(src.packageName(), "Immutable" + src.simpleName());
+    String pkg = src.packageName();
+    String top = pkg.substring(0, pkg.lastIndexOf("."));
+    return ClassName.get(top, "Immutable" + src.simpleName());
   }
   @Override
   public ClassName immutableBuilder(ClassName src) {
-    return ClassName.get(src.packageName(), "Immutable" + src.simpleName() + ".Builder");
+    ClassName type = immutable(src);
+    return ClassName.get(type.packageName(), type.simpleName() + ".Builder");
   }  
   @Override
   public FlNamingContext fl() {

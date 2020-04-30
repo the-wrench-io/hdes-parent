@@ -1,7 +1,6 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,9 +105,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
         .addAnnotation(Value.Immutable.class)
         .addSuperinterface(naming.fl().taskStateSuperinterface(body, node));
 
-    List<TypeSpec> children = node.getNext()
-        .map(e -> visitTaskPointer(e).getChildren())
-        .orElse(Collections.emptyList());
+    List<TypeSpec> children = visitTaskPointer(node.getNext()).getChildren();
 
     return ImmutableFlTaskSpec.builder()
         .addAllChildren(children)

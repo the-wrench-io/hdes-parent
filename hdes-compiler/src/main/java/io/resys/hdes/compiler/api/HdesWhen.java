@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 /*-
  * #%L
@@ -26,6 +27,9 @@ import java.time.LocalTime;
  */
 
 public interface HdesWhen {
+  //string
+  List<String> asList(String ... values);
+  
   //integer
   boolean lt(int arg0, int arg1);
   boolean lte(int arg0, int arg1);
@@ -33,6 +37,7 @@ public interface HdesWhen {
   boolean gte(int arg0, int arg1);
   boolean eq(int arg0, int arg1);
   boolean neq(int arg0, int arg1);
+  boolean between(int arg, int left, int right);
   
   //big decimal
   boolean lt(BigDecimal arg0, BigDecimal arg1);
@@ -41,6 +46,7 @@ public interface HdesWhen {
   boolean gte(BigDecimal arg0, BigDecimal arg1);
   boolean eq(BigDecimal arg0, BigDecimal arg1);
   boolean neq(BigDecimal arg0, BigDecimal arg1);
+  boolean between(BigDecimal arg, BigDecimal left, BigDecimal right);
   
   //date
   boolean lt(LocalDate arg0, LocalDate arg1);
@@ -49,6 +55,7 @@ public interface HdesWhen {
   boolean gte(LocalDate arg0, LocalDate arg1);
   boolean eq(LocalDate arg0, LocalDate arg1);
   boolean neq(LocalDate arg0, LocalDate arg1);
+  boolean between(LocalDate arg, LocalDate left, LocalDate right);
   
   //time
   boolean lt(LocalTime arg0, LocalTime arg1);
@@ -57,6 +64,7 @@ public interface HdesWhen {
   boolean gte(LocalTime arg0, LocalTime arg1);
   boolean eq(LocalTime arg0, LocalTime arg1);
   boolean neq(LocalTime arg0, LocalTime arg1);
+  boolean between(LocalTime arg, LocalTime left, LocalTime right);
   
   //date time
   boolean lt(LocalDateTime arg0, LocalDateTime arg1);
@@ -64,5 +72,6 @@ public interface HdesWhen {
   boolean gt(LocalDateTime arg0, LocalDateTime arg1);
   boolean gte(LocalDateTime arg0, LocalDateTime arg1);
   boolean eq(LocalDateTime arg0, LocalDateTime arg1);
-  boolean neq(LocalDateTime arg0, LocalDateTime arg1); 
+  boolean neq(LocalDateTime arg0, LocalDateTime arg1);
+  boolean between(LocalDateTime arg, LocalDateTime left, LocalDateTime right);
 }

@@ -35,6 +35,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.InOperation;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.LiteralValue;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.NegateLiteralValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.UndefinedValue;
@@ -58,6 +59,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.TypeRefNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowInputs;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowLoop;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowOutputs;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
@@ -138,8 +140,11 @@ public interface AstNodeVisitor<T, R> {
     T visitRule(Rule node);
     T visitUndefinedValue(UndefinedValue node);
     T visitLiteralValue(LiteralValue node);
+    T visitNegateLiteralValue(NegateLiteralValue node);
+    
     T visitExpressionValue(ExpressionValue node);
     T visitEqualityOperation(EqualityOperation node);
+    T visitBetweenExpression(BetweenExpression node);
     T visitAndOperation(AndOperation node);
     T visitOrOperation(OrOperation node);
     T visitInOperation(InOperation node);
@@ -158,12 +163,13 @@ public interface AstNodeVisitor<T, R> {
     T visitWhenThenPointer(WhenThenPointer node);
     T visitThenPointer(ThenPointer node);
     T visitEndPointer(EndPointer node);
+    T visitLoop(FlowLoop node);
     
     T visitWhenThen(WhenThen node);
     T visitWhen(ExpressionBody node);
     T visitMapping(FlowTaskNode node);
     T visitMappingValue(MappingValue node);
-    T visitTaskRef(FlowTaskNode nodeWithRef);
+    T visitTaskRef(FlowTaskNode node);
   }
   
   // mt

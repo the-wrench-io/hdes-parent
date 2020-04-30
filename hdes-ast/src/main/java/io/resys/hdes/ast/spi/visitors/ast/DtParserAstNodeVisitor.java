@@ -40,6 +40,7 @@ import io.resys.hdes.ast.HdesParser.RuleEqualityExpressionContext;
 import io.resys.hdes.ast.HdesParser.RuleMatchingExpressionContext;
 import io.resys.hdes.ast.HdesParser.RuleMatchingOrExpressionContext;
 import io.resys.hdes.ast.HdesParser.RuleRelationalExpressionContext;
+import io.resys.hdes.ast.HdesParser.RuleUnaryExpressionContext;
 import io.resys.hdes.ast.HdesParser.RuleUndefinedValueContext;
 import io.resys.hdes.ast.HdesParser.RuleValueContext;
 import io.resys.hdes.ast.HdesParser.RulesContext;
@@ -72,6 +73,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyMatrix;
 import io.resys.hdes.ast.api.nodes.ImmutableInOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteralValue;
+import io.resys.hdes.ast.api.nodes.ImmutableNegateLiteralValue;
 import io.resys.hdes.ast.api.nodes.ImmutableNotUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableOrOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableRule;
@@ -296,6 +298,19 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
         .token(token(ctx))
         .text(ctx.getStart().getInputStream().getText(new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex())))
         .rules(rules)
+        .build();
+  }
+  
+  @Override
+  public AstNode visitRuleUnaryExpression(RuleUnaryExpressionContext ctx) {
+    Nodes nodes = nodes(ctx);
+    Literal literal = nodes.of(Literal.class).get();
+    if(ctx.getChildCount() == 1) {
+      return literal;
+    }
+    return ImmutableNegateLiteralValue.builder()
+        .token(token(ctx))
+        .value(literal)
         .build();
   }
 }

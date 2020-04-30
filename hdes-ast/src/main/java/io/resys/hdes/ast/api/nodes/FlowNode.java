@@ -55,9 +55,16 @@ public interface FlowNode extends AstNode {
   @Value.Immutable
   interface FlowTaskNode extends FlowNode {
     String getId();
-    Optional<FlowTaskPointer> getNext();
+    FlowTaskPointer getNext();
     Optional<TaskRef> getRef();
+    Optional<FlowLoop> getLoop();
   }
+  
+  @Value.Immutable
+  interface FlowLoop extends FlowNode {
+    TypeName getArrayName();
+    FlowTaskPointer getNext();
+  } 
   
   @Value.Immutable
   interface WhenThenPointer extends FlowTaskPointer {

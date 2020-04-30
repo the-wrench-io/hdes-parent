@@ -32,12 +32,14 @@ import org.immutables.value.Value;
 
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowLoop;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThen;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
+import io.resys.hdes.ast.api.nodes.ImmutableFlowLoop;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTaskNode;
 import io.resys.hdes.ast.api.nodes.ImmutableThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenThen;
@@ -75,65 +77,62 @@ public class FlowTreePointerParser {
     if (createdTasks.containsKey(task.getId())) {
       return createdTasks.get(task.getId());
     }
-    Optional<FlowTaskPointer> next = task.getNext();
-    if (!next.isPresent()) {
-      createdTasks.put(task.getId(), task);
-      return task;
-    }
-    next = visit(next.get());
-    FlowTaskNode clone = ImmutableFlowTaskNode.builder().from(task).next(next).build();
+
+    FlowTaskPointer next = visit(task.getNext());
+    Optional<FlowLoop> loop = task.getLoop()
+        .map(l -> ImmutableFlowLoop.builder().from(l).next(visit(l.getNext())).build()); 
+    
+    FlowTaskNode clone = ImmutableFlowTaskNode.builder()
+        .from(task)
+        .next(next)
+        .loop(loop)
+        .build();
+    
     createdTasks.put(clone.getId(), clone);
     return clone;
   }
 
-  private Optional<FlowTaskPointer> visit(FlowTaskPointer pointer) {
+  private FlowTaskPointer visit(FlowTaskPointer pointer) {
     if(pointer instanceof WhenThenPointer) {
       return visit((WhenThenPointer) pointer);
     } else if(pointer instanceof ThenPointer) {
       return visit((ThenPointer) pointer);
     } else if(pointer instanceof EndPointer) {
-      return Optional.of(pointer);
+      return pointer;
     }
     // TODO : error handling
     throw new AstNodeException("Unknown pointer: " + pointer + "!");
   }
   
-  private Optional<FlowTaskPointer> visit(WhenThenPointer pointer) {
+  private FlowTaskPointer visit(WhenThenPointer pointer) {
     List<WhenThen> values = new ArrayList<>();    
     for(WhenThen src : pointer.getValues()) {
-      Optional<WhenThen> result = visit(src);
-      
-      // TODO : error handling
-      if(result.isPresent()) {
-        values.add(result.get());
-      }
-      
-    }
-    if(values.isEmpty()) {
-      return Optional.empty();
+      WhenThen result = visit(src);
+      values.add(result);
     }
     
-    return Optional.of(ImmutableWhenThenPointer.builder()
+    return ImmutableWhenThenPointer.builder()
         .from(pointer)
         .values(values)
-        .build());
+        .build();
   }
 
-  private Optional<WhenThen> visit(WhenThen pointer) {
-    Optional<FlowTaskPointer> then = visit(pointer.getThen());
-    return Optional.of(ImmutableWhenThen.builder().from(pointer).then(then.get()).build());
+  private WhenThen visit(WhenThen pointer) {
+    FlowTaskPointer then = visit(pointer.getThen());
+    return ImmutableWhenThen.builder().from(pointer).then(then).build();
   }
-  private Optional<FlowTaskPointer> visit(ThenPointer pointer) {
+  
+  private FlowTaskPointer visit(ThenPointer pointer) {
     String taskName = pointer.getName();
     
     if(createdTasks.containsKey(taskName)) {
-      return Optional.of(ImmutableThenPointer.builder().from(pointer).task(createdTasks.get(taskName)).build());
+      return ImmutableThenPointer.builder().from(pointer).task(createdTasks.get(taskName)).build();
     } else if(sourceTasks.containsKey(taskName)) {
       FlowTaskNode src = sourceTasks.get(taskName);
       FlowTaskNode result = visit(src);
-      return Optional.of(ImmutableThenPointer.builder().from(pointer).task(result).build());
+      return ImmutableThenPointer.builder().from(pointer).task(result).build();
     } else if(taskName.equalsIgnoreCase("end")) {
-      return Optional.of(pointer);
+      return pointer;
     }
     
     StringBuilder message = new StringBuilder()
@@ -151,24 +150,5 @@ public class FlowTreePointerParser {
         .message(message.toString())
         .target(pointer)
         .build()));
-//    return Optional.empty();
-  }  
-//  Map<String, FlowTask> tasksById = new HashMap<>();
-//  
-//  redundentTasks.getValues().stream()
-//  .collect(Collectors.toMap(e -> e.getId(), e -> e));
-//  
-//  FlowTask first = null;
-//  for(FlowTask task : redundentTasks.getValues()) {
-//    if(!task.getNext().isPresent()) {
-//      continue;
-//    }
-//    FlowTaskPointer pointer = task.getNext().get();
-//    
-//    if(pointer instanceof ) {
-//      
-//    }
-//    
-//  }
-//  
+  }
 }

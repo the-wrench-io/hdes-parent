@@ -31,6 +31,7 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.HdesParser.EndMappingContext;
 import io.resys.hdes.ast.HdesParser.FlBodyContext;
+import io.resys.hdes.ast.HdesParser.FromPointerContext;
 import io.resys.hdes.ast.HdesParser.MappingArgContext;
 import io.resys.hdes.ast.HdesParser.MappingArgsContext;
 import io.resys.hdes.ast.HdesParser.MappingContext;
@@ -54,6 +55,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.FlowNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowLoop;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
@@ -65,6 +67,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.WhenThenPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableEndPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowInputs;
+import io.resys.hdes.ast.api.nodes.ImmutableFlowLoop;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowOutputs;
 import io.resys.hdes.ast.api.nodes.ImmutableFlowTaskNode;
 import io.resys.hdes.ast.api.nodes.ImmutableMapping;
@@ -167,8 +170,18 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
     return ImmutableFlowTaskNode.builder()
         .token(token(ctx))
         .id(nodes.of(TypeName.class).get().getValue())
-        .next(nodes.of(FlowTaskPointer.class))
+        .next(nodes.of(FlowTaskPointer.class).get())
         .ref(nodes.of(TaskRef.class))
+        .loop(nodes.of(FlowLoop.class))
+        .build();
+  }
+  @Override
+  public FlowLoop visitFromPointer(FromPointerContext ctx) {
+    Nodes nodes = nodes(ctx);
+    return ImmutableFlowLoop.builder()
+        .token(token(ctx))
+        .arrayName(nodes.of(TypeName.class).get())
+        .next(nodes.of(FlowTaskPointer.class).get())
         .build();
   }
   

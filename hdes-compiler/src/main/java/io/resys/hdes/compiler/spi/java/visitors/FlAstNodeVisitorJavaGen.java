@@ -152,16 +152,15 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
     
     // next
     String methodName = "visit" + node.getId();
-    List<MethodSpec> children = new ArrayList<>();
-    if(node.getNext().isPresent()) {
-      FlTaskVisitSpec next = visitTaskPointer(node.getNext().get());
-      codeblock.add(next.getValue());
-      for(MethodSpec method : next.getValues()) {
-        if(!children.stream().filter(m -> m.name.equals(method.name)).findFirst().isPresent()) {
-          children.add(method);          
-        }
+    List<MethodSpec> children = new ArrayList<>();    
+    FlTaskVisitSpec next = visitTaskPointer(node.getNext());
+    codeblock.add(next.getValue());
+    for(MethodSpec method : next.getValues()) {
+      if(!children.stream().filter(m -> m.name.equals(method.name)).findFirst().isPresent()) {
+        children.add(method);          
       }
     }
+    
     return ImmutableFlTaskVisitSpec.builder()
         .value(CodeBlock.builder().addStatement("return $L(after)", methodName).build())
         .addValues(MethodSpec

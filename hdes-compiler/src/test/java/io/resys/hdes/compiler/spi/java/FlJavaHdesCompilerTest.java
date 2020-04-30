@@ -38,7 +38,7 @@ public class FlJavaHdesCompilerTest {
         .add("SimpleFlow.hdes", file("SimpleFlow.hdes"))
     .build();
     
-    System.out.println(code.getValues().get(0).getTarget());
+    //System.out.println(code.getValues().get(0).getTarget());
     //System.out.println(code.getValues().get(1).getTarget());
   }
 
