@@ -29,6 +29,7 @@ import javax.lang.model.element.Modifier;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Immutable;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -67,6 +68,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
     
     TypeSpec.Builder flowBuilder = TypeSpec.interfaceBuilder(naming.fl().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", FlAstNodeVisitorJavaInterface.class.getCanonicalName()).build())
         .addSuperinterface(naming.fl().superinterface(node))
         .addTypes(visitInputs(node.getInputs()).getValues())
         .addTypes(visitOutputs(node.getOutputs()).getValues());

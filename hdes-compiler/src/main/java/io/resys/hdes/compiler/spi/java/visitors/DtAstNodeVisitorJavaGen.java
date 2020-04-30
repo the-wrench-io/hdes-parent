@@ -29,6 +29,7 @@ import java.util.List;
 
 import javax.lang.model.element.Modifier;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -84,6 +85,8 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(naming.dt().interfaze(node))
         .addJavadoc(node.getDescription().orElse(""))
+        .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "$S", "unused").build())
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", DtAstNodeVisitorJavaGen.class.getCanonicalName()).build())
         .addMethod(MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC)
             .addParameter(ParameterSpec.builder(HdesWhen.class, "when").build())
@@ -109,10 +112,11 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         .addStatement("$T<$T> result = new $T<>()", List.class, naming.dt().outputEntry(body), ArrayList.class);
     for (RuleRow row : node.getRows()) {
       DtCodeSpecPair pair = visitRuleRow(row);
+      statements.add("\r\n/** \r\n * $L \r\n */\r\n", row.getText());
       if (pair.getKey().isEmpty()) {
         statements.addStatement("result.add($L)", pair.getValue());
       } else {
-        statements.add("\r\n/** \r\n * $L \r\n */\r\n", row.getText())
+        statements
             .beginControlFlow("if($L)", pair.getKey())
             .addStatement("result.add($L)", pair.getValue())
             .endControlFlow();

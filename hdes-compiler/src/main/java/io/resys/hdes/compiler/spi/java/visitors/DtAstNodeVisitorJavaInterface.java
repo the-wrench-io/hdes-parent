@@ -30,6 +30,7 @@ import javax.lang.model.element.Modifier;
 
 import org.immutables.value.Value.Immutable;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
@@ -62,6 +63,7 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     this.body = node;
     return TypeSpec.interfaceBuilder(naming.dt().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", DtAstNodeVisitorJavaInterface.class.getCanonicalName()).build())
         .addSuperinterface(naming.dt().superinterface(node))
         .addTypes(visitHeaders(node.getHeaders()).getValues()).build();
   }

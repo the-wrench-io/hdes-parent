@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.lang.model.element.Modifier;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -99,6 +100,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
       .build();
  
     return flowBuilder
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", FlAstNodeVisitorJavaGen.class.getCanonicalName()).build())
         .addMethod(MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC)
             .addParameter(ParameterSpec.builder(HdesWhen.class, "when").build())
