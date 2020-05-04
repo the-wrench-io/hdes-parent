@@ -80,7 +80,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>src/main/resources/META-INF/resources</outputDirectory>
+              <outputDirectory>${basedir}/target/classes/META-INF/resources/webjars/${project.artifactId}</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/build</directory>
