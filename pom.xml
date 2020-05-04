@@ -13,42 +13,31 @@
 
   <modules>
     <module>hdes-ast</module>
-    
-    
+
+
     <module>hdes-compiler</module>
     <module>hdes-maven-plugin</module>
-    <module>hdes-maven-plugin-test</module>
-    
-    <module>hdes-object-repo</module>    
-    
-    <!-- 
-    <module>hdes-object-repo-mongodb</module>
-     -->
-    <module>hdes-dev-app-quarkus</module>
 
+    <module>hdes-object-repo</module>
 
+    <!-- <module>hdes-maven-plugin-test</module> <module>hdes-object-repo-mongodb</module> <module>hdes-izpack-installer</module> -->
 
-    <!-- deprecated 
-    <module>hdes-datatype</module>
-    <module>hdes-decisiontable</module>
-    <module>hdes-servicetask</module>
-    <module>hdes-flow</module>
-    <module>hdes-webapi</module>
-    <module>hdes-storage</module>
-    <module>hdes-storage-mongodb</module>
-    <module>hdes-aproc</module>
-    <module>hdes-aproc-test</module>
-    -->
-    
+    <module>hdes-dev-app</module>
+    <module>hdes-dev-app-ui</module>
+
+    <!-- deprecated <module>hdes-datatype</module> <module>hdes-decisiontable</module> <module>hdes-servicetask</module> <module>hdes-flow</module> <module>hdes-webapi</module> <module>hdes-storage</module> <module>hdes-storage-mongodb</module> <module>hdes-aproc</module> <module>hdes-aproc-test</module> -->
   </modules>
 
   <properties>
     <jdk.version>1.8</jdk.version>
     <maven.compiler.target>${jdk.version}</maven.compiler.target>
     <maven.compiler.source>${jdk.version}</maven.compiler.source>
+    <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
     <rx.version>2.2.0</rx.version>
-    <quarkus.version>1.2.0.Final</quarkus.version>
+    <quarkus.version>1.4.1.Final</quarkus.version>
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.24</slf4j.version>
     <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
@@ -113,16 +102,15 @@
           </execution>
         </executions>
       </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5</version>
-      </plugin>
     </plugins>
 
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.5</version>
+        </plugin>
         <plugin>
           <groupId>org.antlr</groupId>
           <artifactId>antlr4-maven-plugin</artifactId>

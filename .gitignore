@@ -2,6 +2,8 @@
 /build/
 bin/
 target/
+build/
+node/
 .bpmn/
 bower_components/
 node_modules/
