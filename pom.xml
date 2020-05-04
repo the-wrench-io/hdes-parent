@@ -24,6 +24,7 @@
 
     <module>hdes-dev-app</module>
     <module>hdes-dev-app-ui</module>
+    <module>hdes-dev-app-starter</module>
 
     <!-- deprecated <module>hdes-datatype</module> <module>hdes-decisiontable</module> <module>hdes-servicetask</module> <module>hdes-flow</module> <module>hdes-webapi</module> <module>hdes-storage</module> <module>hdes-storage-mongodb</module> <module>hdes-aproc</module> <module>hdes-aproc-test</module> -->
   </modules>
@@ -165,6 +166,8 @@
         <artifactId>rxjava</artifactId>
         <version>${rx.version}</version>
       </dependency>
+      
+      
       <dependency>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-bom</artifactId>

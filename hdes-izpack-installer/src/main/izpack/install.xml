@@ -1,6 +1,0 @@
-
-<resources>
-    <res src="@{izpack.staging}/common_resources/img/install-sidebar.png" id="Installer.image"/>
-    <res src="hello.html" id="HTMLHelloPanel.info"/>
-    <res src="license.html" id="HTMLLicencePanel.licence"/>
-</resources>
