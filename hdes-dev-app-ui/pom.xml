@@ -46,7 +46,25 @@
               <goal>npm</goal>
             </goals>
             <configuration>
-              <arguments>install run build</arguments>
+              <arguments>install</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm rebuild node-sass</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>rebuild node-sass</arguments>
+            </configuration>
+          </execution>
+          <execution>
+            <id>npm run build</id>
+            <goals>
+              <goal>npm</goal>
+            </goals>
+            <configuration>
+              <arguments>run build</arguments>
             </configuration>
           </execution>
         </executions>
@@ -62,10 +80,10 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/extra-resources</outputDirectory>
+              <outputDirectory>src/main/resources/META-INF/resources</outputDirectory>
               <resources>
                 <resource>
-                  <directory>src/main/resources/META-INF/resources</directory>
+                  <directory>${basedir}/build</directory>
                   <filtering>false</filtering>
                 </resource>
               </resources>
