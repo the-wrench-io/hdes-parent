@@ -41,21 +41,18 @@ public interface Flow<
   S apply(I input);
   //S apply(S old, ? output);
   
+  
+  
+  
   interface FlowState<I, O> {
     String getId();
     I getInput();
+    
     Optional<O> getOutput();
-    ExecutionStatusType getType();
     List<FlowError> getErrors();
     FlowExecutionLog getLog();
   }
   
-  interface FlowTaskState<I, R> {
-    String getId();
-    Optional<R> getOutput();
-    I getInput();
-  }
-
   @Value.Immutable
   interface FlowExecutionLog {
     String getId();
@@ -70,6 +67,12 @@ public interface Flow<
     String getId();
     String getTrace();
     String getValue();
+  }
+  
+  interface FlowTaskState<I, R> {
+    String getId();
+    Optional<R> getOutput();
+    I getInput();
   }
   
   @FunctionalInterface

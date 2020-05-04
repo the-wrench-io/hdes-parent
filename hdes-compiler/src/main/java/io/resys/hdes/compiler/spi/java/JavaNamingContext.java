@@ -191,7 +191,8 @@ public class JavaNamingContext implements NamingContext {
     public TypeName taskStateSuperinterface(FlowBody body, FlowTaskNode task) {
       return ParameterizedTypeName.get(
           ClassName.get(FlowTaskState.class),
-          refInput(task.getRef().get()), refOutput(task.getRef().get()));
+          task.getRef().map(ref -> refInput(ref)).orElse(ClassName.get(Void.class)),
+          task.getRef().map(ref -> refOutput(ref)).orElse(ClassName.get(Void.class)));
     }
 
     @Override

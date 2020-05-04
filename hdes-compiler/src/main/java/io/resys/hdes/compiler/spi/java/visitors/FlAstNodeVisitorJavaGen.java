@@ -36,6 +36,7 @@ import com.squareup.javapoet.TypeSpec;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowLoop;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Mapping;
@@ -191,7 +192,8 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
   @Override
   public FlCodeSpec visitTaskRef(FlowTaskNode parent) {
     return ImmutableFlCodeSpec.builder().value(CodeBlock.builder()
-      // Create mapping in/out from the task
+     
+        // Create mapping in/out from the task
       .addStatement("long start = System.currentTimeMillis()")
       .add(visitMapping(parent).getValue())
       .addStatement("long end = System.currentTimeMillis()")
@@ -209,12 +211,18 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
       .add("\r\n")
       .add("$T after = $T.builder()", flowState, naming.immutable(flowState))
       .add("\r\n  ").add(".from(before)")
-      .add("\r\n  ").add(".input(input)")
-      .add("\r\n  ").add(".output(output)")
+      //.add("\r\n  ").add(".input(input)")
+      //.add("\r\n  ").add(".output(output)")
       .add("\r\n  ").add(".log(log)")
       .add("\r\n  ").addStatement(".build()")
       .add("\r\n").build()
     ).build(); 
+  }
+  
+  @Override
+  public FlJavaSpec visitLoop(FlowLoop node) {
+    // TODO Auto-generated method stub
+    return super.visitLoop(node);
   }
   
   @Override

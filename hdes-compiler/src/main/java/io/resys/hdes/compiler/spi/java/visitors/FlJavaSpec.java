@@ -29,6 +29,8 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeSpec;
 
+import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
+
 public interface FlJavaSpec {
   
   @Value.Immutable
@@ -38,13 +40,17 @@ public interface FlJavaSpec {
   }
   @Value.Immutable
   public interface FlTaskSpec extends FlJavaSpec {
-    List<TypeSpec> getChildren();
+    FlowTaskNode getTask();
+    TypeSpec getType();
+  }
+  @Value.Immutable
+  public interface FlTasksSpec extends FlJavaSpec {
+    List<FlTaskSpec> getValues();
   }
   @Value.Immutable
   public interface FlTypesSpec extends FlJavaSpec {
     List<TypeSpec> getValues();
   }
-  
   @Value.Immutable
   public interface FlTaskVisitSpec extends FlJavaSpec {
     CodeBlock getValue();

@@ -13,13 +13,22 @@
 
   <modules>
     <module>hdes-ast</module>
+    
+    
     <module>hdes-compiler</module>
     <module>hdes-maven-plugin</module>
     <module>hdes-maven-plugin-test</module>
-    <module>hdes-object-repo</module>
+    
+    <module>hdes-object-repo</module>    
+    
+    <!-- 
     <module>hdes-object-repo-mongodb</module>
+     -->
+    <module>hdes-dev-app-quarkus</module>
 
-    <!-- deprecated -->
+
+
+    <!-- deprecated 
     <module>hdes-datatype</module>
     <module>hdes-decisiontable</module>
     <module>hdes-servicetask</module>
@@ -29,7 +38,8 @@
     <module>hdes-storage-mongodb</module>
     <module>hdes-aproc</module>
     <module>hdes-aproc-test</module>
-    <module>hdes-dev-app-quarkus</module>
+    -->
+    
   </modules>
 
   <properties>
