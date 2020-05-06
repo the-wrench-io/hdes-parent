@@ -73,19 +73,13 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <rx.version>2.2.0</rx.version>
     <quarkus.version>1.4.1.Final</quarkus.version>
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.24</slf4j.version>
-    <groovy.version>2.4.15</groovy.version>
     <jackson.version>2.10.2</jackson.version>
     <immutables.version>2.8.2</immutables.version>
-    <guava.version>27.0.1-jre</guava.version>
-    <freemarker.version>2.3.23</freemarker.version>
-    <findbugs.version>3.0.2</findbugs.version>
 
-    <auto-service.version>1.0-rc6</auto-service.version>
-    <compile-testing.version>0.18</compile-testing.version>
+    <findbugs.version>3.0.2</findbugs.version>
 
     <junit5.version>5.5.0</junit5.version>
     <jsonassert.version>1.5.0</jsonassert.version>
@@ -96,12 +90,9 @@
     <mongodb.version>3.12.0</mongodb.version>
     <javapoet.version>1.12.1</javapoet.version>
 
-    <commons-jexl.version>3.1</commons-jexl.version>
     <commons-io.version>2.5</commons-io.version>
     <commons-csv.version>1.5</commons-csv.version>
     <commons-codec.version>1.13</commons-codec.version>
-    <commons-version>3.9</commons-version>
-    <commons-collections.version>4.4</commons-collections.version>
     <commons-lang.version>3.9</commons-lang.version>
   </properties>
 
@@ -125,47 +116,10 @@
           </argLine>
         </configuration>
       </plugin>
-      
-      <!-- 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
- -->
+
+      <!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-source-plugin</artifactId> <executions> <execution> <id>attach-sources</id> <goals> <goal>jar-no-fork</goal> </goals> </execution> </executions> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-javadoc-plugin</artifactId> 
+        <executions> <execution> <id>attach-javadocs</id> <goals> <goal>jar</goal> </goals> </execution> </executions> </plugin> <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-gpg-plugin</artifactId> <executions> <execution> <id>sign-artifacts</id> <phase>verify</phase> <goals> <goal>sign</goal> 
+        </goals> </execution> </executions> </plugin> -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
@@ -217,6 +171,7 @@
           <configuration>
             <lifecycleMappingMetadata>
               <pluginExecutions>
+
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.codehaus.mojo</groupId>
@@ -224,6 +179,34 @@
                     <versionRange>[1.4,)</versionRange>
                     <goals>
                       <goal>create-timestamp</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.jboss.jandex</groupId>
+                    <artifactId>jandex-maven-plugin</artifactId>
+                    <versionRange>[1.0.7,)</versionRange>
+                    <goals>
+                      <goal>jandex</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+                
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <versionRange>[3.2,)</versionRange>
+                    <goals>
+                      <goal>descriptor</goal>
+                      <goal>helpmojo</goal>
                     </goals>
                   </pluginExecutionFilter>
                   <action>
@@ -252,31 +235,11 @@
         <version>${findbugs.version}</version>
       </dependency>
 
-      <!-- Annotation processing -->
-      <dependency>
-        <groupId>com.google.auto.service</groupId>
-        <artifactId>auto-service</artifactId>
-        <version>${auto-service.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.testing.compile</groupId>
-        <artifactId>compile-testing</artifactId>
-        <version>${compile-testing.version}</version>
-        <scope>test</scope>
-      </dependency>
-
       <dependency>
         <groupId>com.squareup</groupId>
         <artifactId>javapoet</artifactId>
         <version>${javapoet.version}</version>
       </dependency>
-
-      <dependency>
-        <groupId>io.reactivex.rxjava2</groupId>
-        <artifactId>rxjava</artifactId>
-        <version>${rx.version}</version>
-      </dependency>
-
 
       <dependency>
         <groupId>io.quarkus</groupId>
@@ -298,11 +261,6 @@
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
-        <version>${groovy.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-databind</artifactId>
         <version>${jackson.version}</version>
@@ -317,23 +275,6 @@
         <artifactId>value</artifactId>
         <version>${immutables.version}</version>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>com.google.guava</groupId>
-        <artifactId>guava</artifactId>
-        <version>${guava.version}</version>
-      </dependency>
-
-      <!-- Templates -->
-      <dependency>
-        <groupId>org.thymeleaf</groupId>
-        <artifactId>thymeleaf</artifactId>
-        <version>${thymeleaf.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.freemarker</groupId>
-        <artifactId>freemarker</artifactId>
-        <version>${freemarker.version}</version>
       </dependency>
 
       <!-- DB-s -->
@@ -369,11 +310,6 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-collections4</artifactId>
         <version>${commons-collections.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-jexl3</artifactId>
-        <version>${commons-jexl.version}</version>
       </dependency>
 
       <!-- Components -->
