@@ -86,7 +86,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         .addSuperinterface(naming.dt().interfaze(node))
         .addJavadoc(node.getDescription().orElse(""))
         .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "$S", "unused").build())
-        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", DtAstNodeVisitorJavaGen.class.getCanonicalName()).build())
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.processing.Generated.class).addMember("value", "$S", DtAstNodeVisitorJavaGen.class.getCanonicalName()).build())
         .addMethod(MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC)
             .addParameter(ParameterSpec.builder(HdesWhen.class, "when").build())

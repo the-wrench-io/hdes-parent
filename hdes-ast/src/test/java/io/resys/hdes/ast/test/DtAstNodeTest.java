@@ -1,4 +1,4 @@
-package io.resys.hdes.ast;
+package io.resys.hdes.ast.test;
 
 /*-
  * #%L
@@ -30,60 +30,78 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
+import io.resys.hdes.ast.HdesLexer;
+import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
-public class ManualTaskNodeTest {
+public class DtAstNodeTest {
   @Test
   public void basic() throws IOException {
-    parse("define manual-task: basic \n"
-        + "description: 'very descriptive manual task' \n"
-        + "headers: {} \n"
-        + "dropdowns: {} \n"
-        + "actions: {} \n"
-        + "form of fields: {} from ?");
+    parse("define decision-table: basic "
+        + "description: 'very descriptive DT' "
+        + "headers: {} MATRIX: {}");
+    
+    parse("define decision-table: basic "
+        + "description: 'very descriptive DT' "
+        + "headers: {} FIRST: {}");
+    
+    parse("define decision-table: basic "
+        + "description: 'very descriptive DT' "
+        + "headers: {} ALL: {}");
   }
 
   @Test
-  public void emptyFields() throws IOException {
-    parse("define manual-task: basic \n"
-        + "description: 'very descriptive manual task' \n"
-        + "headers: {} \n"
-        + "dropdowns: {} \n"
-        + "actions: {} \n"
-        + "form of fields: {} from ?"); 
+  public void headers() throws IOException {
+    parse("define decision-table: basic \n"
+        + "headers: {\n"
+        +   "name STRING required IN,\n "
+        +   "lastName STRING required IN, \n"
+        +   "value INTEGER required OUT\n"
+        + "} MATRIX: {\n"
+        + "}");
+  }
+
+  @Test
+  public void values() throws IOException {
+    parse("define decision-table: basic \n"
+        + "headers: {\n"
+        +   "name STRING required IN,\n "
+        +   "lastName STRING required IN, \n"
+        +   "value INTEGER required OUT\n"
+        + "} MATRIX: {\n"
+        +   "{ ?, ?, 20 },"
+        +   "{ 'bob', 'woman', 4570 }"
+        + "}");
+  }
+
+  @Test
+  public void matchExpressions() throws IOException {
+    parse("define decision-table: basic \n"
+        + "headers: {\n"
+        +   "name STRING required IN,\n "
+        +   "lastName STRING required IN, \n"
+        +   "value INTEGER required OUT\n"
+        + "} ALL: {\n"
+        +   "{ not 'bob' or 'same' or 'professor', 'woman' or 'man', 4570 }\n"
+        + "}");
   }
   
+
   @Test
-  public void fields() throws IOException {
-    parse("define manual-task: basic \n"
-        + "description: 'very descriptive manual task' \n"
-        + "headers: {} \n"
-        + "dropdowns: {\n"
-        +   "gender: { 'f': 'female', 'm': 'male' }"
-        + "} \n"
-        + "actions: {} \n"
-        + "form of fields: {\n"
-        + "  firstName STRING required: { default-value: 'BOB' class: 'pretty-style-1 pretty-style-2'},\n"
-        + "  age INTEGER required: { },\n"
-        + "  gender INTEGER required: { single-choice dropdown: genderDropdown default-value: 'm' }\n"
-        + "\n} from ?"); 
+  public void equalityExpressions() throws IOException {
+    parse("define decision-table: basic \n"
+        + "headers: {\n"
+        +   "value0 INTEGER required IN,\n "
+        +   "value1 INTEGER required IN, \n"
+        +   "value INTEGER required OUT\n"
+        + "} ALL: {\n"
+        +   "{ > 10, <= 20, 4570 },\n"
+        +   "{ > 10, <= 20 and > 10, 4570 },\n"
+        +   "{ = 6, != 20 and > 10, 4570 }\n"
+        + "}");
   }
   
-  @Test
-  public void nestedGroups() throws IOException {
-    parse("define manual-task: basic \n"
-        + "description: 'very descriptive manual task' \n"
-        + "headers: {} \n"
-        + "dropdowns: {} \n"
-        + "actions: {} \n"
-        + "form of groups: {\n"
-        +   "cars: { fields: {}},\n"
-        +   "boats: { fields: {}},\n"
-        +   "soups: { groups: {}}\n"
-        + "}\n"
-        + "from ? \n"); 
-  }
   
   
   public void parse(String value) {
@@ -92,7 +110,6 @@ public class ManualTaskNodeTest {
     HdesParser parser = new HdesParser(tokens);
     parser.addErrorListener(new ErrorListener());
     ParseTree tree = parser.hdesBody();
-    //tree.accept(new HdesParserConsoleVisitor());
     tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
   }
 

@@ -53,27 +53,23 @@
 
   <modules>
     <module>hdes-ast</module>
-
-
     <module>hdes-compiler</module>
     <module>hdes-maven-plugin</module>
-
     <module>hdes-object-repo</module>
 
-    <!-- <module>hdes-maven-plugin-test</module> <module>hdes-object-repo-mongodb</module> <module>hdes-izpack-installer</module> -->
+    <!-- <module>hdes-maven-plugin-test</module> <module>hdes-object-repo-mongodb</module> -->
 
     <module>hdes-dev-app</module>
     <module>hdes-dev-app-ui</module>
     <module>hdes-dev-app-starter</module>
-
-    <!-- deprecated <module>hdes-datatype</module> <module>hdes-decisiontable</module> <module>hdes-servicetask</module> <module>hdes-flow</module> <module>hdes-webapi</module> <module>hdes-storage</module> <module>hdes-storage-mongodb</module> <module>hdes-aproc</module> <module>hdes-aproc-test</module> -->
   </modules>
 
   <properties>
-    <jdk.version>1.8</jdk.version>
+    <jdk.version>11</jdk.version>
     <maven.compiler.target>${jdk.version}</maven.compiler.target>
     <maven.compiler.source>${jdk.version}</maven.compiler.source>
     <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
+
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
@@ -81,7 +77,6 @@
     <quarkus.version>1.4.1.Final</quarkus.version>
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.24</slf4j.version>
-    <thymeleaf.version>3.0.11.RELEASE</thymeleaf.version>
     <groovy.version>2.4.15</groovy.version>
     <jackson.version>2.10.2</jackson.version>
     <immutables.version>2.8.2</immutables.version>
@@ -115,11 +110,23 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>
+            --illegal-access=permit
+          </argLine>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <argLine>
+            --illegal-access=permit
+          </argLine>
+        </configuration>
       </plugin>
+      
+      <!-- 
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -144,6 +151,7 @@
           </execution>
         </executions>
       </plugin>
+      
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -157,7 +165,7 @@
           </execution>
         </executions>
       </plugin>
-
+ -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
@@ -199,6 +207,32 @@
               </goals>
             </execution>
           </executions>
+        </plugin>
+
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>buildnumber-maven-plugin</artifactId>
+                    <versionRange>[1.4,)</versionRange>
+                    <goals>
+                      <goal>create-timestamp</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore></ignore>
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

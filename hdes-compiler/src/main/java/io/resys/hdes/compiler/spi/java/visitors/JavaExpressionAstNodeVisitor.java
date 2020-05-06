@@ -41,7 +41,7 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.PreDecrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.PreIncrementUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.TypeRefNode;
 
-public class JavaExpressionAstNodeVisitor implements ExpressionAstNodeVisitor {
+public class JavaExpressionAstNodeVisitor implements ExpressionAstNodeVisitor<Object, Object> {
 
   @Override
   public Object visitTypeName(TypeName node) {

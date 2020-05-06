@@ -101,7 +101,7 @@ public class FlAstNodeVisitorJavaGen extends FlAstNodeVisitorTemplate<FlJavaSpec
       .build();
  
     return flowBuilder
-        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", FlAstNodeVisitorJavaGen.class.getCanonicalName()).build())
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.processing.Generated.class).addMember("value", "$S", FlAstNodeVisitorJavaGen.class.getCanonicalName()).build())
         .addMethod(MethodSpec.constructorBuilder()
             .addModifiers(Modifier.PUBLIC)
             .addParameter(ParameterSpec.builder(HdesWhen.class, "when").build())

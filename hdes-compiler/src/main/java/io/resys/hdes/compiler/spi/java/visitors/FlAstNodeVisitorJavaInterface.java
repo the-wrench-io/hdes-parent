@@ -71,7 +71,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
     this.body = node;
     TypeSpec.Builder flowBuilder = TypeSpec.interfaceBuilder(naming.fl().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
-        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", FlAstNodeVisitorJavaInterface.class.getCanonicalName()).build())
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.processing.Generated.class).addMember("value", "$S", FlAstNodeVisitorJavaInterface.class.getCanonicalName()).build())
         .addSuperinterface(naming.fl().superinterface(node))
         .addTypes(visitInputs(node.getInputs()).getValues())
         .addTypes(visitOutputs(node.getOutputs()).getValues());

@@ -63,7 +63,7 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     this.body = node;
     return TypeSpec.interfaceBuilder(naming.dt().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
-        .addAnnotation(AnnotationSpec.builder(javax.annotation.Generated.class).addMember("value", "$S", DtAstNodeVisitorJavaInterface.class.getCanonicalName()).build())
+        .addAnnotation(AnnotationSpec.builder(javax.annotation.processing.Generated.class).addMember("value", "$S", DtAstNodeVisitorJavaInterface.class.getCanonicalName()).build())
         .addSuperinterface(naming.dt().superinterface(node))
         .addTypes(visitHeaders(node.getHeaders()).getValues()).build();
   }

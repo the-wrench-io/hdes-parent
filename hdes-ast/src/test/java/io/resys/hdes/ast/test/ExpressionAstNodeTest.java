@@ -1,4 +1,4 @@
-package io.resys.hdes.ast;
+package io.resys.hdes.ast.test;
 
 /*-
  * #%L
@@ -30,6 +30,8 @@ import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.jupiter.api.Test;
 
+import io.resys.hdes.ast.HdesLexer;
+import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.api.nodes.AstNode.ScalarType;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;

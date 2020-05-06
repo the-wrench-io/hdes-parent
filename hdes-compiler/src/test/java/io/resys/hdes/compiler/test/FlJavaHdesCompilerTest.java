@@ -1,4 +1,4 @@
-package io.resys.hdes.ast;
+package io.resys.hdes.compiler.test;
 
 /*-
  * #%L
@@ -26,23 +26,36 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.ast.spi.ImmutableAstEnvir;
+import io.resys.hdes.compiler.api.HdesCompiler;
+import io.resys.hdes.compiler.api.HdesCompiler.Code;
+import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
 
-public class AstEnvirTest {
+public class FlJavaHdesCompilerTest {
+  private final HdesCompiler compiler = JavaHdesCompiler.config().build();
 
   @Test
   public void simpleFlow() {
-    ImmutableAstEnvir.builder()
-    .add().src(file("basicDt.hdes"))
-    .add().src(file("basicFl.hdes"))
-    .add().src(file("basicMt.hdes"))
-    //.add().src(file("matrixDt.dt"))
+    Code code = compiler.parser()
+        .add("SimpleFlow.hdes", file("SimpleFlow.hdes"))
     .build();
+    
+    //System.out.println(code.getValues().get(0).getTarget());
+    //System.out.println(code.getValues().get(1).getTarget());
   }
 
+  @Test
+  public void arrayFlow() {
+    Code code = compiler.parser()
+        .add("ArrayFlow.hdes", file("ArrayFlow.hdes"))
+    .build();
+    
+    System.out.println(code.getValues().get(0).getTarget());
+    //System.out.println(code.getValues().get(1).getTarget());
+  }
+  
   public static String file(String name) {
     try {
-      return IOUtils.toString(AstEnvirTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
+      return IOUtils.toString(FlJavaHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

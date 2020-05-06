@@ -1,4 +1,4 @@
-package io.resys.hdes.compiler.spi.java;
+package io.resys.hdes.ast.test;
 
 /*-
  * #%L
@@ -26,35 +26,23 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.compiler.api.HdesCompiler;
-import io.resys.hdes.compiler.api.HdesCompiler.Code;
+import io.resys.hdes.ast.spi.ImmutableAstEnvir;
 
-public class DtHdesCompilerTest {
-  private final HdesCompiler compiler = JavaHdesCompiler.config().build();
+public class AstEnvirTest {
 
   @Test
-  public void simpleDt() {
-    Code code = compiler.parser()
-        .add("SimpleDt.hdes", file("SimpleDt.hdes"))
+  public void simpleFlow() {
+    ImmutableAstEnvir.builder()
+    .add().src(file("basicDt.hdes"))
+    .add().src(file("basicFl.hdes"))
+    .add().src(file("basicMt.hdes"))
+    //.add().src(file("matrixDt.dt"))
     .build();
-    
-    System.out.println(code.getValues().get(0).getTarget());
-    
   }
-  @Test
-  public void expressionDt() {
-    Code code = compiler.parser()
-        .add("ExpressionDt.hdes", file("ExpressionDt.hdes"))
-    .build();
-    
-    //System.out.println(code.getValues().get(0).getTarget());
-    //System.out.println(code.getValues().get(1).getTarget());
-    
-  }
-  
+
   public static String file(String name) {
     try {
-      return IOUtils.toString(DtHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
+      return IOUtils.toString(AstEnvirTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

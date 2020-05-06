@@ -1,4 +1,4 @@
-package io.resys.hdes.compiler.spi.java;
+package io.resys.hdes.compiler.test;
 
 /*-
  * #%L
@@ -28,33 +28,34 @@ import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Code;
+import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
 
-public class FlJavaHdesCompilerTest {
+public class DtHdesCompilerTest {
   private final HdesCompiler compiler = JavaHdesCompiler.config().build();
 
   @Test
-  public void simpleFlow() {
+  public void simpleDt() {
     Code code = compiler.parser()
-        .add("SimpleFlow.hdes", file("SimpleFlow.hdes"))
+        .add("SimpleDt.hdes", file("SimpleDt.hdes"))
+    .build();
+    
+    System.out.println(code.getValues().get(0).getTarget());
+    
+  }
+  @Test
+  public void expressionDt() {
+    Code code = compiler.parser()
+        .add("ExpressionDt.hdes", file("ExpressionDt.hdes"))
     .build();
     
     //System.out.println(code.getValues().get(0).getTarget());
     //System.out.println(code.getValues().get(1).getTarget());
-  }
-
-  @Test
-  public void arrayFlow() {
-    Code code = compiler.parser()
-        .add("ArrayFlow.hdes", file("ArrayFlow.hdes"))
-    .build();
     
-    System.out.println(code.getValues().get(0).getTarget());
-    //System.out.println(code.getValues().get(1).getTarget());
   }
   
   public static String file(String name) {
     try {
-      return IOUtils.toString(FlJavaHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
+      return IOUtils.toString(DtHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
