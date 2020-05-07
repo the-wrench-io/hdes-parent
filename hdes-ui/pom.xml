@@ -6,23 +6,7 @@
     <artifactId>hdes</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
-
-  <artifactId>hdes-dev-app-ui</artifactId>
-
-  <properties>
-    <surefire-plugin.version>2.22.0</surefire-plugin.version>
-    <node.version>v10.16.3</node.version>
-    <npm.version>6.11.3</npm.version>
-    <frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
-  </properties>
-
-  <dependencies>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy</artifactId>
-    </dependency>
-  </dependencies>
-
+  <artifactId>hdes-ui</artifactId>
   <build>
     <plugins>
       <plugin>
@@ -69,9 +53,9 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>3.1.0</version>
         <executions>
           <execution>
             <id>copy-resources</id>
@@ -80,7 +64,7 @@
               <goal>copy-resources</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/classes/META-INF/resources/webjars/${project.artifactId}</outputDirectory>
+              <outputDirectory>${basedir}/target/classes/META-INF/resources/webjars/${project.artifactId}/${project.version}</outputDirectory>
               <resources>
                 <resource>
                   <directory>${basedir}/build</directory>
@@ -91,6 +75,33 @@
           </execution>
         </executions>
       </plugin>
+
+
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+          </archive>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <version>3.2.0</version>
+        <extensions>true</extensions>
+        <executions>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
     </plugins>
   </build>
 

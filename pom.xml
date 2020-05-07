@@ -13,12 +13,7 @@
   <description>HDES language for defining decision tables, flows, manual and service tasks</description>
   <url>http://github.com/the-wrench-io/hdes</url>
 
-  <parent>
-    <groupId>com.jcabi</groupId>
-    <artifactId>parent</artifactId>
-    <version>0.49.5</version>
-  </parent>
-
+  <!-- <parent> <groupId>com.jcabi</groupId> <artifactId>parent</artifactId> <version>0.49.5</version> </parent> -->
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -54,13 +49,15 @@
   <modules>
     <module>hdes-ast</module>
     <module>hdes-compiler</module>
-    <module>hdes-maven-plugin</module>
     <module>hdes-object-repo</module>
+
+    <module>hdes-ui</module>
+    <module>hdes-ui-quarkus-parent</module>
 
     <!-- <module>hdes-maven-plugin-test</module> <module>hdes-object-repo-mongodb</module> -->
 
     <module>hdes-dev-app</module>
-    <module>hdes-dev-app-ui</module>
+    <module>hdes-maven-plugin</module>
     <module>hdes-dev-app-starter</module>
   </modules>
 
@@ -81,7 +78,7 @@
 
     <findbugs.version>3.0.2</findbugs.version>
 
-    <junit5.version>5.5.0</junit5.version>
+    <junit5.version>5.6.0</junit5.version>
     <jsonassert.version>1.5.0</jsonassert.version>
     <flapdoodle.version>2.2.0</flapdoodle.version>
 
@@ -94,6 +91,10 @@
     <commons-csv.version>1.5</commons-csv.version>
     <commons-codec.version>1.13</commons-codec.version>
     <commons-lang.version>3.9</commons-lang.version>
+
+    <node.version>v10.16.3</node.version>
+    <npm.version>6.11.3</npm.version>
+    <frontend-maven-plugin.version>1.8.0</frontend-maven-plugin.version>
   </properties>
 
   <build>
@@ -101,6 +102,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.22.0</version>
         <configuration>
           <argLine>
             --illegal-access=permit
@@ -110,6 +112,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.22.0</version>
         <configuration>
           <argLine>
             --illegal-access=permit
@@ -198,7 +201,7 @@
                     <ignore></ignore>
                   </action>
                 </pluginExecution>
-                
+
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -247,6 +250,32 @@
         <version>${quarkus.version}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-core-deployment</artifactId>
+        <version>${quarkus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-vertx-http-deployment</artifactId>
+        <version>${quarkus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-arc-deployment</artifactId>
+        <version>${quarkus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-smallrye-openapi-common-deployment</artifactId>
+        <version>${quarkus.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.quarkus</groupId>
+        <artifactId>quarkus-junit5-internal</artifactId>
+        <scope>test</scope>
+        <version>${quarkus.version}</version>
       </dependency>
 
       <dependency>
@@ -343,58 +372,18 @@
         <artifactId>hdes-dev-app</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
-      <!-- deprecated -->
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-management</artifactId>
+        <artifactId>hdes-ui-quarkus</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-datatype</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-decisiontable</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-flow</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-servicetask</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-webapi</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-ide</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-storage</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-storage-mongodb</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-aproc</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+
 
       <!-- Testing -->
       <dependency>

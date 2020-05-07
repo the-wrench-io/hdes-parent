@@ -8,13 +8,11 @@
   </parent>
   <artifactId>hdes-dev-app</artifactId>
   <dependencies>
-
     <dependency>
       <groupId>org.immutables</groupId>
       <artifactId>value</artifactId>
       <scope>provided</scope>
     </dependency>
-
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
