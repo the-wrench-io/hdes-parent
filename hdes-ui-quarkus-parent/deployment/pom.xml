@@ -13,6 +13,7 @@
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-ui</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>io.resys.hdes</groupId>

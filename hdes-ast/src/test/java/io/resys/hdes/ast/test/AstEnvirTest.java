@@ -22,6 +22,7 @@ package io.resys.hdes.ast.test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,16 @@ public class AstEnvirTest {
     //.add().src(file("matrixDt.dt"))
     .build();
   }
+  
+  @Test
+  public void simpleFlow2() {
+    String artifactId = "hdes-ui";
+    Pattern filePatten = Pattern.compile("hdes-ui-(\\d.*)\\.jar");
+    //Matcher matcher = filePatten.matcher();
+    System.out.println("hdes-ui-1.0.0-SNAPSHOT.jar".matches("hdes-ui-(\\d.*)\\.jar"));
+  }
+    
+  
 
   public static String file(String name) {
     try {
