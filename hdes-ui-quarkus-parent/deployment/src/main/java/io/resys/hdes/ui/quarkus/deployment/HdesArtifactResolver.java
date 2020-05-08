@@ -1,5 +1,7 @@
 package io.resys.hdes.ui.quarkus.deployment;
 
+import java.io.File;
+
 /*-
  * #%L
  * hdes-ui-quarkus-deployment
@@ -46,6 +48,31 @@ public class HdesArtifactResolver implements ArtifactResolver {
       while (res.hasMoreElements()) {
         URL jarUrl = res.nextElement();
         String path = jarUrl.getPath();
+        if(!path.contains("hdes")) {
+          continue;
+        }
+        
+        // Local build
+        
+        if(path.startsWith(File.separator)) {
+          Path jarPath = Path.of(path);
+          Path classes = jarPath.getParent().getParent();
+          if(!classes.endsWith("classes")) {
+            continue;
+          }
+          
+          Path target = classes.getParent();
+          if(!target.endsWith("target")) {
+            continue;
+          }
+          
+          for(File file : target.toFile().listFiles((File dir, String name) -> name.endsWith(".jar"))) {
+            path = "file:" + file.toPath().toAbsolutePath().toString();
+          }
+          pathList.add(new StoredUrl(Paths.get(new URI(path))));
+          continue;
+        }
+
         if (path.startsWith("file:")) {
           pathList.add(new StoredUrl(
               Paths.get(new URI(path.substring(0, path.length() - META_INF_MANIFEST_MF.length() - 2)))));
@@ -91,9 +118,11 @@ public class HdesArtifactResolver implements ArtifactResolver {
       
       if (matches) {
         try {
+          
           int start = url.fileName.lastIndexOf(artifactId) + artifactId.length() + 1;
           int end = url.fileName.lastIndexOf(".jar");
           String version = url.fileName.substring(start, end);
+          
           return new ResolvedArtifact(groupId, artifactId, version, null, url.path);
         } catch (Exception e) {
           throw new RuntimeException(e);
