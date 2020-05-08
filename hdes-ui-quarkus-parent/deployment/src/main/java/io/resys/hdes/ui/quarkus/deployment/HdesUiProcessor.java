@@ -63,6 +63,7 @@ public class HdesUiProcessor {
   private static final String WEBJAR_GROUP_ID = "io.resys.hdes";
   private static final String WEBJAR_ARTIFACT_ID = "hdes-ui";
   private static final String WEBJAR_PREFIX = "META-INF/resources/webjars/" + WEBJAR_ARTIFACT_ID;
+  
   private static final String FINAL_DESTINATION = "META-INF/hdes-ui-files";
   private static final String FEATURE_BUILD_ITEM = "hdes-ui";
   private static final String TEMP_DIR = "hdes-ui-" + System.nanoTime();
@@ -123,6 +124,7 @@ public class HdesUiProcessor {
       LiveReloadBuildItem liveReloadBuildItem,
       HttpRootPathBuildItem httpRootPathBuildItem,
       BuildProducer<NotFoundPageDisplayableEndpointBuildItem> displayableEndpoints) throws Exception {
+    
     if (!hdesUiConfig.enable) {
       return;
     }
@@ -148,7 +150,7 @@ public class HdesUiProcessor {
       if (extract) {
         Path tempDir = Files.createTempDirectory(TEMP_DIR).toRealPath();
         cached.setDir(tempDir.toAbsolutePath().toString());
-        
+
         processArtifact(path, (GeneratedResourceBuildItem item) -> {
           try {
             Path newFile = tempDir.resolve(item.getName());
@@ -176,10 +178,8 @@ public class HdesUiProcessor {
   }
 
   private void processArtifact(String path, Consumer<GeneratedResourceBuildItem> consumer) throws IOException {
-    
     HdesArtifactResolver resolver = new HdesArtifactResolver();
     ResolvedArtifact artifact = resolver.getArtifact(WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID, null);
-    
     
     try (JarFile jarFile = new JarFile(artifact.getArtifactPath().toFile())) {
       Enumeration<JarEntry> entries = jarFile.entries();
