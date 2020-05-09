@@ -34,9 +34,9 @@ import io.resys.hdes.object.repo.mongodb.MongoCommand.MongoDbConfig;
 import io.resys.hdes.object.repo.mongodb.writers.MongoDbDelete;
 import io.resys.hdes.object.repo.mongodb.writers.MongoDbWriter;
 import io.resys.hdes.object.repo.spi.RepoAssert;
-import io.resys.hdes.object.repo.spi.commands.GenericSnapshotBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericCommitBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericMergeBuilder;
+import io.resys.hdes.object.repo.spi.commands.GenericSnapshotBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericStatusBuilder;
 import io.resys.hdes.object.repo.spi.commands.GenericTagBuilder;
 import io.resys.hdes.object.repo.spi.file.FileObjectsSerializerAndDeserializer;
@@ -155,5 +155,17 @@ public class MongoDbObjectRepository implements Commands, ObjectRepository {
               (v) -> new MongoDbWriter(v, command, config),
               (v) -> new MongoDbDelete(v, command, config)));
     }
+  }
+
+  @Override
+  public CheckoutBuilder checkout() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public PullCommand pull() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

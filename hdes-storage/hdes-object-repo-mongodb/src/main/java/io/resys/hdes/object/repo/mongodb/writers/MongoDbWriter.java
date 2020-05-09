@@ -36,6 +36,7 @@ import com.mongodb.client.model.Updates;
 import io.resys.hdes.object.repo.api.ImmutableObjects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Blob;
 import io.resys.hdes.object.repo.api.ObjectRepository.Commit;
+import io.resys.hdes.object.repo.api.ObjectRepository.Head;
 import io.resys.hdes.object.repo.api.ObjectRepository.IsObject;
 import io.resys.hdes.object.repo.api.ObjectRepository.Objects;
 import io.resys.hdes.object.repo.api.ObjectRepository.Ref;
@@ -176,5 +177,11 @@ public class MongoDbWriter implements Writer<MongoClient> {
       log.append("  - tree: ").append(tree.getId()).append(System.lineSeparator());
     }
     return tree;
+  }
+
+  @Override
+  public Head visitHead(MongoClient to, Head head) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }
