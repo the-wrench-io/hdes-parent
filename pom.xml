@@ -50,11 +50,7 @@
     <module>hdes-core</module>
     <module>hdes-storage</module>
     <module>hdes-ui</module>
-
-    <!-- <module>hdes-maven-plugin-test</module> <module>hdes-object-repo-mongodb</module> -->
-    <module>hdes-maven-plugin</module>
-    <module>hdes-dev-app</module>
-    <module>hdes-dev-app-starter</module>
+    <module>hdes-maven</module>
   </modules>
 
   <properties>
