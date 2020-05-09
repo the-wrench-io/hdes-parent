@@ -29,6 +29,7 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-qute</artifactId>
     </dependency>
+    
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core</artifactId>

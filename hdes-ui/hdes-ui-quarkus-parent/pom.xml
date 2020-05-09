@@ -3,17 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.resys.hdes</groupId>
-    <artifactId>hdes</artifactId>
+    <artifactId>hdes-ui</artifactId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>hdes-ui</artifactId>
+  <artifactId>hdes-ui-quarkus-parent</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>hdes-ui-frontend</module>
-    <module>hdes-ui-backend</module>
-    <module>hdes-ui-quarkus-parent</module>
+    <module>deployment</module>
+    <module>runtime</module>
   </modules>
 
 </project>
