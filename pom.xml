@@ -47,16 +47,13 @@
   </distributionManagement>
 
   <modules>
-    <module>hdes-ast</module>
-    <module>hdes-compiler</module>
-    
+    <module>hdes-core</module>
     <module>hdes-storage</module>
     <module>hdes-ui</module>
 
     <!-- <module>hdes-maven-plugin-test</module> <module>hdes-object-repo-mongodb</module> -->
-
-    <module>hdes-dev-app</module>
     <module>hdes-maven-plugin</module>
+    <module>hdes-dev-app</module>
     <module>hdes-dev-app-starter</module>
   </modules>
 
@@ -348,6 +345,11 @@
       <!-- Components -->
       <dependency>
         <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-ast</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -356,6 +358,8 @@
         <artifactId>hdes-compiler</artifactId>
         <version>${project.version}</version>
       </dependency>
+      
+      
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-maven-plugin</artifactId>
@@ -366,7 +370,7 @@
         <artifactId>hdes-dev-app</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-storage</artifactId>
@@ -382,7 +386,7 @@
         <artifactId>hdes-object-repo-mongodb</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
+
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-ui</artifactId>
