@@ -3,8 +3,9 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.resys.hdes</groupId>
-    <artifactId>hdes</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <artifactId>hdes-build-parent</artifactId>
+    <version>999-SNAPSHOT</version>
+    <relativePath>../hdes-build-parent/pom.xml</relativePath>
   </parent>
 
   <artifactId>hdes-maven</artifactId>
@@ -12,11 +13,7 @@
 
   <modules>
     <module>hdes-dev-app</module>
-    <module>hdes-dev-app-starter</module>
-  
-   <!-- 
     <module>hdes-maven-archetype</module>
-   -->
     <module>hdes-maven-plugin</module>
     <module>hdes-maven-plugin-test</module>
   </modules>

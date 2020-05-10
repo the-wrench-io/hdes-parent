@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-maven</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <packaging>maven-plugin</packaging>
   <artifactId>hdes-maven-plugin</artifactId>
@@ -12,6 +12,22 @@
   </prerequisites>
   
   <dependencies>
+      <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-project</artifactId>
+      <version>2.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-compiler-api</artifactId>
+      <version>2.8.6</version>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.plexus</groupId>
+      <artifactId>plexus-build-api</artifactId>
+      <version>0.0.7</version>
+    </dependency>
+  
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-compiler</artifactId>
@@ -30,22 +46,6 @@
       <groupId>org.immutables</groupId>
       <artifactId>value</artifactId>
       <scope>compile</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-project</artifactId>
-      <version>2.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-compiler-api</artifactId>
-      <version>2.8.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.sonatype.plexus</groupId>
-      <artifactId>plexus-build-api</artifactId>
-      <version>0.0.7</version>
     </dependency>
 
     <dependency>

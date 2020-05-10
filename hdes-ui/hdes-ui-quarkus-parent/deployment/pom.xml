@@ -3,7 +3,7 @@
   <parent>
     <artifactId>hdes-ui-quarkus-parent</artifactId>
     <groupId>io.resys.hdes</groupId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>999-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
