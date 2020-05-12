@@ -15,7 +15,10 @@
     <module>hdes-dev-app</module>
     <module>hdes-maven-archetype</module>
     <module>hdes-maven-plugin</module>
+    <!-- 
     <module>hdes-maven-plugin-test</module>
+    
+     -->
   </modules>
 
 </project>
