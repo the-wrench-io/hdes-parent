@@ -2,7 +2,7 @@ on:
   release:
     types:
       - created
-name: Create Maven Release
+name: Maven Release
 
 jobs:
   build:
