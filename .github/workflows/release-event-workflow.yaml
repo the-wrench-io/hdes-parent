@@ -6,11 +6,14 @@ on:
 
 jobs:
   build:
-    name: Maven release
-    uses: qcastel/github-actions-maven-release@v1.0.3
-    with:
-      release-branch-name: "master"
-      gpg-enabled: "true"
-      gpg-key-id: ${{ secrets.GITHUB_GPG_KEY_ID }}
-      gpg-key: ${{ secrets.GITHUB_GPG_KEY }}
-      access-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Maven release
+        uses: qcastel/github-actions-maven-release@v1.0.3
+        with:
+          release-branch-name: "master"
+          gpg-enabled: "true"
+          gpg-key-id: ${{ secrets.GITHUB_GPG_KEY_ID }}
+          gpg-key: ${{ secrets.GITHUB_GPG_KEY }}
+          access-token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
