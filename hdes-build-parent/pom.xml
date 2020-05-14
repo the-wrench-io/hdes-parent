@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.1</version>
   </parent>
 
   <artifactId>hdes-build-parent</artifactId>
@@ -133,7 +133,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
                 <pluginExecution>
@@ -146,7 +146,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
 
@@ -161,7 +161,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore></ignore>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
