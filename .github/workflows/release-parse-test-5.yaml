@@ -1,0 +1,61 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*-alpha' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: release parse test 6
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Branch name
+      id: branch_name
+      run: |
+        echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        echo ::set-output name=SOURCE_VER::${GITHUB_REF:11:-6}
+
+    - name: Source naming
+      run: |
+        echo $SOURCE_NAME
+        echo $SOURCE_BRANCH
+        echo $SOURCE_TAG
+        echo $SOURCE_VER
+        echo $GITHUB_REF
+      env:
+        SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+        SOURCE_BRANCH: ${{ steps.branch_name.outputs.SOURCE_BRANCH }}
+        SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        SOURCE_VER: ${{ steps.branch_name.outputs.SOURCE_VER }}
+
+    - name: Checkout code
+      uses: actions/checkout@master
+      with:
+        ref: master
+
+    - uses: joschi/setup-jdk@v1
+      with:
+        java-version: '11'
+    
+    - name: Maven release
+      run: ./hdes-build-parent/release.sh
+      env:
+        CI: false
+        BOT_NAME: ${{ secrets.HDES_BOT_NAME }}
+        BOT_EMAIL: ${{ secrets.HDES_BOT_EMAIL }}  
+        BOT_TOKEN: ${{ secrets.HDES_BOT_TOKEN }}
+        RELEASE_VERSION: ${{ steps.branch_name.outputs.SOURCE_VER }}
+        GITHUB_SHA: ${GITHUB_SHA}
+        GITHUB_REF: ${GITHUB_REF}
+        GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+        GPG_KEY_ID: ${{ secrets.HDES_GPG_KEY_ID }}
+        GPG_KEY: ${{ secrets.HDES_GPG_KEY }}
+        GPG_KEY_SEC:  ${{ secrets.HDES_GPG_SEC }}
+        OSSRH_PASS: ${{ secrets.OSSRH_PASS }}
+        OSSRH_USER: ${{ secrets.OSSRH_USER }}
+        
+        

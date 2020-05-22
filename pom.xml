@@ -32,9 +32,10 @@
   </developers>
 
   <scm>
-    <connection>scm:git:git://github.com/the-wrench-io/hdes.git</connection>
-    <developerConnection>scm:git:ssh://github.com:the-wrench-io/hdes.git</developerConnection>
+    <connection>scm:git:https://github.com/the-wrench-io/hdes.git</connection>
+    <developerConnection>scm:git:https://github.com/the-wrench-io/hdes.git</developerConnection>
     <url>http://github.com/the-wrench-io/hdes/tree/master</url>
+    <tag>HEAD</tag>
   </scm>
 
   <distributionManagement>
@@ -49,7 +50,7 @@
   </distributionManagement>
 
   <modules>
-    
+
     <module>hdes-build-parent</module>
     <module>hdes-core</module>
     <module>hdes-bom</module>
@@ -62,7 +63,6 @@
   <properties>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <sourceReleaseAssemblyDescriptor>source-release</sourceReleaseAssemblyDescriptor>
   </properties>
 
   <profiles>
@@ -80,6 +80,12 @@
                 <goals>
                   <goal>sign</goal>
                 </goals>
+                <configuration>
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -93,12 +99,14 @@
           </plugin>
           <plugin>
             <artifactId>maven-deploy-plugin</artifactId>
+            <version>3.0.0-M1</version>
             <configuration>
               <skip>true</skip>
             </configuration>
           </plugin>
           <plugin>
             <artifactId>maven-source-plugin</artifactId>
+            <version>3.2.0</version>
             <executions>
               <execution>
                 <id>package-sources</id>
@@ -110,6 +118,7 @@
           </plugin>
           <plugin>
             <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.2.0</version>
             <executions>
               <execution>
                 <id>package-javadoc</id>
@@ -123,7 +132,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6</version>
+            <version>1.6.8</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>oss.sonatype.org</serverId>
