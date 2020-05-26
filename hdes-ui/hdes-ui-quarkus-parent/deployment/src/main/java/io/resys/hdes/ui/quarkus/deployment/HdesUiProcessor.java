@@ -57,9 +57,9 @@ import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.deployment.devmode.NotFoundPageDisplayableEndpointBuildItem;
 import io.quarkus.vertx.http.runtime.HandlerType;
-import io.resys.hdes.ui.quarkus.runtime.HdesDefsHandler;
 import io.resys.hdes.ui.quarkus.runtime.HdesUIBackendProducer;
 import io.resys.hdes.ui.quarkus.runtime.HdesUiRecorder;
+import io.resys.hdes.ui.quarkus.runtime.handlers.HdesDefsHandler;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 

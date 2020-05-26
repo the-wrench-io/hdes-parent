@@ -24,8 +24,24 @@ import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public interface HdesUIBackend {
+  enum DefType { FW, DT, TG, ST, MT }
+  enum ConfigType { LOCAL, REMOTE }
+  
   DefsQuery defs();
-  Writer write();
+  List<Hierarchy> hierarchy();
+  List<Search> search();
+  Status status();
+  DefBuilder builder();
+  
+  interface DefBuilderEntry {
+    String getName();
+    DefType getType();
+  }
+
+  interface DefBuilder {
+    DefBuilder add(DefBuilderEntry def);
+    List<Def> build();
+  }
   
   interface Writer {
     Writer from(List<Def> defs);
@@ -37,6 +53,30 @@ public interface HdesUIBackend {
   }
   
   interface Def {
-    
+    String getId();
+    String getName();
+    DefType getType();
+    String getValue();
+  }
+  
+  interface Hierarchy {
+    Def getDef();
+    List<Def> getIn();
+    List<Def> getOut();
+  }
+  
+  interface Search {
+    String getId();
+    List<SearchEntry> getValues();
+  }
+  
+  interface SearchEntry {
+    String getType();
+    String getValue();
+  }
+  
+  interface Status {
+    ConfigType getConfig();
+    String getBranch();
   }
 }

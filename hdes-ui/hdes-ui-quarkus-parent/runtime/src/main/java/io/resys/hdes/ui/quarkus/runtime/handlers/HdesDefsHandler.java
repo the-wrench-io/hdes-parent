@@ -1,4 +1,4 @@
-package io.resys.hdes.ui.quarkus.runtime;
+package io.resys.hdes.ui.quarkus.runtime.handlers;
 
 /*-
  * #%L
@@ -31,6 +31,7 @@ import javax.enterprise.inject.spi.CDI;
 import io.quarkus.arc.Arc;
 import io.resys.hdes.backend.api.HdesUIBackend;
 import io.resys.hdes.backend.api.HdesUIBackend.Def;
+import io.resys.hdes.ui.quarkus.runtime.HdesHandlerHelper;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -50,7 +51,6 @@ public class HdesDefsHandler implements Handler<RoutingContext> {
       try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
         
         backend.write().from(defs).build(out);
-      
         HttpServerResponse response = event.response();
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(out.toByteArray()));

@@ -14,7 +14,6 @@
   <description>HDES language for defining decision tables, flows, manual and service tasks</description>
   <url>http://github.com/the-wrench-io/hdes</url>
 
-  <!-- <parent> <groupId>com.jcabi</groupId> <artifactId>parent</artifactId> <version>0.49.5</version> </parent> -->
   <licenses>
     <license>
       <name>The Apache Software License, Version 2.0</name>
@@ -25,7 +24,7 @@
   <developers>
     <developer>
       <name>Olev Mutso</name>
-      <email>olev.mutso@gmail.com</email>
+      <email>olev.mutso@resys.io</email>
       <organization>ReSys OÜ</organization>
       <organizationUrl>http://www.resys.io</organizationUrl>
     </developer>
