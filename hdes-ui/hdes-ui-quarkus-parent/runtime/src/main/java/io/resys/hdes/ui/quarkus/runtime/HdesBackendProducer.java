@@ -1,12 +1,17 @@
 package io.resys.hdes.ui.quarkus.runtime;
 
+import java.util.Optional;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.backend.api.HdesUIBackend;
-import io.resys.hdes.backend.spi.GenericHdesUIBackend;
+import io.quarkus.arc.DefaultBean;
+import io.resys.hdes.backend.api.HdesBackend;
+import io.resys.hdes.backend.api.HdesBackendStorage;
+import io.resys.hdes.backend.spi.GenericHdesBackend;
+import io.resys.hdes.backend.spi.storage.local.LocalHdesBackendStorage;
 
 /*-
  * #%L
@@ -29,20 +34,25 @@ import io.resys.hdes.backend.spi.GenericHdesUIBackend;
  */
 
 @ApplicationScoped
-public class HdesUIBackendProducer {
+public class HdesBackendProducer {
   
+  private Optional<String> local;
+  
+  public HdesBackendProducer setLocal(Optional<String> local) {
+    this.local = local;
+    return this;
+  }
 
   @Produces
-  public HdesUIBackend hdesUIBackend() {
+  @DefaultBean
+  public HdesBackend hdesUIBackend() {
+    HdesBackendStorage storage = null;
+    if(!local.isEmpty()) {
+      storage = LocalHdesBackendStorage.config().setLocation(local.get()).build();
+    }
+    
     ObjectMapper objectMapper = new ObjectMapper();
-    return new GenericHdesUIBackend(objectMapper);
+    return new GenericHdesBackend(objectMapper, storage);
   }
-  
-//  @Produces
-//  @DefaultBean
-//  public HdesUIBackendConfiguration configuration() {
-//    return new HdesUIBackendConfiguration();
-//  }
-
   
 }

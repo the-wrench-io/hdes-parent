@@ -1,5 +1,4 @@
 package io.resys.hdes.ui.quarkus.runtime.handlers;
-
 /*-
  * #%L
  * hdes-ui-quarkus
@@ -20,17 +19,13 @@ package io.resys.hdes.ui.quarkus.runtime.handlers;
  * #L%
  */
 
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.List;
 
 import javax.enterprise.inject.spi.CDI;
 
 import io.quarkus.arc.Arc;
-import io.resys.hdes.backend.api.HdesUIBackend;
-import io.resys.hdes.backend.api.HdesUIBackend.Def;
+import io.resys.hdes.backend.api.HdesBackend;
+import io.resys.hdes.backend.api.HdesBackend.Def;
 import io.resys.hdes.ui.quarkus.runtime.HdesHandlerHelper;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -38,26 +33,19 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
-
 public class HdesDefsHandler implements Handler<RoutingContext> {
   
   @Override
   public void handle(RoutingContext event) {
     boolean active = HdesHandlerHelper.active();
-    
     try {
-      HdesUIBackend backend = CDI.current().select(HdesUIBackend.class).get();
-      List<Def> defs = backend.defs().find();
-      try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-        
-        backend.write().from(defs).build(out);
-        HttpServerResponse response = event.response();
-        response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
-        response.end(Buffer.buffer(out.toByteArray()));
-        
-      } catch (IOException e) {
-        throw new UncheckedIOException(e);
-      }
+      HdesBackend backend = CDI.current().select(HdesBackend.class).get();
+      List<Def> defs = backend.query().find();
+      
+      HttpServerResponse response = event.response();
+      response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+      response.end(Buffer.buffer(backend.writer().build(defs)));
+      
     } finally {
       if (active) {
         Arc.container().requestContext().terminate();

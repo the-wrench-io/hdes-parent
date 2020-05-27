@@ -9,6 +9,10 @@
   <artifactId>hdes-ui-backend</artifactId>
   <dependencies>
     <dependency>
+      <groupId>io.resys.hdes</groupId>
+      <artifactId>hdes-ast</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.immutables</groupId>
       <artifactId>value</artifactId>
       <scope>provided</scope>
@@ -17,7 +21,7 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
     </dependency>

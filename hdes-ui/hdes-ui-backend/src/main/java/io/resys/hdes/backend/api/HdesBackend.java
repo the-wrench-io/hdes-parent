@@ -20,61 +20,95 @@ package io.resys.hdes.backend.api;
  * #L%
  */
 
-import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.Optional;
 
-public interface HdesUIBackend {
+import org.immutables.value.Value;
+
+public interface HdesBackend {
   enum DefType { FW, DT, TG, ST, MT }
   enum ConfigType { LOCAL, REMOTE }
   
-  DefsQuery defs();
   List<Hierarchy> hierarchy();
   List<Search> search();
   Status status();
-  DefBuilder builder();
   
-  interface DefBuilderEntry {
+  DefQueryBuilder query();
+  DefCreateBuilder builder();
+  DefChangeBuilder change();
+  
+  Writer writer();
+  Reader reader();
+  
+  interface Writer {
+    byte[] build(Object value);
+  }
+  interface Reader {
+    
+  }
+  
+  interface DefChangeBuilder {
+    DefCreateBuilder add(DefChangeEntry def);
+    List<Def> build();
+  }
+  
+  interface DefQueryBuilder {
+    List<Def> find();
+  }
+  
+  interface DefCreateBuilder {
+    DefCreateBuilder add(DefCreateEntry def);
+    List<Def> build();
+  }
+  
+  @Value.Immutable
+  interface DefChangeEntry {
+    String getId();
+    String getValue();
+  }
+  
+  @Value.Immutable
+  interface DefCreateEntry {
     String getName();
     DefType getType();
   }
 
-  interface DefBuilder {
-    DefBuilder add(DefBuilderEntry def);
-    List<Def> build();
-  }
-  
-  interface Writer {
-    Writer from(List<Def> defs);
-    void build(ByteArrayOutputStream out);
-  }
-  
-  interface DefsQuery {
-    List<Def> find();
-  }
-  
+  @Value.Immutable
   interface Def {
     String getId();
+    DefAst getAst();
     String getName();
     DefType getType();
     String getValue();
   }
   
+  @Value.Immutable
+  interface DefAst {
+    String getType();
+    String getValue();
+    Optional<DefAst> getNext();
+  }
+  
+  @Value.Immutable
   interface Hierarchy {
     Def getDef();
     List<Def> getIn();
     List<Def> getOut();
   }
   
+  @Value.Immutable
   interface Search {
     String getId();
     List<SearchEntry> getValues();
   }
   
+  @Value.Immutable
   interface SearchEntry {
     String getType();
     String getValue();
   }
   
+  @Value.Immutable
   interface Status {
     ConfigType getConfig();
     String getBranch();
