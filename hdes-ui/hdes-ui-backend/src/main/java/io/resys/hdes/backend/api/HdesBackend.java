@@ -1,5 +1,7 @@
 package io.resys.hdes.backend.api;
 
+import java.util.Collection;
+
 /*-
  * #%L
  * hdes-ui-backend
@@ -21,7 +23,6 @@ package io.resys.hdes.backend.api;
  */
 
 import java.util.List;
-import java.util.Optional;
 
 import org.immutables.value.Value;
 
@@ -53,7 +54,7 @@ public interface HdesBackend {
   }
   
   interface DefQueryBuilder {
-    List<Def> find();
+    Collection<Def> find();
   }
   
   interface DefCreateBuilder {
@@ -84,9 +85,9 @@ public interface HdesBackend {
   
   @Value.Immutable
   interface DefAst {
-    String getType();
-    String getValue();
-    Optional<DefAst> getNext();
+    //String getType();
+    //String getValue();
+    //Optional<DefAst> getNext();
   }
   
   @Value.Immutable

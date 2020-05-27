@@ -37,8 +37,8 @@ public class LocalStorageException extends RuntimeException {
 
     public String nonExistingLocation(File file) {
       return new StringBuilder()
-          .append("Configured location: ").append(file.getAbsolutePath())
-          .append(" for .hdes files does not exist!")
+          .append("Configured location: '").append(file.getAbsolutePath())
+          .append("' for .hdes files does not exist!")
           .toString();
     }
     

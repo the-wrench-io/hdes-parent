@@ -20,13 +20,14 @@ package io.resys.hdes.ast.api;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Map;
 
 import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
 
 public interface AstEnvir {
-  Collection<BodyNode> getValues();
-  BodyNode get(String id);
+  Map<String, BodyNode> getBody();
+  BodyNode getBody(String id);
+  String getSrc(String id);
   
   interface Builder {
     Builder from(AstEnvir envir);

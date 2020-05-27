@@ -20,7 +20,7 @@ package io.resys.hdes.backend.api;
  * #L%
  */
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 import io.resys.hdes.backend.api.HdesBackend.Def;
 import io.resys.hdes.backend.api.HdesBackend.DefType;
@@ -32,7 +32,7 @@ public interface HdesBackendStorage {
   StorageWriter write();
   
   interface StorageReader {
-    Stream<Def> build(); 
+    Collection<Def> build(); 
   }
   
   interface StorageWriter {

@@ -3,7 +3,7 @@ package io.resys.hdes.backend.spi;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,8 +64,8 @@ public class GenericHdesBackend implements HdesBackend {
   public DefQueryBuilder query() {
     return new DefQueryBuilder() {
       @Override
-      public List<Def> find() {
-        return Collections.emptyList();
+      public Collection<Def> find() {
+        return storage.read().build();
       }
     };
   }

@@ -46,7 +46,7 @@ public class JavaAstEnvirVisitor {
   
   public Code visit(AstEnvir envir) {
     List<CodeValue> values = new ArrayList<>();
-    for(AstNode ast : envir.getValues()) {
+    for(AstNode ast : envir.getBody().values()) {
       
       if(ast instanceof DecisionTableBody) {
         values.addAll(visit((DecisionTableBody) ast));

@@ -64,6 +64,8 @@
           </execution>
         </executions>
       </plugin>
+      
+      <!-- 
       <plugin>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-maven-plugin</artifactId>
@@ -79,6 +81,7 @@
           </execution>
         </executions>
       </plugin>
+       -->
     </plugins>
   </build>
 </project>

@@ -20,7 +20,7 @@ package io.resys.hdes.ast.spi;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,25 +40,32 @@ import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
 public class ImmutableAstEnvir implements AstEnvir {
   
-  private final Map<String, BodyNode> nodes;
+  private final Map<String, BodyNode> body;
+  private final Map<String, String> src;
 
-  public ImmutableAstEnvir(Map<String, BodyNode> nodes) {
+  public ImmutableAstEnvir(Map<String, BodyNode> body, Map<String, String> src) {
     super();
-    this.nodes = nodes;
+    this.body = body;
+    this.src = src;
   }
   @Override
-  public Collection<BodyNode> getValues() {
-    return nodes.values();
-  } 
-
+  public Map<String, BodyNode> getBody() {
+    return body;
+  }
   @Override
-  public BodyNode get(String id) {
-    if(!nodes.containsKey(id)) {
+  public BodyNode getBody(String id) {
+    if(!body.containsKey(id)) {
       throw new AstNodeException("No node by id: " + id + "!");
     }
-    return nodes.get(id);
+    return body.get(id);
   }
-  
+  @Override
+  public String getSrc(String id) {
+    if(!src.containsKey(id)) {
+      throw new AstNodeException("No node by id: " + id + "!");
+    }
+    return src.get(id);
+  }
   public static Builder builder() {
     return new GenericBuilder();
   }
@@ -66,7 +73,8 @@ public class ImmutableAstEnvir implements AstEnvir {
   public static class GenericBuilder implements Builder {
 
     private final AntlrErrorListener errorListener = new AntlrErrorListener();
-    private final Map<String, BodyNode> nodes = new HashMap<>();
+    private final Map<String, BodyNode> body = new HashMap<>();
+    private final Map<String, String> src = new HashMap<>();
     
     @Override
     public Builder from(AstEnvir envir) {
@@ -80,7 +88,9 @@ public class ImmutableAstEnvir implements AstEnvir {
         throw new AstNodeException(errorListener.getErrors());
       }
       
-      AstEnvir result = new ImmutableAstEnvir(nodes);
+      AstEnvir result = new ImmutableAstEnvir(
+          Collections.unmodifiableMap(body), 
+          Collections.unmodifiableMap(src));
       
       // TODO :: Post processing > 
       // * validations(data types, refs)
@@ -94,10 +104,24 @@ public class ImmutableAstEnvir implements AstEnvir {
     public SourceBuilder<Builder> add() {
       Builder result = this;
       return new GenericSourceBuilder() {
+        private String externalId;
+        private String value;
         @Override
         protected Builder parent(BodyNode node) {
-          nodes.put(node.getId(), node);
+          body.put(externalId == null ? node.getId() : externalId, node);
+          src.put(externalId == null ? node.getId() : externalId, value);
           return result;
+        }
+        
+        @Override
+        public Builder src(String value) {
+          this.value = value;
+          return super.src(value);
+        }
+        @Override
+        public SourceBuilder<Builder> externalId(String externalId) {
+          this.externalId = externalId;
+          return this;
         }
         @Override
         protected ANTLRErrorListener errorListener() {
@@ -111,12 +135,6 @@ public class ImmutableAstEnvir implements AstEnvir {
     protected abstract ANTLRErrorListener errorListener();
     protected abstract Builder parent(BodyNode node);
     
-    @Override
-    public SourceBuilder<Builder> externalId(String externalId) {
-      // TODO Auto-generated method stub
-      return this;
-    }
-
     @Override
     public Builder src(String src) {
       HdesLexer lexer = new HdesLexer(CharStreams.fromString(src));

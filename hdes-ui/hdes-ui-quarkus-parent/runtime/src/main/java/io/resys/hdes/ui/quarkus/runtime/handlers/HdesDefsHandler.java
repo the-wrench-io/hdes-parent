@@ -19,7 +19,7 @@ package io.resys.hdes.ui.quarkus.runtime.handlers;
  * #L%
  */
 
-import java.util.List;
+import java.util.Collection;
 
 import javax.enterprise.inject.spi.CDI;
 
@@ -40,7 +40,7 @@ public class HdesDefsHandler implements Handler<RoutingContext> {
     boolean active = HdesHandlerHelper.active();
     try {
       HdesBackend backend = CDI.current().select(HdesBackend.class).get();
-      List<Def> defs = backend.query().find();
+      Collection<Def> defs = backend.query().find();
       
       HttpServerResponse response = event.response();
       response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
