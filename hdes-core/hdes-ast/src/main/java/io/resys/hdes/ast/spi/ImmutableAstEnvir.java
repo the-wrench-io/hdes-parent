@@ -73,6 +73,13 @@ public class ImmutableAstEnvir implements AstEnvir {
     return src.get(id);
   }
   @Override
+  public List<ErrorNode> getErrors(String id) {
+    if(!src.containsKey(id)) {
+      throw new AstNodeException("No node by id: " + id + "!");
+    }
+    return errors.get(id);
+  }
+  @Override
   public Map<String, List<ErrorNode>> getErrors() {
     return errors;
   }
@@ -134,7 +141,7 @@ public class ImmutableAstEnvir implements AstEnvir {
           String id = externalId == null ? node.getId() : externalId;
           body.put(id, node);
           src.put(id, value);
-          errors.put(id, errorListener.getErrors());
+          errors.put(id, Collections.unmodifiableList(errorListener.getErrors()));
           return result;
         }
         @Override

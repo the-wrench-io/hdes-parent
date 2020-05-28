@@ -75,7 +75,7 @@ const merge = (currentState, updateCommand) => {
 const config = Immutable
   .fromJS(window.config ? window.config : 
     {
-      url: 'http://localhost:8080/hdes-dev-app/'
+      url: 'http://localhost:8080/hdes-ui/services'
     });
 
 const update = flyd.stream()

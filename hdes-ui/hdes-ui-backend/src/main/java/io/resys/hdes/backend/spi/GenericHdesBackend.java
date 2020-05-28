@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.backend.api.HdesBackend;
 import io.resys.hdes.backend.api.HdesBackendStorage;
+import io.resys.hdes.backend.api.ImmutableStatus;
 
 public class GenericHdesBackend implements HdesBackend {
 
@@ -56,8 +57,10 @@ public class GenericHdesBackend implements HdesBackend {
 
   @Override
   public Status status() {
-    // TODO Auto-generated method stub
-    return null;
+    return ImmutableStatus.builder()
+        .storage(storage.getConfig())
+        .errors(storage.errors().build())
+        .build();
   }
 
   @Override

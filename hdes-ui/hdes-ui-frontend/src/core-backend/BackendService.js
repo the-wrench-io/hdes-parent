@@ -32,7 +32,7 @@ class BackendService {
   models(successHandler, errorHandler) {
     // console.log('loading models')
     const method = { method: 'GET', credentials: 'same-origin', headers: this.readHeaders }
-    const url = this.config.get('url') + 'models'
+    const url = this.config.get('url') + '/defs'
     return fetch(url, method)
       .then(getResponse)
       .then(successHandler)
@@ -41,7 +41,7 @@ class BackendService {
   health(successHandler, errorHandler) {
     // console.log('loading health')
     const method = { method: 'GET', credentials: 'same-origin', headers: this.readHeaders }
-    const url = this.config.get('url') + 'health'
+    const url = this.config.get('url') + '/status'
     return fetch(url, method)
       .then(getResponse)
       .then(successHandler)

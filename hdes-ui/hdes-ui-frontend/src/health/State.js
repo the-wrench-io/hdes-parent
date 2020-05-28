@@ -21,12 +21,17 @@ let connectionUp;
 const ID = 'health'
 const init = {
   init: { enabled: true, loading: true, log: [] },
+  status: undefined,
   connection: undefined
 }
 
 const addlog = (update, value) => update(model => {
   return model.updateIn([ID, 'init', 'log'], 
     log => log.push(value))
+})
+
+const setStatus = (update, value) => update(model => {
+  return model.setIn([ID, 'status'], value)
 })
 
 const loaded = (update) => update(model => {
@@ -63,6 +68,8 @@ const successHandler = (update, actions, success) => {
     addlog(update, `Server message id: '${entry.id}', '${entry.value}'.`)
   }
   addlog(update, 'Loading models!')
+  setStatus(update, success)
+
   actions.backend.service.models(data => {
     actions.explorer.setEntries(data)
     addlog(update, `Found '${data.length}' model(s).`)

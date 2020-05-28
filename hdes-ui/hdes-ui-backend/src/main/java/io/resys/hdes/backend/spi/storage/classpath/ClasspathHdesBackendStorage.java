@@ -21,15 +21,28 @@ package io.resys.hdes.backend.spi.storage.classpath;
  */
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.resys.hdes.backend.api.HdesBackend.ClasspathStorageConfig;
+import io.resys.hdes.backend.api.HdesBackend.ConfigType;
 import io.resys.hdes.backend.api.HdesBackend.Def;
+import io.resys.hdes.backend.api.HdesBackend.DefError;
+import io.resys.hdes.backend.api.HdesBackend.StorageConfig;
 import io.resys.hdes.backend.api.HdesBackendStorage;
+import io.resys.hdes.backend.api.ImmutableClasspathStorageConfig;
 
 public class ClasspathHdesBackendStorage implements HdesBackendStorage {
   
   private Map<String, Def> cache = new HashMap<>();
+
+  private final ClasspathStorageConfig storageConfig;
+  
+  public ClasspathHdesBackendStorage(ClasspathStorageConfig storageConfig) {
+    super();
+    this.storageConfig = storageConfig;
+  }
 
   @Override
   public StorageReader read() {
@@ -42,6 +55,16 @@ public class ClasspathHdesBackendStorage implements HdesBackendStorage {
   }
 
   @Override
+  public ErrorReader errors() {
+    return new ErrorReader() {
+      @Override
+      public Collection<DefError> build() {
+        return Collections.emptyList();
+      }
+    };
+  }
+  
+  @Override
   public StorageWriter write() {
     // TODO Auto-generated method stub
     return null;
@@ -53,9 +76,13 @@ public class ClasspathHdesBackendStorage implements HdesBackendStorage {
   }
   
   public static class Config {
-
     public ClasspathHdesBackendStorage build() {
-      return new ClasspathHdesBackendStorage();
+      return new ClasspathHdesBackendStorage(ImmutableClasspathStorageConfig.builder().type(ConfigType.CLASSPATH).build());
     }
+  }
+
+  @Override
+  public StorageConfig getConfig() {
+    return storageConfig;
   }
 }

@@ -61,6 +61,7 @@ import io.quarkus.vertx.http.runtime.HandlerType;
 import io.resys.hdes.ui.quarkus.runtime.HdesBackendProducer;
 import io.resys.hdes.ui.quarkus.runtime.HdesBackendRecorder;
 import io.resys.hdes.ui.quarkus.runtime.handlers.HdesDefsHandler;
+import io.resys.hdes.ui.quarkus.runtime.handlers.HdesStatusHandler;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
@@ -147,10 +148,16 @@ public class HdesUiProcessor {
     beans.produce(new BeanContainerListenerBuildItem(recorder.listener(hdesConfig.local)));
     
     String path = hdesConfig.path + "/services";
-    String defsPath = path + "/defs";
     
+    // Defs handler
+    String defsPath = path + "/defs";
     routes.produce(new RouteBuildItem(defsPath, new HdesDefsHandler(), HandlerType.BLOCKING));
     displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(defsPath));
+    
+    // status handler
+    String statusPath = path + "/status";
+    routes.produce(new RouteBuildItem(statusPath, new HdesStatusHandler(), HandlerType.BLOCKING));
+    displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(statusPath));
   }
 
   @BuildStep

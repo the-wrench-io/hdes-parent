@@ -4,7 +4,6 @@
   "homepage": "/hdes-ui",
   "private": true,
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.12.1",
     "build": "^0.1.4",
     "bulma": "^0.8.0",
     "bulma-tooltip": "^3.0.2",

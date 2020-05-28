@@ -28,7 +28,7 @@ import org.immutables.value.Value;
 
 public interface HdesBackend {
   enum DefType { FW, DT, TG, ST, MT }
-  enum ConfigType { LOCAL, REMOTE }
+  enum ConfigType { LOCAL, REMOTE, CLASSPATH }
   
   List<Hierarchy> hierarchy();
   List<Search> search();
@@ -81,6 +81,7 @@ public interface HdesBackend {
     String getName();
     DefType getType();
     String getValue();
+    List<DefError> getErrors();
   }
   
   @Value.Immutable
@@ -88,6 +89,14 @@ public interface HdesBackend {
     //String getType();
     //String getValue();
     //Optional<DefAst> getNext();
+  }
+  
+  @Value.Immutable
+  interface DefError {
+    String getId();
+    String getName();
+    String getMessage();
+    String getToken();
   }
   
   @Value.Immutable
@@ -100,6 +109,7 @@ public interface HdesBackend {
   @Value.Immutable
   interface Search {
     String getId();
+    String getName();
     List<SearchEntry> getValues();
   }
   
@@ -111,7 +121,27 @@ public interface HdesBackend {
   
   @Value.Immutable
   interface Status {
-    ConfigType getConfig();
-    String getBranch();
+    StorageConfig getStorage();
+    List<DefError> getErrors();
+    List<StatusMessage> getValues();
+  }
+  
+  @Value.Immutable
+  interface StatusMessage {
+    String getId();
+    String getValue();
+  }
+  
+  interface StorageConfig {
+    ConfigType getType();
+  }
+  
+  @Value.Immutable
+  interface LocalStorageConfig extends StorageConfig {
+    String getLocation();
+  }
+  
+  @Value.Immutable
+  interface ClasspathStorageConfig extends StorageConfig {
   }
 }

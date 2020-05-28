@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.immutables.value.Value;
 import org.slf4j.Logger;
@@ -38,23 +39,32 @@ import org.slf4j.LoggerFactory;
 
 import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ErrorNode;
+import io.resys.hdes.ast.api.nodes.AstNode.Token;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
 import io.resys.hdes.ast.spi.ImmutableAstEnvir;
+import io.resys.hdes.backend.api.HdesBackend.ConfigType;
 import io.resys.hdes.backend.api.HdesBackend.Def;
+import io.resys.hdes.backend.api.HdesBackend.DefError;
 import io.resys.hdes.backend.api.HdesBackend.DefType;
+import io.resys.hdes.backend.api.HdesBackend.LocalStorageConfig;
+import io.resys.hdes.backend.api.HdesBackend.StorageConfig;
 import io.resys.hdes.backend.api.HdesBackendStorage;
 import io.resys.hdes.backend.api.ImmutableDef;
 import io.resys.hdes.backend.api.ImmutableDefAst;
+import io.resys.hdes.backend.api.ImmutableDefError;
+import io.resys.hdes.backend.api.ImmutableLocalStorageConfig;
 
 public class LocalHdesBackendStorage implements HdesBackendStorage {
   
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalHdesBackendStorage.class);
-
-  private Map<String, Def> cache = new HashMap<>();
+  
+  private final Map<String, Def> cache = new HashMap<>();
   
   private final File location;
+  private final LocalStorageConfig storageConfig;
   
   @Value.Immutable
   public interface DefFileKey extends Comparable<DefFileKey> {
@@ -69,11 +79,29 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
     }
   }
   
-  public LocalHdesBackendStorage(File location) {
+  public LocalHdesBackendStorage(File location, LocalStorageConfig storageConfig) {
     super();
     this.location = location;
+    this.storageConfig = storageConfig;
   }
 
+  @Override
+  public StorageConfig getConfig() {
+    return storageConfig;
+  }
+  
+  @Override
+  public ErrorReader errors() {
+    return new ErrorReader() {
+      @Override
+      public Collection<DefError> build() {
+        var errors = new ArrayList<DefError>();
+        cache.values().forEach(v -> errors.addAll(v.getErrors()));
+        return errors;
+      }
+    };
+  }
+  
   @Override
   public StorageReader read() {
     return new StorageReader() {
@@ -103,6 +131,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
         for(DefFileKey key : keys) {
           BodyNode node = astEnvir.getBody(key.getDefId());
           String src = astEnvir.getSrc(key.getDefId());
+          List<ErrorNode> errors = astEnvir.getErrors(key.getDefId());
           
           DefType type = null;
           if(node instanceof DecisionTableBody) {
@@ -120,8 +149,10 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
               .value(src)
               .type(type)
               .name(node.getId())
+              .errors(errors.stream().map(e -> map(key, node, e)).collect(Collectors.toUnmodifiableList()))
               .ast(ImmutableDefAst.builder().build()).build();  
           
+
           cache.put(def.getId(), def);
         }
         
@@ -129,6 +160,21 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
         return cache.values();
       }
     };
+  }
+  
+  private DefError map(DefFileKey key, BodyNode body, ErrorNode node) {
+    Token nodeToken = node.getTarget().getToken();
+    return ImmutableDefError.builder()
+        .id(key.getDefId())
+        .name(body.getId())
+        .message(node.getMessage())
+        .token(new StringBuilder()
+            .append("(").append(nodeToken.getLine())
+            .append(":")
+            .append(nodeToken.getCol()).append(")")
+            .append(" ").append(nodeToken.getText())
+            .toString())
+        .build();
   }
 
   @Override
@@ -162,7 +208,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
         throw new LocalStorageException(LocalStorageException.builder().locationCantBeWritten(file));
       }
       
-      return new LocalHdesBackendStorage(file);
+      return new LocalHdesBackendStorage(file, ImmutableLocalStorageConfig.builder().type(ConfigType.LOCAL).location(location).build());
     }
   }
 }

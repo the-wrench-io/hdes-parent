@@ -32,6 +32,7 @@ public interface AstEnvir {
   BodyNode getBody(String id);
   String getSrc(String id);
   Map<String, List<ErrorNode>> getErrors();
+  List<ErrorNode> getErrors(String id);
   
   interface Builder {
     Builder ignoreErrors();

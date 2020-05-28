@@ -23,13 +23,23 @@ package io.resys.hdes.backend.api;
 import java.util.Collection;
 
 import io.resys.hdes.backend.api.HdesBackend.Def;
+import io.resys.hdes.backend.api.HdesBackend.DefError;
 import io.resys.hdes.backend.api.HdesBackend.DefType;
+import io.resys.hdes.backend.api.HdesBackend.StorageConfig;
 
 public interface HdesBackendStorage {
+  
+  StorageConfig getConfig();
   
   StorageReader read();
   
   StorageWriter write();
+  
+  ErrorReader errors();
+  
+  interface ErrorReader {
+    Collection<DefError> build();
+  }
   
   interface StorageReader {
     Collection<Def> build(); 
