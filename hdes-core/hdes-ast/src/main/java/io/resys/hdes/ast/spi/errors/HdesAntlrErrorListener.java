@@ -32,7 +32,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableEmptyNode;
 import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
 import io.resys.hdes.ast.api.nodes.ImmutableToken;
 
-public class AntlrErrorListener extends BaseErrorListener {
+public class HdesAntlrErrorListener extends BaseErrorListener {
   private final List<ErrorNode> errors = new ArrayList<>();
   private int id = 1;
   

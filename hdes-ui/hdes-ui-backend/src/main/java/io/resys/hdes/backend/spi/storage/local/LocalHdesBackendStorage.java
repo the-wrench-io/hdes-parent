@@ -81,8 +81,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
       public Collection<Def> build() {
         StringBuilder log = new StringBuilder()
             .append("Loading .hdes files from '").append(location.getAbsolutePath()).append("':").append(System.lineSeparator());
-        AstEnvir.Builder builder = ImmutableAstEnvir.builder();
-        
+        AstEnvir.Builder builder = ImmutableAstEnvir.builder().ignoreErrors();
         
         List<DefFileKey> keys = new ArrayList<>();
         for(File file : location.listFiles((File dir, String name) -> name.endsWith(".hdes"))) {

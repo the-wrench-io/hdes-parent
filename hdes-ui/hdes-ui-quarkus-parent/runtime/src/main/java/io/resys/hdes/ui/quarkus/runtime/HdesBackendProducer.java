@@ -11,6 +11,7 @@ import io.quarkus.arc.DefaultBean;
 import io.resys.hdes.backend.api.HdesBackend;
 import io.resys.hdes.backend.api.HdesBackendStorage;
 import io.resys.hdes.backend.spi.GenericHdesBackend;
+import io.resys.hdes.backend.spi.storage.classpath.ClasspathHdesBackendStorage;
 import io.resys.hdes.backend.spi.storage.local.LocalHdesBackendStorage;
 
 /*-
@@ -49,6 +50,8 @@ public class HdesBackendProducer {
     HdesBackendStorage storage = null;
     if(!local.isEmpty()) {
       storage = LocalHdesBackendStorage.config().setLocation(local.get()).build();
+    } else {
+      storage = ClasspathHdesBackendStorage.config().build();
     }
     
     ObjectMapper objectMapper = new ObjectMapper();
