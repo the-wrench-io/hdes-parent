@@ -37,6 +37,7 @@ import { createEditorState } from './editor';
 import { createEditorFlState } from './editor-fl';
 import { createEditorDlState } from './editor-dl';
 import { createEditorDtState } from './editor-dt';
+import { createEditorTxState } from './editor-tx';
 
 
 
@@ -89,7 +90,8 @@ const appState = combineState(update, [
   createEditorState,
   createEditorFlState,
   createEditorDlState,
-  createEditorDtState])
+  createEditorDtState,
+  createEditorTxState])
 const states = flyd.scan(merge, Immutable.fromJS(appState.initial), update)
 const actions = appState.actions
 

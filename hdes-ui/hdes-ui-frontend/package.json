@@ -7,6 +7,7 @@
     "build": "^0.1.4",
     "bulma": "^0.8.0",
     "bulma-tooltip": "^3.0.2",
+    "codemirror": "^5.54.0",
     "d3": "^5.15.0",
     "flyd": "^0.2.8",
     "immutable": "^4.0.0-rc.12",

@@ -137,7 +137,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
           if(node instanceof DecisionTableBody) {
             type = DefType.DT;
           } else if(node instanceof FlowBody) {
-            type = DefType.FW;
+            type = DefType.FL;
           } else if(node instanceof ManualTaskBody) {
             type = DefType.MT;
           } else {

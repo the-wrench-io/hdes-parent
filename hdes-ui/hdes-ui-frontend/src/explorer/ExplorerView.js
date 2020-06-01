@@ -18,8 +18,8 @@
  * #L%
  */
 import { Component } from 'inferno'
-import { Section } from './Section'
-import { SectionTabs } from './SectionTabs'
+import { ExplorerEntry } from './ExplorerEntry'
+import { ExplorerOpenEntries } from './ExplorerOpenEntries'
 
 
 export class ExplorerView extends Component {
@@ -33,13 +33,13 @@ export class ExplorerView extends Component {
       <aside class='menu explorer-ed'>
         <ul class='menu-list'>
           <li class='explorer-title'>explorer</li>
-          <SectionTabs actions={actions} state={state} type='oe' name='open editors' />
-          <Section actions={actions} state={state} type='fl' name='flows' />
-          <Section actions={actions} state={state} type='tg' name='tags' />
-          <Section actions={actions} state={state} type='dt' name='decision tables' />
-          <Section actions={actions} state={state} type='st' name='service tasks' />
-          <Section actions={actions} state={state} type='mt' name='manual tasks' />
-          <Section actions={actions} state={state} type='us' name='users' />
+          <ExplorerOpenEntries actions={actions} state={state} type='oe' name='open editors' />
+          <ExplorerEntry actions={actions} state={state} type='FL' name='flows' />
+          <ExplorerEntry actions={actions} state={state} type='TG' name='tags' />
+          <ExplorerEntry actions={actions} state={state} type='DT' name='decision tables' />
+          <ExplorerEntry actions={actions} state={state} type='ST' name='service tasks' />
+          <ExplorerEntry actions={actions} state={state} type='MT' name='manual tasks' />
+          <ExplorerEntry actions={actions} state={state} type='US' name='users' />
         </ul>
       </aside>
     );

@@ -27,7 +27,7 @@ import java.util.List;
 import org.immutables.value.Value;
 
 public interface HdesBackend {
-  enum DefType { FW, DT, TG, ST, MT }
+  enum DefType { FL, DT, TG, ST, MT }
   enum ConfigType { LOCAL, REMOTE, CLASSPATH }
   
   List<Hierarchy> hierarchy();

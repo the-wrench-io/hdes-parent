@@ -4,6 +4,10 @@
 
 $la-font-path: 'core-styles/fonts';
 @import '../node_modules/line-awesome/dist/line-awesome/scss/line-awesome.scss';
+@import '../node_modules/codemirror/lib/codemirror.css';
+@import '../node_modules/codemirror/theme/abcdef.css';
+
+
 @import 'core-styles/colors';
 @import 'core-styles/iconbar';
 @import 'core-styles/editor';
@@ -28,10 +32,15 @@ $has-text-grey:hsl(0, 0%, 48%);
 $has-text-light:hsl(0, 0%, 96%);
 $has-text-white: hsl(0, 0%, 100%);
 $has-text-primary: hsl(171, 100%, 41%);
-
 $has-text-purple: hsl(283, 44%, 68%);
 $has-text-yellow: hsl(34, 85%, 60%); //hsl(41, 67%, 63%);
 
+.CodeMirror {
+  width: 100% !important;
+  height: 100% !important;
+  font-size: 13px;
+  line-height: 1.5;
+}
 
 h1 {
   opacity: 0.5;

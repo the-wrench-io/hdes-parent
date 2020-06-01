@@ -34,7 +34,7 @@ const actions = app => update => ({
   setEntries: (entries) => app(({ actions }) => {
     update(model => model.setIn([ID, 'entries'], Immutable.fromJS(entries)))
     
-    actions.explorer.openEntry('cascoAdditionalFactors');
+    //actions.explorer.openEntry('cascoAdditionalFactors');
 
   }),
   openEntry: (entryId) => app(({ actions }) => update(model => {
