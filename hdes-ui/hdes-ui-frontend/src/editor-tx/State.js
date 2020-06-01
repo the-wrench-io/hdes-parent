@@ -31,9 +31,7 @@ const actions = app => update => ({
     const entry = model.getIn(['editor', 'entry'])
     const id = entry.get('id');
 
-    
     if(codemirror) {
-
       codemirror.getDoc().setValue(entry.get('value'))
       codemirror.refresh()
     }
