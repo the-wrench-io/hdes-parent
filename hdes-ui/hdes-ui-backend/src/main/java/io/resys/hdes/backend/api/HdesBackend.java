@@ -37,6 +37,7 @@ public interface HdesBackend {
   DefQueryBuilder query();
   DefCreateBuilder builder();
   DefChangeBuilder change();
+  DefDeleteBuilder delete();
   
   Writer writer();
   Reader reader();
@@ -45,12 +46,13 @@ public interface HdesBackend {
     byte[] build(Object value);
   }
   interface Reader {
-    
+    <T> T build(byte[] body, Class<T> type);
+    <T> List<T> list(byte[] body, Class<T> type);
   }
   
   interface DefChangeBuilder {
-    DefCreateBuilder add(DefChangeEntry def);
-    List<Def> build();
+    DefChangeBuilder add(DefChangeEntry def);
+    Def build();
   }
   
   interface DefQueryBuilder {
@@ -59,7 +61,21 @@ public interface HdesBackend {
   
   interface DefCreateBuilder {
     DefCreateBuilder add(DefCreateEntry def);
+    DefCreateBuilder add(List<DefCreateEntry> def);
     List<Def> build();
+  }
+  
+  interface DefDeleteBuilder {
+    DefDeleteBuilder add(String defId);
+    DefDeleteBuilder simulation(boolean simulation);
+    DefDeleteBuilder entry(DefDeleteEntry entry);
+    List<Def> build();
+  }
+
+  @Value.Immutable
+  interface DefDeleteEntry {
+    List<String> getId();
+    Boolean getSimulation();
   }
   
   @Value.Immutable
@@ -73,7 +89,7 @@ public interface HdesBackend {
     String getName();
     DefType getType();
   }
-
+  
   @Value.Immutable
   interface Def {
     String getId();

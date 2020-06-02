@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /*-
@@ -33,10 +34,9 @@ import io.resys.hdes.backend.api.HdesBackendStorage;
 import io.resys.hdes.backend.api.ImmutableStatus;
 
 public class GenericHdesBackend implements HdesBackend {
-
   private final ObjectMapper objectMapper;
   private final HdesBackendStorage storage;
-  
+
   public GenericHdesBackend(ObjectMapper objectMapper, HdesBackendStorage storage) {
     super();
     this.objectMapper = objectMapper;
@@ -86,6 +86,12 @@ public class GenericHdesBackend implements HdesBackend {
   }
 
   @Override
+  public DefDeleteBuilder delete() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
   public Writer writer() {
     return new Writer() {
       @Override
@@ -102,8 +108,24 @@ public class GenericHdesBackend implements HdesBackend {
 
   @Override
   public Reader reader() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+    return new Reader() {
+      @Override
+      public <T> T build(byte[] body, Class<T> type) {
+        try {
+          return objectMapper.readValue(body, type);
+        } catch (IOException e) {
+          throw new UncheckedIOException(e);
+        }
+      }
 
+      @Override
+      public <T> List<T> list(byte[] body, Class<T> type) {
+        try {
+          return objectMapper.readValue(body, new TypeReference<List<T>>() {});
+        } catch (IOException e) {
+          throw new UncheckedIOException(e);
+        }
+      }
+    };
+  }
 }

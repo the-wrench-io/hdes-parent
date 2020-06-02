@@ -47,10 +47,6 @@ CodeMirror.defineSimpleMode("hdes", {
     {regex: /[\{\[\(]/, indent: true},
     {regex: /[\}\]\)]/, dedent: true},
     {regex: /[a-z$][\w$]*/, token: "variable"},
-    // You can embed other modes with the mode property. This rule
-    // causes all code between << and >> to be highlighted with the XML
-    // mode.
-    {regex: /<</, token: "meta", mode: {spec: "xml", end: />>/}}
   ],
   // The multi-line comment state.
   comment: [
@@ -93,7 +89,9 @@ export class EditorTx extends Component {
         gutters: ['CodeMirror-lint-markers'],
         theme: 'abcdef'
       })
+      this.editor.on('change', (editor) => actions.editortx.change(entry, editor))
     }
+
     if(this.props.entry.get('id') !== prevProps.entry.get('id')) {
       actions.editortx.load(entry, this.editor)
     }

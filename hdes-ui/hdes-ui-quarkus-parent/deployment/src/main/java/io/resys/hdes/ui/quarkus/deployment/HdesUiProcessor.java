@@ -154,6 +154,7 @@ public class HdesUiProcessor {
     routes.produce(new RouteBuildItem(defsPath, new HdesDefsHandler(), HandlerType.BLOCKING));
     displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(defsPath));
     
+    
     // status handler
     String statusPath = path + "/status";
     routes.produce(new RouteBuildItem(statusPath, new HdesStatusHandler(), HandlerType.BLOCKING));

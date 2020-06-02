@@ -35,11 +35,13 @@ const actions = app => update => ({
       codemirror.getDoc().setValue(entry.get('value'))
       codemirror.refresh()
     }
-
     return model
       .updateIn([ID, 'models'], models => models.get(id) ? models : models.set(id, entry))
       .setIn([ID, 'active'], id);
-  }))
+  })),
+  change: (entry, codemirror) => app(({ actions }) => {
+    actions.editor.save({entry, value: codemirror.getValue()});
+  })
 })
 
 export const State = app => {

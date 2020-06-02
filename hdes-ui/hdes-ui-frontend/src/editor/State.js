@@ -30,16 +30,23 @@ const actions = app => update => ({
   }),
   open: (entry) => app(({ actions }) => {
     update(model => model.setIn([ID, 'entry'], entry));
-    const type = entry.get('type');
 
+    const type = entry.get('type');
     if(type === 'fl') {
       actions.editorfl.load();
     } else if(type === 'delete') {
       actions.editordl.load();
     }
-
-    
   }),
+
+  save: ({entry, value}) => update(model => {
+
+
+    console.log(entry.toJS(), value)
+
+    return model;
+  }),
+
   close: (entry) => update(model => {
     return model.deleteIn([ID, 'entry']);
   })
