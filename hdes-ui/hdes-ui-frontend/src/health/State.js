@@ -105,8 +105,12 @@ const queryHealth = (update, actions) => {
 }
 
 // all explorer actions
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
+const actions = store => ({
+
+  init: () => {
+    const { update, actions } = store
+    console.log(store);
+
     addlog(update, 'Getting connection...')
     actions.backend.service.health(
       data => setTimeout(() => {
@@ -120,13 +124,15 @@ const actions = app => update => ({
           setTimeout(() => actions.health.init(), 5000)
         }
       })
-  })
+  }
+
+
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

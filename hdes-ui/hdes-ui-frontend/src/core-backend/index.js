@@ -20,4 +20,4 @@
 import { State }  from './State'
 import { createBackendService }  from './BackendService'
 
-export const createBackendState = config => (actions) => State(actions, createBackendService(config));
+export const createBackendState = config => (store) => State(store, createBackendService(config));

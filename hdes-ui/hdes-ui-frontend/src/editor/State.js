@@ -25,10 +25,10 @@ const init = {
 
 
 // all explorer actions
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
-  }),
-  open: (entry) => app(({ actions }) => {
+const actions = ({ update, actions }) => ({
+  init: () => {
+  },
+  open: (entry) => {
     update(model => model.setIn([ID, 'entry'], entry));
 
     const type = entry.get('type');
@@ -37,7 +37,7 @@ const actions = app => update => ({
     } else if(type === 'delete') {
       actions.editordl.load();
     }
-  }),
+  },
 
   save: ({entry, value}) => update(model => {
 
@@ -52,10 +52,10 @@ const actions = app => update => ({
   })
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

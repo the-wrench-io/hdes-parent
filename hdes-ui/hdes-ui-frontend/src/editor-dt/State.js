@@ -26,30 +26,29 @@ const init = {
 }
 
 // all explorer actions
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
-  }),
-  load: (entry) => app(({ actions }) => update(model => {
+const actions = ({actions, update }) => ({
+  init: () => { },
+  load: (entry) => update(model => {
     const id = entry.get('id')
     return model
       .updateIn([ID, 'editable'], models => models.get(id) ? models : models.set(id, Immutable.fromJS({})))
       .updateIn([ID, 'models'], models => models.get(id) ? models : models.set(id, entry));
-  })),
-  onCellEdit: (modelId, cellId) => app(({ actions }) => update(model => {
+  }),
+  onCellEdit: (modelId, cellId) => update(model => {
     return model.setIn([ID, 'editable', modelId, 'id'], cellId)
-  })),
-  onChangeStart: (modelId) => app(({ actions }) => update(model => {
+  }),
+  onChangeStart: (modelId) => update(model => {
     return model.setIn([ID, 'editable', modelId, 'enabled'], true)
-  })),
-  onChangeCancel: (modelId) => app(({ actions }) => update(model => {
+  }),
+  onChangeCancel: (modelId) => update(model => {
     return model.setIn([ID, 'editable', modelId, 'enabled'], false)
-  }))
+  })
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

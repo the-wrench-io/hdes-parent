@@ -78,7 +78,7 @@ const filter = (value, model) => {
 }
 
 // all explorer actions
-const actions = update => ({
+const actions = ({update}) => ({
   setSearchFilter: (value) => {
     update(model => filter(value, model))
   },
@@ -98,8 +98,10 @@ const actions = update => ({
   }
 })
 
-export const State = {
-  id: ID,
-  initial: init,
-  actions: actions
+export const State = store => {
+  return {
+    id: ID,
+    initial: init,
+    actions: actions(store)
+  }
 }

@@ -27,13 +27,12 @@ const init = {
   ]
 }
 
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
-  }),
+const actions = ({ actions, update }) => ({
+  init: () => { },
   setTypeName: (value) => {
     update(model => model.setIn([ID, 'value'], value))
   },
-  create: (type, name) => app(({ actions }) => {
+  create: (type, name) => {
     const onSuccess = (entries) => actions.backend.model(() => {
       entries.forEach(e => actions.explorer.openEntry(e.id));
       actions.iconbar.toggleExplorer();
@@ -44,17 +43,17 @@ const actions = app => update => ({
       update(model => model.setIn([ID, 'errors'], Immutable.fromJS(result)))
     };
     actions.backend.service.create({name: name, type: type}, onSuccess, onError)
-  }),
+  },
   deleteError: (id) => update(model => {
     const index = model.getIn([ID, 'errors']).findIndex(e => e.get('id') === id)
     return model.deleteIn([ID, 'errors', index])
   })
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

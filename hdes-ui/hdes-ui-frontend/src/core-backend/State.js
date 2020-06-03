@@ -24,30 +24,33 @@ const init = {
 }
 
 // all explorer actions
-const actions = (app, service) => update => ({
-  model: (callback) => app(state => {
+const actions = (store, service) => ({
+  
+  model: (callback) => {
     service.models(
       (data) => {
-        state.actions.explorer.setEntries(data)
-
+        store.actions.explorer.setEntries(data)
         if(callback) {
           callback()
         }
       }
     );
-  }),
-  delete: (entries, successCallback, errorCallback) => app(state => {
+  },
+
+  delete: (entries, successCallback, errorCallback) => {
     const success = (data) => {console.log('delete-success', data)}
     const error = (data) => {console.log('delete-error', data)}
     service.delete(entries, success, error);
-  }),
+  },
+
   service: service
+
 })
 
-export const State = (app, backend) => {
+export const State = (store, backend) => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app, backend)
+    actions: actions(store, backend)
   }
 }

@@ -24,10 +24,10 @@ const init = {
 }
 
 // all explorer actions
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
-  }),
-  load: (entryToLoad, codemirror) => app(({ actions }) => update(model => {
+const actions = ({actions, update}) => ({
+  init: () => {},
+
+  load: (entryToLoad, codemirror) => update(model => {
     const entry = model.getIn(['editor', 'entry'])
     const id = entry.get('id');
 
@@ -38,16 +38,18 @@ const actions = app => update => ({
     return model
       .updateIn([ID, 'models'], models => models.get(id) ? models : models.set(id, entry))
       .setIn([ID, 'active'], id);
-  })),
-  change: (entry, codemirror) => app(({ actions }) => {
+  }),
+  
+  change: (entry, codemirror) => {
     actions.editor.save({entry, value: codemirror.getValue()});
-  })
+  }
+
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }
