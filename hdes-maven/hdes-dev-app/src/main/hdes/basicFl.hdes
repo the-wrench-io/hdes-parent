@@ -1,27 +1,10 @@
-define flow: x description: 'descriptive'
+define decision-table: basic
 headers: {
-  id INTEGER optional IN,
-  externalId INTEGER required IN,
-  elements ARRAY of OBJECT required IN: {
-    value STRING required IN
-  },
-  output ARRAY of OBJECT required OUT: {
-    value STRING required OUT
-  }
-}  
-tasks: {
-  FirstTask: {
-    then: HandleElement
-    decision-table: bestDtTask uses: {
-      name: elements.value
-    }
-  } from elements then: EndTask,
-  
-  HandleElement: {
-    then: end as: { output: { value: FirstTask.dtOutput }}
-  },
-  
-  EndTask: {
-    then: end as: { input1: arg1.x1, input2: arg2.x1 }
-  }
+  name STRING required IN,
+  lastName STRING required IN,
+  type INTEGER required IN,
+  value INTEGER required OUT 
+} ALL: {
+  { ?, ?, between 1 and 30, 20 },
+  { not 'bob' or 'sam', 'woman', ?, 4570 }
 }
