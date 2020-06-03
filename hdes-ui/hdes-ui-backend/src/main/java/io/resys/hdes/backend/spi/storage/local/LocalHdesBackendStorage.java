@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.immutables.value.Value;
@@ -56,13 +57,13 @@ import io.resys.hdes.backend.api.ImmutableDef;
 import io.resys.hdes.backend.api.ImmutableDefAst;
 import io.resys.hdes.backend.api.ImmutableDefError;
 import io.resys.hdes.backend.api.ImmutableLocalStorageConfig;
+import io.resys.hdes.backend.spi.storage.GenericStorageWriterEntry;
 
 public class LocalHdesBackendStorage implements HdesBackendStorage {
   
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalHdesBackendStorage.class);
   
-  private final Map<String, Def> cache = new HashMap<>();
-  
+  private final Map<String, DefCacheEntry> cache = new HashMap<>();
   private final File location;
   private final LocalStorageConfig storageConfig;
   
@@ -79,6 +80,13 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
     }
   }
   
+  @Value.Immutable
+  public interface DefCacheEntry {
+    DefFileKey getKey();
+    Def getDef();
+  }
+  
+  
   public LocalHdesBackendStorage(File location, LocalStorageConfig storageConfig) {
     super();
     this.location = location;
@@ -86,7 +94,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
   }
 
   @Override
-  public StorageConfig getConfig() {
+  public StorageConfig config() {
     return storageConfig;
   }
   
@@ -96,7 +104,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
       @Override
       public Collection<DefError> build() {
         var errors = new ArrayList<DefError>();
-        cache.values().forEach(v -> errors.addAll(v.getErrors()));
+        cache.values().forEach(v -> errors.addAll(v.getDef().getErrors()));
         return errors;
       }
     };
@@ -107,11 +115,16 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
     return new StorageReader() {
       @Override
       public Collection<Def> build() {
-        StringBuilder log = new StringBuilder()
-            .append("Loading .hdes files from '").append(location.getAbsolutePath()).append("':").append(System.lineSeparator());
-        AstEnvir.Builder builder = ImmutableAstEnvir.builder().ignoreErrors();
+        if(!cache.isEmpty()) {
+          return cache.values().stream().map(e -> e.getDef()).collect(Collectors.toUnmodifiableList());
+        }
         
-        List<DefFileKey> keys = new ArrayList<>();
+        var log = new StringBuilder()
+            .append("Loading .hdes files from '").append(location.getAbsolutePath()).append("':")
+            .append(System.lineSeparator());
+        var builder = ImmutableAstEnvir.builder().ignoreErrors();
+        var keys = new HashMap<String, DefFileKey>();
+        
         for(File file : location.listFiles((File dir, String name) -> name.endsWith(".hdes"))) {
           log.append("  - ").append(file.getAbsolutePath()).append(System.lineSeparator());
           
@@ -120,52 +133,57 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
             String src = new String(bytes, StandardCharsets.UTF_8);
             String id = UUID.randomUUID().toString();
             builder.add().externalId(id).src(src);
-            keys.add(ImmutableDefFileKey.builder().defId(id).fileName(file.getAbsolutePath()).build());
+            keys.put(id, ImmutableDefFileKey.builder().defId(id).fileName(file.getAbsolutePath()).build());
             
           } catch(IOException e) {
             throw new UncheckedIOException(e);
           } 
         }
         
-        AstEnvir astEnvir = builder.build();
-        for(DefFileKey key : keys) {
-          BodyNode node = astEnvir.getBody(key.getDefId());
-          String src = astEnvir.getSrc(key.getDefId());
-          List<ErrorNode> errors = astEnvir.getErrors(key.getDefId());
-          
-          DefType type = null;
-          if(node instanceof DecisionTableBody) {
-            type = DefType.DT;
-          } else if(node instanceof FlowBody) {
-            type = DefType.FL;
-          } else if(node instanceof ManualTaskBody) {
-            type = DefType.MT;
-          } else {
-            continue;
-          }
-          
-          Def def = ImmutableDef.builder()
-              .id(key.getDefId())
-              .value(src)
-              .type(type)
-              .name(node.getId())
-              .errors(errors.stream().map(e -> map(key, node, e)).collect(Collectors.toUnmodifiableList()))
-              .ast(ImmutableDefAst.builder().build()).build();  
-          
-
-          cache.put(def.getId(), def);
-        }
-        
+        map(builder.build(), def -> cache.put(def.getId(), 
+            ImmutableDefCacheEntry.builder()
+            .def(def)
+            .key(keys.get(def.getId()))
+            .build()));
         LOGGER.debug(log.toString());
-        return cache.values();
+        return cache.values().stream().map(e -> e.getDef()).collect(Collectors.toUnmodifiableList());
       }
     };
   }
   
-  private DefError map(DefFileKey key, BodyNode body, ErrorNode node) {
+  private void map(AstEnvir astEnvir, Consumer<Def> consumer) {
+    for(String id : astEnvir.getBody().keySet()) {
+      BodyNode node = astEnvir.getBody(id);
+      String src = astEnvir.getSrc(id);
+      List<ErrorNode> errors = astEnvir.getErrors(id);
+      
+      DefType type = null;
+      if(node instanceof DecisionTableBody) {
+        type = DefType.DT;
+      } else if(node instanceof FlowBody) {
+        type = DefType.FL;
+      } else if(node instanceof ManualTaskBody) {
+        type = DefType.MT;
+      } else {
+        continue;
+      }
+      
+      Def def = ImmutableDef.builder()
+          .id(id)
+          .value(src)
+          .type(type)
+          .name(node.getId())
+          .errors(errors.stream().map(e -> map(id, node, e)).collect(Collectors.toUnmodifiableList()))
+          .ast(ImmutableDefAst.builder().build()).build();  
+      
+      consumer.accept(def);
+    }
+  }
+  
+  private DefError map(String key, BodyNode body, ErrorNode node) {
     Token nodeToken = node.getTarget().getToken();
     return ImmutableDefError.builder()
-        .id(key.getDefId())
+        .id(key)
         .name(body.getId())
         .message(node.getMessage())
         .token(new StringBuilder()
@@ -179,12 +197,129 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
 
   @Override
   public StorageWriter write() {
-    // TODO Auto-generated method stub
-    return null;
+    return new StorageWriter() {
+      private boolean simulation;
+      private final StorageWriter writer = this;
+      private final Map<String, String> toUpdate = new HashMap<>(); 
+      private final List<String> toDelete = new ArrayList<>();
+      private final Map<String, String> toCreate = new HashMap<>();
+      
+      @Override
+      public StorageWriter simulation(Boolean simulation) {
+        this.simulation = Boolean.TRUE.equals(simulation);
+        return this;
+      }
+      @Override
+      public StorageWriterEntry update() {
+        return new GenericStorageWriterEntry() {
+          @Override
+          public StorageWriter build() {
+            toUpdate.put(id, value);
+            return writer;
+          }
+        };
+      }
+      @Override
+      public StorageWriterEntry delete() {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      @Override
+      public StorageWriterEntry add() {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      
+
+      @Override
+      public List<Def> build() {
+        var builder = ImmutableAstEnvir.builder().ignoreErrors();
+        var keys = new HashMap<String, DefFileKey>();
+
+        // add existing 
+        for(DefCacheEntry entry : cache.values()) {
+          if( toDelete.contains(entry.getKey().getDefId()) || 
+              toUpdate.containsKey(entry.getKey().getDefId())) {
+            
+            continue;
+          }
+          keys.put(entry.getKey().getDefId(), entry.getKey());
+          builder.add().externalId(entry.getKey().getDefId()).src(entry.getDef().getValue());
+        }
+        
+        // add new 
+        for(Map.Entry<String, String> entry : toCreate.entrySet()) {
+          builder.add().externalId(entry.getKey()).src(entry.getValue());
+        }
+        
+        // add to update 
+        for(Map.Entry<String, String> entry : toUpdate.entrySet()) {
+          keys.put(entry.getKey(), cache.get(entry.getKey()).getKey());
+          builder.add().externalId(entry.getKey()).src(entry.getValue());
+        }
+
+        AstEnvir envir = builder.build();
+
+        // write down
+        if(!simulation) {
+          var log = new StringBuilder()
+              .append("Writing .hdes files to '").append(location.getAbsolutePath()).append("':")
+              .append(System.lineSeparator());
+
+          // update
+          for(String key : toUpdate.keySet()) {
+            File file = new File(cache.get(key).getKey().getFileName());
+            log.append("  U - ").append(file.getAbsolutePath()).append(System.lineSeparator());
+            try {
+              Files.write(file.toPath(), toUpdate.get(key).getBytes(StandardCharsets.UTF_8));
+              
+            } catch(IOException e) {
+              throw new UncheckedIOException(e);
+            } 
+          }
+
+          // delete
+          for(String key : toDelete) {
+            File file = new File(cache.get(key).getKey().getFileName());
+            log.append("  D - ").append(file.getAbsolutePath()).append(System.lineSeparator());
+            file.delete();
+          }
+          
+          // create
+          for(Map.Entry<String, String> entry : toCreate.entrySet()) {
+            String name = envir.getBody(entry.getKey()).getId();
+            
+            File file = new File(location, name + ".hdes");
+            log.append("  D - ").append(file.getAbsolutePath()).append(System.lineSeparator());
+            try {
+              file.createNewFile();
+              Files.write(file.toPath(), entry.getValue().getBytes(StandardCharsets.UTF_8));
+              keys.put(entry.getKey(), ImmutableDefFileKey.builder().defId(entry.getKey()).fileName(file.getAbsolutePath()).build());
+            } catch(IOException e) {
+              throw new UncheckedIOException(e);
+            } 
+          }
+          
+          
+          Map<String, DefCacheEntry> newCache = new HashMap<>();
+          map(envir, def -> newCache.put(def.getId(), 
+              ImmutableDefCacheEntry.builder()
+              .def(def)
+              .key(keys.get(def.getId()))
+              .build()));
+          cache.clear();
+          cache.putAll(newCache);
+          LOGGER.debug(log.toString());
+        }
+
+        return cache.values().stream().map(e -> e.getDef()).collect(Collectors.toUnmodifiableList());
+      }
+      
+    };
   }
   
   
-  public static Config config() {
+  public static Config create() {
     return new Config();
   }
   

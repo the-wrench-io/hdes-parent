@@ -101,7 +101,7 @@ const queryHealth = (update, actions) => {
     } finally {
       queryHealth(update, actions)  
     }
-  }, 5000)
+  }, 100000)
 }
 
 // all explorer actions
@@ -119,7 +119,7 @@ const actions = store => ({
         errorHandler(update, errors)
         if(!isConnection(errors)) {
           addlog(update, `Trying to connect again...`)
-          setTimeout(() => actions.health.init(), 5000)
+          setTimeout(() => actions.health.init(), 10000)
         }
       })
   }

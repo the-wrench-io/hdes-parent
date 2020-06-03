@@ -3,6 +3,7 @@ package io.resys.hdes.backend.spi;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.backend.api.HdesBackend;
 import io.resys.hdes.backend.api.HdesBackendStorage;
+import io.resys.hdes.backend.api.HdesBackendStorage.StorageWriter;
 import io.resys.hdes.backend.api.ImmutableStatus;
 
 public class GenericHdesBackend implements HdesBackend {
@@ -58,7 +60,7 @@ public class GenericHdesBackend implements HdesBackend {
   @Override
   public Status status() {
     return ImmutableStatus.builder()
-        .storage(storage.getConfig())
+        .storage(storage.config())
         .errors(storage.errors().build())
         .build();
   }
@@ -75,20 +77,73 @@ public class GenericHdesBackend implements HdesBackend {
 
   @Override
   public DefCreateBuilder builder() {
-    // TODO Auto-generated method stub
-    return null;
+    return new DefCreateBuilder() {
+      private final List<DefCreateEntry> entries = new ArrayList<>();
+      @Override
+      public List<Def> build() {
+        StorageWriter writer = storage.write();
+        entries.forEach(e -> writer.add().name(e.getName()).type(e.getType()).build());
+        return writer.build();
+      }
+      @Override
+      public DefCreateBuilder add(List<DefCreateEntry> def) {
+        entries.addAll(def);
+        return this;
+      }
+      @Override
+      public DefCreateBuilder add(DefCreateEntry def) {
+        entries.add(def);
+        return this;
+      }
+    };
   }
 
   @Override
   public DefChangeBuilder change() {
-    // TODO Auto-generated method stub
-    return null;
+    return new DefChangeBuilder() {
+      private final List<DefChangeEntry> entries = new ArrayList<>();
+      @Override
+      public List<Def> build() {
+        StorageWriter writer = storage.write();
+        entries.forEach(e -> writer.update().id(e.getId()).value(e.getValue()).build());
+        return writer.build();
+      }
+      @Override
+      public DefChangeBuilder add(DefChangeEntry def) {
+        entries.add(def);
+        return this;
+      }
+    };
   }
 
   @Override
   public DefDeleteBuilder delete() {
-    // TODO Auto-generated method stub
-    return null;
+    return new DefDeleteBuilder() {
+      private final List<String> entries = new ArrayList<>();
+      private boolean simulation;
+      @Override
+      public List<Def> build() {
+        StorageWriter writer = storage.write().simulation(simulation);
+        entries.forEach(e -> writer.delete().id(e).build());
+        return writer.build();
+      }
+      @Override
+      public DefDeleteBuilder simulation(boolean simulation) {
+        this.simulation = simulation;
+        return this;
+      }
+      @Override
+      public DefDeleteBuilder entry(DefDeleteEntry entry) {
+        this.simulation(Boolean.TRUE.equals(entry.getSimulation()));
+        entries.addAll(entry.getId());
+        return this;
+      }
+      @Override
+      public DefDeleteBuilder add(String defId) {
+        this.entries.add(defId);
+        return this;
+      }
+    };
   }
 
   @Override

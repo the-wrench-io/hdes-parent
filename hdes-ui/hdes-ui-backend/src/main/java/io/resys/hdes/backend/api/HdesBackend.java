@@ -26,6 +26,9 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 public interface HdesBackend {
   enum DefType { FL, DT, TG, ST, MT }
   enum ConfigType { LOCAL, REMOTE, CLASSPATH }
@@ -52,7 +55,7 @@ public interface HdesBackend {
   
   interface DefChangeBuilder {
     DefChangeBuilder add(DefChangeEntry def);
-    Def build();
+    List<Def> build();
   }
   
   interface DefQueryBuilder {
@@ -73,18 +76,24 @@ public interface HdesBackend {
   }
 
   @Value.Immutable
+  @JsonSerialize(as = ImmutableDefDeleteEntry.class)
+  @JsonDeserialize(as = ImmutableDefDeleteEntry.class)
   interface DefDeleteEntry {
     List<String> getId();
     Boolean getSimulation();
   }
   
   @Value.Immutable
+  @JsonSerialize(as = ImmutableDefChangeEntry.class)
+  @JsonDeserialize(as = ImmutableDefChangeEntry.class)
   interface DefChangeEntry {
     String getId();
     String getValue();
   }
   
   @Value.Immutable
+  @JsonSerialize(as = ImmutableDefCreateEntry.class)
+  @JsonDeserialize(as = ImmutableDefCreateEntry.class)
   interface DefCreateEntry {
     String getName();
     DefType getType();

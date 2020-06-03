@@ -19,6 +19,7 @@ package io.resys.hdes.ui.quarkus.runtime.handlers;
  * #L%
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,14 +31,22 @@ import io.resys.hdes.backend.api.HdesBackend.Def;
 import io.resys.hdes.backend.api.HdesBackend.DefChangeEntry;
 import io.resys.hdes.backend.api.HdesBackend.DefCreateEntry;
 import io.resys.hdes.backend.api.HdesBackend.DefDeleteEntry;
+import io.resys.hdes.backend.api.ImmutableDefChangeEntry;
+import io.resys.hdes.backend.api.ImmutableDefCreateEntry;
+import io.resys.hdes.backend.api.ImmutableDefDeleteEntry;
 import io.resys.hdes.ui.quarkus.runtime.HdesHandlerHelper;
-import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.impl.BodyHandlerImpl;
 
-public class HdesDefsHandler implements Handler<RoutingContext> {
+
+public class HdesDefsHandler extends BodyHandlerImpl {
+  
+  public HdesDefsHandler() {
+    super(false);
+  }
   
   @Override
   public void handle(RoutingContext event) {
@@ -54,22 +63,22 @@ public class HdesDefsHandler implements Handler<RoutingContext> {
         break;
         
       case DELETE:
-        DefDeleteEntry toDelete = backend.reader().build(event.getBody().getBytes(), DefDeleteEntry.class);
+        DefDeleteEntry toDelete = backend.reader().build(event.getBody().getBytes(), ImmutableDefDeleteEntry.class);
         List<Def> deleted = backend.delete().entry(toDelete).build();
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(backend.writer().build(deleted)));
         break;
         
       case POST:
-        List<DefCreateEntry> create = backend.reader().list(event.getBody().getBytes(), DefCreateEntry.class);
+        List<DefCreateEntry> create = new ArrayList<>(backend.reader().list(event.getBody().getBytes(), ImmutableDefCreateEntry.class));
         List<Def> created = backend.builder().add(create).build();
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(backend.writer().build(created)));
         break;
         
       case PUT:
-        DefChangeEntry change = backend.reader().build(event.getBody().getBytes(), DefChangeEntry.class);
-        Def changed = backend.change().add(change).build();
+        DefChangeEntry change = backend.reader().build(event.getBody().getBytes(), ImmutableDefChangeEntry.class);
+        Def changed = backend.change().add(change).build().get(0);
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(backend.writer().build(changed)));
         break;

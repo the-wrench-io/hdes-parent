@@ -93,7 +93,9 @@ public class ImmutableAstEnvir implements AstEnvir {
     private final Map<String, BodyNode> body = new HashMap<>();
     private final Map<String, String> src = new HashMap<>();
     private final Map<String, List<ErrorNode>> errors = new HashMap<>();
+    private final List<String> toBeRemoved = new ArrayList<>();
     private boolean ignoreErrors;
+    private AstEnvir from;
     
     @Override
     public Builder ignoreErrors() {
@@ -101,12 +103,23 @@ public class ImmutableAstEnvir implements AstEnvir {
       return this;
     }
     @Override
+    public Builder delete(String id) {
+      this.toBeRemoved.add(id);
+      return this;
+    }
+    @Override
     public Builder from(AstEnvir envir) {
-      // TODO Auto-generated method stub
+      this.from = envir;
       return this;
     }
     @Override
     public AstEnvir build() {
+      if(from != null) {
+        from.getBody().keySet().stream()
+        .filter(id -> !toBeRemoved.contains(id))
+        .filter(id -> !src.containsKey(id))
+        .forEach(id -> add().externalId(id).src(from.getSrc(id)));
+      }
       if(!ignoreErrors) {
         List<ErrorNode> errors = new ArrayList<>();
         this.errors.values().forEach(v -> errors.addAll(v));

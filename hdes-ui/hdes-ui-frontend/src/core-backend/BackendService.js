@@ -38,6 +38,15 @@ class BackendService {
       .then(successHandler)
       .catch(errors => getErrors(errors, errorHandler, url))
   }
+  save({id, value}, successHandler, errorHandler) {
+    const body = {id, value}
+    const method = { method: 'PUT', body: JSON.stringify(body), credentials: 'same-origin', headers: this.writeHeaders }
+    const url = this.config.get('url') + '/defs'
+    return fetch(url, method)
+      .then(getResponse)
+      .then(successHandler)
+      .catch(errors => getErrors(errors, errorHandler, url))
+  }
   health(successHandler, errorHandler) {
     // console.log('loading health')
     const method = { method: 'GET', credentials: 'same-origin', headers: this.readHeaders }

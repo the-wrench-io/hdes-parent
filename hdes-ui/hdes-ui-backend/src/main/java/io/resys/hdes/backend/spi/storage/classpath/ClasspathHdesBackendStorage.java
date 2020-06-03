@@ -71,7 +71,7 @@ public class ClasspathHdesBackendStorage implements HdesBackendStorage {
   }
   
   
-  public static Config config() {
+  public static Config create() {
     return new Config();
   }
   
@@ -82,7 +82,7 @@ public class ClasspathHdesBackendStorage implements HdesBackendStorage {
   }
 
   @Override
-  public StorageConfig getConfig() {
+  public StorageConfig config() {
     return storageConfig;
   }
 }

@@ -21,6 +21,7 @@ package io.resys.hdes.backend.api;
  */
 
 import java.util.Collection;
+import java.util.List;
 
 import io.resys.hdes.backend.api.HdesBackend.Def;
 import io.resys.hdes.backend.api.HdesBackend.DefError;
@@ -29,7 +30,7 @@ import io.resys.hdes.backend.api.HdesBackend.StorageConfig;
 
 public interface HdesBackendStorage {
   
-  StorageConfig getConfig();
+  StorageConfig config();
   
   StorageReader read();
   
@@ -46,9 +47,18 @@ public interface HdesBackendStorage {
   }
   
   interface StorageWriter {
-    StorageWriter name(String name);
-    StorageWriter type(DefType type);
-    StorageWriter value(String value);
-    Def build();
+    StorageWriter simulation(Boolean simulation);
+    StorageWriterEntry add();
+    StorageWriterEntry update();
+    StorageWriterEntry delete();
+    List<Def> build();
+  }
+  
+  interface StorageWriterEntry {
+    StorageWriterEntry id(String id);
+    StorageWriterEntry name(String name);
+    StorageWriterEntry type(DefType type);
+    StorageWriterEntry value(String value);
+    StorageWriter build();
   }
 }

@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Singleton;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,13 +46,14 @@ public class HdesBackendProducer {
   }
 
   @Produces
+  @Singleton
   @DefaultBean
   public HdesBackend hdesUIBackend() {
     HdesBackendStorage storage = null;
     if(!local.isEmpty()) {
-      storage = LocalHdesBackendStorage.config().setLocation(local.get()).build();
+      storage = LocalHdesBackendStorage.create().setLocation(local.get()).build();
     } else {
-      storage = ClasspathHdesBackendStorage.config().build();
+      storage = ClasspathHdesBackendStorage.create().build();
     }
     
     ObjectMapper objectMapper = new ObjectMapper();

@@ -64,6 +64,7 @@ import io.resys.hdes.ui.quarkus.runtime.handlers.HdesDefsHandler;
 import io.resys.hdes.ui.quarkus.runtime.handlers.HdesStatusHandler;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 
 public class HdesUiProcessor {
   private static final Logger LOGGER = Logger.getLogger(HdesUiProcessor.class.getName());
@@ -151,7 +152,9 @@ public class HdesUiProcessor {
     
     // Defs handler
     String defsPath = path + "/defs";
+    routes.produce(new RouteBuildItem(defsPath, BodyHandler.create()));
     routes.produce(new RouteBuildItem(defsPath, new HdesDefsHandler(), HandlerType.BLOCKING));
+    
     displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(defsPath));
     
     

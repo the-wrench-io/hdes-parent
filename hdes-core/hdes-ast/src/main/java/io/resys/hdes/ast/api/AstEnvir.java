@@ -37,6 +37,7 @@ public interface AstEnvir {
   interface Builder {
     Builder ignoreErrors();
     Builder from(AstEnvir envir);
+    Builder delete(String id);
     SourceBuilder<Builder> add();
     AstEnvir build();
   }
