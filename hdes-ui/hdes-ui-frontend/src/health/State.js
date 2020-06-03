@@ -109,8 +109,6 @@ const actions = store => ({
 
   init: () => {
     const { update, actions } = store
-    console.log(store);
-
     addlog(update, 'Getting connection...')
     actions.backend.service.health(
       data => setTimeout(() => {

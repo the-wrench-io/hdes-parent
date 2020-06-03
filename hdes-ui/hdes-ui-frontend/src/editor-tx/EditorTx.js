@@ -29,11 +29,15 @@ CodeMirror.defineSimpleMode("hdes", {
     {regex: /'(?:[^\\]|\\.)*?(?:'|$)/, token: "string"},
     // You can match multiple tokens at once. Note that the captured
     // groups must span the whole string in this case
-    {regex: /(function)(\s+)([a-z$][\w$]*)/,
-     token: ["keyword", null, "variable-2"]},
+    {regex: /(?:define|flow|decision-table|description)\b/,
+      token: 'meta'},
+    {regex: /(?:optional|required)\b/,
+     token: 'builtin'},
+    {regex: /(?:IN|OUT|INTEGER|STRING|ARRAY|OBJECT|FORMULA|ALL|MATRIX|FROM)\b/,
+      token: 'qualifier'},
     // Rules are matched in the order in which they appear, so there is
     // no ambiguity between this one and the one above
-    {regex: /(?:form of groups|groups|from|FORMULA|fields|actions|dropdowns|headers|tasks|define|flow|decision-table|description|then|end as|ALL|MATRIX|FROM)\b/,
+    {regex: /(?:form of groups|groups|from|fields|actions|dropdowns|headers|tasks|then|end as|uses)\b/,
      token: "keyword"},
     {regex: /true|false/, token: "atom"},
     {regex: /0x[a-f\d]+|[-+]?(?:\.\d+|\d+\.?\d*)(?:e[-+]?\d+)?/i,
@@ -42,10 +46,10 @@ CodeMirror.defineSimpleMode("hdes", {
     {regex: /\/(?:[^\\]|\\.)*?\//, token: "variable-3"},
     // A next property will cause the mode to move to a different state
     {regex: /\/\*/, token: "comment", next: "comment"},
-    {regex: /[-+\/*=<>!]+/, token: "operator"},
+    {regex: /[-+/*=<>!]+/, token: "operator"},
     // indent and dedent properties guide autoindentation
-    {regex: /[\{\[\(]/, indent: true},
-    {regex: /[\}\]\)]/, dedent: true},
+    {regex: /[{[(]/, indent: true},
+    {regex: /[}\])]/, dedent: true},
     {regex: /[a-z$][\w$]*/, token: "variable"},
   ],
   // The multi-line comment state.
@@ -97,7 +101,7 @@ export class EditorTx extends Component {
     }
   }
   render() {
-    const { actions, state, entry } = this.props
+    const { state } = this.props
     const active = state.getIn(['editortx', 'active'])
 
     if(!active) {

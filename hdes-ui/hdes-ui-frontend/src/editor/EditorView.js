@@ -17,11 +17,11 @@
  * limitations under the License.
  * #L%
  */
-import { Component } from 'inferno';
-import { EditorTx } from './../editor-tx';
-import { FlView } from './../editor-fl';
-import { DlView } from './../editor-dl';
-import { DtView } from './../editor-dt';
+import { Component } from 'inferno'
+import { EditorTx } from './../editor-tx'
+import { DlView } from './../editor-dl'
+//import { DtView } from './../editor-dt'
+//import { FlView } from './../editor-fl'
 
 
 const createComponent = (actions, state) => {
@@ -40,7 +40,6 @@ const createComponent = (actions, state) => {
   } else {
     return <EditorTx actions={actions} state={state} entry={entry} />
   }
-  return (<div>coming soon!</div>)
 }
 
 export class EditorView extends Component {
