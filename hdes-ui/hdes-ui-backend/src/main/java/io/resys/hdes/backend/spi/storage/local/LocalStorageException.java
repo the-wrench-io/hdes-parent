@@ -59,6 +59,10 @@ public class LocalStorageException extends RuntimeException {
           .append("Resource already exists: ").append(file.getAbsolutePath()).append("!")
           .toString();
     }
-    
+    public String sameResoureInFile(String name, File file) {
+      return new StringBuilder()
+          .append("Resource with the name '").append(name).append("' already exists in: ").append(file.getAbsolutePath()).append("!")
+          .toString();
+    }
   }   
 }

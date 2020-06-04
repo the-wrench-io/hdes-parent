@@ -23,17 +23,21 @@ package io.resys.hdes.backend.spi.storage.local;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.codec.binary.Hex;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,18 +66,17 @@ import io.resys.hdes.backend.spi.storage.HdesResourceBuilder;
 import io.resys.hdes.backend.spi.util.Assert;
 
 public class LocalHdesBackendStorage implements HdesBackendStorage {
-  
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalHdesBackendStorage.class);
-  
   private final File location;
   private final LocalStorageConfig storageConfig;
   private final Map<String, DefCacheEntry> cache = new HashMap<>();
-  
+
   @Value.Immutable
   public interface DefFileKey extends Comparable<DefFileKey> {
     String getDefId();
+
     String getFileName();
-    
+
     @Override
     default int compareTo(DefFileKey o) {
       String o1 = getDefId() + "@" + getFileName();
@@ -81,14 +84,14 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
       return o1.compareTo(o2);
     }
   }
-  
+
   @Value.Immutable
   public interface DefCacheEntry {
     DefFileKey getKey();
+
     Def getDef();
   }
-  
-  
+
   public LocalHdesBackendStorage(File location, LocalStorageConfig storageConfig) {
     super();
     this.location = location;
@@ -99,7 +102,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
   public StorageConfig config() {
     return storageConfig;
   }
-  
+
   @Override
   public ErrorReader errors() {
     return new ErrorReader() {
@@ -111,75 +114,68 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
       }
     };
   }
-  
+
   @Override
   public StorageReader read() {
     return new StorageReader() {
       @Override
       public Collection<Def> build() {
         cache.clear();
-        
         var log = new StringBuilder()
             .append("Loading .hdes files from '").append(location.getAbsolutePath()).append("':")
             .append(System.lineSeparator());
         var builder = ImmutableAstEnvir.builder().ignoreErrors();
         var keys = new HashMap<String, DefFileKey>();
-        
-        for(File file : location.listFiles((File dir, String name) -> name.endsWith(".hdes"))) {
-          log.append("  - ").append(file.getAbsolutePath()).append(System.lineSeparator());
+        for (File file : location.listFiles((File dir, String name) -> name.endsWith(".hdes"))) {
           
           try {
             byte[] bytes = Files.readAllBytes(file.toPath());
             String src = new String(bytes, StandardCharsets.UTF_8);
-            String id = UUID.randomUUID().toString();
+            String id = LocalHdesBackendStorage.id(file);
             builder.add().externalId(id).src(src);
             keys.put(id, ImmutableDefFileKey.builder().defId(id).fileName(file.getAbsolutePath()).build());
-            
-          } catch(IOException e) {
+            log.append("  ").append(id).append(" - ").append(file.getAbsolutePath()).append(System.lineSeparator());
+          } catch (IOException e) {
             throw new UncheckedIOException(e);
-          } 
+          }
         }
-        
-        map(builder.build(), def -> cache.put(def.getId(), 
+        map(builder.build(), def -> cache.put(def.getId(),
             ImmutableDefCacheEntry.builder()
-            .def(def)
-            .key(keys.get(def.getId()))
-            .build()));
+                .def(def)
+                .key(keys.get(def.getId()))
+                .build()));
         LOGGER.debug(log.toString());
         return cache.values().stream().map(e -> e.getDef()).collect(Collectors.toUnmodifiableList());
       }
     };
   }
-  
+
   private void map(AstEnvir astEnvir, Consumer<Def> consumer) {
-    for(String id : astEnvir.getBody().keySet()) {
+    for (String id : astEnvir.getBody().keySet()) {
       BodyNode node = astEnvir.getBody(id);
       String src = astEnvir.getSrc(id);
       List<ErrorNode> errors = astEnvir.getErrors(id);
-      
       DefType type = null;
-      if(node instanceof DecisionTableBody) {
+      if (node instanceof DecisionTableBody) {
         type = DefType.DT;
-      } else if(node instanceof FlowBody) {
+      } else if (node instanceof FlowBody) {
         type = DefType.FL;
-      } else if(node instanceof ManualTaskBody) {
+      } else if (node instanceof ManualTaskBody) {
         type = DefType.MT;
       } else {
         continue;
       }
-      
       Def def = ImmutableDef.builder()
           .id(id)
           .value(src)
           .type(type)
           .name(node.getId())
           .errors(errors.stream().map(e -> map(id, node, e)).collect(Collectors.toUnmodifiableList()))
-          .ast(ImmutableDefAst.builder().build()).build();  
-      
+          .ast(ImmutableDefAst.builder().build()).build();
       consumer.accept(def);
     }
   }
-  
+
   private DefError map(String key, BodyNode body, ErrorNode node) {
     Token nodeToken = node.getTarget().getToken();
     return ImmutableDefError.builder()
@@ -237,7 +233,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
         return new GenericStorageWriterEntry() {
           @Override
           public StorageWriter build() {
-            String id = UUID.randomUUID().toString();
+            String id = LocalHdesBackendStorage.id(new File(location, name + ".hdes"));
             toCreate.put(id, HdesResourceBuilder.builder().name(name).type(type).build());
             return writer;
           }
@@ -301,6 +297,10 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
           // create
           for(Map.Entry<String, String> entry : toCreate.entrySet()) {
             String name = envir.getBody(entry.getKey()).getId();
+            Optional<DefCacheEntry> duplicate = cache.values().stream().filter(e -> e.getDef().getName().equals(name)).findFirst();
+            if(duplicate.isPresent()) {
+              throw new LocalStorageException(LocalStorageException.builder().sameResoureInFile(name, new File(duplicate.get().getKey().getFileName())));
+            }
             
             File file = new File(location, name + ".hdes");
             log.append("  D - ").append(file.getAbsolutePath()).append(System.lineSeparator());
@@ -333,15 +333,30 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
       
     };
   }
-  
-  
+
+  private static String id(File file) {
+    try {
+      String msg = file.getAbsolutePath();
+      MessageDigest md5 = MessageDigest.getInstance("MD5");
+      md5.reset();
+      md5.update(msg.getBytes(Charset.forName("UTF-8")));
+      byte[] digest = md5.digest();
+      return Hex.encodeHexString(digest);
+    } catch (NoSuchAlgorithmException ex) {
+      // Fall back to just hex timestamp in this improbable situation
+      LOGGER.warn("MD5 Digester not found, falling back to timestamp hash", ex);
+      long timestamp = System.currentTimeMillis();
+      return Long.toHexString(timestamp);
+    }
+  }
+
   public static Config create() {
     return new Config();
   }
-  
+
   public static class Config {
     private String location;
-    
+
     public Config setLocation(String location) {
       this.location = location;
       return this;
@@ -349,16 +364,15 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
 
     public LocalHdesBackendStorage build() {
       File file = new File(location);
-      if(!file.exists()) {
+      if (!file.exists()) {
         throw new LocalStorageException(LocalStorageException.builder().nonExistingLocation(file));
       }
-      if(!file.isDirectory()) {
+      if (!file.isDirectory()) {
         throw new LocalStorageException(LocalStorageException.builder().locationIsNotDirectory(file));
       }
-      if(!file.canWrite()) {
+      if (!file.canWrite()) {
         throw new LocalStorageException(LocalStorageException.builder().locationCantBeWritten(file));
       }
-      
       return new LocalHdesBackendStorage(file, ImmutableLocalStorageConfig.builder().type(ConfigType.LOCAL).location(location).build());
     }
   }

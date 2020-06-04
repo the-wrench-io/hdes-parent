@@ -23,7 +23,7 @@ const ID = 'create'
 const init = {
   value: '',
   errors: [
-    {id: '1', value: 'name can not be empty'}
+    //{id: '1', value: 'name can not be empty'}
   ]
 }
 
@@ -39,6 +39,7 @@ const actions = ({ actions, update }) => ({
     })
 
     const onError = (errors) => {
+      console.log(errors)
       const result = errors.map(e => { return {id: e.id, value: e.defaultMessage}});
       update(model => model.setIn([ID, 'errors'], Immutable.fromJS(result)))
     };

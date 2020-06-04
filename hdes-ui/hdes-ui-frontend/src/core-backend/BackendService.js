@@ -57,14 +57,9 @@ class BackendService {
       .catch(errors => getErrors(errors, errorHandler, url))
   }
   create(entities, successHandler, errorHandler) {
-    const map = (e) => {
-      return { label: e.type, values: [{type: 'SET_NAME', value: e.name}]};
-    }
-    const body = Array.isArray(entities) ? entities.map(map) : [map(entities)];
-
-    console.log(body)
+    const body = Array.isArray(entities) ? entities : [entities];
     const method = { method: 'POST', body: JSON.stringify(body), credentials: 'same-origin', headers: this.writeHeaders }
-    const url = this.config.get('url') + 'changes'
+    const url = this.config.get('url') + '/defs'
     return fetch(url, method)
       .then(getResponse)
       .then(successHandler)
@@ -103,7 +98,7 @@ function getErrors(error, callback, url) {
   if(error.response) {
     error.response
     .then(data => {
-      const messages = data.values.map(e => {
+      const messages = data.map(e => {
         return {id: e.id, defaultMessage: e.value, logCode: data.logCode, args: e.args};
       });
       callback(messages);

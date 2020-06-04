@@ -44,12 +44,12 @@ export class CreateView extends Component {
                 defaultValue={value}
                 class='is-rounded input is-primary' type='text' placeholder='Type name...' />
 
-              <div><button class='button is-fullwidth' onClick={() => actions.create.create('fl', value)}>flow</button></div>
-              <div><button class='button is-fullwidth' onClick={() => actions.create.create('dt', value)}>decision table</button></div>
-              <div><button class='button is-fullwidth' onClick={() => actions.create.create('st', value)}>service task</button></div>
-              <div><button class='button is-fullwidth' onClick={() => actions.create.create('mt', value)}>manual task</button></div>
-              <div><button class='button is-fullwidth' onClick={() => actions.create.create('tg', value)}>tag</button></div>
-              <div><button class='button is-fullwidth' onClick={() => actions.create.create('us', value)}>user</button></div>
+              <div><button class='button is-fullwidth' onClick={() => actions.create.create('FL', value)}>flow</button></div>
+              <div><button class='button is-fullwidth' onClick={() => actions.create.create('DT', value)}>decision table</button></div>
+              <div><button class='button is-fullwidth' onClick={() => actions.create.create('ST', value)}>service task</button></div>
+              <div><button class='button is-fullwidth' onClick={() => actions.create.create('MT', value)}>manual task</button></div>
+              <div><button class='button is-fullwidth' onClick={() => actions.create.create('TG', value)}>tag</button></div>
+              <div><button class='button is-fullwidth' onClick={() => actions.create.create('US', value)}>user</button></div>
 
               {errors}
             </div>

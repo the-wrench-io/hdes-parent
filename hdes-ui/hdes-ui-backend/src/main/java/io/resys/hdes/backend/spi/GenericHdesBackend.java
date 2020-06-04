@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /*-
@@ -176,7 +175,7 @@ public class GenericHdesBackend implements HdesBackend {
       @Override
       public <T> List<T> list(byte[] body, Class<T> type) {
         try {
-          return objectMapper.readValue(body, new TypeReference<List<T>>() {});
+          return objectMapper.readValue(body, objectMapper.getTypeFactory().constructCollectionType(List.class, type));
         } catch (IOException e) {
           throw new UncheckedIOException(e);
         }
