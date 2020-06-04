@@ -83,7 +83,9 @@ export class EditorTx extends Component {
     actions.editortx.load(entry)
   }
   componentDidUpdate(prevProps) {
-    const { actions, entry } = this.props
+    const { actions } = this.props
+    const getEntry = () => this.props.entry
+
     if(!this.editor) {
       this.editor = CodeMirror.fromTextArea(this.textareaRef.current, {
         mode: 'hdes',
@@ -93,11 +95,11 @@ export class EditorTx extends Component {
         gutters: ['CodeMirror-lint-markers'],
         theme: 'abcdef'
       })
-      this.editor.on('change', (editor) => actions.editortx.change(entry, editor))
+      this.editor.on('change', (editor) => actions.editortx.change(getEntry(), editor))
     }
 
     if(this.props.entry.get('id') !== prevProps.entry.get('id')) {
-      actions.editortx.load(entry, this.editor)
+      actions.editortx.load(getEntry(), this.editor)
     }
   }
   render() {

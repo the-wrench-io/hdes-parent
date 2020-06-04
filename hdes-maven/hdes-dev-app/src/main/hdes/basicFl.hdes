@@ -8,7 +8,7 @@ headers: {
   output ARRAY of OBJECT required OUT: {
     value STRING required OUT
   }
-}  
+}
 tasks: {
   FirstTask: {
     then: HandleElement

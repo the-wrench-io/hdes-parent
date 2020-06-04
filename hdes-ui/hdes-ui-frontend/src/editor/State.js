@@ -68,6 +68,10 @@ const actions = ({ update, actions }) => ({
     const delayKey = [ID, 'saving', id];
     
     update(model => {
+      if(model.getIn([ID, 'entry', 'value']) === value) {
+        return
+      }
+
       const saving = model.getIn(delayKey);  
       
       // Schedule saved delay if its not present

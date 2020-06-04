@@ -8,7 +8,7 @@ headers: {
   },
   avgAge INTEGER required OUT formula: sum(out.age)/out.length
 }
-
+ 
 dropdowns: {
   gender: { 0: 'female', 1: 'male', 2: 'other' }
 }
