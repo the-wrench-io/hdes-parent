@@ -1,10 +1,13 @@
-define decision-table: basic
+define decision-table: MatrixDT
+
 headers: {
-  name STRING required IN,
+  name     STRING required IN,
   lastName STRING required IN,
-  type INTEGER required IN,
-  value INTEGER required OUT 
-} ALL: {
-  { ?, ?, between 1 and 30, 20 },
-  { not 'bob' or 'sam', 'woman', ?, 4570 }
+  value    INTEGER required OUT,
+  total    INTEGER OUT FORMULA: sum(outputs)/size(outputs) + 10/50
+
+} MATRIX: {
+            { 'BOB', 'SAM', ? }
+  name:     {  10,    20,   30 },
+  lastName: {  20,    50,   60 }
 }

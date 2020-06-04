@@ -58,6 +58,8 @@ import io.resys.hdes.backend.api.ImmutableDefAst;
 import io.resys.hdes.backend.api.ImmutableDefError;
 import io.resys.hdes.backend.api.ImmutableLocalStorageConfig;
 import io.resys.hdes.backend.spi.storage.GenericStorageWriterEntry;
+import io.resys.hdes.backend.spi.storage.HdesResourceBuilder;
+import io.resys.hdes.backend.spi.util.Assert;
 
 public class LocalHdesBackendStorage implements HdesBackendStorage {
   
@@ -214,6 +216,8 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
         return new GenericStorageWriterEntry() {
           @Override
           public StorageWriter build() {
+            Assert.notNull(id, () -> "id can't be null!");
+            Assert.notEmpty(value, () -> "value can't be empty!");
             toUpdate.put(id, value);
             return writer;
           }
@@ -221,15 +225,26 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
       }
       @Override
       public StorageWriterEntry delete() {
-        // TODO Auto-generated method stub
-        return null;
+        return new GenericStorageWriterEntry() {
+          @Override
+          public StorageWriter build() {
+            Assert.notNull(id, () -> "id can't be null!");
+            toDelete.add(id);
+            return writer;
+          }
+        };
       }
       @Override
       public StorageWriterEntry add() {
-        // TODO Auto-generated method stub
-        return null;
+        return new GenericStorageWriterEntry() {
+          @Override
+          public StorageWriter build() {
+            String id = UUID.randomUUID().toString();
+            toCreate.put(id, HdesResourceBuilder.builder().name(name).type(type).build());
+            return writer;
+          }
+        };
       }
-      
 
       @Override
       public List<Def> build() {

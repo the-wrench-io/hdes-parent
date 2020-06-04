@@ -22,7 +22,12 @@ const ID = 'health'
 const init = {
   init: { enabled: true, loading: true, log: [] },
   status: undefined,
-  connection: undefined
+  connection: undefined,
+  messages: {
+    showing: undefined,
+    upcoming: [],
+    done: []
+  }
 }
 
 const addlog = (update, value) => update(model => {
@@ -122,9 +127,10 @@ const actions = store => ({
           setTimeout(() => actions.health.init(), 10000)
         }
       })
+  },
+  notify: ({type, value}) => {
+
   }
-
-
 })
 
 export const State = store => {
