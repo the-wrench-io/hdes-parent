@@ -31,6 +31,7 @@ const init = {
 // all explorer actions
 const actions = ({ update, actions }) => ({
   init: () => {},
+ 
   open: (entry) => {
     update(model => model.setIn([ID, 'entry'], entry));
 
@@ -46,21 +47,21 @@ const actions = ({ update, actions }) => ({
     const saving = model.getIn(delayKey);
     if(!saving) {
       console.log('saving key removed')
+      return
     }
 
     const timeTillSave = saving.get('delay')
     if(timeTillSave > 0) {
       actions.editor.delayedSave(delayKey)
-      return model.updateIn(delayKey, v => v.set('delay', timeTillSave - 1000));
+      return model.updateIn(delayKey, v => v.set('delay', timeTillSave - 1000))
     }
 
-    console.log('performing saving')
     actions.backend.service.save(
       { id: model.getIn(delayKey).get('id'), 
         value: model.getIn(delayKey).get('value') },
       data => {},
       errors => {})
-    return model.deleteIn(delayKey);
+    return model.deleteIn(delayKey)
   }), 1000),
 
   save: ({entry, value}) => {
@@ -83,9 +84,7 @@ const actions = ({ update, actions }) => ({
     })
   },
 
-  close: (entry) => update(model => {
-    return model.deleteIn([ID, 'entry']);
-  })
+  close: (entry) => update(model => model.deleteIn([ID, 'entry']))
 })
 
 export const State = store => {

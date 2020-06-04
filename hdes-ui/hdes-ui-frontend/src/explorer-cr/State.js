@@ -33,10 +33,14 @@ const actions = ({ actions, update }) => ({
     update(model => model.setIn([ID, 'value'], value))
   },
   create: (type, name) => {
-    const onSuccess = (entries) => actions.backend.model(() => {
-      entries.forEach(e => actions.explorer.openEntry(e.id));
-      actions.iconbar.toggleExplorer();
-    })
+    const onSuccess = (entries) => {
+      entries
+      .filter(e => e.type === type && e.name === name)
+      .forEach(e => actions.explorer.openEntry(e.id))
+
+      actions.explorer.setEntries(entries)
+      actions.iconbar.toggleExplorer()
+    }
 
     const onError = (errors) => {
       console.log(errors)
