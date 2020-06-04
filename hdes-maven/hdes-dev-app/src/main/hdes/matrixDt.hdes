@@ -5,7 +5,7 @@ headers: {
   lastName STRING required IN,
   value    INTEGER required OUT,
   total    INTEGER OUT FORMULA: sum(outputs)/size(outputs) + 10/50
-
+ 
 } MATRIX: {
             { 'BOB', 'SAM', ? }
   name:     {  10,    20,   30 },

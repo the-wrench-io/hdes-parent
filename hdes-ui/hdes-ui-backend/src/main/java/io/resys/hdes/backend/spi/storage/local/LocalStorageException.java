@@ -54,6 +54,11 @@ public class LocalStorageException extends RuntimeException {
           .append(" for .hdes files has no write permissions!")
           .toString();
     }
+    public String fileAlreadyExists(File file) {
+      return new StringBuilder()
+          .append("Resource already exists: ").append(file.getAbsolutePath()).append("!")
+          .toString();
+    }
     
   }   
 }

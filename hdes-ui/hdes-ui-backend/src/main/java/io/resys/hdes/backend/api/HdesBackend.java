@@ -23,6 +23,7 @@ import java.util.Collection;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.immutables.value.Value;
 
@@ -155,6 +156,8 @@ public interface HdesBackend {
   interface StatusMessage {
     String getId();
     String getValue();
+    Optional<String> getLogCode();
+    Optional<String> getLogStack();
   }
   
   interface StorageConfig {

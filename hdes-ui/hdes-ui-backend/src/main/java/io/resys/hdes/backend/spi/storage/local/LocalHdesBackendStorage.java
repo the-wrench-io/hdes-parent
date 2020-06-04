@@ -65,9 +65,9 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
   
   private static final Logger LOGGER = LoggerFactory.getLogger(LocalHdesBackendStorage.class);
   
-  private final Map<String, DefCacheEntry> cache = new HashMap<>();
   private final File location;
   private final LocalStorageConfig storageConfig;
+  private final Map<String, DefCacheEntry> cache = new HashMap<>();
   
   @Value.Immutable
   public interface DefFileKey extends Comparable<DefFileKey> {
@@ -117,9 +117,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
     return new StorageReader() {
       @Override
       public Collection<Def> build() {
-        if(!cache.isEmpty()) {
-          return cache.values().stream().map(e -> e.getDef()).collect(Collectors.toUnmodifiableList());
-        }
+        cache.clear();
         
         var log = new StringBuilder()
             .append("Loading .hdes files from '").append(location.getAbsolutePath()).append("':")
@@ -307,6 +305,9 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
             File file = new File(location, name + ".hdes");
             log.append("  D - ").append(file.getAbsolutePath()).append(System.lineSeparator());
             try {
+              if(file.exists()) {
+                throw new LocalStorageException(LocalStorageException.builder().fileAlreadyExists(file));
+              }
               file.createNewFile();
               Files.write(file.toPath(), entry.getValue().getBytes(StandardCharsets.UTF_8));
               keys.put(entry.getKey(), ImmutableDefFileKey.builder().defId(entry.getKey()).fileName(file.getAbsolutePath()).build());

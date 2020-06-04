@@ -1,13 +1,27 @@
-define decision-table: MatrixDT
-
+define flow: x description: 'descriptive'
 headers: {
-  name     STRING required IN,
-  lastName STRING required IN,
-  value    INTEGER required OUT,
-  total    INTEGER OUT FORMULA: sum(outputs)/size(outputs) + 10/50
-
-} MATRIX: {
-            { 'BOB', 'SAM', ? }
-  name:     {  10,    20,   30 },
-  lastName: {  20,    50,   60 }
+  id INTEGER optional IN,
+  externalId INTEGER required IN,
+  elements ARRAY of OBJECT required IN: {
+    value STRING required IN
+  },
+  output ARRAY of OBJECT required OUT: {
+    value STRING required OUT
+  }
+}  
+tasks: {
+  FirstTask: {
+    then: HandleElement
+    decision-table: bestDtTask uses: {
+      name: elements.value
+    }
+  } from elements then: EndTask,
+  
+  HandleElement: {
+    then: end as: { output: { value: FirstTask.dtOutput }}
+  },
+  
+  EndTask: {
+    then: end as: { input1: arg1.x1, input2: arg2.x1 }
+  }
 }
