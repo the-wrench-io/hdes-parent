@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
 
 import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
+import io.resys.hdes.ast.api.nodes.AstNode.EmptyBodyNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ErrorNode;
-import io.resys.hdes.ast.api.nodes.AstNode.Token;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
@@ -60,6 +60,7 @@ import io.resys.hdes.backend.api.HdesBackendStorage;
 import io.resys.hdes.backend.api.ImmutableDef;
 import io.resys.hdes.backend.api.ImmutableDefAst;
 import io.resys.hdes.backend.api.ImmutableDefError;
+import io.resys.hdes.backend.api.ImmutableDefErrorToken;
 import io.resys.hdes.backend.api.ImmutableLocalStorageConfig;
 import io.resys.hdes.backend.spi.storage.GenericStorageWriterEntry;
 import io.resys.hdes.backend.spi.storage.HdesResourceBuilder;
@@ -162,6 +163,8 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
         type = DefType.FL;
       } else if (node instanceof ManualTaskBody) {
         type = DefType.MT;
+      } else if (node instanceof EmptyBodyNode) {
+        type = DefType.EM;
       } else {
         continue;
       }
@@ -177,17 +180,16 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
   }
 
   private DefError map(String key, BodyNode body, ErrorNode node) {
-    Token nodeToken = node.getTarget().getToken();
     return ImmutableDefError.builder()
         .id(key)
         .name(body.getId())
         .message(node.getMessage())
-        .token(new StringBuilder()
-            .append("(").append(nodeToken.getLine())
-            .append(":")
-            .append(nodeToken.getCol()).append(")")
-            .append(" ").append(nodeToken.getText())
-            .toString())
+        .token(ImmutableDefErrorToken.builder()
+            .line(node.getTarget().getToken().getLine())
+            .column(node.getTarget().getToken().getCol())
+            .text(node.getTarget().getToken().getText())
+            .msg(node.getMessage())
+            .build())
         .build();
   }
 

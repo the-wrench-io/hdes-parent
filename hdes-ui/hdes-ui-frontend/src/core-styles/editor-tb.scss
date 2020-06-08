@@ -22,6 +22,10 @@
     .is-type {
       font-weight: bolder;
       font-size: small;
+      color: $has-text-purple;
+    }
+    .is-saving {
+      color: $has-text-yellow;
     }
 
     .is-active {

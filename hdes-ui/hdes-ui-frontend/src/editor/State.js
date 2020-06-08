@@ -25,7 +25,7 @@ const init = {
   saving: {
     // id : { delay: 5000, value: 'valueToSave' }
   },
-  saveDelay: 5000
+  saveDelay: 2000
 }
 
 // all explorer actions
@@ -43,7 +43,7 @@ const actions = ({ update, actions }) => ({
     }
   },
 
-  delayedSave: (delayKey) => setTimeout(() => update(model => {
+  delayedSave: (delayKey, delay) => setTimeout(() => update(model => {
     const saving = model.getIn(delayKey);
     if(!saving) {
       console.log('saving key removed')
@@ -56,13 +56,29 @@ const actions = ({ update, actions }) => ({
       return model.updateIn(delayKey, v => v.set('delay', timeTillSave - 1000))
     }
 
-    actions.backend.service.save(
-      { id: model.getIn(delayKey).get('id'), 
-        value: model.getIn(delayKey).get('value') },
-      data => {},
-      errors => {})
-    return model.deleteIn(delayKey)
-  }), 1000),
+    const id = model.getIn(delayKey).get('id')
+    actions.backend.service.save({ 
+        id: id, 
+        value: model.getIn(delayKey).get('value') 
+      },
+      data => {
+        actions.backend.update(data)
+        update(model => { 
+          const updatedEntry = data.filter(e => e.id === id)[0];
+          return model
+            .setIn([ID, 'entry', 'errors'], Immutable.fromJS(updatedEntry.errors))
+            .deleteIn(delayKey) 
+        })
+      },
+      errors => {
+        console.error(errors)
+        // push errors
+
+        // try again 
+        actions.editor.delayedSave(delayKey, 5000)
+      })
+
+  }), delay ? delay : 1000),
 
   save: ({entry, value}) => {
     const id = entry.get('id')

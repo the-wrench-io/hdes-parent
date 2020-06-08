@@ -6,7 +6,7 @@ $la-font-path: 'core-styles/fonts';
 @import '../node_modules/line-awesome/dist/line-awesome/scss/line-awesome.scss';
 @import '../node_modules/codemirror/lib/codemirror.css';
 @import '../node_modules/codemirror/theme/abcdef.css';
-
+@import '../node_modules/codemirror/addon/lint/lint.css';
 
 @import 'core-styles/colors';
 @import 'core-styles/iconbar';

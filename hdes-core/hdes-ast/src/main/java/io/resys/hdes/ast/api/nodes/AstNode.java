@@ -32,6 +32,10 @@ public interface AstNode {
   }
   
   @Value.Immutable
+  interface EmptyBodyNode extends BodyNode {
+  }
+  
+  @Value.Immutable
   interface TypeName extends AstNode {
     String getValue();
   }

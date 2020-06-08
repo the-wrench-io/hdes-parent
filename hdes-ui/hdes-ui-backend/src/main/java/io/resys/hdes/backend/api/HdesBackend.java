@@ -31,7 +31,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public interface HdesBackend {
-  enum DefType { FL, DT, TG, ST, MT }
+  enum DefType { FL, DT, TG, ST, MT, EM }
   enum ConfigType { LOCAL, REMOTE, CLASSPATH }
   
   List<Hierarchy> hierarchy();
@@ -122,7 +122,15 @@ public interface HdesBackend {
     String getId();
     String getName();
     String getMessage();
-    String getToken();
+    DefErrorToken getToken();
+  }
+  
+  @Value.Immutable
+  interface DefErrorToken {
+    int getLine();
+    int getColumn();
+    String getMsg();
+    String getText();
   }
   
   @Value.Immutable

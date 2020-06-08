@@ -34,7 +34,6 @@ const actions = ({actions, update}) => ({
   setEntries: (entries) => {
     update(model => model.setIn([ID, 'entries'], Immutable.fromJS(entries)))
     console.log(entries)
-
   },
   openEntry: (entryId) => update(model => {
     model.getIn([ID, 'entries'])

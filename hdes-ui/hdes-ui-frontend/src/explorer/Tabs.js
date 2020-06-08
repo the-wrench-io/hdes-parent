@@ -19,12 +19,13 @@
  */
 import { Component } from 'inferno';
 
-const closeIcon = <i class="las la-times" />
 
 export class Tabs extends Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const key = ['explorer'];
-    return !this.props.state.getIn(key).equals(nextProps.state.getIn(key));
+    const key = ['explorer']
+    const savingKey = ['editor', 'saving']
+    return !this.props.state.getIn(key).equals(nextProps.state.getIn(key)) ||
+      !this.props.state.getIn(savingKey).equals(nextProps.state.getIn(savingKey));
   }
   render() {
     const { actions, state } = this.props;
@@ -38,13 +39,22 @@ export class Tabs extends Component {
       if(!entry) {
         return null;
       }
+
       const openEntry = () => actions.explorer.openEntry(id);
       const type = entry.get('type')
-
-      return (<li class={entryStyle}><a href={'#entry/' + id} onClick={openEntry} >
-          <span class='icon is-small is-type'>{type}</span>
-          <span>{entry.get('name')}</span>
-          <button class='delete is-close' onClick={() => actions.explorer.closeEntry(id)} >{closeIcon}</button>
+      const isSaving = state.getIn(['editor', 'saving', id]) ? true : false
+      return (<li class={entryStyle}>
+        <a href={'#entry/' + id} onClick={openEntry} >
+          <div class='columns is-1'>
+            <div class='column'>
+              {isSaving ? <i class='is-saving las la-asterisk'></i> : null}
+              <span class='is-type icon is-smallhas-text-left'>{type}</span>
+              <span>{entry.get('name')}</span>
+            </div>
+            <div class='column' onClick={() => actions.explorer.closeEntry(id)}>
+              <i class='is-close icon is-small has-text-right las la-times'></i>
+            </div>
+          </div>
         </a></li>);
     });
 

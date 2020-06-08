@@ -86,7 +86,7 @@ public class HdesDefsHandler implements Handler<RoutingContext>  {
         
       case PUT:
         DefChangeEntry change = backend.reader().build(event.getBody().getBytes(), ImmutableDefChangeEntry.class);
-        Def changed = backend.change().add(change).build().get(0);
+        List<Def> changed = backend.change().add(change).build();
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(backend.writer().build(changed)));
         break;

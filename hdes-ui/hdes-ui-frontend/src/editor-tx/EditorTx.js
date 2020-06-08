@@ -19,8 +19,10 @@
  */
 import { Component, createRef } from 'inferno'
 import { default as CodeMirror } from 'codemirror'
-
 import 'codemirror/addon/mode/simple'
+import 'codemirror/addon/lint/lint'
+
+
 
 CodeMirror.defineSimpleMode("hdes", {
   // The start state contains the rules that are intially used
@@ -76,7 +78,8 @@ export class EditorTx extends Component {
   shouldComponentUpdate(nextProps, nextState) {
     const key = ['editortx']
     return !this.props.state.getIn(key).equals(nextProps.state.getIn(key)) ||
-      this.props.entry.get('id') !== nextProps.entry.get('id')
+      this.props.entry.get('id') !== nextProps.entry.get('id') ||
+      !this.props.entry.get('errors').equals(nextProps.entry.get('errors'))
   }
   componentDidMount() {
     const { actions, entry } = this.props
@@ -87,13 +90,30 @@ export class EditorTx extends Component {
     const getEntry = () => this.props.entry
 
     if(!this.editor) {
+      const getAnnotations = (txt, updateLinting, options, cm) => {
+        const entry = getEntry().toJS()
+        const found = entry.errors.map(defError => {
+          const line = defError.token.line -1
+          return { 
+            from: CodeMirror.Pos(line, defError.token.column),
+            to: CodeMirror.Pos(line, cm.getLine(line).length),
+            message: defError.message,
+            severity: 'error' }
+        })
+
+        if(found) {
+          updateLinting(found)
+        }
+      }    
+
       this.editor = CodeMirror.fromTextArea(this.textareaRef.current, {
         mode: 'hdes',
         lineNumbers: true,
         tabSize: 2,
         firstLineNumber: 1,
         gutters: ['CodeMirror-lint-markers'],
-        theme: 'abcdef'
+        theme: 'abcdef',
+        lint: { async: true, lintOnChange: false, getAnnotations: getAnnotations},
       })
       this.editor.on('change', (editor) => actions.editortx.change(getEntry(), editor))
     }
@@ -101,7 +121,9 @@ export class EditorTx extends Component {
     if(this.props.entry.get('id') !== prevProps.entry.get('id')) {
       actions.editortx.load(getEntry(), this.editor)
     }
+    this.editor.performLint();
   }
+
   render() {
     const { state } = this.props
     const active = state.getIn(['editortx', 'active'])

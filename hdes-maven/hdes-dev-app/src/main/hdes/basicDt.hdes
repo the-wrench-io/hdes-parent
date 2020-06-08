@@ -1,6 +1,6 @@
 define decision-table: basic
 headers: {
-  name STRING required IN,
+  name STRING optional IN,   
   lastName STRING required IN,
   type INTEGER required IN,
   value INTEGER required OUT 

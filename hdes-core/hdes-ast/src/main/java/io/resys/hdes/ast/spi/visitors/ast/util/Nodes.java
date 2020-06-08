@@ -82,11 +82,10 @@ public class Nodes {
  
   public static AstNode.Token token(ParserRuleContext context, TokenIdGenerator idGen) {
     Token startToken = context.getStart();
-    //Token stopToken = context.getStop();
     return ImmutableToken.builder()
         .id(idGen.next())
         .line(startToken.getLine())
-        .col(startToken.getStartIndex())
+        .col(startToken.getCharPositionInLine())
         .text(context.getText()).build();
   }
   

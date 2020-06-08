@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -38,6 +37,8 @@ import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ErrorNode;
+import io.resys.hdes.ast.api.nodes.ImmutableEmptyBodyNode;
+import io.resys.hdes.ast.api.nodes.ImmutableToken;
 import io.resys.hdes.ast.spi.errors.HdesAntlrErrorListener;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
@@ -146,7 +147,6 @@ public class ImmutableAstEnvir implements AstEnvir {
       Builder result = this;
       return new GenericSourceBuilder() {
         private final HdesAntlrErrorListener errorListener = new HdesAntlrErrorListener();
-        private String externalId;
         private String value;
         
         @Override
@@ -164,12 +164,7 @@ public class ImmutableAstEnvir implements AstEnvir {
           return super.src(value);
         }
         @Override
-        public SourceBuilder<Builder> externalId(String externalId) {
-          this.externalId = externalId;
-          return this;
-        }
-        @Override
-        protected ANTLRErrorListener errorListener() {
+        protected HdesAntlrErrorListener errorListener() {
           return errorListener;
         }
         
@@ -178,9 +173,16 @@ public class ImmutableAstEnvir implements AstEnvir {
   }
   
   public static abstract class GenericSourceBuilder implements SourceBuilder<Builder> {
-    protected abstract ANTLRErrorListener errorListener();
+    
+    protected String externalId;
+    protected abstract HdesAntlrErrorListener errorListener();
     protected abstract Builder parent(BodyNode node);
     
+    @Override
+    public SourceBuilder<Builder> externalId(String externalId) {
+      this.externalId = externalId;
+      return this;
+    }
     @Override
     public Builder src(String src) {
       HdesLexer lexer = new HdesLexer(CharStreams.fromString(src));
@@ -188,7 +190,16 @@ public class ImmutableAstEnvir implements AstEnvir {
       HdesParser parser = new HdesParser(tokens);
       parser.addErrorListener(errorListener());
       ParseTree tree = parser.hdesBody();
-      return parent((BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator())));
+      
+      BodyNode result;
+      try {
+        result = (BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
+      } catch(Exception e) {
+        result = ImmutableEmptyBodyNode.builder().id(externalId).token(ImmutableToken.builder()
+            .id(0).col(0).line(0).text(e.getMessage())
+            .build()).build();
+      }
+      return parent(result);
     }
   }
 }
