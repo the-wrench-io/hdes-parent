@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Enumeration;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -57,11 +58,13 @@ import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 import io.quarkus.vertx.http.deployment.devmode.NotFoundPageDisplayableEndpointBuildItem;
 import io.quarkus.vertx.http.runtime.HandlerType;
-import io.resys.hdes.ui.quarkus.runtime.HdesDefsHandler;
-import io.resys.hdes.ui.quarkus.runtime.HdesUIBackendProducer;
-import io.resys.hdes.ui.quarkus.runtime.HdesUiRecorder;
+import io.resys.hdes.ui.quarkus.runtime.HdesBackendProducer;
+import io.resys.hdes.ui.quarkus.runtime.HdesBackendRecorder;
+import io.resys.hdes.ui.quarkus.runtime.handlers.HdesDefsHandler;
+import io.resys.hdes.ui.quarkus.runtime.handlers.HdesStatusHandler;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.BodyHandler;
 
 public class HdesUiProcessor {
   private static final Logger LOGGER = Logger.getLogger(HdesUiProcessor.class.getName());
@@ -70,24 +73,32 @@ public class HdesUiProcessor {
   private static final String WEBJAR_PREFIX = "META-INF/resources/webjars/" + WEBJAR_ARTIFACT_ID;
   
   private static final String FINAL_DESTINATION = "META-INF/hdes-ui-files";
-  private static final String FEATURE_BUILD_ITEM = "hdes-ui";
+  private static final String FEATURE_BUILD_ITEM = "hdes";
   private static final String TEMP_DIR = "hdes-ui-" + System.nanoTime();
   @Inject
   private LaunchModeBuildItem launch;
-  HdesUiConfig hdesUiConfig;
+  
+  HdesConfig hdesConfig;
 
   @ConfigRoot
-  static final class HdesUiConfig {
+  public static final class HdesConfig {
     /**
      * Hdes UI path, anything except '/'
      */
     @ConfigItem(defaultValue = "/hdes-ui")
     String path;
+    
     /**
      * Enable/disable Hdes UI path, default is true
      */
     @ConfigItem(defaultValue = "true")
     boolean enable;
+    
+    /**
+     * Local resources, save and read all hdes files from defined location
+     */
+    @ConfigItem
+    Optional<String> local;
   }
 
   private static final class HdesUICache implements Runnable {
@@ -113,7 +124,7 @@ public class HdesUiProcessor {
 
   @BuildStep
   void feature(BuildProducer<FeatureBuildItem> feature) {
-    if (hdesUiConfig.enable) {
+    if (hdesConfig.enable) {
       feature.produce(new FeatureBuildItem(FEATURE_BUILD_ITEM));
     }
   }
@@ -121,33 +132,42 @@ public class HdesUiProcessor {
   @BuildStep
   @Record(ExecutionTime.STATIC_INIT)
   void registerHdesUIBackendExtension(
-      HdesUiRecorder recorder,
+      HdesBackendRecorder recorder,
       BuildProducer<RouteBuildItem> routes,
       BuildProducer<NotFoundPageDisplayableEndpointBuildItem> displayableEndpoints,
       BuildProducer<AdditionalBeanBuildItem> buildItems,
       BuildProducer<BeanContainerListenerBuildItem> beans) {
     
-    if (!hdesUiConfig.enable) {
+    if (!hdesConfig.enable) {
       return;
     }
-    if ("/".equals(hdesUiConfig.path)) {
+    if ("/".equals(hdesConfig.path)) {
       throw new ConfigurationError("quarkus.hdes-ui.path was set to \"/\", this is not allowed as it blocks the application from serving anything else.");
     }
 
-    buildItems.produce(AdditionalBeanBuildItem.builder().setUnremovable().addBeanClass(HdesUIBackendProducer.class).build());
-
-    beans.produce(new BeanContainerListenerBuildItem(recorder.listener()));
+    buildItems.produce(AdditionalBeanBuildItem.builder().setUnremovable().addBeanClass(HdesBackendProducer.class).build());
+    beans.produce(new BeanContainerListenerBuildItem(recorder.listener(hdesConfig.local)));
     
-    String path = hdesUiConfig.path + "/services";
+    String path = hdesConfig.path + "/services";
+    
+    // Defs handler
     String defsPath = path + "/defs";
+    routes.produce(new RouteBuildItem(defsPath, BodyHandler.create()));
     routes.produce(new RouteBuildItem(defsPath, new HdesDefsHandler(), HandlerType.BLOCKING));
+    
     displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(defsPath));
+    
+    
+    // status handler
+    String statusPath = path + "/status";
+    routes.produce(new RouteBuildItem(statusPath, new HdesStatusHandler(), HandlerType.BLOCKING));
+    displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(statusPath));
   }
 
   @BuildStep
   @Record(ExecutionTime.STATIC_INIT)
   public void registerHdesUiServletExtension(
-      HdesUiRecorder recorder,
+      HdesBackendRecorder recorder,
       BuildProducer<RouteBuildItem> routes,
       BeanContainerBuildItem container,
       
@@ -158,14 +178,14 @@ public class HdesUiProcessor {
       HttpRootPathBuildItem httpRootPathBuildItem,
       BuildProducer<NotFoundPageDisplayableEndpointBuildItem> displayableEndpoints) throws Exception {
     
-    if (!hdesUiConfig.enable) {
+    if (!hdesConfig.enable) {
       return;
     }
-    if ("/".equals(hdesUiConfig.path)) {
+    if ("/".equals(hdesConfig.path)) {
       throw new ConfigurationError("quarkus.hdes-ui.path was set to \"/\", this is not allowed as it blocks the application from serving anything else.");
     }
     
-    final String path = httpRootPathBuildItem.adjustPath(hdesUiConfig.path);
+    final String path = httpRootPathBuildItem.adjustPath(hdesConfig.path);
     final Handler<RoutingContext> handler;
     if (launch.getLaunchMode().isDevOrTest()) {
       HdesUICache cached = liveReloadBuildItem.getContextObject(HdesUICache.class);
@@ -194,8 +214,8 @@ public class HdesUiProcessor {
           }
         });
       }
-      handler = recorder.handler(cached.dir, httpRootPathBuildItem.adjustPath(hdesUiConfig.path));
-      displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(hdesUiConfig.path + "/"));
+      handler = recorder.handler(cached.dir, httpRootPathBuildItem.adjustPath(hdesConfig.path));
+      displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(hdesConfig.path + "/"));
       
     } else {
       processArtifact(path, (GeneratedResourceBuildItem item) -> {
@@ -203,11 +223,11 @@ public class HdesUiProcessor {
         generatedResources.produce(new GeneratedResourceBuildItem(fileName, item.getClassData()));
         nativeImageResourceBuildItemBuildProducer.produce(new NativeImageResourceBuildItem(fileName));
       });
-      handler = recorder.handler(FINAL_DESTINATION, httpRootPathBuildItem.adjustPath(hdesUiConfig.path));
+      handler = recorder.handler(FINAL_DESTINATION, httpRootPathBuildItem.adjustPath(hdesConfig.path));
     }
     
-    routes.produce(new RouteBuildItem(hdesUiConfig.path, handler));
-    routes.produce(new RouteBuildItem(hdesUiConfig.path + "/*", handler));
+    routes.produce(new RouteBuildItem(hdesConfig.path, handler));
+    routes.produce(new RouteBuildItem(hdesConfig.path + "/*", handler));
   }
 
   private void processArtifact(String path, Consumer<GeneratedResourceBuildItem> consumer) throws IOException {

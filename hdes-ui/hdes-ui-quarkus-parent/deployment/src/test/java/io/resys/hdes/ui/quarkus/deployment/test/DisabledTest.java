@@ -33,7 +33,7 @@ public class DisabledTest {
   @RegisterExtension
   final static QuarkusUnitTest config = new QuarkusUnitTest()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addAsResource(new StringAsset("quarkus.hdes-ui.enable=false"), "application.properties")
+          .addAsResource(new StringAsset("quarkus.hdes.enable=false"), "application.properties")
           .addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
           );
 

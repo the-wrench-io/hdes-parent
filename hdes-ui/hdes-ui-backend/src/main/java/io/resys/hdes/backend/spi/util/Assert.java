@@ -1,4 +1,4 @@
-package io.resys.hdes.backend.api;
+package io.resys.hdes.backend.spi.util;
 
 /*-
  * #%L
@@ -20,23 +20,29 @@ package io.resys.hdes.backend.api;
  * #L%
  */
 
-import java.io.ByteArrayOutputStream;
-import java.util.List;
+import java.util.function.Supplier;
 
-public interface HdesUIBackend {
-  DefsQuery defs();
-  Writer write();
+
+
+public class Assert {
   
-  interface Writer {
-    Writer from(List<Def> defs);
-    void build(ByteArrayOutputStream out);
+  public static void notNull(Object value, Supplier<String> msg) {
+    if(value == null) {
+      throw new HdesUIBackendApiExeption(msg.get());
+    }
   }
   
-  interface DefsQuery {
-    List<Def> find();
+  public static void notEmpty(String value, Supplier<String> msg) {
+    if(value == null || value.isBlank()) {
+      throw new HdesUIBackendApiExeption(msg.get());
+    }
   }
   
-  interface Def {
+  public static class HdesUIBackendApiExeption extends RuntimeException {
+    private static final long serialVersionUID = 3801387126866326646L;
     
+    public HdesUIBackendApiExeption(String msg) {
+      super(msg);
+    }
   }
 }

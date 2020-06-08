@@ -42,7 +42,7 @@ const toggle = (model, name) => {
 }
 
 // all explorer actions
-const actions = app => update => ({
+const actions = ({actions, update}) => ({
   toggleExplorer: () => {
     update(model => toggle(model, 'explorer'))
   },
@@ -58,7 +58,7 @@ const actions = app => update => ({
   toggleNewitem: () => {
     update(model => toggle(model, 'create'))
   },
-  toggleDelete: () => app(({ actions }) => update(model => {
+  toggleDelete: () => update(model => {
     const result = toggle(model, 'delete');
     const entry = Immutable.fromJS({type: 'delete', id: 'delete-view-entry'});
 
@@ -70,13 +70,13 @@ const actions = app => update => ({
     return result;
 
 
-  }))
+  })
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

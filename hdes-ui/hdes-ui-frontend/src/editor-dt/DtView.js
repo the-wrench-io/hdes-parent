@@ -52,22 +52,22 @@ export class DtView extends Component {
     }
   }
   onCellEdit(cellId) {
-    const { actions, state, entry } = this.props
+    const { actions, entry } = this.props
     const id = entry.get('id')
     actions.editordt.onCellEdit(id, cellId)
   }
   onChangeStart(editable) {
-    const { actions, state, entry } = this.props
+    const { actions, entry } = this.props
     const id = entry.get('id')
     actions.editordt.onChangeStart(id)
   }
   onChangeCancel(editable) {
-    const { actions, state, entry } = this.props
+    const { actions, entry } = this.props
     const id = entry.get('id')
     actions.editordt.onChangeCancel(id)
   }
   render() {
-    const { actions, state, entry } = this.props
+    const { state, entry } = this.props
     const id = entry.get('id')
     const loaded = state.getIn(['editordt', 'models', id])
 

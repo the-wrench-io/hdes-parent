@@ -20,13 +20,12 @@
 import { Component } from 'inferno'
 
 
-export class SectionTabs extends Component {
+export class ExplorerOpenEntries extends Component {
   render() {
     const { state, actions, type, name } = this.props;
     const isOpen = state.getIn(['explorer', 'entriesOpen']).indexOf(type) > -1;
     const iconStyle = isOpen ? 'la-angle-down' : 'la-angle-right';
-    //const linkStyle = isOpen ? 'is-active' : null;
-  
+
     const sectionEntries = !isOpen ? [] : state.getIn(['explorer', 'entriesEditing']).toJS().map(id => {
     
       const e = state.getIn(['explorer', 'entries']).filter(item => item.get('id') === id).get(0);

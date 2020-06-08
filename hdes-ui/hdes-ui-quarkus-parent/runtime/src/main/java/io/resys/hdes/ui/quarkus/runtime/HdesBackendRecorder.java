@@ -21,6 +21,7 @@ package io.resys.hdes.ui.quarkus.runtime;
  */
 
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import io.quarkus.arc.runtime.BeanContainerListener;
 import io.quarkus.runtime.annotations.Recorder;
@@ -31,11 +32,12 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 
 @Recorder
-public class HdesUiRecorder {
+public class HdesBackendRecorder {
   
-  public BeanContainerListener listener() {
-    return beanContainer -> {
-      HdesUIBackendProducer producer = beanContainer.instance(HdesUIBackendProducer.class);
+  public BeanContainerListener listener(Optional<String> local) {
+    return beanContainer -> {      
+      HdesBackendProducer producer = beanContainer.instance(HdesBackendProducer.class);
+      producer.setLocal(local);
     };
   }
 

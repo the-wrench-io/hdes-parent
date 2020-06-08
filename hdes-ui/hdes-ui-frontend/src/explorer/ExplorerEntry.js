@@ -20,7 +20,7 @@
 import { Component } from 'inferno'
 
 
-export class Section extends Component {
+export class ExplorerEntry extends Component {
   render() {
     const { state, actions, type, name } = this.props;
     const isOpen = state.getIn(['explorer', 'entriesOpen']).indexOf(type) > -1;

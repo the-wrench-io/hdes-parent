@@ -1,5 +1,7 @@
 package io.resys.hdes.ast.api;
 
+import java.util.List;
+
 /*-
  * #%L
  * hdes-ast
@@ -20,16 +22,22 @@ package io.resys.hdes.ast.api;
  * #L%
  */
 
-import java.util.Collection;
+import java.util.Map;
 
 import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
+import io.resys.hdes.ast.api.nodes.AstNode.ErrorNode;
 
 public interface AstEnvir {
-  Collection<BodyNode> getValues();
-  BodyNode get(String id);
+  Map<String, BodyNode> getBody();
+  BodyNode getBody(String id);
+  String getSrc(String id);
+  Map<String, List<ErrorNode>> getErrors();
+  List<ErrorNode> getErrors(String id);
   
   interface Builder {
+    Builder ignoreErrors();
     Builder from(AstEnvir envir);
+    Builder delete(String id);
     SourceBuilder<Builder> add();
     AstEnvir build();
   }

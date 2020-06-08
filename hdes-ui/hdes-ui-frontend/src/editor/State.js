@@ -17,38 +17,96 @@
  * limitations under the License.
  * #L%
  */
+import Immutable from 'immutable'
+
 const ID = 'editor'
 const init = {
-  entry: undefined
+  entry: undefined,
+  saving: {
+    // id : { delay: 5000, value: 'valueToSave' }
+  },
+  saveDelay: 2000
 }
 
-
-
 // all explorer actions
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
-  }),
-  open: (entry) => app(({ actions }) => {
+const actions = ({ update, actions }) => ({
+  init: () => {},
+ 
+  open: (entry) => {
     update(model => model.setIn([ID, 'entry'], entry));
-    const type = entry.get('type');
 
+    const type = entry.get('type');
     if(type === 'fl') {
       actions.editorfl.load();
     } else if(type === 'delete') {
       actions.editordl.load();
     }
+  },
 
+  delayedSave: (delayKey, delay) => setTimeout(() => update(model => {
+    const saving = model.getIn(delayKey);
+    if(!saving) {
+      console.log('saving key removed')
+      return
+    }
+
+    const timeTillSave = saving.get('delay')
+    if(timeTillSave > 0) {
+      actions.editor.delayedSave(delayKey)
+      return model.updateIn(delayKey, v => v.set('delay', timeTillSave - 1000))
+    }
+
+    const id = model.getIn(delayKey).get('id')
+    actions.backend.service.save({ 
+        id: id, 
+        value: model.getIn(delayKey).get('value') 
+      },
+      data => {
+        actions.backend.update(data)
+        update(model => { 
+          const updatedEntry = data.filter(e => e.id === id)[0];
+          return model
+            .setIn([ID, 'entry', 'errors'], Immutable.fromJS(updatedEntry.errors))
+            .deleteIn(delayKey) 
+        })
+      },
+      errors => {
+        console.error(errors)
+        // push errors
+
+        // try again 
+        actions.editor.delayedSave(delayKey, 5000)
+      })
+
+  }), delay ? delay : 1000),
+
+  save: ({entry, value}) => {
+    const id = entry.get('id')
+    const delayKey = [ID, 'saving', id];
     
-  }),
-  close: (entry) => update(model => {
-    return model.deleteIn([ID, 'entry']);
-  })
+    update(model => {
+      if(model.getIn([ID, 'entry', 'value']) === value) {
+        return
+      }
+
+      const saving = model.getIn(delayKey);  
+      
+      // Schedule saved delay if its not present
+      if(!saving) {
+        actions.editor.delayedSave(delayKey, entry, value)
+      }
+
+      return model.setIn(delayKey, Immutable.fromJS({delay: init.saveDelay, id: id, value: value}))
+    })
+  },
+
+  close: (entry) => update(model => model.deleteIn([ID, 'entry']))
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

@@ -1,0 +1,10 @@
+define decision-table: basicx
+headers: {
+  name STRING optional IN,
+  lastName STRING required IN,
+  type INTEGER required IN,
+  value INTEGER required OUT 
+} ALL: {
+  { ?, ?, between 1 and 30, 20 },
+  { not 'bob' or 'sam', 'woman', ?, 4570 }
+}

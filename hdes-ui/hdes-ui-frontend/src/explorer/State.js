@@ -30,14 +30,12 @@ const init = {
 }
 
 // all explorer actions
-const actions = app => update => ({
-  setEntries: (entries) => app(({ actions }) => {
+const actions = ({actions, update}) => ({
+  setEntries: (entries) => {
     update(model => model.setIn([ID, 'entries'], Immutable.fromJS(entries)))
-    
-    actions.explorer.openEntry('cascoAdditionalFactors');
-
-  }),
-  openEntry: (entryId) => app(({ actions }) => update(model => {
+    console.log(entries)
+  },
+  openEntry: (entryId) => update(model => {
     model.getIn([ID, 'entries'])
       .filter(e => e.get('id') === entryId)
       .forEach(e => actions.editor.open(e));
@@ -46,8 +44,8 @@ const actions = app => update => ({
       .setIn([ID, 'entryOpen'], entryId)
       .updateIn([ID, 'entriesEditing'], e => e.indexOf(entryId) > -1 ? e : e.push(entryId))
     }
-  )),
-  closeEntry: (entryId) => app(({ actions }) => update(model => {
+  ),
+  closeEntry: (entryId) => update(model => {
     model.getIn([ID, 'entries'])
     .filter(e => e.get('id') === entryId)
     .forEach(e => actions.editor.close(e));
@@ -64,7 +62,7 @@ const actions = app => update => ({
         }
         return explorer;
       })
-  })),
+  }),
   toggleEntries: (type) => {
     update(model => model.updateIn([ID, 'entriesOpen'], e => {
       const contains = e.indexOf(type);
@@ -73,10 +71,10 @@ const actions = app => update => ({
   }
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

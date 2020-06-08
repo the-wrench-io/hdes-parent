@@ -32,9 +32,16 @@ const getConnection = (state) => {
 }
 
 const getTag = (state) => {
+  const value = state.getIn(['health', 'status'])
+
+  let tag = value.storage.type
+  if(value.storage.type === 'LOCAL') {
+    tag += '@' + value.storage.location
+  }
+
   return <div>
-    <span class='icon'><i class='fas fa-code-branch is-size-6 icon-small' /></span>
-    <span>master</span>
+    <span class='icon'><i class='las la-database is-size-6 icon-small' /></span>
+    <span>{tag}</span>
   </div>
 }
 

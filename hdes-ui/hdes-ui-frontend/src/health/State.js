@@ -21,12 +21,22 @@ let connectionUp;
 const ID = 'health'
 const init = {
   init: { enabled: true, loading: true, log: [] },
-  connection: undefined
+  status: undefined,
+  connection: undefined,
+  messages: {
+    showing: undefined,
+    upcoming: [],
+    done: []
+  }
 }
 
 const addlog = (update, value) => update(model => {
   return model.updateIn([ID, 'init', 'log'], 
     log => log.push(value))
+})
+
+const setStatus = (update, value) => update(model => {
+  return model.setIn([ID, 'status'], value)
 })
 
 const loaded = (update) => update(model => {
@@ -63,6 +73,8 @@ const successHandler = (update, actions, success) => {
     addlog(update, `Server message id: '${entry.id}', '${entry.value}'.`)
   }
   addlog(update, 'Loading models!')
+  setStatus(update, success)
+
   actions.backend.service.models(data => {
     actions.explorer.setEntries(data)
     addlog(update, `Found '${data.length}' model(s).`)
@@ -94,12 +106,14 @@ const queryHealth = (update, actions) => {
     } finally {
       queryHealth(update, actions)  
     }
-  }, 5000)
+  }, 100000)
 }
 
 // all explorer actions
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
+const actions = store => ({
+
+  init: () => {
+    const { update, actions } = store
     addlog(update, 'Getting connection...')
     actions.backend.service.health(
       data => setTimeout(() => {
@@ -110,16 +124,19 @@ const actions = app => update => ({
         errorHandler(update, errors)
         if(!isConnection(errors)) {
           addlog(update, `Trying to connect again...`)
-          setTimeout(() => actions.health.init(), 5000)
+          setTimeout(() => actions.health.init(), 10000)
         }
       })
-  })
+  },
+  notify: ({type, value}) => {
+
+  }
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }
