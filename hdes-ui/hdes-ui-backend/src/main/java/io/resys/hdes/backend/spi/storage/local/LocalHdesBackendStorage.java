@@ -364,6 +364,20 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
 
     public LocalHdesBackendStorage build() {
       File file = new File(location);
+      // dev mode, partial path
+      if(!file.exists()) {
+        File parent = file.getAbsoluteFile();
+        while((parent = parent.getParentFile()) != null) {
+          if(parent.exists() && parent.isDirectory() && parent.getName().equals("target")) {
+            File possibleLocation = new File(parent.getParentFile(), location);
+            if(possibleLocation.exists()) {
+              file = possibleLocation;
+            }
+            break;
+          }
+        }
+      }
+      
       if (!file.exists()) {
         throw new LocalStorageException(LocalStorageException.builder().nonExistingLocation(file));
       }
@@ -373,7 +387,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
       if (!file.canWrite()) {
         throw new LocalStorageException(LocalStorageException.builder().locationCantBeWritten(file));
       }
-      return new LocalHdesBackendStorage(file, ImmutableLocalStorageConfig.builder().type(ConfigType.LOCAL).location(location).build());
+      return new LocalHdesBackendStorage(file, ImmutableLocalStorageConfig.builder().type(ConfigType.LOCAL).location(file.getAbsolutePath()).build());
     }
   }
 }
