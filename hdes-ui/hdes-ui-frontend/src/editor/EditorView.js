@@ -34,12 +34,29 @@ const createComponent = (actions, state) => {
 
     return null;
   }
+
   const type = entry.get('type')
-  if(type === 'delete') {
-    return <DlView actions={actions} state={state} />
-  } else {
-    return <EditorTx actions={actions} state={state} entry={entry} />
+  const result = []
+
+  const id = entry.get('id')
+  const savingErrorsKey = ['editor', 'saving', id, 'errors']
+  const savingErrors = state.getIn(savingErrorsKey) ? state.getIn(savingErrorsKey).toJS() : []
+
+  if(savingErrors.length > 0) {
+    const messages = savingErrors.map(e => [<div>{e.defaultMessage}</div>,<div><strong>Log: </strong>{JSON.stringify(e.values)}</div>])
+    result.push(<div class='notification is-danger is-error-messages'>
+      <button class='delete'></button>
+      {messages}
+    </div>)
   }
+
+  if(type === 'delete') {
+    result.push(<DlView actions={actions} state={state} />)
+  } else {
+    result.push(<EditorTx actions={actions} state={state} entry={entry} />)
+  }
+
+  return result
 }
 
 export class EditorView extends Component {

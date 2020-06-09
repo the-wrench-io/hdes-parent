@@ -19,19 +19,17 @@
  */
 import { Component } from 'inferno';
 
-
-export class Tabs extends Component {
+export class EditorTabs extends Component {
   shouldComponentUpdate(nextProps, nextState) {
-    const key = ['explorer']
-    const savingKey = ['editor', 'saving']
-    return !this.props.state.getIn(key).equals(nextProps.state.getIn(key)) ||
-      !this.props.state.getIn(savingKey).equals(nextProps.state.getIn(savingKey));
+    const key = ['editor']
+    return !this.props.state.getIn(key).equals(nextProps.state.getIn(key))
   }
   render() {
-    const { actions, state } = this.props;
-    const entries = state.getIn(['explorer', 'entriesEditing']).toJS().map(id => {
+    const { actions, state } = this.props
+    const open = state.getIn(['editor', 'entry', 'id'])
+    const entries = state.getIn(['editor', 'entries']).toJS().map(id => {
 
-      const isOpen = state.getIn(['explorer', 'entryOpen']) === id;
+      const isOpen = open === id;
       const entryStyle = isOpen ? 'is-active' : null;
       const entry = state.getIn(['explorer', 'entries']).filter(e => e.get('id') === id).get(0);
 
@@ -43,11 +41,15 @@ export class Tabs extends Component {
       const openEntry = () => actions.explorer.openEntry(id);
       const type = entry.get('type')
       const isSaving = state.getIn(['editor', 'saving', id]) ? true : false
+      const savingErrorsKey = ['editor', 'saving', id, 'errors']
+      const isSavingErrors = state.getIn(savingErrorsKey) ? state.getIn(savingErrorsKey).toJS().length > 0 : false
+      
       return (<li class={entryStyle}>
         <a href={'#entry/' + id} onClick={openEntry} >
           <div class='columns is-1'>
             <div class='column'>
-              {isSaving ? <i class='is-saving las la-asterisk'></i> : null}
+              {isSaving && !isSavingErrors ? <i class='is-saving las la-asterisk'></i> : null}
+              {isSaving && isSavingErrors ? <i class='is-saving-error las la-asterisk'></i> : null}
               <span class='is-type icon is-smallhas-text-left'>{type}</span>
               <span>{entry.get('name')}</span>
             </div>
@@ -55,9 +57,9 @@ export class Tabs extends Component {
               <i class='is-close icon is-small has-text-right las la-times'></i>
             </div>
           </div>
-        </a></li>);
-    });
+        </a></li>)
+    })
 
-    return (<div class='tabs is-boxed editor-tb'><ul>{entries}</ul></div>);
+    return (<div class='tabs is-boxed editor-tb'><ul>{entries}</ul></div>)
   }
 }

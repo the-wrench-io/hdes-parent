@@ -19,8 +19,7 @@
  */
 import { Component } from 'inferno';
 
-import { Tabs } from './explorer';
-import { EditorView } from './editor';
+import { EditorView, EditorTabs } from './editor';
 import { Iconbar, IconbarView } from './iconbar';
 import { Init, Healthbar } from './health';
 
@@ -57,7 +56,7 @@ export default class App extends Component {
 
             <div class="tile is-parent is-radiusless is-marginless is-paddingless editor-window">
               <div class="tile is-child">
-                <Tabs state={state} actions={actions}/>
+                <EditorTabs state={state} actions={actions}/>
                 <EditorView state={state} actions={actions} />
               </div>
             </div>

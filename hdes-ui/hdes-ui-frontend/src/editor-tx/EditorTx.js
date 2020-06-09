@@ -23,7 +23,7 @@ import 'codemirror/addon/mode/simple'
 import 'codemirror/addon/lint/lint'
 
 
-
+// TODO:: example from simple mode
 CodeMirror.defineSimpleMode("hdes", {
   // The start state contains the rules that are intially used
   start: [
@@ -82,59 +82,54 @@ export class EditorTx extends Component {
       !this.props.entry.get('errors').equals(nextProps.entry.get('errors'))
   }
   componentDidMount() {
-    const { actions, entry } = this.props
-    actions.editortx.load(entry)
-  }
-  componentDidUpdate(prevProps) {
     const { actions } = this.props
     const getEntry = () => this.props.entry
-
-    if(!this.editor) {
-      const getAnnotations = (txt, updateLinting, options, cm) => {
-        const entry = getEntry().toJS()
-        const found = entry.errors.map(defError => {
-          const line = defError.token.line -1
-          return { 
-            from: CodeMirror.Pos(line, defError.token.column),
-            to: CodeMirror.Pos(line, cm.getLine(line).length),
-            message: defError.message,
-            severity: 'error' }
-        })
-
-        if(found) {
-          updateLinting(found)
-        }
-      }    
-
-      this.editor = CodeMirror.fromTextArea(this.textareaRef.current, {
-        mode: 'hdes',
-        lineNumbers: true,
-        tabSize: 2,
-        firstLineNumber: 1,
-        gutters: ['CodeMirror-lint-markers'],
-        theme: 'abcdef',
-        lint: { async: true, lintOnChange: false, getAnnotations: getAnnotations},
+    const getAnnotations = (txt, updateLinting, options, cm) => {
+      const entry = getEntry().toJS()
+      const found = entry.errors.map(defError => {
+        const line = defError.token.line -1
+        return { 
+          from: CodeMirror.Pos(line, defError.token.column),
+          to: CodeMirror.Pos(line, cm.getLine(line).length),
+          message: defError.message,
+          severity: 'error' }
       })
-      this.editor.on('change', (editor) => actions.editortx.change(getEntry(), editor))
+
+      if(found) {
+        updateLinting(found)
+      }
     }
 
+    this.editor = CodeMirror.fromTextArea(this.textareaRef.current, {
+      mode: 'hdes',
+      lineNumbers: true,
+      tabSize: 2,
+      firstLineNumber: 1,
+      gutters: ['CodeMirror-lint-markers'],
+      theme: 'abcdef',
+      lint: { async: true, lintOnChange: false, getAnnotations: getAnnotations},
+    })
+    this.editor.on('change', (editor) => actions.editortx.change(getEntry(), editor.getValue()))
+  }
+
+  componentDidUpdate(prevProps) {
     if(this.props.entry.get('id') !== prevProps.entry.get('id')) {
-      actions.editortx.load(getEntry(), this.editor)
+      this.editor.getDoc().setValue(this.getValue(this.props))
+      this.editor.refresh()
     }
-    this.editor.performLint();
+    this.editor.performLint()
+  }
+
+  getValue(props) {
+    const id = props.entry.get('id')
+    const saving = props.state.getIn(['editor', 'saving', id, 'value'])
+    return saving ? saving : props.entry.get('value')
   }
 
   render() {
-    const { state } = this.props
-    const active = state.getIn(['editortx', 'active'])
-
-    if(!active) {
-      return <div>Loading...</div>
-    }
-
-    const model = state.getIn(['editortx', 'models', active]).toJS()
+    const id = this.props.entry.get('id')
     return (<div class='tile editor-tx'>
-      <textarea id={active} ref={this.textareaRef} defaultValue={model.value}/>
+      <textarea id={id} ref={this.textareaRef} defaultValue={this.getValue(this.props)}/>
     </div>
     )
   }

@@ -1,5 +1,5 @@
 define decision-table: MatrixDT
-
+ 
 headers: {
   name     STRING required IN,
   lastName STRING required IN,
