@@ -2,6 +2,10 @@
 
 .editor-window {
   background-color: $has-background-black-ter;
+
+  .is-error-messages {
+    margin-top: 1.5rem;
+  }
 }
 
 .basic-editor {

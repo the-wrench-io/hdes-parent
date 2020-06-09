@@ -27,7 +27,9 @@
     .is-saving {
       color: $has-text-yellow;
     }
-
+    .is-saving-error {
+      color: $has-text-danger;
+    }
     .is-active {
       a {
         border-color: transparent !important;

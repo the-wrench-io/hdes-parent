@@ -22,26 +22,26 @@ import Immutable from 'immutable'
 const ID = 'editor'
 const init = {
   entry: undefined,
+  entries: [], // entry id-s
   saving: {
-    // id : { delay: 5000, value: 'valueToSave' }
+    // id : { delay: 5000, value: 'valueToSave', errors: [] }
   },
-  saveDelay: 2000
+  saveDelay: 2000,
+  saveDelayFailRetry: 5000 
 }
 
 // all explorer actions
 const actions = ({ update, actions }) => ({
   init: () => {},
  
-  open: (entry) => {
-    update(model => model.setIn([ID, 'entry'], entry));
-
-    const type = entry.get('type');
-    if(type === 'fl') {
-      actions.editorfl.load();
-    } else if(type === 'delete') {
-      actions.editordl.load();
-    }
-  },
+  open: (entry) => update(model => model
+    .updateIn([ID, 'entries'], e => {
+      const id = entry.get('id')
+      const contains = e.indexOf(id)
+      return contains > -1 ? e : e.push(id);
+    })
+    .setIn([ID, 'entry'], entry)
+  ),
 
   delayedSave: (delayKey, delay) => setTimeout(() => update(model => {
     const saving = model.getIn(delayKey);
@@ -57,28 +57,30 @@ const actions = ({ update, actions }) => ({
     }
 
     const id = model.getIn(delayKey).get('id')
-    actions.backend.service.save({ 
-        id: id, 
-        value: model.getIn(delayKey).get('value') 
-      },
+    const entityToSave = { id: id, value: model.getIn(delayKey).get('value') }
+
+    actions.backend.service.save(entityToSave,
       data => {
         actions.backend.update(data)
         update(model => { 
           const updatedEntry = data.filter(e => e.id === id)[0];
+
+          // update editable entry
           return model
-            .setIn([ID, 'entry', 'errors'], Immutable.fromJS(updatedEntry.errors))
+            .setIn([ID, 'entry'], Immutable.fromJS(updatedEntry))
             .deleteIn(delayKey) 
         })
       },
       errors => {
         console.error(errors)
         // push errors
+        update(model => model.setIn([...delayKey, 'errors'], Immutable.fromJS(errors)))
 
-        // try again 
-        actions.editor.delayedSave(delayKey, 5000)
+        // try again later
+        actions.editor.delayedSave(delayKey, init.saveDelayFailRetry)
       })
 
-  }), delay ? delay : 1000),
+  }), delay ? delay : init.saveDelay),
 
   save: ({entry, value}) => {
     const id = entry.get('id')
@@ -88,7 +90,6 @@ const actions = ({ update, actions }) => ({
       if(model.getIn([ID, 'entry', 'value']) === value) {
         return
       }
-
       const saving = model.getIn(delayKey);  
       
       // Schedule saved delay if its not present
@@ -100,7 +101,14 @@ const actions = ({ update, actions }) => ({
     })
   },
 
-  close: (entry) => update(model => model.deleteIn([ID, 'entry']))
+  close: (entry) => update(model => model
+    .updateIn([ID, 'entries'], e => {
+      const id = entry.get('id')
+      const contains = e.indexOf(id)
+      return contains > -1 ? e.delete(id) : e;
+    })
+    .updateIn([ID], e => e.getIn(['entry', 'id']) === entry.get('id') ? e.delete('entry') : e)
+    )
 })
 
 export const State = store => {

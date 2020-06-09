@@ -19,31 +19,12 @@
  */
 const ID = 'editortx'
 const init = {
-  models: {},
-  active: undefined, //id
 }
 
 // all explorer actions
-const actions = ({actions, update}) => ({
+const actions = ({ actions }) => ({
   init: () => {},
-
-  load: (entryToLoad, codemirror) => update(model => {
-    const entry = model.getIn(['editor', 'entry'])
-    const id = entry.get('id');
-
-    if(codemirror) {
-      codemirror.getDoc().setValue(entry.get('value'))
-      codemirror.refresh()
-    }
-    return model
-      .updateIn([ID, 'models'], models => models.get(id) ? models : models.set(id, entry))
-      .setIn([ID, 'active'], id);
-  }),
-  
-  change: (entry, codemirror) => {
-    actions.editor.save({entry, value: codemirror.getValue()});
-  }
-
+  change: (entry, value) => actions.editor.save({entry, value: value})
 })
 
 export const State = store => {
