@@ -24,7 +24,7 @@ public class ImmutableRuntimeEnvir implements RuntimeEnvir {
     this.executables = executables;
   }
 
-  @SuppressWarnings({ "unchecked", "deprecation" })
+  @SuppressWarnings({ "unchecked" })
   @Override
   public <T> T get(String name) throws ClassNotFoundException {
     if(executables.containsKey(name)) {
