@@ -1,63 +1,33 @@
 package io.resys.hdes.runtime.tests;
 
-import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
-import java.util.ArrayList;
 import java.util.List;
-
-import javax.tools.DiagnosticCollector;
-import javax.tools.JavaCompiler;
-import javax.tools.JavaCompiler.CompilationTask;
-import javax.tools.JavaFileManager;
-import javax.tools.SimpleJavaFileObject;
-import javax.tools.ToolProvider;
 
 import org.junit.jupiter.api.Test;
 
-import io.resys.hdes.runtime.HdesJavaFileObject;
+import io.resys.hdes.compiler.api.HdesCompiler;
+import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
+import io.resys.hdes.runtime.spi.ImmutableHdesRuntime;
 
 public class HdesRuntimeTest {
-
-  @Test
-  public void createRepository() {
-    Lookup lookup = MethodHandles.lookup();
-    ClassLoader classLoader = lookup.lookupClass().getClassLoader();
-    
-    
-    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-    JavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);
-    
-    
-    // compilation
-    DiagnosticCollector diagnosticListener = new DiagnosticCollector();
-    List<String> options = new ArrayList<>();
-    StringWriter out = new StringWriter();
-    Iterable<String> classes = null;
-    List<SimpleJavaFileObject> files = new ArrayList<>();
-    
-    String test = "package io.resys.hdes.runtime.tests;\n" + 
-        "\n" + 
-        "import io.resys.hdes.runtime.HdesRuntimeResource;\n" + 
-        "\n" + 
-        "public class TestClass implements HdesRuntimeResource {\n" + 
-        "\n" + 
-        "  @Override\n" + 
-        "  public String run() {\n" + 
-        "    // TODO Auto-generated method stub\n" + 
-        "    return \"DATA\";\n" + 
-        "  }\n" + 
-        "  \n" + 
-        "  \n" + 
+  private final HdesCompiler compiler = JavaHdesCompiler.config().build();
+  
+  @Test 
+  public void dtHitPolicyAll() {
+    String src = "define decision-table: ExpressionDT description: 'uber dt'\n" + 
+        "headers: {\n" + 
+        "  value0 INTEGER required IN,\n" + 
+        "  value1 INTEGER required IN,\n" + 
+        "  value INTEGER required OUT\n" + 
+        "} ALL: {\n" + 
+        "  { > 10, <= 20,          4570 },\n" + 
+        "  { > 10, <= 20 and > 10, 4570 },\n" + 
+        "  { = 6 , != 20 and > 10, 4570 }\n" + 
         "}";
     
-    files.add(HdesJavaFileObject.create("TestClass", test));
+    List<Resource> resources = compiler.parser().add("ExpressionDT", src).build();
     
-    CompilationTask task = compiler.getTask(out, fileManager, diagnosticListener, options, classes, files);
-    task.call();
+    ImmutableHdesRuntime.builder().from(resources).build();
     
-    
-    System.out.println(diagnosticListener.getDiagnostics());
   }
-
 }

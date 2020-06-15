@@ -84,7 +84,6 @@ import io.resys.hdes.ast.api.nodes.ManualTaskNode.ThenAction;
 import io.resys.hdes.ast.api.nodes.ManualTaskNode.WhenAction;
 
 public interface AstNodeVisitor<T, R> {
-  
   @FunctionalInterface
   interface TypeNameRef {
     String get(TypeName node);

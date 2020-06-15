@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
@@ -62,33 +63,25 @@ public class JavaAstEnvirVisitor {
   }
   
   private Resource visit(DecisionTableBody body) {
-    StringBuilder interfaceBuilder = new StringBuilder();
-    StringBuilder implementationBuilder = new StringBuilder();
+    final var pkg = naming.dt().pkg(body);
+    final var interfaceBuilder = new StringBuilder();
+    final var implementationBuilder = new StringBuilder();
     
-    TypeSpec superInterface = visitDt(body, new DtAstNodeVisitorJavaInterface(naming).visitDecisionTableBody(body), interfaceBuilder);
-    TypeSpec implementation = visitDt(body, new DtAstNodeVisitorJavaGen(naming).visitDecisionTableBody(body), implementationBuilder);
+    final TypeSpec superInterface = visitDt(body, new DtAstNodeVisitorJavaInterface(naming).visitDecisionTableBody(body), interfaceBuilder);
+    final TypeSpec implementation = visitDt(body, new DtAstNodeVisitorJavaGen(naming).visitDecisionTableBody(body), implementationBuilder);
+    final var interfaceType = ImmutableTypeName.builder().name(superInterface.name).pkg(pkg).build();
+    final var implementationType = ImmutableTypeName.builder().name(implementation.name).pkg(pkg).build();
+    
+    final var nestedPkg = pkg + "." + superInterface.name;
+    final var types = superInterface.typeSpecs.stream()
+        .map(spec -> ImmutableTypeName.builder().name(spec.name).pkg(nestedPkg).build()).collect(Collectors.toList());
+    types.add(interfaceType);
+    types.add(implementationType);
     
     return ImmutableResource.builder()
-        .type(HdesCompiler.SourceType.DT)
-        .name(body.getId())
-        .source(body.getToken().getText())
-        
-        .addDeclarations(ImmutableTypeDeclaration.builder()
-            .type(ImmutableTypeName.builder()
-                .name(superInterface.name)
-                .pkg(naming.dt().pkg(body))
-                .build())
-            .value(interfaceBuilder.toString())
-            .build())
-        
-        .addDeclarations(ImmutableTypeDeclaration.builder()
-            .type(ImmutableTypeName.builder()
-                .name(implementation.name)
-                .pkg(naming.dt().pkg(body))
-                .build())
-            .value(implementationBuilder.toString())
-            .build())
-        
+        .type(HdesCompiler.SourceType.DT).name(body.getId()).types(types).source(body.getToken().getText())
+        .addDeclarations(ImmutableTypeDeclaration.builder().type(interfaceType).value(interfaceBuilder.toString()).build())
+        .addDeclarations(ImmutableTypeDeclaration.builder().type(implementationType).value(implementationBuilder.toString()).build())
         .build();
   }
   
