@@ -80,8 +80,8 @@ public class JavaAstEnvirVisitor {
     
     return ImmutableResource.builder()
         .type(HdesCompiler.SourceType.DT).name(body.getId()).types(types).source(body.getToken().getText())
-        .addDeclarations(ImmutableTypeDeclaration.builder().type(interfaceType).value(interfaceBuilder.toString()).build())
-        .addDeclarations(ImmutableTypeDeclaration.builder().type(implementationType).value(implementationBuilder.toString()).build())
+        .addDeclarations(ImmutableTypeDeclaration.builder().type(interfaceType).value(interfaceBuilder.toString()).isExecutable(false).build())
+        .addDeclarations(ImmutableTypeDeclaration.builder().type(implementationType).value(implementationBuilder.toString()).isExecutable(true).build())
         .build();
   }
   
@@ -101,6 +101,7 @@ public class JavaAstEnvirVisitor {
                 .name(superInterface.name)
                 .pkg(naming.fl().pkg(body))
                 .build())
+            .isExecutable(false)
             .value(interfaceBuilder.toString())
             .build())
         
@@ -109,6 +110,7 @@ public class JavaAstEnvirVisitor {
                 .name(implementation.name)
                 .pkg(naming.fl().pkg(body))
                 .build())
+            .isExecutable(true)
             .value(implementationBuilder.toString())
             .build())
         

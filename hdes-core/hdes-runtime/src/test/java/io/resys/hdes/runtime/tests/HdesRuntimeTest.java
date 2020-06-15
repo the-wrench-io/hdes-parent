@@ -7,13 +7,14 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
+import io.resys.hdes.runtime.api.HdesRuntime.RuntimeEnvir;
 import io.resys.hdes.runtime.spi.ImmutableHdesRuntime;
 
 public class HdesRuntimeTest {
   private final HdesCompiler compiler = JavaHdesCompiler.config().build();
   
   @Test 
-  public void dtHitPolicyAll() {
+  public void dtHitPolicyAll() throws ClassNotFoundException {
     String src = "define decision-table: ExpressionDT description: 'uber dt'\n" + 
         "headers: {\n" + 
         "  value0 INTEGER required IN,\n" + 
@@ -26,8 +27,9 @@ public class HdesRuntimeTest {
         "}";
     
     List<Resource> resources = compiler.parser().add("ExpressionDT", src).build();
+    RuntimeEnvir runtime = ImmutableHdesRuntime.builder().from(resources).build();
     
-    ImmutableHdesRuntime.builder().from(resources).build();
+    runtime.get("ExpressionDT");
     
   }
 }

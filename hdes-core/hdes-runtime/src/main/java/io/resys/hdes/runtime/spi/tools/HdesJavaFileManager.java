@@ -1,5 +1,6 @@
 package io.resys.hdes.runtime.spi.tools;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,7 +12,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 
 public class HdesJavaFileManager extends ForwardingJavaFileManager<StandardJavaFileManager> {
-  private final Map<String, JavaFileObject> cache = new HashMap<>();
+  private final Map<String, HdesJavaFileObject> cache = new HashMap<>();
 
   public HdesJavaFileManager(StandardJavaFileManager standardManager) {
     super(standardManager);
@@ -28,6 +29,9 @@ public class HdesJavaFileManager extends ForwardingJavaFileManager<StandardJavaF
     return result;
   }
   
+  public Map<String, HdesJavaFileObject> getCache() {
+    return Collections.unmodifiableMap(cache);
+  }
   
   public static HdesJavaFileManager create(JavaCompiler compiler) {
     StandardJavaFileManager fileManager = compiler.getStandardFileManager(null, null, null);

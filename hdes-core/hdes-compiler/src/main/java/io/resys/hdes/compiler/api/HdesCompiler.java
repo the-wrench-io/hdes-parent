@@ -50,6 +50,9 @@ public interface HdesCompiler {
   interface TypeDeclaration {
     TypeName getType();
     String getValue();
+    
+    // Is main executable
+    boolean isExecutable(); 
   }
   
   @Value.Immutable

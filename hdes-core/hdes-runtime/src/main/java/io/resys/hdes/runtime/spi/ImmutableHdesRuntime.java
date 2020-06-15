@@ -1,12 +1,13 @@
 package io.resys.hdes.runtime.spi;
 
 import java.io.StringWriter;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodHandles.Lookup;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaCompiler.CompilationTask;
@@ -19,6 +20,7 @@ import io.resys.hdes.compiler.api.HdesCompiler.TypeName;
 import io.resys.hdes.runtime.api.HdesRuntime;
 import io.resys.hdes.runtime.spi.tools.HdesJavaFileManager;
 import io.resys.hdes.runtime.spi.tools.HdesJavaFileObject;
+import io.resys.hdes.runtime.spi.tools.ImmutableRuntimeEnvir;
 
 public class ImmutableHdesRuntime implements HdesRuntime {
   
@@ -31,41 +33,41 @@ public class ImmutableHdesRuntime implements HdesRuntime {
     private final List<Resource> resources = new ArrayList<>();
 
     @Override
-    public HdesRuntimeEnvir build() {
-      
-      Lookup lookup = MethodHandles.lookup();
-      ClassLoader classLoader = lookup.lookupClass().getClassLoader();
-      
+    public RuntimeEnvir build() {
       JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
       HdesJavaFileManager fileManager = HdesJavaFileManager.create(compiler);
       
-      // compilation
-      DiagnosticCollector diagnosticListener = new DiagnosticCollector();
+      DiagnosticCollector<Object> diagnosticListener = new DiagnosticCollector<Object>();
       List<String> options = new ArrayList<>();
       StringWriter out = new StringWriter();
       List<String> annotatedClasses = new ArrayList<>();
       List<SimpleJavaFileObject> files = new ArrayList<>();
+      Map<String, TypeName> executables = new HashMap<>();
+      
       
       for(Resource resource : resources) {
+        // Type names for annotation processor
         for(TypeName typeName : resource.getTypes()) {
           annotatedClasses.add(typeName.getPkg() + "." + typeName.getName());
         }
         
+        // Java source code
         for(TypeDeclaration typeDeclaration : resource.getDeclarations()) {
           files.add(HdesJavaFileObject.create(typeDeclaration.getType().getName(), typeDeclaration.getValue()));
+          if(typeDeclaration.isExecutable()) {
+            System.out.println(typeDeclaration.getValue());
+            executables.put(resource.getName(), typeDeclaration.getType());
+          }
         }
       }
       
       CompilationTask task = compiler.getTask(out, fileManager, diagnosticListener, options, annotatedClasses, files);
-      
       var immutables = new org.immutables.processor.ProxyProcessor(); 
       task.setProcessors(Arrays.asList(immutables));
       task.call();
       
-      
-      System.out.println(diagnosticListener.getDiagnostics());
-      
-      return null;
+      List<Diagnostic<?>> diagnostics = diagnosticListener.getDiagnostics();  
+      return ImmutableRuntimeEnvir.from(fileManager, diagnostics, executables);
     }
 
     @Override

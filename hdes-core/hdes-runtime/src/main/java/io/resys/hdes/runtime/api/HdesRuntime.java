@@ -8,11 +8,11 @@ public interface HdesRuntime {
   
   interface EnvirBuilder {
     EnvirBuilder from(List<Resource> resources);
-    HdesRuntimeEnvir build();
+    RuntimeEnvir build();
   }
 
   
-  interface HdesRuntimeEnvir {
-    <T> T get(String name);
+  interface RuntimeEnvir {
+    <T> T get(String name) throws ClassNotFoundException;
   }
 }
