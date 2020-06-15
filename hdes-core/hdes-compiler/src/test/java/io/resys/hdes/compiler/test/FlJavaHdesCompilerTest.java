@@ -22,12 +22,13 @@ package io.resys.hdes.compiler.test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.compiler.api.HdesCompiler;
-import io.resys.hdes.compiler.api.HdesCompiler.Code;
+import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
 
 public class FlJavaHdesCompilerTest {
@@ -35,22 +36,16 @@ public class FlJavaHdesCompilerTest {
 
   @Test
   public void simpleFlow() {
-    Code code = compiler.parser()
+    List<Resource> code = compiler.parser()
         .add("SimpleFlow.hdes", file("SimpleFlow.hdes"))
     .build();
-    
-    //System.out.println(code.getValues().get(0).getTarget());
-    //System.out.println(code.getValues().get(1).getTarget());
   }
 
   @Test
   public void arrayFlow() {
-    Code code = compiler.parser()
+    List<Resource> code = compiler.parser()
         .add("ArrayFlow.hdes", file("ArrayFlow.hdes"))
     .build();
-    
-    System.out.println(code.getValues().get(0).getTarget());
-    //System.out.println(code.getValues().get(1).getTarget());
   }
   
   public static String file(String name) {

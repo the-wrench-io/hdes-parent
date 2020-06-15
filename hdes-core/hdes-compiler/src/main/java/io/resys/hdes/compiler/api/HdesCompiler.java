@@ -28,24 +28,33 @@ public interface HdesCompiler {
   
   enum SourceType {FL, MT, DT}
   
+  interface HdesExecutable {}
+
   Parser parser();
   
   interface Parser {
-    Parser add(String fileName, String src);
-    Code build();
+    Parser add(String name, String src);
+    List<Resource> build();
   }
 
   @Value.Immutable
-  interface Code {
-    List<CodeValue> getValues();
+  interface Resource {
+    String getName();
+    SourceType getType();
+    String getSource();
+    List<TypeName> getTypes();
+    List<TypeDeclaration> getDeclarations();
   }
   
   @Value.Immutable
-  interface CodeValue {
-    SourceType getType();
-    String getPackageName();
-    String getSimpleName();
-    String getSource();
-    String getTarget();
+  interface TypeDeclaration {
+    TypeName getType();
+    String getValue();
+  }
+  
+  @Value.Immutable
+  interface TypeName {
+    String getPkg();
+    String getName();
   }
 }

@@ -1,5 +1,7 @@
 package io.resys.hdes.compiler.spi.java;
 
+import java.util.List;
+
 /*-
  * #%L
  * hdes-compiler
@@ -32,7 +34,7 @@ public class JavaHdesCompiler implements HdesCompiler {
     AstEnvir.Builder builder = ImmutableAstEnvir.builder();
     return new Parser() {
       @Override
-      public Code build() {
+      public List<Resource> build() {
         return new JavaAstEnvirVisitor().visit(builder.build());
       }
       @Override
