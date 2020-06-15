@@ -71,11 +71,16 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
   
   @Override
   public DtTypesSpec visitHeaders(Headers node) {
-    Function<ClassName, TypeSpec.Builder> from = (name) -> TypeSpec
-        .interfaceBuilder(name)
-        .addAnnotation(Immutable.class)
-        .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
-    
+    Function<ClassName, TypeSpec.Builder> from = (name) -> {
+      ClassName jsonType = naming.immutable(name);
+      return TypeSpec
+          .interfaceBuilder(name)
+          .addAnnotation(Immutable.class)
+          .addAnnotation(AnnotationSpec.builder(ClassName.get("com.fasterxml.jackson.databind.annotation", "JsonSerialize")).addMember("as", "$T.class", jsonType).build())
+          .addAnnotation(AnnotationSpec.builder(ClassName.get("com.fasterxml.jackson.databind.annotation", "JsonDeserialize")).addMember("as", "$T.class", jsonType).build())
+          .addModifiers(Modifier.PUBLIC, Modifier.STATIC);
+    };
+        
     TypeSpec.Builder inputBuilder = from.apply(naming.dt().input(body))
         .addSuperinterface(DecisionTable.DecisionTableInput.class);
     
@@ -106,7 +111,6 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
           .build()).build();
       values.add(collectionOutput);
     }
-    
     
     return ImmutableDtTypesSpec.builder().addAllValues(values).build();
   }

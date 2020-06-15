@@ -27,6 +27,7 @@ import io.resys.hdes.compiler.api.DecisionTable.DecisionTableOutput;
 import io.resys.hdes.compiler.api.HdesCompiler.HdesExecutable;
 
 public interface DecisionTable<I extends DecisionTableInput, O extends DecisionTableOutput> extends HdesExecutable, Function<I, O> {
+  
   interface DecisionTableInput {}
   interface DecisionTableOutput {}
 }

@@ -42,6 +42,10 @@ public interface HdesCompiler {
     String getName();
     SourceType getType();
     String getSource();
+    
+    TypeName getInput();
+    TypeName getOutput();
+    
     List<TypeName> getTypes();
     List<TypeDeclaration> getDeclarations();
   }

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
@@ -35,6 +36,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.api.HdesCompiler.TypeName;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.api.ImmutableResource;
 import io.resys.hdes.compiler.api.ImmutableTypeDeclaration;
@@ -80,6 +82,10 @@ public class JavaAstEnvirVisitor {
     
     return ImmutableResource.builder()
         .type(HdesCompiler.SourceType.DT).name(body.getId()).types(types).source(body.getToken().getText())
+        
+        .input(visitNestedTypeName(naming.dt().input(body)))
+        .output(visitNestedTypeName(naming.dt().output(body)))
+        
         .addDeclarations(ImmutableTypeDeclaration.builder().type(interfaceType).value(interfaceBuilder.toString()).isExecutable(false).build())
         .addDeclarations(ImmutableTypeDeclaration.builder().type(implementationType).value(implementationBuilder.toString()).isExecutable(true).build())
         .build();
@@ -96,23 +102,16 @@ public class JavaAstEnvirVisitor {
         .name(body.getId())
         .source(body.getToken().getText())
         
-        .addDeclarations(ImmutableTypeDeclaration.builder()
-            .type(ImmutableTypeName.builder()
-                .name(superInterface.name)
-                .pkg(naming.fl().pkg(body))
-                .build())
-            .isExecutable(false)
-            .value(interfaceBuilder.toString())
-            .build())
+        .input(visitNestedTypeName(naming.fl().input(body)))
+        .output(visitNestedTypeName(naming.fl().output(body)))
         
         .addDeclarations(ImmutableTypeDeclaration.builder()
-            .type(ImmutableTypeName.builder()
-                .name(implementation.name)
-                .pkg(naming.fl().pkg(body))
-                .build())
-            .isExecutable(true)
-            .value(implementationBuilder.toString())
-            .build())
+            .type(ImmutableTypeName.builder().name(superInterface.name).pkg(naming.fl().pkg(body)).build())
+            .isExecutable(false).value(interfaceBuilder.toString()).build())
+        
+        .addDeclarations(ImmutableTypeDeclaration.builder()
+            .type(ImmutableTypeName.builder().name(implementation.name).pkg(naming.fl().pkg(body)).build())
+            .isExecutable(true).value(implementationBuilder.toString()).build())
         
         .build();
   }
@@ -135,5 +134,9 @@ public class JavaAstEnvirVisitor {
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
+  }
+  
+  private static TypeName visitNestedTypeName(ClassName name) {
+   return ImmutableTypeName.builder().name(name.simpleName()).pkg(name.packageName()).build(); 
   }
 }

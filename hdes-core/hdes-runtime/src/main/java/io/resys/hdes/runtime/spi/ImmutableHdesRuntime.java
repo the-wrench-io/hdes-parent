@@ -3,6 +3,7 @@ package io.resys.hdes.runtime.spi;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +25,11 @@ import io.resys.hdes.runtime.spi.tools.ImmutableRuntimeEnvir;
 
 public class ImmutableHdesRuntime implements HdesRuntime {
   
-  public static EnvirBuilder builder() {
+  public static Builder builder() {
     return new ImmutableEnvirBuilder();
   }
   
-  public static class ImmutableEnvirBuilder implements EnvirBuilder {
+  public static class ImmutableEnvirBuilder implements Builder {
 
     private final List<Resource> resources = new ArrayList<>();
 
@@ -44,8 +45,11 @@ public class ImmutableHdesRuntime implements HdesRuntime {
       List<SimpleJavaFileObject> files = new ArrayList<>();
       Map<String, TypeName> executables = new HashMap<>();
       
+      Map<String, Resource> values = new HashMap<>();
       
       for(Resource resource : resources) {
+        values.put(resource.getName(), resource);
+        
         // Type names for annotation processor
         for(TypeName typeName : resource.getTypes()) {
           annotatedClasses.add(typeName.getPkg() + "." + typeName.getName());
@@ -53,9 +57,9 @@ public class ImmutableHdesRuntime implements HdesRuntime {
         
         // Java source code
         for(TypeDeclaration typeDeclaration : resource.getDeclarations()) {
+          System.out.println(typeDeclaration.getValue());
           files.add(HdesJavaFileObject.create(typeDeclaration.getType().getName(), typeDeclaration.getValue()));
           if(typeDeclaration.isExecutable()) {
-            System.out.println(typeDeclaration.getValue());
             executables.put(resource.getName(), typeDeclaration.getType());
           }
         }
@@ -67,11 +71,11 @@ public class ImmutableHdesRuntime implements HdesRuntime {
       task.call();
       
       List<Diagnostic<?>> diagnostics = diagnosticListener.getDiagnostics();  
-      return ImmutableRuntimeEnvir.from(fileManager, diagnostics, executables);
+      return ImmutableRuntimeEnvir.from(fileManager, diagnostics, executables, Collections.unmodifiableMap(values));
     }
 
     @Override
-    public EnvirBuilder from(List<Resource> resources) {
+    public Builder from(List<Resource> resources) {
       if(resources != null) {
         this.resources.addAll(resources);
       }
