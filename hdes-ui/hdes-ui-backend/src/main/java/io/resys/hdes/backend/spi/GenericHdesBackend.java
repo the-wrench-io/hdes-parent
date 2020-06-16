@@ -33,10 +33,14 @@ import io.resys.hdes.backend.api.HdesBackend;
 import io.resys.hdes.backend.api.HdesBackendStorage;
 import io.resys.hdes.backend.api.HdesBackendStorage.StorageWriter;
 import io.resys.hdes.backend.api.ImmutableStatus;
+import io.resys.hdes.compiler.api.HdesCompiler;
+import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
 
 public class GenericHdesBackend implements HdesBackend {
+  
   private final ObjectMapper objectMapper;
   private final HdesBackendStorage storage;
+  private final HdesCompiler compiler = JavaHdesCompiler.config().build();
 
   public GenericHdesBackend(ObjectMapper objectMapper, HdesBackendStorage storage) {
     super();
@@ -54,6 +58,11 @@ public class GenericHdesBackend implements HdesBackend {
   public List<Search> search() {
     // TODO Auto-generated method stub
     return null;
+  }
+  
+  @Override
+  public DefDebugBuilder debug() {
+    return new GenericDefDebugBuilder(compiler, storage, reader());
   }
 
   @Override

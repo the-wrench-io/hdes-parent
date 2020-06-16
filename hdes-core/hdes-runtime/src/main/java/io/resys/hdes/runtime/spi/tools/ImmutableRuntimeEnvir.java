@@ -1,5 +1,25 @@
 package io.resys.hdes.runtime.spi.tools;
 
+/*-
+ * #%L
+ * hdes-runtime
+ * %%
+ * Copyright (C) 2020 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
@@ -23,12 +43,18 @@ public class ImmutableRuntimeEnvir implements RuntimeEnvir {
   private final HdesClassLoader classLoader;
   private final Map<String, TypeName> executables;
   private final Map<String, Resource> values;
+  private final List<Diagnostic<?>> diagnostics;
   
-  public ImmutableRuntimeEnvir(HdesClassLoader classLoader, Map<String, TypeName> executables, Map<String, Resource> values) {
+  public List<Diagnostic<?>> getDiagnostics() {
+    return diagnostics;
+  }
+
+  public ImmutableRuntimeEnvir(HdesClassLoader classLoader, Map<String, TypeName> executables, Map<String, Resource> values, List<Diagnostic<?>> diagnostics) {
     super();
     this.classLoader = classLoader;
     this.executables = executables;
     this.values = values;
+    this.diagnostics = diagnostics;
   }
 
   @Override
@@ -73,7 +99,7 @@ public class ImmutableRuntimeEnvir implements RuntimeEnvir {
     
     Map<String, HdesJavaFileObject> cache = fileManager.getCache();
     HdesClassLoader classLoader = new HdesClassLoader(cache);
-    return new ImmutableRuntimeEnvir(classLoader, executables, values);
+    return new ImmutableRuntimeEnvir(classLoader, executables, values, diagnostics);
   }
 
   private static class HdesClassLoader extends ClassLoader {

@@ -1,5 +1,7 @@
 package io.resys.hdes.compiler.api;
 
+import java.io.Serializable;
+
 /*-
  * #%L
  * hdes-compiler
@@ -28,6 +30,6 @@ import io.resys.hdes.compiler.api.HdesCompiler.HdesExecutable;
 
 public interface DecisionTable<I extends DecisionTableInput, O extends DecisionTableOutput> extends HdesExecutable, Function<I, O> {
   
-  interface DecisionTableInput {}
-  interface DecisionTableOutput {}
+  interface DecisionTableInput extends Serializable {}
+  interface DecisionTableOutput extends Serializable {}
 }

@@ -1,5 +1,25 @@
 package io.resys.hdes.runtime.spi.tools;
 
+/*-
+ * #%L
+ * hdes-runtime
+ * %%
+ * Copyright (C) 2020 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
@@ -9,8 +29,16 @@ import javax.tools.JavaFileObject;
 import javax.tools.SimpleJavaFileObject;
 
 public abstract class HdesJavaFileObject extends SimpleJavaFileObject {
-  public HdesJavaFileObject(URI uri, JavaFileObject.Kind kind) {
+  
+  private String className;
+  
+  public HdesJavaFileObject(String className, URI uri, JavaFileObject.Kind kind) {
     super(uri, kind);
+    this.className = className;
+  }
+  
+  public String getClassName() {
+    return className;
   }
   
   public abstract byte[] getBytes();
@@ -18,7 +46,7 @@ public abstract class HdesJavaFileObject extends SimpleJavaFileObject {
   public static HdesJavaFileObject create(String className, CharSequence content) {
     final URI uri = URI.create("string:///" + className.replace('.', '/') + JavaFileObject.Kind.SOURCE.extension);
     final JavaFileObject.Kind kind = JavaFileObject.Kind.SOURCE;
-    return new HdesJavaFileObject(uri, kind) {
+    return new HdesJavaFileObject(className, uri, kind) {
       @Override
       public CharSequence getCharContent(boolean ignoreEncodingErrors) {
         return content;
@@ -30,9 +58,9 @@ public abstract class HdesJavaFileObject extends SimpleJavaFileObject {
     };
   }
 
-  public static HdesJavaFileObject create(String name, JavaFileObject.Kind kind) {
-    final URI uri = URI.create("string:///" + name.replace('.', '/') + kind.extension);
-    return new HdesJavaFileObject(uri, kind) {
+  public static HdesJavaFileObject create(String className, JavaFileObject.Kind kind) {
+    final URI uri = URI.create("string:///" + className.replace('.', '/') + kind.extension);
+    return new HdesJavaFileObject(className, uri, kind) {
       private ByteArrayOutputStream content = new ByteArrayOutputStream();
       private byte[] bytes;
 

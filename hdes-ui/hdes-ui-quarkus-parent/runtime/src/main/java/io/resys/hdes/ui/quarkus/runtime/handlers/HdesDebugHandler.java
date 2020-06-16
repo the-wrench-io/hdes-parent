@@ -23,7 +23,7 @@ import javax.enterprise.inject.spi.CDI;
 
 import io.quarkus.arc.Arc;
 import io.resys.hdes.backend.api.HdesBackend;
-import io.resys.hdes.backend.api.HdesBackend.Status;
+import io.resys.hdes.backend.api.HdesBackend.DefDebug;
 import io.resys.hdes.ui.quarkus.runtime.HdesHandlerHelper;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -31,17 +31,24 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
-public class HdesStatusHandler implements Handler<RoutingContext> {
+
+public class HdesDebugHandler implements Handler<RoutingContext>  {
   
   @Override
   public void handle(RoutingContext event) {
     boolean active = HdesHandlerHelper.active();
-    HdesBackend backend = CDI.current().select(HdesBackend.class).get();
     HttpServerResponse response = event.response();
+    HdesBackend backend = CDI.current().select(HdesBackend.class).get();
+    
     try {
-      Status status = backend.status();
+      byte[] input = event.getBody().getBytes();
+      String qualifier = event.pathParam("qualifier");
+      String name = event.pathParam("name");
+      
+      DefDebug debug = backend.debug().input(input).name(name).qualifier(qualifier).build();
+      
       response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
-      response.end(Buffer.buffer(backend.writer().build(status)));
+      response.end(Buffer.buffer(backend.writer().build(debug)));
     } catch(Exception e) {
       HdesHandlerHelper.catch422(e, backend, response);
     } finally {
@@ -50,4 +57,6 @@ public class HdesStatusHandler implements Handler<RoutingContext> {
       }
     }
   }
+  
+
 }

@@ -26,6 +26,11 @@
         <artifactId>hdes-compiler</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-runtime</artifactId>
+        <version>${project.version}</version>
+      </dependency>
 
       <dependency>
         <groupId>io.resys.hdes</groupId>

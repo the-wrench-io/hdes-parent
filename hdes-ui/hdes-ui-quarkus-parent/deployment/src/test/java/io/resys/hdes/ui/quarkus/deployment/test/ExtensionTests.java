@@ -44,7 +44,12 @@ public class ExtensionTests {
   }
   
   @Test
-  public void responsesBackend() {
+  public void responsesDef() {
     RestAssured.when().get("/hdes-ui/services/defs").then().statusCode(200);
+  }
+  
+  @Test
+  public void responsesDebug() {
+    RestAssured.given().body("{}").when().post("/hdes-ui/services/debug/superBranch/superResource").then().statusCode(200);
   }
 }

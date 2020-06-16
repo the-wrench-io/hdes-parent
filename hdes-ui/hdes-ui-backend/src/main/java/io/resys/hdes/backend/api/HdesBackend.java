@@ -1,5 +1,6 @@
 package io.resys.hdes.backend.api;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /*-
@@ -38,6 +39,7 @@ public interface HdesBackend {
   List<Search> search();
   Status status();
   
+  DefDebugBuilder debug();
   DefQueryBuilder query();
   DefCreateBuilder builder();
   DefChangeBuilder change();
@@ -52,6 +54,23 @@ public interface HdesBackend {
   interface Reader {
     <T> T build(byte[] body, Class<T> type);
     <T> List<T> list(byte[] body, Class<T> type);
+  }
+  
+  interface DefDebugBuilder {
+    DefDebugBuilder qualifier(String tagOrBranch);
+    DefDebugBuilder name(String name);
+    DefDebugBuilder input(byte[] input);
+    DefDebug build();
+  }
+  
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableDefDebug.class)
+  @JsonDeserialize(as = ImmutableDefDebug.class)
+  interface DefDebug {
+    String getQualifier();
+    String getName();
+    Optional<Serializable> getOutput();
+    List<DefError> getErrors();
   }
   
   interface DefChangeBuilder {

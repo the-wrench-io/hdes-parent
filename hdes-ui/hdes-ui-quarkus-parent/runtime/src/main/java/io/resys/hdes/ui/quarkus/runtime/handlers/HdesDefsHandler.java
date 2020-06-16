@@ -23,14 +23,12 @@ import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.enterprise.inject.spi.CDI;
 
 import org.apache.commons.codec.binary.Hex;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,11 +38,9 @@ import io.resys.hdes.backend.api.HdesBackend.Def;
 import io.resys.hdes.backend.api.HdesBackend.DefChangeEntry;
 import io.resys.hdes.backend.api.HdesBackend.DefCreateEntry;
 import io.resys.hdes.backend.api.HdesBackend.DefDeleteEntry;
-import io.resys.hdes.backend.api.HdesBackend.StatusMessage;
 import io.resys.hdes.backend.api.ImmutableDefChangeEntry;
 import io.resys.hdes.backend.api.ImmutableDefCreateEntry;
 import io.resys.hdes.backend.api.ImmutableDefDeleteEntry;
-import io.resys.hdes.backend.api.ImmutableStatusMessage;
 import io.resys.hdes.ui.quarkus.runtime.HdesHandlerHelper;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -94,23 +90,7 @@ public class HdesDefsHandler implements Handler<RoutingContext>  {
         break;
       }
     } catch(Exception e) {
-      String stack = ExceptionUtils.getStackTrace(e);
-      
-      // Log error
-      String log = new StringBuilder().append(e.getMessage()).append(System.lineSeparator()).append(stack).toString();
-      String hash = exceptionHash(log);
-      LOGGER.error(hash + " - " + log);
-      
-      // Msg back to ui
-      List<StatusMessage> messages = Arrays.asList(ImmutableStatusMessage.builder()
-          .id("error-msg")
-          .value(e.getMessage())
-          .logCode(hash)
-          .logStack(stack)
-          .build());
-      response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
-      response.setStatusCode(422);
-      response.end(Buffer.buffer(backend.writer().build(messages)));
+      HdesHandlerHelper.catch422(e, backend, response);
     } finally {
       if (active) {
         Arc.container().requestContext().terminate();
