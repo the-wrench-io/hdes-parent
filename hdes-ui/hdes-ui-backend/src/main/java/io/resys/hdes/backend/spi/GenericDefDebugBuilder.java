@@ -41,11 +41,10 @@ import io.resys.hdes.backend.api.HdesBackendStorage;
 import io.resys.hdes.backend.api.ImmutableDefDebug;
 import io.resys.hdes.backend.api.ImmutableDefError;
 import io.resys.hdes.backend.api.ImmutableDefErrorToken;
-import io.resys.hdes.compiler.api.DecisionTable;
-import io.resys.hdes.compiler.api.DecisionTable.DecisionTableInput;
-import io.resys.hdes.compiler.api.DecisionTable.DecisionTableOutput;
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.api.HdesExecutable;
+import io.resys.hdes.compiler.api.HdesExecutable.DecisionTable;
 import io.resys.hdes.runtime.api.HdesRuntime.RuntimeEnvir;
 import io.resys.hdes.runtime.api.HdesRuntime.RuntimeTask;
 import io.resys.hdes.runtime.spi.ImmutableHdesRuntime;
@@ -138,9 +137,9 @@ public class GenericDefDebugBuilder implements DefDebugBuilder {
       // TODO, separate task runners for different resource types
       
       // DT only 
-      DecisionTableInput dtInput = (DecisionTableInput) reader.build(input, task.getInput());
-      DecisionTable dt = (DecisionTable) task.getValue();
-      DecisionTableOutput dtOutput = (DecisionTableOutput) dt.apply(input);
+      HdesExecutable.Input dtInput = reader.build(input, task.getInput());
+      HdesExecutable.DecisionTable dt = (DecisionTable) task.getValue();
+      HdesExecutable.Output dtOutput = dt.apply(dtInput);
       
       return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch).output(dtOutput).build();
     } catch(ClassNotFoundException e) {

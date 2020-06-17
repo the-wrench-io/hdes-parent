@@ -77,7 +77,7 @@ public class ImmutableHdesRuntime implements HdesRuntime {
         
         // Java source code
         for(TypeDeclaration typeDeclaration : resource.getDeclarations()) {
-          //System.out.println(typeDeclaration.getValue());
+          System.out.println(typeDeclaration.getValue());
           files.add(HdesJavaFileObject.create(typeDeclaration.getType().getName(), typeDeclaration.getValue()));
           if(typeDeclaration.isExecutable()) {
             executables.put(resource.getName(), typeDeclaration.getType());

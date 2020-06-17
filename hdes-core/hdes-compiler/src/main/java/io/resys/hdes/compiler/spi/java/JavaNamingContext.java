@@ -32,11 +32,11 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
-import io.resys.hdes.compiler.api.DecisionTable;
 import io.resys.hdes.compiler.api.Flow;
 import io.resys.hdes.compiler.api.Flow.FlowState;
 import io.resys.hdes.compiler.api.Flow.FlowTaskState;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.api.HdesExecutable.DecisionTable;
 import io.resys.hdes.compiler.spi.NamingContext;
 
 public class JavaNamingContext implements NamingContext {

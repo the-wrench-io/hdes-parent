@@ -196,7 +196,10 @@ public class ImmutableAstEnvir implements AstEnvir {
         result = (BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
       } catch(Exception e) {
         result = ImmutableEmptyBodyNode.builder().id(externalId).token(ImmutableToken.builder()
-            .id(0).col(0).line(0).text(e.getMessage())
+            .id(0)
+            .startCol(0).startLine(0)
+            .endCol(0).endLine(0)
+            .text(e.getMessage())
             .build()).build();
       }
       return parent(result);

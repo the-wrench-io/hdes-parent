@@ -26,8 +26,8 @@ import javax.tools.Diagnostic;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.compiler.api.HdesCompiler.HdesExecutable;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.api.HdesExecutable;
 
 public interface HdesRuntime {
   
@@ -45,7 +45,7 @@ public interface HdesRuntime {
   interface RuntimeTask {
     String getName();
     HdesExecutable getValue();
-    Class<?> getInput();
-    Class<?> getOutput();
+    Class<? extends HdesExecutable.Input> getInput();
+    Class<? extends HdesExecutable.Output> getOutput();
   }
 }

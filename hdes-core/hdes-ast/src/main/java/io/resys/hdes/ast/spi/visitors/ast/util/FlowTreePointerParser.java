@@ -144,7 +144,7 @@ public class FlowTreePointerParser {
       message.append(System.lineSeparator()).append("Expecting one of: ");
     }
     for(FlowTaskNode task : sourceTasks.values()) {
-      message.append(System.lineSeparator()).append("  - ").append(task.getId()).append(" (line: ").append(task.getToken().getLine()).append(")");
+      message.append(System.lineSeparator()).append("  - ").append(task.getId()).append(" (line: ").append(task.getToken().getStartLine()).append(")");
     }
     throw new AstNodeException(Arrays.asList(ImmutableErrorNode.builder()
         .message(message.toString())

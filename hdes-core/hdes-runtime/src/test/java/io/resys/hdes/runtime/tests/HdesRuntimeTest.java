@@ -28,11 +28,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.compiler.api.DecisionTable;
-import io.resys.hdes.compiler.api.DecisionTable.DecisionTableInput;
-import io.resys.hdes.compiler.api.DecisionTable.DecisionTableOutput;
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.api.HdesExecutable;
+import io.resys.hdes.compiler.api.HdesExecutable.DecisionTable;
 import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
 import io.resys.hdes.runtime.api.HdesRuntime.RuntimeEnvir;
 import io.resys.hdes.runtime.api.HdesRuntime.RuntimeTask;
@@ -61,10 +60,11 @@ public class HdesRuntimeTest {
     
     RuntimeTask task = runtime.get("ExpressionDT");
     
-    DecisionTableInput input = (DecisionTableInput) objectMapper.readValue("{\"value0\": 11, \"value1\": 2}", task.getInput());
+    HdesExecutable.Input input = (HdesExecutable.Input) objectMapper.readValue("{\"value0\": 11, \"value1\": 2}", task.getInput());
     DecisionTable dt = (DecisionTable) task.getValue();
-    DecisionTableOutput output = (DecisionTableOutput) dt.apply(input);
+    HdesExecutable.Output output = dt.apply(input);
     
     System.out.println(output);
   }
 }
+

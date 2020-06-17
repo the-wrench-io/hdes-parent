@@ -61,8 +61,12 @@ public interface AstNode {
   interface Token {
     int getId();
     String getText();
-    int getLine();
-    int getCol();
+    
+    int getStartLine();
+    int getStartCol();
+    
+    int getEndLine();
+    int getEndCol();
   }
   
   interface DataTypeConversion extends ExpressionNode {

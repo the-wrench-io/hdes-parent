@@ -39,12 +39,20 @@ public class DtHdesCompilerTest {
     List<Resource> code = compiler.parser()
         .add("SimpleDt.hdes", file("SimpleDt.hdes"))
     .build();
+    print(code);
   }
   @Test
   public void expressionDt() {
     List<Resource> code = compiler.parser()
         .add("ExpressionDt.hdes", file("ExpressionDt.hdes"))
     .build();
+    print(code);
+  }
+  
+  public static void print(List<Resource> resources) {
+   for(Resource r : resources) {
+     r.getDeclarations().forEach(d -> System.out.println(d.getValue()));
+   } 
   }
   
   public static String file(String name) {

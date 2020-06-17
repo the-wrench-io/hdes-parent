@@ -34,10 +34,10 @@ import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.nodes.AstNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 import io.resys.hdes.compiler.api.HdesCompiler.TypeName;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.api.HdesExecutable;
 import io.resys.hdes.compiler.api.ImmutableResource;
 import io.resys.hdes.compiler.api.ImmutableTypeDeclaration;
 import io.resys.hdes.compiler.api.ImmutableTypeName;
@@ -81,7 +81,7 @@ public class JavaAstEnvirVisitor {
     types.add(implementationType);
     
     return ImmutableResource.builder()
-        .type(HdesCompiler.SourceType.DT).name(body.getId()).types(types).source(body.getToken().getText())
+        .type(HdesExecutable.SourceType.DT).name(body.getId()).types(types).source(body.getToken().getText())
         
         .input(visitNestedTypeName(naming.dt().input(body)))
         .output(visitNestedTypeName(naming.dt().output(body)))
@@ -98,7 +98,7 @@ public class JavaAstEnvirVisitor {
     TypeSpec implementation = visitFlow(body, new FlAstNodeVisitorJavaGen(naming).visitBody(body), implementationBuilder);
 
     return ImmutableResource.builder()
-        .type(HdesCompiler.SourceType.FL)
+        .type(HdesExecutable.SourceType.FL)
         .name(body.getId())
         .source(body.getToken().getText())
         

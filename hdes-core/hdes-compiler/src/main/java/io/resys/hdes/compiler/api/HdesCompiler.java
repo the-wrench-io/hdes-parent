@@ -24,11 +24,9 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.compiler.api.HdesExecutable.SourceType;
+
 public interface HdesCompiler {
-  
-  enum SourceType {FL, MT, DT}
-  
-  interface HdesExecutable {}
 
   Parser parser();
   

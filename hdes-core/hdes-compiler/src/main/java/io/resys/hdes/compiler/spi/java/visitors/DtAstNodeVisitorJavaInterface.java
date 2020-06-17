@@ -1,6 +1,7 @@
 package io.resys.hdes.compiler.spi.java.visitors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -42,7 +43,7 @@ import io.resys.hdes.ast.api.nodes.AstNode.ScalarTypeDefNode;
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
-import io.resys.hdes.compiler.api.DecisionTable;
+import io.resys.hdes.compiler.api.HdesExecutable;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
@@ -61,9 +62,13 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {
     this.body = node;
+    List<AnnotationSpec> annotations = Arrays.asList(
+        AnnotationSpec.builder(javax.annotation.processing.Generated.class)
+        .addMember("value", "$S", DtAstNodeVisitorJavaInterface.class.getCanonicalName()).build());
+    
     TypeSpec result = TypeSpec.interfaceBuilder(naming.dt().interfaze(node))
         .addModifiers(Modifier.PUBLIC)
-        .addAnnotation(AnnotationSpec.builder(javax.annotation.processing.Generated.class).addMember("value", "$S", DtAstNodeVisitorJavaInterface.class.getCanonicalName()).build())
+        .addAnnotations(annotations)
         .addSuperinterface(naming.dt().superinterface(node))
         .addTypes(visitHeaders(node.getHeaders()).getValues()).build();
     return result;
@@ -82,10 +87,10 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     };
         
     TypeSpec.Builder inputBuilder = from.apply(naming.dt().input(body))
-        .addSuperinterface(DecisionTable.DecisionTableInput.class);
+        .addSuperinterface(HdesExecutable.Input.class);
     
     TypeSpec.Builder outputBuilder = from.apply(naming.dt().outputEntry(body))
-        .addSuperinterface(DecisionTable.DecisionTableOutput.class);
+        .addSuperinterface(HdesExecutable.OutputValue.class);
     
     for(TypeDefNode header : node.getValues()) {
       MethodSpec method = visitHeader(header).getValue();
@@ -104,7 +109,7 @@ public class DtAstNodeVisitorJavaInterface extends DtAstNodeVisitorTemplate<DtJa
     if (isCollection) {
       ParameterizedTypeName returnType = ParameterizedTypeName.get(ClassName.get(Collection.class), naming.dt().outputEntry(body));
       TypeSpec collectionOutput = from.apply(naming.dt().output(body))
-        .addSuperinterface(DecisionTable.DecisionTableOutput.class)
+        .addSuperinterface(HdesExecutable.OutputValue.class)
         .addMethod(MethodSpec.methodBuilder(JavaSpecUtil.getMethodName("values"))
           .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
           .returns(returnType)

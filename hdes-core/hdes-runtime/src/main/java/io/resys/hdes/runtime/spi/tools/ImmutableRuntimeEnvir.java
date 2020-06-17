@@ -29,9 +29,11 @@ import javax.tools.Diagnostic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.resys.hdes.compiler.api.HdesCompiler.HdesExecutable;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 import io.resys.hdes.compiler.api.HdesCompiler.TypeName;
+import io.resys.hdes.compiler.api.HdesExecutable;
+import io.resys.hdes.compiler.api.HdesExecutable.Input;
+import io.resys.hdes.compiler.api.HdesExecutable.Output;
 import io.resys.hdes.compiler.api.HdesWhen;
 import io.resys.hdes.compiler.spi.HdesWhenGen;
 import io.resys.hdes.runtime.api.HdesRuntime.RuntimeEnvir;
@@ -45,6 +47,7 @@ public class ImmutableRuntimeEnvir implements RuntimeEnvir {
   private final Map<String, Resource> values;
   private final List<Diagnostic<?>> diagnostics;
   
+  @Override
   public List<Diagnostic<?>> getDiagnostics() {
     return diagnostics;
   }
@@ -68,8 +71,8 @@ public class ImmutableRuntimeEnvir implements RuntimeEnvir {
     try {
       Resource resource = values.get(name);
       
-      Class<?> input = classLoader.findClass(resource.getInput().getPkg() + "$" + resource.getInput().getName());
-      Class<?> output = classLoader.findClass(resource.getInput().getPkg() + "$" + resource.getOutput().getName());
+      Class<? extends HdesExecutable.Input> input = (Class<? extends Input>) classLoader.findClass(resource.getInput().getPkg() + "$" + resource.getInput().getName());
+      Class<? extends HdesExecutable.Output> output = (Class<? extends Output>) classLoader.findClass(resource.getInput().getPkg() + "$" + resource.getOutput().getName());
       
       HdesWhen when = HdesWhenGen.get();
       HdesExecutable executable = (HdesExecutable) clazz.getConstructors()[0].newInstance(when);

@@ -25,7 +25,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.lang.model.element.Modifier;
 
@@ -35,6 +37,7 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import io.resys.hdes.ast.api.nodes.AstNode;
@@ -60,8 +63,17 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.AndOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.BetweenExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
+import io.resys.hdes.compiler.api.DecisionTableMeta;
+import io.resys.hdes.compiler.api.DecisionTableMeta.DecisionTableMetaEntry;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.api.HdesExecutable.Output;
+import io.resys.hdes.compiler.api.HdesExecutable.SourceType;
 import io.resys.hdes.compiler.api.HdesWhen;
+import io.resys.hdes.compiler.api.ImmutableDecisionTableMeta;
+import io.resys.hdes.compiler.api.ImmutableDecisionTableMetaEntry;
+import io.resys.hdes.compiler.api.ImmutableMetaStamp;
+import io.resys.hdes.compiler.api.ImmutableMetaToken;
+import io.resys.hdes.compiler.api.ImmutableOutput;
 import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
@@ -81,6 +93,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
   @Override
   public TypeSpec visitDecisionTableBody(DecisionTableBody node) {
     this.body = node;
+    
     return TypeSpec.classBuilder(naming.dt().impl(node))
         .addModifiers(Modifier.PUBLIC)
         .addSuperinterface(naming.dt().interfaze(node))
@@ -94,33 +107,79 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
             .build())
         .addField(FieldSpec.builder(HdesWhen.class, "when", Modifier.PRIVATE, Modifier.FINAL).build())
         .addMethod(visitHitPolicy(node.getHitPolicy()).getValue())
+        
+        .addMethod(MethodSpec.methodBuilder("getSourceType")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .returns(SourceType.class)
+            .addStatement("return $T.DT", SourceType.class)
+            .build())
         .build();
   }
 
   @Override
   public DtMethodSpec visitHitPolicyAll(HitPolicyAll node) {
     CodeBlock.Builder statements = CodeBlock.builder()
-        .addStatement("$T<$T> result = new $T<>()", List.class, naming.dt().outputEntry(body), ArrayList.class);
+        .addStatement("$T<$T> result = new $T<>()", List.class, naming.dt().outputEntry(body), ArrayList.class)
+        .addStatement("$T<Integer, $T> meta = new $T<>()", Map.class, DecisionTableMetaEntry.class, HashMap.class)
+        .addStatement("int id = 0")
+        .addStatement("long start = System.currentTimeMillis()");
+    
+    int rowIndex = 0;
     for (RuleRow row : node.getRows()) {
+
       DtCodeSpecPair pair = visitRuleRow(row);
-      statements.add("\r\n/** \r\n * $L \r\n */\r\n", row.getText());
-      if (pair.getKey().isEmpty()) {
-        statements.addStatement("result.add($L)", pair.getValue());
-      } else {
-        statements
-            .beginControlFlow("if($L)", pair.getKey())
-            .addStatement("result.add($L)", pair.getValue())
-            .endControlFlow();
+
+      statements.add("\r\n");
+      
+      // control start
+      if (!pair.getKey().isEmpty()) {
+        statements.beginControlFlow("if($L)", pair.getKey()).add("\r\n");
       }
+      
+      // generate token
+      CodeBlock token = CodeBlock.builder().add("$T.builder()", ImmutableMetaToken.class)
+          .add("\r\n    .value($S)", row.getText().replaceAll("\\r|\\n", " ").replaceAll("\\s{2,}", " "))
+          .add("\r\n    .start($T.builder().line($L).column($L).build())", ImmutableMetaStamp.class, row.getToken().getStartLine(), row.getToken().getStartCol())
+          .add("\r\n    .end($T.builder().line($L).column($L).build())", ImmutableMetaStamp.class, row.getToken().getEndLine(), row.getToken().getEndCol())
+          .add("\r\n    .build()")
+          .build();
+      
+      statements
+      .add("meta.put(id, $T.builder()", ImmutableDecisionTableMetaEntry.class)
+      .add("\r\n  .id(id++)")
+      .add("\r\n  .index($L)", rowIndex++)
+      .add("\r\n  .token($L)", token)
+      .addStatement(".build())")
+      .addStatement("result.add($L)", pair.getValue());
+      
+      // Control end
+      if (!pair.getKey().isEmpty()) {
+        statements.endControlFlow();
+      }
+      
     }
-    ClassName returnType = naming.dt().output(body);
+    
+    ClassName outputName = naming.dt().output(body);
+    ParameterizedTypeName returnType = ParameterizedTypeName
+        .get(ClassName.get(Output.class), ClassName.get(DecisionTableMeta.class), outputName);
+    
+    statements
+    .addStatement("$T.Builder<$T, $T> builder = $T.builder()", ImmutableOutput.class, DecisionTableMeta.class, outputName, ImmutableOutput.class)
+    .add("builder")
+    .add(".meta($T.builder().time(System.currentTimeMillis() - start).values(meta).build())", ImmutableDecisionTableMeta.class)
+    .add("\r\n  .value(")
+    .add("$T.builder().values(result).build()", naming.immutable(outputName))
+    .addStatement(")")
+    .addStatement("return builder.build()");
+    
     return ImmutableDtMethodSpec.builder().value(
         MethodSpec.methodBuilder("apply")
             .addAnnotation(Override.class)
             .addModifiers(Modifier.PUBLIC)
             .addParameter(ParameterSpec.builder(naming.dt().input(body), "input").build())
             .returns(returnType)
-            .addCode(statements.addStatement("return $T.builder().values(result).build()", naming.immutable(returnType)).build())
+            .addCode(statements.build())
             .build()).build();
   }
 
@@ -343,7 +402,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     }
     throw new HdesCompilerException(HdesCompilerException.builder().unknownDTInputRule(node));
   }
-
+  
   private DtMethodSpec visitHitPolicy(HitPolicy node) {
     if (node instanceof HitPolicyAll) {
       return visitHitPolicyAll((HitPolicyAll) node);
