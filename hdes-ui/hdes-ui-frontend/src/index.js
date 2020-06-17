@@ -33,6 +33,7 @@ import { createHealthState } from './health';
 import { createExplorerState } from './explorer';
 import { createSearchState } from './explorer-se';
 import { createCreateState } from './explorer-cr';
+import { createDebugState } from './explorer-dg';
 import { createEditorState } from './editor';
 import { createEditorFlState } from './editor-fl';
 import { createEditorDlState } from './editor-dl';
@@ -104,6 +105,7 @@ const store = new Store(config, [
   createHealthState,
   createSearchState,
   createExplorerState,
+  createDebugState,
   createIconbarState,
   createCreateState,
   createEditorState,

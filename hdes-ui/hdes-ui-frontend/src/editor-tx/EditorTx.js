@@ -18,7 +18,10 @@
  * #L%
  */
 import { Component, createRef } from 'inferno'
+import Immutable from 'immutable'
 import { default as CodeMirror } from 'codemirror'
+
+import 'codemirror/addon/selection/mark-selection'
 import 'codemirror/addon/mode/simple'
 import 'codemirror/addon/lint/lint'
 
@@ -75,12 +78,16 @@ export class EditorTx extends Component {
     super(props)
     this.textareaRef = createRef()
   }
+
   shouldComponentUpdate(nextProps, nextState) {
     const key = ['editortx']
+    const annotations = annotations ? this.props.annotations : Immutable.fromJS([])
     return !this.props.state.getIn(key).equals(nextProps.state.getIn(key)) ||
       this.props.entry.get('id') !== nextProps.entry.get('id') ||
-      !this.props.entry.get('errors').equals(nextProps.entry.get('errors'))
+      !this.props.entry.get('errors').equals(nextProps.entry.get('errors')) ||
+      !annotations.equals(nextProps.annotations)
   }
+  
   componentDidMount() {
     const { actions } = this.props
     const getEntry = () => this.props.entry
@@ -110,6 +117,7 @@ export class EditorTx extends Component {
       lint: { async: true, lintOnChange: false, getAnnotations: getAnnotations},
     })
     this.editor.on('change', (editor) => actions.editortx.change(getEntry(), editor.getValue()))
+    this.markers = []
   }
 
   componentDidUpdate(prevProps) {
@@ -118,6 +126,16 @@ export class EditorTx extends Component {
       this.editor.refresh()
     }
     this.editor.performLint()
+
+    if(this.props.annotations) {
+      this.markers.forEach(marker => marker.clear())
+      for(let annotation of this.props.annotations.toJS()) {
+        const marker = this.editor.markText(
+          {line: annotation.startLine-1, ch: annotation.startCol}, 
+          {line: annotation.endLine-1, ch: annotation.endCol -1}, {css: 'background-color: rgba(255, 255, 119, 0.35)'});
+        this.markers.push(marker)
+      }
+    }
   }
 
   getValue(props) {

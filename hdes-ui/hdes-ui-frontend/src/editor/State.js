@@ -26,14 +26,21 @@ const init = {
   saving: {
     // id : { delay: 5000, value: 'valueToSave', errors: [] }
   },
+  annotations: {
+    // id : []
+  },
   saveDelay: 2000,
-  saveDelayFailRetry: 5000 
+  saveDelayFailRetry: 5000
 }
 
 // all explorer actions
 const actions = ({ update, actions }) => ({
   init: () => {},
  
+  setAnnotations: (id, tokens) => update(model => 
+    model.setIn([ID, 'annotations', id], Immutable.fromJS(tokens))
+  ),
+
   open: (entry) => update(model => model
     .updateIn([ID, 'entries'], e => {
       const id = entry.get('id')

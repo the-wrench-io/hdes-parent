@@ -53,7 +53,7 @@ const createComponent = (actions, state) => {
   if(type === 'delete') {
     result.push(<DlView actions={actions} state={state} />)
   } else {
-    result.push(<EditorTx actions={actions} state={state} entry={entry} />)
+    result.push(<EditorTx actions={actions} state={state} entry={entry} annotations={state.getIn(['editor', 'annotations', id])} />)
   }
 
   return result
