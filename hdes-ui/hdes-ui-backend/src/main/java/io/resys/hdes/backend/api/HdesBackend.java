@@ -31,6 +31,8 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
+
 public interface HdesBackend {
   enum DefType { FL, DT, TG, ST, MT, EM }
   enum ConfigType { LOCAL, REMOTE, CLASSPATH }
@@ -131,6 +133,8 @@ public interface HdesBackend {
   
   @Value.Immutable
   interface DefAst {
+    List<TypeDefNode> getInputs();
+    
     //String getType();
     //String getValue();
     //Optional<DefAst> getNext();

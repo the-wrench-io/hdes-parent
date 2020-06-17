@@ -60,10 +60,10 @@ public class HdesRuntimeTest {
     
     RuntimeTask task = runtime.get("ExpressionDT");
     
-    HdesExecutable.Input input = (HdesExecutable.Input) objectMapper.readValue("{\"value0\": 11, \"value1\": 2}", task.getInput());
+    HdesExecutable.Input input = objectMapper.readValue("{\"value0\": 11, \"value1\": 2}", task.getInput());
     DecisionTable dt = (DecisionTable) task.getValue();
     HdesExecutable.Output output = dt.apply(input);
-    
+
     System.out.println(output);
   }
 }

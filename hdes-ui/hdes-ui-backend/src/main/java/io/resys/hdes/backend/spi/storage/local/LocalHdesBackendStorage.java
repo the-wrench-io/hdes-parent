@@ -34,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.codec.binary.Hex;
@@ -43,25 +42,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.resys.hdes.ast.api.AstEnvir;
-import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
-import io.resys.hdes.ast.api.nodes.AstNode.EmptyBodyNode;
-import io.resys.hdes.ast.api.nodes.AstNode.ErrorNode;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
 import io.resys.hdes.ast.spi.ImmutableAstEnvir;
 import io.resys.hdes.backend.api.HdesBackend.ConfigType;
 import io.resys.hdes.backend.api.HdesBackend.Def;
 import io.resys.hdes.backend.api.HdesBackend.DefError;
-import io.resys.hdes.backend.api.HdesBackend.DefType;
 import io.resys.hdes.backend.api.HdesBackend.LocalStorageConfig;
 import io.resys.hdes.backend.api.HdesBackend.StorageConfig;
 import io.resys.hdes.backend.api.HdesBackendStorage;
-import io.resys.hdes.backend.api.ImmutableDef;
-import io.resys.hdes.backend.api.ImmutableDefAst;
-import io.resys.hdes.backend.api.ImmutableDefError;
-import io.resys.hdes.backend.api.ImmutableDefErrorToken;
 import io.resys.hdes.backend.api.ImmutableLocalStorageConfig;
+import io.resys.hdes.backend.spi.GenericDefBuilder;
 import io.resys.hdes.backend.spi.storage.GenericStorageWriterEntry;
 import io.resys.hdes.backend.spi.storage.HdesResourceBuilder;
 import io.resys.hdes.backend.spi.util.Assert;
@@ -140,7 +129,8 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
             throw new UncheckedIOException(e);
           }
         }
-        map(builder.build(), def -> cache.put(def.getId(),
+        
+        GenericDefBuilder.create().from(builder.build(), def -> cache.put(def.getId(),
             ImmutableDefCacheEntry.builder()
                 .def(def)
                 .key(keys.get(def.getId()))
@@ -151,47 +141,6 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
     };
   }
 
-  private void map(AstEnvir astEnvir, Consumer<Def> consumer) {
-    for (String id : astEnvir.getBody().keySet()) {
-      BodyNode node = astEnvir.getBody(id);
-      String src = astEnvir.getSrc(id);
-      List<ErrorNode> errors = astEnvir.getErrors(id);
-      DefType type = null;
-      if (node instanceof DecisionTableBody) {
-        type = DefType.DT;
-      } else if (node instanceof FlowBody) {
-        type = DefType.FL;
-      } else if (node instanceof ManualTaskBody) {
-        type = DefType.MT;
-      } else if (node instanceof EmptyBodyNode) {
-        type = DefType.EM;
-      } else {
-        continue;
-      }
-      Def def = ImmutableDef.builder()
-          .id(id)
-          .value(src)
-          .type(type)
-          .name(node.getId())
-          .errors(errors.stream().map(e -> map(id, node, e)).collect(Collectors.toUnmodifiableList()))
-          .ast(ImmutableDefAst.builder().build()).build();
-      consumer.accept(def);
-    }
-  }
-
-  private DefError map(String key, BodyNode body, ErrorNode node) {
-    return ImmutableDefError.builder()
-        .id(key)
-        .name(body.getId())
-        .message(node.getMessage())
-        .token(ImmutableDefErrorToken.builder()
-            .line(node.getTarget().getToken().getStartLine())
-            .column(node.getTarget().getToken().getStartCol())
-            .text(node.getTarget().getToken().getText())
-            .msg(node.getMessage())
-            .build())
-        .build();
-  }
 
   @Override
   public StorageWriter write() {
@@ -320,7 +269,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
           
           
           Map<String, DefCacheEntry> newCache = new HashMap<>();
-          map(envir, def -> newCache.put(def.getId(), 
+          GenericDefBuilder.create().from(envir, def -> newCache.put(def.getId(), 
               ImmutableDefCacheEntry.builder()
               .def(def)
               .key(keys.get(def.getId()))
