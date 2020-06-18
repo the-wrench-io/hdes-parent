@@ -38,6 +38,10 @@ const actions = (store, service) => ({
   },
 
   update: (data) => store.actions.explorer.setEntries(data),
+  
+  debug: ({name, input}, successCallback, errorCallback) => { 
+    service.debug({name, input}, successCallback, errorCallback) 
+  },
 
   delete: (entries, successCallback, errorCallback) => {
     const success = (data) => {console.log('delete-success', data)}

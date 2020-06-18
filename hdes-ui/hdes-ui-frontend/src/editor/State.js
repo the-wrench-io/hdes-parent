@@ -24,10 +24,15 @@ const init = {
   entry: undefined,
   entries: [], // entry id-s
   saving: {
-    // id : { delay: 5000, value: 'valueToSave', errors: [] }
+    // id : { delay: 5000, value: 'valueToSave', /* saving related errors */ errors: [] }
   },
+  // sort of markers/highlights that contain src related meta
   annotations: {
     // id : []
+  },
+  // generic runtime errors
+  errors: {
+    // id : [] { id, name, message, token, resources }
   },
   saveDelay: 2000,
   saveDelayFailRetry: 5000
@@ -41,6 +46,12 @@ const actions = ({ update, actions }) => ({
     model.setIn([ID, 'annotations', id], Immutable.fromJS(tokens))
   ),
 
+  setErrors: (id, errors) => update(model => 
+    model.setIn([ID, 'errors', id], Immutable.fromJS(errors))
+  ),
+
+  closeErrors: (id) => update(model => model.deleteIn([ID, 'errors', id])),
+  
   open: (entry) => update(model => model
     .updateIn([ID, 'entries'], e => {
       const id = entry.get('id')

@@ -26,12 +26,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
+import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 
 public interface HdesBackend {
   enum DefType { FL, DT, TG, ST, MT, EM }
@@ -71,8 +74,11 @@ public interface HdesBackend {
   interface DefDebug {
     String getQualifier();
     String getName();
-    Optional<Serializable> getOutput();
+    @Nullable
+    Serializable getOutput();
     List<DefError> getErrors();
+    // Only set in error cases
+    List<Resource> getResources();
   }
   
   interface DefChangeBuilder {

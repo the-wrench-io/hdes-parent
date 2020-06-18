@@ -41,6 +41,7 @@ import io.resys.hdes.backend.api.HdesBackendStorage;
 import io.resys.hdes.backend.api.ImmutableDefDebug;
 import io.resys.hdes.backend.api.ImmutableDefError;
 import io.resys.hdes.backend.api.ImmutableDefErrorToken;
+import io.resys.hdes.backend.api.ReaderException;
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 import io.resys.hdes.compiler.api.HdesExecutable;
@@ -127,7 +128,7 @@ public class GenericDefDebugBuilder implements DefDebugBuilder {
     .collect(Collectors.toList());
     
     if(!errors.isEmpty()) {
-      return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch).errors(errors).build();
+      return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch).resources(resources).errors(errors).build();
     }
     
     // Run the def
@@ -141,19 +142,45 @@ public class GenericDefDebugBuilder implements DefDebugBuilder {
       HdesExecutable.DecisionTable dt = (DecisionTable) task.getValue();
       HdesExecutable.Output dtOutput = dt.apply(dtInput);
       
-      return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch).output(dtOutput).build();
+      return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch).resources(resources).output(dtOutput).build();
+    } catch(ReaderException e) {
+      
+      String msg = e.getMessage();
+      StringBuilder resultMsg = new StringBuilder();
+      int start = msg.indexOf("required attributes are not set");
+      if(start > 0) {
+        int stop = msg.indexOf("]") + 1;
+        resultMsg
+        .append(msg.substring(start, stop)).append(System.lineSeparator())
+        .append(msg.substring(stop));
+      } else {
+        resultMsg.append(msg);
+      }
+      
+      
+      return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch)
+          .resources(resources)
+          .errors(Arrays.asList(ImmutableDefError.builder()
+            .id("defInputInvalid").name(name)
+            .message(resultMsg.toString())
+            .token(EMPTY_TOKEN).build()))
+          .build();
     } catch(ClassNotFoundException e) {
       return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch)
+          .resources(resources)
           .errors(Arrays.asList(ImmutableDefError.builder()
-          .id("defDependencyNotFound").name(name)
-          .message(e.getMessage())
-          .token(EMPTY_TOKEN).build())).build();
+            .id("defDependencyNotFound").name(name)
+            .message(e.getMessage())
+            .token(EMPTY_TOKEN).build()))
+          .build();
     } catch(Exception e) {
-      return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch).errors(
-          Arrays.asList(ImmutableDefError.builder()
+      return ImmutableDefDebug.builder().name(name).qualifier(tagOrBranch)
+          .resources(resources)
+          .errors(Arrays.asList(ImmutableDefError.builder()
               .id("defNotFound").name(name)
               .message(e.getMessage() == null ? "not unavailable" : e.getMessage())
-              .token(EMPTY_TOKEN).build())).build();
+              .token(EMPTY_TOKEN).build()))
+          .build();
     }
     
   }

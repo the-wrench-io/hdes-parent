@@ -48,7 +48,7 @@ export class IconbarView extends Component {
       return null;
     }
 
-    return (<div class="tile is-parent is-3 is-radiusless is-marginless is-paddingless">
+    return (<div class="tile is-parent is-2 is-radiusless is-marginless is-paddingless">
       <div class="tile is-child">{view}</div>
     </div>);
   }

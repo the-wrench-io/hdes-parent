@@ -65,6 +65,16 @@ class BackendService {
       .then(successHandler)
       .catch(errors => getErrors(errors, errorHandler, url))
   }
+  debug({name, input}, successHandler, errorHandler) {
+    const method = { method: 'POST', body: JSON.stringify(input), credentials: 'same-origin', headers: this.writeHeaders }
+    const qualifier = 'master'
+    const url = this.config.get('url') + '/debug/' + qualifier + '/' + name
+
+    return fetch(url, method)
+      .then(getResponse)
+      .then(successHandler)
+      .catch(errors => getErrors(errors, errorHandler, url))
+  }
   delete(entities, successHandler, errorHandler) {
 
     console.log(entities)

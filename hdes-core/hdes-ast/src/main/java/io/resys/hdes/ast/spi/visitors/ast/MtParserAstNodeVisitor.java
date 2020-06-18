@@ -174,7 +174,7 @@ public class MtParserAstNodeVisitor extends DtParserAstNodeVisitor {
     
     return ImmutableManualTaskBody.builder()
         .token(token(ctx))
-        .id(nodes.of(TypeName.class).get().getValue())
+        .id(nodes.of(TypeName.class).get())
         .description(nodes.of(RedundentDescription.class).get().getValue())
         .form(nodes.of(ManualTaskForm.class).get())
         .dropdowns(nodes.of(ManualTaskDropdowns.class).get())

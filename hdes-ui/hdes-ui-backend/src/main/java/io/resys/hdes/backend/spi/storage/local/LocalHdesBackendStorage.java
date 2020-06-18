@@ -247,7 +247,7 @@ public class LocalHdesBackendStorage implements HdesBackendStorage {
           
           // create
           for(Map.Entry<String, String> entry : toCreate.entrySet()) {
-            String name = envir.getBody(entry.getKey()).getId();
+            String name = envir.getBody(entry.getKey()).getId().getValue();
             Optional<DefCacheEntry> duplicate = cache.values().stream().filter(e -> e.getDef().getName().equals(name)).findFirst();
             if(duplicate.isPresent()) {
               throw new LocalStorageException(LocalStorageException.builder().sameResoureInFile(name, new File(duplicate.get().getKey().getFileName())));

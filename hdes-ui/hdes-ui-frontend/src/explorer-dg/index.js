@@ -20,4 +20,5 @@
 import { State }  from './State'
 
 export { DebugView } from './DebugView'
+export { DebugSummary } from './DebugSummary'
 export const createDebugState = (app) => State(app);

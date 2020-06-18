@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.ValueInstantiationException;
 
 import io.resys.hdes.compiler.api.HdesCompiler;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
@@ -60,11 +61,18 @@ public class HdesRuntimeTest {
     
     RuntimeTask task = runtime.get("ExpressionDT");
     
-    HdesExecutable.Input input = objectMapper.readValue("{\"value0\": 11, \"value1\": 2}", task.getInput());
+    //HdesExecutable.Input input = objectMapper.readValue("{\"value0\": 11, \"value1\": 2}", task.getInput());
+    
+    try {
+    HdesExecutable.Input input = objectMapper.readValue("{\"value0\": 11}", task.getInput());
     DecisionTable dt = (DecisionTable) task.getValue();
     HdesExecutable.Output output = dt.apply(input);
 
     System.out.println(output);
+    } catch(ValueInstantiationException e) {
+      
+      System.out.println(e);
+    }
   }
 }
 

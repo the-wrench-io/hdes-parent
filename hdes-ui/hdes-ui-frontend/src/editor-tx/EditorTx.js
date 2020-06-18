@@ -81,7 +81,7 @@ export class EditorTx extends Component {
 
   shouldComponentUpdate(nextProps, nextState) {
     const key = ['editortx']
-    const annotations = annotations ? this.props.annotations : Immutable.fromJS([])
+    const annotations = this.props.annotations ? this.props.annotations : Immutable.fromJS([])
     return !this.props.state.getIn(key).equals(nextProps.state.getIn(key)) ||
       this.props.entry.get('id') !== nextProps.entry.get('id') ||
       !this.props.entry.get('errors').equals(nextProps.entry.get('errors')) ||
@@ -132,7 +132,7 @@ export class EditorTx extends Component {
       for(let annotation of this.props.annotations.toJS()) {
         const marker = this.editor.markText(
           {line: annotation.startLine-1, ch: annotation.startCol}, 
-          {line: annotation.endLine-1, ch: annotation.endCol -1}, {css: 'background-color: rgba(255, 255, 119, 0.35)'});
+          {line: annotation.endLine-1, ch: annotation.endCol -1}, {css: 'background-color: #00ff7d57'});
         this.markers.push(marker)
       }
     }
@@ -145,10 +145,8 @@ export class EditorTx extends Component {
   }
 
   render() {
-    const id = this.props.entry.get('id')
-    return (<div class='tile editor-tx'>
-      <textarea id={id} ref={this.textareaRef} defaultValue={this.getValue(this.props)}/>
-    </div>
-    )
+    const { props, textareaRef, getValue } = this
+    const id = props.entry.get('id')
+    return (<div class='tile editor-tx'><textarea id={id} ref={textareaRef} defaultValue={getValue(props)}/></div>)
   }
 }

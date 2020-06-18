@@ -23,6 +23,7 @@ package io.resys.hdes.runtime.spi.tools;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.tools.Diagnostic;
 
@@ -95,9 +96,12 @@ public class ImmutableRuntimeEnvir implements RuntimeEnvir {
       Map<String, TypeName> executables, 
       Map<String, Resource> values) {
     
-    if (!diagnostics.isEmpty()) {
-      LOGGER.error(diagnostics.toString());
-      System.err.println(diagnostics);
+    List<Diagnostic<?>> errors = diagnostics.stream()
+        .filter(d -> d.getKind() == Diagnostic.Kind.ERROR)
+        .collect(Collectors.toList());
+    if (!errors.isEmpty()) {
+      LOGGER.error(errors.toString());
+      System.err.println(errors);
     }
     
     Map<String, HdesJavaFileObject> cache = fileManager.getCache();

@@ -81,7 +81,7 @@ public class JavaAstEnvirVisitor {
     types.add(implementationType);
     
     return ImmutableResource.builder()
-        .type(HdesExecutable.SourceType.DT).name(body.getId()).types(types).source(body.getToken().getText())
+        .type(HdesExecutable.SourceType.DT).name(body.getId().getValue()).types(types).source(body.getToken().getText())
         
         .input(visitNestedTypeName(naming.dt().input(body)))
         .output(visitNestedTypeName(naming.dt().output(body)))
@@ -99,7 +99,7 @@ public class JavaAstEnvirVisitor {
 
     return ImmutableResource.builder()
         .type(HdesExecutable.SourceType.FL)
-        .name(body.getId())
+        .name(body.getId().getValue())
         .source(body.getToken().getText())
         
         .input(visitNestedTypeName(naming.fl().input(body)))

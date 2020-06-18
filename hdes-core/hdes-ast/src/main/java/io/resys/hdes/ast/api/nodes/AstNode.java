@@ -28,7 +28,7 @@ public interface AstNode {
   Token getToken();
   
   interface BodyNode extends AstNode {
-    String getId();
+    TypeName getId();
   }
   
   @Value.Immutable

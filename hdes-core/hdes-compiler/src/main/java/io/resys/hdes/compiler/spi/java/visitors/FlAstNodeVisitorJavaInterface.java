@@ -88,7 +88,7 @@ public class FlAstNodeVisitorJavaInterface extends FlAstNodeVisitorTemplate<FlJa
         flowBuilder.addType(task.getType());
         String typeName = task.getType().name;
         stateBuilder.addMethod(MethodSpec
-            .methodBuilder(JavaSpecUtil.getMethodName(typeName.substring(body.getId().length())))
+            .methodBuilder(JavaSpecUtil.getMethodName(typeName.substring(body.getId().getValue().length())))
             .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
             .returns(ParameterizedTypeName.get(
                 task.getTask().getLoop().map(l -> ClassName.get(List.class)).orElse(ClassName.get(Optional.class)),

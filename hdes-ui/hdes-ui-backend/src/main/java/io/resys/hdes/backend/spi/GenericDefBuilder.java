@@ -73,7 +73,7 @@ public class GenericDefBuilder {
           .id(id)
           .value(src)
           .type(type)
-          .name(node.getId())
+          .name(node.getId().getValue())
           .errors(errors.stream().map(e -> map(id, node, e)).collect(Collectors.toUnmodifiableList()))
           .ast(ast).build();
       consumer.accept(def);
@@ -106,7 +106,7 @@ public class GenericDefBuilder {
   private DefError map(String key, BodyNode body, ErrorNode node) {
     return ImmutableDefError.builder()
         .id(key)
-        .name(body.getId())
+        .name(body.getId().getValue())
         .message(node.getMessage())
         .token(ImmutableDefErrorToken.builder()
             .line(node.getTarget().getToken().getStartLine())

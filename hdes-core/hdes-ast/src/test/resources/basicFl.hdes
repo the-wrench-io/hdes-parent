@@ -1,4 +1,4 @@
-define flow: x description: 'descriptive'
+define flow: X description: 'descriptive'
 headers: {
   id INTEGER optional IN,
   externalId INTEGER required IN,

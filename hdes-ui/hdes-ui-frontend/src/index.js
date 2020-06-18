@@ -27,6 +27,7 @@ import './App.scss';
 import App from './App';
 
 import { createBackendState } from './core-backend';
+import { createSupportbarState } from './supportbar';
 import { createIconbarState } from './iconbar';
 import { createHealthState } from './health';
 
@@ -107,6 +108,7 @@ const store = new Store(config, [
   createExplorerState,
   createDebugState,
   createIconbarState,
+  createSupportbarState,
   createCreateState,
   createEditorState,
   createEditorFlState,
