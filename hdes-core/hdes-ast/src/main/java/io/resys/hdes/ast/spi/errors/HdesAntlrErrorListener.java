@@ -49,14 +49,19 @@ public class HdesAntlrErrorListener extends BaseErrorListener {
       String msg,
       RecognitionException e) {
     
-    // System.err.println("line " + line + ":" + charPositionInLine + " " + msg);
+    
+    // TODO:: System.err.println("line " + line + ":" + charPositionInLine + " " + msg);
     this.errors.add(ImmutableErrorNode.builder()
         .target(ImmutableEmptyNode.builder()
             .token(ImmutableToken.builder()
                 .id(id++)
                 .text(e == null ? "" : e.getCtx().getText())
-                .line(line)
-                .col(charPositionInLine)
+                .startLine(line)
+                .startCol(charPositionInLine)
+                
+                // TODO:: unknown
+                .endLine(0).endCol(0)
+                
                 .build())
             .build())
         .message(msg).build());

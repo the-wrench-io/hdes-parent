@@ -24,28 +24,42 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.compiler.api.HdesExecutable.SourceType;
+
 public interface HdesCompiler {
-  
-  enum SourceType {FL, MT, DT}
-  
+
   Parser parser();
   
   interface Parser {
-    Parser add(String fileName, String src);
-    Code build();
+    Parser add(String name, String src);
+    List<Resource> build();
   }
 
   @Value.Immutable
-  interface Code {
-    List<CodeValue> getValues();
+  interface Resource {
+    String getName();
+    SourceType getType();
+    String getSource();
+    
+    TypeName getInput();
+    TypeName getOutput();
+    
+    List<TypeName> getTypes();
+    List<TypeDeclaration> getDeclarations();
   }
   
   @Value.Immutable
-  interface CodeValue {
-    SourceType getType();
-    String getPackageName();
-    String getSimpleName();
-    String getSource();
-    String getTarget();
+  interface TypeDeclaration {
+    TypeName getType();
+    String getValue();
+    
+    // Is main executable
+    boolean isExecutable(); 
+  }
+  
+  @Value.Immutable
+  interface TypeName {
+    String getPkg();
+    String getName();
   }
 }

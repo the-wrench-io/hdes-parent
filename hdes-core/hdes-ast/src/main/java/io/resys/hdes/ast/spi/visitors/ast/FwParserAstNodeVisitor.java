@@ -130,7 +130,7 @@ public class FwParserAstNodeVisitor extends MtParserAstNodeVisitor {
             .build())
         
         .token(token(ctx))
-        .id(children.of(TypeName.class).get().getValue())
+        .id(children.of(TypeName.class).get())
         .description(children.of(RedundentDescription.class).map(e -> e.getValue()).orElse(null))
         .task(tasks.getFirst())
         .unreachableTasks(tasks.getUnclaimed())

@@ -8,6 +8,12 @@
   </parent>
   <artifactId>hdes-ui-backend</artifactId>
   <dependencies>
+  
+    <dependency>
+      <groupId>io.resys.hdes</groupId>
+      <artifactId>hdes-runtime</artifactId>
+    </dependency>
+    
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -15,10 +21,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-ast</artifactId>
     </dependency>
     <dependency>
       <groupId>org.immutables</groupId>

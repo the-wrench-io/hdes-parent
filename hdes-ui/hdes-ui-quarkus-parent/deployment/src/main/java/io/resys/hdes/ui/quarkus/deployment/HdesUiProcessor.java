@@ -60,6 +60,7 @@ import io.quarkus.vertx.http.deployment.devmode.NotFoundPageDisplayableEndpointB
 import io.quarkus.vertx.http.runtime.HandlerType;
 import io.resys.hdes.ui.quarkus.runtime.HdesBackendProducer;
 import io.resys.hdes.ui.quarkus.runtime.HdesBackendRecorder;
+import io.resys.hdes.ui.quarkus.runtime.handlers.HdesDebugHandler;
 import io.resys.hdes.ui.quarkus.runtime.handlers.HdesDefsHandler;
 import io.resys.hdes.ui.quarkus.runtime.handlers.HdesStatusHandler;
 import io.vertx.core.Handler;
@@ -154,16 +155,20 @@ public class HdesUiProcessor {
     String defsPath = path + "/defs";
     routes.produce(new RouteBuildItem(defsPath, BodyHandler.create()));
     routes.produce(new RouteBuildItem(defsPath, new HdesDefsHandler(), HandlerType.BLOCKING));
-    
     displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(defsPath));
-    
+
+    // Debug handler
+    String debugPath = path + "/debug/:qualifier/:name";
+    routes.produce(new RouteBuildItem(debugPath, BodyHandler.create()));
+    routes.produce(new RouteBuildItem(debugPath, new HdesDebugHandler(), HandlerType.BLOCKING));
+    displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(debugPath));
     
     // status handler
     String statusPath = path + "/status";
     routes.produce(new RouteBuildItem(statusPath, new HdesStatusHandler(), HandlerType.BLOCKING));
     displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(statusPath));
   }
-
+  
   @BuildStep
   @Record(ExecutionTime.STATIC_INIT)
   public void registerHdesUiServletExtension(

@@ -31,7 +31,7 @@
     <maven.compiler.target>11</maven.compiler.target>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <surefire-plugin.version>2.22.0</surefire-plugin.version>
-    <hdes.version>999-SNAPSHOT</hdes.version>
+    <hdes.version>${version}</hdes.version>
     <quarkus.version>1.4.1.Final</quarkus.version>
     <immutables.version>2.8.2</immutables.version>
   </properties>

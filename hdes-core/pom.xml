@@ -14,6 +14,7 @@
   <modules>
     <module>hdes-ast</module>
     <module>hdes-compiler</module>
+    <module>hdes-runtime</module>
   </modules>
 
 </project>

@@ -6,10 +6,12 @@ $la-font-path: 'core-styles/fonts';
 @import '../node_modules/line-awesome/dist/line-awesome/scss/line-awesome.scss';
 @import '../node_modules/codemirror/lib/codemirror.css';
 @import '../node_modules/codemirror/theme/abcdef.css';
+@import '../node_modules/codemirror/theme/neo.css';
 @import '../node_modules/codemirror/addon/lint/lint.css';
 
 @import 'core-styles/colors';
 @import 'core-styles/iconbar';
+@import 'core-styles/supportbar';
 @import 'core-styles/editor';
 @import 'core-styles/editor-tb';
 @import 'core-styles/editor-dl';
@@ -19,6 +21,7 @@ $la-font-path: 'core-styles/fonts';
 @import 'core-styles/explorer-ed';
 @import 'core-styles/explorer-cr';
 @import 'core-styles/explorer-se';
+@import 'core-styles/explorer-dg';
 
 
 $has-text-link:hsl(217, 71%, 53%);

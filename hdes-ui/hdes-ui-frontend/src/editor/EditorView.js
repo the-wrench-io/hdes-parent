@@ -24,38 +24,39 @@ import { DlView } from './../editor-dl'
 //import { FlView } from './../editor-fl'
 
 
-const createComponent = (actions, state) => {
-  const entry = state.getIn(['editor', 'entry']);
-  
-  if(!entry) {
-    if(state.getIn(['iconbar', 'delete', 'enabled'])) {
-      return <DlView actions={actions} state={state} />
-    }
-
-    return null;
-  }
-
-  const type = entry.get('type')
-  const result = []
-
+const createEditorComponent = (actions, state, entry) => {
   const id = entry.get('id')
+  const type = entry.get('type')
+
+  if(type === 'delete') {
+    return <DlView actions={actions} state={state} />
+  } else {
+    return <EditorTx actions={actions} state={state} entry={entry} annotations={state.getIn(['editor', 'annotations', id])} />
+  }
+}
+
+const createErrorComponent = (actions, state, entry) => {
+  const result = []
+  const id = entry.get('id')
+
+  // Saving errors
   const savingErrorsKey = ['editor', 'saving', id, 'errors']
   const savingErrors = state.getIn(savingErrorsKey) ? state.getIn(savingErrorsKey).toJS() : []
-
   if(savingErrors.length > 0) {
     const messages = savingErrors.map(e => [<div>{e.defaultMessage}</div>,<div><strong>Log: </strong>{JSON.stringify(e.values)}</div>])
+    result.push(<div class='notification is-danger is-error-messages'>{messages}</div>)
+  }
+
+  // Generic errors
+  const genericErrorsKey = ['editor', 'errors', id]
+  const genericErrors = state.getIn(genericErrorsKey) ? state.getIn(genericErrorsKey).toJS() : []
+  if(genericErrors.length > 0) {
+    const messages = genericErrors.map(e => [<div>{e.message}</div>,<div><strong>code: </strong>{e.id}</div>])
     result.push(<div class='notification is-danger is-error-messages'>
-      <button class='delete'></button>
+      <button class='delete' onClick={() => actions.editor.closeErrors(id)}></button>
       {messages}
     </div>)
   }
-
-  if(type === 'delete') {
-    result.push(<DlView actions={actions} state={state} />)
-  } else {
-    result.push(<EditorTx actions={actions} state={state} entry={entry} />)
-  }
-
   return result
 }
 
@@ -69,6 +70,15 @@ export class EditorView extends Component {
 
   render() {
     const { actions, state } = this.props
-    return createComponent(actions, state)
+    const entry = state.getIn(['editor', 'entry'])
+
+    // Entry not selected
+    if(!entry) {
+      return null
+    }
+
+    const errors = createErrorComponent(actions, state, entry)
+    const editor = createEditorComponent(actions, state, entry)
+    return [...errors, editor]
   }
 }

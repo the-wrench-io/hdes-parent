@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
@@ -48,8 +49,8 @@ import org.codehaus.plexus.compiler.util.scan.mapping.SuffixMapping;
 import org.sonatype.plexus.build.incremental.BuildContext;
 
 import io.resys.hdes.compiler.api.HdesCompiler;
-import io.resys.hdes.compiler.api.HdesCompiler.Code;
-import io.resys.hdes.compiler.api.HdesCompiler.CodeValue;
+import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.api.HdesCompiler.TypeDeclaration;
 import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
 
 @Mojo(name = "hdes", defaultPhase = LifecyclePhase.GENERATE_SOURCES, requiresDependencyResolution = ResolutionScope.COMPILE, requiresProject = true)
@@ -82,10 +83,12 @@ public class HdesMojo extends AbstractMojo {
       getLog().info("Compiling HDES source: " + file.getAbsolutePath());
       parser.add(file.getAbsolutePath(), getSource(file, sourceEncoding));
     }
-    Code code = parser.build();
+    List<Resource> code = parser.build();
     File outputDirectory = getOutputDirectory(this.outputDirectory);
-    for (CodeValue value : code.getValues()) {
-      createFile(value, outputDirectory, sourceEncoding);
+    for (Resource resource : code) {
+      for(TypeDeclaration value : resource.getDeclarations()) {
+        createFile(value, outputDirectory, sourceEncoding);
+      }
     }
     
     if (project != null) {
@@ -93,27 +96,27 @@ public class HdesMojo extends AbstractMojo {
     }
   }
 
-  private void createFile(CodeValue value, File outputDirectory, String sourceEncoding) throws MojoExecutionException {
+  private void createFile(TypeDeclaration value, File outputDirectory, String sourceEncoding) throws MojoExecutionException {
     try {
-      File packageDirectory = new File(outputDirectory, value.getPackageName().replace(".", File.separator));
+      File packageDirectory = new File(outputDirectory, value.getType().getPkg().replace(".", File.separator));
       if(!packageDirectory.exists()) {
         packageDirectory.mkdirs();
       } 
-      File outputFile = new File(packageDirectory, value.getSimpleName() + ".java");
+      File outputFile = new File(packageDirectory, value.getType().getName() + ".java");
       URI relativePath = project.getBasedir().toURI().relativize(outputFile.toURI());
       getLog().info("Writing file: " + relativePath);
       OutputStream outputStream = buildContext.newFileOutputStream(outputFile);
       
       BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream, sourceEncoding));
       
-      writer.write(value.getTarget());
+      writer.write(value.getValue());
       writer.flush();
       writer.close();
       
     } catch (Exception e) {
 
       getLog().error(e);
-      throw new MojoExecutionException("Failed to write file: " + value.getPackageName() + "." + value.getSimpleName() + " because of: " + e.getMessage(), e);
+      throw new MojoExecutionException("Failed to write file: " + value.getType().getPkg() + "." + value.getType().getName() + " because of: " + e.getMessage(), e);
     }
   }
 

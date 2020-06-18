@@ -22,6 +22,7 @@ import { Component } from 'inferno'
 import { ExplorerView } from './../explorer';
 import { SearchView } from './../explorer-se';
 import { CreateView } from './../explorer-cr';
+import { DebugView } from './../explorer-dg';
 
 
 export class IconbarView extends Component {
@@ -41,11 +42,13 @@ export class IconbarView extends Component {
       view = (<SearchView state={state} actions={actions}/>);
     } else if(state.getIn(['iconbar', 'create', 'enabled'])) {
       view = (<CreateView state={state} actions={actions}/>);
+    } else if(state.getIn(['iconbar', 'debug', 'enabled'])) {
+      view = (<DebugView state={state} actions={actions}/>);
     } else {
       return null;
     }
 
-    return (<div class="tile is-parent is-3 is-radiusless is-marginless is-paddingless">
+    return (<div class="tile is-parent is-2 is-radiusless is-marginless is-paddingless">
       <div class="tile is-child">{view}</div>
     </div>);
   }

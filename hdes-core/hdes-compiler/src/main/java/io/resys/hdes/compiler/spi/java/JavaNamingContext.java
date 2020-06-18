@@ -32,11 +32,11 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskNode;
 import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
-import io.resys.hdes.compiler.api.DecisionTable;
 import io.resys.hdes.compiler.api.Flow;
 import io.resys.hdes.compiler.api.Flow.FlowState;
 import io.resys.hdes.compiler.api.Flow.FlowTaskState;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.api.HdesExecutable.DecisionTable;
 import io.resys.hdes.compiler.spi.NamingContext;
 
 public class JavaNamingContext implements NamingContext {
@@ -97,22 +97,22 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public ClassName impl(DecisionTableBody node) {
-      return ClassName.get(parent.dt, node.getId() + "Gen");
+      return ClassName.get(parent.dt, node.getId().getValue() + "Gen");
     }
 
     @Override
     public ClassName input(DecisionTableBody node) {
-      return input(node.getId());
+      return input(node.getId().getValue());
     }
 
     @Override
     public ClassName output(DecisionTableBody node) {
-      return output(node.getId());
+      return output(node.getId().getValue());
     }
 
     @Override
     public ClassName interfaze(DecisionTableBody node) {
-      return interfaze(node.getId());
+      return interfaze(node.getId().getValue());
     }
     
     public ClassName interfaze(String node) {
@@ -128,7 +128,7 @@ public class JavaNamingContext implements NamingContext {
     @Override
     public ClassName outputEntry(DecisionTableBody node) {
       if (node.getHitPolicy() instanceof HitPolicyAll) {
-        return ClassName.get(parent.dt + "." + node.getId(), node.getId() + "OutputEntry");        
+        return ClassName.get(parent.dt + "." + node.getId().getValue(), node.getId().getValue() + "OutputEntry");        
       }
       return output(node);
     } 
@@ -149,32 +149,32 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public ClassName interfaze(FlowBody node) {
-      return ClassName.get(parent.fl, node.getId());
+      return ClassName.get(parent.fl, node.getId().getValue());
     }
 
     @Override
     public ClassName impl(FlowBody node) {
-      return ClassName.get(parent.fl, node.getId() + "Gen");
+      return ClassName.get(parent.fl, node.getId().getValue() + "Gen");
     }
 
     @Override
     public ClassName state(FlowBody node) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + "State");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId().getValue() + "State");
     }
 
     @Override
     public ClassName input(FlowBody node) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + "In");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId().getValue() + "In");
     }
 
     @Override
     public ClassName output(FlowBody node) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + "Out");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId().getValue() + "Out");
     }
 
     @Override
     public ClassName taskState(FlowBody body, FlowTaskNode task) {
-      return ClassName.get(interfaze(body).canonicalName(), body.getId() + task.getId());
+      return ClassName.get(interfaze(body).canonicalName(), body.getId().getValue() + task.getId());
     }
 
     @Override
@@ -197,12 +197,12 @@ public class JavaNamingContext implements NamingContext {
 
     @Override
     public ClassName input(FlowBody node, ObjectTypeDefNode object) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + JavaSpecUtil.capitalize(object.getName()) + "In");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId().getValue() + JavaSpecUtil.capitalize(object.getName()) + "In");
     }
     
     @Override
     public ClassName output(FlowBody node, ObjectTypeDefNode object) {
-      return ClassName.get(interfaze(node).canonicalName(), node.getId() + JavaSpecUtil.capitalize(object.getName()) + "Out");
+      return ClassName.get(interfaze(node).canonicalName(), node.getId().getValue() + JavaSpecUtil.capitalize(object.getName()) + "Out");
     }
 
     @Override

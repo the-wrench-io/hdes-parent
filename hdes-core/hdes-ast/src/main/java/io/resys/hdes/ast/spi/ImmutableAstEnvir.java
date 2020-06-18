@@ -37,9 +37,12 @@ import io.resys.hdes.ast.api.AstEnvir;
 import io.resys.hdes.ast.api.AstNodeException;
 import io.resys.hdes.ast.api.nodes.AstNode.BodyNode;
 import io.resys.hdes.ast.api.nodes.AstNode.ErrorNode;
+import io.resys.hdes.ast.api.nodes.AstNode.Token;
 import io.resys.hdes.ast.api.nodes.ImmutableEmptyBodyNode;
 import io.resys.hdes.ast.api.nodes.ImmutableToken;
+import io.resys.hdes.ast.api.nodes.ImmutableTypeName;
 import io.resys.hdes.ast.spi.errors.HdesAntlrErrorListener;
+import io.resys.hdes.ast.spi.validators.BodyValidatorVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
@@ -121,6 +124,12 @@ public class ImmutableAstEnvir implements AstEnvir {
         .filter(id -> !src.containsKey(id))
         .forEach(id -> add().externalId(id).src(from.getSrc(id)));
       }
+      
+      // TODO :: Post processing > 
+      // * validations(data types, refs)
+      // * data type conversions
+      BodyValidatorVisitor.validate(body, errors);
+      
       if(!ignoreErrors) {
         List<ErrorNode> errors = new ArrayList<>();
         this.errors.values().forEach(v -> errors.addAll(v));
@@ -134,11 +143,6 @@ public class ImmutableAstEnvir implements AstEnvir {
           Collections.unmodifiableMap(src),
           Collections.unmodifiableMap(errors));
       
-      // TODO :: Post processing > 
-      // * validations(data types, refs)
-      // * data type conversions
-      
-      
       return result;
     }
 
@@ -151,7 +155,7 @@ public class ImmutableAstEnvir implements AstEnvir {
         
         @Override
         protected Builder parent(BodyNode node) {
-          String id = externalId == null ? node.getId() : externalId;
+          String id = externalId == null ? node.getId().getValue() : externalId;
           body.put(id, node);
           src.put(id, value);
           errors.put(id, Collections.unmodifiableList(errorListener.getErrors()));
@@ -195,9 +199,17 @@ public class ImmutableAstEnvir implements AstEnvir {
       try {
         result = (BodyNode) tree.accept(new HdesParserAstNodeVisitor(new TokenIdGenerator()));
       } catch(Exception e) {
-        result = ImmutableEmptyBodyNode.builder().id(externalId).token(ImmutableToken.builder()
-            .id(0).col(0).line(0).text(e.getMessage())
-            .build()).build();
+        Token exceptionToken = ImmutableToken.builder()
+          .id(0)
+          .startCol(0).startLine(0)
+          .endCol(0).endLine(0)
+          .text(e.getMessage())
+          .build();
+        
+        result = ImmutableEmptyBodyNode.builder()
+            .id(ImmutableTypeName.builder().value(externalId).token(exceptionToken).build())
+            .token(exceptionToken)
+            .build();
       }
       return parent(result);
     }

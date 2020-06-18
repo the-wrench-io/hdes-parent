@@ -1,5 +1,16 @@
 package io.resys.hdes.ui.quarkus.runtime;
 
+import java.nio.charset.Charset;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*-
  * #%L
  * hdes-ui-quarkus
@@ -22,8 +33,15 @@ package io.resys.hdes.ui.quarkus.runtime;
 
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.ManagedContext;
+import io.resys.hdes.backend.api.HdesBackend;
+import io.resys.hdes.backend.api.HdesBackend.StatusMessage;
+import io.resys.hdes.backend.api.ImmutableStatusMessage;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpServerResponse;
 
 public class HdesHandlerHelper {
+  private static final Logger LOGGER = LoggerFactory.getLogger(HdesHandlerHelper.class);
   
   public static boolean active() {
     ManagedContext context = Arc.container().requestContext();
@@ -32,5 +50,40 @@ public class HdesHandlerHelper {
     }
     context.activate();
     return true;
+  }
+  
+  public static void catch422(Exception e, HdesBackend backend, HttpServerResponse response) {
+    String stack = ExceptionUtils.getStackTrace(e);
+    
+    // Log error
+    String log = new StringBuilder().append(e.getMessage()).append(System.lineSeparator()).append(stack).toString();
+    String hash = exceptionHash(log);
+    LOGGER.error(hash + " - " + log);
+    
+    // Msg back to ui
+    List<StatusMessage> messages = Arrays.asList(ImmutableStatusMessage.builder()
+        .id("error-msg")
+        .value(e.getMessage() == null ? "not available": e.getMessage())
+        .logCode(hash)
+        .logStack(stack)
+        .build());
+    response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+    response.setStatusCode(422);
+    response.end(Buffer.buffer(backend.writer().build(messages)));
+  }
+  
+  private static String exceptionHash(String msg) {
+    try {
+      MessageDigest md5 = MessageDigest.getInstance("MD5");
+      md5.reset();
+      md5.update(msg.getBytes(Charset.forName("UTF-8")));
+      byte[] digest = md5.digest();
+      return Hex.encodeHexString(digest);
+    } catch (NoSuchAlgorithmException ex) {
+      // Fall back to just hex timestamp in this improbable situation
+      LOGGER.warn("MD5 Digester not found, falling back to timestamp hash", ex);
+      long timestamp = System.currentTimeMillis();
+      return Long.toHexString(timestamp);
+    }
   }
 }

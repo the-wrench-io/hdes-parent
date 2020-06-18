@@ -1,4 +1,4 @@
-define decision-table: basic
+define decision-table: Basic
 headers: {
   name STRING required IN,
   lastName STRING required IN,

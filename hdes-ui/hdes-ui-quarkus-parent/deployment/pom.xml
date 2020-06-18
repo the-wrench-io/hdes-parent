@@ -54,7 +54,6 @@
       <plugin>
         <groupId>io.quarkus</groupId>
         <artifactId>quarkus-bootstrap-maven-plugin</artifactId>
-        <version>${quarkus.version}</version>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>

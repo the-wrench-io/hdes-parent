@@ -23,6 +23,7 @@ import javax.enterprise.inject.spi.CDI;
 
 import io.quarkus.arc.Arc;
 import io.resys.hdes.backend.api.HdesBackend;
+import io.resys.hdes.backend.api.HdesBackend.Status;
 import io.resys.hdes.ui.quarkus.runtime.HdesHandlerHelper;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -35,14 +36,14 @@ public class HdesStatusHandler implements Handler<RoutingContext> {
   @Override
   public void handle(RoutingContext event) {
     boolean active = HdesHandlerHelper.active();
+    HdesBackend backend = CDI.current().select(HdesBackend.class).get();
+    HttpServerResponse response = event.response();
     try {
-      var backend = CDI.current().select(HdesBackend.class).get();
-      var status = backend.status();
-      
-      HttpServerResponse response = event.response();
+      Status status = backend.status();
       response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
       response.end(Buffer.buffer(backend.writer().build(status)));
-      
+    } catch(Exception e) {
+      HdesHandlerHelper.catch422(e, backend, response);
     } finally {
       if (active) {
         Arc.container().requestContext().terminate();

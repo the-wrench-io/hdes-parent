@@ -101,7 +101,7 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
     this.headers = children.of(Headers.class).get();
     return ImmutableDecisionTableBody.builder()
         .token(token(ctx))
-        .id(children.of(TypeName.class).get().getValue())
+        .id(children.of(TypeName.class).get())
         .description(children.of(RedundentDescription.class).map(e -> e.getValue()))
         .headers(headers)
         .hitPolicy(children.of(HitPolicy.class).get())

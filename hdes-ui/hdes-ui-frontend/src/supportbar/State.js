@@ -1,8 +1,6 @@
-package io.resys.hdes.compiler.api;
-
 /*-
  * #%L
- * hdes-compiler
+ * hdes-dev-app-ui
  * %%
  * Copyright (C) 2020 Copyright 2020 ReSys OÜ
  * %%
@@ -19,13 +17,24 @@ package io.resys.hdes.compiler.api;
  * limitations under the License.
  * #L%
  */
+import Immutable from 'immutable'
 
-import java.util.function.Function;
+const ID = 'supportbar'
+const init = {
+  debug: { enabled: false }
+}
 
-import io.resys.hdes.compiler.api.DecisionTable.DecisionTableInput;
-import io.resys.hdes.compiler.api.DecisionTable.DecisionTableOutput;
+const actions = ({actions, update}) => ({
+  debug: (enable) => {
 
-public interface DecisionTable<I extends DecisionTableInput, O extends DecisionTableOutput> extends Function<I, O> {
-  interface DecisionTableInput {}
-  interface DecisionTableOutput {}
+    update(model => model.setIn([ID, 'debug', 'enabled'], enable))
+  }
+})
+
+export const State = store => {
+  return {
+    id: ID,
+    initial: init,
+    actions: actions(store)
+  }
 }

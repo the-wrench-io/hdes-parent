@@ -1,5 +1,6 @@
 package io.resys.hdes.backend.api;
 
+import java.io.Serializable;
 import java.util.Collection;
 
 /*-
@@ -25,10 +26,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.resys.hdes.ast.api.nodes.AstNode.TypeDefNode;
+import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 
 public interface HdesBackend {
   enum DefType { FL, DT, TG, ST, MT, EM }
@@ -38,6 +44,7 @@ public interface HdesBackend {
   List<Search> search();
   Status status();
   
+  DefDebugBuilder debug();
   DefQueryBuilder query();
   DefCreateBuilder builder();
   DefChangeBuilder change();
@@ -52,6 +59,26 @@ public interface HdesBackend {
   interface Reader {
     <T> T build(byte[] body, Class<T> type);
     <T> List<T> list(byte[] body, Class<T> type);
+  }
+  
+  interface DefDebugBuilder {
+    DefDebugBuilder qualifier(String tagOrBranch);
+    DefDebugBuilder name(String name);
+    DefDebugBuilder input(byte[] input);
+    DefDebug build();
+  }
+  
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableDefDebug.class)
+  @JsonDeserialize(as = ImmutableDefDebug.class)
+  interface DefDebug {
+    String getQualifier();
+    String getName();
+    @Nullable
+    Serializable getOutput();
+    List<DefError> getErrors();
+    // Only set in error cases
+    List<Resource> getResources();
   }
   
   interface DefChangeBuilder {
@@ -112,6 +139,8 @@ public interface HdesBackend {
   
   @Value.Immutable
   interface DefAst {
+    List<TypeDefNode> getInputs();
+    
     //String getType();
     //String getValue();
     //Optional<DefAst> getNext();
