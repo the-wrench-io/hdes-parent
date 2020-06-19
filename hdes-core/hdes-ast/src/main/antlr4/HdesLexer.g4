@@ -50,6 +50,7 @@ DESC: 'description';
 HEADERS: 'headers';
 OF: 'of';
 AS: 'as';
+TO: 'to';
 
 FORMULA: 'formula';
 

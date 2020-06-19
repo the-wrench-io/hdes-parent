@@ -36,7 +36,7 @@ public class AstEnvirTest {
     .add().src(file("basicDt.hdes"))
     .add().src(file("basicFl.hdes"))
     .add().src(file("basicMt.hdes"))
-    //.add().src(file("matrixDt.dt"))
+    .add().src(file("matrixDt.hdes"))
     .build();
   }
 

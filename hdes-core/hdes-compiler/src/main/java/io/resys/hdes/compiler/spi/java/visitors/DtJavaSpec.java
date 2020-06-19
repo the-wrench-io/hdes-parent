@@ -33,6 +33,10 @@ public interface DtJavaSpec {
   public interface DtMethodSpec extends DtJavaSpec {
     MethodSpec getValue();
   }
+  @Value.Immutable
+  public interface DtMethodsSpec extends DtJavaSpec {
+    List<MethodSpec> getValue();
+  }
 
   @Value.Immutable
   public interface DtTypesSpec extends DtJavaSpec {

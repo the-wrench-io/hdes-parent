@@ -9,7 +9,13 @@ hitPolicy: first | all | matrix;
 
 first: 'FIRST' ':' '{' rulesets? '}';
 all: 'ALL' ':' '{' rulesets? '}';
-matrix: 'MATRIX' ':' '{' rulesets? '}';
+matrix: 'MATRIX' 'from' scalarType 'to' scalarType ':' '{' (matrixHeaders ',')? matrixRulesets? '}';
+
+matrixHeaders: ruleset;
+matrixRulesets: matrixRuleset (',' matrixRuleset)*;
+matrixRuleset: typeName ':' '{' matrixRules? '}';
+matrixRules: matrixRule (',' matrixRule)*;
+matrixRule: literal;
 
 rulesets: ruleset (',' ruleset)*;
 ruleset: '{' rules? '}';

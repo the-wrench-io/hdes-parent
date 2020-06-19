@@ -1,4 +1,4 @@
-define decision-table: MatrixDT
+define decision-table: SimpleHitPolicyMatrixDt
 
 headers: {
   name     STRING required IN,

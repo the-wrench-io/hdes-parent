@@ -35,6 +35,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.InOperation;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.LiteralValue;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.MatrixRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.NegateLiteralValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
@@ -137,6 +138,8 @@ public interface AstNodeVisitor<T, R> {
     T visitHitPolicyFirst(HitPolicyFirst node);
     T visitRuleRow(RuleRow node);
     T visitRule(Rule node);
+    T visitMatrixRow(MatrixRow node);
+    
     T visitUndefinedValue(UndefinedValue node);
     T visitLiteralValue(LiteralValue node);
     T visitNegateLiteralValue(NegateLiteralValue node);

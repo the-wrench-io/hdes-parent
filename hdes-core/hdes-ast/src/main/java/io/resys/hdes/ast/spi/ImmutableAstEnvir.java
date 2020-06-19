@@ -203,7 +203,7 @@ public class ImmutableAstEnvir implements AstEnvir {
           .id(0)
           .startCol(0).startLine(0)
           .endCol(0).endLine(0)
-          .text(e.getMessage())
+          .text(e.getMessage() == null ? "" : e.getMessage())
           .build();
         
         result = ImmutableEmptyBodyNode.builder()

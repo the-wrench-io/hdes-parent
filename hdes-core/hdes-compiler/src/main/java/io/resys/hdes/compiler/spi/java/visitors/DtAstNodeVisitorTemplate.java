@@ -36,6 +36,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.InOperation;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.LiteralValue;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.MatrixRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.NegateLiteralValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
@@ -164,6 +165,11 @@ public class DtAstNodeVisitorTemplate<T, R> implements DtAstNodeVisitor<T, R> {
 
   @Override
   public T visitNegateLiteralValue(NegateLiteralValue node) {
+    throw new IllegalArgumentException("Not implemented");
+  }
+
+  @Override
+  public T visitMatrixRow(MatrixRow node) {
     throw new IllegalArgumentException("Not implemented");
   }
 }

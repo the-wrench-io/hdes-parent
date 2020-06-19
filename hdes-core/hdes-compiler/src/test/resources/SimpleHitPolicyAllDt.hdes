@@ -1,0 +1,13 @@
+define decision-table: SimpleHitPolicyAllDT description: 'uber dt'
+headers: {
+  name STRING required IN,
+  lastName STRING required IN,
+  value INTEGER required OUT
+} ALL: {
+  {             ?,         ?,   20 },
+  {         'bob',   'woman', 4570 },
+  {not 'bob' 
+   or 'same' 
+   or 'professor',   'woman' 
+                    or 'man', 4570 }
+}

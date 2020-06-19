@@ -1,8 +1,8 @@
-package io.resys.hdes.ast.api.types;
+package io.resys.hdes.compiler.api;
 
 /*-
  * #%L
- * hdes-ast
+ * hdes-compiler
  * %%
  * Copyright (C) 2020 Copyright 2020 ReSys OÜ
  * %%
@@ -20,11 +20,12 @@ package io.resys.hdes.ast.api.types;
  * #L%
  */
 
-public interface ServiceTask<C extends ServiceTask.Context, I extends ServiceTask.Input, O extends ServiceTask.Output> {
+public class DecisionTableHitPolicyFirstException extends RuntimeException {
+  private static final long serialVersionUID = -2741344591344941378L;
 
-  O execute(C context, I input);
+  public DecisionTableHitPolicyFirstException(String message) {
+    super(message);
+  }
   
-  interface Input {}
-  interface Output {}
-  interface Context {}
+  
 }
