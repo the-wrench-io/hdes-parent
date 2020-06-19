@@ -36,6 +36,10 @@ import io.resys.hdes.ast.HdesParser.DtBodyContext;
 import io.resys.hdes.ast.HdesParser.FirstContext;
 import io.resys.hdes.ast.HdesParser.HitPolicyContext;
 import io.resys.hdes.ast.HdesParser.MatrixContext;
+import io.resys.hdes.ast.HdesParser.MatrixRuleContext;
+import io.resys.hdes.ast.HdesParser.MatrixRulesContext;
+import io.resys.hdes.ast.HdesParser.MatrixRulesetContext;
+import io.resys.hdes.ast.HdesParser.MatrixRulesetsContext;
 import io.resys.hdes.ast.HdesParser.RuleEqualityExpressionContext;
 import io.resys.hdes.ast.HdesParser.RuleMatchingExpressionContext;
 import io.resys.hdes.ast.HdesParser.RuleMatchingOrExpressionContext;
@@ -57,6 +61,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicy;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyAll;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.MatrixRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleValue;
@@ -73,6 +78,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.ImmutableHitPolicyMatrix;
 import io.resys.hdes.ast.api.nodes.ImmutableInOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteralValue;
+import io.resys.hdes.ast.api.nodes.ImmutableMatrixRow;
 import io.resys.hdes.ast.api.nodes.ImmutableNegateLiteralValue;
 import io.resys.hdes.ast.api.nodes.ImmutableNotUnaryOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableOrOperation;
@@ -80,6 +86,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableRule;
 import io.resys.hdes.ast.api.nodes.ImmutableRuleRow;
 import io.resys.hdes.ast.api.nodes.ImmutableUndefinedValue;
 import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentDescription;
+import io.resys.hdes.ast.spi.visitors.ast.HdesParserAstNodeVisitor.RedundentScalarType;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes;
 import io.resys.hdes.ast.spi.visitors.ast.util.Nodes.TokenIdGenerator;
 
@@ -94,6 +101,16 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
   public interface DtRedundentRulesets extends DecisionTableNode {
     List<RuleRow> getRows();
   }
+  
+  @Value.Immutable
+  public interface DtRedundentMatrixRules extends DecisionTableNode {
+    List<Literal> getValues();
+  }
+  @Value.Immutable
+  public interface DtRedundentMatrixRows extends DecisionTableNode {
+    List<MatrixRow> getValues();
+  }  
+  
 
   @Override
   public DecisionTableBody visitDtBody(DtBodyContext ctx) {
@@ -247,13 +264,72 @@ public class DtParserAstNodeVisitor extends EnParserAstNodeVisitor {
 
   @Override
   public HitPolicyMatrix visitMatrix(MatrixContext ctx) {
-    List<RuleRow> rulesets = nodes(ctx).of(DtRedundentRulesets.class).map(e -> e.getRows()).orElse(Collections.emptyList());
+    AstNode.ScalarType from = ((RedundentScalarType) ctx.getChild(2).accept(this)).getValue();
+    AstNode.ScalarType to = ((RedundentScalarType) ctx.getChild(4).accept(this)).getValue();
+    List<Rule> rules = new ArrayList<>();
+    List<MatrixRow> rows = new ArrayList<>();
+    
+    for (int i = 5; i < ctx.getChildCount(); i++) {
+      ParseTree c = ctx.getChild(i);
+      if (c instanceof TerminalNode) {
+        continue;
+      }
+      
+      AstNode node = c.accept(this);
+      if(node instanceof RuleRow) {
+        rules.addAll(((RuleRow) node).getRules()); 
+      } else if(node instanceof DtRedundentMatrixRows) {
+        rows.addAll(((DtRedundentMatrixRows) node).getValues());
+      }
+    }
     return ImmutableHitPolicyMatrix.builder()
         .token(token(ctx))
-        .rows(rulesets)
+        .fromType(from)
+        .toType(to)
+        .rules(rules)
+        .rows(rows)
         .build();
   }
+  
+  @Override
+  public DtRedundentMatrixRows visitMatrixRulesets(MatrixRulesetsContext ctx) {
+    return ImmutableDtRedundentMatrixRows.builder()
+        .token(token(ctx))
+        .values(nodes(ctx).list(MatrixRow.class))
+        .build();
+  }
+  
+  @Override
+  public MatrixRow visitMatrixRuleset(MatrixRulesetContext ctx) {
+    // type name : { rules }
+    TypeName typeName = (TypeName) ctx.getChild(0).accept(this);
+    List<Literal> values = new ArrayList<>();
+    
+    for (int i = 1; i < ctx.getChildCount(); i++) {
+      ParseTree c = ctx.getChild(i);
+      if (c instanceof TerminalNode) {
+        continue;
+      }
+      
+      DtRedundentMatrixRules node = (DtRedundentMatrixRules) c.accept(this);
+      values.addAll(node.getValues());
+    }
+    return ImmutableMatrixRow.builder().token(token(ctx)).typeName(typeName).values(values).build();
+  }
 
+  @Override
+  public AstNode visitMatrixRules(MatrixRulesContext ctx) {
+    return ImmutableDtRedundentMatrixRules.builder()
+        .token(token(ctx))
+        .values(nodes(ctx).list(Literal.class))
+        .build();
+  }
+  
+  @Override
+  public AstNode visitMatrixRule(MatrixRuleContext ctx) {
+    return nodes(ctx).of(Literal.class).get();
+  }
+  
   @Override
   public DtRedundentRulesets visitRulesets(RulesetsContext ctx) {
     return ImmutableDtRedundentRulesets.builder()

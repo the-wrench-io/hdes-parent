@@ -13,7 +13,7 @@ matrix: 'MATRIX' 'from' scalarType 'to' scalarType ':' '{' (matrixHeaders ',')? 
 
 matrixHeaders: ruleset;
 matrixRulesets: matrixRuleset (',' matrixRuleset)*;
-matrixRuleset: typeName ':' '{' matrixRules '}';
+matrixRuleset: typeName ':' '{' matrixRules? '}';
 matrixRules: matrixRule (',' matrixRule)*;
 matrixRule: literal;
 

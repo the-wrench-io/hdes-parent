@@ -44,7 +44,16 @@ public interface DecisionTableNode extends AstNode {
 
   @Value.Immutable
   interface HitPolicyMatrix extends HitPolicy {
-    List<RuleRow> getRows();
+    ScalarType getFromType();
+    ScalarType getToType();
+    List<Rule> getRules();
+    List<MatrixRow> getRows();
+  }
+
+  @Value.Immutable
+  interface MatrixRow extends DecisionTableNode {
+    TypeName getTypeName();
+    List<Literal> getValues();
   }
 
   @Value.Immutable
