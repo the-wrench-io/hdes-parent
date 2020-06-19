@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-maven</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.0.13</version>
   </parent>
   
   <packaging>maven-plugin</packaging>
