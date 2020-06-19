@@ -132,7 +132,7 @@ export class EditorTx extends Component {
       for(let annotation of this.props.annotations.toJS()) {
         const marker = this.editor.markText(
           {line: annotation.startLine-1, ch: annotation.startCol}, 
-          {line: annotation.endLine-1, ch: annotation.endCol -1}, {css: 'background-color: #00ff7d57'});
+          {line: annotation.endLine-1, ch: annotation.endCol}, {css: 'background-color: #00ff7d57'});
         this.markers.push(marker)
       }
     }

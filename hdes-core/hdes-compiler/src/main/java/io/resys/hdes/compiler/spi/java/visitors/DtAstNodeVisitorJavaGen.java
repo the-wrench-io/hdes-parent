@@ -54,6 +54,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyFirst;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.HitPolicyMatrix;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.InOperation;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.LiteralValue;
+import io.resys.hdes.ast.api.nodes.DecisionTableNode.MatrixRow;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.NegateLiteralValue;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.Rule;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.RuleRow;
@@ -119,6 +120,90 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
         .build();
   }
 
+  @Override
+  public DtMethodsSpec visitHitPolicyMatrix(HitPolicyMatrix node) {
+    ClassName outputName = naming.dt().output(body);
+    ClassName immutableOutputName = naming.immutable(outputName);
+    
+    CodeBlock.Builder statements = CodeBlock.builder()
+        .addStatement("long start = System.currentTimeMillis()")
+        .addStatement("int id = 0")
+        .addStatement("$T.Builder result = $T.builder()", immutableOutputName, immutableOutputName)
+        .addStatement("$T<Integer, $T> metaValues = new $T<>()", Map.class, DecisionTableMetaEntry.class, HashMap.class);
+    
+    for (MatrixRow matrixRow : node.getRows()) {
+      DtCodeSpec spec = visitMatrixRow(matrixRow);
+      statements.add(spec.getValue()).add("\r\n");
+    }
+    
+    statements
+      .add("\r\n")
+      .addStatement("$T.Builder<$T, $T> builder = $T.builder()", ImmutableOutput.class, DecisionTableMeta.class, outputName, ImmutableOutput.class)
+      
+      .add("return builder")
+      .add("\r\n  .meta($T.builder().time(System.currentTimeMillis() - start).values(metaValues).build())", ImmutableDecisionTableMeta.class)
+      .add("\r\n  .value(result.build())")
+      .addStatement(".build()")
+      .build();
+
+    
+    ParameterizedTypeName returnType = ParameterizedTypeName
+        .get(ClassName.get(Output.class), ClassName.get(DecisionTableMeta.class), outputName);
+    
+    return ImmutableDtMethodsSpec.builder().addValue(
+        
+        MethodSpec.methodBuilder("apply")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(ParameterSpec.builder(naming.dt().input(body), "input").build())
+            .returns(returnType)
+            .addCode(statements.build())
+            .build()
+            
+        ).build();
+  }
+  
+  @Override
+  public DtCodeSpec visitMatrixRow(MatrixRow node) {
+    HitPolicyMatrix matrix = (HitPolicyMatrix) body.getHitPolicy();
+    
+    CodeBlock.Builder result = CodeBlock.builder()
+        .add("// row $L \r\n", node.getTypeName().getValue());
+
+    int index = 0;
+    for (Literal literal : node.getValues()) {
+      
+      ScalarTypeDefNode header = (ScalarTypeDefNode) body.getHeaders().getValues().stream()
+          .filter(t -> t.getName().equals(node.getTypeName().getValue())).findFirst().get();
+      Rule rule = matrix.getRules().get(index);
+      
+      DtCodeSpec valueToSet = visitLiteral(literal);
+      DtCodeSpec expression = visitInputRule(rule, header);
+      var prefix = index > 0 ? "else " : "";
+      result.beginControlFlow(prefix + "if($L)", expression.getValue());
+      
+      // generate token
+      CodeBlock token = CodeBlock.builder().add("$T.builder()", ImmutableMetaToken.class)
+          .add("\r\n    .value($S)", "not available")
+          .add("\r\n    .start($T.builder().line($L).column($L).build())", ImmutableMetaStamp.class, literal.getToken().getStartLine(), literal.getToken().getStartCol())
+          .add("\r\n    .end($T.builder().line($L).column($L).build())", ImmutableMetaStamp.class, literal.getToken().getEndLine(), literal.getToken().getEndCol())
+          .add("\r\n    .build()")
+          .build();
+      
+      result
+      .add("metaValues.put(id, $T.builder()", ImmutableDecisionTableMetaEntry.class)
+      .add("\r\n  .id(id++)")
+      .add("\r\n  .index($L)", index++)
+      .add("\r\n  .token($L)", token).addStatement(".build())")
+      .addStatement("result.$L($L)", header.getName(), valueToSet.getValue())
+      .endControlFlow();
+      
+    }
+    return ImmutableDtCodeSpec.builder()
+        .value(result.build())
+        .build();
+  }
+  
   @Override
   public DtMethodsSpec visitHitPolicyAll(HitPolicyAll node) {
     CodeBlock.Builder statements = CodeBlock.builder()
@@ -370,27 +455,6 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     return ImmutableDtCodeSpec.builder().value(CodeBlock.builder().add(HEADER_REF).build()).build();
   }
 
-  private DtCodeSpec visitExpressionRuleValue(AstNode node) {
-    if (node instanceof Literal) {
-      return visitLiteral((Literal) node);
-    } else if (node instanceof HeaderRefValue) {
-      return visitHeaderRefValue((HeaderRefValue) node);
-    } else if (node instanceof InOperation) {
-      return visitInOperation((InOperation) node);
-    } else if (node instanceof NotUnaryOperation) {
-      return visitNotOperation((NotUnaryOperation) node);
-    } else if (node instanceof EqualityOperation) {
-      return visitEqualityOperation((EqualityOperation) node);
-    } else if (node instanceof AndOperation) {
-      return visitAndOperation((AndOperation) node);
-    } else if (node instanceof BetweenExpression) {
-      return visitBetweenExpression((BetweenExpression) node);
-    } else if(node instanceof NegateLiteralValue) {
-      return visitNegateLiteralValue((NegateLiteralValue) node);
-    }
-    throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionNode(node));
-  }
-
   @Override
   public DtCodeSpec visitBetweenExpression(BetweenExpression node) {
     CodeBlock value = visitExpressionRuleValue(node.getValue()).getValue();
@@ -438,13 +502,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     }
     return ImmutableDtCodeSpec.builder().value(code.build()).build();
   }
-
-  @Override
-  public DtMethodsSpec visitHitPolicyMatrix(HitPolicyMatrix node) {
-    throw new RuntimeException("not implemented");
-  }
   
-
   private DtCodeSpec visitInputRule(Rule node, ScalarTypeDefNode header) {
     RuleValue value = node.getValue();
     String getMethod = JavaSpecUtil.getMethodName(header.getName());
@@ -472,8 +530,33 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
       return ImmutableDtCodeSpec.builder()
           .value(CodeBlock.builder().add(result.getValue().toString().replaceAll(HEADER_REF, inputName)).build())
           .build();
+    } else if(value instanceof UndefinedValue) {
+      return ImmutableDtCodeSpec.builder()
+          .value(CodeBlock.builder().add("true").build())
+          .build();
     }
     throw new HdesCompilerException(HdesCompilerException.builder().unknownDTInputRule(node));
+  }
+ 
+  private DtCodeSpec visitExpressionRuleValue(AstNode node) {
+    if (node instanceof Literal) {
+      return visitLiteral((Literal) node);
+    } else if (node instanceof HeaderRefValue) {
+      return visitHeaderRefValue((HeaderRefValue) node);
+    } else if (node instanceof InOperation) {
+      return visitInOperation((InOperation) node);
+    } else if (node instanceof NotUnaryOperation) {
+      return visitNotOperation((NotUnaryOperation) node);
+    } else if (node instanceof EqualityOperation) {
+      return visitEqualityOperation((EqualityOperation) node);
+    } else if (node instanceof AndOperation) {
+      return visitAndOperation((AndOperation) node);
+    } else if (node instanceof BetweenExpression) {
+      return visitBetweenExpression((BetweenExpression) node);
+    } else if(node instanceof NegateLiteralValue) {
+      return visitNegateLiteralValue((NegateLiteralValue) node);
+    }
+    throw new HdesCompilerException(HdesCompilerException.builder().unknownDTExpressionNode(node));
   }
   
   private DtMethodsSpec visitHitPolicy(HitPolicy node) {

@@ -94,6 +94,32 @@ public class HdesRuntimeTest {
     Assertions.assertEquals(output.getMeta().getValues().get(0).getIndex(), 0);
   }
   
+  @Test 
+  public void dtHitPolicyMatrix() {
+    String src = "define decision-table: SimpleHitPolicyMatrixDt\n" + 
+        "\n" + 
+        "headers: {\n" + 
+        "  name     STRING required IN,\n" + 
+        "  lastName STRING required IN\n" +   
+        "\n" + 
+        "} MATRIX from STRING to INTEGER: {\n" + 
+        "/* first row is expressions */ { 'BOB', 'SAM', ? },\n" + 
+        "                     lastName: {  10,    20,   30 },\n" + 
+        "                         name: {  20,    50,   60 }\n" + 
+        "}";
+    
+    Map<String, Serializable> data = new HashMap<>();
+    data.put("name", "sam");
+    data.put("lastName", "blah");
+    
+    HdesExecutable.Output<DecisionTableMeta, ? extends OutputValue> output = runDT("SimpleHitPolicyMatrixDt", src, data);
+    
+    Assertions.assertEquals(2, output.getMeta().getValues().size());
+    Assertions.assertEquals("SimpleHitPolicyMatrixDtOut{lastName=30, name=60}", output.getValue().toString());
+    
+    
+  }
+  
   @SuppressWarnings({ "rawtypes", "unchecked" })
   private static HdesExecutable.Output<DecisionTableMeta, ? extends OutputValue> runDT(
       String name, 

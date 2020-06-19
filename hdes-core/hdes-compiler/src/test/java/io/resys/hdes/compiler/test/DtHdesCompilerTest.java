@@ -35,6 +35,15 @@ public class DtHdesCompilerTest {
   private final HdesCompiler compiler = JavaHdesCompiler.config().build();
 
   @Test
+  public void simpleHitPolicyMatrixDt() {
+    List<Resource> code = compiler.parser()
+        .add("SimpleHitPolicyMatrixDt.hdes", file("SimpleHitPolicyMatrixDt.hdes"))
+    .build();
+    print(code);
+  }
+  
+  
+  @Test
   public void simpleHitPolicyAllDt() {
     List<Resource> code = compiler.parser()
         .add("SimpleHitPolicyAllDt.hdes", file("SimpleHitPolicyAllDt.hdes"))

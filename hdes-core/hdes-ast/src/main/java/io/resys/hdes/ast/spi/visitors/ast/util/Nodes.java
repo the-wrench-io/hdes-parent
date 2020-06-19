@@ -84,12 +84,19 @@ public class Nodes {
     Token startToken = context.getStart();
     Token stopToken = context.getStop();
     
+    var endStartsAtLine = stopToken.getCharPositionInLine();
+    if(stopToken.getLine() == startToken.getLine()) {
+      int a = context.start.getStartIndex();
+      int b = context.stop.getStopIndex();
+      endStartsAtLine = endStartsAtLine + b - a + 1;
+    }
+    
     return ImmutableToken.builder()
         .id(idGen.next())
         .startLine(startToken.getLine())
         .startCol(startToken.getCharPositionInLine())
         .endLine(stopToken.getLine())
-        .endCol(stopToken.getCharPositionInLine())
+        .endCol(endStartsAtLine)
         .text(context.getText()).build();
   }
   
