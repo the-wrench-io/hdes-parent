@@ -63,9 +63,11 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.AndOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.BetweenExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnaryOperation;
+import io.resys.hdes.compiler.api.DecisionTableHitPolicyFirstException;
 import io.resys.hdes.compiler.api.DecisionTableMeta;
 import io.resys.hdes.compiler.api.DecisionTableMeta.DecisionTableMetaEntry;
 import io.resys.hdes.compiler.api.HdesCompilerException;
+import io.resys.hdes.compiler.api.HdesExecutable.MetaToken;
 import io.resys.hdes.compiler.api.HdesExecutable.Output;
 import io.resys.hdes.compiler.api.HdesExecutable.SourceType;
 import io.resys.hdes.compiler.api.HdesWhen;
@@ -78,7 +80,7 @@ import io.resys.hdes.compiler.spi.NamingContext;
 import io.resys.hdes.compiler.spi.java.JavaSpecUtil;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpec;
 import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtCodeSpecPair;
-import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodSpec;
+import io.resys.hdes.compiler.spi.java.visitors.DtJavaSpec.DtMethodsSpec;
 
 public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec, TypeSpec> {
   private final static String HEADER_REF = "//header ref to be replaces";
@@ -106,7 +108,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
             .addStatement("this.when = when")
             .build())
         .addField(FieldSpec.builder(HdesWhen.class, "when", Modifier.PRIVATE, Modifier.FINAL).build())
-        .addMethod(visitHitPolicy(node.getHitPolicy()).getValue())
+        .addMethods(visitHitPolicy(node.getHitPolicy()).getValue())
         
         .addMethod(MethodSpec.methodBuilder("getSourceType")
             .addAnnotation(Override.class)
@@ -118,7 +120,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
   }
 
   @Override
-  public DtMethodSpec visitHitPolicyAll(HitPolicyAll node) {
+  public DtMethodsSpec visitHitPolicyAll(HitPolicyAll node) {
     CodeBlock.Builder statements = CodeBlock.builder()
         .addStatement("$T<$T> result = new $T<>()", List.class, naming.dt().outputEntry(body), ArrayList.class)
         .addStatement("$T<Integer, $T> meta = new $T<>()", Map.class, DecisionTableMetaEntry.class, HashMap.class)
@@ -127,7 +129,6 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     
     int rowIndex = 0;
     for (RuleRow row : node.getRows()) {
-
       DtCodeSpecPair pair = visitRuleRow(row);
 
       statements.add("\r\n");
@@ -173,7 +174,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     .addStatement(")")
     .addStatement("return builder.build()");
     
-    return ImmutableDtMethodSpec.builder().value(
+    return ImmutableDtMethodsSpec.builder().addValue(
         MethodSpec.methodBuilder("apply")
             .addAnnotation(Override.class)
             .addModifiers(Modifier.PUBLIC)
@@ -181,6 +182,83 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
             .returns(returnType)
             .addCode(statements.build())
             .build()).build();
+  }
+  
+  @Override
+  public DtMethodsSpec visitHitPolicyFirst(HitPolicyFirst node) {
+    CodeBlock.Builder statements = CodeBlock.builder()
+        .addStatement("long start = System.currentTimeMillis()");
+    
+    int rowIndex = 0;
+    for (RuleRow row : node.getRows()) {
+      DtCodeSpecPair pair = visitRuleRow(row);
+
+      statements.add("\r\n");
+      
+      // control start
+      if (!pair.getKey().isEmpty()) {
+        statements.beginControlFlow("if($L)", pair.getKey()).add("\r\n");
+      }
+      
+      // generate token
+      statements.add("$T token = $T.builder()", MetaToken.class, ImmutableMetaToken.class)
+      .add("\r\n  .value($S)", row.getText().replaceAll("\\r|\\n", " ").replaceAll("\\s{2,}", " "))
+      .add("\r\n  .start($T.builder().line($L).column($L).build())", ImmutableMetaStamp.class, row.getToken().getStartLine(), row.getToken().getStartCol())
+      .add("\r\n  .end($T.builder().line($L).column($L).build())", ImmutableMetaStamp.class, row.getToken().getEndLine(), row.getToken().getEndCol())
+      .addStatement(".build()")
+      
+      .add("$T meta = $T.builder()", DecisionTableMetaEntry.class, ImmutableDecisionTableMetaEntry.class)
+      .add("\r\n  .id(0)")
+      .add("\r\n  .index($L)", rowIndex++)
+      .add("\r\n  .token(token)")
+      .addStatement(".build()")
+      
+      .addStatement("return createResult(start, meta, $L)", pair.getValue());
+      
+      // Control end
+      if (!pair.getKey().isEmpty()) {
+        statements.endControlFlow();
+      } 
+    }
+    
+    // first hit policy must always return something
+    statements.addStatement("throw new $T($S)", DecisionTableHitPolicyFirstException.class, 
+        "No rules where match for DT: '" + body.getId().getValue() + "' with hit policy 'FIRST'!");
+    
+    ClassName outputName = naming.dt().output(body);
+    ParameterizedTypeName returnType = ParameterizedTypeName
+        .get(ClassName.get(Output.class), ClassName.get(DecisionTableMeta.class), outputName);
+    
+    return ImmutableDtMethodsSpec.builder().addValue(
+
+        MethodSpec.methodBuilder("createResult")
+          .addModifiers(Modifier.PROTECTED)
+          .addParameter(ParameterSpec.builder(long.class, "start").build())
+          .addParameter(ParameterSpec.builder(DecisionTableMetaEntry.class, "meta").build())
+          .addParameter(ParameterSpec.builder(outputName, "result").build())
+          .returns(returnType)
+          .addCode(CodeBlock.builder()
+              .addStatement("$T<Integer, $T> metaValues = new $T<>()", Map.class, DecisionTableMetaEntry.class, HashMap.class)
+              .addStatement("metaValues.put(0, meta)")
+              
+              .addStatement("$T.Builder<$T, $T> builder = $T.builder()", ImmutableOutput.class, DecisionTableMeta.class, outputName, ImmutableOutput.class)
+              
+              .add("return builder")
+              .add("\r\n  .meta($T.builder().time(System.currentTimeMillis() - start).values(metaValues).build())", ImmutableDecisionTableMeta.class)
+              .add("\r\n  .value(result)")
+              .addStatement(".build()")
+              .build())
+          .build(),
+        
+        MethodSpec.methodBuilder("apply")
+            .addAnnotation(Override.class)
+            .addModifiers(Modifier.PUBLIC)
+            .addParameter(ParameterSpec.builder(naming.dt().input(body), "input").build())
+            .returns(returnType)
+            .addCode(statements.build())
+            .build()
+            
+        ).build();
   }
 
   @Override
@@ -360,14 +438,9 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     }
     return ImmutableDtCodeSpec.builder().value(code.build()).build();
   }
-  
-  @Override
-  public DtMethodSpec visitHitPolicyFirst(HitPolicyFirst node) {
-    throw new RuntimeException("not implemented");
-  }
 
   @Override
-  public DtMethodSpec visitHitPolicyMatrix(HitPolicyMatrix node) {
+  public DtMethodsSpec visitHitPolicyMatrix(HitPolicyMatrix node) {
     throw new RuntimeException("not implemented");
   }
   
@@ -403,7 +476,7 @@ public class DtAstNodeVisitorJavaGen extends DtAstNodeVisitorTemplate<DtJavaSpec
     throw new HdesCompilerException(HdesCompilerException.builder().unknownDTInputRule(node));
   }
   
-  private DtMethodSpec visitHitPolicy(HitPolicy node) {
+  private DtMethodsSpec visitHitPolicy(HitPolicy node) {
     if (node instanceof HitPolicyAll) {
       return visitHitPolicyAll((HitPolicyAll) node);
     } else if (node instanceof HitPolicyMatrix) {

@@ -1,4 +1,4 @@
-define decision-table: SimpleDT description: 'uber dt'
+define decision-table: SimpleHitPolicyAllDT description: 'uber dt'
 headers: {
   name STRING required IN,
   lastName STRING required IN,
