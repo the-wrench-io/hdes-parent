@@ -40,7 +40,7 @@ public class DtAstNodeTest {
   public void basic() throws IOException {
     parse("define decision-table: basic "
         + "description: 'very descriptive DT' "
-        + "headers: {} MATRIX: {}");
+        + "headers: {} MATRIX from STRING to INTEGER: {}");
     
     parse("define decision-table: basic "
         + "description: 'very descriptive DT' "
@@ -58,7 +58,7 @@ public class DtAstNodeTest {
         +   "name STRING required IN,\n "
         +   "lastName STRING required IN, \n"
         +   "value INTEGER required OUT\n"
-        + "} MATRIX: {\n"
+        + "} MATRIX from STRING to INTEGER: {\n"
         + "}");
   }
 
@@ -66,12 +66,13 @@ public class DtAstNodeTest {
   public void values() throws IOException {
     parse("define decision-table: basic \n"
         + "headers: {\n"
-        +   "name STRING required IN,\n "
+        +   "firstName STRING required IN,\n "
         +   "lastName STRING required IN, \n"
         +   "value INTEGER required OUT\n"
-        + "} MATRIX: {\n"
-        +   "{ ?, ?, 20 },"
-        +   "{ 'bob', 'woman', 4570 }"
+        + "} MATRIX from STRING to INTEGER: {\n"
+        +               "{ 'bob', 'sam', 'viv' },"
+        +   "firstName:  {     1,     2,     3 },"
+        +   "lastName:   {     3,    10,    20 }"
         + "}");
   }
 
