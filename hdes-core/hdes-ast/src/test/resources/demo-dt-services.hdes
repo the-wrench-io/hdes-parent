@@ -1,0 +1,27 @@
+
+// first DT
+decision-table Basic {
+  accepts { name STRING, lastName STRING, type INTEGER }
+  returns { value INTEGER }
+  
+  matches ALL {
+    when { ?, ?, _ between 1 and 30 } then { 20 }
+    when { _ = 'bob', _ = 'woman', ? } then { 4570 }
+  }
+}
+
+// second DT
+decision-table MatrixDT {
+  accepts { name STRING, lastName STRING }
+  returns {
+    total INTEGER: sum(_matched), // total score of hit columns // sum the values that where produces by the mapping
+    avg INTEGER: avg(_constants), // avg score hit columns
+    max INTEGER: sum(_constants.map(row -> max(row))) // sum max possible score of defined mapping value => sum( max(lastName), max(name))
+  }
+  
+  maps STRING { _ IN('BOB', 'SMTH', 'X'), _ = 'SAM', ? } // _ signifies placeholder
+  to INTEGER {
+    lastName  { 10, 20, 50 } // lastName = 'BOB' maps to '10', lastName = 'SAM' maps to '20', all the rest of cases map to 30  
+        name  { 20, 50, 60 }
+  }
+}

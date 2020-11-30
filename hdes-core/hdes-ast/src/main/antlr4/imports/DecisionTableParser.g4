@@ -1,38 +1,24 @@
 parser grammar DecisionTableParser;
 options { tokenVocab = HdesLexer; }
-import CommonParser;
+import TypeDefParser, ExpressionParser;
 
 
-dtBody: typeName description? headers hitPolicy;
+dtBody: simpleTypeName '{' headers hitPolicy '}';
+hitPolicy: matchingPolicy | mappingPolicy;
 
-hitPolicy: first | all | matrix;
+matchingPolicy: 'matches' ('FIRST' | 'ALL') '{' whenThenRules* '}';
+whenThenRules: 'when' whenRules 'then' thenRules;
 
-first: 'FIRST' ':' '{' rulesets? '}';
-all: 'ALL' ':' '{' rulesets? '}';
-matrix: 'MATRIX' ':' '{' rulesets? '}';
+mappingPolicy: 'maps' mappingFrom whenRules 'to' mappingTo mappingRows;
+mappingFrom: scalarType;
+mappingTo: scalarType;
 
-rulesets: ruleset (',' ruleset)*;
-ruleset: '{' rules? '}';
-rules: ruleValue (',' ruleValue)*;
+mappingRows: '{' (mappingRow (mappingRow)*)? '}';
+mappingRow: simpleTypeName thenRules;
 
-ruleValue: ruleUndefinedValue | ruleMatchingExpression | ruleEqualityExpression;
+thenRules: '{' (ruleLiteral (',' ruleLiteral)*)? '}';
+whenRules: '{' (ruleExpression (',' ruleExpression)*)? '}';
 
-ruleMatchingExpression: 'not'? ruleMatchingOrExpression;
-ruleMatchingOrExpression: literal (OR literal)*;
-
-ruleEqualityExpression
-  : ruleRelationalExpression 
-  | ruleRelationalExpression AND ruleRelationalExpression
-  | ruleRelationalExpression OR ruleRelationalExpression
-  | BETWEEN ruleUnaryExpression AND ruleUnaryExpression;
-
-ruleRelationalExpression
-  : '=' ruleUnaryExpression
-  | '!=' ruleUnaryExpression
-  | '<' ruleUnaryExpression
-  | '<=' ruleUnaryExpression
-  | '>' ruleUnaryExpression
-  | '>=' ruleUnaryExpression;
-
-ruleUnaryExpression:  '-' ruleUnaryExpression | literal;
+ruleLiteral: literal;
+ruleExpression: ruleUndefinedValue | enBody;
 ruleUndefinedValue: '?';

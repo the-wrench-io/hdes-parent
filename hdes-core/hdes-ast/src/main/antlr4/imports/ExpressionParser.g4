@@ -1,15 +1,27 @@
 parser grammar ExpressionParser;
 options { tokenVocab = HdesLexer; }
-import LiteralParser;
 
+literal
+  : IntegerLiteral
+  | DecimalLiteral
+  | BooleanLiteral
+  | StringLiteral;
 
-methodName: Identifier;
+placeholderRule: Placeholder;
+placeholderTypeName: placeholderRule | simpleTypeName;
+
+simpleTypeName: Identifier;
+typeName: placeholderTypeName | typeName '.' placeholderTypeName;
+
+methodName: simpleTypeName;
 
 // method invocation
 methodInvocation
   : methodName '(' methodArgs? ')'
   | typeName '.' methodName '(' methodArgs? ')' ('.' expression)?;
-methodArgs: expression (',' expression)*;
+
+methodArgs: methodArg (',' methodArg)*;
+methodArg: expression;
 
 primary
   : literal
@@ -21,10 +33,16 @@ primary
 enBody: expression;
 
 // expressions
-expression: conditionalExpression | primary;
+expression: conditionalExpression | primary | lambdaExpression;
+
+// lambda
+lambdaExpression: lambdaParameters '->' lambdaBody;
+lambdaParameters: typeName | '(' typeName (',' typeName)* ')';
+lambdaBody: primary; 
 
 conditionalExpression
   : conditionalOrExpression
+  | conditionalOrExpression IN '(' expression (',' expression)* ')'
   | conditionalOrExpression BETWEEN expression AND conditionalExpression
   | conditionalOrExpression '?' expression ':' conditionalExpression; 
 
@@ -64,16 +82,11 @@ multiplicativeExpression
 
 // unary operation is an operation with only one operand
 unaryExpression
-  : preIncrementExpression
-  | preDecrementExpression
-  | unaryExpressionNotPlusMinus
+  : unaryExpressionNotPlusMinus
   | '+' unaryExpression
   | '-' unaryExpression
   | primary;
   
-preIncrementExpression: '++' unaryExpression;
-preDecrementExpression: '--' unaryExpression;
-unaryExpressionNotPlusMinus: postfixExpression | '!' unaryExpression;
-postfixExpression: typeName ('++' | '--')*;
+unaryExpressionNotPlusMinus: '!' unaryExpression;
 
 

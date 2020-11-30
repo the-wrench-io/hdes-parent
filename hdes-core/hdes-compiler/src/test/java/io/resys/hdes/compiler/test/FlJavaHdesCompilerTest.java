@@ -22,37 +22,46 @@ package io.resys.hdes.compiler.test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.compiler.api.HdesCompiler;
-import io.resys.hdes.compiler.api.HdesCompiler.Code;
-import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
+import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.spi.GenericHdesCompiler;
 
 public class FlJavaHdesCompilerTest {
-  private final HdesCompiler compiler = JavaHdesCompiler.config().build();
+  
+  private final HdesCompiler compiler = GenericHdesCompiler.config().build();
 
   @Test
   public void simpleFlow() {
-    Code code = compiler.parser()
-        .add("SimpleFlow.hdes", file("SimpleFlow.hdes"))
-    .build();
-    
-    //System.out.println(code.getValues().get(0).getTarget());
-    //System.out.println(code.getValues().get(1).getTarget());
+    List<Resource> code = compiler.parser()
+      .add("SimpleFlow.hdes", file("SimpleFlow.hdes"))
+      //.add("SimpleHitPolicyFirstDt.hdes", file("SimpleHitPolicyFirstDt.hdes"))
+      .build();
+
+    print(code);
   }
 
-  @Test
+//  @Test
   public void arrayFlow() {
-    Code code = compiler.parser()
-        .add("ArrayFlow.hdes", file("ArrayFlow.hdes"))
-    .build();
-    
-    System.out.println(code.getValues().get(0).getTarget());
-    //System.out.println(code.getValues().get(1).getTarget());
+    List<Resource> code = compiler.parser()
+      .add("ArrayFlow.hdes", file("ArrayFlow.hdes"))
+      .build();
+
+    print(code);
   }
-  
+
+  public static void print(List<Resource> resources) {
+    for (Resource r : resources) {
+      if(r.getName().contains("Flow")) {
+      r.getDeclarations().forEach(d -> System.out.println(d.getValue()));
+      }
+    }
+  }
+
   public static String file(String name) {
     try {
       return IOUtils.toString(FlJavaHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);

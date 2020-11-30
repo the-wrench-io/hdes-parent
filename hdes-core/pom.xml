@@ -13,6 +13,11 @@
 
   <modules>
     <module>hdes-ast</module>
+    <module>hdes-executor</module>
+    
+    <module>hdes-interpreter</module>
+    <module>hdes-runtime-test</module>
+    <module>hdes-runtime</module>
     <module>hdes-compiler</module>
   </modules>
 

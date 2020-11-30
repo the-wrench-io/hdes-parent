@@ -1,0 +1,19 @@
+
+// first DT
+decision-table MobileScore {
+  accepts { name STRING, version INTEGER, classifier INTEGER: version + 10 }
+  returns { 
+    score INTEGER,
+    classifier INTEGER: version + 10,
+    max INTEGER: max(_constants.map(row -> max(row.score))), // sum max possible score of defined fields
+    total INTEGER: sum(_constants.map(row -> row.score)) // sum max possible score of defined fields
+  }
+  
+  matches ALL {
+    when { _ = 'android', _ <= 5, _ > 10 } then { 10 }
+    when { _ = 'android', _ > 5 , _ > 10 } then { 5  }
+    
+    when { _ = 'ubuntu', _ <= 10, _ > 10 } then { 100 }
+    when { _ = 'ubuntu', _ > 10,  _ > 10 } then { 50  }
+  }
+}

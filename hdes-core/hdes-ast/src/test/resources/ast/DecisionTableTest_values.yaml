@@ -1,0 +1,517 @@
+---
+token:
+  text: "decision-tablebasic{accepts{firstNameSTRING,lastNameSTRING}returns{}mapsSTRING{'bob','sam','viv'}toINTEGER{firstName{1,2,3}lastName{3,10,20}}}<EOF>"
+  start:
+    line: 1
+    col: 1
+  end:
+    line: 8
+    col: 1
+values:
+- token:
+    text: "basic{accepts{firstNameSTRING,lastNameSTRING}returns{}mapsSTRING{'bob','sam','viv'}toINTEGER{firstName{1,2,3}lastName{3,10,20}}}"
+    start:
+      line: 1
+      col: 16
+    end:
+      line: 7
+      col: 4
+  id:
+    token:
+      text: "basic"
+      start:
+        line: 1
+        col: 16
+      end:
+        line: 1
+        col: 21
+    value: "basic"
+  headers:
+    token:
+      text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 2
+        col: 57
+    acceptDefs:
+    - token:
+        text: "firstNameSTRING"
+        start:
+          line: 2
+          col: 11
+        end:
+          line: 2
+          col: 27
+      required: true
+      name: "firstName"
+      array: false
+      context: "ACCEPTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "STRING"
+    - token:
+        text: "lastNameSTRING"
+        start:
+          line: 2
+          col: 29
+        end:
+          line: 2
+          col: 44
+      required: true
+      name: "lastName"
+      array: false
+      context: "ACCEPTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "STRING"
+    returnDefs: []
+  hitPolicy:
+    token:
+      text: "mapsSTRING{'bob','sam','viv'}toINTEGER{firstName{1,2,3}lastName{3,10,20}}"
+      start:
+        line: 3
+        col: 1
+      end:
+        line: 7
+        col: 2
+    defFrom: "STRING"
+    defTo: "INTEGER"
+    when:
+      token:
+        text: "{'bob','sam','viv'}"
+        start:
+          line: 3
+          col: 13
+        end:
+          line: 3
+          col: 35
+      values:
+      - token:
+          text: "'bob'"
+          start:
+            line: 3
+            col: 14
+          end:
+            line: 3
+            col: 19
+        id:
+          token:
+            text: "'bob'"
+            start:
+              line: 3
+              col: 14
+            end:
+              line: 3
+              col: 19
+          value: ""
+        headers:
+          token:
+            text: "'bob'"
+            start:
+              line: 3
+              col: 14
+            end:
+              line: 3
+              col: 19
+          acceptDefs: []
+          returnDefs: []
+        src: "'bob'"
+        value:
+          token:
+            text: "'bob'"
+            start:
+              line: 3
+              col: 14
+            end:
+              line: 3
+              col: 19
+          type: "STRING"
+          value: "bob"
+      - token:
+          text: "'sam'"
+          start:
+            line: 3
+            col: 21
+          end:
+            line: 3
+            col: 26
+        id:
+          token:
+            text: "'sam'"
+            start:
+              line: 3
+              col: 21
+            end:
+              line: 3
+              col: 26
+          value: ""
+        headers:
+          token:
+            text: "'sam'"
+            start:
+              line: 3
+              col: 21
+            end:
+              line: 3
+              col: 26
+          acceptDefs: []
+          returnDefs: []
+        src: "'sam'"
+        value:
+          token:
+            text: "'sam'"
+            start:
+              line: 3
+              col: 21
+            end:
+              line: 3
+              col: 26
+          type: "STRING"
+          value: "sam"
+      - token:
+          text: "'viv'"
+          start:
+            line: 3
+            col: 28
+          end:
+            line: 3
+            col: 33
+        id:
+          token:
+            text: "'viv'"
+            start:
+              line: 3
+              col: 28
+            end:
+              line: 3
+              col: 33
+          value: ""
+        headers:
+          token:
+            text: "'viv'"
+            start:
+              line: 3
+              col: 28
+            end:
+              line: 3
+              col: 33
+          acceptDefs: []
+          returnDefs: []
+        src: "'viv'"
+        value:
+          token:
+            text: "'viv'"
+            start:
+              line: 3
+              col: 28
+            end:
+              line: 3
+              col: 33
+          type: "STRING"
+          value: "viv"
+    mapsTo:
+    - token:
+        text: "firstName{1,2,3}"
+        start:
+          line: 5
+          col: 3
+        end:
+          line: 5
+          col: 36
+      accepts:
+        token:
+          text: "firstName"
+          start:
+            line: 5
+            col: 3
+          end:
+            line: 5
+            col: 12
+        value: "firstName"
+      then:
+        token:
+          text: "{1,2,3}"
+          start:
+            line: 5
+            col: 13
+          end:
+            line: 5
+            col: 36
+        values:
+        - token:
+            text: "1"
+            start:
+              line: 5
+              col: 19
+            end:
+              line: 5
+              col: 20
+          type: "INTEGER"
+          value: "1"
+        - token:
+            text: "2"
+            start:
+              line: 5
+              col: 26
+            end:
+              line: 5
+              col: 27
+          type: "INTEGER"
+          value: "2"
+        - token:
+            text: "3"
+            start:
+              line: 5
+              col: 33
+            end:
+              line: 5
+              col: 34
+          type: "INTEGER"
+          value: "3"
+    - token:
+        text: "lastName{3,10,20}"
+        start:
+          line: 6
+          col: 3
+        end:
+          line: 6
+          col: 36
+      accepts:
+        token:
+          text: "lastName"
+          start:
+            line: 6
+            col: 3
+          end:
+            line: 6
+            col: 11
+        value: "lastName"
+      then:
+        token:
+          text: "{3,10,20}"
+          start:
+            line: 6
+            col: 13
+          end:
+            line: 6
+            col: 36
+        values:
+        - token:
+            text: "3"
+            start:
+              line: 6
+              col: 19
+            end:
+              line: 6
+              col: 20
+          type: "INTEGER"
+          value: "3"
+        - token:
+            text: "10"
+            start:
+              line: 6
+              col: 25
+            end:
+              line: 6
+              col: 27
+          type: "INTEGER"
+          value: "10"
+        - token:
+            text: "20"
+            start:
+              line: 6
+              col: 32
+            end:
+              line: 6
+              col: 34
+          type: "INTEGER"
+          value: "20"
+  constants:
+    token:
+      text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 2
+        col: 57
+    required: true
+    name: "constants"
+    array: true
+    context: "CONSTANTS"
+    values:
+    - token:
+        text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+        start:
+          line: 2
+          col: 1
+        end:
+          line: 2
+          col: 57
+      required: true
+      name: ""
+      array: true
+      context: "CONSTANTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+    - token:
+        text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+        start:
+          line: 2
+          col: 1
+        end:
+          line: 2
+          col: 57
+      required: true
+      name: "firstName"
+      array: true
+      context: "CONSTANTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+    - token:
+        text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+        start:
+          line: 2
+          col: 1
+        end:
+          line: 2
+          col: 57
+      required: true
+      name: "lastName"
+      array: true
+      context: "CONSTANTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+  matched:
+    token:
+      text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 2
+        col: 57
+    required: true
+    name: "instance"
+    array: false
+    context: "MATCHES"
+    values:
+    - token:
+        text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+        start:
+          line: 2
+          col: 1
+        end:
+          line: 2
+          col: 57
+      required: true
+      name: "instance"
+      array: true
+      context: "MATCHES"
+      values:
+      - token:
+          text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+          start:
+            line: 2
+            col: 1
+          end:
+            line: 2
+            col: 57
+        required: true
+        name: ""
+        array: true
+        context: "MATCHES"
+        debugValue:
+          empty: true
+          present: false
+        formula:
+          empty: true
+          present: false
+        formulaOverAll:
+          empty: true
+          present: false
+        type: "INTEGER"
+    - token:
+        text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+        start:
+          line: 2
+          col: 1
+        end:
+          line: 2
+          col: 57
+      required: true
+      name: "firstName"
+      array: true
+      context: "MATCHES"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+    - token:
+        text: "accepts{firstNameSTRING,lastNameSTRING}returns{}"
+        start:
+          line: 2
+          col: 1
+        end:
+          line: 2
+          col: 57
+      required: true
+      name: "lastName"
+      array: true
+      context: "MATCHES"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"

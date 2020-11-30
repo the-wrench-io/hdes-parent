@@ -21,11 +21,13 @@ package io.resys.hdes.ast.api.nodes;
  */
 
 import java.util.List;
-import java.util.Optional;
 
 import org.immutables.value.Value;
 
-public interface ExpressionNode extends AstNode {
+import io.resys.hdes.ast.api.nodes.InvocationNode.MathMethodType;
+import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
+
+public interface ExpressionNode extends HdesNode {
   enum AdditiveType { ADD, SUBSTRACT }
   enum MultiplicativeType { DIVIDE, MULTIPLY }
   enum EqualityType { 
@@ -42,55 +44,28 @@ public interface ExpressionNode extends AstNode {
       return value;
     }
   }
-
-  interface UnaryOperation extends ExpressionNode {
-    AstNode getValue();
-  }
+  
 
   @Value.Immutable
-  interface ExpressionBody extends ExpressionNode {
-    AstNode getValue();
-    // ScalarType getType();
+  interface ExpressionBody extends ExpressionNode, BodyNode {
+    String getSrc();
+    HdesNode getValue();
   }
 
   /*
    * Unary operation
    */
-  @Value.Immutable
-  interface NotUnaryOperation extends UnaryOperation { }
-
-  @Value.Immutable
-  interface NegateUnaryOperation extends UnaryOperation { }
-  
-  @Value.Immutable
-  interface PositiveUnaryOperation extends UnaryOperation { }
-  
-  @Value.Immutable
-  interface PreIncrementUnaryOperation extends UnaryOperation { }
-  
-  @Value.Immutable
-  interface PreDecrementUnaryOperation extends UnaryOperation { }
-
-  @Value.Immutable
-  interface PostIncrementUnaryOperation extends UnaryOperation { }
-  
-  @Value.Immutable
-  interface PostDecrementUnaryOperation extends UnaryOperation { }
-  
-  /*
-   * Ref nodes
-   */
-  @Value.Immutable
-  interface MethodRefNode extends ExpressionNode {
-    Optional<TypeRefNode> getType();
-    String getName();
-    List<AstNode> getValues();
+  interface Unary extends ExpressionNode {
+    HdesNode getValue();
   }
+  @Value.Immutable
+  interface NotUnary extends Unary { }
 
   @Value.Immutable
-  interface TypeRefNode extends ExpressionNode {
-    String getName();
-  }
+  interface NegateUnary extends Unary { }
+  
+  @Value.Immutable
+  interface PositiveUnary extends Unary { }
 
   /*
    * Conditions and expressions
@@ -98,47 +73,69 @@ public interface ExpressionNode extends AstNode {
   @Value.Immutable
   interface EqualityOperation extends ExpressionNode {
     EqualityType getType();
-    AstNode getLeft();
-    AstNode getRight();
+    HdesNode getLeft();
+    HdesNode getRight();
   }
 
+  // operation ? val1 : val2 
   @Value.Immutable
   interface ConditionalExpression extends ExpressionNode {
     EqualityOperation getOperation();
-    AstNode getLeft();
-    AstNode getRight();
+    HdesNode getLeft();
+    HdesNode getRight();
   }
 
   @Value.Immutable
   interface BetweenExpression extends ExpressionNode {
-    AstNode getValue();
-    AstNode getLeft();
-    AstNode getRight();
+    HdesNode getValue();
+    HdesNode getLeft();
+    HdesNode getRight();
+  }
+  
+  @Value.Immutable
+  interface InExpression extends ExpressionNode {
+    HdesNode getLeft();
+    List<HdesNode> getRight();
   }
 
   @Value.Immutable
-  interface AndOperation extends ExpressionNode {
-    AstNode getLeft();
-    AstNode getRight();
+  interface AndExpression extends ExpressionNode {
+    HdesNode getLeft();
+    HdesNode getRight();
   }
 
   @Value.Immutable
-  interface OrOperation extends ExpressionNode {
-    AstNode getLeft();
-    AstNode getRight();
+  interface OrExpression extends ExpressionNode {
+    HdesNode getLeft();
+    HdesNode getRight();
   }
 
   @Value.Immutable
-  interface AdditiveOperation extends ExpressionNode {
+  interface AdditiveExpression extends ExpressionNode {
     AdditiveType getType();
-    AstNode getLeft();
-    AstNode getRight();
+    HdesNode getLeft();
+    HdesNode getRight();
   }
 
   @Value.Immutable
-  interface MultiplicativeOperation extends ExpressionNode {
+  interface MultiplicativeExpression extends ExpressionNode {
     MultiplicativeType getType();
-    AstNode getLeft();
-    AstNode getRight();
+    HdesNode getLeft();
+    HdesNode getRight();
+  }
+  
+  interface MethodInvocation extends ExpressionNode {}
+  
+  @Value.Immutable
+  interface MathOperationExpression extends MethodInvocation {
+    MathMethodType getType();
+    List<HdesNode> getValues();
+  }
+  
+  @Value.Immutable
+  interface LambdaMapExpression extends MethodInvocation {
+    InvocationNode getType();
+    SimpleInvocation getIterable();
+    HdesNode getBody();
   }
 }

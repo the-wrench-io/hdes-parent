@@ -25,26 +25,26 @@ const init = {
 }
 
 // all delete actions
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
-  }),
-  load: () => app(({ actions }) => update(model => {
+const actions = ({actions, update}) => ({
+  init: () => {
+  },
+  load: () => update(model => {
 
     return model.setIn([ID, 'active'], true);
-  })),
-  mark: (entry) => app(({ actions }) => update(model => {
+  }),
+  mark: (entry) => update(model => {
     return model.updateIn([ID, 'entries'], e => {
       const contains = e.findIndex(e => e.src.id === entry.src.id);
       return contains === -1 ? e.push(entry) : e
     });
-  })),
-  unmark: (entry) => app(({ actions }) => update(model => {
+  }),
+  unmark: (entry) => update(model => {
     return model.updateIn([ID, 'entries'], e => {
       const contains = e.findIndex(e => e.src.id === entry.src.id);
       return contains === -1 ? e : e.delete(contains)
     });
-  })),
-  delete: (entries) => app(({ actions }) => { 
+  }),
+  delete: (entries) => { 
 
     actions.backend.delete(entries.map(e => e.src), 
     (data) => {
@@ -55,16 +55,16 @@ const actions = app => update => ({
       // errors
       update(model => { return model; })
     })
-  }),
-  setChord: (data) => app(({ actions }) => update(model => {
+  },
+  setChord: (data) => update(model => {
     return model.setIn([ID, 'chord'], data);
-  }))
+  })
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

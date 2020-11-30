@@ -1,0 +1,10 @@
+decision-table SimpleHitPolicyMatrixDt {
+  accepts { name STRING, lastName STRING }
+  returns { }
+  
+  maps STRING { _ = 'BOB', _ = 'SAM', ? } 
+  to  INTEGER {
+       lastName {  10,    20,   30 }
+           name {  20,    50,   60 }
+  }
+}

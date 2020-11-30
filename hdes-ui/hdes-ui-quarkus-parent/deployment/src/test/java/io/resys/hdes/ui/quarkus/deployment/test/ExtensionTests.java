@@ -33,7 +33,7 @@ public class ExtensionTests {
   @RegisterExtension
   final static QuarkusUnitTest config = new QuarkusUnitTest()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addAsResource(new StringAsset("quarkus.hdes-ui.enable=true"), "application.properties")
+          .addAsResource(new StringAsset("quarkus.hdes.enable=true"), "application.properties")
           .addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
           );
 
@@ -44,7 +44,12 @@ public class ExtensionTests {
   }
   
   @Test
-  public void responsesBackend() {
+  public void responsesDef() {
     RestAssured.when().get("/hdes-ui/services/defs").then().statusCode(200);
+  }
+  
+  @Test
+  public void responsesDebug() {
+    RestAssured.given().body("{}").when().post("/hdes-ui/services/debug/superBranch/superResource").then().statusCode(200);
   }
 }

@@ -1,7 +1,6 @@
 package io.resys.hdes.ast.api.nodes;
 
 import java.util.List;
-import java.util.Optional;
 
 /*-
  * #%L
@@ -25,16 +24,25 @@ import java.util.Optional;
 
 import org.immutables.value.Value;
 
-public interface DecisionTableNode extends AstNode {
+import io.resys.hdes.ast.api.nodes.BodyNode.Literal;
+import io.resys.hdes.ast.api.nodes.BodyNode.ScalarType;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
+import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
+
+public interface DecisionTableNode extends HdesNode {
   
   interface HitPolicy extends DecisionTableNode {}
-  interface RuleValue extends DecisionTableNode {}
   
   @Value.Immutable
   interface DecisionTableBody extends DecisionTableNode, BodyNode {
-    Optional<String> getDescription();
     HitPolicy getHitPolicy();
-    Headers getHeaders();
+    ObjectDef getConstants();
+    ObjectDef getMatched();
+  }
+  
+  @Value.Immutable
+  interface HitPolicyFirst extends HitPolicy {
+    List<RuleRow> getRows();
   }
  
   @Value.Immutable
@@ -43,54 +51,34 @@ public interface DecisionTableNode extends AstNode {
   }
 
   @Value.Immutable
-  interface HitPolicyMatrix extends HitPolicy {
-    List<RuleRow> getRows();
-  }
-
-  @Value.Immutable
-  interface HitPolicyFirst extends HitPolicy {
-    List<RuleRow> getRows();
-  }
-  
-  @Value.Immutable
   interface RuleRow extends DecisionTableNode {
-    List<Rule> getRules();
+    WhenRuleRow getWhen();
+    ThenRuleRow getThen();
     String getText();
   }
   
   @Value.Immutable
-  interface Rule extends DecisionTableNode {
-    int getHeader();
-    RuleValue getValue();
-  }
-  
-  @Value.Immutable
-  interface UndefinedValue extends RuleValue {
-    
-  }
-  
-  @Value.Immutable
-  interface LiteralValue extends RuleValue {
-    Literal getValue();
+  interface WhenRuleRow extends DecisionTableNode {
+    List<ExpressionBody> getValues();
   }
 
   @Value.Immutable
-  interface NegateLiteralValue extends RuleValue {
-    Literal getValue();
-  }
-  
-  @Value.Immutable
-  interface ExpressionValue extends RuleValue {
-    String getValue();
-    AstNode getExpression();
-  }
-  
-  @Value.Immutable
-  interface HeaderRefValue extends DecisionTableNode {
-  }
-  
-  @Value.Immutable
-  interface InOperation extends DecisionTableNode {
+  interface ThenRuleRow extends DecisionTableNode {
     List<Literal> getValues();
+  }
+  
+  @Value.Immutable
+  interface HitPolicyMapping extends HitPolicy {
+    ScalarType getDefFrom();
+    ScalarType getDefTo();
+    
+    WhenRuleRow getWhen();
+    List<MappingRow> getMapsTo();
+  }
+
+  @Value.Immutable
+  interface MappingRow extends DecisionTableNode {
+    SimpleInvocation getAccepts();
+    ThenRuleRow getThen();
   }
 }

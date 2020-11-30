@@ -1,9 +1,10 @@
 parser grammar HdesParser;
 options { tokenVocab = HdesLexer; }
-import DecisionTableParser, ExpressionParser, FlowParser, ManualTaskParser;
+import DecisionTableParser, ExpressionParser, ServiceTaskParser, FlowParser;
 
-hdesBody: 'define'
-  ( DEF_FL ':' flBody
-  | DEF_DT ':'dtBody
-  | DEF_MT ':' mtBody
-  | DEF_EN ':' enBody) EOF;
+hdesContent: hdesBody* EOF;
+hdesBody: (
+    'flow' flBody
+  | 'decision-table' dtBody
+  | 'service-task' stBody
+  | 'expression' '{' enBody '}');

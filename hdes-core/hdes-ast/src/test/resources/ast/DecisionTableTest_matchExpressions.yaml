@@ -1,0 +1,785 @@
+---
+token:
+  text: "decision-tablebasic{accepts{nameSTRING,lastNameSTRING}returns{valueINTEGER,expINTEGER:value+20}matchesALL{when{_!='bob'or_='same'or_='professor',_='woman'or_='man'}then{4570}when{_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2'}then{4590}}}<EOF>"
+  start:
+    line: 1
+    col: 1
+  end:
+    line: 8
+    col: 1
+values:
+- token:
+    text: "basic{accepts{nameSTRING,lastNameSTRING}returns{valueINTEGER,expINTEGER:value+20}matchesALL{when{_!='bob'or_='same'or_='professor',_='woman'or_='man'}then{4570}when{_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2'}then{4590}}}"
+    start:
+      line: 1
+      col: 16
+    end:
+      line: 7
+      col: 3
+  id:
+    token:
+      text: "basic"
+      start:
+        line: 1
+        col: 16
+      end:
+        line: 1
+        col: 21
+    value: "basic"
+  headers:
+    token:
+      text: "accepts{nameSTRING,lastNameSTRING}returns{valueINTEGER,expINTEGER:value+20}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 3
+        col: 50
+    acceptDefs:
+    - token:
+        text: "nameSTRING"
+        start:
+          line: 2
+          col: 11
+        end:
+          line: 2
+          col: 22
+      required: true
+      name: "name"
+      array: false
+      context: "ACCEPTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "STRING"
+    - token:
+        text: "lastNameSTRING"
+        start:
+          line: 2
+          col: 24
+        end:
+          line: 2
+          col: 39
+      required: true
+      name: "lastName"
+      array: false
+      context: "ACCEPTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "STRING"
+    returnDefs:
+    - token:
+        text: "valueINTEGER"
+        start:
+          line: 3
+          col: 11
+        end:
+          line: 3
+          col: 24
+      required: true
+      name: "value"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+    - token:
+        text: "expINTEGER:value+20"
+        start:
+          line: 3
+          col: 26
+        end:
+          line: 3
+          col: 49
+      required: false
+      name: "exp"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: false
+        present: true
+      formulaOverAll:
+        empty: false
+        present: true
+      type: "INTEGER"
+  hitPolicy:
+    token:
+      text: "matchesALL{when{_!='bob'or_='same'or_='professor',_='woman'or_='man'}then{4570}when{_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2'}then{4590}}"
+      start:
+        line: 4
+        col: 1
+      end:
+        line: 7
+        col: 2
+    rows:
+    - token:
+        text: "when{_!='bob'or_='same'or_='professor',_='woman'or_='man'}then{4570}"
+        start:
+          line: 5
+          col: 3
+        end:
+          line: 5
+          col: 96
+      when:
+        token:
+          text: "{_!='bob'or_='same'or_='professor',_='woman'or_='man'}"
+          start:
+            line: 5
+            col: 8
+          end:
+            line: 5
+            col: 82
+        values:
+        - token:
+            text: "_!='bob'or_='same'or_='professor'"
+            start:
+              line: 5
+              col: 10
+            end:
+              line: 5
+              col: 54
+          id:
+            token:
+              text: "_!='bob'or_='same'or_='professor'"
+              start:
+                line: 5
+                col: 10
+              end:
+                line: 5
+                col: 54
+            value: ""
+          headers:
+            token:
+              text: "_!='bob'or_='same'or_='professor'"
+              start:
+                line: 5
+                col: 10
+              end:
+                line: 5
+                col: 54
+            acceptDefs: []
+            returnDefs: []
+          src: "_ != 'bob'  or _ = 'same' or _ = 'professor'"
+          value:
+            token:
+              text: "_!='bob'or_='same'or_='professor'"
+              start:
+                line: 5
+                col: 10
+              end:
+                line: 5
+                col: 54
+            left:
+              token:
+                text: "_!='bob'or_='same'"
+                start:
+                  line: 5
+                  col: 10
+                end:
+                  line: 5
+                  col: 35
+              left:
+                token:
+                  text: "_!='bob'"
+                  start:
+                    line: 5
+                    col: 10
+                  end:
+                    line: 5
+                    col: 20
+                type: "NOTEQUAL"
+                left:
+                  token:
+                    text: "_"
+                    start:
+                      line: 5
+                      col: 10
+                    end:
+                      line: 5
+                      col: 11
+                right:
+                  token:
+                    text: "'bob'"
+                    start:
+                      line: 5
+                      col: 15
+                    end:
+                      line: 5
+                      col: 20
+                  type: "STRING"
+                  value: "bob"
+              right:
+                token:
+                  text: "_='same'"
+                  start:
+                    line: 5
+                    col: 25
+                  end:
+                    line: 5
+                    col: 35
+                type: "EQUAL"
+                left:
+                  token:
+                    text: "_"
+                    start:
+                      line: 5
+                      col: 25
+                    end:
+                      line: 5
+                      col: 26
+                right:
+                  token:
+                    text: "'same'"
+                    start:
+                      line: 5
+                      col: 29
+                    end:
+                      line: 5
+                      col: 35
+                  type: "STRING"
+                  value: "same"
+            right:
+              token:
+                text: "_='professor'"
+                start:
+                  line: 5
+                  col: 39
+                end:
+                  line: 5
+                  col: 54
+              type: "EQUAL"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 5
+                    col: 39
+                  end:
+                    line: 5
+                    col: 40
+              right:
+                token:
+                  text: "'professor'"
+                  start:
+                    line: 5
+                    col: 43
+                  end:
+                    line: 5
+                    col: 54
+                type: "STRING"
+                value: "professor"
+        - token:
+            text: "_='woman'or_='man'"
+            start:
+              line: 5
+              col: 57
+            end:
+              line: 5
+              col: 81
+          id:
+            token:
+              text: "_='woman'or_='man'"
+              start:
+                line: 5
+                col: 57
+              end:
+                line: 5
+                col: 81
+            value: ""
+          headers:
+            token:
+              text: "_='woman'or_='man'"
+              start:
+                line: 5
+                col: 57
+              end:
+                line: 5
+                col: 81
+            acceptDefs: []
+            returnDefs: []
+          src: "_ = 'woman' or _ = 'man'"
+          value:
+            token:
+              text: "_='woman'or_='man'"
+              start:
+                line: 5
+                col: 57
+              end:
+                line: 5
+                col: 81
+            left:
+              token:
+                text: "_='woman'"
+                start:
+                  line: 5
+                  col: 57
+                end:
+                  line: 5
+                  col: 68
+              type: "EQUAL"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 5
+                    col: 57
+                  end:
+                    line: 5
+                    col: 58
+              right:
+                token:
+                  text: "'woman'"
+                  start:
+                    line: 5
+                    col: 61
+                  end:
+                    line: 5
+                    col: 68
+                type: "STRING"
+                value: "woman"
+            right:
+              token:
+                text: "_='man'"
+                start:
+                  line: 5
+                  col: 72
+                end:
+                  line: 5
+                  col: 81
+              type: "EQUAL"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 5
+                    col: 72
+                  end:
+                    line: 5
+                    col: 73
+              right:
+                token:
+                  text: "'man'"
+                  start:
+                    line: 5
+                    col: 76
+                  end:
+                    line: 5
+                    col: 81
+                type: "STRING"
+                value: "man"
+      then:
+        token:
+          text: "{4570}"
+          start:
+            line: 5
+            col: 88
+          end:
+            line: 5
+            col: 96
+        values:
+        - token:
+            text: "4570"
+            start:
+              line: 5
+              col: 90
+            end:
+              line: 5
+              col: 94
+          type: "INTEGER"
+          value: "4570"
+      text: "when { _ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman' or\
+        \ _ = 'man'} then { 4570 }"
+    - token:
+        text: "when{_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2'}then{4590}"
+        start:
+          line: 6
+          col: 3
+        end:
+          line: 6
+          col: 98
+      when:
+        token:
+          text: "{_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2'}"
+          start:
+            line: 6
+            col: 8
+          end:
+            line: 6
+            col: 84
+        values:
+        - token:
+            text: "_!='bob1'or_='same'or_='professor2'"
+            start:
+              line: 6
+              col: 10
+            end:
+              line: 6
+              col: 55
+          id:
+            token:
+              text: "_!='bob1'or_='same'or_='professor2'"
+              start:
+                line: 6
+                col: 10
+              end:
+                line: 6
+                col: 55
+            value: ""
+          headers:
+            token:
+              text: "_!='bob1'or_='same'or_='professor2'"
+              start:
+                line: 6
+                col: 10
+              end:
+                line: 6
+                col: 55
+            acceptDefs: []
+            returnDefs: []
+          src: "_ != 'bob1' or _ = 'same' or _ = 'professor2'"
+          value:
+            token:
+              text: "_!='bob1'or_='same'or_='professor2'"
+              start:
+                line: 6
+                col: 10
+              end:
+                line: 6
+                col: 55
+            left:
+              token:
+                text: "_!='bob1'or_='same'"
+                start:
+                  line: 6
+                  col: 10
+                end:
+                  line: 6
+                  col: 35
+              left:
+                token:
+                  text: "_!='bob1'"
+                  start:
+                    line: 6
+                    col: 10
+                  end:
+                    line: 6
+                    col: 21
+                type: "NOTEQUAL"
+                left:
+                  token:
+                    text: "_"
+                    start:
+                      line: 6
+                      col: 10
+                    end:
+                      line: 6
+                      col: 11
+                right:
+                  token:
+                    text: "'bob1'"
+                    start:
+                      line: 6
+                      col: 15
+                    end:
+                      line: 6
+                      col: 21
+                  type: "STRING"
+                  value: "bob1"
+              right:
+                token:
+                  text: "_='same'"
+                  start:
+                    line: 6
+                    col: 25
+                  end:
+                    line: 6
+                    col: 35
+                type: "EQUAL"
+                left:
+                  token:
+                    text: "_"
+                    start:
+                      line: 6
+                      col: 25
+                    end:
+                      line: 6
+                      col: 26
+                right:
+                  token:
+                    text: "'same'"
+                    start:
+                      line: 6
+                      col: 29
+                    end:
+                      line: 6
+                      col: 35
+                  type: "STRING"
+                  value: "same"
+            right:
+              token:
+                text: "_='professor2'"
+                start:
+                  line: 6
+                  col: 39
+                end:
+                  line: 6
+                  col: 55
+              type: "EQUAL"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 6
+                    col: 39
+                  end:
+                    line: 6
+                    col: 40
+              right:
+                token:
+                  text: "'professor2'"
+                  start:
+                    line: 6
+                    col: 43
+                  end:
+                    line: 6
+                    col: 55
+                type: "STRING"
+                value: "professor2"
+        - token:
+            text: "_='woman2'or_='man2'"
+            start:
+              line: 6
+              col: 57
+            end:
+              line: 6
+              col: 83
+          id:
+            token:
+              text: "_='woman2'or_='man2'"
+              start:
+                line: 6
+                col: 57
+              end:
+                line: 6
+                col: 83
+            value: ""
+          headers:
+            token:
+              text: "_='woman2'or_='man2'"
+              start:
+                line: 6
+                col: 57
+              end:
+                line: 6
+                col: 83
+            acceptDefs: []
+            returnDefs: []
+          src: "_ = 'woman2' or _ = 'man2'"
+          value:
+            token:
+              text: "_='woman2'or_='man2'"
+              start:
+                line: 6
+                col: 57
+              end:
+                line: 6
+                col: 83
+            left:
+              token:
+                text: "_='woman2'"
+                start:
+                  line: 6
+                  col: 57
+                end:
+                  line: 6
+                  col: 69
+              type: "EQUAL"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 6
+                    col: 57
+                  end:
+                    line: 6
+                    col: 58
+              right:
+                token:
+                  text: "'woman2'"
+                  start:
+                    line: 6
+                    col: 61
+                  end:
+                    line: 6
+                    col: 69
+                type: "STRING"
+                value: "woman2"
+            right:
+              token:
+                text: "_='man2'"
+                start:
+                  line: 6
+                  col: 73
+                end:
+                  line: 6
+                  col: 83
+              type: "EQUAL"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 6
+                    col: 73
+                  end:
+                    line: 6
+                    col: 74
+              right:
+                token:
+                  text: "'man2'"
+                  start:
+                    line: 6
+                    col: 77
+                  end:
+                    line: 6
+                    col: 83
+                type: "STRING"
+                value: "man2"
+      then:
+        token:
+          text: "{4590}"
+          start:
+            line: 6
+            col: 90
+          end:
+            line: 6
+            col: 98
+        values:
+        - token:
+            text: "4590"
+            start:
+              line: 6
+              col: 92
+            end:
+              line: 6
+              col: 96
+          type: "INTEGER"
+          value: "4590"
+      text: "when { _ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or\
+        \ _ = 'man2'} then { 4590 }"
+  constants:
+    token:
+      text: "accepts{nameSTRING,lastNameSTRING}returns{valueINTEGER,expINTEGER:value+20}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 3
+        col: 50
+    required: true
+    name: "constants"
+    array: true
+    context: "CONSTANTS"
+    values:
+    - token:
+        text: "valueINTEGER"
+        start:
+          line: 3
+          col: 11
+        end:
+          line: 3
+          col: 24
+      required: true
+      name: "value"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+  matched:
+    token:
+      text: "accepts{nameSTRING,lastNameSTRING}returns{valueINTEGER,expINTEGER:value+20}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 3
+        col: 50
+    required: true
+    name: ""
+    array: true
+    context: "MATCHES"
+    values:
+    - token:
+        text: "valueINTEGER"
+        start:
+          line: 3
+          col: 11
+        end:
+          line: 3
+          col: 24
+      required: true
+      name: "value"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+    - token:
+        text: "expINTEGER:value+20"
+        start:
+          line: 3
+          col: 26
+        end:
+          line: 3
+          col: 49
+      required: false
+      name: "exp"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: false
+        present: true
+      formulaOverAll:
+        empty: false
+        present: true
+      type: "INTEGER"

@@ -27,76 +27,96 @@ import './App.scss';
 import App from './App';
 
 import { createBackendState } from './core-backend';
+import { createSupportbarState } from './supportbar';
 import { createIconbarState } from './iconbar';
 import { createHealthState } from './health';
 
 import { createExplorerState } from './explorer';
 import { createSearchState } from './explorer-se';
 import { createCreateState } from './explorer-cr';
+import { createDebugState } from './explorer-dg';
 import { createEditorState } from './editor';
 import { createEditorFlState } from './editor-fl';
 import { createEditorDlState } from './editor-dl';
 import { createEditorDtState } from './editor-dt';
+import { createEditorTxState } from './editor-tx';
 
 
+class Store {
+  constructor(config, createComponentStates) {
+    this.update = flyd.stream()
+    this.config = config
+    this.actions = {}
+    this.initActions = []
+    this.currentState = {}
+    this.states = undefined
+    this.addComponents(createComponentStates).finalize()
+  }
 
-const combineState = (update, states) => {
-  const result = { initial: {}, actions: {}, inits: [] };
+  addComponent(createComponentState) {
+    const componentState = createComponentState(this)
+    const { id, initial, actions } = componentState
 
-  for(let createCommand of states) {
-    const state = createCommand((command) => command(result))
-    const newInitial = {}
-    newInitial[state.id] = state.initial
-
-    const newActions = {}
-    newActions[state.id] = state.actions(update)
-    const initAction = newActions[state.id].init;
-
-    if(initAction) {
-      result.inits.push(initAction)
+    if(this.actions[id]) {
+      throw Error(`Store has already registered component with id: ${id}!`)
     }
 
-    result.initial = Object.assign(result.initial, newInitial)
-    result.actions = Object.assign(result.actions, newActions)
+    this.actions[id] = actions
+    this.currentState[id] = initial
+
+    if(actions.init) {
+      this.initActions.push(actions.init)
+    }
+
+    return this;
   }
 
-  return result;
-}
-
-const merge = (currentState, updateCommand) => {
-  const result = updateCommand(currentState);
-  if(result) {
-    return result; 
+  addComponents(createComponentStates) {
+    createComponentStates.forEach(c => this.addComponent(c))
+    return this;
   }
-  return currentState;
-}
 
+  finalize() {
+    const setCurrentState = (value) => this.currentState = value;
+
+    const merge = (currentState, updateCommand) => {
+      const result = updateCommand(currentState);
+      if(result) {
+        setCurrentState(result)
+        return result;
+      }
+      return currentState;
+    }
+
+    setCurrentState(Immutable.fromJS(this.currentState))
+    this.states = flyd.scan(merge, this.currentState, this.update)
+    this.initActions.forEach(i => i())
+    return this;
+  }
+}
 
 const config = Immutable
   .fromJS(window.config ? window.config : 
     {
-      url: 'http://localhost:8080/hdes-dev-app/'
+      url: 'http://localhost:8080/hdes-ui/services'
     });
 
-const update = flyd.stream()
-const appState = combineState(update, [
+const store = new Store(config, [
   createBackendState(config),
   createHealthState,
   createSearchState,
   createExplorerState,
+  createDebugState,
   createIconbarState,
+  createSupportbarState,
   createCreateState,
   createEditorState,
   createEditorFlState,
   createEditorDlState,
-  createEditorDtState])
-const states = flyd.scan(merge, Immutable.fromJS(appState.initial), update)
-const actions = appState.actions
+  createEditorDtState,
+  createEditorTxState])
 
-// trigger inits
-appState.inits.forEach(i => i())
-
-render(<App states={states} actions={actions} />, document.getElementById('root'));
+render(<App states={store.states} actions={store.actions} />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

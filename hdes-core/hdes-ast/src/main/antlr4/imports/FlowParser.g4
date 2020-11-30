@@ -1,31 +1,26 @@
 parser grammar FlowParser;
 options { tokenVocab = HdesLexer; }
-import CommonParser;
+import TypeDefParser, ExpressionParser;
 
-taskTypes
-  : DEF_FL
-  | DEF_DT
-  | DEF_MT
-  | DEF_SE;
+flBody: simpleTypeName '{' headers 'steps' '{' steps '}' '}';
+steps: step*;
+step: simpleTypeName '{' (iterateAction | callAction ) pointer '}';
 
-flBody: typeName description? headers tasks;
+callAction: callDef*;
+callDef: ('call' | 'await') simpleTypeName mapping;
 
-tasks: 'tasks' ':' '{' taskArgs? '}';
-taskArgs: nextTask (',' nextTask)*;
-nextTask: typeName ':' '{' taskPointer taskRef? '}' fromPointer?;
+iterateAction: 'maps' typeName 'to' '{' iterateBody '}' where? sortBy? findFirst?;
+iterateBody: callAction | steps;
 
-taskPointer: whenThenPointerArgs | thenPointer;
-whenThenPointerArgs: whenThenPointer (',' whenThenPointer)*;
-whenThenPointer: 'when' ':' ('?' | enBody) thenPointer;
-thenPointer: 'then' ':' (endMapping | typeName);
-fromPointer: 'from' typeName thenPointer;
+sortBy: 'sort-by' '{' sortByArg* '}';
+sortByArg: typeName ('ASC' | 'DESC')?;
 
-taskRef: taskTypes ':' typeName 'uses' ':' mapping;
-endMapping: 'end' 'as' ':' mapping;
+findFirst: 'find-first';
+where: WHERE enBody (AND enBody)*;
 
-mapping: '{' mappingArgs? '}';
-mappingArgs: mappingArg (',' mappingArg)*;
-
-mappingArg: typeName ':' mappingValue;
-mappingValue: mapping | typeName | literal;
-
+pointer: whenThenPointerArgs || thenPointer;
+whenThenPointerArgs: whenThenPointer (whenThenPointer)* thenPointer?; 
+whenThenPointer: 'when' '{' enBody '}' thenPointer;
+thenPointer: 'then' (endAsPointer | continuePointer | simpleTypeName);
+continuePointer: CONTINUE;
+endAsPointer: 'end-as' mapping;

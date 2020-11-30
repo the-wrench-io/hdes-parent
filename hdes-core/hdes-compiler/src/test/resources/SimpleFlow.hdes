@@ -1,25 +1,35 @@
 
-define flow: SimpleFlow description: 'descriptive'
-
-headers: {
-  arg1 INTEGER optional IN,
-  arg2 INTEGER optional IN,
-  arg3 ARRAY of INTEGER optional IN,
-  arg4 ARRAY of OBJECT optional IN: {
-    arg5 INTEGER optional IN,
-    arg6 INTEGER optional IN
+decision-table Scoring {
+  accepts { arg INTEGER }
+  returns { score INTEGER }
+  
+  matches FIRST {
+    when { _ between 1 and 30 } then { 10 }
+    when { ? } then { 20 }
   }
 }
-tasks: {
-  firstTask: {
-    then: switch
-    decision-table: BestDt uses: { name: arg1, lastName: arg2 } },
-  
-  switch: {
-    when: arg1 > 10 then: secondTask,
-    when: ? then: end as: { name: arg1, lastName: arg2 } },
 
-  secondTask: {
-    then: end as: { }
-    decision-table: Best2Dt uses: { name: arg1, lastName: arg2 } }
+
+flow SimpleFlow {
+
+  accepts { arg1 INTEGER, arg2 INTEGER }
+  returns { score INTEGER }
+  
+  steps {
+    
+    InitialScoring {
+      call Scoring { arg: arg1 }
+      then Decision
+    }
+    
+    Decision {
+      when { InitialScoring.score > 10 } then ExtraScoring
+      then end-as { InitialScoring.score } 
+    }
+  
+    ExtraScoring {
+      call Scoring { arg: arg2 }
+      then end-as { _score }
+    }
+  }
 }

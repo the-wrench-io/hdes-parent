@@ -25,98 +25,103 @@ import java.util.Optional;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
+import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
+import io.resys.hdes.ast.api.nodes.MappingNode.ObjectMappingDef;
 
-public interface FlowNode extends AstNode {
+public interface FlowNode extends HdesNode {
+  
+  @Value.Immutable
+  interface FlowBody extends FlowNode, BodyNode { 
+    Optional<Step> getStep();
+  }
+  
+  @Value.Immutable
+  interface Step extends FlowNode {
+    SimpleInvocation getId();
+    StepAction getAction();
+    StepPointer getPointer();
+    Boolean getAwait();
+  }
+  
+  /*
+   * Step actions iterator, call, suspend
+   */
+  interface StepAction extends FlowNode {}
 
-  enum RefTaskType { FLOW_TASK, MANUAL_TASK, DECISION_TABLE, SERVICE_TASK }
-  
-  interface FlowTaskPointer extends FlowNode {}
-  
   @Value.Immutable
-  interface FlowBody extends FlowNode, BodyNode {
-    String getDescription();
-    FlowInputs getInputs();
-    FlowOutputs getOutputs(); 
-    List<FlowTaskNode> getUnreachableTasks();
-    Optional<FlowTaskNode> getTask();
-  }
-
-  @Value.Immutable
-  interface FlowInputs extends FlowNode {
-    List<TypeDefNode> getValues();
+  interface EmptyAction extends StepAction {
   }
   
   @Value.Immutable
-  interface FlowOutputs extends FlowNode {
-    List<TypeDefNode> getValues();
+  interface CallAction extends StepAction {
+    List<CallDef> getCalls();
   }
   
   @Value.Immutable
-  interface FlowTaskNode extends FlowNode {
-    String getId();
-    FlowTaskPointer getNext();
-    Optional<TaskRef> getRef();
-    Optional<FlowLoop> getLoop();
-  }
-  
-  @Value.Immutable
-  interface FlowLoop extends FlowNode {
-    TypeName getArrayName();
-    FlowTaskPointer getNext();
-  } 
-  
-  @Value.Immutable
-  interface WhenThenPointer extends FlowTaskPointer {
-    List<WhenThen> getValues();
-  }
-  
-  @Value.Immutable
-  interface ThenPointer extends FlowTaskPointer {
-    String getName();
-    // Only possible in invalid tree
-    Optional<FlowTaskNode> getTask();
+  interface CallDef extends FlowNode {
+    Optional<Integer> getIndex();
+    SimpleInvocation getId();
+    ObjectMappingDef getMapping();
+    Boolean getAwait();
   }
 
   @Value.Immutable
-  interface EndPointer extends FlowTaskPointer {
-    String getName();
-    List<Mapping> getValues();
+  interface IterateAction extends StepAction {
+    InvocationNode getOver();
+    Optional<Step> getStep();
+    Optional<SortBy> getSortBy();
+    Boolean getFindFirst();
+    Boolean getNested();
   }
   
   @Value.Immutable
-  interface WhenThen extends FlowNode {
-    Optional<ExpressionBody> getWhen();
-    FlowTaskPointer getThen();
+  interface SortBy extends FlowNode {
+    List<SortByDef> getValues();
   }
 
   @Value.Immutable
-  interface Mapping extends FlowNode {
-    String getLeft();
-    MappingValue getRight();
+  interface SortByDef extends FlowNode {
+    InvocationNode getName();
+    Boolean getAsc();
   }
   
-  interface MappingValue extends FlowNode { }
-  
-  @Value.Immutable  
-  interface MappingArray extends MappingValue {
-    List<Mapping> getValues();
+  /**
+   * Step pointer types: when/then, then, then end as
+   */
+  interface StepPointer extends FlowNode {}
+
+  @Value.Immutable
+  interface SplitPointer extends StepPointer {
+    List<StepPointer> getValues();
   }
 
-  @Value.Immutable  
-  interface MappingLiteral extends MappingValue {
-    Literal getValue();
-  }
-
-  @Value.Immutable  
-  interface MappingTypeName extends MappingValue {
-    TypeName getValue();    
+  @Value.Immutable
+  interface WhenPointer extends StepPointer {
+    ExpressionBody getWhen();
+    StepPointer getThen();
   }
   
   @Value.Immutable
-  interface TaskRef extends FlowNode {
-    RefTaskType getType();
-    String getValue();
-    List<Mapping> getMapping();
+  interface ThenPointer extends StepPointer {
+    SimpleInvocation getId();
+    Step getStep();
+  }
+  
+  @Value.Immutable
+  interface EndPointer extends StepPointer {
+    ObjectMappingDef getMapping();
+  }
+
+  @Value.Immutable
+  interface IterationEndPointer extends StepPointer {
+  }
+  
+  @Value.Immutable
+  interface StepCallDef extends TypeDef {
+    int getIndex();
+    CallDef getCallDef();
+    List<TypeDef> getValues();
   }
 }

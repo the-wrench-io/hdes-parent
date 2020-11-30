@@ -20,4 +20,6 @@
 import { State }  from './State'
 
 export { EditorView } from './EditorView'
+export { EditorTabs } from './EditorTabs'
+
 export const createEditorState = app => State(app)

@@ -15,7 +15,7 @@
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-ui-backend</artifactId>
-    </dependency>  
+    </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>

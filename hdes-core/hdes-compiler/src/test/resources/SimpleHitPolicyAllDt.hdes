@@ -1,0 +1,9 @@
+decision-table SimpleHitPolicyAllDT {
+  accepts { name STRING, lastName STRING }
+  returns { value INTEGER } 
+  matches ALL {
+    when { ?, ? } then { 20 }
+    when { _ = 'bob', _ = 'woman'} then { 4570 }
+    when { _ != 'bob' or _ = 'same' or _ = 'professor', _ in('woman', 'man') } then { 4570 }
+  }
+}

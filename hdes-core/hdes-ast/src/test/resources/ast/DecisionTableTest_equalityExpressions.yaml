@@ -1,0 +1,742 @@
+---
+token:
+  text: "decision-tablebasic{accepts{value0INTEGER,value1INTEGER}returns{valueINTEGER}matchesALL{when{_>10,_<=20}then{4570}when{_>10,_<=20and_>10}then{4570}when{_=6,_!=20and_>10}then{4570}}}<EOF>"
+  start:
+    line: 1
+    col: 1
+  end:
+    line: 9
+    col: 1
+values:
+- token:
+    text: "basic{accepts{value0INTEGER,value1INTEGER}returns{valueINTEGER}matchesALL{when{_>10,_<=20}then{4570}when{_>10,_<=20and_>10}then{4570}when{_=6,_!=20and_>10}then{4570}}}"
+    start:
+      line: 1
+      col: 16
+    end:
+      line: 8
+      col: 4
+  id:
+    token:
+      text: "basic"
+      start:
+        line: 1
+        col: 16
+      end:
+        line: 1
+        col: 21
+    value: "basic"
+  headers:
+    token:
+      text: "accepts{value0INTEGER,value1INTEGER}returns{valueINTEGER}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 3
+        col: 26
+    acceptDefs:
+    - token:
+        text: "value0INTEGER"
+        start:
+          line: 2
+          col: 11
+        end:
+          line: 2
+          col: 25
+      required: true
+      name: "value0"
+      array: false
+      context: "ACCEPTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+    - token:
+        text: "value1INTEGER"
+        start:
+          line: 2
+          col: 27
+        end:
+          line: 2
+          col: 41
+      required: true
+      name: "value1"
+      array: false
+      context: "ACCEPTS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+    returnDefs:
+    - token:
+        text: "valueINTEGER"
+        start:
+          line: 3
+          col: 11
+        end:
+          line: 3
+          col: 24
+      required: true
+      name: "value"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+  hitPolicy:
+    token:
+      text: "matchesALL{when{_>10,_<=20}then{4570}when{_>10,_<=20and_>10}then{4570}when{_=6,_!=20and_>10}then{4570}}"
+      start:
+        line: 4
+        col: 1
+      end:
+        line: 8
+        col: 2
+    rows:
+    - token:
+        text: "when{_>10,_<=20}then{4570}"
+        start:
+          line: 5
+          col: 3
+        end:
+          line: 5
+          col: 40
+      when:
+        token:
+          text: "{_>10,_<=20}"
+          start:
+            line: 5
+            col: 8
+          end:
+            line: 5
+            col: 26
+        values:
+        - token:
+            text: "_>10"
+            start:
+              line: 5
+              col: 10
+            end:
+              line: 5
+              col: 16
+          id:
+            token:
+              text: "_>10"
+              start:
+                line: 5
+                col: 10
+              end:
+                line: 5
+                col: 16
+            value: ""
+          headers:
+            token:
+              text: "_>10"
+              start:
+                line: 5
+                col: 10
+              end:
+                line: 5
+                col: 16
+            acceptDefs: []
+            returnDefs: []
+          src: "_ > 10"
+          value:
+            token:
+              text: "_>10"
+              start:
+                line: 5
+                col: 10
+              end:
+                line: 5
+                col: 16
+            type: "GREATER"
+            left:
+              token:
+                text: "_"
+                start:
+                  line: 5
+                  col: 10
+                end:
+                  line: 5
+                  col: 11
+            right:
+              token:
+                text: "10"
+                start:
+                  line: 5
+                  col: 14
+                end:
+                  line: 5
+                  col: 16
+              type: "INTEGER"
+              value: "10"
+        - token:
+            text: "_<=20"
+            start:
+              line: 5
+              col: 18
+            end:
+              line: 5
+              col: 25
+          id:
+            token:
+              text: "_<=20"
+              start:
+                line: 5
+                col: 18
+              end:
+                line: 5
+                col: 25
+            value: ""
+          headers:
+            token:
+              text: "_<=20"
+              start:
+                line: 5
+                col: 18
+              end:
+                line: 5
+                col: 25
+            acceptDefs: []
+            returnDefs: []
+          src: "_ <= 20"
+          value:
+            token:
+              text: "_<=20"
+              start:
+                line: 5
+                col: 18
+              end:
+                line: 5
+                col: 25
+            type: "LESS_THEN"
+            left:
+              token:
+                text: "_"
+                start:
+                  line: 5
+                  col: 18
+                end:
+                  line: 5
+                  col: 19
+            right:
+              token:
+                text: "20"
+                start:
+                  line: 5
+                  col: 23
+                end:
+                  line: 5
+                  col: 25
+              type: "INTEGER"
+              value: "20"
+      then:
+        token:
+          text: "{4570}"
+          start:
+            line: 5
+            col: 32
+          end:
+            line: 5
+            col: 40
+        values:
+        - token:
+            text: "4570"
+            start:
+              line: 5
+              col: 34
+            end:
+              line: 5
+              col: 38
+          type: "INTEGER"
+          value: "4570"
+      text: "when { _ > 10, _ <= 20} then { 4570 }"
+    - token:
+        text: "when{_>10,_<=20and_>10}then{4570}"
+        start:
+          line: 6
+          col: 3
+        end:
+          line: 6
+          col: 51
+      when:
+        token:
+          text: "{_>10,_<=20and_>10}"
+          start:
+            line: 6
+            col: 8
+          end:
+            line: 6
+            col: 37
+        values:
+        - token:
+            text: "_>10"
+            start:
+              line: 6
+              col: 10
+            end:
+              line: 6
+              col: 16
+          id:
+            token:
+              text: "_>10"
+              start:
+                line: 6
+                col: 10
+              end:
+                line: 6
+                col: 16
+            value: ""
+          headers:
+            token:
+              text: "_>10"
+              start:
+                line: 6
+                col: 10
+              end:
+                line: 6
+                col: 16
+            acceptDefs: []
+            returnDefs: []
+          src: "_ > 10"
+          value:
+            token:
+              text: "_>10"
+              start:
+                line: 6
+                col: 10
+              end:
+                line: 6
+                col: 16
+            type: "GREATER"
+            left:
+              token:
+                text: "_"
+                start:
+                  line: 6
+                  col: 10
+                end:
+                  line: 6
+                  col: 11
+            right:
+              token:
+                text: "10"
+                start:
+                  line: 6
+                  col: 14
+                end:
+                  line: 6
+                  col: 16
+              type: "INTEGER"
+              value: "10"
+        - token:
+            text: "_<=20and_>10"
+            start:
+              line: 6
+              col: 18
+            end:
+              line: 6
+              col: 36
+          id:
+            token:
+              text: "_<=20and_>10"
+              start:
+                line: 6
+                col: 18
+              end:
+                line: 6
+                col: 36
+            value: ""
+          headers:
+            token:
+              text: "_<=20and_>10"
+              start:
+                line: 6
+                col: 18
+              end:
+                line: 6
+                col: 36
+            acceptDefs: []
+            returnDefs: []
+          src: "_ <= 20 and _ > 10"
+          value:
+            token:
+              text: "_<=20and_>10"
+              start:
+                line: 6
+                col: 18
+              end:
+                line: 6
+                col: 36
+            left:
+              token:
+                text: "_<=20"
+                start:
+                  line: 6
+                  col: 18
+                end:
+                  line: 6
+                  col: 25
+              type: "LESS_THEN"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 6
+                    col: 18
+                  end:
+                    line: 6
+                    col: 19
+              right:
+                token:
+                  text: "20"
+                  start:
+                    line: 6
+                    col: 23
+                  end:
+                    line: 6
+                    col: 25
+                type: "INTEGER"
+                value: "20"
+            right:
+              token:
+                text: "_>10"
+                start:
+                  line: 6
+                  col: 30
+                end:
+                  line: 6
+                  col: 36
+              type: "GREATER"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 6
+                    col: 30
+                  end:
+                    line: 6
+                    col: 31
+              right:
+                token:
+                  text: "10"
+                  start:
+                    line: 6
+                    col: 34
+                  end:
+                    line: 6
+                    col: 36
+                type: "INTEGER"
+                value: "10"
+      then:
+        token:
+          text: "{4570}"
+          start:
+            line: 6
+            col: 43
+          end:
+            line: 6
+            col: 51
+        values:
+        - token:
+            text: "4570"
+            start:
+              line: 6
+              col: 45
+            end:
+              line: 6
+              col: 49
+          type: "INTEGER"
+          value: "4570"
+      text: "when { _ > 10, _ <= 20 and _ > 10} then { 4570 }"
+    - token:
+        text: "when{_=6,_!=20and_>10}then{4570}"
+        start:
+          line: 7
+          col: 3
+        end:
+          line: 7
+          col: 51
+      when:
+        token:
+          text: "{_=6,_!=20and_>10}"
+          start:
+            line: 7
+            col: 8
+          end:
+            line: 7
+            col: 37
+        values:
+        - token:
+            text: "_=6"
+            start:
+              line: 7
+              col: 10
+            end:
+              line: 7
+              col: 15
+          id:
+            token:
+              text: "_=6"
+              start:
+                line: 7
+                col: 10
+              end:
+                line: 7
+                col: 15
+            value: ""
+          headers:
+            token:
+              text: "_=6"
+              start:
+                line: 7
+                col: 10
+              end:
+                line: 7
+                col: 15
+            acceptDefs: []
+            returnDefs: []
+          src: "_ = 6"
+          value:
+            token:
+              text: "_=6"
+              start:
+                line: 7
+                col: 10
+              end:
+                line: 7
+                col: 15
+            type: "EQUAL"
+            left:
+              token:
+                text: "_"
+                start:
+                  line: 7
+                  col: 10
+                end:
+                  line: 7
+                  col: 11
+            right:
+              token:
+                text: "6"
+                start:
+                  line: 7
+                  col: 14
+                end:
+                  line: 7
+                  col: 15
+              type: "INTEGER"
+              value: "6"
+        - token:
+            text: "_!=20and_>10"
+            start:
+              line: 7
+              col: 18
+            end:
+              line: 7
+              col: 36
+          id:
+            token:
+              text: "_!=20and_>10"
+              start:
+                line: 7
+                col: 18
+              end:
+                line: 7
+                col: 36
+            value: ""
+          headers:
+            token:
+              text: "_!=20and_>10"
+              start:
+                line: 7
+                col: 18
+              end:
+                line: 7
+                col: 36
+            acceptDefs: []
+            returnDefs: []
+          src: "_ != 20 and _ > 10"
+          value:
+            token:
+              text: "_!=20and_>10"
+              start:
+                line: 7
+                col: 18
+              end:
+                line: 7
+                col: 36
+            left:
+              token:
+                text: "_!=20"
+                start:
+                  line: 7
+                  col: 18
+                end:
+                  line: 7
+                  col: 25
+              type: "NOTEQUAL"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 7
+                    col: 18
+                  end:
+                    line: 7
+                    col: 19
+              right:
+                token:
+                  text: "20"
+                  start:
+                    line: 7
+                    col: 23
+                  end:
+                    line: 7
+                    col: 25
+                type: "INTEGER"
+                value: "20"
+            right:
+              token:
+                text: "_>10"
+                start:
+                  line: 7
+                  col: 30
+                end:
+                  line: 7
+                  col: 36
+              type: "GREATER"
+              left:
+                token:
+                  text: "_"
+                  start:
+                    line: 7
+                    col: 30
+                  end:
+                    line: 7
+                    col: 31
+              right:
+                token:
+                  text: "10"
+                  start:
+                    line: 7
+                    col: 34
+                  end:
+                    line: 7
+                    col: 36
+                type: "INTEGER"
+                value: "10"
+      then:
+        token:
+          text: "{4570}"
+          start:
+            line: 7
+            col: 43
+          end:
+            line: 7
+            col: 51
+        values:
+        - token:
+            text: "4570"
+            start:
+              line: 7
+              col: 45
+            end:
+              line: 7
+              col: 49
+          type: "INTEGER"
+          value: "4570"
+      text: "when { _ = 6,  _ != 20 and _ > 10} then { 4570 }"
+  constants:
+    token:
+      text: "accepts{value0INTEGER,value1INTEGER}returns{valueINTEGER}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 3
+        col: 26
+    required: true
+    name: "constants"
+    array: true
+    context: "CONSTANTS"
+    values:
+    - token:
+        text: "valueINTEGER"
+        start:
+          line: 3
+          col: 11
+        end:
+          line: 3
+          col: 24
+      required: true
+      name: "value"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"
+  matched:
+    token:
+      text: "accepts{value0INTEGER,value1INTEGER}returns{valueINTEGER}"
+      start:
+        line: 2
+        col: 1
+      end:
+        line: 3
+        col: 26
+    required: true
+    name: ""
+    array: true
+    context: "MATCHES"
+    values:
+    - token:
+        text: "valueINTEGER"
+        start:
+          line: 3
+          col: 11
+        end:
+          line: 3
+          col: 24
+      required: true
+      name: "value"
+      array: false
+      context: "RETURNS"
+      debugValue:
+        empty: true
+        present: false
+      formula:
+        empty: true
+        present: false
+      formulaOverAll:
+        empty: true
+        present: false
+      type: "INTEGER"

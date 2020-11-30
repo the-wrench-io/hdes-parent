@@ -1,8 +1,5 @@
 lexer grammar HdesLexer;
-
-DirectionType: IN | OUT;
-RequiredType: REQUIRED | OPTIONAL;
-DropdownType: DROPDOWN_SINGLE | DROPDOWN_MULTIPLE;
+ReservedKeyWord: 'switch' | 'case' | 'if' | 'else';
 
 ScalarType
   : INTEGER
@@ -13,29 +10,39 @@ ScalarType
   | STRING
   | BOOLEAN;
 
-// BETWEEN/AND/OR operators
+// BETWEEN/AND/OR/IN operators
+IN: I N;
 BETWEEN: B E T W E E N;
 AND: A N D;
 OR: O R;
-NOT_OP: 'not';
+WHERE: W H E R E;
 
 fragment A : [aA];
 fragment B : [bB];
 fragment D : [dD];
 fragment E : [eE];
+fragment H : [hH];
+fragment I : [iI];
 fragment N : [nN];
 fragment O : [oO];
 fragment R : [rR];
 fragment T : [tT];
 fragment W : [wW];
 
-DEFINE: 'define';
+
+ACCEPTS: 'accepts';
+RETURNS: 'returns';
+
+// Main definition types
 DEF_FL: 'flow';
 DEF_DT: 'decision-table';
-DEF_MT: 'manual-task';
+DEF_ST: 'service-task';
 DEF_EN: 'expression';
-DEF_SE: 'service';
 
+// data type options
+DEBUG_VALUE: 'debug-value';
+
+// possible data types
 INTEGER: 'INTEGER';
 DECIMAL: 'DECIMAL';
 DATE_TIME: 'DATE_TIME';
@@ -45,52 +52,34 @@ STRING: 'STRING';
 BOOLEAN: 'BOOLEAN';
 OBJECT: 'OBJECT';
 ARRAY: 'ARRAY';
+OF: 'of'; // ARRAY of STRING 
 
-DESC: 'description';
-HEADERS: 'headers';
-OF: 'of';
-AS: 'as';
+LAMBDA: '->';
 
-FORMULA: 'formula';
-
-// DT
-IN: 'IN';
-OUT: 'OUT';
+// DT matching policy
 ALL: 'ALL';
 FIRST: 'FIRST';
-MATRIX: 'MATRIX';
-
-// MANUAL TASK
-CLASS: 'class';
-DROPDOWN_SINGLE: 'single-choice';
-DROPDOWN_MULTIPLE: 'multiple-choice'; 
-DROPDOWN: 'dropdown';
-DROPDOWNS: 'dropdowns'; 
-
-SHOW: 'show';
-ACTIONS: 'actions';
-MESSAGE: 'message';
-MESSAGE_ERROR: 'error';
-MESSAGE_INFO: 'info';
-MESSAGE_WARNING: 'warning';
-
-FORM: 'form';
-FROM: 'from';
-GROUPS: 'groups';
-GROUP: 'group';
-FIELDS: 'fields';
-FIELD: 'field';
-DEFAULT_VALUE: 'default-value';
+MATCHES: 'matches';
 
 // FLOW
-TASKS: 'tasks';
-DEBUG_VALUE: 'debug-value';
-REQUIRED: 'required';
-OPTIONAL: 'optional';
-USES: 'uses';
+STEPS: 'steps';
+CALL: 'call';
+AWAIT: 'await';
+CONTINUE: 'continue';
+FIND_FIRST: 'find-first';
+SORT_BY: 'sort-by';
+ASC: 'ASC';
+DESC: 'DESC';
+
+// SERVICE
+PROMISE: 'promise';
+TIMEOUT: 'timeout';
+
 WHEN: 'when';
 THEN: 'then';
-END: 'end';
+END: 'end-as';
+MAPS: 'maps';
+TO: 'to';
 
 // MARKS
 QUESTION_MARK: '?';
@@ -99,9 +88,10 @@ DOT: '.';
 COMMA: ',';
 NOT: '!';
 
-// BLOCKS
 PARENTHESES_START: '(';
 PARENTHESES_END: ')';
+
+// BLOCKS
 BLOCK_START: '{';
 BLOCK_END: '}';
 
@@ -110,8 +100,6 @@ ADD: '+';
 SUBTRACT: '-';
 MULTIPLY: '*';
 DIVIDE: '/';
-INCREMENT: '++';
-DECREMENT: '--';
 
 // equality operators
 EQ_NOTEQUAL: '!=';
@@ -123,6 +111,7 @@ EQ_GREATER_THEN: '>=';
 
 // integer literal
 IntegerLiteral: '0' | NonZeroDigit (Digits? | Underscores Digits);
+Placeholder: '_' Digits?;
 
 fragment Digit : '0' | NonZeroDigit;
 fragment NonZeroDigit: [1-9];

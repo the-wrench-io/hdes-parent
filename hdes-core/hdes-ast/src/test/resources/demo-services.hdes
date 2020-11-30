@@ -1,0 +1,78 @@
+
+service-task ExampleServiceCall {
+  accepts { type INTEGER }
+  returns { value INTEGER }
+  
+  x.y.io.MySuperService {}
+}
+
+
+/* first DT */
+decision-table Basic {
+  accepts { *name STRING, lastName STRING, type INTEGER } // * = means the parameter is optional
+  returns { value INTEGER }
+  
+  matches ALL {
+    when { ?, ?, between 1 and 30 }        then { 20 }
+    when { not 'bob' or 'sam', 'woman', ?} then { 4570 }
+  }
+}
+
+// second DT
+decision-table MatrixDT {
+  accepts { name STRING, lastName STRING }
+  returns {
+    total INTEGER formula: sum(_.maps-to), // total score of hit columns
+    avg INTEGER   formula: avg(_.maps-to), // avg score hit columns
+    max INTEGER   formula: sum(_.constants.map(row -> max(row))) // sum max possible score of defined fields
+  }
+  
+  maps STRING { _ = 'BOB', _ = 'SAM', ? }
+  to INTEGER {
+    lastName  { 10, 20, 30 }
+        name  { 20, 50, 60 }
+  }
+}
+
+
+// flow
+flow CreateSchoolScores {
+  accepts {
+    id INTEGER, externalId INTEGER,
+    schools ARRAY of OBJECT { schoolName STRING, address STRING }
+  }
+  returns { offers ARRAY of OBJECT { distance INTEGER, value STRING } }
+  
+  steps {
+    CreateScore {
+      maps schools to {
+        // Create score for one school in iterator
+        CreateScoreForOneSchool {
+          /*
+           * maps school name into DT input call, underscore is for using iterator pointer to the element in the iterator
+           * there can be n number for call elements, they will be executed in parallel when given the option 'parallel'
+           */
+          call bestDtTask { name: CreateScore._schoolName }
+          
+          /* 
+           * syntax for suspending the flow, where 
+           *   1. publish is responsible for creating task into third system
+           *   2. complete is responsible for being called by integration on task complete and mapping relevant data back to flow
+           * suspend { publish call OnCreateSession {} complete call OnCompleteService {}  }
+           */
+          then CalculateDistance
+        }
+        
+        CalculateDistance {
+          end-as { distance: 10, value: CreateScoreForOneSchool.value } // end for one element in iterator
+        }
+        
+      }
+      then ProposeOffer
+    }
+    
+    ProposeOffer {
+      end-as { offers: CreateScore } // final end
+    }
+  }
+}

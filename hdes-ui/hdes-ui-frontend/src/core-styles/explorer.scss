@@ -2,6 +2,7 @@
 
 .explorer {
   background-color: $has-background-grey-darker;
+  border-right: 1px solid $has-background-black-ter !important;
   height: 100%;
   
   .explorer-title {

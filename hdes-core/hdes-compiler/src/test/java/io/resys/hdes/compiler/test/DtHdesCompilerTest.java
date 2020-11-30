@@ -22,35 +22,55 @@ package io.resys.hdes.compiler.test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.compiler.api.HdesCompiler;
-import io.resys.hdes.compiler.api.HdesCompiler.Code;
-import io.resys.hdes.compiler.spi.java.JavaHdesCompiler;
+import io.resys.hdes.compiler.api.HdesCompiler.Resource;
+import io.resys.hdes.compiler.spi.GenericHdesCompiler;
 
 public class DtHdesCompilerTest {
-  private final HdesCompiler compiler = JavaHdesCompiler.config().build();
+  private final HdesCompiler compiler = GenericHdesCompiler.config().build();
 
   @Test
-  public void simpleDt() {
-    Code code = compiler.parser()
-        .add("SimpleDt.hdes", file("SimpleDt.hdes"))
+  public void simpleHitPolicyMatrixDt() {
+    List<Resource> code = compiler.parser()
+        .add("SimpleHitPolicyMatrixDt.hdes", file("SimpleHitPolicyMatrixDt.hdes"))
     .build();
-    
-    System.out.println(code.getValues().get(0).getTarget());
-    
+    print(code);
   }
+  
+  
   @Test
-  public void expressionDt() {
-    Code code = compiler.parser()
-        .add("ExpressionDt.hdes", file("ExpressionDt.hdes"))
+  public void simpleHitPolicyAllDt() {
+    List<Resource> code = compiler.parser()
+        .add("SimpleHitPolicyAllDt.hdes", file("SimpleHitPolicyAllDt.hdes"))
     .build();
-    
-    //System.out.println(code.getValues().get(0).getTarget());
-    //System.out.println(code.getValues().get(1).getTarget());
-    
+    print(code);
+  }
+  
+  @Test
+  public void simpleHitPolicyFirstDt() {
+    List<Resource> code = compiler.parser()
+        .add("SimpleHitPolicyFirstDt.hdes", file("SimpleHitPolicyFirstDt.hdes"))
+    .build();
+    print(code);
+  }
+  
+  @Test
+  public void formulaHitPolicyFirstDt() {
+    List<Resource> code = compiler.parser()
+        .add("FormulaHitPolicyFirstDt.hdes", file("FormulaHitPolicyFirstDt.hdes"))
+    .build();
+    print(code);
+  }
+  
+  public static void print(List<Resource> resources) {
+   for(Resource r : resources) {
+     r.getDeclarations().forEach(d -> System.out.println(d.getValue()));
+   } 
   }
   
   public static String file(String name) {

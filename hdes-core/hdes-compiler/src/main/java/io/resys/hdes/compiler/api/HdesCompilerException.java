@@ -1,11 +1,6 @@
 package io.resys.hdes.compiler.api;
 
-import io.resys.hdes.ast.api.nodes.AstNode;
-import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.FlowTaskPointer;
-import io.resys.hdes.ast.api.nodes.FlowNode.TaskRef;
-import io.resys.hdes.ast.api.nodes.ManualTaskNode.ManualTaskBody;
+import io.resys.hdes.ast.api.nodes.HdesNode;
 
 /*-
  * #%L
@@ -51,73 +46,31 @@ public class HdesCompilerException extends RuntimeException {
     super(cause);
   }
   
-  
+
   public static Builder builder() {
     return new Builder();
   }
 
   public static class Builder {
-    public String unknownAst(AstNode ast) {
+    public String unknownExpression(HdesNode ast) {
       return new StringBuilder()
-          .append("Unknown AST: ").append(ast.getClass())
-          .append("  - ").append(ast.getClass()).append(System.lineSeparator())
-          .append("  supported types are: ").append(System.lineSeparator())
-          .append("    - ").append(DecisionTableBody.class).append(System.lineSeparator())
-          .append("    - ").append(FlowBody.class).append(System.lineSeparator())
-          .append("    - ").append(ManualTaskBody.class).append(System.lineSeparator())
-          .toString();
-    }
-    public String unknownDTExpressionNode(AstNode ast) {
-      return new StringBuilder()
-          .append("Unknown DT expression AST: ").append(ast.getClass()).append(System.lineSeparator())
+          .append("Unknown expression AST: ").append(ast.getClass()).append(System.lineSeparator())
           .append("  - ").append(ast).append("!")
           .toString();
     }
-    public String unknownDTExpressionOperation(AstNode ast) {
+
+    public String unknownHeader(HdesNode ast) {
       return new StringBuilder()
-          .append("Unknown DT expression operation AST: ").append(ast.getClass()).append(System.lineSeparator())
+          .append("Unknown header AST: ").append(ast.getClass()).append(System.lineSeparator())
           .append("  - ").append(ast).append("!")
           .toString();
     }
-    public String unknownDTInputRule(AstNode ast) {
+
+    public String unknownFunctionCall(HdesNode ast, String was) {
       return new StringBuilder()
-          .append("Unknown DT input rule AST: ").append(ast.getClass()).append(System.lineSeparator())
-          .append("  - ").append(ast).append("!")
-          .toString();
-    }
-    public String unknownFlInputRule(AstNode ast) {
-      return new StringBuilder()
-          .append("Unknown FLOW input rule AST: ").append(ast.getClass()).append(System.lineSeparator())
-          .append("  - ").append(ast).append("!")
-          .toString();
-    }
-    public String unknownFlTaskRef(TaskRef ast) {
-      return new StringBuilder()
-          .append("Unknown FLOW task reference AST: ").append(ast.getValue()).append(System.lineSeparator())
-          .append("  - ").append(ast).append("!")
-          .toString();
-    }
-    public String unknownFlTaskPointer(FlowTaskPointer ast) {
-      return new StringBuilder()
-          .append("Unknown FLOW task pointer AST: ").append(ast.getClass()).append(System.lineSeparator())
-          .append("  - ").append(ast).append("!")
-          .toString();
-    }
-    public String wildcardUnknownFlTaskWhenThen(FlowTaskPointer ast) {
-      return new StringBuilder()
-          .append("Unknown FLOW when/then(wildcard '?' can be only present as the last element) AST: ").append(System.lineSeparator())
-          .append("  - ").append(ast).append("!")
-          .toString();
-    }
-    public String unknownExpressionNode(AstNode ast) {
-      return new StringBuilder()
-          .append("Unknown EXPRESSION AST: ").append(ast.getClass()).append(System.lineSeparator())
-          .append("  - ").append(ast).append("!")
-          .toString();
-    }
-    public String unknownExpressionOperation(AstNode ast) {
-      return new StringBuilder()
-          .append("Unknown EXPRESSION operation AST: ").append(ast.getClass()).append(System.lineSeparator())
+          .append("Unknown function in expression!").append(System.lineSeparator())
+          .append("Function: ").append(was).append(" !").append(System.lineSeparator())
+          .append(" AST: ").append(ast.getClass()).append(System.lineSeparator())
           .append("  - ").append(ast).append("!")
           .toString();
     }

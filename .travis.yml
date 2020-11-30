@@ -2,4 +2,4 @@ language: java
 env:
   - process.env.CI=false
 jdk:
-  - openjdk11
+  - openjdk15

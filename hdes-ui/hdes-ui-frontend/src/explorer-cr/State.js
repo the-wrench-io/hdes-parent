@@ -23,38 +23,42 @@ const ID = 'create'
 const init = {
   value: '',
   errors: [
-    {id: '1', value: 'name can not be empty'}
+    //{id: '1', value: 'name can not be empty'}
   ]
 }
 
-const actions = app => update => ({
-  init: () => app(({ actions }) => {
-  }),
+const actions = ({ actions, update }) => ({
+  init: () => { },
   setTypeName: (value) => {
     update(model => model.setIn([ID, 'value'], value))
   },
-  create: (type, name) => app(({ actions }) => {
-    const onSuccess = (entries) => actions.backend.model(() => {
-      entries.forEach(e => actions.explorer.openEntry(e.id));
-      actions.iconbar.toggleExplorer();
-    })
+  create: (type, name) => {
+    const onSuccess = (entries) => {
+      entries
+      .filter(e => e.type === type && e.name === name)
+      .forEach(e => actions.explorer.openEntry(e.id))
+
+      actions.explorer.setEntries(entries)
+      actions.iconbar.toggleExplorer()
+    }
 
     const onError = (errors) => {
+      console.log(errors)
       const result = errors.map(e => { return {id: e.id, value: e.defaultMessage}});
       update(model => model.setIn([ID, 'errors'], Immutable.fromJS(result)))
     };
     actions.backend.service.create({name: name, type: type}, onSuccess, onError)
-  }),
+  },
   deleteError: (id) => update(model => {
     const index = model.getIn([ID, 'errors']).findIndex(e => e.get('id') === id)
     return model.deleteIn([ID, 'errors', index])
   })
 })
 
-export const State = app => {
+export const State = store => {
   return {
     id: ID,
     initial: init,
-    actions: actions(app)
+    actions: actions(store)
   }
 }

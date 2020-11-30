@@ -7,6 +7,7 @@
     <version>999-SNAPSHOT</version>
   </parent>
   <artifactId>hdes-dev-app</artifactId>
+
   <dependencies>
     <dependency>
       <groupId>org.immutables</groupId>
@@ -29,12 +30,12 @@
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-qute</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-ui-quarkus</artifactId>
@@ -42,6 +43,14 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/hdes</directory>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>io.quarkus</groupId>
@@ -55,19 +64,24 @@
           </execution>
         </executions>
       </plugin>
+      
+      <!-- 
       <plugin>
-        <groupId>org.jboss.jandex</groupId>
-        <artifactId>jandex-maven-plugin</artifactId>
-        <version>1.0.7</version>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-maven-plugin</artifactId>
+        <version>${project.version}</version>
+        <configuration>
+          <package>io.resys.hdes.testproject</package>
+        </configuration>
         <executions>
           <execution>
-            <id>make-index</id>
             <goals>
-              <goal>jandex</goal>
+              <goal>hdes</goal>
             </goals>
           </execution>
         </executions>
       </plugin>
+       -->
     </plugins>
   </build>
 </project>
