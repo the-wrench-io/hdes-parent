@@ -118,6 +118,11 @@ public class ReturnTypeFlVisitor implements InvocationVisitor<TypeDef, TypeDef> 
     // find flow step
     Optional<Step> step = ctx.step().findStep(node.getValue(), body.getStep());
     if(step.isPresent()) {
+      
+      if(step.get().getAs().isPresent()) {
+        return ctx.step().getDefAs(step.get()).get();  
+      }
+      
       return ctx.step().getDef(step.get());
     }
     

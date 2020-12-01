@@ -1,5 +1,7 @@
 package io.resys.hdes.ast.spi.returntypes;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * hdes-ast
@@ -70,9 +72,14 @@ public class ReturnTypeFlStepAsDefVisitor implements FlowStepVisitor<List<TypeDe
 
   @Override
   public List<TypeDef> visitStepAs(StepAs stepAs, HdesTree ctx) {
-    final var next = ctx.next(stepAs);
-    final var mapping = mappingDef.visitObjectMappingDef(stepAs.getMapping(), next); 
-    return mapping.getValues();
+    final var next = ctx.next(stepAs);    
+    final List<TypeDef> result = new ArrayList<>();
+    
+    for(var def : stepAs.getMapping().getValues()) {
+      result.add(mappingDef.visitMappingDef(def, next));
+    }
+    
+    return result;
   }
 
   @Override

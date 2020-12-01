@@ -110,7 +110,7 @@ public class FlowWithDecisionAndDtTest {
         flow SimpleFlow {
         
           accepts { arg1 INTEGER, arg2 INTEGER }
-          returns { score INTEGER }
+          returns { total INTEGER }
           
           steps {
             
@@ -123,13 +123,13 @@ public class FlowWithDecisionAndDtTest {
             }
             
             Decision {
-              when { InitialScoring.score > 10 } then ExtraScoring
-              then end-as { InitialScoring.score } 
+              when { InitialScoring.total > 10 } then ExtraScoring
+              then end-as { InitialScoring.total } 
             }
           
             ExtraScoring {
               call Scoring { arg: arg2 }
-              then end-as { _score }
+              then end-as { total: _score }
             }
           }
         }

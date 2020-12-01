@@ -103,7 +103,7 @@ public class FlowInvocationVisitor extends DecisionTableInvocationVisitor implem
       value.add("$T.from(parent).step($S)", ClassName.get(GetTrace.class), node.getValue());
       
       ObjectDef returnDef = (ObjectDef) typeDef;
-      typeDef = returnDef;
+      
       if(returnDef.getValues().size() == 1) {
         StepCallDef call = (StepCallDef) returnDef.getValues().get(0);
         String dependencyId = call.getCallDef().getId().getValue();
@@ -123,6 +123,14 @@ public class FlowInvocationVisitor extends DecisionTableInvocationVisitor implem
           throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(node)); 
         }
       }
+    } else if(typeDef.getContext() == ContextTypeDef.STEP_AS) {
+      FlowUnit unit = ctx.get().node(FlowUnit.class);
+      FlowBody flow = ctx.get().node(FlowBody.class);
+      
+      Step step = ctx.step().findStep(node.getValue(), flow.getStep()).get();
+      value
+        .add("$T.from(parent).step($S)", ClassName.get(GetTrace.class), node.getValue())
+        .add(".body($T.class)", unit.getEndAs(step).getName());
       
 
     } else if(typeDef.getContext() == ContextTypeDef.ACCEPTS) {
@@ -131,9 +139,11 @@ public class FlowInvocationVisitor extends DecisionTableInvocationVisitor implem
         .add(".body($T.class)", ctx.get().node(FlowUnit.class).getType().getAccepts().getName())
         .add(".$L$L", JavaSpecUtil.methodCall(typeDef.getName()), typeDef.getRequired() ? "" : ".get()"); 
     } else if(typeDef.getContext() == ContextTypeDef.STEP_END) {
-      
 
     } else if(typeDef.getContext() == ContextTypeDef.RETURNS) {
+      value.add("." + JavaSpecUtil.methodCall(typeDef.getName()) + (typeDef.getRequired() ? "" : ".get()"));
+      
+    } else if(typeDef.getContext() == ContextTypeDef.EXPRESSION) {
       value.add("." + JavaSpecUtil.methodCall(typeDef.getName()) + (typeDef.getRequired() ? "" : ".get()")); 
     }
     return wrap(typeDef, value.build());
