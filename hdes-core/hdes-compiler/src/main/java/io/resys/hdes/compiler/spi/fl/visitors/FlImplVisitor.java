@@ -50,6 +50,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.IterationEndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
@@ -409,5 +410,11 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
         .execution(e -> {})
         .value(POINTER_VISITOR.visitIterationEndPointer(pointer, ctx).getValue())
         .build();
+  }
+
+  @Override
+  public FlSpec visitStepAs(StepAs stepAs, HdesTree ctx) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

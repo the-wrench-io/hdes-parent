@@ -167,8 +167,6 @@ public class FlPointerVisitor implements FlowPointerVisitor<FlSpec, FlSpec> {
 
   @Override
   public FlPointerSpec visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
-
-    
     return ImmutableFlPointerSpec.builder()
         .value(code -> code.addStatement("return ($T) parent", TraceEnd.class))
         .build();

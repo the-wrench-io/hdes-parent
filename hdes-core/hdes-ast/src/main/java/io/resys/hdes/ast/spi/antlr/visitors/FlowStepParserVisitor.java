@@ -38,6 +38,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.IterationEndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
@@ -223,11 +224,17 @@ public class FlowStepParserVisitor implements FlowStepVisitor<HdesNode, StepTree
   public HdesNode visitThenPointer(ThenPointer pointer, HdesTree ctx) {
     return pointer;
   }
+  
   @Override
-  public HdesNode visitCallDef(CallDef def, HdesTree ctx) {
-    throw new HdesException("Not implemented!");
+  public CallDef visitCallDef(CallDef def, HdesTree ctx) {
+    return def;
   }
 
+  @Override
+  public HdesNode visitStepAs(StepAs stepAs, HdesTree ctx) {
+    return stepAs;
+  }
+  
   @Value.Immutable
   public interface StepTree {
     Optional<Step> getStep();

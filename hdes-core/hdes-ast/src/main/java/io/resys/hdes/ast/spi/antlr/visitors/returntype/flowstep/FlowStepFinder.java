@@ -33,6 +33,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.IterationEndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
@@ -145,5 +146,10 @@ public class FlowStepFinder implements FlowStepVisitor<Optional<Step>, Optional<
   @Override
   public Optional<Step> visitCallDef(CallDef def, HdesTree ctx) {
     throw new HdesException(unknownAst(def));
+  }
+
+  @Override
+  public Optional<Step> visitStepAs(StepAs stepAs, HdesTree ctx) {
+    throw new HdesException(unknownAst(stepAs));
   }
 }

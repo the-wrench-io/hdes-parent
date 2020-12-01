@@ -44,6 +44,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.IterationEndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
@@ -249,6 +250,14 @@ public class FlWakeUpVisitor implements FlowBodyVisitor<FlSpec, FlSpec>, FlowSte
   }
   
   @Override
+  public FlExecSpec visitCallDef(CallDef def, HdesTree ctx) {
+    return ImmutableFlExecSpec.builder()
+        .execution(api -> {})
+        .value(code -> code.add(FlowMappingFactory.from(def, ctx)))
+        .build();
+  }
+  
+  @Override
   public FlSpec visitHeaders(Headers node, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
@@ -269,11 +278,13 @@ public class FlWakeUpVisitor implements FlowBodyVisitor<FlSpec, FlSpec>, FlowSte
   }
 
   @Override
-  public FlExecSpec visitCallDef(CallDef def, HdesTree ctx) {
-    return ImmutableFlExecSpec.builder()
-        .execution(api -> {})
-        .value(code -> code.add(FlowMappingFactory.from(def, ctx)))
-        .build();
+  public FlSpec visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
+    throw new IllegalArgumentException("not implemented");
+  }
+
+  @Override
+  public FlSpec visitStepAs(StepAs stepAs, HdesTree ctx) {
+    throw new IllegalArgumentException("not implemented");
   }
   
   private String wakeupMethodName(Step step) {
@@ -283,11 +294,5 @@ public class FlWakeUpVisitor implements FlowBodyVisitor<FlSpec, FlSpec>, FlowSte
         .append(name.substring(0, 1).toUpperCase())
         .append(name.length() == 1 ? "" : name.substring(1))
         .toString();
-  }
-
-  @Override
-  public FlSpec visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

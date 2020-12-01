@@ -46,6 +46,7 @@ import io.resys.hdes.ast.HdesParser.MappingValueContext;
 import io.resys.hdes.ast.HdesParser.PointerContext;
 import io.resys.hdes.ast.HdesParser.SortByArgContext;
 import io.resys.hdes.ast.HdesParser.SortByContext;
+import io.resys.hdes.ast.HdesParser.StepAsContext;
 import io.resys.hdes.ast.HdesParser.StepContext;
 import io.resys.hdes.ast.HdesParser.StepsContext;
 import io.resys.hdes.ast.HdesParser.ThenPointerContext;
@@ -64,6 +65,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.SortByDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
 import io.resys.hdes.ast.api.nodes.HdesNode;
@@ -86,6 +88,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableSortBy;
 import io.resys.hdes.ast.api.nodes.ImmutableSortByDef;
 import io.resys.hdes.ast.api.nodes.ImmutableSplitPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableStep;
+import io.resys.hdes.ast.api.nodes.ImmutableStepAs;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenPointer;
 import io.resys.hdes.ast.api.nodes.InvocationNode;
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
@@ -178,13 +181,23 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
     SimpleInvocation id = nodes.of(SimpleInvocation.class).get();
     StepAction action = nodes.of(StepAction.class).orElseGet(() -> ImmutableEmptyAction.builder().token(nodes.getToken()).build());
     StepPointer pointer = nodes.of(StepPointer.class).orElseGet(() -> ImmutableFwRedundentEmptyPointer.builder().token(nodes.getToken()).build());
+    Optional<StepAs> stepAs = nodes.of(StepAs.class);
     
     boolean await = false;
     if(action instanceof CallAction) {
       CallAction call = (CallAction) action;
       await = call.getCalls().stream().filter(c -> c.getAwait()).findFirst().map(c -> true).orElse(false);
     }
-    return ImmutableStep.builder().token(nodes.getToken()).id(id).action(action).pointer(pointer).await(await).build();
+    return ImmutableStep.builder().token(nodes.getToken()).id(id).action(action).pointer(pointer).await(await).as(stepAs).build();
+  }
+  
+  @Override
+  public StepAs visitStepAs(StepAsContext ctx) {
+    Nodes nodes = nodes(ctx);
+    return ImmutableStepAs.builder()
+        .token(nodes.getToken())
+        .mapping(nodes.of(ObjectMappingDef.class).get())
+        .build();
   }
   
   @Override

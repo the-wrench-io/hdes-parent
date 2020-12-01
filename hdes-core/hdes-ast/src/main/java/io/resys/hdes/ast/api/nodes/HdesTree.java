@@ -41,10 +41,14 @@ public interface HdesTree {
   // creates new context with this as parent
   HdesTree next(HdesNode next);
   
+  // tree related operations
   NodeGetQuery get();
   NodeFindQuery find();
   
+  // step related operations 
   StepQuery step();
+  
+  // type registry
   TypeDefAnyQuery any();
   TypeDefReturnsQuery returns();
 
@@ -68,6 +72,7 @@ public interface HdesTree {
   interface StepQuery {
     List<InvocationNode> getWakeUps(Optional<Step> start);
     ObjectDef getDef(Step target); // find def for the step
+    Optional<ObjectDef> getDefAs(Step target); // find def for the step
     Optional<Step> findStep(String id, Optional<Step> children); // get step with id from the children
     Optional<ObjectDef> findEnd(Optional<Step> step); // find end-as from the given steps
   }

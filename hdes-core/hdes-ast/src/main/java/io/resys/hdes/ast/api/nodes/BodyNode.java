@@ -50,7 +50,7 @@ public interface BodyNode extends HdesNode {
     CONSTANTS, MATCHES, EXPRESSION, 
     
     STEP_END, STEP_ITERATOR, 
-    STEP_CALL, STEP_RETURNS }
+    STEP_CALL, STEP_AS, STEP_RETURNS }
   
   enum ScalarType {
     STRING, INTEGER, BOOLEAN, DECIMAL,

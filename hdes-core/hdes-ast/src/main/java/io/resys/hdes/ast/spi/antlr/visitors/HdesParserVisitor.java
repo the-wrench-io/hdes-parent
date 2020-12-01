@@ -71,7 +71,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableObjectDef;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarDef;
 import io.resys.hdes.ast.api.nodes.ImmutableSimpleInvocation;
 import io.resys.hdes.ast.api.nodes.InvocationNode;
-import io.resys.hdes.ast.api.nodes.InvocationNode.EmptyPlaceholder;
+import io.resys.hdes.ast.api.nodes.InvocationNode.Placeholder;
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
 import io.resys.hdes.ast.spi.antlr.util.Nodes;
 
@@ -187,7 +187,8 @@ public class HdesParserVisitor extends FlowParserVisitor {
   @Override
   public HdesNode visitPlaceholderTypeName(PlaceholderTypeNameContext ctx) {
     HdesNode typeName = first(ctx);
-    if(ctx.getText().startsWith("_") && ctx.getText().length() > 1) {
+    
+    if(ctx.getText().startsWith("_") && ctx.getText().length() > 1 && typeName instanceof SimpleInvocation) {
       return ImmutableNamedPlaceholder.builder()
           .token(token(ctx))
           .value(((SimpleInvocation) typeName).getValue().substring(1))
@@ -197,7 +198,13 @@ public class HdesParserVisitor extends FlowParserVisitor {
   }
 
   @Override
-  public EmptyPlaceholder visitPlaceholderRule(PlaceholderRuleContext ctx) {
+  public Placeholder visitPlaceholderRule(PlaceholderRuleContext ctx) {
+    if(ctx.getText().startsWith("_") && ctx.getText().length() > 1) {
+      return ImmutableNamedPlaceholder.builder()
+          .token(token(ctx))
+          .value(ctx.getText().substring(1))
+          .build();
+    }
     return ImmutableEmptyPlaceholder.builder().token(token(ctx)).build();
   }
 

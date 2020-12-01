@@ -52,17 +52,61 @@ public class FlowWithDecisionAndDtTest {
   }
   
   @Test
-  public void simpleFlow() {
+  public void flowWithDecisionAndSplit() {
     String src = """
         decision-table Scoring {
-          accepts { arg INTEGER }
-          returns { score INTEGER }
-          
+          accepts { arg INTEGER } returns { score INTEGER }
           matches FIRST {
             when { _ between 1 and 30 } then { 10 }
             when { ? } then { 20 }
           }
         }
+
+        flow SimpleFlow {
+          accepts { arg1 INTEGER, arg2 INTEGER } returns { score INTEGER }
+          
+          steps {
+            
+            InitialScoring {
+              call Scoring { arg: arg1 } then Decision
+            }
+            
+            Decision {
+              when { InitialScoring.score > 10 } then ExtraScoring
+              then end-as { InitialScoring.score } 
+            }
+          
+            ExtraScoring {
+              call Scoring { arg: arg2 } then end-as { _score }
+            }
+          }
+        }
+        """;
+    
+    
+    TraceEnd output = TestUtil.runtime().src(src).build("SimpleFlow")
+        .accepts()
+        .value("arg1", 11)
+        .value("arg2", 2)
+        .build();
+    
+    Assertions.assertEquals("""
+      ---
+      score: 10
+      """, yaml(output.getBody()));
+  }
+  
+  @Test
+  public void flowWithParalDecisionAndSplit() {
+    String src = """
+        decision-table Scoring {
+          accepts { arg INTEGER } returns { score INTEGER }
+          matches FIRST {
+            when { _ between 1 and 30 } then { 10 }
+            when { ? } then { 20 }
+          }
+        }
+        
         flow SimpleFlow {
         
           accepts { arg1 INTEGER, arg2 INTEGER }
@@ -72,7 +116,10 @@ public class FlowWithDecisionAndDtTest {
             
             InitialScoring {
               call Scoring { arg: arg1 }
+              call Scoring { arg: arg2 }
               then Decision
+            } as {
+              total: _0.score + _1.score
             }
             
             Decision {

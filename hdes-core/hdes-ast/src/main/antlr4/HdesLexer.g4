@@ -66,10 +66,14 @@ STEPS: 'steps';
 CALL: 'call';
 AWAIT: 'await';
 CONTINUE: 'continue';
+
+
+// TODO replace with expression 
 FIND_FIRST: 'find-first';
 SORT_BY: 'sort-by';
 ASC: 'ASC';
 DESC: 'DESC';
+
 
 // SERVICE
 PROMISE: 'promise';
@@ -78,6 +82,7 @@ TIMEOUT: 'timeout';
 WHEN: 'when';
 THEN: 'then';
 END: 'end-as';
+AS: 'as';
 MAPS: 'maps';
 TO: 'to';
 

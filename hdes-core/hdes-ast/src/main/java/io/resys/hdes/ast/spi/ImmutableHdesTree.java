@@ -38,14 +38,15 @@ import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.InvocationNode;
 import io.resys.hdes.ast.api.nodes.RootNode;
 import io.resys.hdes.ast.api.nodes.ServiceNode.ServiceBody;
-import io.resys.hdes.ast.spi.antlr.visitors.returntype.ReturnTypeDtVisitor;
-import io.resys.hdes.ast.spi.antlr.visitors.returntype.ReturnTypeExpVisitor;
-import io.resys.hdes.ast.spi.antlr.visitors.returntype.ReturnTypeFlVisitor;
-import io.resys.hdes.ast.spi.antlr.visitors.returntype.ReturnTypeStVisitor;
-import io.resys.hdes.ast.spi.antlr.visitors.returntype.flowstep.FlowStepDefVisitor;
 import io.resys.hdes.ast.spi.antlr.visitors.returntype.flowstep.FlowStepEndFinder;
 import io.resys.hdes.ast.spi.antlr.visitors.returntype.flowstep.FlowStepFinder;
 import io.resys.hdes.ast.spi.antlr.visitors.returntype.flowstep.FlowWakeUpFinder;
+import io.resys.hdes.ast.spi.returntypes.ReturnTypeDtVisitor;
+import io.resys.hdes.ast.spi.returntypes.ReturnTypeExpVisitor;
+import io.resys.hdes.ast.spi.returntypes.ReturnTypeFlStepAsDefVisitor;
+import io.resys.hdes.ast.spi.returntypes.ReturnTypeFlStepDefVisitor;
+import io.resys.hdes.ast.spi.returntypes.ReturnTypeFlVisitor;
+import io.resys.hdes.ast.spi.returntypes.ReturnTypeStVisitor;
 import io.resys.hdes.ast.spi.util.Assertions;
 
 public class ImmutableHdesTree implements HdesTree {
@@ -57,6 +58,7 @@ public class ImmutableHdesTree implements HdesTree {
   private final ReturnTypeDtVisitor decisionTableInvocationReturnTypeVisitor = new ReturnTypeDtVisitor();
   private final ReturnTypeFlVisitor flowInvocationReturnTypeVisitor = new ReturnTypeFlVisitor();
   private final ReturnTypeStVisitor serviceInvocationReturnTypeVisitor = new ReturnTypeStVisitor();
+  private final ReturnTypeFlStepAsDefVisitor flStepAsDefVisitor = new ReturnTypeFlStepAsDefVisitor();
   
   private ImmutableHdesTree(Optional<HdesTree> parent, HdesNode value) {
     super();
@@ -180,10 +182,16 @@ public class ImmutableHdesTree implements HdesTree {
   
   @Override
   public TypeDefAnyQuery any() {
-    BodyNode body = getBody().get();
-    if(body instanceof ExpressionBody) {
-      HdesTree parent = get().ctx(ExpressionBody.class).getParent().get();
-      body = parent.get().body();
+    BodyNode body = null;
+    
+    HdesTree iterable = this;
+    while(iterable != null) {
+      iterable = iterable.get().ctx(BodyNode.class);
+      body = (BodyNode) iterable.getValue();
+      if(!(body instanceof ExpressionBody)) {
+        break;
+      }
+      iterable = iterable.getParent().get();
     }
     
     HdesTree ctx = this;
@@ -242,7 +250,7 @@ public class ImmutableHdesTree implements HdesTree {
       
       @Override
       public ObjectDef getDef(Step target) {
-        return (ObjectDef) new FlowStepDefVisitor().visitBody(target, ctx).getValue().get();
+        return (ObjectDef) new ReturnTypeFlStepDefVisitor().visitBody(target, ctx);
       }
       
       @Override
@@ -265,6 +273,11 @@ public class ImmutableHdesTree implements HdesTree {
           return Collections.emptyList();
         }
         return new FlowWakeUpFinder().visitBody(start.get(), ctx).getValues();
+      }
+
+      @Override
+      public Optional<ObjectDef> getDefAs(Step target) {
+        return flStepAsDefVisitor.visitBody(target, ctx);
       }
     };
   }

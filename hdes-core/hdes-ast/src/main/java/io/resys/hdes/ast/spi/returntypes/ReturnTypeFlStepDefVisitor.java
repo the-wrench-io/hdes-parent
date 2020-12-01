@@ -1,4 +1,7 @@
-package io.resys.hdes.ast.spi.antlr.visitors.returntype.flowstep;
+package io.resys.hdes.ast.spi.returntypes;
+
+import java.util.ArrayList;
+import java.util.Collections;
 
 /*-
  * #%L
@@ -40,6 +43,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.IterationEndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
@@ -50,9 +54,10 @@ import io.resys.hdes.ast.api.nodes.ImmutableObjectDef;
 import io.resys.hdes.ast.api.nodes.ImmutableScalarDef;
 import io.resys.hdes.ast.api.nodes.ImmutableStepCallDef;
 import io.resys.hdes.ast.api.visitors.FlowBodyVisitor.FlowStepVisitor;
-import io.resys.hdes.ast.spi.antlr.visitors.returntype.flowstep.FlowStepDefVisitor.FlowStepDefVisitorSpec;
 
-public class FlowStepDefVisitor implements FlowStepVisitor<FlowStepDefVisitorSpec, FlowStepDefVisitorSpec> {
+
+
+public class ReturnTypeFlStepDefVisitor implements FlowStepVisitor<List<TypeDef>, ObjectDef> {
 
   public interface FlowStepDefVisitorSpec {}
   
@@ -67,76 +72,75 @@ public class FlowStepDefVisitor implements FlowStepVisitor<FlowStepDefVisitorSpe
   }
   
   @Override
-  public SingleFlowStepDefVisitorSpec visitBody(Step step, HdesTree ctx) {
+  public ObjectDef visitBody(Step step, HdesTree ctx) {
     final var next = ctx.next(step);
-    return ImmutableSingleFlowStepDefVisitorSpec.builder()
-        .value(ImmutableObjectDef.builder()
-            .token(step.getToken())
-            .name(step.getId().getValue())
-            .required(true)
-            .array(false)
-            .context(ContextTypeDef.STEP_RETURNS)
-            .addAllValues(visitAction(step.getAction(), next).getValues())
-            .build())
-        .build();
+    final var action = visitAction(step.getAction(), next);
+    
+    return ImmutableObjectDef.builder()
+      .token(step.getToken())
+      .name(step.getId().getValue())
+      .required(true)
+      .array(false)
+      .context(ContextTypeDef.STEP_RETURNS)
+      .addAllValues(action)
+      .build();
   }
 
   @Override
-  public MultipleFlowStepDefVisitorSpec visitAction(StepAction action, HdesTree ctx) {
+  public List<TypeDef> visitAction(StepAction action, HdesTree ctx) {
     if(action instanceof CallAction) {
       return visitCallAction((CallAction) action, ctx);
     } else if(action instanceof IterateAction) {
       return visitIterateAction((IterateAction) action, ctx);
     }
-    return ImmutableMultipleFlowStepDefVisitorSpec.builder().build();
-    
+    return Collections.emptyList(); 
   }
 
   @Override
-  public MultipleFlowStepDefVisitorSpec visitCallAction(CallAction action, HdesTree ctx) {
+  public List<TypeDef> visitCallAction(CallAction action, HdesTree ctx) {
     final var next = ctx.next(action);
-    final var result = ImmutableMultipleFlowStepDefVisitorSpec.builder();
+    final List<TypeDef> result = new ArrayList<>();
     
     if (action.getCalls().size() > 1) {
       int index = 0;
       for (var call : action.getCalls()) {
-        result.addValues(ImmutableStepCallDef.builder().name("_" + index).index(index).callDef(call)
+        result.add(ImmutableStepCallDef.builder().name("_" + index).index(index).callDef(call)
             .token(call.getToken()).required(false).array(false).context(ContextTypeDef.STEP_CALL)
-            .values(visitCallDef(call, next).getValues()).build());
+            .values(visitCallDef(call, next)).build());
         index++;
       }
     } else if (action.getCalls().size() == 1) {
       CallDef call = action.getCalls().get(0);
-      result.addValues(
+      result.add(
           ImmutableStepCallDef.builder().token(call.getToken()).name("_").index(0).callDef(call).required(false)
-              .array(false).context(ContextTypeDef.STEP_CALL).values(visitCallDef(call, next).getValues()).build());
+              .array(false).context(ContextTypeDef.STEP_CALL).values(visitCallDef(call, next)).build());
     }
     
-    return result.build();
+    return result;
   }
 
   @Override
-  public MultipleFlowStepDefVisitorSpec visitCallDef(CallDef def, HdesTree ctx) {
+  public List<TypeDef> visitCallDef(CallDef def, HdesTree ctx) {
     final var dependency = ctx.getRoot().getBody(def.getId().getValue());
-    final var result = ImmutableMultipleFlowStepDefVisitorSpec.builder();
+    final List<TypeDef> result = new ArrayList<>();
     if(dependency instanceof DecisionTableBody) {
       DecisionTableBody dt = (DecisionTableBody) dependency;
       if(dt.getHitPolicy() instanceof HitPolicyAll) {
-        result.addValues(ImmutableObjectDef.builder()
+        result.add(ImmutableObjectDef.builder()
             .name("_")
             .array(true)
             .values(dependency.getHeaders().getReturnDefs())
             .build());
       }
-      result.addAllValues(dependency.getHeaders().getReturnDefs());      
+      result.addAll(dependency.getHeaders().getReturnDefs());      
     } else {
-      result.addAllValues(dependency.getHeaders().getReturnDefs());
+      result.addAll(dependency.getHeaders().getReturnDefs());
     }
-    return result.build();
+    return result;
   }
 
   @Override
-  public MultipleFlowStepDefVisitorSpec visitIterateAction(IterateAction action, HdesTree ctx) {
+  public List<TypeDef> visitIterateAction(IterateAction action, HdesTree ctx) {
     TypeDef iterator = ctx.returns().build(action.getOver()).getReturns();
     
     if(!iterator.getArray()) {
@@ -148,68 +152,53 @@ public class FlowStepDefVisitor implements FlowStepVisitor<FlowStepDefVisitorSpe
     }
 
     // Add iterator 
-    final var result = ImmutableMultipleFlowStepDefVisitorSpec.builder();
+    final List<TypeDef> result = new ArrayList<>();
     if(iterator instanceof ObjectDef) {
-      result.addValues(ImmutableObjectDef.builder().from(iterator).context(ContextTypeDef.STEP_ITERATOR).array(false).name("_").build());
+      result.add(ImmutableObjectDef.builder().from(iterator).context(ContextTypeDef.STEP_ITERATOR).array(false).name("_").build());
     } else if(iterator instanceof ScalarDef) {
-      result.addValues(ImmutableScalarDef.builder().from(iterator).context(ContextTypeDef.STEP_ITERATOR).array(false).name("_").build());
+      result.add(ImmutableScalarDef.builder().from(iterator).context(ContextTypeDef.STEP_ITERATOR).array(false).name("_").build());
     }
     
     // Add how the iteration ends
     Optional<ObjectDef> endAs = ctx.step().findEnd(action.getStep());
-    endAs.ifPresent(e -> result.addValues(e));
+    endAs.ifPresent(e -> result.add(e));
     
-    return result.build();
+    return result;
   }
 
   @Override
-  public SingleFlowStepDefVisitorSpec visitPointer(StepPointer pointer, HdesTree ctx) {
-    if(pointer instanceof EndPointer) {
-      return visitEndPointer((EndPointer) pointer, ctx);
-    } else if(pointer instanceof SplitPointer) {
-      return visitSplitPointer((SplitPointer) pointer, ctx);
-    } else if(pointer instanceof WhenPointer) {
-      return visitWhenPointer((WhenPointer) pointer, ctx);
-    } else if(pointer instanceof ThenPointer) {
-      return visitThenPointer((ThenPointer) pointer, ctx); 
-    } else if(pointer instanceof IterationEndPointer) {
-      return visitIterationEndPointer((IterationEndPointer) pointer, ctx);
-    }
+  public List<TypeDef> visitPointer(StepPointer pointer, HdesTree ctx) {
     throw new HdesException(unknownAst(pointer));
   }
 
   @Override
-  public SingleFlowStepDefVisitorSpec visitSplitPointer(SplitPointer pointer, HdesTree ctx) {
-    final var next = ctx.next(pointer);
-    for(var p : pointer.getValues()) {
-      var result = visitPointer(p, next);
-      if(result.getValue().isPresent()) {
-        return result;
-      }
-    }
-    return ImmutableSingleFlowStepDefVisitorSpec.builder().build();
+  public List<TypeDef> visitSplitPointer(SplitPointer pointer, HdesTree ctx) {
+    throw new HdesException(unknownAst(pointer));
   }
 
   @Override
-  public SingleFlowStepDefVisitorSpec visitWhenPointer(WhenPointer pointer, HdesTree ctx) {
-    final var next = ctx.next(pointer);
-    return visitPointer(pointer.getThen(), next);
+  public List<TypeDef> visitWhenPointer(WhenPointer pointer, HdesTree ctx) {
+    throw new HdesException(unknownAst(pointer));
   }
 
   @Override
-  public SingleFlowStepDefVisitorSpec visitThenPointer(ThenPointer pointer, HdesTree ctx) {
-    final var next = ctx.next(pointer);
-    return visitBody(pointer.getStep(), next);
+  public List<TypeDef> visitThenPointer(ThenPointer pointer, HdesTree ctx) {
+    throw new HdesException(unknownAst(pointer));
   }
 
   @Override
-  public SingleFlowStepDefVisitorSpec visitEndPointer(EndPointer pointer, HdesTree ctx) {
-    return ImmutableSingleFlowStepDefVisitorSpec.builder().build();
+  public List<TypeDef> visitEndPointer(EndPointer pointer, HdesTree ctx) {
+    throw new HdesException(unknownAst(pointer));
   }
   
   @Override
-  public SingleFlowStepDefVisitorSpec visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
-    return ImmutableSingleFlowStepDefVisitorSpec.builder().build();
+  public List<TypeDef> visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
+    throw new HdesException(unknownAst(pointer));
+  }
+  
+  @Override
+  public List<TypeDef> visitStepAs(StepAs stepAs, HdesTree ctx) {
+    throw new HdesException(unknownAst(stepAs));
   }
   
   private String unknownAst(HdesNode ast) {

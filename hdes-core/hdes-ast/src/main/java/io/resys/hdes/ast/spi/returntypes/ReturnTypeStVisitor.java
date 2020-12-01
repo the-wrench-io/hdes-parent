@@ -1,4 +1,4 @@
-package io.resys.hdes.ast.spi.antlr.visitors.returntype;
+package io.resys.hdes.ast.spi.returntypes;
 
 /*-
  * #%L
@@ -38,9 +38,10 @@ import io.resys.hdes.ast.api.nodes.InvocationNode.NamedPlaceholder;
 import io.resys.hdes.ast.api.nodes.InvocationNode.NestedInvocation;
 import io.resys.hdes.ast.api.nodes.InvocationNode.Placeholder;
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
+import io.resys.hdes.ast.api.nodes.ServiceNode.ServiceBody;
 import io.resys.hdes.ast.api.visitors.ExpressionVisitor.InvocationVisitor;
 
-public class ReturnTypeDtVisitor implements InvocationVisitor<TypeDef, TypeDef> {
+public class ReturnTypeStVisitor implements InvocationVisitor<TypeDef, TypeDef> {
 
   @Override
   public TypeDef visitBody(InvocationNode node, HdesTree ctx) {
@@ -76,15 +77,15 @@ public class ReturnTypeDtVisitor implements InvocationVisitor<TypeDef, TypeDef> 
       }
       
       iterator = iterator.getParent().get();
-    } while(!(iterator.getValue() instanceof DecisionTableBody));
+    } while(!(iterator.getValue() instanceof ServiceBody));
     
     if(lambdaObject != null && lambdaObject.getName().equals(node.getValue())) {
       return lambdaObject;
     }
     
-    DecisionTableBody body = ctx.get().node(DecisionTableBody.class);
+    ServiceBody body = ctx.get().node(ServiceBody.class);
     
-    // DT accepted section
+    // ST accepted section
     Optional<TypeDef> accepted = body.getHeaders().getAcceptDefs().stream()
         .filter(t -> t.getName().equals(node.getValue()))
         .findFirst();
@@ -92,7 +93,7 @@ public class ReturnTypeDtVisitor implements InvocationVisitor<TypeDef, TypeDef> 
       return accepted.get();
     }
     
-    // DT returns section
+    // ST returns section
     Optional<TypeDef> returns = body.getHeaders().getReturnDefs().stream()
         .filter(t -> t.getName().equals(node.getValue()))
         .findFirst();

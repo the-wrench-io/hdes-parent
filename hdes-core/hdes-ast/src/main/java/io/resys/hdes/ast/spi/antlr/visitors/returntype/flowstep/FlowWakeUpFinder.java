@@ -37,6 +37,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.IterationEndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
@@ -187,5 +188,10 @@ public class FlowWakeUpFinder implements FlowStepVisitor<FlowWakeUpSpec, FlowWak
         .append("Unknown AST: ").append(ast.getClass())
         .append("  - ").append(ast).append(System.lineSeparator())
         .toString();
+  }
+
+  @Override
+  public FlowWakeUpSpec visitStepAs(StepAs stepAs, HdesTree ctx) {
+    throw new HdesException(unknownAst(stepAs));
   }
 }

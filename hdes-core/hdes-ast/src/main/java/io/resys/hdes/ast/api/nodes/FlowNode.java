@@ -43,7 +43,14 @@ public interface FlowNode extends HdesNode {
     StepAction getAction();
     StepPointer getPointer();
     Boolean getAwait();
+    Optional<StepAs> getAs();
   }
+  
+  @Value.Immutable
+  interface StepAs extends FlowNode {
+    ObjectMappingDef getMapping();
+  }
+  
   
   /*
    * Step actions iterator, call, suspend

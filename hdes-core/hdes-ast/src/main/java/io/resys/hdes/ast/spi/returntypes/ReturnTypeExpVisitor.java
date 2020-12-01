@@ -1,4 +1,4 @@
-package io.resys.hdes.ast.spi.antlr.visitors.returntype;
+package io.resys.hdes.ast.spi.returntypes;
 
 /*-
  * #%L

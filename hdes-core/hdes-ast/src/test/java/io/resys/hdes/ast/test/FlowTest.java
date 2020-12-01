@@ -54,7 +54,7 @@ public class FlowTest {
           steps {
             firstTask { 
               when { arg2 > 10} then continue 
-              then continue }
+              then continue } as { classifier: 10 }
             nextTask {then end-as {} }
           }
         }

@@ -4,7 +4,8 @@ import TypeDefParser, ExpressionParser;
 
 flBody: simpleTypeName '{' headers 'steps' '{' steps '}' '}';
 steps: step*;
-step: simpleTypeName '{' (iterateAction | callAction ) pointer '}';
+step: simpleTypeName '{' (iterateAction | callAction ) pointer '}' stepAs?;
+stepAs: AS mapping;
 
 callAction: callDef*;
 callDef: ('call' | 'await') simpleTypeName mapping;

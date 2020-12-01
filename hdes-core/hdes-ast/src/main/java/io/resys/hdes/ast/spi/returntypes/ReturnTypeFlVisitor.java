@@ -1,4 +1,4 @@
-package io.resys.hdes.ast.spi.antlr.visitors.returntype;
+package io.resys.hdes.ast.spi.returntypes;
 
 /*-
  * #%L
@@ -237,25 +237,40 @@ public class ReturnTypeFlVisitor implements InvocationVisitor<TypeDef, TypeDef> 
   @Override
   public TypeDef visitNamedPlaceholder(NamedPlaceholder node, HdesTree ctx) {
     Optional<Step> step = ctx.find().node(Step.class);
-    if(step.isPresent()) {
-      ObjectDef stepDef = ctx.step().getDef(step.get());
-      Optional<TypeDef> def = stepDef.getValues().stream().filter(t -> t.getName().equals("_")).findFirst();
+    if(step.isEmpty()) {
+      throw new HdesException(
+          ImmutableErrorNode.builder()
+          .bodyId(ctx.get().body().getId().getValue())
+          .target(node)
+          .message("Can't find step for placeholder: '" + node.getValue() + "'!")
+          .build()); 
+    }
+    
+    ObjectDef stepDef = ctx.step().getDef(step.get());
+    
+    // default place
+    Optional<TypeDef> def = stepDef.getValues().stream().filter(t -> t.getName().equals("_")).findFirst();
+    if(def.isPresent()) {
+      StepCallDef type = (StepCallDef) def.get();
+      Optional<TypeDef> value = type.getValues().stream().filter(t -> t.getName().equals(node.getValue())).findFirst();
+      if(value.isPresent()) {
+        return value.get();
+      }
       
-      if(def.isPresent()) {
-        StepCallDef type = (StepCallDef) def.get();
-        Optional<TypeDef> value = type.getValues().stream().filter(t -> t.getName().equals(node.getValue())).findFirst();
-        if(value.isPresent()) {
-          return value.get();
-        }
+    } else {
+      Optional<TypeDef> callDefForOrder = stepDef.getValues().stream().filter(t -> t.getName().equals("_" + node.getValue())).findFirst();
+      if(callDefForOrder.isPresent()) {
+        return callDefForOrder.get();
       }
     }
     
+    
     throw new HdesException(
-      ImmutableErrorNode.builder()
-      .bodyId(ctx.get().body().getId().getValue())
-      .target(node)
-      .message("Unknown placeholder: '" + node.getValue() + "'!")
-      .build());
+        ImmutableErrorNode.builder()
+        .bodyId(ctx.get().body().getId().getValue())
+        .target(node)
+        .message("Unknown placeholder: '" + node.getValue() + "'!")
+        .build()); 
   }
   
   private String unknownInvocation(HdesNode ast) {

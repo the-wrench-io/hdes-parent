@@ -43,6 +43,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.IterationEndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.ThenPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
@@ -162,13 +163,15 @@ public class FlApiVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowStep
   @Override
   public FlHeaderSpec visitBody(Step step, HdesTree ctx) {
     final var next = ctx.next(step);
-    FlHeaderSpec action = visitAction(step.getAction(), next);
-    FlHeaderSpec pointer = visitPointer(step.getPointer(), next);
+    final var action = visitAction(step.getAction(), next);
+    final var pointer = visitPointer(step.getPointer(), next);
+    final var as = step.getAs().map(v -> visitStepAs(v, next));
     
     return ImmutableFlHeaderSpec.builder()
         .nested(api -> {
           action.getNested().accept(api);
           pointer.getNested().accept(api);
+          as.ifPresent(v -> v.getNested().accept(api));
         })
         .value(code -> {}).build();
   }
@@ -189,12 +192,11 @@ public class FlApiVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowStep
   @Override
   public FlHeaderSpec visitIterateAction(IterateAction action, HdesTree ctx) {
     final var unit = ctx.get().node(FlowUnit.class);
-    Step step = ctx.get().node(Step.class);
+    final var step = ctx.get().node(Step.class);
     Optional<ObjectDef> endDef = ctx.step().findEnd(action.getStep());
     if(endDef.isEmpty()) {
       return ImmutableFlHeaderSpec.builder().nested(api -> {}).value(code -> {}).build();
     }
-    
     
     Consumer<HdesDefSpec.ApiBuilder> nested = (api) -> {
       final var immutable = api.outputValue(unit.getEndAs(step).getName())
@@ -235,6 +237,28 @@ public class FlApiVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowStep
         .nested(api -> nested.forEach(v -> v.getNested().accept(api)))
         .value(code -> {}).build();
   }
+  
+  @Override
+  public FlHeaderSpec visitStepAs(StepAs stepAs, HdesTree ctx) {
+    final var unit = ctx.get().node(FlowUnit.class);
+    final var step = ctx.get().node(Step.class);
+    final var endDef = ctx.step().getDefAs(step).get();
+    
+    Consumer<HdesDefSpec.ApiBuilder> nested = (api) -> {
+      final var immutable = api
+          .outputValue(unit.getEndAs(step).getName())
+          .superinterface(TraceBody.class);
+      
+      for (TypeDef type : endDef.getValues()) {
+        FlHeaderSpec spec = visitHeader(type, ctx.next(type));
+        spec.getValue().accept(immutable);
+        spec.getNested().accept(api);
+      }
+      immutable.build();
+    };
+        
+    return ImmutableFlHeaderSpec.builder().nested(nested).value(code -> {}).build();
+  }
 
   @Override
   public FlHeaderSpec visitWhenPointer(WhenPointer pointer, HdesTree ctx) {
@@ -260,10 +284,9 @@ public class FlApiVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowStep
   public FlHeaderSpec visitCallDef(CallDef def, HdesTree ctx) {
     return ImmutableFlHeaderSpec.builder().nested(api -> {}).value(code -> {}).build();
   }
-
+  
   @Override
   public FlSpec visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
-    // TODO Auto-generated method stub
-    return null;
+    return ImmutableFlHeaderSpec.builder().nested(api -> {}).value(code -> {}).build();
   }
 }
