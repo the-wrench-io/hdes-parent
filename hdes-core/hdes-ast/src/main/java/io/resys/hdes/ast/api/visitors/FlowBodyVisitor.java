@@ -76,8 +76,10 @@ public interface FlowBodyVisitor<T, R> {
   
   interface FlowMappingDefVisitor<T, R> {
     R visitBody(EndPointer node, HdesTree ctx);
+    R visitBody(StepAs def, HdesTree ctx);
     R visitBody(CallDef def, HdesTree ctx);
     R visitBody(CallDef def, MappingEvent event, HdesTree ctx);
+    
     T visitMappingDef(MappingDef node, HdesTree ctx);
     T visitExpressionMappingDef(ExpressionMappingDef node, HdesTree ctx);
     T visitFastMappingDef(FastMappingDef node, HdesTree ctx);

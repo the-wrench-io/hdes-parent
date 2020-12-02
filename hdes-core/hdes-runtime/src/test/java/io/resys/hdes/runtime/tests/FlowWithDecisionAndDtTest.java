@@ -129,7 +129,7 @@ public class FlowWithDecisionAndDtTest {
           
             ExtraScoring {
               call Scoring { arg: arg2 }
-              then end-as { total: _score }
+              then end-as { total: _score + InitialScoring.total }
             }
           }
         }
@@ -144,7 +144,7 @@ public class FlowWithDecisionAndDtTest {
     
     Assertions.assertEquals("""
       ---
-      score: 10
+      total: 30
       """, yaml(output.getBody()));
   }
 }

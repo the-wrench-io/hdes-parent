@@ -96,44 +96,41 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
     return impl.build().build();
   }
   
-  private void addSteps(HdesDefSpec.ImplBuilder impl, FlowTree tree, FlowUnit unit) {
-    
-    final var code = CodeBlock.builder()
-        .addStatement(
-            "final var parent = $T.builder().id($S).body($L).build()", 
-            ImmutableTrace.class, "input", HdesDefSpec.ACCESS_INPUT_VALUE);
-
-    final var step = tree.getValue().getStep()
-        // step to code
-        .map(s -> visitStep(s, tree))
-        
-        // empty body
-        .orElseGet(() -> ImmutableFlExecSpec.builder().execution(e -> {})
-            .value(b -> b
-                .addStatement("final var returns = $T.builder().build()", ImmutableSpec.from(unit.getType().getReturns().getName()))
-                .addStatement("return $T.builder().id($S).time(System.currentTimeMillis()).parent(parent).body(returns).build()",
-                  ImmutableSpec.from(unit.getType().getReturnType().getName()), tree.getValue().getId().getValue())
-                )
-            .build());
-    step.getExecution().accept(impl);
-    step.getValue().accept(code);
-    impl.execution(code.build());
+  @Override
+  public FlExecSpec visitPointer(StepPointer pointer, HdesTree ctx) {
+    if(pointer instanceof EndPointer) {
+      return visitEndPointer((EndPointer) pointer, ctx);
+    } else if(pointer instanceof SplitPointer) {
+      return visitSplitPointer((SplitPointer) pointer, ctx);
+    } else if(pointer instanceof WhenPointer) {
+      return visitWhenPointer((WhenPointer) pointer, ctx);
+    } else if(pointer instanceof ThenPointer) {
+      return visitThenPointer((ThenPointer) pointer, ctx); 
+    } else if(pointer instanceof IterationEndPointer) {
+      return visitIterationEndPointer((IterationEndPointer) pointer, ctx); 
+    }
+    throw new IllegalArgumentException("not implemented");
   }
   
-  private void addContinue(HdesDefSpec.ImplBuilder impl, FlowTree tree) {
-    FlExecSpec continueSpec = new FlWakeUpVisitor().visitBody(tree);
-    
-    final var wakeup = CodeBlock.builder();
-    continueSpec.getValue().accept(wakeup);
-    
-    continueSpec.getExecution().accept(impl);
-    impl.wakeup(wakeup.build());
+  @Override
+  public FlExecSpec visitAction(StepAction action, HdesTree ctx) {
+    if(action instanceof CallAction) {
+      if(ctx.get().node(Step.class).getAwait()) {
+        return visitWaitForAction((CallAction) action, ctx);
+      }
+      
+      return visitCallAction((CallAction) action, ctx);      
+    } else if(action instanceof IterateAction) {
+      return visitIterateAction((IterateAction) action, ctx);
+    } else if(action instanceof EmptyAction) {
+      return ImmutableFlExecSpec.builder().execution(api -> {}).value(code -> {}).build();
+    }
+    throw new IllegalArgumentException("not implemented");
   }
-
+  
   @Override
   public FlExecSpec visitStep(Step step, HdesTree ctx) {
-    FlExecSpec body = visitBody(step, ctx);
-
+    final var body = visitBody(step, ctx);
     return ImmutableFlExecSpec.builder()
         .execution(body.getExecution())
         .value(b -> b.addStatement("return $L(parent)", visitMethodName(step, ctx)))
@@ -143,18 +140,17 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
   @Override
   public FlExecSpec visitBody(Step step, HdesTree ctx) {
     if(visited.contains(step.getToken())) {
-      return ImmutableFlExecSpec.builder()
-          .execution(impl -> {})
-          .value(code -> {})
-          .build();
+      return ImmutableFlExecSpec.builder().execution(impl -> {}).value(code -> {}).build();
     }
     visited.add(step.getToken());
+    
     
     final var next = ctx.next(step);
     final var children = visitPointer(step.getPointer(), next);
     final var action = visitAction(step.getAction(), next);
     final var insideIteration = ctx.find().ctx(IterateAction.class);
     final var unit = ctx.get().node(FlowUnit.class);
+    
     
     final ClassName returnType;
     if(insideIteration.isPresent()) {
@@ -163,10 +159,16 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
       returnType = unit.getType().getReturnType().getName();
     }
     
+    // step call/iteration/await etc...
     final var body = CodeBlock.builder();
     action.getValue().accept(body);
+    if(step.getAs().isPresent()) {
+      visitStepAs(step.getAs().get(), next).getValue().accept(body);
+    }
+    
+    // return next step to call
     children.getValue().accept(body);
-
+    
     final var method = MethodSpec.methodBuilder(visitMethodName(step, ctx))
         .addModifiers(Modifier.PROTECTED)
         .addParameter(ParameterSpec.builder(ClassName.get(Trace.class), "parent").build())
@@ -184,22 +186,6 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
         })
         .value(code -> {})
         .build();
-  }
-
-  @Override
-  public FlExecSpec visitPointer(StepPointer pointer, HdesTree ctx) {
-    if(pointer instanceof EndPointer) {
-      return visitEndPointer((EndPointer) pointer, ctx);
-    } else if(pointer instanceof SplitPointer) {
-      return visitSplitPointer((SplitPointer) pointer, ctx);
-    } else if(pointer instanceof WhenPointer) {
-      return visitWhenPointer((WhenPointer) pointer, ctx);
-    } else if(pointer instanceof ThenPointer) {
-      return visitThenPointer((ThenPointer) pointer, ctx); 
-    } else if(pointer instanceof IterationEndPointer) {
-      return visitIterationEndPointer((IterationEndPointer) pointer, ctx); 
-    }
-    throw new IllegalArgumentException("not implemented");
   }
   
   @Override
@@ -226,16 +212,16 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
 
   @Override
   public FlExecSpec visitThenPointer(ThenPointer pointer, HdesTree ctx) {
-    FlExecSpec next = visitBody(pointer.getStep(), ctx.next(pointer));
+    final var next = visitBody(pointer.getStep(), ctx.next(pointer));
+    final var body = CodeBlock.builder();
+    
+    if(!ctx.get().node(Step.class).getAwait()) {
+      POINTER_VISITOR.visitThenPointer(pointer, ctx).getValue().accept(body); 
+    }
     
     return ImmutableFlExecSpec.builder()
         .execution(next.getExecution())
-        .value(code -> { 
-          if(ctx.get().node(Step.class).getAwait()) {
-            return;
-          }
-          POINTER_VISITOR.visitThenPointer(pointer, ctx).getValue().accept(code); 
-        })
+        .value(code -> code.add(body.build()))
         .build();
   }
 
@@ -246,23 +232,6 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
         .value(POINTER_VISITOR.visitEndPointer(pointer, ctx).getValue())
         .build();
   }
-  
-  @Override
-  public FlExecSpec visitAction(StepAction action, HdesTree ctx) {
-    if(action instanceof CallAction) {
-      if(ctx.get().node(Step.class).getAwait()) {
-        return visitWaitForAction((CallAction) action, ctx);
-      }
-      
-      return visitCallAction((CallAction) action, ctx);      
-    } else if(action instanceof IterateAction) {
-      return visitIterateAction((IterateAction) action, ctx);
-    } else if(action instanceof EmptyAction) {
-      return ImmutableFlExecSpec.builder().execution(api -> {}).value(code -> {}).build();
-    }
-    throw new IllegalArgumentException("not implemented");
-  }
-
   @Override
   public FlExecSpec visitCallAction(CallAction action, HdesTree ctx) {    
     final var next = ctx.next(action);
@@ -330,7 +299,61 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
   }
 
 
-  private FlExecSpec visitWaitForAction(CallAction action, HdesTree ctx) {
+  @Override
+  public FlExecSpec visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
+    return ImmutableFlExecSpec.builder()
+        .execution(e -> {})
+        .value(POINTER_VISITOR.visitIterationEndPointer(pointer, ctx).getValue())
+        .build();
+  }
+
+  @Override
+  public FlExecSpec visitStepAs(StepAs stepAs, HdesTree ctx) {
+    final var step = ctx.get().node(Step.class);
+    final var as = FlowMappingFactory.from(stepAs, ctx);;
+    final var body = CodeBlock.builder().addStatement(
+        "parent = $T.builder().id($S).body($L).parent(parent).step()", 
+        ImmutableTrace.class, step.getId().getValue(), as).build();
+    
+    return ImmutableFlExecSpec.builder()
+        .execution(e -> {})
+        .value(b -> b.add(body))
+        .build();
+  }
+
+  
+  @Override
+  public FlExecSpec visitCallDef(CallDef def, HdesTree ctx) {
+    return ImmutableFlExecSpec.builder()
+        .execution(api -> {})
+        .value(code -> code.add(FlowMappingFactory.from(def, ctx)))
+        .build();
+  }
+  
+  private void addSteps(HdesDefSpec.ImplBuilder impl, FlowTree tree, FlowUnit unit) {
+    
+    final var code = CodeBlock.builder().addStatement(
+        "final var parent = $T.builder().id($S).body($L).build()", 
+        ImmutableTrace.class, "input", HdesDefSpec.ACCESS_INPUT_VALUE);
+
+    final var step = tree.getValue().getStep()
+        // step to code
+        .map(s -> visitStep(s, tree))
+        
+        // empty body
+        .orElseGet(() -> ImmutableFlExecSpec.builder().execution(e -> {})
+            .value(b -> b
+                .addStatement("final var returns = $T.builder().build()", ImmutableSpec.from(unit.getType().getReturns().getName()))
+                .addStatement("return $T.builder().id($S).time(System.currentTimeMillis()).parent(parent).body(returns).build()",
+                  ImmutableSpec.from(unit.getType().getReturnType().getName()), tree.getValue().getId().getValue())
+                )
+            .build());
+    step.getExecution().accept(impl);
+    step.getValue().accept(code);
+    impl.execution(code.build());
+  }
+
+  private static FlExecSpec visitWaitForAction(CallAction action, HdesTree ctx) {
     return ImmutableFlExecSpec.builder()
         .execution(api -> {})
         .value(code -> {
@@ -358,6 +381,35 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
         .build();
   }
   
+  public static String visitMethodName(Step step, HdesTree ctx) {
+    String name = step.getId().getValue();
+    
+    if(name.isEmpty()) {
+      Optional<HdesTree> iterate = ctx.find().ctx(IterateAction.class);
+      if(iterate.isPresent()) {
+        Step origin = iterate.get().get().node(Step.class);
+        name = origin.getId().getValue() + "_It";
+      }
+    }
+    
+    return new StringBuilder()
+        .append("visit")
+        .append(name.substring(0, 1).toUpperCase())
+        .append(name.length() == 1 ? "" : name.substring(1))
+        .toString();
+  }
+  
+  private static void addContinue(HdesDefSpec.ImplBuilder impl, FlowTree tree) {
+    FlExecSpec continueSpec = new FlWakeUpVisitor().visitBody(tree);
+    
+    final var wakeup = CodeBlock.builder();
+    continueSpec.getValue().accept(wakeup);
+    
+    continueSpec.getExecution().accept(impl);
+    impl.wakeup(wakeup.build());
+  }
+
+  
   @Override
   public FlSpec visitHeaders(Headers node, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
@@ -378,43 +430,4 @@ public class FlImplVisitor implements FlowBodyVisitor<FlSpec, TypeSpec>, FlowSte
     throw new IllegalArgumentException("not implemented");
   }
 
-  @Override
-  public FlExecSpec visitCallDef(CallDef def, HdesTree ctx) {
-    return ImmutableFlExecSpec.builder()
-        .execution(api -> {})
-        .value(code -> code.add(FlowMappingFactory.from(def, ctx)))
-        .build();
-  }
-
-  public static String visitMethodName(Step step, HdesTree ctx) {
-    String name = step.getId().getValue();
-    
-    if(name.isEmpty()) {
-      Optional<HdesTree> iterate = ctx.find().ctx(IterateAction.class);
-      if(iterate.isPresent()) {
-        Step origin = iterate.get().get().node(Step.class);
-        name = origin.getId().getValue() + "_It";
-      }
-    }
-    
-    return new StringBuilder()
-        .append("visit")
-        .append(name.substring(0, 1).toUpperCase())
-        .append(name.length() == 1 ? "" : name.substring(1))
-        .toString();
-  }
-
-  @Override
-  public FlExecSpec visitIterationEndPointer(IterationEndPointer pointer, HdesTree ctx) {
-    return ImmutableFlExecSpec.builder()
-        .execution(e -> {})
-        .value(POINTER_VISITOR.visitIterationEndPointer(pointer, ctx).getValue())
-        .build();
-  }
-
-  @Override
-  public FlSpec visitStepAs(StepAs stepAs, HdesTree ctx) {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

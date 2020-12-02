@@ -28,6 +28,7 @@ import com.squareup.javapoet.CodeBlock;
 
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.MappingNode.ExpressionMappingDef;
 import io.resys.hdes.ast.api.nodes.MappingNode.FastMappingDef;
@@ -44,7 +45,7 @@ import io.resys.hdes.compiler.spi.spec.ImmutableSpec;
 import io.resys.hdes.compiler.spi.units.CompilerNode;
 import io.resys.hdes.compiler.spi.units.CompilerNode.ServiceUnit;
 
-public class ServiceCallDefMappingDefVisitor implements FlowMappingDefVisitor<ServiceMappingSpec, ServiceMappingSpec> {
+public class ServiceCallDefMappingDefVisitor implements FlowMappingDefVisitor<ServiceMappingSpec, CodeBlock> {
 
 
   @Value.Immutable
@@ -53,12 +54,12 @@ public class ServiceCallDefMappingDefVisitor implements FlowMappingDefVisitor<Se
   }
   
   @Override
-  public ServiceMappingSpec visitBody(CallDef def, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef def, HdesTree ctx) {
     return visitBody(def, null, ctx);
   }
   
   @Override
-  public ServiceMappingSpec visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
     CompilerNode compilerNode = ctx.get().node(CompilerNode.class);
     String dependencyId = def.getId().getValue();
     ServiceBody body = (ServiceBody) ctx.getRoot().getBody(dependencyId);
@@ -74,9 +75,7 @@ public class ServiceCallDefMappingDefVisitor implements FlowMappingDefVisitor<Se
     final var result = CodeBlock.builder()
         .addStatement("final var $L = new $T().$L", call, impl, methodName);
     
-    return ImmutableServiceMappingSpec.builder()
-        .value(c -> c.add(result.build()))
-        .build();
+    return result.build();
   }
   
   private CodeBlock mappingEvent(MappingEvent event, CodeBlock mapping) {
@@ -149,7 +148,12 @@ public class ServiceCallDefMappingDefVisitor implements FlowMappingDefVisitor<Se
   }
 
   @Override
-  public ServiceMappingSpec visitBody(EndPointer node, HdesTree ctx) {
+  public CodeBlock visitBody(EndPointer node, HdesTree ctx) {
+    throw new IllegalArgumentException("not implemented");
+  }
+
+  @Override
+  public CodeBlock visitBody(StepAs def, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
 }

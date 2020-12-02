@@ -236,16 +236,35 @@ public class FlowInvocationVisitor extends DecisionTableInvocationVisitor implem
   public ExpCode visitNamedPlaceholder(NamedPlaceholder node, HdesTree ctx) {
     // step reference?
     Optional<Step> step = ctx.find().node(Step.class);
-    if(step.isPresent()) {
-      TypeDefReturns returns = ctx.returns().build(node);
-      
-      StepAction action = step.get().getAction();      
-      if(action instanceof CallAction) {
-        CodeBlock value = CodeBlock.builder().add("call.getBody().$L()", JavaSpecUtil.getMethodName(node.getValue())).build();
-        return wrap(returns.getReturns(), value);
-      }
-      
+    if(step.isEmpty()) {
+      throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(node));
     }
+    
+    TypeDefReturns returns = ctx.returns().build(node);
+    StepAction action = step.get().getAction();      
+    
+    if(!(action instanceof CallAction)) {
+      throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(node));
+    }
+    
+    CallAction calls = (CallAction) action;
+    if(calls.getCalls().size() == 1) {
+      CodeBlock value = CodeBlock.builder().add("call.getBody().$L()", JavaSpecUtil.getMethodName(node.getValue())).build();
+      return wrap(returns.getReturns(), value);      
+    }
+    
+    try {
+      int index = Integer.parseInt(node.getValue());
+      Optional<CallDef> call = calls.getCalls().stream().filter(c -> c.getIndex().get().equals(index)).findFirst();
+      if(call.isPresent()) {
+        
+        CodeBlock value = CodeBlock.builder().add("call$L.getBody()", index).build();
+        return wrap(returns.getReturns(), value); 
+      }
+    } catch(Exception e) {
+      // nothing to handle, unknown node
+    }
+
     throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(node));
   }
   

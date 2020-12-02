@@ -1,25 +1,5 @@
 package io.resys.hdes.compiler.spi.fl.visitors.mapping;
 
-/*-
- * #%L
- * hdes-compiler
- * %%
- * Copyright (C) 2020 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
 import java.util.function.Consumer;
 
 import org.immutables.value.Value;
@@ -29,6 +9,7 @@ import com.squareup.javapoet.CodeBlock;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.MappingNode.ExpressionMappingDef;
 import io.resys.hdes.ast.api.nodes.MappingNode.FastMappingDef;
@@ -44,8 +25,7 @@ import io.resys.hdes.compiler.spi.spec.ImmutableSpec;
 import io.resys.hdes.compiler.spi.units.CompilerNode;
 import io.resys.hdes.compiler.spi.units.CompilerNode.FlowUnit;
 
-public class FlowCallDefMappingDefVisitor implements FlowMappingDefVisitor<FlowMappingSpec, FlowMappingSpec> {
-
+public class FlowCallDefMappingDefVisitor implements FlowMappingDefVisitor<FlowMappingSpec, CodeBlock> {
 
   @Value.Immutable
   public interface FlowMappingSpec extends FlSpec {
@@ -53,7 +33,7 @@ public class FlowCallDefMappingDefVisitor implements FlowMappingDefVisitor<FlowM
   }
   
   @Override
-  public FlowMappingSpec visitBody(CallDef def, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef def, HdesTree ctx) {
     CompilerNode compilerNode = ctx.get().node(CompilerNode.class);
     String dependencyId = def.getId().getValue();
     FlowBody body = (FlowBody) ctx.getRoot().getBody(dependencyId);
@@ -67,9 +47,7 @@ public class FlowCallDefMappingDefVisitor implements FlowMappingDefVisitor<FlowM
     final var result = CodeBlock.builder()
         .addStatement("final var $L = new $T().apply($L)", call, impl, mapping.build());
     
-    return ImmutableFlowMappingSpec.builder()
-        .value(c -> c.add(result.build()))
-        .build();
+    return result.build();
   }
   
   @Override
@@ -129,12 +107,17 @@ public class FlowCallDefMappingDefVisitor implements FlowMappingDefVisitor<FlowM
   }
 
   @Override
-  public FlowMappingSpec visitBody(EndPointer node, HdesTree ctx) {
+  public CodeBlock visitBody(EndPointer node, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
 
   @Override
-  public FlowMappingSpec visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+    throw new IllegalArgumentException("not implemented");
+  }
+
+  @Override
+  public CodeBlock visitBody(StepAs def, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
 }

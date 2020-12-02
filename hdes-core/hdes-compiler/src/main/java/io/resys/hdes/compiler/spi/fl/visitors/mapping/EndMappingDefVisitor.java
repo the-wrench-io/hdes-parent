@@ -30,6 +30,7 @@ import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.IterateAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.MappingNode.ExpressionMappingDef;
 import io.resys.hdes.ast.api.nodes.MappingNode.FastMappingDef;
@@ -45,7 +46,7 @@ import io.resys.hdes.compiler.spi.spec.ImmutableSpec;
 import io.resys.hdes.compiler.spi.units.CompilerNode.CompilerEntry;
 import io.resys.hdes.compiler.spi.units.CompilerNode.FlowUnit;
 
-public class EndMappingDefVisitor implements FlowMappingDefVisitor<FlEndMappingSpec, FlEndMappingSpec> {
+public class EndMappingDefVisitor implements FlowMappingDefVisitor<FlEndMappingSpec, CodeBlock> {
   
   @Value.Immutable
   public interface FlEndMappingSpec extends FlSpec {
@@ -53,7 +54,7 @@ public class EndMappingDefVisitor implements FlowMappingDefVisitor<FlEndMappingS
   }
   
   @Override
-  public FlEndMappingSpec visitBody(EndPointer node, HdesTree ctx) {
+  public CodeBlock visitBody(EndPointer node, HdesTree ctx) {
     final var unit = ctx.get().node(FlowUnit.class);
     final var next = ctx.next(node).next(node.getMapping());
     
@@ -67,14 +68,13 @@ public class EndMappingDefVisitor implements FlowMappingDefVisitor<FlEndMappingS
     }
     
     final var body = CodeBlock.builder()
+        .add("\r\n  ")
         .add("$T.builder()", ImmutableSpec.from(returnType.getName()));
 
     node.getMapping().getValues()
       .forEach(def -> visitMappingDef(def, next).getValue().accept(body));
     
-    return ImmutableFlEndMappingSpec.builder()
-        .value(code -> code.add("\r\n  ").add("$L.build()", body.build()))
-        .build();
+    return body.add(".build()").build();
   }
 
   @Override
@@ -131,12 +131,17 @@ public class EndMappingDefVisitor implements FlowMappingDefVisitor<FlEndMappingS
   }
 
   @Override
-  public FlEndMappingSpec visitBody(CallDef node, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef node, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
 
   @Override
-  public FlEndMappingSpec visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+    throw new IllegalArgumentException("not implemented");
+  }
+
+  @Override
+  public CodeBlock visitBody(StepAs def, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
 }

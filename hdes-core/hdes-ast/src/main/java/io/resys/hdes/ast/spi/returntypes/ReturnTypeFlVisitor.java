@@ -90,6 +90,15 @@ public class ReturnTypeFlVisitor implements InvocationVisitor<TypeDef, TypeDef> 
       return lambdaObject;
     }
     
+    
+    if(ctx.getValue() instanceof StepCallDef) {
+      StepCallDef def = (StepCallDef) ctx.getValue();
+      Optional<TypeDef> nested = def.getValues().stream().filter(s -> s.getName().equals(node.getValue())).findFirst();
+      if(nested.isPresent()) {
+        return nested.get();
+      }
+    }
+    
     // find node on parent
     if(ctx.getValue() instanceof ObjectDef) {
       ObjectDef def = (ObjectDef) ctx.getValue();

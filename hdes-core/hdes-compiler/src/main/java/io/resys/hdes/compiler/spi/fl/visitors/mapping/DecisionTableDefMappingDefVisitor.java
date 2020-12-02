@@ -29,6 +29,7 @@ import com.squareup.javapoet.CodeBlock;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.MappingNode.ExpressionMappingDef;
 import io.resys.hdes.ast.api.nodes.MappingNode.FastMappingDef;
@@ -44,7 +45,7 @@ import io.resys.hdes.compiler.spi.spec.ImmutableSpec;
 import io.resys.hdes.compiler.spi.units.CompilerNode;
 import io.resys.hdes.compiler.spi.units.CompilerNode.DecisionTableUnit;
 
-public class DecisionTableDefMappingDefVisitor implements FlowMappingDefVisitor<DtMappingSpec, DtMappingSpec> {
+public class DecisionTableDefMappingDefVisitor implements FlowMappingDefVisitor<DtMappingSpec, CodeBlock> {
 
 
   @Value.Immutable
@@ -53,7 +54,7 @@ public class DecisionTableDefMappingDefVisitor implements FlowMappingDefVisitor<
   }
   
   @Override
-  public DtMappingSpec visitBody(CallDef def, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef def, HdesTree ctx) {
     CompilerNode compilerNode = ctx.get().node(CompilerNode.class);
     String dependencyId = def.getId().getValue();
     DecisionTableBody body = (DecisionTableBody) ctx.getRoot().getBody(dependencyId);
@@ -64,11 +65,8 @@ public class DecisionTableDefMappingDefVisitor implements FlowMappingDefVisitor<
         
     final var call = def.getIndex().map(index -> "call" + index).orElse("call");
     final var impl = unit.getType().getImpl().getName();
-    final var result = CodeBlock.builder()
-        .addStatement("final var $L = new $T().apply($L)", call, impl, mapping.build());
-    
-    return ImmutableDtMappingSpec.builder()
-        .value(c -> c.add(result.build()))
+    return  CodeBlock.builder().addStatement(
+        "final var $L = new $T().apply($L)", call, impl, mapping.build())
         .build();
   }
   
@@ -129,12 +127,17 @@ public class DecisionTableDefMappingDefVisitor implements FlowMappingDefVisitor<
   }
 
   @Override
-  public DtMappingSpec visitBody(EndPointer node, HdesTree ctx) {
+  public CodeBlock visitBody(EndPointer node, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
 
   @Override
-  public DtMappingSpec visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+  public CodeBlock visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+    throw new IllegalArgumentException("not implemented");
+  }
+
+  @Override
+  public CodeBlock visitBody(StepAs def, HdesTree ctx) {
     throw new IllegalArgumentException("not implemented");
   }
 }

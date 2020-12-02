@@ -7,6 +7,7 @@ import io.resys.hdes.ast.api.nodes.BodyNode.ScalarDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.HdesNode;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectDef;
@@ -87,6 +88,11 @@ public class FlowStepMappingDef implements FlowMappingDefVisitor<TypeDef, TypeDe
   
   @Override
   public TypeDef visitBody(CallDef def, MappingEvent event, HdesTree ctx) {
+    throw new HdesException(unknownAst(def));
+  }
+  
+  @Override
+  public TypeDef visitBody(StepAs def, HdesTree ctx) {
     throw new HdesException(unknownAst(def));
   }
   

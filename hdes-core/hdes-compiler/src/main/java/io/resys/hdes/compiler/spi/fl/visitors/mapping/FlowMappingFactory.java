@@ -26,6 +26,7 @@ import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
+import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.ServiceNode.ServiceBody;
 import io.resys.hdes.ast.api.visitors.FlowBodyVisitor.MappingEvent;
@@ -34,38 +35,33 @@ import io.resys.hdes.compiler.api.HdesCompilerException;
 public class FlowMappingFactory {
   
   public static CodeBlock from(EndPointer end, HdesTree tree) {
-    final var result = CodeBlock.builder();
-    new EndMappingDefVisitor().visitBody(end, tree).getValue().accept(result);
-    return result.build();
+    return new EndMappingDefVisitor().visitBody(end, tree);
   }
   
+  public static CodeBlock from(StepAs stepAs, HdesTree tree) {
+    return new StepAsMappingDefVisitor().visitBody(stepAs, tree);
+  }
+
   public static CodeBlock from(CallDef def, HdesTree ctx) {
     final var dependencyId = def.getId().getValue();
     final var dependencyNode = ctx.getRoot().getBody(dependencyId); 
-    final var result = CodeBlock.builder();
     
     if(dependencyNode instanceof DecisionTableBody) {
-      new DecisionTableDefMappingDefVisitor().visitBody(def, ctx).getValue().accept(result);
+      return new DecisionTableDefMappingDefVisitor().visitBody(def, ctx);
     } else if(dependencyNode instanceof FlowBody) {
-      new FlowCallDefMappingDefVisitor().visitBody(def, ctx).getValue().accept(result);
+      return new FlowCallDefMappingDefVisitor().visitBody(def, ctx);
     } else if(dependencyNode instanceof ServiceBody) {
-      new ServiceCallDefMappingDefVisitor().visitBody(def, ctx).getValue().accept(result);
-    } else {
-      throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(def));
+      return new ServiceCallDefMappingDefVisitor().visitBody(def, ctx);
     }
-    return result.build();
+    throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(def));
   }
   
   public static CodeBlock from(CallDef def, MappingEvent event, HdesTree ctx) {
     final var dependencyId = def.getId().getValue();
     final var dependencyNode = ctx.getRoot().getBody(dependencyId); 
-    final var result = CodeBlock.builder();
-    
     if(dependencyNode instanceof ServiceBody) {
-      new ServiceCallDefMappingDefVisitor().visitBody(def, event, ctx).getValue().accept(result);
-    } else {
-      throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(def));
+      return new ServiceCallDefMappingDefVisitor().visitBody(def, event, ctx);
     }
-    return result.build();
+    throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(def));
   }
 }
