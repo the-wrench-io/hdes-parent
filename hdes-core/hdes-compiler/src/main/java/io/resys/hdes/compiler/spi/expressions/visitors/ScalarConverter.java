@@ -52,7 +52,7 @@ public class ScalarConverter {
   }
   
   private static boolean temporalType(ScalarType t) {
-    return t == ScalarType.DATE || t == ScalarType.DATE_TIME || t == ScalarType.TIME;
+    return t == ScalarType.DATE || t == ScalarType.DATETIME || t == ScalarType.TIME;
   }
   
   private static boolean isDecimalConvert(ScalarType type1, ScalarType type2) {

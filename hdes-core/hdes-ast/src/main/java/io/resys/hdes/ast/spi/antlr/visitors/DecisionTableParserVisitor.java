@@ -29,7 +29,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
 import io.resys.hdes.ast.HdesParser;
-import io.resys.hdes.ast.HdesParser.DtBodyContext;
+import io.resys.hdes.ast.HdesParser.DecisionTableUnitContext;
 import io.resys.hdes.ast.HdesParser.HitPolicyContext;
 import io.resys.hdes.ast.HdesParser.MappingFromContext;
 import io.resys.hdes.ast.HdesParser.MappingPolicyContext;
@@ -100,7 +100,7 @@ public class DecisionTableParserVisitor extends ExpressionParserVisitor {
   }  
   
   @Override
-  public DecisionTableBody visitDtBody(DtBodyContext ctx) {
+  public DecisionTableBody visitDecisionTableUnit(DecisionTableUnitContext ctx) {
     final Nodes children = nodes(ctx);
     final Headers headers = children.of(Headers.class).get();
     

@@ -21,14 +21,17 @@ package io.resys.hdes.ast.api.nodes;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.ast.api.nodes.InvocationNode.MathMethodType;
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
+import io.resys.hdes.ast.api.nodes.InvocationNode.StaticMethodType;
 
 public interface ExpressionNode extends HdesNode {
   enum AdditiveType { ADD, SUBSTRACT }
+  enum MappingType { MAP, FILTER, SORT }
+  
   enum MultiplicativeType { DIVIDE, MULTIPLY }
   enum EqualityType { 
     NOTEQUAL("!="), EQUAL("="), 
@@ -127,15 +130,24 @@ public interface ExpressionNode extends HdesNode {
   interface MethodInvocation extends ExpressionNode {}
   
   @Value.Immutable
-  interface MathOperationExpression extends MethodInvocation {
-    MathMethodType getType();
+  interface StaticMethodInvocation extends MethodInvocation {
+    StaticMethodType getType();
     List<HdesNode> getValues();
   }
   
   @Value.Immutable
-  interface LambdaMapExpression extends MethodInvocation {
+  interface MapperMethodInvocation extends MethodInvocation {
+    SimpleInvocation getName();
+    List<HdesNode> getValues();
+  }
+  
+  @Value.Immutable
+  interface LambdaExpression extends MethodInvocation {    
     InvocationNode getType();
-    SimpleInvocation getIterable();
+    SimpleInvocation getParam();
+    MappingType getMappingType();
     HdesNode getBody();
+    
+    Optional<HdesNode> getNext();
   }
 }

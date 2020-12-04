@@ -2,26 +2,22 @@ parser grammar FlowParser;
 options { tokenVocab = HdesLexer; }
 import TypeDefParser, ExpressionParser;
 
-flBody: simpleTypeName '{' headers 'steps' '{' steps '}' '}';
+flowUnit: simpleTypeName '{' headers STEPS '{' steps '}' '}';
 steps: step*;
 step: simpleTypeName '{' (iterateAction | callAction ) pointer '}' stepAs?;
 stepAs: AS mapping;
 
 callAction: callDef*;
-callDef: ('call' | 'await') simpleTypeName mapping;
+callDef: (CALL | AWAIT) simpleTypeName mapping;
 
-iterateAction: 'maps' typeName 'to' '{' iterateBody '}' where? sortBy? findFirst?;
+iterateAction: MAP typeName TO '{' iterateBody '}';
 iterateBody: callAction | steps;
 
-sortBy: 'sort-by' '{' sortByArg* '}';
-sortByArg: typeName ('ASC' | 'DESC')?;
+pointer: whenThenPointerArgs | thenPointer;
+whenThenPointerArgs: (whenThenPointer (whenThenPointer)* elsePointer?) | thenPointer?; 
+whenThenPointer: WHEN '(' expressionUnit ')' thenPointer;
+elsePointer: ELSE thenPointer;
 
-findFirst: 'find-first';
-where: WHERE enBody (AND enBody)*;
-
-pointer: whenThenPointerArgs || thenPointer;
-whenThenPointerArgs: whenThenPointer (whenThenPointer)* thenPointer?; 
-whenThenPointer: 'when' '{' enBody '}' thenPointer;
-thenPointer: 'then' (endAsPointer | continuePointer | simpleTypeName);
+thenPointer: (RETURN (endAsPointer | simpleTypeName)) | continuePointer;
 continuePointer: CONTINUE;
-endAsPointer: 'end-as' mapping;
+endAsPointer: mapping;

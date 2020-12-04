@@ -31,11 +31,11 @@ import io.resys.hdes.ast.HdesParser.ConditionalAndExpressionContext;
 import io.resys.hdes.ast.HdesParser.ConditionalExpressionContext;
 import io.resys.hdes.ast.HdesParser.ConditionalOrExpressionContext;
 import io.resys.hdes.ast.HdesParser.DebugValueContext;
-import io.resys.hdes.ast.HdesParser.DtBodyContext;
-import io.resys.hdes.ast.HdesParser.EnBodyContext;
+import io.resys.hdes.ast.HdesParser.DecisionTableUnitContext;
 import io.resys.hdes.ast.HdesParser.EqualityExpressionContext;
 import io.resys.hdes.ast.HdesParser.ExpressionContext;
-import io.resys.hdes.ast.HdesParser.FlBodyContext;
+import io.resys.hdes.ast.HdesParser.ExpressionUnitContext;
+import io.resys.hdes.ast.HdesParser.FlowUnitContext;
 import io.resys.hdes.ast.HdesParser.FormulaContext;
 import io.resys.hdes.ast.HdesParser.HdesBodyContext;
 import io.resys.hdes.ast.HdesParser.HeadersContext;
@@ -138,9 +138,9 @@ public class ConsoleParserVisitor extends HdesParserBaseVisitor<HdesNode> {
   }
 
   @Override
-  public HdesNode visitDtBody(DtBodyContext ctx) {
+  public HdesNode visitDecisionTableUnit(DecisionTableUnitContext ctx) {
     log(ctx);
-    return super.visitDtBody(ctx);
+    return super.visitDecisionTableUnit(ctx);
   }
 
   @Override
@@ -168,9 +168,9 @@ public class ConsoleParserVisitor extends HdesParserBaseVisitor<HdesNode> {
   }
 
   @Override
-  public HdesNode visitEnBody(EnBodyContext ctx) {
+  public HdesNode visitExpressionUnit(ExpressionUnitContext ctx) {
     log(ctx);
-    return super.visitEnBody(ctx);
+    return super.visitExpressionUnit(ctx);
   }
 
   @Override
@@ -240,9 +240,9 @@ public class ConsoleParserVisitor extends HdesParserBaseVisitor<HdesNode> {
   }
 
   @Override
-  public HdesNode visitFlBody(FlBodyContext ctx) {
+  public HdesNode visitFlowUnit(FlowUnitContext ctx) {
     log(ctx);
-    return super.visitFlBody(ctx);
+    return super.visitFlowUnit(ctx);
   }
   
   @Override

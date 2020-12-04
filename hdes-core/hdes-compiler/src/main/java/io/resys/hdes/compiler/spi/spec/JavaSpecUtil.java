@@ -70,7 +70,7 @@ public class JavaSpecUtil {
       return boolean.class;
     case DATE:
       return LocalDate.class;
-    case DATE_TIME:
+    case DATETIME:
       return LocalDateTime.class;
     case TIME:
       return LocalTime.class;

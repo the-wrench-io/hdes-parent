@@ -28,7 +28,7 @@ import io.resys.hdes.ast.api.nodes.BodyNode.ObjectDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.ScalarDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaMapExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
 import io.resys.hdes.ast.api.nodes.HdesNode;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
@@ -71,7 +71,7 @@ public class ReturnTypeStVisitor implements InvocationVisitor<TypeDef, TypeDef> 
     ObjectDef lambdaObject = null;
     do {
       
-      if(iterator.getParent().get().getValue() instanceof LambdaMapExpression) {
+      if(iterator.getParent().get().getValue() instanceof LambdaExpression) {
         lambdaObject = (ObjectDef) iterator.getValue();
         break;
       }

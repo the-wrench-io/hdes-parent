@@ -17,11 +17,25 @@ methodName: simpleTypeName;
 
 // method invocation
 methodInvocation
-  : methodName '(' methodArgs? ')'
-  | typeName '.' methodName '(' methodArgs? ')' ('.' expression)?;
+  : staticMethodInvocation
+  | mapperMethodInvocation 
+  | mappingInvocation;
+
+staticMethodInvocation: StaticMethod '(' methodArgs? ')';
+mapperMethodInvocation: methodName '(' methodArgs? ')' ('.' typeInvocation)?;
+
+typeInvocation: typeName | boundMethod | mappingInvocation;
+mappingInvocation: typeName '.' boundMethod ('.' typeInvocation)?;
+boundMethod: mapMethod | filterMethod | sortMethod;
+mapMethod: MAP '(' lambdaExpression ')';
+filterMethod: TM_FILTER '(' lambdaExpression ')';
+sortMethod: TM_SORT '(' lambdaExpression ')';
+findFirstMethod: TM_FIND_FIRST '(' ')';
+
 
 methodArgs: methodArg (',' methodArg)*;
 methodArg: expression;
+
 
 primary
   : literal
@@ -30,7 +44,7 @@ primary
   | methodInvocation;
 
 // final output
-enBody: expression;
+expressionUnit: expression;
 
 // expressions
 expression: conditionalExpression | primary | lambdaExpression;
@@ -42,7 +56,7 @@ lambdaBody: primary;
 
 conditionalExpression
   : conditionalOrExpression
-  | conditionalOrExpression IN '(' expression (',' expression)* ')'
+  | conditionalOrExpression StaticMethod '(' expression (',' expression)* ')'
   | conditionalOrExpression BETWEEN expression AND conditionalExpression
   | conditionalOrExpression '?' expression ':' conditionalExpression; 
 

@@ -47,7 +47,7 @@ public class ExpressionTest {
       .add("_ > 40", ScalarType.BOOLEAN)
       .add("_field1 > 40", ScalarType.BOOLEAN)
       .add("GetX.values._field1 > 40", ScalarType.INTEGER).build();
-    matches(node, "invocation");
+    assertNode(node, "invocation");
   }
 
   @Test
@@ -57,7 +57,7 @@ public class ExpressionTest {
         .add("stepx._value1 >= 20 ? 30 : 40", ScalarType.INTEGER)
         .add("_value1 >= 20 ? 30 : 40", ScalarType.INTEGER).build();
     
-    matches(node, "placeholderExpression");
+    assertNode(node, "placeholderExpression");
   }
 
   @Test
@@ -82,14 +82,35 @@ public class ExpressionTest {
         .add("+x + (1-20)", ScalarType.INTEGER)
         .add("(x*y/20) + 1", ScalarType.DECIMAL).build();
     
-    matches(node, "complex");
+    assertNode(node, "complex");
   }
 
   @Test
-  public void inclusiveStrings() throws IOException {
+  public void staticMethods() throws IOException {
     ContentNode node = parse()
-        .add("sum(10, 20, 40)", ScalarType.INTEGER).build();    
-    matches(node, "inclusiveStrings");
+        .add("sum(10, 20, 40)", ScalarType.INTEGER)
+        .add("min(10, 20, 40)", ScalarType.INTEGER)
+        .add("max(10, 20, 40)", ScalarType.INTEGER)
+        .add("avg(10, 20, 40)", ScalarType.DECIMAL)
+        .build();    
+    assertNode(node, "staticMethods");
+  }
+  
+  @Test
+  public void globalMethods() throws IOException {
+    ContentNode node = parse()
+        .add("createEntity(10, 20, 40)")
+        .add("createPerson('sam', 'vimes').firstName")
+        .build();
+    assertNode(node, "globalMethods");
+  }
+  
+  @Test
+  public void arrayMethod() throws IOException {
+    ContentNode node = parse()
+        .add("users.map(e -> e.firstName)")
+        .build();
+    assertNode(node, "globalMethods");
   }
 
   @Test
@@ -101,7 +122,7 @@ public class ExpressionTest {
         .add("true", ScalarType.BOOLEAN)
         .add("false", ScalarType.BOOLEAN)
         .add("'words'", ScalarType.STRING).build();
-    matches(node, "literals");
+    assertNode(node, "literals");
   }
   
   @Test
@@ -112,7 +133,7 @@ public class ExpressionTest {
         .add("x <= k ? 30 : 40", ScalarType.INTEGER)
         .add("x < 20 ? 30 : x", ScalarType.INTEGER).build();
     
-    matches(node, "conditionalExpression");
+    assertNode(node, "conditionalExpression");
   }
 
   @Test
@@ -123,7 +144,7 @@ public class ExpressionTest {
         .add("z != w", ScalarType.BOOLEAN)
         .build();
     
-    matches(node, "equalityExpression");
+    assertNode(node, "equalityExpression");
   }
 
   @Test
@@ -134,19 +155,19 @@ public class ExpressionTest {
         .add("x = 20 and y = 10 or c > 10", ScalarType.BOOLEAN)
     .build();
     
-    matches(node, "conditionalAndOrExpression");
+    assertNode(node, "conditionalAndOrExpression");
   }
 
   @Test
   public void arithmeticalExpression() throws IOException {
     ContentNode node = parse().add("x+y/z*89*(x+5)", ScalarType.DECIMAL).build();
     
-    matches(node, "arithmeticalExpression");
+    assertNode(node, "arithmeticalExpression");
   }
   
   
   
-  public static void matches(ContentNode node, String file) {
+  public static void assertNode(ContentNode node, String file) {
     String actual = DataFormatTestUtil.yaml(node);
     String expected = DataFormatTestUtil.file("ast/ExpressionTest_" + file + ".yaml");
     Assertions.assertEquals(expected, actual);
@@ -159,6 +180,11 @@ public class ExpressionTest {
     private List<ScalarType> types = new ArrayList<>();
     
     public TestExpressionBuilder add(String value, ScalarType type) {
+      result.append("expression {").append(value).append("}").append(System.lineSeparator());
+      return this;
+    }
+    
+    public TestExpressionBuilder add(String value) {
       result.append("expression {").append(value).append("}").append(System.lineSeparator());
       return this;
     }

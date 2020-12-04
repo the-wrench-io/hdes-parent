@@ -1,5 +1,5 @@
 lexer grammar HdesLexer;
-ReservedKeyWord: 'switch' | 'case' | 'if' | 'else';
+ReservedKeyWord: 'switch' | 'case';
 
 ScalarType
   : INTEGER
@@ -9,92 +9,115 @@ ScalarType
   | TIME
   | STRING
   | BOOLEAN;
+  
+StaticMethod
+  : SM_SUM
+  | SM_IN
+  | SM_AVG 
+  | SM_MIN
+  | SM_MAX;
 
 // BETWEEN/AND/OR/IN operators
-IN: I N;
 BETWEEN: B E T W E E N;
 AND: A N D;
 OR: O R;
-WHERE: W H E R E;
 
-fragment A : [aA];
-fragment B : [bB];
-fragment D : [dD];
-fragment E : [eE];
-fragment H : [hH];
-fragment I : [iI];
-fragment N : [nN];
-fragment O : [oO];
-fragment R : [rR];
-fragment T : [tT];
-fragment W : [wW];
+// static method names
+SM_SUM: S U M;
+SM_AVG: A V G;
+SM_MIN: M I N;
+SM_MAX: M A X;
+SM_IN: I N;
 
+// array/list methods
+TM_FILTER: F I L T E R;
+TM_SORT: S O R T;
+TM_FIND_FIRST: F I N D F I R S T;
 
-ACCEPTS: 'accepts';
-RETURNS: 'returns';
+ACCEPTS: A C C E P T S;
+RETURNS: R E T U R N S;
 
 // Main definition types
-DEF_FL: 'flow';
-DEF_DT: 'decision-table';
-DEF_ST: 'service-task';
-DEF_EN: 'expression';
+FLOW: F L O W;
+DECISION_TABLE: D E C I S I O N '-' T A B L E;
+SERVICE_TASK: S E R V I C E '-' T A S K;
+EXPRESSION: E X P R E S S I O N;
 
 // data type options
 DEBUG_VALUE: 'debug-value';
 
 // possible data types
-INTEGER: 'INTEGER';
-DECIMAL: 'DECIMAL';
-DATE_TIME: 'DATE_TIME';
-DATE: 'DATE';
-TIME: 'TIME';
-STRING: 'STRING';
-BOOLEAN: 'BOOLEAN';
-OBJECT: 'OBJECT';
-ARRAY: 'ARRAY';
-OF: 'of'; // ARRAY of STRING 
+INTEGER: I N T E G E R;
+DECIMAL: D E C I M A L;
+DATE_TIME: D A T E T I M E;
+DATE: D A T E;
+TIME: T I M E;
+STRING: S T R I N G;
+BOOLEAN: B O O L E A N;
 
 LAMBDA: '->';
 
 // DT matching policy
-ALL: 'ALL';
-FIRST: 'FIRST';
-MATCHES: 'matches';
+ALL: A L L;
+FIRST: F I R S T;
+MATCH: M A T C H;
 
 // FLOW
-STEPS: 'steps';
-CALL: 'call';
-AWAIT: 'await';
-CONTINUE: 'continue';
-
-
-// TODO replace with expression 
-FIND_FIRST: 'find-first';
-SORT_BY: 'sort-by';
-ASC: 'ASC';
-DESC: 'DESC';
-
+STEPS: S T E P S;
+CALL: C A L L;
+AWAIT: A W A I T;
+CONTINUE: C O N T I N U E;
 
 // SERVICE
-PROMISE: 'promise';
-TIMEOUT: 'timeout';
+PROMISE: P R O M I S E;
+TIMEOUT: T I M E O U T;
 
-WHEN: 'when';
-THEN: 'then';
-END: 'end-as';
-AS: 'as';
-MAPS: 'maps';
-TO: 'to';
+WHEN: I F;
+ELSE: E L S E;
+
+RETURN: R E T U R N;
+AS: A S;
+MAP: M A P;
+TO: T O;
 
 // MARKS
 QUESTION_MARK: '?';
 COLON: ':';
+SCOLON: ';';
 DOT: '.';
 COMMA: ',';
 NOT: '!';
 
+fragment A : [aA];
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment X : [xX];
+fragment Y : [yY];
+fragment W : [wW];
+
 PARENTHESES_START: '(';
 PARENTHESES_END: ')';
+
+ARRAY_START: '[';
+ARRAY_END: ']';
+
 
 // BLOCKS
 BLOCK_START: '{';

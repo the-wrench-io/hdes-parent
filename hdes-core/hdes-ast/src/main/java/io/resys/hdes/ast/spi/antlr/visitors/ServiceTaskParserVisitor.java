@@ -23,7 +23,7 @@ package io.resys.hdes.ast.spi.antlr.visitors;
 import io.resys.hdes.ast.HdesParser.ExternalServiceContext;
 import io.resys.hdes.ast.HdesParser.PromiseContext;
 import io.resys.hdes.ast.HdesParser.PromiseTimeoutContext;
-import io.resys.hdes.ast.HdesParser.StBodyContext;
+import io.resys.hdes.ast.HdesParser.ServiceTaskUnitContext;
 import io.resys.hdes.ast.api.nodes.BodyNode.Headers;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ImmutableBodyId;
@@ -41,7 +41,7 @@ import io.resys.hdes.ast.spi.antlr.util.Nodes;
 public class ServiceTaskParserVisitor extends DecisionTableParserVisitor {
 
   @Override
-  public ServiceBody visitStBody(StBodyContext ctx) {
+  public ServiceBody visitServiceTaskUnit(ServiceTaskUnitContext ctx) {
     final Nodes children = nodes(ctx);
     final Headers headers = children.of(Headers.class).get();
     final SimpleInvocation id = children.of(SimpleInvocation.class).get();

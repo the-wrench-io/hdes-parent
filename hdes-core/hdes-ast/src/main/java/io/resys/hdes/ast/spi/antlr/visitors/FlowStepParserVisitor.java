@@ -108,8 +108,6 @@ public class FlowStepParserVisitor implements FlowStepVisitor<HdesNode, StepTree
     
     return ImmutableIterateAction.builder()
         .token(iterate.getToken())
-        .findFirst(iterate.getFindFirst())
-        .sortBy(iterate.getSortBy())
         .over(iterate.getOver())
         .step(step)
         .nested(nested)

@@ -44,8 +44,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.InExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaMapExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MathOperationExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
@@ -59,7 +59,7 @@ import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectDef;
 import io.resys.hdes.ast.api.nodes.InvocationNode;
-import io.resys.hdes.ast.api.nodes.InvocationNode.MathMethodType;
+import io.resys.hdes.ast.api.nodes.InvocationNode.StaticMethodType;
 import io.resys.hdes.ast.api.visitors.ExpressionVisitor;
 import io.resys.hdes.compiler.api.HdesCompilerException;
 import io.resys.hdes.compiler.spi.expressions.ExpressionFactory.ExpCode;
@@ -101,7 +101,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
     case DATE:
       builder.add("$T.parse($S)", LocalDate.class, node.getValue());
       break;
-    case DATE_TIME:
+    case DATETIME:
       builder.add("$T.parse($S)", LocalDateTime.class, node.getValue());
       break;
     case TIME:
@@ -169,16 +169,16 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
   
   @Override
   public ExpCode visitMethod(MethodInvocation node, HdesTree ctx) {
-    if(node instanceof LambdaMapExpression) {
-      return visitLambda((LambdaMapExpression) node, ctx);
-    } else if(node instanceof MathOperationExpression) {
-      return visitMathMethod((MathOperationExpression) node, ctx);
+    if(node instanceof LambdaExpression) {
+      return visitLambda((LambdaExpression) node, ctx);
+    } else if(node instanceof StaticMethodInvocation) {
+      return visitMathMethod((StaticMethodInvocation) node, ctx);
     }
     throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(node));
   }
   
   @Override
-  public ExpCode visitLambda(LambdaMapExpression node, HdesTree ctx) {
+  public ExpCode visitLambda(LambdaExpression node, HdesTree ctx) {
     var next = ctx.next(node);
     ExpCode type = visitAny(node.getType(), next);
 
@@ -188,7 +188,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
         .addAllValues(mapOrigin instanceof StepCallDef ? 
             ((StepCallDef) mapOrigin).getValues() : 
             Collections.emptyList())
-        .name(node.getIterable().getValue())
+        .name(node.getParam().getValue())
         .array(false)
         .build();
     
@@ -196,7 +196,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
     ExpCode body = visitAny(node.getBody(), next);
     CodeBlock value = CodeBlock.builder()
         .add("$L.map($L -> $L).collect($T.toList())", 
-            type.getValue(), visitAny(node.getIterable(), next).getValue(), 
+            type.getValue(), visitAny(node.getParam(), next).getValue(), 
             body.getValue(), Collectors.class)
         .build();
     
@@ -209,7 +209,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
   }
   
   @Override
-  public ExpCode visitMathMethod(MathOperationExpression node, HdesTree ctx) {
+  public ExpCode visitMathMethod(StaticMethodInvocation node, HdesTree ctx) {
     HdesTree next = ctx.next(node);
     CodeBlock.Builder params = CodeBlock.builder().add("$T.get().math()", HdesOperationsGen.class);
     boolean isDecimal = false;
@@ -265,7 +265,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
       params.add(".toInteger()");
     }
     
-    ScalarType returnType = isDecimal || node.getType() == MathMethodType.AVG ? ScalarType.DECIMAL : ScalarType.INTEGER;
+    ScalarType returnType = isDecimal || node.getType() == StaticMethodType.AVG ? ScalarType.DECIMAL : ScalarType.INTEGER;
     String method = "";
     switch (node.getType()) {
     case AVG: method = "avg"; break;
@@ -346,7 +346,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
         body.add("Integer.compare($L, $L) >= 0", left, right);
       }
       break;
-    case DATE_TIME:
+    case DATETIME:
     case DATE:
     case TIME:
       if (node.getType() == EqualityType.EQUAL) {
@@ -488,7 +488,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
       leftBuilder.add("Integer.compare($L, $L) <= 0", left, value);
       rightBuilder.add("Integer.compare($L, $L) >= 0", right, value);
       break;
-    case DATE_TIME:
+    case DATETIME:
     case DATE:
     case TIME:
       leftBuilder.add("($L.isBefore($L) || $L.isEqual($L))", left, value, left, value);

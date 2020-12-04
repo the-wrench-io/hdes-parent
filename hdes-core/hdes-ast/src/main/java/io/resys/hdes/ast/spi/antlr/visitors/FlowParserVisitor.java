@@ -37,15 +37,12 @@ import io.resys.hdes.ast.HdesParser.ContinuePointerContext;
 import io.resys.hdes.ast.HdesParser.EndAsPointerContext;
 import io.resys.hdes.ast.HdesParser.FastMappingContext;
 import io.resys.hdes.ast.HdesParser.FieldMappingContext;
-import io.resys.hdes.ast.HdesParser.FindFirstContext;
-import io.resys.hdes.ast.HdesParser.FlBodyContext;
+import io.resys.hdes.ast.HdesParser.FlowUnitContext;
 import io.resys.hdes.ast.HdesParser.IterateActionContext;
 import io.resys.hdes.ast.HdesParser.MappingArgContext;
 import io.resys.hdes.ast.HdesParser.MappingContext;
 import io.resys.hdes.ast.HdesParser.MappingValueContext;
 import io.resys.hdes.ast.HdesParser.PointerContext;
-import io.resys.hdes.ast.HdesParser.SortByArgContext;
-import io.resys.hdes.ast.HdesParser.SortByContext;
 import io.resys.hdes.ast.HdesParser.StepAsContext;
 import io.resys.hdes.ast.HdesParser.StepContext;
 import io.resys.hdes.ast.HdesParser.StepsContext;
@@ -60,15 +57,12 @@ import io.resys.hdes.ast.api.nodes.FlowNode.CallAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.SortBy;
-import io.resys.hdes.ast.api.nodes.FlowNode.SortByDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
-import io.resys.hdes.ast.api.nodes.HdesNode;
 import io.resys.hdes.ast.api.nodes.HdesNode.ErrorNode;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.ImmutableBodyId;
@@ -84,8 +78,6 @@ import io.resys.hdes.ast.api.nodes.ImmutableFlowBody;
 import io.resys.hdes.ast.api.nodes.ImmutableIterationEndPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectMappingDef;
 import io.resys.hdes.ast.api.nodes.ImmutableSimpleInvocation;
-import io.resys.hdes.ast.api.nodes.ImmutableSortBy;
-import io.resys.hdes.ast.api.nodes.ImmutableSortByDef;
 import io.resys.hdes.ast.api.nodes.ImmutableSplitPointer;
 import io.resys.hdes.ast.api.nodes.ImmutableStep;
 import io.resys.hdes.ast.api.nodes.ImmutableStepAs;
@@ -109,10 +101,6 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
   }
   
   @Value.Immutable
-  public interface FwRedundentFindFirst extends FlowNode {
-  }
-  
-  @Value.Immutable
   interface FwRedundentThenPointer extends StepPointer {
     SimpleInvocation getId();
   }
@@ -120,8 +108,6 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
   @Value.Immutable
   interface RedundentIterateAction extends StepAction {
     InvocationNode getOver();
-    Optional<SortBy> getSortBy();
-    Boolean getFindFirst();
     List<Step> getSteps();
   }
   
@@ -135,7 +121,7 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
   }  
   
   @Override
-  public FlowBody visitFlBody(FlBodyContext ctx) {
+  public FlowBody visitFlowUnit(FlowUnitContext ctx) {
     Nodes children = nodes(ctx);
     Headers headers = children.of(Headers.class).get();
     SimpleInvocation id = children.of(SimpleInvocation.class).get();
@@ -225,34 +211,7 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
         .token(token)
         .over(nodes.of(InvocationNode.class).get())
         .steps(steps)
-        .sortBy(nodes.of(SortBy.class))
-        .findFirst(nodes.of(FwRedundentFindFirst.class).isPresent())
         .build();
-  }
-  
-  @Override
-  public SortBy visitSortBy(SortByContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableSortBy.builder().token(nodes.getToken()).values(nodes.list(SortByDef.class)).build();
-  }
-  
-  @Override
-  public SortByDef visitSortByArg(SortByArgContext ctx) {
-    Nodes nodes = nodes(ctx);
-    
-    final boolean asc;
-    if(ctx.getChildCount() > 1) {
-      TerminalNode node = (TerminalNode) ctx.getChild(1);
-      asc = node.getSymbol().getType() == HdesParser.ASC;
-    } else {
-      asc = true;
-    }
-    return ImmutableSortByDef.builder().token(nodes.getToken()).name(nodes.of(InvocationNode.class).get()).asc(asc).build();
-  }
-  
-  @Override
-  public HdesNode visitFindFirst(FindFirstContext ctx) {
-    return ImmutableFwRedundentFindFirst.builder().token(token(ctx)).build();
   }
   
   @Override

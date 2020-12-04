@@ -212,7 +212,7 @@ public class HdesParserVisitor extends FlowParserVisitor {
   public RedundentScalarType visitScalarType(ScalarTypeContext ctx) {
     return ImmutableRedundentScalarType.builder()
         .token(token(ctx))
-        .value(ScalarType.valueOf(ctx.getText()))
+        .value(ScalarType.valueOf(ctx.getText().toUpperCase()))
         .build();
   }
   

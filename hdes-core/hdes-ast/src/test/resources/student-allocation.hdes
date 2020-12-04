@@ -3,26 +3,19 @@
  * Example of a java specific service task
  */
 service-task SchoolService {
-  accepts { importId INTEGER }
-  returns { schools ARRAY of OBJECT { schoolId STRING, zipcode STRING } }
-  
-  //java {} // java file content with pkg and rest of the declarations as last resort
-  //java-service { mysuperpkg.subpk.ClassName } // service class that has one parameter type as 'accepts' and return type 'returns'
-  
-  // syntax 'could' include other languages, based on what is the compilation envir
+  accepts { importId: integer }
+  returns { 
+    schools: { schoolId: string, zipcode: string }[]
+  }
   
   x.y.io.MySuperService {}
 }
 
 service-task CreateFormService {
-  accepts { schoolId STRING, formName STRING }
-  returns { confirmed BOOLEAN }
+  accepts { schoolId: string, formName: string }
+  returns { confirmed: boolean }
+  
   promise { timeout: 500 }
-  
-  //java {} // java file content with pkg and rest of the declarations as last resort
-  //java-service { mysuperpkg.subpk.ClassName } // service class that has one parameter type as 'accepts' and return type 'returns'
-  
-  // syntax 'could' include other languages, based on what is the compilation envir
   
   x.y.io.MySuperService {}
 }
@@ -32,19 +25,31 @@ service-task CreateFormService {
  * Flow for allocating students into school
  */
 flow StudentAllocation {
-  accepts { importId INTEGER } 
-  returns { importId INTEGER }
+  accepts { importId: integer } 
+  returns { importId: string }
   
   steps {
     
     GetSchools {
       call SchoolService { importId } // shorter version then 'importId: importId', school service uses import id as parameter
       call StudentService { importId }
-      then AllocateStudents
+      return AllocateStudents
     }
     
     AllocateStudents {
-      maps GetStudents.students to {
+    
+      map GetStudents.students to {
+      
+        SelectSchool {
+          map GetSchools.schools to { 
+            CalculateSchoolScore {
+              call DistanceService { zip1: GetStudents._zipcode, zip2: SelectSchool._zipcode } // place holder accesses iterable element of the step
+              return { distance: _value, schoolId: SelectSchool._schoolId } // end of one school element in the iteration
+            }
+          }
+          continue
+        }
+      
         ParentalInquiry {
           /**
            * This is a step that suspends the flow. 
@@ -52,34 +57,23 @@ flow StudentAllocation {
            * 2. 'complete call' refers to: service task(developer created) thats is responsible for mapping data back to flow from completed task/event.
            */
           await CreateFormService { SelectSchool.schoolId, formName: 'parentalForm' }
-          when { _confirmed = true } then AddStudentToSchool // placeholder to access data from 'complete call' inside the current step
-          then ChangeSchool
+          if ( _confirmed = true ) return AddStudentToSchool // placeholder to access data from 'complete call' inside the current step
+          else return ChangeSchool
         }
         
         AddStudentToSchool {
           // end of one student element in the iteration
           call AllocationService { SelectSchool.schoolId }
-          then end-as {}
+          return {}
         }
         
         ChangeSchool {
           // end of one student iteration
           call AllocationService { ParentalInquiry.schoolId }
-          then end-as {}
+          return {}
         }
       }
-      then end-as { importId } // ends the whole flow once all tasks are completed
-    }
-    
-    SelectSchool {
-      maps GetSchools.schools to { 
-        CalculateSchoolScore {
-          call DistanceService { zip1: GetStudents._zipcode, zip2: SelectSchool._zipcode } // place holder accesses iterable element of the step
-          then end-as { distance: _value, schoolId: SelectSchool._schoolId } // end of one school element in the iteration
-        }
-      }
-      sort-by { _distance } find-first   //distance refers to the last step in the iterator chain
-      then ParentalInquiry
+      return { importId } // ends the whole flow once all tasks are completed
     }
   }
 }

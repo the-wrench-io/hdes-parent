@@ -27,7 +27,7 @@ import io.resys.hdes.ast.api.nodes.BodyNode.ContextTypeDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.ObjectDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
 import io.resys.hdes.ast.api.nodes.ExpressionNode;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaMapExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
 import io.resys.hdes.ast.api.nodes.FlowNode.IterateAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
@@ -75,7 +75,7 @@ public class ReturnTypeFlVisitor implements InvocationVisitor<TypeDef, TypeDef> 
     HdesTree iterator = ctx;
     ObjectDef lambdaObject = null;
     do {
-      if(iterator.getParent().get().getValue() instanceof LambdaMapExpression) {
+      if(iterator.getParent().get().getValue() instanceof LambdaExpression) {
         if(iterator.getValue() instanceof ObjectDef) {
           lambdaObject = (ObjectDef) iterator.getValue();    
           if(lambdaObject.getName().equals(node.getValue())) {

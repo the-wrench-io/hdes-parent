@@ -41,8 +41,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.InExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaMapExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MathOperationExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
@@ -564,16 +564,16 @@ public class ReturnTypeExpVisitor implements ExpressionVisitor<TypeDefReturns, T
 
   @Override
   public TypeDefReturns visitMethod(MethodInvocation node, HdesTree ctx) {
-    if(node instanceof LambdaMapExpression) {
-      return visitLambda((LambdaMapExpression) node, ctx);
-    } else if(node instanceof MathOperationExpression) {
-      return visitMathMethod((MathOperationExpression) node, ctx);
+    if(node instanceof LambdaExpression) {
+      return visitLambda((LambdaExpression) node, ctx);
+    } else if(node instanceof StaticMethodInvocation) {
+      return visitMathMethod((StaticMethodInvocation) node, ctx);
     }
     throw new HdesException(unknownExpression(node));
   }
 
   @Override
-  public TypeDefReturns visitMathMethod(MathOperationExpression method, HdesTree ctx) {
+  public TypeDefReturns visitMathMethod(StaticMethodInvocation method, HdesTree ctx) {
     List<TypeDefAccepts> accepts = new ArrayList<>();
     var next = ctx.next(method);
     for(HdesNode child : method.getValues()) {
@@ -617,15 +617,15 @@ public class ReturnTypeExpVisitor implements ExpressionVisitor<TypeDefReturns, T
   }
 
   @Override
-  public TypeDefReturns visitLambda(LambdaMapExpression lambda, HdesTree ctx) {
+  public TypeDefReturns visitLambda(LambdaExpression lambda, HdesTree ctx) {
     HdesNode body = lambda.getBody();
     TypeDefReturns type = visit(lambda.getType(), ctx.getParent().get());
     
     TypeDef lambdaParam;
     if(type.getReturns() instanceof ScalarDef) {
-      lambdaParam = ImmutableScalarDef.builder().from(type.getReturns()).name(lambda.getIterable().getValue()).array(false).build();
+      lambdaParam = ImmutableScalarDef.builder().from(type.getReturns()).name(lambda.getParam().getValue()).array(false).build();
     } else {
-      lambdaParam = ImmutableObjectDef.builder().from(type.getReturns()).name(lambda.getIterable().getValue()).array(false).build();
+      lambdaParam = ImmutableObjectDef.builder().from(type.getReturns()).name(lambda.getParam().getValue()).array(false).build();
     }
     
     var next = ctx.next(lambda);

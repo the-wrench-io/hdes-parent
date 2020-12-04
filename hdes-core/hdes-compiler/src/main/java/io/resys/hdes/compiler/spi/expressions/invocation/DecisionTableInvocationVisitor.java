@@ -26,7 +26,7 @@ import io.resys.hdes.ast.api.nodes.BodyNode.ContextTypeDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.ObjectDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.ScalarDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaMapExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepCallDef;
 import io.resys.hdes.ast.api.nodes.HdesTree;
 import io.resys.hdes.ast.api.nodes.ImmutableObjectDef;
@@ -130,7 +130,7 @@ public class DecisionTableInvocationVisitor implements InvocationVisitor<ExpCode
       TypeDef def = ctx.returns().build(node).getReturns();
       final var value = CodeBlock.builder().add("constants");
       
-      if(ctx.getValue() instanceof LambdaMapExpression) {
+      if(ctx.getValue() instanceof LambdaExpression) {
         value.add(".getValues().stream()");
       }
       return wrap(def, value.build());
@@ -138,7 +138,7 @@ public class DecisionTableInvocationVisitor implements InvocationVisitor<ExpCode
       TypeDef def = ctx.returns().build(node).getReturns();
       final var value = CodeBlock.builder().add("returns");
       
-      if(ctx.getValue() instanceof LambdaMapExpression) {
+      if(ctx.getValue() instanceof LambdaExpression) {
         value.add(".getValues().stream()");
       }
       return wrap(def, value.build());

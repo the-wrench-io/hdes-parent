@@ -41,8 +41,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.InExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaMapExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MathOperationExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NegateUnary;
@@ -96,7 +96,7 @@ public class InterpraterExpressionVisitor implements ExpressionVisitor<LiteralIn
     case DATE:
       builder.value(LocalDate.parse(node.getValue()));
       break;
-    case DATE_TIME:
+    case DATETIME:
       builder.value(LocalDateTime.parse(node.getValue()));
       break;    
     case TIME:
@@ -483,10 +483,10 @@ public class InterpraterExpressionVisitor implements ExpressionVisitor<LiteralIn
 
   @Override
   public LiteralInterpratedNode visitMethod(MethodInvocation node, HdesTree ctx) {
-    if(node instanceof LambdaMapExpression) {
-      return visitLambda((LambdaMapExpression) node, ctx);
-    } else if(node instanceof MathOperationExpression) {
-      return visitMathMethod((MathOperationExpression) node, ctx);
+    if(node instanceof LambdaExpression) {
+      return visitLambda((LambdaExpression) node, ctx);
+    } else if(node instanceof StaticMethodInvocation) {
+      return visitMathMethod((StaticMethodInvocation) node, ctx);
     }
     throw new HdesInterpreterException(new StringBuilder()
         .append("Not implemented method").append(System.lineSeparator()) 
@@ -495,7 +495,7 @@ public class InterpraterExpressionVisitor implements ExpressionVisitor<LiteralIn
   }
 
   @Override
-  public LiteralInterpratedNode visitLambda(LambdaMapExpression node, HdesTree ctx) {
+  public LiteralInterpratedNode visitLambda(LambdaExpression node, HdesTree ctx) {
     final var next = ctx.next(node);
     final Serializable type = visitInvocation(node.getType(), next).getValue();
 
@@ -517,7 +517,7 @@ public class InterpraterExpressionVisitor implements ExpressionVisitor<LiteralIn
   }
   
   @Override
-  public LiteralInterpratedNode visitMathMethod(MathOperationExpression node, HdesTree ctx) {
+  public LiteralInterpratedNode visitMathMethod(StaticMethodInvocation node, HdesTree ctx) {
     final var next = ctx.next(node);
     final var result = ImmutableLiteralInterpratedNode.builder();
     final var value = HdesOperationsGen.get().math();

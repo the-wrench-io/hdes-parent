@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import io.resys.hdes.ast.api.RootNodeFactory;
 
-public class CombinedTest {
+public class IntegrationTest {
 
   @Test
   public void dt() {

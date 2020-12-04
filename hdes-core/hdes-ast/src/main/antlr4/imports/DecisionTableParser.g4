@@ -3,13 +3,13 @@ options { tokenVocab = HdesLexer; }
 import TypeDefParser, ExpressionParser;
 
 
-dtBody: simpleTypeName '{' headers hitPolicy '}';
+decisionTableUnit: simpleTypeName '{' headers hitPolicy '}';
 hitPolicy: matchingPolicy | mappingPolicy;
 
-matchingPolicy: 'matches' ('FIRST' | 'ALL') '{' whenThenRules* '}';
-whenThenRules: 'when' whenRules 'then' thenRules;
+matchingPolicy: MATCH (FIRST | ALL) '{' whenThenRules* '}';
+whenThenRules: whenRules thenRules;
 
-mappingPolicy: 'maps' mappingFrom whenRules 'to' mappingTo mappingRows;
+mappingPolicy: MAP mappingFrom whenRules TO mappingTo mappingRows;
 mappingFrom: scalarType;
 mappingTo: scalarType;
 
@@ -17,8 +17,8 @@ mappingRows: '{' (mappingRow (mappingRow)*)? '}';
 mappingRow: simpleTypeName thenRules;
 
 thenRules: '{' (ruleLiteral (',' ruleLiteral)*)? '}';
-whenRules: '{' (ruleExpression (',' ruleExpression)*)? '}';
+whenRules: WHEN '(' (ruleExpression (',' ruleExpression)*)? ')';
 
 ruleLiteral: literal;
-ruleExpression: ruleUndefinedValue | enBody;
+ruleExpression: ruleUndefinedValue | expressionUnit;
 ruleUndefinedValue: '?';

@@ -35,27 +35,45 @@ import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.spi.antlr.visitors.HdesParserVisitor;
 
 public class FlowTest {
+  
   @Test
   public void basic() throws IOException {
     parse("""
         flow x1 { accepts {} returns {} steps {} }
-        flow x2 { accepts { arg1 INTEGER, arg2 INTEGER } returns {} steps {} }
-        flow x3 { accepts { arg0 OBJECT {} } returns {} steps {} }
-        flow x4 { accepts { person OBJECT { firstName INTEGER, lastName INTEGER } } returns {} steps {} }
+        flow x2 { accepts { arg1: integer, arg2: integer } returns {} steps {} }
+        flow x3 { accepts { arg0: {} } returns {} steps {} }
+        flow x4 { accepts { person: { firstName: integer, lastName: integer } } returns {} steps {} }
        """);
   }
 
   @Test
   public void taskWhenThen() throws IOException {
     parse("""
-        flow x {
-          accepts { arg1 INTEGER, arg2 INTEGER }
-          returns {  }
+        flow AgeProductSelection {
+          accepts { 
+            age: integer
+            office: string 
+          }
+          returns { 
+            products: { name: string }[] 
+            log: string 
+          }
+          
           steps {
-            firstTask { 
-              when { arg2 > 10} then continue 
-              then continue } as { classifier: 10 }
-            nextTask {then end-as {} }
+          
+            GetAgeScore { 
+              if (age > 80) return NoProductAvailable 
+              else continue
+            }
+            
+            SelectProducts {
+              call ProductDecisionTable { inputAge: age }
+              return { products: $call, log: 'found some products from dt' }
+            }
+            
+            NoProductAvailable {
+              return { products: [], log: 'sorry nothing to sell' }
+            }
           }
         }
      """);
@@ -65,11 +83,11 @@ public class FlowTest {
   public void taskThen() throws IOException {
     parse("""
         flow x {
-          accepts { arg1 INTEGER, arg2 INTEGER }
+          accepts { arg1: integer arg2: integer }
           returns {  }
           steps {
-            firstTask { call XXX { } then nextTask }
-            nextTask { then end-as {} } 
+            firstTask { call XXX { } return nextTask }
+            nextTask { return {} } 
           }
         }   
      """);
@@ -85,9 +103,9 @@ public class FlowTest {
          pkg.name.ClassName {}
        }
        flow x {
-         accepts { arg1 INTEGER, arg2 INTEGER } returns { }
+         accepts { arg1: integer, arg2: integer } returns { }
          steps {
-           firstTask { await ServiceX {} then end-as {} }
+           firstTask { await ServiceX {} return {} }
          }
        }
      """);
@@ -97,10 +115,10 @@ public class FlowTest {
   public void taskServiceTask() throws IOException {
     parse("""
        flow x {
-         accepts { arg1 INTEGER, arg2 INTEGER }
+         accepts { arg1: integer, arg2: integer }
          returns {  }
          steps {
-           firstTask { call bestServiceTask {} then end-as {} } 
+           firstTask { call bestServiceTask {} return {} } 
          }
        }
      """);
@@ -110,16 +128,17 @@ public class FlowTest {
   public void taskFlowTaskOverArray() throws IOException {
     parse("""
        flow x {
-         accepts { arg1 INTEGER, arg2 INTEGER, x ARRAY of INTEGER }
+         accepts { arg1: integer, arg2: integer, x: integer[] }
          returns {  }
          steps {
            firstTask {
-             maps x to {
+           
+             map x to {
                 nestedStep { 
                    call bestDT { input: _ } 
-                   then end-as { out: _bestDTOutput }
+                   return { out: _bestDTOutput }
                 }
-             } then end-as {}
+             } return {}
            }
          } 
        }
@@ -130,13 +149,15 @@ public class FlowTest {
   public void simpleIterationOverArray() throws IOException {
     parse("""
        flow x {
-         accepts { arg1 INTEGER, arg2 INTEGER, x ARRAY of INTEGER }
+         accepts { arg1: integer, arg2: integer, x: integer[] }
          returns {  }
          steps {
+         
            firstTask {
-             maps x to {
+             map x to {
                call bestDT { input: _ }
-             } then end-as {}
+             } return {}
+             
            }
          } 
        }
@@ -147,13 +168,13 @@ public class FlowTest {
   public void taskOverDTOutputArray() throws IOException {
     parse("""
        flow x {
-         accepts { *arg1 INTEGER, *arg2 INTEGER, x ARRAY of INTEGER }
-         returns { code INTEGER, summary ARRAY of OBJECT { value INTEGER } }  
+         accepts { arg1: integer, arg2?: integer, x: integer[] }
+         returns { code: integer, summary: { value: integer }[] }  
          steps {
-           firstTask { call bestDtTask {} then nextTask } 
+           firstTask { call bestDtTask {} continue } 
            nextTask {
              call DoSmth { value : firstTask.key } 
-             then end-as { code: 5 }
+             return { code: 5 }
            }
          }
        }
@@ -164,10 +185,10 @@ public class FlowTest {
   public void taskDTArray() throws IOException {
     parse("""
        flow x {
-         accepts { arg1 INTEGER, arg2 INTEGER }
+         accepts { arg1: integer, arg2: integer }
          returns {  }
          steps {
-           firstTask { call bestDtTask {} then end-as {} } 
+           firstTask { call bestDtTask {} return {} } 
          }
        }
      """);
@@ -177,12 +198,12 @@ public class FlowTest {
   public void mapping() throws IOException {
     parse("""
        flow x {
-         accepts { arg1 INTEGER, arg2 INTEGER }
+         accepts { arg1: integer, arg2: integer }
          returns {  }
          steps {
            firstTask {
             call bestDtTask { input1: arg1.x1, input2: arg2.x1 }
-            then end-as { input1: arg1.x1, input2: arg2.x1 }
+            return { input1: arg1.x1, input2: arg2.x1 }
         }}}
      """);
   }

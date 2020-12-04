@@ -35,21 +35,29 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.HdesParser.AdditiveExpressionContext;
 import io.resys.hdes.ast.HdesParser.AndExpressionContext;
+import io.resys.hdes.ast.HdesParser.BoundMethodContext;
 import io.resys.hdes.ast.HdesParser.ConditionalAndExpressionContext;
 import io.resys.hdes.ast.HdesParser.ConditionalExpressionContext;
 import io.resys.hdes.ast.HdesParser.ConditionalOrExpressionContext;
-import io.resys.hdes.ast.HdesParser.EnBodyContext;
 import io.resys.hdes.ast.HdesParser.EqualityExpressionContext;
 import io.resys.hdes.ast.HdesParser.ExpressionContext;
+import io.resys.hdes.ast.HdesParser.ExpressionUnitContext;
+import io.resys.hdes.ast.HdesParser.FilterMethodContext;
 import io.resys.hdes.ast.HdesParser.LambdaBodyContext;
 import io.resys.hdes.ast.HdesParser.LambdaExpressionContext;
 import io.resys.hdes.ast.HdesParser.LambdaParametersContext;
+import io.resys.hdes.ast.HdesParser.MapMethodContext;
+import io.resys.hdes.ast.HdesParser.MapperMethodInvocationContext;
+import io.resys.hdes.ast.HdesParser.MappingInvocationContext;
 import io.resys.hdes.ast.HdesParser.MethodArgsContext;
 import io.resys.hdes.ast.HdesParser.MethodInvocationContext;
 import io.resys.hdes.ast.HdesParser.MethodNameContext;
 import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
 import io.resys.hdes.ast.HdesParser.PrimaryContext;
 import io.resys.hdes.ast.HdesParser.RelationalExpressionContext;
+import io.resys.hdes.ast.HdesParser.SortMethodContext;
+import io.resys.hdes.ast.HdesParser.StaticMethodInvocationContext;
+import io.resys.hdes.ast.HdesParser.TypeInvocationContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionNotPlusMinusContext;
 import io.resys.hdes.ast.HdesParserBaseVisitor;
@@ -59,8 +67,12 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.AdditiveType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.MapperMethodInvocation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.MappingType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
 import io.resys.hdes.ast.api.nodes.HdesNode;
 import io.resys.hdes.ast.api.nodes.HdesNode.Token;
 import io.resys.hdes.ast.api.nodes.ImmutableAdditiveExpression;
@@ -68,21 +80,24 @@ import io.resys.hdes.ast.api.nodes.ImmutableAndExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableBetweenExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableBodyId;
 import io.resys.hdes.ast.api.nodes.ImmutableConditionalExpression;
+import io.resys.hdes.ast.api.nodes.ImmutableEmptyPlaceholder;
 import io.resys.hdes.ast.api.nodes.ImmutableEqualityOperation;
 import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
 import io.resys.hdes.ast.api.nodes.ImmutableExpressionBody;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableInExpression;
-import io.resys.hdes.ast.api.nodes.ImmutableLambdaMapExpression;
-import io.resys.hdes.ast.api.nodes.ImmutableMathOperationExpression;
+import io.resys.hdes.ast.api.nodes.ImmutableLambdaExpression;
+import io.resys.hdes.ast.api.nodes.ImmutableMapperMethodInvocation;
 import io.resys.hdes.ast.api.nodes.ImmutableMultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableNegateUnary;
 import io.resys.hdes.ast.api.nodes.ImmutableNotUnary;
 import io.resys.hdes.ast.api.nodes.ImmutableOrExpression;
 import io.resys.hdes.ast.api.nodes.ImmutablePositiveUnary;
+import io.resys.hdes.ast.api.nodes.ImmutableSimpleInvocation;
+import io.resys.hdes.ast.api.nodes.ImmutableStaticMethodInvocation;
 import io.resys.hdes.ast.api.nodes.InvocationNode;
-import io.resys.hdes.ast.api.nodes.InvocationNode.MathMethodType;
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
+import io.resys.hdes.ast.api.nodes.InvocationNode.StaticMethodType;
 import io.resys.hdes.ast.spi.antlr.util.Nodes;
 
 public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
@@ -118,9 +133,16 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
   public interface RedundentNullNode extends ExpressionNode {
   }
 
+  @Value.Immutable
+  public interface RedundentTypeInvocation extends ExpressionNode {
+    HdesNode getValue();
+  }
+
+  
   @Override
   public MethodInvocation visitMethodInvocation(MethodInvocationContext ctx) {
     final Nodes nodes = nodes(ctx);
+/*
     final Optional<InvocationNode> type = nodes.of(InvocationNode.class);
     final SimpleInvocation methodName = nodes.of(RedundentMethodName.class).get().getValue();
     final List<HdesNode> args = nodes.of(RedundentArgs.class).map(t -> t.getValues()).orElse(Collections.emptyList());
@@ -158,14 +180,111 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
           .iterable(lambda.getArgs().get(0))
           .body(lambda.getBody())
           .build();
-    }
+    }*/
+
+    return nodes.of(MethodInvocation.class).get();
+  }
+  
+  @Override
+  public RedundentTypeInvocation visitTypeInvocation(TypeInvocationContext ctx) {
+    final Nodes nodes = nodes(ctx);
+    return ImmutableRedundentTypeInvocation.builder()
+        .token(nodes.getToken())
+        .value(nodes.of(HdesNode.class).get())
+        .build();
+  }
+  
+  @Override
+  public HdesNode visitMappingInvocation(MappingInvocationContext ctx) {
+    final Nodes nodes = nodes(ctx);
+    final Optional<HdesNode> typeInvocation = nodes
+        .of(RedundentTypeInvocation.class)
+        .map(v -> v.getValue());
     
-    final MathMethodType mathType;
-    switch(methodName.getValue()) {
-      case "sum": mathType = MathMethodType.SUM; break;
-      case "avg": mathType = MathMethodType.AVG; break;
-      case "min": mathType = MathMethodType.MIN; break;
-      case "max": mathType = MathMethodType.MAX; break;
+    return ImmutableLambdaExpression.builder()
+        .from(nodes.of(LambdaExpression.class).get())
+        .type(nodes.of(InvocationNode.class).get())
+        .next(typeInvocation)
+        .build();
+  }
+  
+  @Override
+  public HdesNode visitBoundMethod(BoundMethodContext ctx) {
+    final Nodes nodes = nodes(ctx);
+    return nodes.of(HdesNode.class).get();
+  }
+  
+  @Override
+  public LambdaExpression visitMapMethod(MapMethodContext ctx) {
+    final var nodes = nodes(ctx);
+    final var lambda = nodes.of(RedundentLambdaExpression.class).get();
+    
+    return ImmutableLambdaExpression.builder()
+        .token(nodes.getToken())
+        .mappingType(MappingType.MAP)
+        .param(lambda.getArgs().get(0))
+        .body(lambda.getBody())
+        .type(ImmutableEmptyPlaceholder.builder().token(nodes.getToken()).build())
+        .build();
+  }
+  
+  @Override
+  public LambdaExpression visitFilterMethod(FilterMethodContext ctx) {
+    final var nodes = nodes(ctx);
+    final var lambda = nodes.of(RedundentLambdaExpression.class).get();
+    
+    return ImmutableLambdaExpression.builder()
+        .token(nodes.getToken())
+        .mappingType(MappingType.FILTER)
+        .param(lambda.getArgs().get(0))
+        .body(lambda.getBody())
+        .type(ImmutableEmptyPlaceholder.builder().token(nodes.getToken()).build())
+        .build();
+  }
+  
+  @Override
+  public LambdaExpression visitSortMethod(SortMethodContext ctx) {
+    final var nodes = nodes(ctx);
+    final var lambda = nodes.of(RedundentLambdaExpression.class).get();
+    
+    return ImmutableLambdaExpression.builder()
+        .token(nodes.getToken())
+        .mappingType(MappingType.SORT)
+        .param(lambda.getArgs().get(0))
+        .body(lambda.getBody())
+        .type(ImmutableEmptyPlaceholder.builder().token(nodes.getToken()).build())
+        .build();
+  }
+  
+  @Override
+  public MapperMethodInvocation visitMapperMethodInvocation(MapperMethodInvocationContext ctx) {
+    final Nodes nodes = nodes(ctx);
+    final SimpleInvocation methodName = nodes.of(RedundentMethodName.class).get().getValue();
+    final List<HdesNode> args = nodes.of(RedundentArgs.class).map(t -> t.getValues()).orElse(Collections.emptyList());
+    return ImmutableMapperMethodInvocation.builder()
+        .token(nodes.getToken())
+        .name(methodName)
+        .values(args)
+        .build();
+  }
+  
+  @Override
+  public StaticMethodInvocation visitStaticMethodInvocation(StaticMethodInvocationContext ctx) {
+    final Nodes nodes = nodes(ctx);
+    final TerminalNode type = (TerminalNode) ctx.getChild(0);
+    
+    final ImmutableSimpleInvocation methodName = ImmutableSimpleInvocation.builder()
+        .token(nodes.getToken())
+        .value(type.getText())
+        .build();
+    
+    final StaticMethodType mathType;
+    switch(type.getSymbol().getText().toLowerCase()) {
+      case "sum": mathType = StaticMethodType.SUM; break;
+      case "avg": mathType = StaticMethodType.AVG; break;
+      case "min": mathType = StaticMethodType.MIN; break;
+      case "max": mathType = StaticMethodType.MAX; break;
+      case "in": mathType = StaticMethodType.MAX; break;
       default: throw new HdesException(ImmutableErrorNode.builder()
         .bodyId("")
         .target(methodName)
@@ -173,7 +292,8 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
         .build());
     }
     
-    return ImmutableMathOperationExpression.builder()
+    final List<HdesNode> args = nodes.of(RedundentArgs.class).map(t -> t.getValues()).orElse(Collections.emptyList());
+    return ImmutableStaticMethodInvocation.builder()
         .token(nodes.getToken())
         .type(mathType)
         .values(args)
@@ -251,7 +371,7 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
   }
 
   @Override
-  public ExpressionBody visitEnBody(EnBodyContext ctx) {
+  public ExpressionBody visitExpressionUnit(ExpressionUnitContext ctx) {
     String text = ctx.getStart().getInputStream().getText(new Interval(ctx.start.getStartIndex(), ctx.stop.getStopIndex()));
     Token token = token(ctx);
     HdesNode node = first(ctx);
@@ -291,7 +411,7 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
             .left(left)
             .right(right)
             .build();
-      } else if(terminal.getSymbol().getType() == HdesParser.IN) {
+      } else if(terminal.getSymbol().getText().equalsIgnoreCase(StaticMethodType.IN.name())) {
         List<HdesNode> values = new ArrayList<>();
         for(int index = 2; index < n; index++) {
           HdesNode value = ctx.getChild(index).accept(this);

@@ -78,20 +78,7 @@ public interface FlowNode extends HdesNode {
   interface IterateAction extends StepAction {
     InvocationNode getOver();
     Optional<Step> getStep();
-    Optional<SortBy> getSortBy();
-    Boolean getFindFirst();
     Boolean getNested();
-  }
-  
-  @Value.Immutable
-  interface SortBy extends FlowNode {
-    List<SortByDef> getValues();
-  }
-
-  @Value.Immutable
-  interface SortByDef extends FlowNode {
-    InvocationNode getName();
-    Boolean getAsc();
   }
   
   /**

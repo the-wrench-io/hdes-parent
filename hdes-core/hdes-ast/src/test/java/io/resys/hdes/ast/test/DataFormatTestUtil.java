@@ -45,7 +45,7 @@ public class DataFormatTestUtil {
   
   public static String file(String name) {
     try {
-      return IOUtils.toString(CombinedTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
+      return IOUtils.toString(IntegrationTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

@@ -42,12 +42,12 @@ public class DecisionTableTest {
   public void basic() throws IOException {
     ContentNode node = 
         parse("""
-            decision-table mappingDT { accepts {} returns {} maps STRING {} to INTEGER {} }
-            decision-table matchingFirstDT { accepts {} returns {} matches FIRST {} } 
-            decision-table matchingFirstALL { accepts {} returns {} matches ALL {} }
+            decision-table mappingDT { accepts {} returns {} map STRING if() to INTEGER {} }
+            decision-table matchingFirstDT { accepts {} returns {} match FIRST {} } 
+            decision-table matchingFirstALL { accepts {} returns {} match ALL {} }
             """);
     
-    matches(node, "basic");
+    assetNode(node, "basic");
   }
 
   @Test
@@ -55,11 +55,11 @@ public class DecisionTableTest {
     ContentNode node = 
       parse("""
           decision-table basic { 
-          accepts { name, lastName STRING, *value INTEGER } 
+          accepts { name, lastName: STRING, value?: INTEGER } 
           returns { } 
-          maps STRING {} to INTEGER {} }
+          map STRING if() to INTEGER {} }
           """);
-    matches(node, "headers");
+    assetNode(node, "headers");
   }
 
   @Test
@@ -67,14 +67,14 @@ public class DecisionTableTest {
     ContentNode node = 
     parse("""
         decision-table basic {
-        accepts { firstName STRING, lastName STRING } returns {}
-        maps STRING {'bob', 'sam', 'viv' }
+        accepts { firstName: STRING lastName: STRING } returns {}
+        map STRING if( 'bob', 'sam', 'viv' )
         to INTEGER  {
           firstName {     1,     2,     3 }
           lastName  {     3,    10,    20 }
         } }
         """);
-    matches(node, "values");
+    assetNode(node, "values");
   }
 
   @Test
@@ -82,14 +82,14 @@ public class DecisionTableTest {
     ContentNode node = 
     parse("""
         decision-table basic { 
-        accepts { name STRING, lastName STRING }
-        returns { value INTEGER, exp INTEGER: value + 20}
-        matches ALL {
-          when { _ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman' or _ = 'man'} then { 4570 }
-          when { _ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or _ = 'man2'} then { 4590 }
+        accepts { name: STRING, lastName: STRING }
+        returns { value: INTEGER, exp: INTEGER = value + 20}
+        match ALL {
+          if ( _ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman' or _ = 'man')   { 4570 }
+          if ( _ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or _ = 'man2') { 4590 }
         }}
         """);
-    matches(node, "matchExpressions");
+    assetNode(node, "matchExpressions");
   }
   
   @Test
@@ -97,15 +97,15 @@ public class DecisionTableTest {
     ContentNode node = 
     parse("""
         decision-table basic { 
-        accepts { value0 INTEGER, value1 INTEGER }
-        returns { value INTEGER } 
-        matches ALL {
-          when { _ > 10, _ <= 20} then { 4570 }
-          when { _ > 10, _ <= 20 and _ > 10} then { 4570 }
-          when { _ = 6,  _ != 20 and _ > 10} then { 4570 }
+        accepts { value0: INTEGER, value1: INTEGER }
+        returns { value: INTEGER } 
+        match ALL {
+          if ( _ > 10, _ <= 20 )            { 4570 }
+          if ( _ > 10, _ <= 20 and _ > 10 ) { 4570 }
+          if ( _ = 6,  _ != 20 and _ > 10 ) { 4570 }
         } }
         """);
-    matches(node, "equalityExpressions");
+    assetNode(node, "equalityExpressions");
   }
   
   
@@ -119,7 +119,7 @@ public class DecisionTableTest {
     return (ContentNode) tree.accept(new HdesParserVisitor());
   }
   
-  public static void matches(ContentNode node, String file) {
+  public static void assetNode(ContentNode node, String file) {
     String actual = DataFormatTestUtil.yaml(node);
     String expected = DataFormatTestUtil.file("ast/DecisionTableTest_" + file + ".yaml");
     Assertions.assertEquals(expected, actual);

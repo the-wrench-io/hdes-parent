@@ -31,7 +31,7 @@ import io.resys.hdes.ast.api.nodes.BodyNode.ObjectDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.ScalarDef;
 import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
 import io.resys.hdes.ast.api.nodes.DecisionTableNode.DecisionTableBody;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaMapExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
@@ -92,11 +92,11 @@ public class FlowInvocationVisitor extends DecisionTableInvocationVisitor implem
   
   @Override
   public ExpCode visitSimple(SimpleInvocation node, HdesTree ctx) {
-    Optional<LambdaMapExpression> lambda = ctx.find().node(LambdaMapExpression.class);
+    Optional<LambdaExpression> lambda = ctx.find().node(LambdaExpression.class);
     TypeDef typeDef = ctx.any().build(node);
     CodeBlock.Builder value = CodeBlock.builder();
     
-    if(lambda.isPresent() && lambda.get().getIterable().getValue().equals(node.getValue())) {
+    if(lambda.isPresent() && lambda.get().getParam().getValue().equals(node.getValue())) {
       value.add("$L", node.getValue());
       
     } else if(typeDef.getContext() == ContextTypeDef.STEP_RETURNS) {

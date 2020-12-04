@@ -54,7 +54,7 @@ public interface BodyNode extends HdesNode {
   
   enum ScalarType {
     STRING, INTEGER, BOOLEAN, DECIMAL,
-    DATE, DATE_TIME, TIME,
+    DATE, DATETIME, TIME,
   }
   
   @Value.Immutable
