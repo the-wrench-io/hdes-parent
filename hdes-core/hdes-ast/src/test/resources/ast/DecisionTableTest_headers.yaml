@@ -1,49 +1,49 @@
 ---
 token:
-  text: "decision-tablebasic{accepts{name,lastNameSTRING,*valueINTEGER}returns{}mapsSTRING{}toINTEGER{}}<EOF>"
+  text: "decision-tablebasic({name,lastName:STRING,value?:INTEGER}):{}{map(STRING)to(INTEGER)when()}<EOF>"
   start:
     line: 1
-    col: 1
+    col: 3
   end:
     line: 5
     col: 1
 values:
 - token:
-    text: "basic{accepts{name,lastNameSTRING,*valueINTEGER}returns{}mapsSTRING{}toINTEGER{}}"
+    text: "basic({name,lastName:STRING,value?:INTEGER}):{}{map(STRING)to(INTEGER)when()}"
     start:
       line: 1
-      col: 16
+      col: 18
     end:
-      line: 4
-      col: 31
+      line: 3
+      col: 4
   id:
     token:
       text: "basic"
       start:
         line: 1
-        col: 16
+        col: 18
       end:
         line: 1
-        col: 21
+        col: 23
     value: "basic"
   headers:
     token:
-      text: "accepts{name,lastNameSTRING,*valueINTEGER}returns{}"
+      text: "({name,lastName:STRING,value?:INTEGER}):{}"
       start:
-        line: 2
-        col: 1
+        line: 1
+        col: 23
       end:
-        line: 3
-        col: 12
+        line: 1
+        col: 74
     acceptDefs:
     - token:
-        text: "name,lastNameSTRING"
+        text: "name,lastName:STRING"
         start:
-          line: 2
-          col: 11
+          line: 1
+          col: 26
         end:
-          line: 2
-          col: 32
+          line: 1
+          col: 48
       required: true
       name: "name"
       array: false
@@ -59,13 +59,13 @@ values:
         present: false
       type: "STRING"
     - token:
-        text: "name,lastNameSTRING"
+        text: "name,lastName:STRING"
         start:
-          line: 2
-          col: 11
+          line: 1
+          col: 26
         end:
-          line: 2
-          col: 32
+          line: 1
+          col: 48
       required: true
       name: "lastName"
       array: false
@@ -81,13 +81,13 @@ values:
         present: false
       type: "STRING"
     - token:
-        text: "*valueINTEGER"
+        text: "value?:INTEGER"
         start:
-          line: 2
-          col: 34
+          line: 1
+          col: 50
         end:
-          line: 2
-          col: 48
+          line: 1
+          col: 65
       required: false
       name: "value"
       array: false
@@ -105,48 +105,48 @@ values:
     returnDefs: []
   hitPolicy:
     token:
-      text: "mapsSTRING{}toINTEGER{}"
+      text: "map(STRING)to(INTEGER)when()"
       start:
-        line: 4
-        col: 1
+        line: 2
+        col: 5
       end:
-        line: 4
-        col: 29
+        line: 2
+        col: 35
     defFrom: "STRING"
     defTo: "INTEGER"
     when:
       token:
-        text: "{}"
+        text: "()"
         start:
-          line: 4
-          col: 13
+          line: 2
+          col: 33
         end:
-          line: 4
-          col: 15
+          line: 2
+          col: 35
       values: []
     mapsTo: []
   constants:
     token:
-      text: "accepts{name,lastNameSTRING,*valueINTEGER}returns{}"
+      text: "({name,lastName:STRING,value?:INTEGER}):{}"
       start:
-        line: 2
-        col: 1
+        line: 1
+        col: 23
       end:
-        line: 3
-        col: 12
+        line: 1
+        col: 74
     required: true
     name: "constants"
     array: true
     context: "CONSTANTS"
     values:
     - token:
-        text: "accepts{name,lastNameSTRING,*valueINTEGER}returns{}"
+        text: "({name,lastName:STRING,value?:INTEGER}):{}"
         start:
-          line: 2
-          col: 1
+          line: 1
+          col: 23
         end:
-          line: 3
-          col: 12
+          line: 1
+          col: 74
       required: true
       name: ""
       array: true
@@ -163,39 +163,39 @@ values:
       type: "INTEGER"
   matched:
     token:
-      text: "accepts{name,lastNameSTRING,*valueINTEGER}returns{}"
+      text: "({name,lastName:STRING,value?:INTEGER}):{}"
       start:
-        line: 2
-        col: 1
+        line: 1
+        col: 23
       end:
-        line: 3
-        col: 12
+        line: 1
+        col: 74
     required: true
     name: "instance"
     array: false
     context: "MATCHES"
     values:
     - token:
-        text: "accepts{name,lastNameSTRING,*valueINTEGER}returns{}"
+        text: "({name,lastName:STRING,value?:INTEGER}):{}"
         start:
-          line: 2
-          col: 1
+          line: 1
+          col: 23
         end:
-          line: 3
-          col: 12
+          line: 1
+          col: 74
       required: true
       name: "instance"
       array: true
       context: "MATCHES"
       values:
       - token:
-          text: "accepts{name,lastNameSTRING,*valueINTEGER}returns{}"
+          text: "({name,lastName:STRING,value?:INTEGER}):{}"
           start:
-            line: 2
-            col: 1
+            line: 1
+            col: 23
           end:
-            line: 3
-            col: 12
+            line: 1
+            col: 74
         required: true
         name: ""
         array: true

@@ -110,7 +110,7 @@ public class ExpressionTest {
     ContentNode node = parse()
         .add("users.map(e -> e.firstName)")
         .build();
-    assertNode(node, "globalMethods");
+    assertNode(node, "arrayMethods");
   }
 
   @Test

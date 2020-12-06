@@ -4,7 +4,7 @@ import ExpressionParser;
 
 scalarType: ScalarType;
 
-headers: ACCEPTS headersAccepts RETURNS headersReturns;
+headers: '(' headersAccepts ')' ':' headersReturns;
 headersAccepts: typeDefs;
 headersReturns: typeDefs;
 
@@ -27,4 +27,6 @@ mapping: '{' (mappingArg (',' mappingArg)* )? '}';
 mappingArg: fieldMapping | fastMapping;
 fieldMapping: simpleTypeName ':' mappingValue;
 fastMapping: typeName;
-mappingValue: mapping | expressionUnit;
+
+mappingArray: '[' (mapping (',' mapping)*)? ']';
+mappingValue: mapping | mappingArray | expressionUnit;

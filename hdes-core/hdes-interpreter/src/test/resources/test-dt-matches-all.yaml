@@ -3,5 +3,5 @@ values:
   matches:
   - score: 5
   classifier: 110
-  max: 100
+  maxPossible: 100
   total: 165

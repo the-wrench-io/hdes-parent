@@ -226,9 +226,9 @@ public class DecisionTableParserVisitor extends ExpressionParserVisitor {
   public HitPolicy visitMatchingPolicy(MatchingPolicyContext ctx) {
     Nodes nodes = nodes(ctx);
     List<RuleRow> rows = nodes.list(RuleRow.class);
-    TerminalNode v = (TerminalNode) ctx.getChild(1);
+    TerminalNode v = (TerminalNode) ctx.getChild(0);
     
-    if(v.getSymbol().getType() == HdesParser.FIRST) {
+    if(v.getSymbol().getType() == HdesParser.TM_FIND_FIRST) {
       return ImmutableHitPolicyFirst.builder().token(nodes.getToken()).rows(rows).build();
     }
     return ImmutableHitPolicyAll.builder().token(nodes.getToken()).rows(rows).build();

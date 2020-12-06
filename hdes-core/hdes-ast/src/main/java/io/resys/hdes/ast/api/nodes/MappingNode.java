@@ -51,6 +51,11 @@ public interface MappingNode extends HdesNode {
   }
   
   @Value.Immutable  
+  interface ArrayMappingDef extends MappingDef {
+    List<MappingDef> getValues();
+  }
+  
+  @Value.Immutable  
   interface FastMappingDef extends MappingDef {
     InvocationNode getValue();
   }

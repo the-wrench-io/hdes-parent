@@ -1,86 +1,86 @@
 ---
 token:
-  text: "decision-tablemappingDT{accepts{}returns{}mapsSTRING{}toINTEGER{}}decision-tablematchingFirstDT{accepts{}returns{}matchesFIRST{}}decision-tablematchingFirstALL{accepts{}returns{}matchesALL{}}<EOF>"
+  text: "decision-tablemappingDT({}):{}{map(STRING)to(INTEGER)when()}decision-tablematchingFirstDT({}):{}{findFirst({})}decision-tablematchingFirstALL({}):{}{findAll({})}<EOF>"
   start:
     line: 1
-    col: 1
+    col: 3
   end:
     line: 4
     col: 1
 values:
 - token:
-    text: "mappingDT{accepts{}returns{}mapsSTRING{}toINTEGER{}}"
+    text: "mappingDT({}):{}{map(STRING)to(INTEGER)when()}"
     start:
       line: 1
-      col: 16
+      col: 18
     end:
       line: 1
-      col: 80
+      col: 76
   id:
     token:
       text: "mappingDT"
       start:
         line: 1
-        col: 16
+        col: 18
       end:
         line: 1
-        col: 25
+        col: 27
     value: "mappingDT"
   headers:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 1
-        col: 28
+        col: 27
       end:
         line: 1
-        col: 49
+        col: 34
     acceptDefs: []
     returnDefs: []
   hitPolicy:
     token:
-      text: "mapsSTRING{}toINTEGER{}"
+      text: "map(STRING)to(INTEGER)when()"
       start:
         line: 1
-        col: 50
+        col: 44
       end:
         line: 1
-        col: 78
+        col: 74
     defFrom: "STRING"
     defTo: "INTEGER"
     when:
       token:
-        text: "{}"
+        text: "()"
         start:
           line: 1
-          col: 62
+          col: 72
         end:
           line: 1
-          col: 64
+          col: 74
       values: []
     mapsTo: []
   constants:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 1
-        col: 28
+        col: 27
       end:
         line: 1
-        col: 49
+        col: 34
     required: true
     name: "constants"
     array: true
     context: "CONSTANTS"
     values:
     - token:
-        text: "accepts{}returns{}"
+        text: "({}):{}"
         start:
           line: 1
-          col: 28
+          col: 27
         end:
           line: 1
-          col: 49
+          col: 34
       required: true
       name: ""
       array: true
@@ -97,39 +97,39 @@ values:
       type: "INTEGER"
   matched:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 1
-        col: 28
+        col: 27
       end:
         line: 1
-        col: 49
+        col: 34
     required: true
     name: "instance"
     array: false
     context: "MATCHES"
     values:
     - token:
-        text: "accepts{}returns{}"
+        text: "({}):{}"
         start:
           line: 1
-          col: 28
+          col: 27
         end:
           line: 1
-          col: 49
+          col: 34
       required: true
       name: "instance"
       array: true
       context: "MATCHES"
       values:
       - token:
-          text: "accepts{}returns{}"
+          text: "({}):{}"
           start:
             line: 1
-            col: 28
+            col: 27
           end:
             line: 1
-            col: 49
+            col: 34
         required: true
         name: ""
         array: true
@@ -145,53 +145,53 @@ values:
           present: false
         type: "INTEGER"
 - token:
-    text: "matchingFirstDT{accepts{}returns{}matchesFIRST{}}"
+    text: "matchingFirstDT({}):{}{findFirst({})}"
     start:
       line: 2
-      col: 16
+      col: 18
     end:
       line: 2
-      col: 74
+      col: 59
   id:
     token:
       text: "matchingFirstDT"
       start:
         line: 2
-        col: 16
+        col: 18
       end:
         line: 2
-        col: 31
+        col: 33
     value: "matchingFirstDT"
   headers:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 2
-        col: 34
+        col: 33
       end:
         line: 2
-        col: 55
+        col: 40
     acceptDefs: []
     returnDefs: []
   hitPolicy:
     token:
-      text: "matchesFIRST{}"
+      text: "findFirst({})"
       start:
         line: 2
-        col: 56
+        col: 44
       end:
         line: 2
-        col: 72
+        col: 57
     rows: []
   constants:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 2
-        col: 34
+        col: 33
       end:
         line: 2
-        col: 55
+        col: 40
     required: true
     name: "constants"
     array: true
@@ -199,66 +199,66 @@ values:
     values: []
   matched:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 2
-        col: 34
+        col: 33
       end:
         line: 2
-        col: 55
+        col: 40
     required: true
     name: ""
     array: false
     context: "MATCHES"
     values: []
 - token:
-    text: "matchingFirstALL{accepts{}returns{}matchesALL{}}"
+    text: "matchingFirstALL({}):{}{findAll({})}"
     start:
       line: 3
-      col: 16
+      col: 18
     end:
       line: 3
-      col: 73
+      col: 57
   id:
     token:
       text: "matchingFirstALL"
       start:
         line: 3
-        col: 16
+        col: 18
       end:
         line: 3
-        col: 32
+        col: 34
     value: "matchingFirstALL"
   headers:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 3
-        col: 35
+        col: 34
       end:
         line: 3
-        col: 56
+        col: 41
     acceptDefs: []
     returnDefs: []
   hitPolicy:
     token:
-      text: "matchesALL{}"
+      text: "findAll({})"
       start:
         line: 3
-        col: 57
+        col: 44
       end:
         line: 3
-        col: 71
+        col: 55
     rows: []
   constants:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 3
-        col: 35
+        col: 34
       end:
         line: 3
-        col: 56
+        col: 41
     required: true
     name: "constants"
     array: true
@@ -266,13 +266,13 @@ values:
     values: []
   matched:
     token:
-      text: "accepts{}returns{}"
+      text: "({}):{}"
       start:
         line: 3
-        col: 35
+        col: 34
       end:
         line: 3
-        col: 56
+        col: 41
     required: true
     name: ""
     array: true

@@ -40,25 +40,23 @@ public class DecisionTableTest {
   
   @Test
   public void basic() throws IOException {
-    ContentNode node = 
-        parse("""
-            decision-table mappingDT { accepts {} returns {} map STRING if() to INTEGER {} }
-            decision-table matchingFirstDT { accepts {} returns {} match FIRST {} } 
-            decision-table matchingFirstALL { accepts {} returns {} match ALL {} }
-            """);
+    ContentNode node = parse("""
+      decision-table mappingDT({}):{}        { map(STRING) to(INTEGER) when() }
+      decision-table matchingFirstDT({}):{}  { findFirst({}) } 
+      decision-table matchingFirstALL({}):{} { findAll({}) }
+    """);
     
     assetNode(node, "basic");
   }
 
   @Test
   public void headers() throws IOException {
-    ContentNode node = 
-      parse("""
-          decision-table basic { 
-          accepts { name, lastName: STRING, value?: INTEGER } 
-          returns { } 
-          map STRING if() to INTEGER {} }
-          """);
+    ContentNode node = parse("""
+      decision-table basic({ name, lastName: STRING, value?: INTEGER }) : { } { 
+        map(STRING) to(INTEGER) when()
+      }
+        
+    """);
     assetNode(node, "headers");
   }
 
@@ -66,13 +64,13 @@ public class DecisionTableTest {
   public void values() throws IOException {
     ContentNode node = 
     parse("""
-        decision-table basic {
-        accepts { firstName: STRING lastName: STRING } returns {}
-        map STRING if( 'bob', 'sam', 'viv' )
-        to INTEGER  {
-          firstName {     1,     2,     3 }
-          lastName  {     3,    10,    20 }
-        } }
+        decision-table basic({ firstName: STRING lastName: STRING }):{} {
+          map(string) to(integer)
+          when( _ = 'bob', _ = 'sam', _ = 'viv' )
+          
+          firstName({1, 2, 3 })
+          lastName({3, 10, 20 })
+        }
         """);
     assetNode(node, "values");
   }
@@ -81,13 +79,13 @@ public class DecisionTableTest {
   public void matchExpressions() throws IOException {
     ContentNode node = 
     parse("""
-        decision-table basic { 
-        accepts { name: STRING, lastName: STRING }
-        returns { value: INTEGER, exp: INTEGER = value + 20}
-        match ALL {
-          if ( _ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman' or _ = 'man')   { 4570 }
-          if ( _ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or _ = 'man2') { 4590 }
-        }}
+        decision-table basic({ name: STRING, lastName: STRING }):{ value: INTEGER, exp: INTEGER = value + 20}
+        {
+          findFirst({
+            when(_ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman'  or _ = 'man' ).add({ 4590 })
+            when(_ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or _ = 'man2').add({ 4590 })
+          })
+        }
         """);
     assetNode(node, "matchExpressions");
   }
@@ -96,14 +94,13 @@ public class DecisionTableTest {
   public void equalityExpressions() throws IOException {
     ContentNode node = 
     parse("""
-        decision-table basic { 
-        accepts { value0: INTEGER, value1: INTEGER }
-        returns { value: INTEGER } 
-        match ALL {
-          if ( _ > 10, _ <= 20 )            { 4570 }
-          if ( _ > 10, _ <= 20 and _ > 10 ) { 4570 }
-          if ( _ = 6,  _ != 20 and _ > 10 ) { 4570 }
-        } }
+        decision-table basic({ value0: INTEGER, value1: INTEGER }): { value: INTEGER } {  
+          findAll({
+            when( _ > 10, _ <= 20 ).add({ 4570 })
+            when( _ > 10, _ <= 20 and _ > 10 ).add({ 4570 })
+            when( _ = 6,  _ != 20 and _ > 10 ).add({ 4570 })
+          })
+        }
         """);
     assetNode(node, "equalityExpressions");
   }

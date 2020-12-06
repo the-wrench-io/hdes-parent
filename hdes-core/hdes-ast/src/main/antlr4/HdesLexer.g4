@@ -33,9 +33,7 @@ SM_IN: I N;
 TM_FILTER: F I L T E R;
 TM_SORT: S O R T;
 TM_FIND_FIRST: F I N D F I R S T;
-
-ACCEPTS: A C C E P T S;
-RETURNS: R E T U R N S;
+TM_FIND_ALL: F I N D A L L;
 
 // Main definition types
 FLOW: F L O W;
@@ -57,14 +55,7 @@ BOOLEAN: B O O L E A N;
 
 LAMBDA: '->';
 
-// DT matching policy
-ALL: A L L;
-FIRST: F I R S T;
-MATCH: M A T C H;
-
 // FLOW
-STEPS: S T E P S;
-CALL: C A L L;
 AWAIT: A W A I T;
 CONTINUE: C O N T I N U E;
 
@@ -72,7 +63,9 @@ CONTINUE: C O N T I N U E;
 PROMISE: P R O M I S E;
 TIMEOUT: T I M E O U T;
 
-WHEN: I F;
+WHEN: W H E N;
+ADD_TO: A D D;
+IF: I F;
 ELSE: E L S E;
 
 RETURN: R E T U R N;

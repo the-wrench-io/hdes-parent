@@ -27,11 +27,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.immutables.value.Value;
 
-import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.HdesParser.CallActionContext;
+import io.resys.hdes.ast.HdesParser.CallAwaitContext;
 import io.resys.hdes.ast.HdesParser.CallDefContext;
 import io.resys.hdes.ast.HdesParser.ContinuePointerContext;
 import io.resys.hdes.ast.HdesParser.EndAsPointerContext;
@@ -40,6 +39,7 @@ import io.resys.hdes.ast.HdesParser.FieldMappingContext;
 import io.resys.hdes.ast.HdesParser.FlowUnitContext;
 import io.resys.hdes.ast.HdesParser.IterateActionContext;
 import io.resys.hdes.ast.HdesParser.MappingArgContext;
+import io.resys.hdes.ast.HdesParser.MappingArrayContext;
 import io.resys.hdes.ast.HdesParser.MappingContext;
 import io.resys.hdes.ast.HdesParser.MappingValueContext;
 import io.resys.hdes.ast.HdesParser.PointerContext;
@@ -63,8 +63,10 @@ import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.WhenPointer;
+import io.resys.hdes.ast.api.nodes.HdesNode;
 import io.resys.hdes.ast.api.nodes.HdesNode.ErrorNode;
 import io.resys.hdes.ast.api.nodes.HdesTree;
+import io.resys.hdes.ast.api.nodes.ImmutableArrayMappingDef;
 import io.resys.hdes.ast.api.nodes.ImmutableBodyId;
 import io.resys.hdes.ast.api.nodes.ImmutableCallAction;
 import io.resys.hdes.ast.api.nodes.ImmutableCallDef;
@@ -84,6 +86,7 @@ import io.resys.hdes.ast.api.nodes.ImmutableStepAs;
 import io.resys.hdes.ast.api.nodes.ImmutableWhenPointer;
 import io.resys.hdes.ast.api.nodes.InvocationNode;
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
+import io.resys.hdes.ast.api.nodes.MappingNode.ArrayMappingDef;
 import io.resys.hdes.ast.api.nodes.MappingNode.FastMappingDef;
 import io.resys.hdes.ast.api.nodes.MappingNode.FieldMappingDef;
 import io.resys.hdes.ast.api.nodes.MappingNode.MappingDef;
@@ -104,6 +107,9 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
   interface FwRedundentThenPointer extends StepPointer {
     SimpleInvocation getId();
   }
+  
+  @Value.Immutable
+  interface FwRedundentAwait extends StepPointer {}
   
   @Value.Immutable
   interface RedundentIterateAction extends StepAction {
@@ -236,12 +242,19 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
   @Override
   public CallDef visitCallDef(CallDefContext ctx) {
     Nodes nodes = nodes(ctx);
-    TerminalNode type = (TerminalNode) ctx.getChild(0);
     
     return ImmutableCallDef.builder().token(nodes.getToken())
         .id(nodes.of(SimpleInvocation.class).get())
         .mapping(nodes.of(ObjectMappingDef.class).get())
-        .await(type.getSymbol().getType() == HdesParser.AWAIT)
+        .await(nodes.of(FwRedundentAwait.class).isPresent())
+        .build();
+  }
+  
+  @Override
+  public HdesNode visitCallAwait(CallAwaitContext ctx) {
+    Nodes nodes = nodes(ctx);
+    return ImmutableFwRedundentAwait.builder()
+        .token(nodes.getToken())
         .build();
   }
   
@@ -329,6 +342,15 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
     return ImmutableFastMappingDef.builder()
         .token(nodes.getToken())
         .value(nodes.of(InvocationNode.class).get())
+        .build();
+  }
+  
+  @Override
+  public ArrayMappingDef visitMappingArray(MappingArrayContext ctx) {
+    Nodes nodes = nodes(ctx);
+    return ImmutableArrayMappingDef.builder()
+        .token(nodes.getToken())
+        .values(nodes.list(MappingDef.class))
         .build();
   }
   
