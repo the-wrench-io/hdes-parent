@@ -1,11 +1,11 @@
-decision-table FormulaHitPolicyFirstDt {
-  accepts {
-    a INTEGER, b INTEGER, c DECIMAL,
-    sum DECIMAL: a + b + c
-  }
-  returns { value INTEGER, qualifier DECIMAL: value + 10 + sum }
+decision-table FormulaHitPolicyFirstDt ({
+    a,b, c: DECIMAL,
+    total: DECIMAL = a + b + c
+  }) : { value: INTEGER, qualifier: DECIMAL = value + 10 + total } 
+
+{
   
-  matches FIRST {
-    when { ?, ?, ?, ? } then { 20 }
-  } 
+  findFirst({
+    when( ?, ?, ?, ? ) add({ 20 })
+  })
 }

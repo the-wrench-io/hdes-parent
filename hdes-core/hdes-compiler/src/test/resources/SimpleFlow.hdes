@@ -1,35 +1,29 @@
 
-decision-table Scoring {
-  accepts { arg INTEGER }
-  returns { score INTEGER }
-  
-  matches FIRST {
-    when { _ between 1 and 30 } then { 10 }
-    when { ? } then { 20 }
-  }
+decision-table Scoring({ arg: INTEGER }) :{ score: INTEGER } 
+{ 
+  findFirst({
+    when ( _ between 1 and 30) add({ 10 })
+    when ( ? ) add({ 20 })
+  })
 }
 
 
-flow SimpleFlow {
+flow SimpleFlow ({ arg1: INTEGER, arg2: INTEGER }) : { score: INTEGER }
+{
+    
+    InitialScoring() {
+      Scoring ({ arg: arg1 }) 
+      return Decision()
+    }
+    
+    Decision() {
+      if( InitialScoring.score > 10) return ExtraScoring()
+      else return { InitialScoring.score } 
+    }
+  
+    ExtraScoring() {
+      Scoring({ arg: arg2 })
+      return { _score }
+    }
 
-  accepts { arg1 INTEGER, arg2 INTEGER }
-  returns { score INTEGER }
-  
-  steps {
-    
-    InitialScoring {
-      call Scoring { arg: arg1 }
-      then Decision
-    }
-    
-    Decision {
-      when { InitialScoring.score > 10 } then ExtraScoring
-      then end-as { InitialScoring.score } 
-    }
-  
-    ExtraScoring {
-      call Scoring { arg: arg2 }
-      then end-as { _score }
-    }
-  }
 }
