@@ -6,8 +6,8 @@ import TypeDefParser, ExpressionParser;
 decisionTableUnit: simpleTypeName headers '{' hitPolicy '}';
 hitPolicy: matchingPolicy | mappingPolicy;
 
-matchingPolicy: (TM_FIND_FIRST | TM_FIND_ALL) '(' '{' whenThenRules* '}' ')';
-whenThenRules: WHEN whenRules '.'? ADD_TO '(' thenRules ')';
+matchingPolicy: (FIND_FIRST | FIND_ALL) '(' '{' whenThenRules* '}' ')';
+whenThenRules: WHEN whenRules '.'? ADD '(' thenRules ')';
 
 mappingPolicy: MAP '(' mappingFrom ')' '.'? TO '(' mappingTo ')' '.'? WHEN whenRules mappingRows;
 mappingFrom: scalarType;

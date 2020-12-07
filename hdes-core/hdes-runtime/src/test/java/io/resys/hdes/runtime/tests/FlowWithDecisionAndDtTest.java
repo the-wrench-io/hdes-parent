@@ -103,9 +103,8 @@ public class FlowWithDecisionAndDtTest {
           InitialScoring() {
             Scoring ({ arg: arg1 })
             Scoring ({ arg: arg2 })
+            as({ total: _0.score + _1.score })
             return Decision()
-          } as {
-            total: _0.score + _1.score
           }
           
           Decision() {

@@ -47,11 +47,13 @@ public class FlowWithLoopTest {
         { 
         
           InitialScoring() {
-            map classifiers to {
+          
+            map(classifiers).to({
               ScoreClassifier() { 
                 Scoring ({arg: _ }) return { _score } 
               }
-            }
+            })
+            
             return { total: sum(_.map(scoring -> scoring.score)) }
           }
         }

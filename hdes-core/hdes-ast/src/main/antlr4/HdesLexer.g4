@@ -32,8 +32,9 @@ SM_IN: I N;
 // array/list methods
 TM_FILTER: F I L T E R;
 TM_SORT: S O R T;
-TM_FIND_FIRST: F I N D F I R S T;
-TM_FIND_ALL: F I N D A L L;
+
+FIND_FIRST: F I N D F I R S T;
+FIND_ALL: F I N D A L L;
 
 // Main definition types
 FLOW: F L O W;
@@ -64,7 +65,7 @@ PROMISE: P R O M I S E;
 TIMEOUT: T I M E O U T;
 
 WHEN: W H E N;
-ADD_TO: A D D;
+ADD: A D D;
 IF: I F;
 ELSE: E L S E;
 
@@ -117,7 +118,7 @@ BLOCK_START: '{';
 BLOCK_END: '}';
 
 // mathematical operators
-ADD: '+';
+PLUS: '+';
 SUBTRACT: '-';
 MULTIPLY: '*';
 DIVIDE: '/';

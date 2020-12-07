@@ -4,14 +4,14 @@ import TypeDefParser, ExpressionParser;
 
 flowUnit: simpleTypeName headers '{' steps '}';
 steps: step*;
-step: simpleTypeName '(' ')' '{' (iterateAction | callAction ) pointer '}' stepAs?;
-stepAs: AS mapping;
+step: simpleTypeName '(' ')' '{' (iterateAction | callAction) stepAs? pointer '}';
+stepAs: '.'? AS '(' mapping ')';
 
 callAction: callDef*;
 callDef: callAwait? simpleTypeName '(' mapping ')';
 callAwait: AWAIT;
 
-iterateAction: MAP typeName TO '{' iterateBody '}';
+iterateAction: MAP '(' typeName ')' '.'? TO '(' '{' iterateBody '}' ')';
 iterateBody: callAction | steps;
 
 pointer: whenThenPointerArgs | thenPointer;

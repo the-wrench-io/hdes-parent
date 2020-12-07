@@ -527,7 +527,7 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
     TerminalNode sign = (TerminalNode) ctx.getChild(1);
     return ImmutableAdditiveExpression.builder()
         .token(token(ctx))
-        .type(sign.getSymbol().getType() == HdesParser.ADD ? AdditiveType.ADD : AdditiveType.SUBSTRACT)
+        .type(sign.getSymbol().getType() == HdesParser.PLUS ? AdditiveType.ADD : AdditiveType.SUBSTRACT)
         .left(left).right(right).build();
   }
 

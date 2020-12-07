@@ -45,9 +45,7 @@ public class FlowWithSimpleLoopTest {
         flow SimpleFlow ({ classifiers: INTEGER[] }): { total: INTEGER }
         { 
           InitialScoring() {
-            map classifiers to {
-              Scoring ({ arg: _ })
-            }
+            map(classifiers).to({ Scoring ({ arg: _ }) })
             return { total: sum(_.map(scoring -> scoring.score)) }
           }
         }

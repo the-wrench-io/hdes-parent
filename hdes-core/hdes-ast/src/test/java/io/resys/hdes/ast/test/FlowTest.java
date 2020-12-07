@@ -58,6 +58,7 @@ public class FlowTest {
           
           SelectProducts() {
             ProductDecisionTable({ inputAge: age })
+            
             return { products: $call, log: 'found some products from dt' }
           }
           
@@ -104,14 +105,14 @@ public class FlowTest {
   @Test
   public void taskFlowTaskOverArray() throws IOException {
     parse("""
-       flow x({ arg1: integer, arg2: integer, x: integer[] }) :{  } {
+       flow x({ arg1: integer, arg2: integer, x: integer[] }) : { log: string } {
          firstTask() {
-           map x to {
+           map(x).to({
               nestedStep() { 
                  bestDT({ input: _ }) 
                  return { out: _bestDTOutput }
               }
-           } return {}
+           }).as({summary: 'loop completed'}) return { log: _summary }
          }
        }
      """);
@@ -123,7 +124,9 @@ public class FlowTest {
        flow x({ arg1: integer, arg2: integer, x: integer[] }): {} 
        {
            firstTask() {
-             map x to { bestDT({ input: _ })} 
+             map(x).to({ 
+               bestDT({ input: _ })
+             }) 
              return {}
            }
        }

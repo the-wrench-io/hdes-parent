@@ -34,15 +34,15 @@ flow StudentAllocation (
     
     
     AllocateStudents() {
-      map GetStudents.students to {
+      map(GetStudents.students).to({
       
         SelectSchool() {
-          map GetSchools.schools to { 
+          map(GetSchools.schools).to({ 
             CalculateSchoolScore() {
               DistanceService ({ zip1: GetStudents._zipcode, zip2: SelectSchool._zipcode }) // place holder accesses iterable element of the step
               return { distance: _value, schoolId: SelectSchool._schoolId } // end of one school element in the iteration
             }
-          }
+          })
           continue
         }
       
@@ -68,7 +68,7 @@ flow StudentAllocation (
           AllocationService ({ ParentalInquiry.schoolId })
           return {}
         }
-      }
+      })
       
       
       return { importId } // ends the whole flow once all tasks are completed
