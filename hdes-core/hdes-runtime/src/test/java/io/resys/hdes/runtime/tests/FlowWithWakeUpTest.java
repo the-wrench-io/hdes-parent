@@ -39,43 +39,36 @@ public class FlowWithWakeUpTest {
   @Test
   public void simpleFlow() {
     String src = """
-        service-task FormPromise {
-          accepts { }
-          returns { dataId STRING, userValue INTEGER }
+        service-task FormPromise({}) : { dataId: STRING, userValue: INTEGER } {
           promise { timeout: 100 } 
           
           io.resys.hdes.runtime.test.CreateSessionCommand { formId: 'SuperForm' }
         }
         
-        
-        decision-table ScoringDT {
-          accepts { arg INTEGER } returns { score INTEGER }
-          matches FIRST {
-            when { _ between 1 and 30 } then { 10 }
-            when { ? } then { 20 }
-          }
+        decision-table ScoringDT({ arg: INTEGER }) : { score: INTEGER } {
+          findFirst({
+            when( _ between 1 and 30 ) add({ 10 })
+            when( ? ) add({ 20 })
+          })
         }
 
-        flow SimpleFlow {
+        flow SimpleFlow({ arg1: INTEGER, arg2: INTEGER }):{ score: INTEGER, userValue: INTEGER }
+        {
+          InitialScoring() {
+            ScoringDT({ arg: arg1 }) continue 
+          }
 
-          accepts { arg1 INTEGER, arg2 INTEGER } 
-          returns { score INTEGER, userValue INTEGER }
-          
-          steps {
+          UserInput() {
+            await FormPromise({}) continue 
+          }
 
-            InitialScoring {
-              call ScoringDT { arg: arg1 } then continue 
-            }
-
-            UserInput {
-              await FormPromise {} then continue 
-            }
-
-            DecisionStep /* conditional step */ {
-              when { UserInput.userValue > 10 } then continue
-              then end-as { InitialScoring.score, UserInput.userValue }
-            }
-            ExtraScoring { call ScoringDT { arg: UserInput.userValue } then end-as { _score, UserInput.userValue } }
+          DecisionStep() {
+            if(UserInput.userValue > 10) continue
+            else return { InitialScoring.score, UserInput.userValue }
+          }
+          ExtraScoring () { 
+            ScoringDT({ arg: UserInput.userValue }) 
+            return { _score, UserInput.userValue } 
           }
         }
         """;

@@ -32,13 +32,8 @@ public class FlowWithDecisionAndDtTest {
   @Test
   public void flowWithNoSteps() {
     String src = """
-        flow EmptyFlow {
-        
-          accepts { arg1 INTEGER, arg2 INTEGER }
-          returns { }
-          
-          steps {
-          }
+        flow EmptyFlow ({ arg1: INTEGER, arg2: INTEGER }) : { }
+        {
         }
       """;
     
@@ -54,31 +49,27 @@ public class FlowWithDecisionAndDtTest {
   @Test
   public void flowWithDecisionAndSplit() {
     String src = """
-        decision-table Scoring {
-          accepts { arg INTEGER } returns { score INTEGER }
-          matches FIRST {
-            when { _ between 1 and 30 } then { 10 }
-            when { ? } then { 20 }
-          }
+        decision-table Scoring({ arg: integer }) : { score: integer } {
+          findFirst({
+            when( _ between 1 and 30) add({ 10 })
+            when( ? ) add({ 20 })
+          })
         }
 
-        flow SimpleFlow {
-          accepts { arg1 INTEGER, arg2 INTEGER } returns { score INTEGER }
-          
-          steps {
+        flow SimpleFlow ({ arg1: INTEGER, arg2: INTEGER }) : { score: INTEGER }
+        {
             
-            InitialScoring {
-              call Scoring { arg: arg1 } then Decision
-            }
-            
-            Decision {
-              when { InitialScoring.score > 10 } then ExtraScoring
-              then end-as { InitialScoring.score } 
-            }
+          InitialScoring() {
+            Scoring({ arg: arg1 }) return Decision()
+          }
           
-            ExtraScoring {
-              call Scoring { arg: arg2 } then end-as { _score }
-            }
+          Decision() {
+            if( InitialScoring.score > 10 ) return ExtraScoring()
+            else return { InitialScoring.score } 
+          }
+        
+          ExtraScoring() {
+            Scoring({ arg: arg2 }) return { _score }
           }
         }
         """;
@@ -99,38 +90,32 @@ public class FlowWithDecisionAndDtTest {
   @Test
   public void flowWithParalDecisionAndSplit() {
     String src = """
-        decision-table Scoring {
-          accepts { arg INTEGER } returns { score INTEGER }
-          matches FIRST {
-            when { _ between 1 and 30 } then { 10 }
-            when { ? } then { 20 }
-          }
+        decision-table Scoring ({ arg: INTEGER }) : { score: INTEGER } {
+          findFirst({
+            when ( _ between 1 and 30 ).add({ 10 })
+            when ( ? ).add({ 20 })
+          })
         }
         
-        flow SimpleFlow {
+        flow SimpleFlow({ arg1: INTEGER, arg2: INTEGER }) : { total: INTEGER }
+        {
+            
+          InitialScoring() {
+            Scoring ({ arg: arg1 })
+            Scoring ({ arg: arg2 })
+            return Decision()
+          } as {
+            total: _0.score + _1.score
+          }
+          
+          Decision() {
+            if (InitialScoring.total > 10) return ExtraScoring()
+            else return { InitialScoring.total } 
+          }
         
-          accepts { arg1 INTEGER, arg2 INTEGER }
-          returns { total INTEGER }
-          
-          steps {
-            
-            InitialScoring {
-              call Scoring { arg: arg1 }
-              call Scoring { arg: arg2 }
-              then Decision
-            } as {
-              total: _0.score + _1.score
-            }
-            
-            Decision {
-              when { InitialScoring.total > 10 } then ExtraScoring
-              then end-as { InitialScoring.total } 
-            }
-          
-            ExtraScoring {
-              call Scoring { arg: arg2 }
-              then end-as { total: _score + InitialScoring.total }
-            }
+          ExtraScoring() {
+            Scoring({ arg: arg2 })
+            return { total: _score + InitialScoring.total }
           }
         }
         """;

@@ -57,7 +57,6 @@ import io.resys.hdes.ast.api.nodes.FlowNode.CallAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.CallDef;
 import io.resys.hdes.ast.api.nodes.FlowNode.EndPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.FlowBody;
-import io.resys.hdes.ast.api.nodes.FlowNode.SplitPointer;
 import io.resys.hdes.ast.api.nodes.FlowNode.Step;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAction;
 import io.resys.hdes.ast.api.nodes.FlowNode.StepAs;
@@ -274,9 +273,14 @@ public class FlowParserVisitor extends ServiceTaskParserVisitor {
   }
   
   @Override
-  public SplitPointer visitWhenThenPointerArgs(WhenThenPointerArgsContext ctx) {
+  public HdesNode visitWhenThenPointerArgs(WhenThenPointerArgsContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableSplitPointer.builder().token(nodes.getToken()).values(nodes.list(StepPointer.class)).build();
+    List<StepPointer> pointers = nodes.list(StepPointer.class);
+    if(pointers.size() == 1) {
+      return pointers.get(0);
+    }
+    
+    return ImmutableSplitPointer.builder().token(nodes.getToken()).values(pointers).build();
   }
   
   @Override

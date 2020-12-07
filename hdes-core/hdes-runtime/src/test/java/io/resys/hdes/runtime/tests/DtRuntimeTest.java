@@ -35,14 +35,14 @@ public class DtRuntimeTest {
   @Test 
   public void dtHitPolicyAll() {
     String src = """
-        decision-table ExpressionDT {  
-        accepts { value0 INTEGER, value1 INTEGER } 
-        returns { score INTEGER }  
-        matches ALL { 
-          when { _ > 10, _ <= 20 }            then { 4571 } 
-          when { _ > 10, _ <= 20 and _ > 10 } then { 4572 } 
-          when { _ = 6 , _ != 20 and _ > 10 } then { 4573 } 
-        }}
+        decision-table ExpressionDT({ value0: INTEGER, value1: INTEGER }): { score: INTEGER } {  
+        
+        findAll({ 
+          when ( _ > 10, _ <= 20 )            add ({ 4571 }) 
+          when ( _ > 10, _ <= 20 and _ > 10 ) add ({ 4572 })
+          when ( _ = 6 , _ != 20 and _ > 10 ) add ({ 4573 }) 
+        })
+        }
       """;
     
     TraceEnd output = TestUtil.runtime().src(src).build("ExpressionDT")
@@ -61,15 +61,13 @@ public class DtRuntimeTest {
   @Test 
   public void dtHitPolicyFirstBetween() {
     String src = """
-        decision-table Scoring { 
-              accepts { arg INTEGER } 
-              returns { score INTEGER } 
+        decision-table Scoring({ arg: INTEGER }) : { score: INTEGER } { 
                
-              matches FIRST { 
-                when { _ between 1 and 30 } then { 10 } 
-                when { ? } then { 20 } 
-              } 
-            }
+          findFirst({
+            when( _ between 1 and 30).add({ 10 }) 
+            when( ? ).add({ 20 })
+          })
+        }
       """;
     
     TraceEnd output = TestUtil.runtime().src(src).build("Scoring")
@@ -87,17 +85,19 @@ public class DtRuntimeTest {
   @Test 
   public void dtHitPolicdtHitPolicyFirstyFirst() {
     String src = """ 
-        decision-table SimpleHitPolicyFirstDt { 
-        accepts { name STRING, lastName STRING } 
-        returns {
-          value INTEGER, 
-          totalHit INTEGER: sum(_constants.map(row -> row.value))
+        decision-table SimpleHitPolicyFirstDt({ name: STRING, lastName: STRING }): 
+        {
+          value: INTEGER, 
+          totalHit: INTEGER = sum(_constants.map(row -> row.value))
+        } {
+        
+         findFirst({ 
+           when(_ = 'sam', ? )           add({ 20 })
+           when(_ = 'bob', _ = 'woman')  add({ 4570 })
+           when(_ != 'bob' or _ !='same' or _ = 'professor', _ = 'woman' or _ = 'man') add({ 4571 }) 
+         })
+        
         }
-         matches FIRST { 
-          when {_ = 'sam', ? }           then { 20 }
-          when { _ = 'bob', _ = 'woman'} then { 4570 }
-          when { _ != 'bob' or _ !='same' or _ = 'professor', _ = 'woman' or _ = 'man'} then { 4571 } 
-        }}
       """;
 
     TraceEnd output = TestUtil.runtime().src(src).build("SimpleHitPolicyFirstDt")
@@ -116,15 +116,14 @@ public class DtRuntimeTest {
   @Test 
   public void dtHitPolicyMatrix() {
     String src = """
-        decision-table SimpleHitPolicyMatrixDt { 
-        accepts { name STRING, lastName STRING }   
-        returns {}
-        
-        maps STRING { _ = 'BOB', _ = 'SAM', ? }
-        to INTEGER { 
-          lastName {  10,    20,   30 } 
-          name     {  20,    50,   60 } 
-        }}
+        decision-table SimpleHitPolicyMatrixDt({ name: string, lastName: string }) : {}
+        {
+          map(string) to(integer)
+          when( _ = 'BOB', _ = 'SAM', ?)
+            lastName({  10,    20,   30 })
+            name    ({  20,    50,   60 }) 
+          
+        }
       """;
 
     TraceEnd output = TestUtil.runtime().src(src).build("SimpleHitPolicyMatrixDt")
@@ -144,19 +143,19 @@ public class DtRuntimeTest {
   @Test 
   public void dtHitPolicyFirstFormula() {
     String src = """ 
-        decision-table DtWithFormula { 
-        accepts { 
-          a INTEGER, b INTEGER, c DECIMAL,
-          total DECIMAL: a + b + c }
-        returns {
-          totalOut DECIMAL: total,
-          score STRING }
+        decision-table DtWithFormula
+        ({ 
+          a: INTEGER, b: INTEGER, c: DECIMAL,
+          total: DECIMAL = a + b + c }):
+        {
+          totalOut: DECIMAL = total,
+          score: STRING } {
         
-        matches FIRST { 
-          when { ?, ?, ?, _ > 100}  then {'high-risk'} 
-          when { ?, ?, ?, ?}        then {'low-risk'} 
-        }}
-        
+          findFirst({ 
+            when(?, ?, ?, _ > 100)  add({'high-risk'}) 
+            when(?, ?, ?, ?)        add({'low-risk'}) 
+          })
+        }
       """;
 
     TraceEnd output = TestUtil.runtime().src(src).build("DtWithFormula")
@@ -176,18 +175,19 @@ public class DtRuntimeTest {
   @Test 
   public void dtHitPolicyMatrixLambdas() {
     String src = """ 
-        decision-table MatrixDT {   
-        accepts { name STRING, lastName STRING }
-        returns {
-          score INTEGER: sum(_matched), // total score of hit columns  
-          max   INTEGER: sum(_constants.map( row -> max(row) )) // sum max possible score of defined fields 
-        }
+        decision-table MatrixDT(  
+        { name: STRING, lastName: STRING }):
+        {
+                score: INTEGER = sum(_matched), // total score of hit columns  
+          maxPossible: INTEGER = sum(_constants.map( row -> max(row) )) // sum max possible score of defined fields 
+        } {
         
-        maps STRING { _ = 'BOB', _ = 'SAM', ? }
-        to INTEGER {  
-          lastName {  10,    20,   30 } 
-          name     {  20,    50,   60 } 
-        }}
+        map(STRING)
+          .to(INTEGER)
+          .when(_ = 'BOB', _ = 'SAM', ?)
+            lastName({  10,    20,   30 }) 
+            name    ({  20,    50,   60 })
+        }
       """;
         
     TraceEnd output = TestUtil.runtime().src(src).build("MatrixDT")
@@ -199,7 +199,7 @@ public class DtRuntimeTest {
     Assertions.assertEquals("""
       --- 
       score: 40 
-      max: 90 
+      maxPossible: 90 
       lastName: 20 
       name: 20
       """, yaml(output.getBody()));
