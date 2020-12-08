@@ -40,10 +40,10 @@ values:
   src: "users.map(e -> e.firstName)"
   value:
     token:
-      text: "map(e->e.firstName)"
+      text: "users.map(e->e.firstName)"
       start:
         line: 1
-        col: 19
+        col: 13
       end:
         line: 1
         col: 40
@@ -67,7 +67,6 @@ values:
           line: 1
           col: 24
       value: "e"
-    mappingType: "MAP"
     body:
       token:
         text: "e.firstName"
@@ -97,6 +96,9 @@ values:
             line: 1
             col: 39
         value: "firstName"
+    findFirst: false
+    sort: []
+    filter: []
     next:
       empty: true
       present: false

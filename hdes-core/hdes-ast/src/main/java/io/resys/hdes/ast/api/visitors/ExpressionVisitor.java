@@ -30,8 +30,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.InExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.CallMethodExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NegateUnary;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnary;
@@ -61,8 +61,8 @@ public interface ExpressionVisitor<T, R> extends HdesVisitor<T, R> {
   T visitAdditive(AdditiveExpression node, HdesTree ctx);
   T visitMultiplicative(MultiplicativeExpression node, HdesTree ctx);
 
-  T visitMethod(MethodInvocation node, HdesTree ctx);
-  T visitMathMethod(StaticMethodInvocation node, HdesTree ctx);
+  T visitMethod(CallMethodExpression node, HdesTree ctx);
+  T visitMathMethod(StaticMethodExpression node, HdesTree ctx);
   T visitLambda(LambdaExpression node, HdesTree ctx);
 
   interface InvocationVisitor<T, R> extends HdesVisitor<T, R> {

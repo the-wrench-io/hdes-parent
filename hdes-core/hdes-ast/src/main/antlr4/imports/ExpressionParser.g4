@@ -17,25 +17,23 @@ methodName: simpleTypeName;
 
 // method invocation
 methodInvocation
-  : staticMethodInvocation
-  | mapperMethodInvocation 
-  | mappingInvocation;
+  : staticMethod
+  | instanceMethod
+  | mappingMethod;
 
-staticMethodInvocation: StaticMethod '(' methodArgs? ')';
-mapperMethodInvocation: methodName '(' methodArgs? ')' ('.' typeInvocation)?;
+staticMethod: StaticMethod '(' methodArgs? ')';
+instanceMethod: methodName '(' methodArgs? ')' ('.' instanceMethodChild)?;
+instanceMethodChild: mappingMethod | typeName;
+mappingMethod: typeName '.' mapMethod ('.' mappingMethodChild)?;
+mappingMethodChild: mappingMethod | mapMethod;
 
-typeInvocation: typeName | boundMethod | mappingInvocation;
-mappingInvocation: typeName '.' boundMethod ('.' typeInvocation)?;
-boundMethod: mapMethod | filterMethod | sortMethod;
-mapMethod: MAP '(' lambdaExpression ')';
-filterMethod: TM_FILTER '(' lambdaExpression ')';
-sortMethod: TM_SORT '(' lambdaExpression ')';
+mapMethod: MAP '(' lambdaExpression ')'  ('.' filterMethod)* ('.' sortMethod)* ('.' findFirstMethod)?;
+filterMethod: FILTER '(' lambdaExpression ')';
+sortMethod: SORT '(' lambdaExpression (',' ASC | DESC)? ')';
 findFirstMethod: FIND_FIRST '(' ')';
-
 
 methodArgs: methodArg (',' methodArg)*;
 methodArg: expression;
-
 
 primary
   : literal
@@ -52,7 +50,7 @@ expression: conditionalExpression | primary | lambdaExpression;
 // lambda
 lambdaExpression: lambdaParameters '->' lambdaBody;
 lambdaParameters: typeName | '(' typeName (',' typeName)* ')';
-lambdaBody: primary; 
+lambdaBody: expression | primary; 
 
 conditionalExpression
   : conditionalOrExpression

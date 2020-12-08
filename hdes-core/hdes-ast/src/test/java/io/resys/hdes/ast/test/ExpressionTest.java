@@ -112,6 +112,15 @@ public class ExpressionTest {
         .build();
     assertNode(node, "arrayMethods");
   }
+  
+  @Test
+  public void arrayMethodFindFirst() throws IOException {
+    ContentNode node = parse()
+        .add("users.map(e -> e.firstName).findFirst()")
+        .add("users.map(e -> e.firstName).filter(e -> e = 'SAM').sort(e -> e, ASC).findFirst()")
+        .build();
+    assertNode(node, "arrayMethodsFindFirst");
+  }
 
   @Test
   public void literals() throws IOException {

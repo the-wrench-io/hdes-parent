@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
@@ -35,7 +34,6 @@ import org.immutables.value.Value;
 import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.HdesParser.AdditiveExpressionContext;
 import io.resys.hdes.ast.HdesParser.AndExpressionContext;
-import io.resys.hdes.ast.HdesParser.BoundMethodContext;
 import io.resys.hdes.ast.HdesParser.ConditionalAndExpressionContext;
 import io.resys.hdes.ast.HdesParser.ConditionalExpressionContext;
 import io.resys.hdes.ast.HdesParser.ConditionalOrExpressionContext;
@@ -43,12 +41,15 @@ import io.resys.hdes.ast.HdesParser.EqualityExpressionContext;
 import io.resys.hdes.ast.HdesParser.ExpressionContext;
 import io.resys.hdes.ast.HdesParser.ExpressionUnitContext;
 import io.resys.hdes.ast.HdesParser.FilterMethodContext;
+import io.resys.hdes.ast.HdesParser.FindFirstMethodContext;
+import io.resys.hdes.ast.HdesParser.InstanceMethodChildContext;
+import io.resys.hdes.ast.HdesParser.InstanceMethodContext;
 import io.resys.hdes.ast.HdesParser.LambdaBodyContext;
 import io.resys.hdes.ast.HdesParser.LambdaExpressionContext;
 import io.resys.hdes.ast.HdesParser.LambdaParametersContext;
 import io.resys.hdes.ast.HdesParser.MapMethodContext;
-import io.resys.hdes.ast.HdesParser.MapperMethodInvocationContext;
-import io.resys.hdes.ast.HdesParser.MappingInvocationContext;
+import io.resys.hdes.ast.HdesParser.MappingMethodChildContext;
+import io.resys.hdes.ast.HdesParser.MappingMethodContext;
 import io.resys.hdes.ast.HdesParser.MethodArgsContext;
 import io.resys.hdes.ast.HdesParser.MethodInvocationContext;
 import io.resys.hdes.ast.HdesParser.MethodNameContext;
@@ -56,23 +57,23 @@ import io.resys.hdes.ast.HdesParser.MultiplicativeExpressionContext;
 import io.resys.hdes.ast.HdesParser.PrimaryContext;
 import io.resys.hdes.ast.HdesParser.RelationalExpressionContext;
 import io.resys.hdes.ast.HdesParser.SortMethodContext;
-import io.resys.hdes.ast.HdesParser.StaticMethodInvocationContext;
-import io.resys.hdes.ast.HdesParser.TypeInvocationContext;
+import io.resys.hdes.ast.HdesParser.StaticMethodContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionContext;
 import io.resys.hdes.ast.HdesParser.UnaryExpressionNotPlusMinusContext;
 import io.resys.hdes.ast.HdesParserBaseVisitor;
 import io.resys.hdes.ast.api.HdesException;
 import io.resys.hdes.ast.api.nodes.ExpressionNode;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.AdditiveType;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.CallMethodExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityOperation;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.InstanceMethodExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MapperMethodInvocation;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MappingType;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaFilterExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaSortExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodExpression;
 import io.resys.hdes.ast.api.nodes.HdesNode;
 import io.resys.hdes.ast.api.nodes.HdesNode.Token;
 import io.resys.hdes.ast.api.nodes.ImmutableAdditiveExpression;
@@ -86,15 +87,17 @@ import io.resys.hdes.ast.api.nodes.ImmutableErrorNode;
 import io.resys.hdes.ast.api.nodes.ImmutableExpressionBody;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableInExpression;
+import io.resys.hdes.ast.api.nodes.ImmutableInstanceMethodExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableLambdaExpression;
-import io.resys.hdes.ast.api.nodes.ImmutableMapperMethodInvocation;
+import io.resys.hdes.ast.api.nodes.ImmutableLambdaFilterExpression;
+import io.resys.hdes.ast.api.nodes.ImmutableLambdaSortExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableMultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ImmutableNegateUnary;
 import io.resys.hdes.ast.api.nodes.ImmutableNotUnary;
 import io.resys.hdes.ast.api.nodes.ImmutableOrExpression;
 import io.resys.hdes.ast.api.nodes.ImmutablePositiveUnary;
 import io.resys.hdes.ast.api.nodes.ImmutableSimpleInvocation;
-import io.resys.hdes.ast.api.nodes.ImmutableStaticMethodInvocation;
+import io.resys.hdes.ast.api.nodes.ImmutableStaticMethodExpression;
 import io.resys.hdes.ast.api.nodes.InvocationNode;
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
 import io.resys.hdes.ast.api.nodes.InvocationNode.StaticMethodType;
@@ -133,6 +136,17 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
   public interface RedundentNullNode extends ExpressionNode {
   }
 
+  
+  @Value.Immutable
+  public interface RedundentFindFirst extends ExpressionNode {
+  }
+  
+  @Value.Immutable
+  public interface RedundentNestedMethod extends ExpressionNode {
+    HdesNode getValue();
+  }
+
+  
   @Value.Immutable
   public interface RedundentTypeInvocation extends ExpressionNode {
     HdesNode getValue();
@@ -140,7 +154,7 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
 
   
   @Override
-  public MethodInvocation visitMethodInvocation(MethodInvocationContext ctx) {
+  public CallMethodExpression visitMethodInvocation(MethodInvocationContext ctx) {
     final Nodes nodes = nodes(ctx);
 /*
     final Optional<InvocationNode> type = nodes.of(InvocationNode.class);
@@ -182,36 +196,49 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
           .build();
     }*/
 
-    return nodes.of(MethodInvocation.class).get();
+    return nodes.of(CallMethodExpression.class).get();
   }
   
   @Override
-  public RedundentTypeInvocation visitTypeInvocation(TypeInvocationContext ctx) {
-    final Nodes nodes = nodes(ctx);
-    return ImmutableRedundentTypeInvocation.builder()
+  public InstanceMethodExpression visitInstanceMethod(InstanceMethodContext ctx) {
+    final var nodes = nodes(ctx);
+    final SimpleInvocation methodName = nodes.of(RedundentMethodName.class).get().getValue();
+    final List<HdesNode> args = nodes.of(RedundentArgs.class).map(t -> t.getValues()).orElse(Collections.emptyList());
+    return ImmutableInstanceMethodExpression.builder()
+        .token(nodes.getToken())
+        .name(methodName)
+        .values(args)
+        .next(nodes.of(RedundentNestedMethod.class))
+        .build();
+  }
+  
+  @Override
+  public RedundentNestedMethod visitInstanceMethodChild(InstanceMethodChildContext ctx) {
+    final var nodes = nodes(ctx);
+    return ImmutableRedundentNestedMethod.builder()
         .token(nodes.getToken())
         .value(nodes.of(HdesNode.class).get())
         .build();
   }
   
+  
   @Override
-  public HdesNode visitMappingInvocation(MappingInvocationContext ctx) {
-    final Nodes nodes = nodes(ctx);
-    final Optional<HdesNode> typeInvocation = nodes
-        .of(RedundentTypeInvocation.class)
-        .map(v -> v.getValue());
+  public LambdaExpression visitMappingMethod(MappingMethodContext ctx) {
+    final var nodes = nodes(ctx);
+    final var lambda = nodes.of(LambdaExpression.class).get();
     
     return ImmutableLambdaExpression.builder()
-        .from(nodes.of(LambdaExpression.class).get())
+        .from(lambda)
+        .token(nodes.getToken())
         .type(nodes.of(InvocationNode.class).get())
-        .next(typeInvocation)
+        .next(nodes.of(RedundentNestedMethod.class))
         .build();
   }
   
   @Override
-  public HdesNode visitBoundMethod(BoundMethodContext ctx) {
-    final Nodes nodes = nodes(ctx);
-    return nodes.of(HdesNode.class).get();
+  public HdesNode visitMappingMethodChild(MappingMethodChildContext ctx) {
+    // TODO Auto-generated method stub
+    return super.visitMappingMethodChild(ctx);
   }
   
   @Override
@@ -221,55 +248,47 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
     
     return ImmutableLambdaExpression.builder()
         .token(nodes.getToken())
-        .mappingType(MappingType.MAP)
         .param(lambda.getArgs().get(0))
         .body(lambda.getBody())
+        .sort(nodes.list(LambdaSortExpression.class))
+        .filter(nodes.list(LambdaFilterExpression.class))
+        .findFirst(nodes.of(RedundentFindFirst.class).isPresent())
         .type(ImmutableEmptyPlaceholder.builder().token(nodes.getToken()).build())
         .build();
   }
   
   @Override
-  public LambdaExpression visitFilterMethod(FilterMethodContext ctx) {
+  public HdesNode visitFindFirstMethod(FindFirstMethodContext ctx) {
+    final var nodes = nodes(ctx);
+    return ImmutableRedundentFindFirst.builder().token(nodes.getToken()).build();
+  }
+  
+  @Override
+  public LambdaFilterExpression visitFilterMethod(FilterMethodContext ctx) {
     final var nodes = nodes(ctx);
     final var lambda = nodes.of(RedundentLambdaExpression.class).get();
     
-    return ImmutableLambdaExpression.builder()
+    return ImmutableLambdaFilterExpression.builder()
         .token(nodes.getToken())
-        .mappingType(MappingType.FILTER)
         .param(lambda.getArgs().get(0))
         .body(lambda.getBody())
-        .type(ImmutableEmptyPlaceholder.builder().token(nodes.getToken()).build())
         .build();
   }
   
   @Override
-  public LambdaExpression visitSortMethod(SortMethodContext ctx) {
+  public LambdaSortExpression visitSortMethod(SortMethodContext ctx) {
     final var nodes = nodes(ctx);
     final var lambda = nodes.of(RedundentLambdaExpression.class).get();
     
-    return ImmutableLambdaExpression.builder()
+    return ImmutableLambdaSortExpression.builder()
         .token(nodes.getToken())
-        .mappingType(MappingType.SORT)
         .param(lambda.getArgs().get(0))
         .body(lambda.getBody())
-        .type(ImmutableEmptyPlaceholder.builder().token(nodes.getToken()).build())
         .build();
   }
   
   @Override
-  public MapperMethodInvocation visitMapperMethodInvocation(MapperMethodInvocationContext ctx) {
-    final Nodes nodes = nodes(ctx);
-    final SimpleInvocation methodName = nodes.of(RedundentMethodName.class).get().getValue();
-    final List<HdesNode> args = nodes.of(RedundentArgs.class).map(t -> t.getValues()).orElse(Collections.emptyList());
-    return ImmutableMapperMethodInvocation.builder()
-        .token(nodes.getToken())
-        .name(methodName)
-        .values(args)
-        .build();
-  }
-  
-  @Override
-  public StaticMethodInvocation visitStaticMethodInvocation(StaticMethodInvocationContext ctx) {
+  public StaticMethodExpression visitStaticMethod(StaticMethodContext ctx) {
     final Nodes nodes = nodes(ctx);
     final TerminalNode type = (TerminalNode) ctx.getChild(0);
     
@@ -293,7 +312,7 @@ public class ExpressionParserVisitor extends HdesParserBaseVisitor<HdesNode> {
     }
     
     final List<HdesNode> args = nodes.of(RedundentArgs.class).map(t -> t.getValues()).orElse(Collections.emptyList());
-    return ImmutableStaticMethodInvocation.builder()
+    return ImmutableStaticMethodExpression.builder()
         .token(nodes.getToken())
         .type(mathType)
         .values(args)

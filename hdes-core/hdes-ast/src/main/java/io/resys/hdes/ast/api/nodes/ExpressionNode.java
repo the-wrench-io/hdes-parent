@@ -30,8 +30,6 @@ import io.resys.hdes.ast.api.nodes.InvocationNode.StaticMethodType;
 
 public interface ExpressionNode extends HdesNode {
   enum AdditiveType { ADD, SUBSTRACT }
-  enum MappingType { MAP, FILTER, SORT }
-  
   enum MultiplicativeType { DIVIDE, MULTIPLY }
   enum EqualityType { 
     NOTEQUAL("!="), EQUAL("="), 
@@ -127,27 +125,43 @@ public interface ExpressionNode extends HdesNode {
     HdesNode getRight();
   }
   
-  interface MethodInvocation extends ExpressionNode {}
+  interface CallMethodExpression extends ExpressionNode {}
   
   @Value.Immutable
-  interface StaticMethodInvocation extends MethodInvocation {
+  interface StaticMethodExpression extends CallMethodExpression {
     StaticMethodType getType();
     List<HdesNode> getValues();
   }
-  
+
   @Value.Immutable
-  interface MapperMethodInvocation extends MethodInvocation {
+  interface InstanceMethodExpression extends CallMethodExpression {
     SimpleInvocation getName();
     List<HdesNode> getValues();
+    Optional<HdesNode> getNext();
   }
   
   @Value.Immutable
-  interface LambdaExpression extends MethodInvocation {    
+  interface LambdaExpression extends CallMethodExpression {    
     InvocationNode getType();
     SimpleInvocation getParam();
-    MappingType getMappingType();
     HdesNode getBody();
     
+    Boolean getFindFirst();
+    List<LambdaSortExpression> getSort();
+    List<LambdaFilterExpression> getFilter();
+    
     Optional<HdesNode> getNext();
+  }
+  
+  @Value.Immutable
+  interface LambdaSortExpression extends ExpressionNode {
+    SimpleInvocation getParam();
+    HdesNode getBody();
+  }
+  
+  @Value.Immutable
+  interface LambdaFilterExpression extends ExpressionNode {
+    SimpleInvocation getParam();
+    HdesNode getBody();
   }
 }

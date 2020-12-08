@@ -45,8 +45,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.InExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.CallMethodExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NegateUnary;
@@ -168,11 +168,11 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
   }
   
   @Override
-  public ExpCode visitMethod(MethodInvocation node, HdesTree ctx) {
+  public ExpCode visitMethod(CallMethodExpression node, HdesTree ctx) {
     if(node instanceof LambdaExpression) {
       return visitLambda((LambdaExpression) node, ctx);
-    } else if(node instanceof StaticMethodInvocation) {
-      return visitMathMethod((StaticMethodInvocation) node, ctx);
+    } else if(node instanceof StaticMethodExpression) {
+      return visitMathMethod((StaticMethodExpression) node, ctx);
     }
     throw new HdesCompilerException(HdesCompilerException.builder().unknownExpression(node));
   }
@@ -209,7 +209,7 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
   }
   
   @Override
-  public ExpCode visitMathMethod(StaticMethodInvocation node, HdesTree ctx) {
+  public ExpCode visitMathMethod(StaticMethodExpression node, HdesTree ctx) {
     HdesTree next = ctx.next(node);
     CodeBlock.Builder params = CodeBlock.builder().add("$T.get().math()", HdesOperationsGen.class);
     boolean isDecimal = false;
@@ -516,8 +516,8 @@ public class GenericExpressionVisitor implements ExpressionVisitor<ExpCode, ExpC
   public ExpCode visitAny(HdesNode node, HdesTree ctx) {
     if (node instanceof InvocationNode) {
       return visitInvocation((InvocationNode) node, ctx);
-    } else if(node instanceof MethodInvocation) {
-      return visitMethod((MethodInvocation) node, ctx);      
+    } else if(node instanceof CallMethodExpression) {
+      return visitMethod((CallMethodExpression) node, ctx);      
     } else if (node instanceof Literal) {
       return visitLiteral((Literal) node, ctx);
     } else if (node instanceof NotUnary) {

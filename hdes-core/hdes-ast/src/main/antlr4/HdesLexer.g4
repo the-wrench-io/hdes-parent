@@ -30,8 +30,10 @@ SM_MAX: M A X;
 SM_IN: I N;
 
 // array/list methods
-TM_FILTER: F I L T E R;
-TM_SORT: S O R T;
+FILTER: F I L T E R;
+SORT: S O R T;
+ASC: A S C;
+DESC: D E S C;
 
 FIND_FIRST: F I N D F I R S T;
 FIND_ALL: F I N D A L L;

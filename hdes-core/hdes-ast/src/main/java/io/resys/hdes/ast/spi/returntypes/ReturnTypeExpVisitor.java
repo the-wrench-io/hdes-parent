@@ -42,8 +42,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.InExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.CallMethodExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NegateUnary;
@@ -563,17 +563,17 @@ public class ReturnTypeExpVisitor implements ExpressionVisitor<TypeDefReturns, T
   }
 
   @Override
-  public TypeDefReturns visitMethod(MethodInvocation node, HdesTree ctx) {
+  public TypeDefReturns visitMethod(CallMethodExpression node, HdesTree ctx) {
     if(node instanceof LambdaExpression) {
       return visitLambda((LambdaExpression) node, ctx);
-    } else if(node instanceof StaticMethodInvocation) {
-      return visitMathMethod((StaticMethodInvocation) node, ctx);
+    } else if(node instanceof StaticMethodExpression) {
+      return visitMathMethod((StaticMethodExpression) node, ctx);
     }
     throw new HdesException(unknownExpression(node));
   }
 
   @Override
-  public TypeDefReturns visitMathMethod(StaticMethodInvocation method, HdesTree ctx) {
+  public TypeDefReturns visitMathMethod(StaticMethodExpression method, HdesTree ctx) {
     List<TypeDefAccepts> accepts = new ArrayList<>();
     var next = ctx.next(method);
     for(HdesNode child : method.getValues()) {
@@ -646,8 +646,8 @@ public class ReturnTypeExpVisitor implements ExpressionVisitor<TypeDefReturns, T
 
     if (node instanceof InvocationNode) {
       return visitInvocation((InvocationNode) node, ctx);
-    } else if (node instanceof MethodInvocation) {
-      return visitMethod((MethodInvocation) node, ctx);
+    } else if (node instanceof CallMethodExpression) {
+      return visitMethod((CallMethodExpression) node, ctx);
     } else if (node instanceof InExpression) {
       return visitIn((InExpression) node, ctx);
     } else if (node instanceof Literal) {

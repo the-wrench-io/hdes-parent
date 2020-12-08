@@ -42,8 +42,8 @@ import io.resys.hdes.ast.api.nodes.ExpressionNode.EqualityType;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.InExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.LambdaExpression;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodInvocation;
-import io.resys.hdes.ast.api.nodes.ExpressionNode.MethodInvocation;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.StaticMethodExpression;
+import io.resys.hdes.ast.api.nodes.ExpressionNode.CallMethodExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.MultiplicativeExpression;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NegateUnary;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.NotUnary;
@@ -482,11 +482,11 @@ public class InterpraterExpressionVisitor implements ExpressionVisitor<LiteralIn
   }
 
   @Override
-  public LiteralInterpratedNode visitMethod(MethodInvocation node, HdesTree ctx) {
+  public LiteralInterpratedNode visitMethod(CallMethodExpression node, HdesTree ctx) {
     if(node instanceof LambdaExpression) {
       return visitLambda((LambdaExpression) node, ctx);
-    } else if(node instanceof StaticMethodInvocation) {
-      return visitMathMethod((StaticMethodInvocation) node, ctx);
+    } else if(node instanceof StaticMethodExpression) {
+      return visitMathMethod((StaticMethodExpression) node, ctx);
     }
     throw new HdesInterpreterException(new StringBuilder()
         .append("Not implemented method").append(System.lineSeparator()) 
@@ -517,7 +517,7 @@ public class InterpraterExpressionVisitor implements ExpressionVisitor<LiteralIn
   }
   
   @Override
-  public LiteralInterpratedNode visitMathMethod(StaticMethodInvocation node, HdesTree ctx) {
+  public LiteralInterpratedNode visitMathMethod(StaticMethodExpression node, HdesTree ctx) {
     final var next = ctx.next(node);
     final var result = ImmutableLiteralInterpratedNode.builder();
     final var value = HdesOperationsGen.get().math();
@@ -540,8 +540,8 @@ public class InterpraterExpressionVisitor implements ExpressionVisitor<LiteralIn
   public LiteralInterpratedNode visit(HdesNode node, HdesTree ctx) {
     if (node instanceof InvocationNode) {
       return visitInvocation((InvocationNode) node, ctx);
-    } else if(node instanceof MethodInvocation) {
-      return visitMethod((MethodInvocation) node, ctx);
+    } else if(node instanceof CallMethodExpression) {
+      return visitMethod((CallMethodExpression) node, ctx);
     } else if (node instanceof Literal) {
       return visitLiteral((Literal) node, ctx);
     } else if (node instanceof NotUnary) {
