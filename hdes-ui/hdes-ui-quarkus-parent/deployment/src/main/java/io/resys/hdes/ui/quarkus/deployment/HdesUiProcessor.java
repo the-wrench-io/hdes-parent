@@ -40,6 +40,7 @@ import org.jboss.logging.Logger;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.arc.deployment.BeanContainerListenerBuildItem;
+import io.quarkus.bootstrap.model.AppArtifact;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
 import io.quarkus.deployment.annotations.ExecutionTime;
@@ -50,7 +51,6 @@ import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.configuration.ConfigurationError;
-import io.quarkus.deployment.index.ResolvedArtifact;
 import io.quarkus.deployment.util.FileUtil;
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigRoot;
@@ -237,9 +237,9 @@ public class HdesUiProcessor {
 
   private void processArtifact(String path, Consumer<GeneratedResourceBuildItem> consumer) throws IOException {
     HdesArtifactResolver resolver = new HdesArtifactResolver();
-    ResolvedArtifact artifact = resolver.getArtifact(WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID, null);
+    AppArtifact artifact = resolver.getArtifact(WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID, null);
     
-    try (JarFile jarFile = new JarFile(artifact.getArtifactPath().toFile())) {
+    try (JarFile jarFile = new JarFile(artifact.getPaths().getSinglePath().toFile())) {
       Enumeration<JarEntry> entries = jarFile.entries();
       String jarPrefix = String.format("%s/%s/", WEBJAR_PREFIX, artifact.getVersion());
       

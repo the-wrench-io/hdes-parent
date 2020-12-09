@@ -38,7 +38,7 @@ import com.mongodb.client.MongoClients;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder;
+import de.flapdoodle.embed.mongo.config.MongodConfig;
 import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
@@ -74,7 +74,7 @@ public class MongoDbConfig {
           new ValueCodecProvider()
           ));
       
-      executable = starter.prepare(new MongodConfigBuilder()
+      executable = starter.prepare(MongodConfig.builder()
         .version(Version.Main.PRODUCTION)
 //          .version(Versions.withFeatures(new GenericVersion("4.2.1"), 
 //              Feature.SYNC_DELAY, Feature.STORAGE_ENGINE, Feature.ONLY_64BIT, 
@@ -84,6 +84,7 @@ public class MongoDbConfig {
           .net(new Net("localhost", port, Network.localhostIsIPv6()))
           .build());
       process = executable.start();
+      
       client = MongoClients.create(
           MongoClientSettings.builder()
           .codecRegistry(codecRegistry)

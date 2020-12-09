@@ -35,31 +35,25 @@ public class FlowWithSimpleLoopTest {
   @Test
   public void loop() {
     String src = """ 
-        decision-table Scoring ({ arg: INTEGER }) : { score: INTEGER } { 
+        decision-table ScoringClassifierDT ({ arg: INTEGER }) : { score: INTEGER } { 
           findFirst({
             when( _ between 1 and 10 ).add({ 10 }) 
             when( ? ).add({ 20 })
           })
         } 
         
-        flow SimpleFlow ({ classifiers: INTEGER[] }): { total: INTEGER }
-        { 
+        flow ScoringClassifiersFlow ({ classifiers: INTEGER[] }): { total: INTEGER } {
           InitialScoring() {
-            map(classifiers).to({ Scoring ({ arg: _ }) })
+            map(classifiers)
+            .to({ ScoringClassifierDT({ arg: _ }) })
+            
             return { total: sum(_.map(scoring -> scoring.score)) }
           }
         }
+        
       """;
-    
-    /*
 
-    map(classifiers).to({
-      Scoring ({ arg: _ })
-    })
-    
-*/
-
-    TraceEnd output = TestUtil.runtime().src(src).build("SimpleFlow")
+    TraceEnd output = TestUtil.runtime().src(src).build("ScoringClassifiersFlow")
         .accepts()
         .value("classifiers", new ArrayList<>(Arrays.asList(10, 12)))
         .build();

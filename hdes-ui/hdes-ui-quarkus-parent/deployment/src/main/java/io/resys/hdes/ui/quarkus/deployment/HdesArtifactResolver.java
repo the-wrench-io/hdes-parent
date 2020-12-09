@@ -33,11 +33,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.function.Function;
 
-import io.quarkus.deployment.index.ArtifactResolver;
-import io.quarkus.deployment.index.ResolvedArtifact;
+import io.quarkus.bootstrap.model.AppArtifact;
 import io.resys.hdes.ui.quarkus.runtime.HdesBackendRecorder;
 
-public class HdesArtifactResolver implements ArtifactResolver {
+public class HdesArtifactResolver {
   private static final String META_INF_MANIFEST_MF = "META-INF/MANIFEST.MF";
   private final List<StoredUrl> pathList = new ArrayList<>();
 
@@ -83,13 +82,12 @@ public class HdesArtifactResolver implements ArtifactResolver {
     }
   }
 
-  @Override
-  public ResolvedArtifact getArtifact(String groupId, String artifactId, String classifier) {
+  public AppArtifact getArtifact(String groupId, String artifactId, String classifier) {
     String filePatten = artifactId + "-(\\d.*)\\.jar";
-    Function<StoredUrl, ResolvedArtifact> resolver = createMavenResolver(groupId, artifactId);
+    Function<StoredUrl, AppArtifact> resolver = createMavenResolver(groupId, artifactId);
     for (StoredUrl url : pathList) {
       if (url.fileName.matches(filePatten)) {
-        ResolvedArtifact result = resolver.apply(url);
+        AppArtifact result = resolver.apply(url);
         if (result != null) {
           return result;
         }
@@ -98,7 +96,7 @@ public class HdesArtifactResolver implements ArtifactResolver {
     throw new RuntimeException("Could not resolve artifact " + groupId + ":" + artifactId + ":" + classifier);
   }
 
-  public Function<StoredUrl, ResolvedArtifact> createMavenResolver(String groupId, String artifactId) {
+  public Function<StoredUrl, AppArtifact> createMavenResolver(String groupId, String artifactId) {
     return (StoredUrl url) -> {
       String[] groupParts = groupId.split("\\.");
       if (url.path.getNameCount() < groupParts.length + 2) {
@@ -123,7 +121,9 @@ public class HdesArtifactResolver implements ArtifactResolver {
           int end = url.fileName.lastIndexOf(".jar");
           String version = url.fileName.substring(start, end);
           
-          return new ResolvedArtifact(groupId, artifactId, version, null, url.path);
+          var artifact = new AppArtifact(groupId, artifactId, version);
+          artifact.setPath(url.path);
+          return artifact;
         } catch (Exception e) {
           throw new RuntimeException(e);
         }

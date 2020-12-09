@@ -29,6 +29,8 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import io.quarkus.test.QuarkusUnitTest;
 import io.restassured.RestAssured;
 
+
+//-Djava.util.logging.manager=org.jboss.logmanager.LogManager
 public class DisabledTest {
   @RegisterExtension
   final static QuarkusUnitTest config = new QuarkusUnitTest()

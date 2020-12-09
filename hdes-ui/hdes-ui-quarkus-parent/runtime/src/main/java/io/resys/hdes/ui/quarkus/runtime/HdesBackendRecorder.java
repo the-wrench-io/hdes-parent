@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import io.quarkus.arc.runtime.BeanContainerListener;
 import io.quarkus.runtime.annotations.Recorder;
-import io.quarkus.vertx.http.runtime.ThreadLocalHandler;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
@@ -42,10 +41,12 @@ public class HdesBackendRecorder {
   }
 
   public Handler<RoutingContext> handler(String destination, String uiPath) {
-    Handler<RoutingContext> handler = new ThreadLocalHandler(() -> StaticHandler.create()
+    
+    Handler<RoutingContext> handler = StaticHandler.create()
         .setAllowRootFileSystemAccess(true)
         .setWebRoot(destination)
-        .setDefaultContentEncoding(StandardCharsets.UTF_8.name()));
+        .setDefaultContentEncoding(StandardCharsets.UTF_8.name());
+    
     return (RoutingContext event) -> {
       if (event.normalisedPath().length() == uiPath.length()) {
         event.response()
