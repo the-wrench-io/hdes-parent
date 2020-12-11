@@ -1,21 +1,24 @@
 package io.resys.hdes.backend.spi.mongodb.commands;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
-import org.bson.conversions.Bson;
-
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
+import io.resys.hdes.backend.api.ImmutableConstraintViolation;
 import io.resys.hdes.backend.api.ImmutableProject;
+import io.resys.hdes.backend.api.ImmutableRevisionConflict;
 import io.resys.hdes.backend.api.PmException;
-import io.resys.hdes.backend.api.PmException.ExceptionCode;
+import io.resys.hdes.backend.api.PmException.ConstraintType;
+import io.resys.hdes.backend.api.PmException.ErrorType;
 import io.resys.hdes.backend.api.PmRepository.Project;
+import io.resys.hdes.backend.api.PmRevException;
 import io.resys.hdes.backend.api.commands.ProjectCommands;
 import io.resys.hdes.backend.spi.mongodb.PersistentCommand;
 import io.resys.hdes.backend.spi.mongodb.PersistentCommand.MongoDbConfig;
@@ -48,7 +51,12 @@ public class MongoProjectCommands implements ProjectCommands {
         RepoAssert.notEmpty(name, () -> "name not defined!");
         Optional<Project> conflict = query().findByName(name);
         if(conflict.isPresent()) {
-          throw new PmException(ExceptionCode.DUPLICATE_PROJECT, "Project with the same name already exists!");
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(conflict.get().getId())
+              .rev(conflict.get().getRev())
+              .constraint(ConstraintType.NOT_UNIQUE)
+              .type(ErrorType.ACCESS)
+              .build(), "entity not found: 'project' with name: '" + name + "' already exists!");
         }
         
         Project project = ImmutableProject.builder()
@@ -67,33 +75,69 @@ public class MongoProjectCommands implements ProjectCommands {
   @Override
   public ProjectQueryBuilder query() {
     return new ProjectQueryBuilder() {
-      
       @Override
       public List<Project> list() {
-        // TODO Auto-generated method stub
-        return null;
+        BiFunction<MongoClient, MongoDbConfig, List<Project>> mapper = (client, config) -> {
+          List<Project> result = new ArrayList<>();          
+          client
+            .getDatabase(config.getDb())
+            .getCollection(config.getProjects(), Project.class)
+            .find().forEach(result::add);
+          
+          return Collections.unmodifiableList(result);
+        };
+        return persistentCommand.map(mapper);
       }
       
       @Override
       public Project id(String id) throws PmException {
-        // TODO Auto-generated method stub
-        return null;
+        RepoAssert.notNull(id, () -> "id not defined!");
+        
+        BiFunction<MongoClient, MongoDbConfig, Optional<Project>> mapper = (client, config) -> {
+          Project value = client
+              .getDatabase(config.getDb())
+              .getCollection(config.getProjects(), Project.class)
+              .find(Filters.eq(ProjectCodec.ID, id))
+              .first();
+          return Optional.ofNullable(value);
+        };
+        Optional<Project> result = persistentCommand.map(mapper);
+        if(result.isEmpty()) {
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(id)
+              .rev("any")
+              .constraint(ConstraintType.NOT_FOUND)
+              .type(ErrorType.PROJECT)
+              .build(), "entity not found: 'project' with id: '" + id + "'!"); 
+        }
+        return result.get();
+      }
+      
+      @Override
+      public Project rev(String id, String rev) throws PmException {
+        RepoAssert.notNull(id, () -> "id not defined!");
+        RepoAssert.notNull(rev, () -> "rev not defined!");
+        Project project = id(id);
+        
+        if(!rev.equals(project.getRev())) {
+          throw new PmRevException(ImmutableRevisionConflict.builder()
+              .id(project.getId())
+              .revToUpdate(rev)
+              .rev(project.getRev())
+              .build(), "revision conflict: 'project' with id: '" + project.getId() + "', revs: " + project.getRev() + " != " + rev + "!");
+        }
+        return project;
       }
       
       @Override
       public Optional<Project> findByName(String name) {
+        RepoAssert.notNull(name, () -> "name not defined!");
         BiFunction<MongoClient, MongoDbConfig, Optional<Project>> mapper = (client, config) -> {
-          
-          MongoCollection<Project> collection = client
+          Project value = client
               .getDatabase(config.getDb())
-              .getCollection(config.getProjects(), Project.class);
-          collection.find().forEach(p -> {
-            
-            System.out.println(p);
-          });;
-          
-          Bson filter = Filters.eq(ProjectCodec.NAME, name);
-          Project value = collection.find(filter).first();
+              .getCollection(config.getProjects(), Project.class)
+              .find(Filters.eq(ProjectCodec.NAME, name))
+              .first();
           return Optional.ofNullable(value);
         };
         return persistentCommand.map(mapper);
@@ -101,37 +145,82 @@ public class MongoProjectCommands implements ProjectCommands {
       
       @Override
       public Optional<Project> find(String id) {
-        // TODO Auto-generated method stub
-        return null;
+        BiFunction<MongoClient, MongoDbConfig, Optional<Project>> mapper = (client, config) -> {
+          Project value = client
+              .getDatabase(config.getDb())
+              .getCollection(config.getProjects(), Project.class)
+              .find(Filters.eq(ProjectCodec.ID, id))
+              .first();
+          return Optional.ofNullable(value);
+        };
+        return persistentCommand.map(mapper);
       }
     };
   }
 
   @Override
   public ProjectUpdateBuilder update() {
-    // TODO Auto-generated method stub
-    return null;
+    return new ProjectUpdateBuilder() {
+      private String id;
+      private String rev;
+      private String name;
+      
+      @Override
+      public ProjectUpdateBuilder rev(String rev) {
+        this.rev = rev;
+        return this;
+      }
+      @Override
+      public ProjectUpdateBuilder name(String name) {
+        this.name = name;
+        return this;
+      }
+      @Override
+      public ProjectUpdateBuilder id(String id) {
+        this.id = id;
+        return this;
+      }
+      @Override
+      public Project build() throws PmException {
+        RepoAssert.notNull(id, () -> "id not defined!");
+        RepoAssert.notNull(rev, () -> "rev not defined!");
+        RepoAssert.notNull(name, () -> "name not defined!");
+        
+        Project project = ImmutableProject.builder()
+            .from(query().rev(id, rev))
+            .name(name)
+            .build();
+        return persistentCommand
+            .update(visitor -> visitor.visitProject(project))
+            .getProject().get(project.getId());
+      }
+    };
   }
 
   @Override
   public ProjectDeleteBuilder delete() {
     return new ProjectDeleteBuilder() {
+      private String id;
+      private String rev;
       @Override
       public ProjectDeleteBuilder rev(String rev) {
-        // TODO Auto-generated method stub
-        return null;
+        this.rev = rev;
+        return this;
       }
-      
       @Override
       public ProjectDeleteBuilder id(String id) {
-        // TODO Auto-generated method stub
-        return null;
+        this.id = id;
+        return this;
       }
-      
       @Override
       public Project build() throws PmException {
-        // TODO Auto-generated method stub
-        return null;
+        RepoAssert.notNull(id, () -> "id not defined!");
+        RepoAssert.notNull(rev, () -> "rev not defined!");
+        
+        Project project = query().rev(id, rev);
+        return persistentCommand
+            .delete(visitor -> visitor.visitProject(project))
+            .getProject().get(project.getId());
       }
     };
   }

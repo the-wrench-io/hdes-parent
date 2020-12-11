@@ -13,20 +13,22 @@ public interface AccessCommands {
   AccessDeleteBuilder delete();
 
   interface AccessQueryBuilder {
+    Access rev(String id, String rev) throws PmException;
+    Access id(String id) throws PmException;
+    
+    Optional<Access> find(String id);
+    Optional<Access> findByName(String name);
+    
     AccessQueryBuilder projectId(String projectId);
     AccessQueryBuilder userId(String userId);
-    
-    Access id(String id) throws PmException;
-    Optional<Access> find(String id) throws PmException;
-    List<Access> list() throws PmException;
+    List<Access> find() throws PmException;
   }  
   
   interface AccessDeleteBuilder {
-    AccessDeleteBuilder id(String id);
-    AccessDeleteBuilder rev(String rev);
+    AccessDeleteBuilder rev(String id, String rev);
     AccessDeleteBuilder projectId(String projectId);
     AccessDeleteBuilder userId(String userId);
-    Access build() throws PmException;
+    List<Access> build() throws PmException;
   }  
   
   interface AccessUpdateBuilder {

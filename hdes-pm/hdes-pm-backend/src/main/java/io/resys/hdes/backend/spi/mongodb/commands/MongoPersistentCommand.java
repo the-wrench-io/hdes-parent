@@ -11,6 +11,7 @@ import io.resys.hdes.backend.spi.mongodb.ImmutablePersistedEntities;
 import io.resys.hdes.backend.spi.mongodb.PersistentCommand;
 import io.resys.hdes.backend.spi.mongodb.visitors.CreateEntityVisitor;
 import io.resys.hdes.backend.spi.mongodb.visitors.DeleteEntityVisitor;
+import io.resys.hdes.backend.spi.mongodb.visitors.UpdateEntityVisitor;
 
 public class MongoPersistentCommand implements PersistentCommand {
 
@@ -59,8 +60,14 @@ public class MongoPersistentCommand implements PersistentCommand {
 
   @Override
   public PersistedEntities update(Consumer<EntityVisitor> consumer) {
-    // TODO Auto-generated method stub
-    return null;
+    final var collect = ImmutablePersistedEntities.builder();
+    transaction.accept(client -> consumer.accept(UpdateEntityVisitor.builder()
+        .client(client)
+        .config(config)
+        .collect(collect)
+        .build())
+    );
+    return collect.build();
   }
 
   @Override

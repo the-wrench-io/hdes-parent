@@ -13,21 +13,20 @@ public interface UserCommands {
   UserDeleteBuilder delete();
 
   interface UserQueryBuilder {
-    UserQueryBuilder projectId(String projectId);
     User id(String id) throws PmException;
-    Optional<User> find(String id) throws PmException;
-    List<User> list() throws PmException;
+    User rev(String id, String rev) throws PmException;
+    Optional<User> find(String id);
+    Optional<User> findByValue(String name);
+    List<User> find() throws PmException;
   }  
   
   interface UserDeleteBuilder {
-    UserDeleteBuilder id(String id);
-    UserDeleteBuilder rev(String rev);
+    UserDeleteBuilder rev(String id, String rev);
     User build() throws PmException;
   }  
   
   interface UserUpdateBuilder {
-    UserUpdateBuilder id(String id);
-    UserUpdateBuilder rev(String rev);
+    UserUpdateBuilder rev(String id, String rev);
     UserUpdateBuilder externalId(String externalId);
     UserUpdateBuilder value(String value);
     User build() throws PmException;

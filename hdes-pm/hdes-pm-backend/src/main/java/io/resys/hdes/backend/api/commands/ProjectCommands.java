@@ -14,6 +14,7 @@ public interface ProjectCommands {
 
   interface ProjectQueryBuilder {
     Project id(String id) throws PmException;
+    Project rev(String id, String rev) throws PmException;
     Optional<Project> find(String id);
     Optional<Project> findByName(String name);
     List<Project> list();

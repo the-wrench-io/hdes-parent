@@ -37,10 +37,10 @@ import io.resys.hdes.backend.api.PmRepository.User;
 public class UserCodec implements Codec<User> {
   
   public static final String ID = "_id";
-  private static final String REV = "rev";
+  public static final String REV = "rev";
   private static final String EXTERNAL_ID = "externalId";
   private static final String CREATED = "created";
-  private static final String VALUE = "value";
+  public static final String VALUE = "value";
   
   @Override
   public void encode(BsonWriter writer, User command, EncoderContext encoderContext) {

@@ -35,12 +35,13 @@ import io.resys.hdes.backend.api.PmRepository.Access;
 public class AccessCodec implements Codec<Access> {
   
   public static final String ID = "_id";
-  private static final String REV = "rev";
+  public static final String REV = "rev";
+  public static final String NAME = "name";
+  
   private static final String CREATED = "created";
-  private static final String NAME = "name";
-  private static final String USER_ID = "userId";
-  private static final String PROJECT_ID = "projectId";
-  private static final String TOKEN = "token";
+  public static final String USER_ID = "userId";
+  public static final String PROJECT_ID = "projectId";
+  public static final String TOKEN = "token";
   
   @Override
   public void encode(BsonWriter writer, Access command, EncoderContext encoderContext) {

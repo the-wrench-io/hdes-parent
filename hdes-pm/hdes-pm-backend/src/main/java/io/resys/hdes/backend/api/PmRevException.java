@@ -25,6 +25,7 @@ public class PmRevException extends RuntimeException {
   public interface RevisionConflict {
     String getId();
     String getRev();
+    String getRevToUpdate();
     RevisionType getType();
   }
   

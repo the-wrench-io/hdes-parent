@@ -2,7 +2,6 @@ package io.resys.hdes.backend.spi.mongodb.visitors;
 
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.result.InsertOneResult;
 
 import io.resys.hdes.backend.api.PmRepository.Access;
 import io.resys.hdes.backend.api.PmRepository.Project;
@@ -17,7 +16,6 @@ public class CreateEntityVisitor implements EntityVisitor {
   private final MongoClient client;
   private final MongoDbConfig config;
   private final ImmutablePersistedEntities.Builder collect;
-  private final StringBuilder log = new StringBuilder("Writing transaction: ").append(System.lineSeparator());
   
   public CreateEntityVisitor(MongoClient client, MongoDbConfig config, ImmutablePersistedEntities.Builder collect) {
     super();
@@ -61,22 +59,31 @@ public class CreateEntityVisitor implements EntityVisitor {
     final MongoCollection<Project> collection = client
         .getDatabase(config.getDb())
         .getCollection(config.getProjects(), Project.class);
-    InsertOneResult inserted = collection.insertOne(project);
     
+    collection.insertOne(project);
     collect.putProject(project.getId(), project);
-    log.append("  - ").append(project.getName()).append(System.lineSeparator());
     return project;
   }
 
   @Override
   public Access visitAccess(Access access) {
-    // TODO Auto-generated method stub
-    return null;
+    final MongoCollection<Access> collection = client
+        .getDatabase(config.getDb())
+        .getCollection(config.getAccess(), Access.class);
+    
+    collection.insertOne(access);
+    collect.putAccess(access.getId(), access);
+    return access;
   }
 
   @Override
   public User visitUser(User user) {
-    // TODO Auto-generated method stub
-    return null;
+    final MongoCollection<User> collection = client
+        .getDatabase(config.getDb())
+        .getCollection(config.getUsers(), User.class);
+    
+    collection.insertOne(user);
+    collect.putUser(user.getId(), user);
+    return user;
   }
 }

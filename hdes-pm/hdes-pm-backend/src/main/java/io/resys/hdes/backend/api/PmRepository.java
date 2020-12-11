@@ -41,9 +41,9 @@ public interface PmRepository {
     String getId();
     String getRev();
     LocalDateTime getCreated();
-    String getName();
     String getUserId();
     String getProjectId();
     String getToken();
+    String getName();
   }
 }
