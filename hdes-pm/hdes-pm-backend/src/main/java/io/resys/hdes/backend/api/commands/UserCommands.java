@@ -15,8 +15,10 @@ public interface UserCommands {
   interface UserQueryBuilder {
     User id(String id) throws PmException;
     User rev(String id, String rev) throws PmException;
+    
     Optional<User> find(String id);
     Optional<User> findByValue(String name);
+    Optional<User> findByExternalId(String externalId);
     List<User> find() throws PmException;
   }  
   

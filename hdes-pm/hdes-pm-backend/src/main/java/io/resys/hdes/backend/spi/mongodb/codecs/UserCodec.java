@@ -38,7 +38,7 @@ public class UserCodec implements Codec<User> {
   
   public static final String ID = "_id";
   public static final String REV = "rev";
-  private static final String EXTERNAL_ID = "externalId";
+  public static final String EXTERNAL_ID = "externalId";
   private static final String CREATED = "created";
   public static final String VALUE = "value";
   

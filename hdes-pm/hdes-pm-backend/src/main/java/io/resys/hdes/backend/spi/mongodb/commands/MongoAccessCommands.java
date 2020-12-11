@@ -85,6 +85,7 @@ public class MongoAccessCommands implements AccessCommands {
             .id(UUID.randomUUID().toString())
             .rev(UUID.randomUUID().toString())
             .name(name)
+            .token(UUID.randomUUID().toString())
             .projectId(projectId)
             .userId(userId)
             .created(LocalDateTime.now())

@@ -76,7 +76,7 @@ public class MongoProjectCommands implements ProjectCommands {
   public ProjectQueryBuilder query() {
     return new ProjectQueryBuilder() {
       @Override
-      public List<Project> list() {
+      public List<Project> find() {
         BiFunction<MongoClient, MongoDbConfig, List<Project>> mapper = (client, config) -> {
           List<Project> result = new ArrayList<>();          
           client

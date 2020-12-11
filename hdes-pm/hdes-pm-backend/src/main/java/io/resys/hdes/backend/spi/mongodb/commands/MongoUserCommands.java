@@ -150,6 +150,20 @@ public class MongoUserCommands implements UserCommands {
       }
       
       @Override
+      public Optional<User> findByExternalId(String externalId) {
+        RepoAssert.notNull(externalId, () -> "externalId not defined!");
+        
+        BiFunction<MongoClient, MongoDbConfig, Optional<User>> mapper = (client, config) -> {
+          User user = client
+              .getDatabase(config.getDb())
+              .getCollection(config.getUsers(), User.class)
+              .find(Filters.eq(UserCodec.EXTERNAL_ID, externalId))
+              .first();
+          return Optional.ofNullable(user);
+        };
+        return persistentCommand.map(mapper);
+      }
+      @Override
       public Optional<User> find(String id) {
         BiFunction<MongoClient, MongoDbConfig, Optional<User>> mapper = (client, config) -> {
           User value = client

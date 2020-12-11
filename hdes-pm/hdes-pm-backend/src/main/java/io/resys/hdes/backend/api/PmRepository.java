@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.immutables.value.Value;
 
 import io.resys.hdes.backend.api.commands.AccessCommands;
+import io.resys.hdes.backend.api.commands.BatchProjectCommands;
 import io.resys.hdes.backend.api.commands.ProjectCommands;
 import io.resys.hdes.backend.api.commands.UserCommands;
 
@@ -15,9 +16,7 @@ public interface PmRepository {
   ProjectCommands projects();
   UserCommands users();
   AccessCommands access();
-  
-  
-  
+  BatchProjectCommands batchProject();
   
   @Value.Immutable
   interface Project extends Serializable {

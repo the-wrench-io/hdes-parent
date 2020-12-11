@@ -17,7 +17,7 @@ public interface ProjectCommands {
     Project rev(String id, String rev) throws PmException;
     Optional<Project> find(String id);
     Optional<Project> findByName(String name);
-    List<Project> list();
+    List<Project> find();
   }  
   
   interface ProjectDeleteBuilder {
