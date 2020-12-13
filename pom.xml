@@ -49,14 +49,11 @@
   </distributionManagement>
 
   <modules>
-
     <module>hdes-build-parent</module>
-    <module>hdes-core</module>
     <module>hdes-bom</module>
-    <module>hdes-storage</module>
-    <module>hdes-ui</module>
+    <module>hdes-core</module>
     <module>hdes-maven</module>
-
+    <module>hdes-dev-tools</module>
   </modules>
 
   <properties>
