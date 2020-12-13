@@ -12,6 +12,7 @@
   <packaging>pom</packaging>
 
   <modules>
+    <module>hdes-pm-repo</module>
     <module>hdes-object-repo</module>
     <module>hdes-object-repo-mongodb</module>
   </modules>
