@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>io.resys.hdes</groupId>
-		<artifactId>hdes-storage</artifactId>
+		<artifactId>hdes-dev-tools</artifactId>
 		<version>999-SNAPSHOT</version>
 	</parent>
 	<artifactId>hdes-pm-repo</artifactId>

@@ -157,6 +157,8 @@ public class HdesUiProcessor {
     routes.produce(new RouteBuildItem(defsPath, new HdesDefsHandler(), HandlerType.BLOCKING));
     displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(defsPath));
 
+    
+    
     // Debug handler
     String debugPath = path + "/debug/:qualifier/:name";
     routes.produce(new RouteBuildItem(debugPath, BodyHandler.create()));

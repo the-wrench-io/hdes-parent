@@ -8,7 +8,7 @@
     <relativePath>../hdes-build-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>hdes-storage</artifactId>
+  <artifactId>hdes-dev-tools</artifactId>
   <packaging>pom</packaging>
 
   <modules>
