@@ -3,45 +3,74 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
-import PeopleIcon from '@material-ui/icons/People';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import LayersIcon from '@material-ui/icons/Layers';
-import AssignmentIcon from '@material-ui/icons/Assignment';
 
-export const mainListItems = (
-  <div>
-    <ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <ListItemText primary="Add User" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <ShoppingCartIcon />
-      </ListItemIcon>
-      <ListItemText primary="Add Project" />
-    </ListItem>
-  </div>
-);
+import LibraryBooksOutlinedIcon from '@material-ui/icons/LibraryBooksOutlined';
+import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 
-export const secondaryListItems = (
-  <div>
-    <ListSubheader inset>Views</ListSubheader>
-    <ListItem button>
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <ListItemText primary="List Users" />
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <BarChartIcon />
-      </ListItemIcon>
-      <ListItemText primary="List Projects" />
-    </ListItem>
+import LibraryAddOutlinedIcon from '@material-ui/icons/LibraryAddOutlined';
+import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined';
 
-  </div>
-);
+import AddUser from './AddUser';
+
+
+
+enum OperationType { USER, PROJECT }
+
+class OperationsState { 
+  enabled: boolean;
+  type?: OperationType
+
+  constructor(enabled: boolean, type?: OperationType) {
+    this.enabled = enabled;
+    this.type = type;
+  }
+}
+
+export const Operations = ({}) => {
+  const [open, setOpen] = React.useState(new OperationsState(false));
+  
+  const openAdd = (type: OperationType) => {
+    setOpen(new OperationsState(true, type));
+  };
+  const closeAdd = () => {
+    setOpen(new OperationsState(false));
+  };
+
+  return (
+    <div>
+      <AddUser open={open.enabled && open.type === OperationType.USER} handleClose={closeAdd} /> 
+    
+      <ListSubheader inset>Operation</ListSubheader>
+      <ListItem button onClick={() => openAdd(OperationType.USER)}>
+        <ListItemIcon>
+          <PersonAddOutlinedIcon />
+        </ListItemIcon>
+        <ListItemText primary="Add User"/>
+      </ListItem>
+      <ListItem button onClick={() => openAdd(OperationType.PROJECT)}>
+        <ListItemIcon>
+          <LibraryAddOutlinedIcon />
+        </ListItemIcon>
+        <ListItemText primary="Add Project" />
+      </ListItem>
+    </div>);
+}
+
+export const Views = ({}) => {
+  return (
+    <div>
+      <ListSubheader inset>Views</ListSubheader>
+      <ListItem button>
+        <ListItemIcon>
+          <GroupOutlinedIcon />
+        </ListItemIcon>
+        <ListItemText primary="List Users" />
+      </ListItem>
+      <ListItem button>
+        <ListItemIcon>
+          <LibraryBooksOutlinedIcon />
+        </ListItemIcon>
+        <ListItemText primary="List Projects" />
+      </ListItem>
+    </div>);
+  }
