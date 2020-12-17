@@ -24,6 +24,8 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
+import io.resys.hdes.pm.repo.api.PmRepository.GroupUser;
 import io.resys.hdes.pm.repo.api.PmRepository.Project;
 import io.resys.hdes.pm.repo.api.PmRepository.User;
 import io.resys.hdes.pm.repo.spi.mongodb.ImmutablePersistedEntities;
@@ -105,5 +107,27 @@ public class CreateEntityVisitor implements EntityVisitor {
     collection.insertOne(user);
     collect.putUser(user.getId(), user);
     return user;
+  }
+
+  @Override
+  public Group visitGroup(Group group) {
+    final MongoCollection<Group> collection = client
+        .getDatabase(config.getDb())
+        .getCollection(config.getGroups(), Group.class);
+    
+    collection.insertOne(group);
+    collect.putGroups(group.getId(), group);
+    return group;
+  }
+
+  @Override
+  public GroupUser visitGroupUser(GroupUser groupUser) {
+    final MongoCollection<GroupUser> collection = client
+        .getDatabase(config.getDb())
+        .getCollection(config.getGroupUsers(), GroupUser.class);
+    
+    collection.insertOne(groupUser);
+    collect.putGroupUsers(groupUser.getId(), groupUser);
+    return groupUser;
   }
 }

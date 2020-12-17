@@ -31,6 +31,7 @@ import com.mongodb.client.model.Updates;
 
 import io.resys.hdes.pm.repo.api.ImmutableAccess;
 import io.resys.hdes.pm.repo.api.ImmutableConstraintViolation;
+import io.resys.hdes.pm.repo.api.ImmutableGroup;
 import io.resys.hdes.pm.repo.api.ImmutableProject;
 import io.resys.hdes.pm.repo.api.ImmutableRevisionConflict;
 import io.resys.hdes.pm.repo.api.ImmutableUser;
@@ -38,6 +39,8 @@ import io.resys.hdes.pm.repo.api.PmException;
 import io.resys.hdes.pm.repo.api.PmException.ConstraintType;
 import io.resys.hdes.pm.repo.api.PmException.ErrorType;
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
+import io.resys.hdes.pm.repo.api.PmRepository.GroupUser;
 import io.resys.hdes.pm.repo.api.PmRepository.Project;
 import io.resys.hdes.pm.repo.api.PmRepository.User;
 import io.resys.hdes.pm.repo.api.PmRevException;
@@ -45,6 +48,7 @@ import io.resys.hdes.pm.repo.spi.mongodb.ImmutablePersistedEntities;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand.EntityVisitor;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand.MongoDbConfig;
 import io.resys.hdes.pm.repo.spi.mongodb.codecs.AccessCodec;
+import io.resys.hdes.pm.repo.spi.mongodb.codecs.GroupCodec;
 import io.resys.hdes.pm.repo.spi.mongodb.codecs.ProjectCodec;
 import io.resys.hdes.pm.repo.spi.mongodb.codecs.UserCodec;
 import io.resys.hdes.pm.repo.spi.support.RepoAssert;
@@ -218,12 +222,53 @@ public class UpdateEntityVisitor implements EntityVisitor {
     
     final var newRev = UUID.randomUUID().toString();
     collection.updateOne(filter, Updates.combine(
-        Updates.set(UserCodec.VALUE, user.getValue()), 
+        Updates.set(UserCodec.NAME, user.getName()), 
         Updates.set(UserCodec.TOKEN, user.getToken()), 
         Updates.set(UserCodec.REV, newRev)));
     
     final var result = ImmutableUser.builder().from(user).rev(newRev).build();
     collect.putUser(result.getId(), result);
     return result;
+  }
+
+  @Override
+  public Group visitGroup(Group group) {
+    final MongoCollection<Group> collection = client
+        .getDatabase(config.getDb())
+        .getCollection(config.getGroups(), Group.class);
+    
+    final Bson filter = Filters.eq(GroupCodec.ID, group.getId());
+    final Group value = collection.find(filter).first();
+    
+    if(value == null) {
+      throw new PmException(ImmutableConstraintViolation.builder()
+          .id(group.getId())
+          .rev(group.getRev())
+          .constraint(ConstraintType.NOT_FOUND)
+          .type(ErrorType.GROUP)
+          .build(), "entity: 'group' not found with id: '" + group.getId() + "'!");
+    }
+    
+    if(!value.getRev().equals(group.getRev())) {
+      throw new PmRevException(ImmutableRevisionConflict.builder()
+          .id(group.getId())
+          .revToUpdate(group.getRev())
+          .rev(value.getRev())
+          .build(), "revision conflict: 'group' with id: '" + group.getId() + "', revs: " + group.getRev() + " != " + value.getRev() + "!");
+    }
+    
+    final var newRev = UUID.randomUUID().toString();
+    collection.updateOne(filter, Updates.combine(
+        Updates.set(ProjectCodec.NAME, group.getName()), 
+        Updates.set(ProjectCodec.REV, newRev)));
+    
+    final var result = ImmutableGroup.builder().from(group).rev(newRev).build();
+    collect.putGroups(result.getId(), result);
+    return result;
+  }
+
+  @Override
+  public GroupUser visitGroupUser(GroupUser groupUser) {
+    return groupUser;
   }
 }

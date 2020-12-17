@@ -1,7 +1,6 @@
 package io.resys.hdes.pm.repo.spi.mongodb.codecs;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 /*-
  * #%L
@@ -29,62 +28,42 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
-import io.resys.hdes.pm.repo.api.ImmutableAccess;
-import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.ImmutableGroup;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
 
 
-public class AccessCodec implements Codec<Access> {
+public class GroupCodec implements Codec<Group> {
   
   public static final String ID = "_id";
   public static final String REV = "rev";
   public static final String NAME = "name";
-  
   private static final String CREATED = "created";
-  public static final String USER_ID = "userId";
-  public static final String GROUP_ID = "groupId";
-  public static final String PROJECT_ID = "projectId";
   
   @Override
-  public void encode(BsonWriter writer, Access command, EncoderContext encoderContext) {
+  public void encode(BsonWriter writer, Group command, EncoderContext encoderContext) {
     writer.writeStartDocument();
     writer.writeString(ID, command.getId());
     writer.writeString(REV, command.getRev());
     writer.writeString(CREATED, command.getCreated().toString());
     writer.writeString(NAME, command.getName());
-    writer.writeString(PROJECT_ID, command.getProjectId());
-    
-    if (command.getUserId().isPresent()) {
-      writer.writeString(USER_ID, command.getUserId().get());
-    } else {
-      writer.writeNull(USER_ID);
-    }
-    
-    if (command.getGroupId().isPresent()) {
-      writer.writeString(GROUP_ID, command.getGroupId().get());
-    } else {
-      writer.writeNull(GROUP_ID);
-    }
     writer.writeEndDocument();
   }
 
   @Override
-  public Access decode(BsonReader reader, DecoderContext decoderContext) {
+  public Group decode(BsonReader reader, DecoderContext decoderContext) {
     reader.readStartDocument();
-    Access result = ImmutableAccess.builder()
+    Group result = ImmutableGroup.builder()
       .id(reader.readString(ID))
       .rev(reader.readString(REV))
       .created(LocalDateTime.parse(reader.readString(CREATED)))
       .name(reader.readString(NAME))
-      .projectId(reader.readString(PROJECT_ID))
-      .userId(Optional.ofNullable(CodecUtil.readNull(USER_ID, reader) ? null : reader.readString()))
-      .groupId(Optional.ofNullable(CodecUtil.readNull(GROUP_ID, reader) ? null : reader.readString()))
       .build();
     reader.readEndDocument();
     return result;
   }
 
   @Override
-  public Class<Access> getEncoderClass() {
-    return Access.class;
+  public Class<Group> getEncoderClass() {
+    return Group.class;
   }
 }

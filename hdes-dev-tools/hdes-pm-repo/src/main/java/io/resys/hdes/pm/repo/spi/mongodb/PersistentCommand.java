@@ -29,6 +29,8 @@ import org.immutables.value.Value;
 import com.mongodb.client.MongoClient;
 
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
+import io.resys.hdes.pm.repo.api.PmRepository.GroupUser;
 import io.resys.hdes.pm.repo.api.PmRepository.Project;
 import io.resys.hdes.pm.repo.api.PmRepository.User;
 
@@ -46,6 +48,8 @@ public interface PersistentCommand {
     String getDb();
     String getProjects();
     String getUsers();
+    String getGroups();
+    String getGroupUsers();
     String getAccess();
   }
   
@@ -53,6 +57,8 @@ public interface PersistentCommand {
     Project visitProject(Project project);
     Access visitAccess(Access access);
     User visitUser(User user);
+    Group visitGroup(Group group);
+    GroupUser visitGroupUser(GroupUser groupUser);
   }
 
   @Value.Immutable
@@ -60,5 +66,7 @@ public interface PersistentCommand {
     Map<String, Project> getProject();
     Map<String, Access> getAccess();
     Map<String, User> getUser();
+    Map<String, Group> getGroups();
+    Map<String, GroupUser> getGroupUsers();
   }
 }

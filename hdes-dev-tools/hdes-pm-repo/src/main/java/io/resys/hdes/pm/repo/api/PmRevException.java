@@ -50,6 +50,6 @@ public class PmRevException extends RuntimeException {
   }
   
   public static enum RevisionType {
-    PROJECT, USER, ACCESS
+    PROJECT, USER, ACCESS, GROUP, GROUP_USER
   }
 }

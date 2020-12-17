@@ -1,5 +1,5 @@
 package io.resys.hdes.pm.repo.spi.mongodb.commands;
-
+ 
 /*-
  * #%L
  * hdes-pm-repo
@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.pm.repo.api.ImmutableConstraintViolation;
@@ -31,29 +32,41 @@ import io.resys.hdes.pm.repo.api.PmException;
 import io.resys.hdes.pm.repo.api.PmException.ConstraintType;
 import io.resys.hdes.pm.repo.api.PmException.ErrorType;
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
+import io.resys.hdes.pm.repo.api.PmRepository.GroupUser;
 import io.resys.hdes.pm.repo.api.PmRepository.Project;
 import io.resys.hdes.pm.repo.api.PmRepository.User;
 import io.resys.hdes.pm.repo.api.commands.AccessCommands;
 import io.resys.hdes.pm.repo.api.commands.BatchCommands;
+import io.resys.hdes.pm.repo.api.commands.GroupCommands;
+import io.resys.hdes.pm.repo.api.commands.GroupUserCommands;
+import io.resys.hdes.pm.repo.api.commands.ImmutableGroupResource;
 import io.resys.hdes.pm.repo.api.commands.ImmutableProjectResource;
 import io.resys.hdes.pm.repo.api.commands.ImmutableUserResource;
 import io.resys.hdes.pm.repo.api.commands.ProjectCommands;
 import io.resys.hdes.pm.repo.api.commands.UserCommands;
+import io.resys.hdes.pm.repo.spi.support.RepoAssert;
 
 public class MongoBatchCommands implements BatchCommands {
 
   private final ProjectCommands projectCommands;
   private final UserCommands userCommands;
   private final AccessCommands accessCommands;
+  private final GroupCommands groupCommands;
+  private final GroupUserCommands groupUserCommands;
   
   public MongoBatchCommands(
       ProjectCommands projectCommands, 
       UserCommands userCommands,
-      AccessCommands accessCommands) {
+      AccessCommands accessCommands,
+      GroupCommands groupCommands,
+      GroupUserCommands groupUserCommands) {
     super();
     this.projectCommands = projectCommands;
     this.userCommands = userCommands;
     this.accessCommands = accessCommands;
+    this.groupCommands = groupCommands;
+    this.groupUserCommands = groupUserCommands;
   }
 
   @Override
@@ -62,6 +75,7 @@ public class MongoBatchCommands implements BatchCommands {
       private String projectName;
       private boolean createUsersIfNotFound;
       private List<String> users = Collections.emptyList();
+      private List<String> groups = Collections.emptyList();
       
       @Override
       public BatchProjectBuilder projectName(String projectName) {
@@ -79,7 +93,11 @@ public class MongoBatchCommands implements BatchCommands {
         return this;
       }
       @Override
-      public ProjectResource build() {
+      public BatchProjectBuilder groups(String... groupNames) {
+        groups = new ArrayList<>(Arrays.asList(groupNames));
+        return this;
+      }
+      private ProjectResource buildByUsers() {
         final var project = projectCommands.create().name(projectName).build();
         final var builder = ImmutableProjectResource.builder().project(project);
         
@@ -99,7 +117,7 @@ public class MongoBatchCommands implements BatchCommands {
                           .rev("")
                           .constraint(ConstraintType.NOT_FOUND)
                           .type(ErrorType.USER)
-                          .build(), "entity not found: 'user'by one of the keys: 'value/externalId/id' = '" + userFilter + "' already exists!");
+                          .build(), "entity: 'user' not found one of the keys: 'name/externalId/id' = '" + userFilter + "'!");
                     })));
           final var access = accessCommands.create()
               .projectId(project.getId())
@@ -111,7 +129,55 @@ public class MongoBatchCommands implements BatchCommands {
             .putUsers(user.getId(), user)
             .putAccess(access.getId(), access);
         }
+        
         return builder.build();
+      }
+      
+      private ProjectResource buildByGroups() {
+        final var project = projectCommands.create().name(projectName).build();
+        final var builder = ImmutableProjectResource.builder().project(project);
+        
+        for(String groupFilter : groups) {
+          // get user by: 
+          //   * id/name 
+          //   * create new user
+          final var group = groupCommands.query().find(groupFilter)
+            .orElseGet(() -> groupCommands.query().findByName(groupFilter)
+              .orElseGet(() -> {
+                if(createUsersIfNotFound) {
+                  return groupCommands.create().name(groupFilter).build();  
+                }
+                
+                throw new PmException(ImmutableConstraintViolation.builder()
+                    .id(groupFilter)
+                    .rev("")
+                    .constraint(ConstraintType.NOT_FOUND)
+                    .type(ErrorType.GROUP)
+                    .build(), "entity: 'group' not found one of the keys: 'id/name' = '" + groupFilter + "'!");
+              }));
+    
+          final var access = accessCommands.create()
+              .projectId(project.getId())
+              .groupId(group.getId())
+              .name(projectName + "-" + groupFilter)
+              .build();
+          
+          builder
+            .putGroups(group.getId(), group)
+            .putAccess(access.getId(), access);
+        }
+        
+        return builder.build();
+      }
+      
+      
+      @Override
+      public ProjectResource build() {
+        RepoAssert.isTrue(users.isEmpty() || groups.isEmpty(), () -> "users and groups can't be used at the same time!");
+        if(!users.isEmpty()) {
+          return buildByUsers();
+        }
+        return buildByGroups();
       }
     };
   }
@@ -121,15 +187,33 @@ public class MongoBatchCommands implements BatchCommands {
     return new BatchProjectQuery() {
       private ProjectResource map(Project project) {
         List<Access> access = accessCommands.query().projectId(project.getId()).find();
-        List<User> users = access
-            .stream().map(e -> e.getUserId()).collect(Collectors.toSet())
+        List<User> users = new ArrayList<>(access
+            .stream().filter(e -> e.getUserId().isPresent())
+            .map(e -> e.getUserId().get()).collect(Collectors.toSet())
             .stream().map(e -> userCommands.query().id(e))
+            .collect(Collectors.toList()));
+        
+        Set<String> groupIds = access.stream()
+            .filter(e -> e.getGroupId().isPresent())
+            .map(e -> e.getGroupId().get())
+            .collect(Collectors.toSet());
+        
+        List<GroupUser> groupUsers = groupIds
+            .stream().map(e -> groupUserCommands.query().id(e))
             .collect(Collectors.toList());
+        List<Group> groups = groupIds
+            .stream().map(e -> groupCommands.query().id(e))
+            .collect(Collectors.toList());
+
+        // Add users from group
+        groupUsers.forEach(user -> users.add(userCommands.query().id(user.getUserId())));
         
         return ImmutableProjectResource.builder()
           .project(project)
           .access(access.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
           .users(users.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .groups(groups.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .groupUsers(groupUsers.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
           .build();
       }
       @Override
@@ -149,16 +233,27 @@ public class MongoBatchCommands implements BatchCommands {
   public BatchUserQuery queryUsers() {
     return new BatchUserQuery() {
       private UserResource map(User user) {
-        List<Access> access = accessCommands.query().userId(user.getId()).find();
+        List<GroupUser> groupUsers = groupUserCommands.query().userId(user.getId()).find();
+        List<Group> groups = groupUsers
+            .stream().map(e -> e.getGroupId()).collect(Collectors.toSet())
+            .stream().map(e -> groupCommands.query().id(e))
+            .collect(Collectors.toList());
+        
+        List<Access> access = new ArrayList<>(accessCommands.query().userId(user.getId()).find());
+        groups.stream().map(g -> g.getId())
+          .forEach(groupId -> accessCommands.query().groupId(groupId).find().forEach(a -> access.add(a)));        
+
         List<Project> projects = access
             .stream().map(e -> e.getProjectId()).collect(Collectors.toSet())
             .stream().map(e -> projectCommands.query().id(e))
             .collect(Collectors.toList());
-        
+
         return ImmutableUserResource.builder()
           .user(user)
           .access(access.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
           .projects(projects.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .groups(groups.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .groupUsers(groupUsers.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
           .build();
       }
       @Override
@@ -170,6 +265,94 @@ public class MongoBatchCommands implements BatchCommands {
         return userCommands.query().find().stream()
             .map(this::map)
             .collect(Collectors.toList());
+      }
+    };
+  }
+
+  @Override
+  public BatchGroupQuery queryGroups() {
+    return new BatchGroupQuery() {
+      private GroupResource map(Group group) {
+        List<Access> access = accessCommands.query().groupId(group.getId()).find();
+        List<Project> projects = access
+            .stream().map(e -> e.getProjectId()).collect(Collectors.toSet())
+            .stream().map(e -> projectCommands.query().id(e))
+            .collect(Collectors.toList());
+        List<GroupUser> groupUsers = groupUserCommands.query().groupId(group.getId()).find();
+        List<User> users = groupUsers.stream().map(user -> userCommands.query().id(user.getUserId())).collect(Collectors.toList());
+        
+        return ImmutableGroupResource.builder()
+          .group(group)
+          .users(users.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .access(access.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .projects(projects.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .groupUser(groupUsers.stream().collect(Collectors.toMap(e -> e.getId(), e -> e)))
+          .build();
+      }
+      @Override
+      public GroupResource get(String idOrName) {
+        return map(groupCommands.query().any(idOrName));
+      }
+      @Override
+      public List<GroupResource> find() {
+        return groupCommands.query().find().stream()
+            .map(this::map)
+            .collect(Collectors.toList());
+      }
+    };
+  }
+
+  @Override
+  public BatchGroupUsersBuilder createGroupUsers() {
+    return new BatchGroupUsersBuilder() {
+      private String groupIdOrName;
+      private boolean createUsersIfNotFound;
+      private List<String> users = Collections.emptyList();
+      @Override
+      public BatchGroupUsersBuilder users(String... userIdOrExternalIdOrValue) {
+        users = new ArrayList<>(Arrays.asList(userIdOrExternalIdOrValue));
+        return this;
+      }
+      @Override
+      public BatchGroupUsersBuilder groupId(String groupIdOrName) {
+        this.groupIdOrName = groupIdOrName;
+        return this;
+      }
+      @Override
+      public BatchGroupUsersBuilder createUser(boolean createUsersIfNotFound) {
+        this.createUsersIfNotFound = createUsersIfNotFound;
+        return this;
+      }
+      @Override
+      public GroupResource build() {
+        Group group = groupCommands.query().any(groupIdOrName);
+        List<User> foundUsers = new ArrayList<>();
+        
+        for(String userFilter : users) {
+          // get user by: 
+          //   * id/value/externalId 
+          //   * create new user
+          final var user = userCommands.query().find(userFilter)
+            .orElseGet(() -> userCommands.query().findByValue(userFilter)
+                .orElseGet(() -> userCommands.query().findByExternalId(userFilter)
+                    .orElseGet(() -> {
+                      if(createUsersIfNotFound) {
+                        return userCommands.create().value(userFilter).build();  
+                      }
+                      throw new PmException(ImmutableConstraintViolation.builder()
+                          .id(userFilter)
+                          .rev("")
+                          .constraint(ConstraintType.NOT_FOUND)
+                          .type(ErrorType.USER)
+                          .build(), "entity: 'user' not found one of the keys: 'name/externalId/id' = '" + userFilter + "'!");
+                    })));
+          
+          foundUsers.add(user);
+        }
+        for(User user : foundUsers) {
+          groupUserCommands.create().groupId(group.getId()).userId(user.getId()).build();
+        }
+        return queryGroups().get(groupIdOrName);
       }
     };
   }

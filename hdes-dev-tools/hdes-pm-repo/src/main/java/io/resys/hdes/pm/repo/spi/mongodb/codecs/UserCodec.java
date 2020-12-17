@@ -24,7 +24,6 @@ import java.util.Optional;
  */
 
 import org.bson.BsonReader;
-import org.bson.BsonType;
 import org.bson.BsonWriter;
 import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
@@ -40,7 +39,7 @@ public class UserCodec implements Codec<User> {
   public static final String REV = "rev";
   public static final String EXTERNAL_ID = "externalId";
   private static final String CREATED = "created";
-  public static final String VALUE = "value";
+  public static final String NAME = "name";
   public static final String TOKEN = "token";
   
   @Override
@@ -49,7 +48,7 @@ public class UserCodec implements Codec<User> {
     writer.writeString(ID, command.getId());
     writer.writeString(REV, command.getRev());
     writer.writeString(CREATED, command.getCreated().toString());
-    writer.writeString(VALUE, command.getValue());
+    writer.writeString(NAME, command.getName());
     writer.writeString(TOKEN, command.getToken());  
     
     if (command.getExternalId().isPresent()) {
@@ -68,21 +67,12 @@ public class UserCodec implements Codec<User> {
       .id(reader.readString(ID))
       .rev(reader.readString(REV))
       .created(LocalDateTime.parse(reader.readString(CREATED)))
-      .value(reader.readString(VALUE))
+      .name(reader.readString(NAME))
       .token(reader.readString(TOKEN))
-      .externalId(Optional.ofNullable(isNull(EXTERNAL_ID, reader) ? null : reader.readString()))
+      .externalId(Optional.ofNullable(CodecUtil.readNull(EXTERNAL_ID, reader) ? null : reader.readString()))
       .build();
     reader.readEndDocument();
     return result;
-  }
-
-  private boolean isNull(String id, BsonReader reader) {
-    reader.readName(id);
-    if (reader.getCurrentBsonType() == BsonType.NULL) {
-      reader.readNull();
-      return true;
-    }
-    return false;
   }
 
   @Override

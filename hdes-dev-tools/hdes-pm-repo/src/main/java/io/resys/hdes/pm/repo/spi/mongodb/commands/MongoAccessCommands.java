@@ -42,7 +42,9 @@ import io.resys.hdes.pm.repo.api.PmException.ConstraintType;
 import io.resys.hdes.pm.repo.api.PmException.ErrorType;
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
 import io.resys.hdes.pm.repo.api.PmRevException;
+import io.resys.hdes.pm.repo.api.PmRevException.RevisionType;
 import io.resys.hdes.pm.repo.api.commands.AccessCommands;
+import io.resys.hdes.pm.repo.api.commands.GroupCommands;
 import io.resys.hdes.pm.repo.api.commands.ProjectCommands;
 import io.resys.hdes.pm.repo.api.commands.UserCommands;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand;
@@ -55,12 +57,14 @@ public class MongoAccessCommands implements AccessCommands {
   private final PersistentCommand persistentCommand;
   private final ProjectCommands projectCommands;
   private final UserCommands userCommands;
+  private final GroupCommands groupCommands;
 
-  public MongoAccessCommands(PersistentCommand persistentCommand, ProjectCommands projectCommands, UserCommands userCommands) {
+  public MongoAccessCommands(PersistentCommand persistentCommand, ProjectCommands projectCommands, UserCommands userCommands, GroupCommands groupCommands) {
     super();
     this.persistentCommand = persistentCommand;
     this.projectCommands = projectCommands;
     this.userCommands = userCommands;
+    this.groupCommands = groupCommands;
   }
 
   @Override
@@ -70,6 +74,7 @@ public class MongoAccessCommands implements AccessCommands {
       private String name;
       private String projectId;
       private String userId;
+      private String groupId;
       
       @Override
       public AccessCreateBuilder name(String name) {
@@ -87,8 +92,15 @@ public class MongoAccessCommands implements AccessCommands {
         return this;
       }
       @Override
+      public AccessCreateBuilder groupId(String groupId) {
+        this.groupId = groupId;
+        return this;
+      }
+      @Override
       public Access build() throws PmException {
         RepoAssert.notEmpty(name, () -> "name not defined!");
+        RepoAssert.isTrue(userId == null || groupId == null, () -> "both userId and groupId can't be used simultaneously!");
+        
         Optional<Access> conflict = query().findByName(name);
         if(conflict.isPresent()) {
           throw new PmException(ImmutableConstraintViolation.builder()
@@ -96,10 +108,16 @@ public class MongoAccessCommands implements AccessCommands {
               .rev(conflict.get().getRev())
               .constraint(ConstraintType.NOT_UNIQUE)
               .type(ErrorType.ACCESS)
-              .build(), "entity not found: 'project' with name: '" + name + "' already exists!");
+              .build(), "entity: 'access' with name: '" + name + "' already exists!");
         }
         
-        RepoAssert.notNull(userCommands.query().id(userId), () -> "user not found");
+        if(userId != null) {
+          RepoAssert.notNull(userCommands.query().id(userId), () -> "user not found");
+        }
+        if(groupId != null) {
+          RepoAssert.notNull(groupCommands.query().id(groupId), () -> "group not found");
+        }
+        
         RepoAssert.notNull(projectCommands.query().id(projectId), () -> "user not found");
         
         Access project = ImmutableAccess.builder()
@@ -107,7 +125,8 @@ public class MongoAccessCommands implements AccessCommands {
             .rev(UUID.randomUUID().toString())
             .name(name)
             .projectId(projectId)
-            .userId(userId)
+            .userId(Optional.ofNullable(userId))
+            .groupId(Optional.ofNullable(groupId))
             .created(LocalDateTime.now())
             .build();
         return persistentCommand
@@ -122,6 +141,7 @@ public class MongoAccessCommands implements AccessCommands {
     return new AccessQueryBuilder() {
       private String projectId;
       private String userId;
+      private String groupId;
       @Override
       public AccessQueryBuilder projectId(String projectId) {
         this.projectId = projectId;
@@ -130,6 +150,11 @@ public class MongoAccessCommands implements AccessCommands {
       @Override
       public AccessQueryBuilder userId(String userId) {
         this.userId = userId;
+        return this;
+      }
+      @Override
+      public AccessQueryBuilder groupId(String groupId) {
+        this.groupId = groupId;
         return this;
       }
       @Override
@@ -143,6 +168,9 @@ public class MongoAccessCommands implements AccessCommands {
           }
           if(projectId != null) {
             filters.add(Filters.eq(AccessCodec.PROJECT_ID, projectId));
+          }
+          if(groupId != null) {
+            filters.add(Filters.eq(AccessCodec.GROUP_ID, groupId));
           }
           
           MongoCollection<Access> collection = client
@@ -180,8 +208,8 @@ public class MongoAccessCommands implements AccessCommands {
               .id(id)
               .rev("any")
               .constraint(ConstraintType.NOT_FOUND)
-              .type(ErrorType.PROJECT)
-              .build(), "entity not found: 'project' with id: '" + id + "'!"); 
+              .type(ErrorType.ACCESS)
+              .build(), "entity: 'access' not found with id: '" + id + "'!"); 
         }
         return result.get();
       }
@@ -197,7 +225,8 @@ public class MongoAccessCommands implements AccessCommands {
               .id(project.getId())
               .revToUpdate(rev)
               .rev(project.getRev())
-              .build(), "revision conflict: 'project' with id: '" + project.getId() + "', revs: " + project.getRev() + " != " + rev + "!");
+              .type(RevisionType.ACCESS)
+              .build(), "revision conflict: 'access' with id: '" + project.getId() + "', revs: " + project.getRev() + " != " + rev + "!");
         }
         return project;
       }

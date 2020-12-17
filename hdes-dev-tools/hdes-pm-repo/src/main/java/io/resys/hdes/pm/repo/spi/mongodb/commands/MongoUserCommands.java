@@ -71,7 +71,7 @@ public class MongoUserCommands implements UserCommands {
       }
       @Override
       public User build() throws PmException {
-        RepoAssert.notEmpty(value, () -> "value not defined!");
+        RepoAssert.notEmpty(value, () -> "name not defined!");
         
         Optional<User> conflict = query().findByValue(value);
         if(conflict.isPresent()) {
@@ -80,7 +80,7 @@ public class MongoUserCommands implements UserCommands {
               .rev(conflict.get().getRev())
               .constraint(ConstraintType.NOT_UNIQUE)
               .type(ErrorType.USER)
-              .build(), "entity not found: 'user' with value: '" + value + "' already exists!");
+              .build(), "entity: 'user' with name: '" + value + "' already exists!");
         }
         
         User project = ImmutableUser.builder()
@@ -88,7 +88,7 @@ public class MongoUserCommands implements UserCommands {
             .rev(UUID.randomUUID().toString())
             .token(UUID.randomUUID().toString())
             .externalId(Optional.ofNullable(externalId))
-            .value(value)
+            .name(value)
             .created(LocalDateTime.now())
             .build();
         return persistentCommand
@@ -135,7 +135,7 @@ public class MongoUserCommands implements UserCommands {
               .rev("any")
               .constraint(ConstraintType.NOT_FOUND)
               .type(ErrorType.PROJECT)
-              .build(), "entity not found: 'user' with id: '" + id + "'!"); 
+              .build(), "entity: 'user' not found with id: '" + id + "'!"); 
         }
         return result.get();
       }
@@ -163,7 +163,7 @@ public class MongoUserCommands implements UserCommands {
           User user = client
               .getDatabase(config.getDb())
               .getCollection(config.getUsers(), User.class)
-              .find(Filters.eq(UserCodec.VALUE, value))
+              .find(Filters.eq(UserCodec.NAME, value))
               .first();
           return Optional.ofNullable(user);
         };
@@ -264,13 +264,13 @@ public class MongoUserCommands implements UserCommands {
         RepoAssert.notNull(rev, () -> "rev not defined!");
         
         final User old = query().rev(id, rev);
-        final String value = this.value == null ? old.getValue() : this.value;
+        final String value = this.value == null ? old.getName() : this.value;
         final String externalId = this.externalId == null ? old.getExternalId().orElse(null) : this.externalId;
         final String token = this.token == null ? old.getToken() : this.token;
         
         User access = ImmutableUser.builder()
             .from(old)
-            .value(value)
+            .name(value)
             .externalId(externalId)
             .token(token)
             .build();

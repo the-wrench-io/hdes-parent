@@ -41,6 +41,7 @@ public interface AccessCommands {
     
     AccessQueryBuilder projectId(String projectId);
     AccessQueryBuilder userId(String userId);
+    AccessQueryBuilder groupId(String groupId);
     List<Access> find() throws PmException;
   }  
   
@@ -62,6 +63,7 @@ public interface AccessCommands {
     AccessCreateBuilder name(String name);
     AccessCreateBuilder projectId(String projectId);
     AccessCreateBuilder userId(String userId);
+    AccessCreateBuilder groupId(String groupId);
     Access build() throws PmException;
   }
 }

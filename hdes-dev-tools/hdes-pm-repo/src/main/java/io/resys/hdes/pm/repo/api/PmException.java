@@ -33,7 +33,7 @@ public class PmException extends RuntimeException {
   }
   
   public static enum ErrorType {
-    PROJECT, USER, ACCESS
+    PROJECT, USER, ACCESS, GROUP, GROUP_USER
   }
   
   public PmException(ConstraintViolation value, String message, Throwable cause) {

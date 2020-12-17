@@ -26,23 +26,44 @@ import java.util.Map;
 import org.immutables.value.Value;
 
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
+import io.resys.hdes.pm.repo.api.PmRepository.GroupUser;
 import io.resys.hdes.pm.repo.api.PmRepository.Project;
 import io.resys.hdes.pm.repo.api.PmRepository.User;
 
 public interface BatchCommands {
 
   BatchProjectBuilder createProject();
+  BatchGroupUsersBuilder createGroupUsers();
+  
   BatchProjectQuery queryProject();
   BatchUserQuery queryUsers();
+  BatchGroupQuery queryGroups();
   
   interface BatchUserQuery {
     UserResource get(String idOrValueOrExternalIdOrToken);
     List<UserResource> find();
   }
+
+  interface BatchGroupQuery {
+    GroupResource get(String idOrName);
+    List<GroupResource> find();
+  }
+  
+  interface BatchGroupUsersBuilder {
+    BatchGroupUsersBuilder groupId(String groupIdOrName);
+    BatchGroupUsersBuilder users(String ... userIdOrExternalIdOrValue);
+    BatchGroupUsersBuilder createUser(boolean createUsersIfNotFound);
+    GroupResource build();
+  }
   
   interface BatchProjectBuilder {
-    BatchProjectBuilder projectName(String projectName);
+    
     BatchProjectBuilder users(String ... userIdOrExternalIdOrValue);
+    // users or groups
+    BatchProjectBuilder groups(String ... groupNames);
+    
+    BatchProjectBuilder projectName(String projectName);
     BatchProjectBuilder createUser(boolean createUsersIfNotFound);
     ProjectResource build();
   }
@@ -57,6 +78,8 @@ public interface BatchCommands {
     Project getProject();
     Map<String, User> getUsers();
     Map<String, Access> getAccess();
+    Map<String, Group> getGroups();
+    Map<String, GroupUser> getGroupUsers();
   }
   
   
@@ -65,5 +88,16 @@ public interface BatchCommands {
     User getUser();
     Map<String, Project> getProjects();
     Map<String, Access> getAccess();
+    Map<String, Group> getGroups();
+    Map<String, GroupUser> getGroupUsers();
+  }
+  
+  @Value.Immutable
+  interface GroupResource {
+    Group getGroup();
+    Map<String, User> getUsers();
+    Map<String, Project> getProjects();
+    Map<String, Access> getAccess();
+    Map<String, GroupUser> getGroupUser();
   }
 }

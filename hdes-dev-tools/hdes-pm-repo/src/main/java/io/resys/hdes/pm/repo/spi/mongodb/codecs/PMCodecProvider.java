@@ -25,6 +25,8 @@ import org.bson.codecs.configuration.CodecProvider;
 import org.bson.codecs.configuration.CodecRegistry;
 
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
+import io.resys.hdes.pm.repo.api.PmRepository.GroupUser;
 import io.resys.hdes.pm.repo.api.PmRepository.Project;
 import io.resys.hdes.pm.repo.api.PmRepository.User;
 
@@ -33,7 +35,8 @@ public class PMCodecProvider implements CodecProvider {
   private final ProjectCodec project = new ProjectCodec();
   private final UserCodec user = new UserCodec();
   private final AccessCodec access = new AccessCodec();
-  
+  private final GroupCodec group = new GroupCodec();
+  private final GroupUserCodec groupUser = new GroupUserCodec();
   
   @SuppressWarnings("unchecked")
   @Override
@@ -48,7 +51,12 @@ public class PMCodecProvider implements CodecProvider {
     if(Access.class.isAssignableFrom(clazz)) {
       return (Codec<T>) access;
     }
-    
+    if(Group.class.isAssignableFrom(clazz)) {
+      return (Codec<T>) group;
+    }    
+    if(GroupUser.class.isAssignableFrom(clazz)) {
+      return (Codec<T>) groupUser;
+    }   
     return null;
   }
 }

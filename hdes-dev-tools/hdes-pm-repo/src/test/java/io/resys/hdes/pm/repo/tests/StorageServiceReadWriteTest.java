@@ -48,8 +48,8 @@ public class StorageServiceReadWriteTest {
       
       // User create and find
       User user = repo.users().create().value("admin-user").build();
-      Optional<User> persistedUser = repo.users().query().findByValue(user.getValue());
-      Assertions.assertEquals(user.getValue(), persistedUser.get().getValue());
+      Optional<User> persistedUser = repo.users().query().findByValue(user.getName());
+      Assertions.assertEquals(user.getName(), persistedUser.get().getName());
       
       // Access create and find
       Access access = repo.access().create().name("admin-user-access-to-project-1").userId(user.getId()).projectId(project.getId()).build();
@@ -59,11 +59,9 @@ public class StorageServiceReadWriteTest {
   }
   
   @Test
-  public void createAndQueryBatch() {
+  public void createAndQueryUsersAndProjectBatch() {
     MongoDbFactory.instance(transaction -> {
       PmRepository repo = MongoPmRepository.builder().transaction(transaction).build();
-      
-
       ProjectResource project = repo.batch().createProject()
         .projectName("pricing-project")
         .users("user-1", "user-2", "user-3")
@@ -72,6 +70,28 @@ public class StorageServiceReadWriteTest {
    
       UserResource user1 = repo.batch().queryUsers().get("user-1");
       Assertions.assertEquals(1, user1.getAccess().size());
+      Assertions.assertTrue(user1.getProjects().containsKey(project.getProject().getId()));
+      
+    });
+  }
+  
+  
+  @Test
+  public void createAndQueryUsersGroupsAndProjectBatch() {
+    MongoDbFactory.instance(transaction -> {
+      PmRepository repo = MongoPmRepository.builder().transaction(transaction).build();
+      
+      ProjectResource project = repo.batch().createProject()
+        .projectName("pricing-project")
+        .groups("Group X1", "Group X2")
+        .createUser(true)
+        .build();
+   
+      repo.batch().createGroupUsers().createUser(true).users("user-1").groupId("Group X1").build();
+      
+      UserResource user1 = repo.batch().queryUsers().get("user-1");
+      Assertions.assertEquals(1, user1.getAccess().size());
+      Assertions.assertEquals(1, user1.getGroupUsers().size());
       Assertions.assertTrue(user1.getProjects().containsKey(project.getProject().getId()));
       
     });

@@ -28,6 +28,8 @@ import io.resys.hdes.pm.repo.api.commands.UserCommands;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand.MongoDbConfig;
 import io.resys.hdes.pm.repo.spi.mongodb.commands.MongoAccessCommands;
 import io.resys.hdes.pm.repo.spi.mongodb.commands.MongoBatchCommands;
+import io.resys.hdes.pm.repo.spi.mongodb.commands.MongoGroupCommands;
+import io.resys.hdes.pm.repo.spi.mongodb.commands.MongoGroupUserCommands;
 import io.resys.hdes.pm.repo.spi.mongodb.commands.MongoPersistentCommand;
 import io.resys.hdes.pm.repo.spi.mongodb.commands.MongoPersistentCommand.MongoTransaction;
 import io.resys.hdes.pm.repo.spi.mongodb.commands.MongoProjectCommands;
@@ -95,14 +97,19 @@ public class MongoPmRepository implements PmRepository {
             .projects("projects")
             .users("users")
             .access("access")
+            .groups("groups")
+            .groupUsers("groupUsers")
             .build();
       }
       
       final var persistentCommand = new MongoPersistentCommand(transaction, config);
       final var projectCommands = new MongoProjectCommands(persistentCommand);
       final var userCommands = new MongoUserCommands(persistentCommand);
-      final var accessCommands = new MongoAccessCommands(persistentCommand, projectCommands, userCommands);
-      final var batchProjectCommands = new MongoBatchCommands(projectCommands, userCommands, accessCommands);
+      final var groupCommands = new MongoGroupCommands(persistentCommand);
+      final var groupUserCommands = new MongoGroupUserCommands(persistentCommand, groupCommands, userCommands);
+      final var accessCommands = new MongoAccessCommands(persistentCommand, projectCommands, userCommands, groupCommands);
+      
+      final var batchProjectCommands = new MongoBatchCommands(projectCommands, userCommands, accessCommands, groupCommands, groupUserCommands);
       
       return new MongoPmRepository(batchProjectCommands, projectCommands, userCommands, accessCommands);
     }

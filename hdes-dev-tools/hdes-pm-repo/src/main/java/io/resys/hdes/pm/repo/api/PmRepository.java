@@ -52,8 +52,25 @@ public interface PmRepository {
     String getRev();
     LocalDateTime getCreated();
     Optional<String> getExternalId();
-    String getValue();
+    String getName();
     String getToken();
+  }
+  
+  @Value.Immutable
+  interface Group extends Serializable {
+    String getId();
+    String getRev();
+    LocalDateTime getCreated();
+    String getName();
+  }
+  
+  @Value.Immutable
+  interface GroupUser extends Serializable {
+    String getId();
+    String getRev();
+    LocalDateTime getCreated();
+    String getUserId();
+    String getGroupId();
   }
   
   @Value.Immutable
@@ -61,8 +78,10 @@ public interface PmRepository {
     String getId();
     String getRev();
     LocalDateTime getCreated();
-    String getUserId();
     String getProjectId();
     String getName();
+    
+    Optional<String> getUserId();
+    Optional<String> getGroupId();
   }
 }

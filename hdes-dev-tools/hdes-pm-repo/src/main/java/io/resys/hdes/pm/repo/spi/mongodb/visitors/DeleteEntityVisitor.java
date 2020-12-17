@@ -32,13 +32,18 @@ import io.resys.hdes.pm.repo.api.PmException;
 import io.resys.hdes.pm.repo.api.PmException.ConstraintType;
 import io.resys.hdes.pm.repo.api.PmException.ErrorType;
 import io.resys.hdes.pm.repo.api.PmRepository.Access;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
+import io.resys.hdes.pm.repo.api.PmRepository.GroupUser;
 import io.resys.hdes.pm.repo.api.PmRepository.Project;
 import io.resys.hdes.pm.repo.api.PmRepository.User;
 import io.resys.hdes.pm.repo.api.PmRevException;
+import io.resys.hdes.pm.repo.api.PmRevException.RevisionType;
 import io.resys.hdes.pm.repo.spi.mongodb.ImmutablePersistedEntities;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand.EntityVisitor;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand.MongoDbConfig;
 import io.resys.hdes.pm.repo.spi.mongodb.codecs.AccessCodec;
+import io.resys.hdes.pm.repo.spi.mongodb.codecs.GroupCodec;
+import io.resys.hdes.pm.repo.spi.mongodb.codecs.GroupUserCodec;
 import io.resys.hdes.pm.repo.spi.mongodb.codecs.ProjectCodec;
 import io.resys.hdes.pm.repo.spi.mongodb.codecs.UserCodec;
 import io.resys.hdes.pm.repo.spi.support.RepoAssert;
@@ -192,5 +197,82 @@ public class DeleteEntityVisitor implements EntityVisitor {
     collection.deleteOne(filter);
     collect.putUser(user.getId(), user);
     return user;
+  }
+
+  @Override
+  public Group visitGroup(Group group) {
+    final MongoCollection<Group> collection = client
+        .getDatabase(config.getDb())
+        .getCollection(config.getGroups(), Group.class);
+    
+    final Bson filter = Filters.eq(GroupCodec.ID, group.getId());
+    final Group value = collection.find(filter).first();
+    
+    if(value == null) {
+      throw new PmException(ImmutableConstraintViolation.builder()
+          .id(group.getId())
+          .rev(group.getRev())
+          .constraint(ConstraintType.NOT_FOUND)
+          .type(ErrorType.GROUP)
+          .build(), "entity: 'group' not found with id: '" + group.getId() + "'!");
+    }
+    
+    if(!value.getRev().equals(group.getRev())) {
+      throw new PmRevException(ImmutableRevisionConflict.builder()
+          .id(group.getId())
+          .type(RevisionType.GROUP)
+          .revToUpdate(group.getRev())
+          .rev(value.getRev())
+          .build(), "revision conflict: 'group' with id: '" + group.getId() + "', revs: " + group.getRev() + " != " + value.getRev() + "!");
+    }
+    collection.deleteOne(filter);
+    
+    // Delete all group users associated with the project
+    client
+      .getDatabase(config.getDb())
+      .getCollection(config.getGroupUsers(), GroupUser.class)
+      .find(Filters.eq(GroupUserCodec.GROUP_ID, group.getId()))
+      .forEach(groupUser -> visitGroupUser(groupUser));
+    
+    
+    // Delete all access associated with the group
+    client
+      .getDatabase(config.getDb())
+      .getCollection(config.getAccess(), Access.class)
+      .find(Filters.eq(AccessCodec.GROUP_ID, group.getId()))
+      .forEach(access -> visitAccess(access));
+    
+    return group;
+  }
+  @Override
+  public GroupUser visitGroupUser(GroupUser groupUser) {
+    final MongoCollection<GroupUser> collection = client
+        .getDatabase(config.getDb())
+        .getCollection(config.getGroupUsers(), GroupUser.class);
+    
+    final Bson filter = Filters.eq(GroupUserCodec.ID, groupUser.getId());
+    final GroupUser value = collection.find(filter).first();
+    
+    if(value == null) {
+      throw new PmException(ImmutableConstraintViolation.builder()
+          .id(groupUser.getId())
+          .rev(groupUser.getRev())
+          .constraint(ConstraintType.NOT_FOUND)
+          .type(ErrorType.GROUP_USER)
+          .build(), "entity: 'group user' not found with id: '" + groupUser.getId() + "'!");
+    }
+    
+    if(!value.getRev().equals(groupUser.getRev())) {
+      throw new PmRevException(ImmutableRevisionConflict.builder()
+          .id(groupUser.getId())
+          .type(RevisionType.GROUP_USER)
+          .revToUpdate(groupUser.getRev())
+          .rev(value.getRev())
+          .build(), "revision conflict: 'group user' with id: '" + groupUser.getId() + "', revs: " + groupUser.getRev() + " != " + value.getRev() + "!");
+    }
+    
+    collection.deleteOne(filter);
+    collect.putGroupUsers(groupUser.getId(), groupUser);
+    return groupUser;
   }
 }

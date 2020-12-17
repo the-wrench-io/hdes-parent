@@ -29,134 +29,135 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
 import io.resys.hdes.pm.repo.api.ImmutableConstraintViolation;
-import io.resys.hdes.pm.repo.api.ImmutableProject;
+import io.resys.hdes.pm.repo.api.ImmutableGroup;
 import io.resys.hdes.pm.repo.api.ImmutableRevisionConflict;
 import io.resys.hdes.pm.repo.api.PmException;
 import io.resys.hdes.pm.repo.api.PmException.ConstraintType;
 import io.resys.hdes.pm.repo.api.PmException.ErrorType;
-import io.resys.hdes.pm.repo.api.PmRepository.Project;
+import io.resys.hdes.pm.repo.api.PmRepository.Group;
 import io.resys.hdes.pm.repo.api.PmRevException;
-import io.resys.hdes.pm.repo.api.commands.ProjectCommands;
+import io.resys.hdes.pm.repo.api.commands.GroupCommands;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand;
 import io.resys.hdes.pm.repo.spi.mongodb.PersistentCommand.MongoDbConfig;
-import io.resys.hdes.pm.repo.spi.mongodb.codecs.ProjectCodec;
+import io.resys.hdes.pm.repo.spi.mongodb.codecs.GroupCodec;
 import io.resys.hdes.pm.repo.spi.support.RepoAssert;
 
-public class MongoProjectCommands implements ProjectCommands {
+public class MongoGroupCommands implements GroupCommands {
 
   private final PersistentCommand persistentCommand;
 
-  public MongoProjectCommands(PersistentCommand persistentCommand) {
+  public MongoGroupCommands(PersistentCommand persistentCommand) {
     super();
     this.persistentCommand = persistentCommand;
   }
 
   @Override
-  public ProjectCreateBuilder create() {
-    
-    return new ProjectCreateBuilder() {
+  public GroupCreateBuilder create() {
+    return new GroupCreateBuilder() {
       private String name;
-      
       @Override
-      public ProjectCreateBuilder name(String name) {
+      public GroupCreateBuilder name(String name) {
         this.name = name;
         return this;
       }
-      
       @Override
-      public Project build() throws PmException {
+      public Group build() throws PmException {
         RepoAssert.notEmpty(name, () -> "name not defined!");
-        Optional<Project> conflict = query().findByName(name);
+        
+        Optional<Group> conflict = query().findByName(name);
         if(conflict.isPresent()) {
           throw new PmException(ImmutableConstraintViolation.builder()
               .id(conflict.get().getId())
               .rev(conflict.get().getRev())
               .constraint(ConstraintType.NOT_UNIQUE)
-              .type(ErrorType.ACCESS)
-              .build(), "entity: 'project' with name: '" + name + "' already exists!");
+              .type(ErrorType.GROUP)
+              .build(), "entity: 'group' with name: '" + name + "' already exists!");
         }
-        
-        Project project = ImmutableProject.builder()
+
+        Group group = ImmutableGroup.builder()
             .id(UUID.randomUUID().toString())
             .rev(UUID.randomUUID().toString())
             .name(name)
             .created(LocalDateTime.now())
             .build();
         return persistentCommand
-            .create(visitor -> visitor.visitProject(project)).getProject()
-            .get(project.getId());
+            .create(visitor -> visitor.visitGroup(group)).getGroups()
+            .get(group.getId());
       }
     };
   }
   
   @Override
-  public ProjectQueryBuilder query() {
-    return new ProjectQueryBuilder() {
+  public GroupQueryBuilder query() {
+    return new GroupQueryBuilder() {
       @Override
-      public List<Project> find() {
-        BiFunction<MongoClient, MongoDbConfig, List<Project>> mapper = (client, config) -> {
-          List<Project> result = new ArrayList<>();          
-          client
+      public List<Group> find() {
+        BiFunction<MongoClient, MongoDbConfig, List<Group>> mapper = (client, config) -> {
+          List<Group> result = new ArrayList<>();
+
+          MongoCollection<Group> collection = client
             .getDatabase(config.getDb())
-            .getCollection(config.getProjects(), Project.class)
-            .find().forEach(result::add);
+            .getCollection(config.getGroups(), Group.class);
           
+          collection.find().forEach(result::add);
           return Collections.unmodifiableList(result);
+          
         };
         return persistentCommand.map(mapper);
       }
       
       @Override
-      public Project id(String id) throws PmException {
+      public Group id(String id) throws PmException {
         RepoAssert.notNull(id, () -> "id not defined!");
         
-        BiFunction<MongoClient, MongoDbConfig, Optional<Project>> mapper = (client, config) -> {
-          Project value = client
+        BiFunction<MongoClient, MongoDbConfig, Optional<Group>> mapper = (client, config) -> {
+          Group value = client
               .getDatabase(config.getDb())
-              .getCollection(config.getProjects(), Project.class)
-              .find(Filters.eq(ProjectCodec.ID, id))
+              .getCollection(config.getGroups(), Group.class)
+              .find(Filters.eq(GroupCodec.ID, id))
               .first();
           return Optional.ofNullable(value);
         };
-        Optional<Project> result = persistentCommand.map(mapper);
+        Optional<Group> result = persistentCommand.map(mapper);
         if(result.isEmpty()) {
           throw new PmException(ImmutableConstraintViolation.builder()
               .id(id)
               .rev("any")
               .constraint(ConstraintType.NOT_FOUND)
-              .type(ErrorType.PROJECT)
-              .build(), "entity: 'project' not found with id: '" + id + "'!"); 
+              .type(ErrorType.GROUP)
+              .build(), "entity: 'group' not found with id: '" + id + "'!");
         }
         return result.get();
       }
       
       @Override
-      public Project rev(String id, String rev) throws PmException {
+      public Group rev(String id, String rev) throws PmException {
         RepoAssert.notNull(id, () -> "id not defined!");
         RepoAssert.notNull(rev, () -> "rev not defined!");
-        Project project = id(id);
+        Group group = id(id);
         
-        if(!rev.equals(project.getRev())) {
+        if(!rev.equals(group.getRev())) {
           throw new PmRevException(ImmutableRevisionConflict.builder()
-              .id(project.getId())
+              .id(group.getId())
               .revToUpdate(rev)
-              .rev(project.getRev())
-              .build(), "revision conflict: 'project' with id: '" + project.getId() + "', revs: " + project.getRev() + " != " + rev + "!");
+              .rev(group.getRev())
+              .build(), "revision conflict: 'group' with id: '" + group.getId() + "', revs: " + group.getRev() + " != " + rev + "!");
         }
-        return project;
+        return group;
       }
       
       @Override
-      public Optional<Project> findByName(String name) {
+      public Optional<Group> findByName(String name) {
         RepoAssert.notNull(name, () -> "name not defined!");
-        BiFunction<MongoClient, MongoDbConfig, Optional<Project>> mapper = (client, config) -> {
-          Project value = client
+        BiFunction<MongoClient, MongoDbConfig, Optional<Group>> mapper = (client, config) -> {
+          Group value = client
               .getDatabase(config.getDb())
-              .getCollection(config.getProjects(), Project.class)
-              .find(Filters.eq(ProjectCodec.NAME, name))
+              .getCollection(config.getGroups(), Group.class)
+              .find(Filters.eq(GroupCodec.NAME, name))
               .first();
           return Optional.ofNullable(value);
         };
@@ -164,83 +165,90 @@ public class MongoProjectCommands implements ProjectCommands {
       }
       
       @Override
-      public Optional<Project> find(String id) {
-        BiFunction<MongoClient, MongoDbConfig, Optional<Project>> mapper = (client, config) -> {
-          Project value = client
+      public Optional<Group> find(String id) {
+        BiFunction<MongoClient, MongoDbConfig, Optional<Group>> mapper = (client, config) -> {
+          Group value = client
               .getDatabase(config.getDb())
-              .getCollection(config.getProjects(), Project.class)
-              .find(Filters.eq(ProjectCodec.ID, id))
+              .getCollection(config.getGroups(), Group.class)
+              .find(Filters.eq(GroupCodec.ID, id))
               .first();
           return Optional.ofNullable(value);
         };
         return persistentCommand.map(mapper);
+      }
+
+      @Override
+      public Group any(String idOrName) {
+        return find(idOrName).orElseGet(() -> findByName(idOrName)
+            .orElseThrow(() -> new PmException(ImmutableConstraintViolation.builder()
+                  .id(idOrName)
+                  .rev("")
+                  .constraint(ConstraintType.NOT_FOUND)
+                  .type(ErrorType.GROUP)
+                  .build(), "entity: 'group' not found by one of the keys: 'id/name' = '" + idOrName + "'!")
+            ));
       }
     };
   }
 
   @Override
-  public ProjectUpdateBuilder update() {
-    return new ProjectUpdateBuilder() {
+  public GroupUpdateBuilder update() {
+    return new GroupUpdateBuilder() {
       private String id;
       private String rev;
       private String name;
       
       @Override
-      public ProjectUpdateBuilder rev(String rev) {
+      public GroupUpdateBuilder rev(String rev) {
         this.rev = rev;
         return this;
       }
       @Override
-      public ProjectUpdateBuilder name(String name) {
+      public GroupUpdateBuilder name(String name) {
         this.name = name;
         return this;
       }
       @Override
-      public ProjectUpdateBuilder id(String id) {
+      public GroupUpdateBuilder id(String id) {
         this.id = id;
         return this;
       }
       @Override
-      public Project build() throws PmException {
+      public Group build() throws PmException {
         RepoAssert.notNull(id, () -> "id not defined!");
         RepoAssert.notNull(rev, () -> "rev not defined!");
         RepoAssert.notNull(name, () -> "name not defined!");
         
-        Project project = ImmutableProject.builder()
+        Group group = ImmutableGroup.builder()
             .from(query().rev(id, rev))
             .name(name)
             .build();
         return persistentCommand
-            .update(visitor -> visitor.visitProject(project))
-            .getProject().get(project.getId());
+            .update(visitor -> visitor.visitGroup(group))
+            .getGroups().get(group.getId());
       }
     };
   }
 
   @Override
-  public ProjectDeleteBuilder delete() {
-    return new ProjectDeleteBuilder() {
+  public GroupDeleteBuilder delete() {
+    return new GroupDeleteBuilder() {
       private String id;
       private String rev;
       @Override
-      public ProjectDeleteBuilder rev(String rev) {
-        this.rev = rev;
-        return this;
-      }
-      @Override
-      public ProjectDeleteBuilder id(String id) {
+      public GroupDeleteBuilder rev(String id, String rev) {
         this.id = id;
         return this;
       }
       @Override
-      public Project build() throws PmException {
+      public Group build() throws PmException {
         RepoAssert.notNull(id, () -> "id not defined!");
         RepoAssert.notNull(rev, () -> "rev not defined!");
         
-        Project project = query().rev(id, rev);
+        Group group = query().rev(id, rev);
         return persistentCommand
-            .delete(visitor -> visitor.visitProject(project))
-            .getProject().get(project.getId());
+            .delete(visitor -> visitor.visitGroup(group))
+            .getGroups().get(group.getId());
       }
     };
   }
