@@ -3,7 +3,7 @@ import moment from 'moment';
 
 import { makeStyles } from '@material-ui/core/styles';
 import Link from '@material-ui/core/Link';
-import PersonAddOutlinedIcon from '@material-ui/icons/PersonAddOutlined';
+import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -66,7 +66,7 @@ export default function Projects() {
               <TableCell>{row.users}</TableCell>
               <TableCell>{row.modifiedDaysAgo} day(s) ago</TableCell>
               <TableCell>{row.created}</TableCell>
-              <TableCell><IconButton size="small" onClick={openAdd} color="inherit"><PersonAddOutlinedIcon/></IconButton></TableCell>
+              <TableCell><IconButton size="small" onClick={openAdd} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
             </TableRow>
           ))}
         </TableBody>

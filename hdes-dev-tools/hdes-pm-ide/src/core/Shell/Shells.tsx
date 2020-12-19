@@ -1,11 +1,18 @@
 import React from 'react';
 import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListSubheader from '@material-ui/core/ListSubheader';
+
+
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
@@ -17,137 +24,97 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 
-const drawerWidth = 240;
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-  },
-  toolbar: {
-    paddingRight: 24, // keep right padding when drawer closed
-  },
-  toolbarIcon: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    padding: '0 8px',
-    ...theme.mixins.toolbar,
-  },
-  appBar: {
-    zIndex: theme.zIndex.drawer + 1,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    backgroundColor: theme.palette.background.default,
-    borderBottom: `1px solid ${theme.palette.primary.main}`,
-  },
-  appBarShift: {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(['width', 'margin'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    color: theme.palette.primary.main,
-    marginRight: 36,
-  },
-  appBarIcon: {
-    color: theme.palette.primary.main,
-  },
-  menuButtonHidden: {
-    display: 'none',
-  },
-  title: {
-    flexGrow: 1,
-    color: theme.palette.primary.main,
-  },
-  drawerPaper: {
-    position: 'relative',
-    whiteSpace: 'nowrap',
-    width: drawerWidth,
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  drawerPaperClose: {
-    overflowX: 'hidden',
-    transition: theme.transitions.create('width', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    width: theme.spacing(7),
-    [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(9),
-    },
-  },
-  
-  appBarSpacer: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
-  container: {
-    paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
-  }
-}));
-
+import ShellStyles from './ShellStyles' 
 
 type ShellProps = {
-  title: string,
-  menu: React.ReactNode[],
-  content: React.ReactNode[],
+  operations: { 
+    label: string, icon: React.ReactNode,
+    dialog: (open: boolean, handleClose: () => void) => React.ReactNode
+  } [],
+  views: { label: string, icon: React.ReactNode }[],
+  tabs: { label: string, panel: React.ReactNode } []
 };
 
-const Shell: React.FC<ShellProps> = ({title, menu, content}) => {
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: any;
+  value: any;
+}
+
+const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`wrapped-tabpanel-${index}`}
+      aria-labelledby={`wrapped-tab-${index}`}
+      {...other} >
+      
+      {value === index && (<Grid container spacing={3}>{children}</Grid>)}
+    </div>
+  );
+}
+
+const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
   
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
+  const classes = ShellStyles();
+  
+  // Drawer
+  const [drawerOpen, setDrawerOpen] = React.useState(true);
+  const handleDrawerOpen = () => setDrawerOpen(true);
+  const handleDrawerClose = () => setDrawerOpen(false);
+  
+  // Operations and views
+  const [dialogOpen, setDialogOpen] = React.useState(-1);
+  const handleDialogOpen = (index: number) => setDialogOpen(index);
+  const handleDialogClose = () => setDialogOpen(-1);
+  const listOperations = operations.map((item, index) => (
+    <ListItem button onClick={() => handleDialogOpen(index)}>
+      <ListItemIcon>{item.icon}</ListItemIcon>
+      <ListItemText primary={item.label}/>
+    </ListItem>));
+  const listDialogs = operations.map((item, index) => item.dialog(dialogOpen === index, handleDialogClose));
+  const listViews = views.map((item, index) => (
+    <ListItem button key={index}>
+      <ListItemIcon>{item.icon}</ListItemIcon>
+      <ListItemText primary={item.label} />
+    </ListItem>
+  ));
   const menus = (<React.Fragment>
-      {menu.map((m, id) => <React.Fragment key={id}><Divider/><List>{m}</List></React.Fragment>)}
+      <Divider/><List><ListSubheader inset>Operation</ListSubheader>{listOperations}</List>
+      <Divider/><List><ListSubheader inset>Views</ListSubheader>{listViews}</List>
     </React.Fragment>)
+  
+  // Tabs
+  const [tabOpen, setTabOpen] = React.useState('0');
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: string) => setTabOpen(newValue);
+  const listTabs = tabs.map((tab, index) => <Tab value={index + ''} label={tab.label} />);
+  const listPanels = tabs.map((tab, index) => <TabPanel index={index + ''} value={tabOpen}>{tab.panel}</TabPanel>);
   
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
+      <AppBar position="absolute" className={clsx(classes.appBar, drawerOpen && classes.appBarShift)}>
         <Toolbar className={classes.toolbar}>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            className={clsx(classes.menuButton, open && classes.menuButtonHidden)}
+          <IconButton edge="start" color="inherit" aria-label="open drawer" 
+            className={clsx(classes.menuButton, drawerOpen && classes.menuButtonHidden)} 
             onClick={handleDrawerOpen}>
             <MenuIcon />
           </IconButton>
-          
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            Dashboard
+            <Tabs value={tabOpen} onChange={handleTabChange}>{listTabs}</Tabs>
           </Typography>
-          
           <IconButton color="inherit" className={classes.appBarIcon}>
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
             </Badge>
           </IconButton>
-        
         </Toolbar>
       </AppBar>
 
-      <Drawer variant="permanent" open={open} 
+      <Drawer variant="permanent" open={drawerOpen} 
         classes={{
-          paper: clsx(classes.drawerPaper, !open && classes.drawerPaperClose),
+          paper: clsx(classes.drawerPaper, !drawerOpen && classes.drawerPaperClose),
         }}>
         
         <div className={classes.toolbarIcon}>
@@ -160,9 +127,7 @@ const Shell: React.FC<ShellProps> = ({title, menu, content}) => {
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>{content}</Grid>
-        </Container>
+        <Container maxWidth="lg" className={classes.container}>{listDialogs}{listPanels}</Container>
       </main>
     </div>
   );
