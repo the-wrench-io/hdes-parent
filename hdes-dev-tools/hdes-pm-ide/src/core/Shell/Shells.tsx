@@ -32,13 +32,17 @@ type ShellProps = {
     dialog: (open: boolean, handleClose: () => void) => React.ReactNode
   } [],
   views: { label: string, icon: React.ReactNode }[],
-  tabs: { label: string, panel: React.ReactNode } []
+  tabs: {
+    open: number,
+    handleOpen: (index: number) => void,
+    entries: { label: string, panel: React.ReactNode }[]
+  }
 };
 
 interface TabPanelProps {
   children?: React.ReactNode;
-  index: any;
-  value: any;
+  index: number;
+  value: number;
 }
 
 const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other }) => {
@@ -69,11 +73,11 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
   const handleDialogOpen = (index: number) => setDialogOpen(index);
   const handleDialogClose = () => setDialogOpen(-1);
   const listOperations = operations.map((item, index) => (
-    <ListItem button onClick={() => handleDialogOpen(index)}>
+    <ListItem key={index} button onClick={() => handleDialogOpen(index)}>
       <ListItemIcon>{item.icon}</ListItemIcon>
       <ListItemText primary={item.label}/>
     </ListItem>));
-  const listDialogs = operations.map((item, index) => item.dialog(dialogOpen === index, handleDialogClose));
+  const listDialogs = operations.map((item, index) => <React.Fragment key={index}>{item.dialog(dialogOpen === index, handleDialogClose)}</React.Fragment>);
   const listViews = views.map((item, index) => (
     <ListItem button key={index}>
       <ListItemIcon>{item.icon}</ListItemIcon>
@@ -86,10 +90,9 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
     </React.Fragment>)
   
   // Tabs
-  const [tabOpen, setTabOpen] = React.useState('0');
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: string) => setTabOpen(newValue);
-  const listTabs = tabs.map((tab, index) => <Tab value={index + ''} label={tab.label} />);
-  const listPanels = tabs.map((tab, index) => <TabPanel index={index + ''} value={tabOpen}>{tab.panel}</TabPanel>);
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => tabs.handleOpen(newValue);
+  const listTabs = tabs.entries.map((tab, index) => <Tab key={index} value={index} label={tab.label} />);
+  const listPanels = tabs.entries.map((tab, index) => <TabPanel key={index} index={index} value={tabs.open}>{tab.panel}</TabPanel>);
   
   return (
     <div className={classes.root}>
@@ -102,7 +105,7 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            <Tabs value={tabOpen} onChange={handleTabChange}>{listTabs}</Tabs>
+            <Tabs value={tabs.open} onChange={handleTabChange}>{listTabs}</Tabs>
           </Typography>
           <IconButton color="inherit" className={classes.appBarIcon}>
             <Badge badgeContent={4} color="secondary">

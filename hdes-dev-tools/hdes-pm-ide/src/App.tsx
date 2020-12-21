@@ -16,7 +16,7 @@ import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined'
 
 
 import Shell from './core/Shell';
-import { AddUser } from './core/Users';
+import { User, AddUser, ConfigureUser } from './core/Users';
 import { Projects, AddProject } from './core/Projects';
 import { AddGroup } from './core/Groups';
 
@@ -31,6 +31,21 @@ const useStyles = makeStyles((theme) => ({
     height: 340,
   },
 }));
+
+interface SessionTab {
+  label: string;
+  panel: React.ReactNode;  
+}
+
+interface SessionHistory {
+  previous?: SessionHistory;
+  open: number;
+}
+
+interface Session {  
+  tabs: SessionTab[];
+  history: SessionHistory;
+}
 
 function App() {
   
@@ -48,19 +63,33 @@ function App() {
               </Paper>
             </Grid>)
   
+  const startSession: Session = { tabs: [{ label: 'Dashboard', panel: <React.Fragment>{projects}{users}</React.Fragment> }], history: { open: 0 } };
+  const [session, setSession] = React.useState(startSession);
+  
+  const changeTab = (index: number) => {
+    const history: SessionHistory = { previous: session.history, open: index };
+    setSession({tabs: session.tabs, history: history});
+  };
+  const addSessionItem = (newItem: SessionTab, session: Session) => {
+    const next = session.tabs.length;
+    const history: SessionHistory = { previous: session.history, open: next };
+    setSession({tabs: session.tabs.concat(newItem), history: history});
+  };
+  const confNewUser = (session: Session, activeStep: number, user: User) => {
+    addSessionItem({label: 'creating new user', panel: <ConfigureUser user={user} activeStep={activeStep} /> }, session);
+  };
+  
   const operations = [
     { label: 'Add User', icon: <PersonAddOutlinedIcon />, 
-      dialog: (open: boolean, handleClose: () => void) => <AddUser open={open} handleClose={handleClose} />},
+      dialog: (open: boolean, handleClose: () => void) => <AddUser open={open} 
+        handleClose={handleClose} 
+        handleConf={(activeStep, user) => confNewUser(session, activeStep, user)} />},
       
     { label: 'Add Project', icon: <InputOutlinedIcon />,
       dialog: (open: boolean, handleClose: () => void) => <AddProject open={open} handleClose={handleClose} />},
       
     { label: 'Add Group', icon: <LibraryAddOutlinedIcon />,
       dialog: (open: boolean, handleClose: () => void) => <AddGroup open={open} handleClose={handleClose} />}];
-  
-  const tabs = [
-      { label: 'Dashboard', panel: <React.Fragment>{projects}{users}</React.Fragment> }
-    ];
 
   const views = [
     { label: 'List Groups', icon: <GroupOutlinedIcon />},
@@ -68,7 +97,14 @@ function App() {
     { label: 'List Projects', icon: <LibraryBooksOutlinedIcon />}
   ]
   
-  return (<Shell operations={operations} views={views} tabs={tabs} />);
+  return (<Shell 
+    operations={operations} 
+    views={views} 
+    tabs={{
+      entries: session.tabs,
+      open: session.history.open,
+      handleOpen: changeTab
+    }}/>);
 }
 
 export default App;
