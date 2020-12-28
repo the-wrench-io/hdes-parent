@@ -12,7 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 
 import AddUserToProject from './AddUserToProject';
-import Title from './Title';
+import { Title } from '.././Views';
 
 // Generate Order Data
 function createData(id: string, name: string, users: number, modifiedDaysAgo: number, created: Date) {
@@ -28,9 +28,6 @@ const rows = [
   createData('3', 'room condition project', 2, 10, new Date("2015-01-16"))
 ];
 
-function preventDefault(event: MouseEvent) {
-  event.preventDefault();
-}
 
 const useStyles = makeStyles((theme) => ({
   seeMore: {
@@ -38,7 +35,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Projects() {
+interface ProjectsViewProps {
+  top?: number,
+  seeMore?: () => void
+};
+
+
+const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore}) => {
   const classes = useStyles();
   
   const [open, setOpen] = React.useState(false);
@@ -48,7 +51,7 @@ export default function Projects() {
   return (
     <React.Fragment>
       <AddUserToProject open={open} handleClose={closeAdd} />
-      <Title>Recent Projects</Title>
+      <Title>{top ? 'Recent Projects' : 'All Projects'}</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -71,11 +74,21 @@ export default function Projects() {
           ))}
         </TableBody>
       </Table>
-      <div className={classes.seeMore}>
-        <Link color="primary" href="#" onClick={preventDefault}>
-          See more projects
-        </Link>
-      </div>
+      { seeMore ? 
+        (<div className={classes.seeMore}>
+          <Link color="primary" href="#" onClick={(event: MouseEvent) => {
+            event.preventDefault();
+            seeMore();
+          }}>
+            See more projects
+          </Link>
+        </div>) :
+        null
+      }
     </React.Fragment>
   );
 }
+
+
+export default ProjectsView;
+

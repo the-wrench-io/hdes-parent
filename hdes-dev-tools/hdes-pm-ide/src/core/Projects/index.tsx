@@ -1,4 +1,4 @@
-import Projects from './Projects';
+import ProjectsView from './ProjectsView';
 import AddProject from './AddProject';
 
-export { Projects, AddProject };
+export { ProjectsView, AddProject };

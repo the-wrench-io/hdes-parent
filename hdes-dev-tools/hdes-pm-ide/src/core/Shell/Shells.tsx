@@ -9,11 +9,8 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListSubheader from '@material-ui/core/ListSubheader';
-
-
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
-
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
@@ -26,12 +23,13 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 
 import ShellStyles from './ShellStyles' 
 
+
 type ShellProps = {
   operations: { 
     label: string, icon: React.ReactNode,
     dialog: (open: boolean, handleClose: () => void) => React.ReactNode
   } [],
-  views: { label: string, icon: React.ReactNode }[],
+  views: { label: string, icon: React.ReactNode, onClick: () => void }[],
   tabs: {
     open: number,
     handleOpen: (index: number) => void,
@@ -72,27 +70,9 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
   const [dialogOpen, setDialogOpen] = React.useState(-1);
   const handleDialogOpen = (index: number) => setDialogOpen(index);
   const handleDialogClose = () => setDialogOpen(-1);
-  const listOperations = operations.map((item, index) => (
-    <ListItem key={index} button onClick={() => handleDialogOpen(index)}>
-      <ListItemIcon>{item.icon}</ListItemIcon>
-      <ListItemText primary={item.label}/>
-    </ListItem>));
-  const listDialogs = operations.map((item, index) => <React.Fragment key={index}>{item.dialog(dialogOpen === index, handleDialogClose)}</React.Fragment>);
-  const listViews = views.map((item, index) => (
-    <ListItem button key={index}>
-      <ListItemIcon>{item.icon}</ListItemIcon>
-      <ListItemText primary={item.label} />
-    </ListItem>
-  ));
-  const menus = (<React.Fragment>
-      <Divider/><List><ListSubheader inset>Operation</ListSubheader>{listOperations}</List>
-      <Divider/><List><ListSubheader inset>Views</ListSubheader>{listViews}</List>
-    </React.Fragment>)
   
-  // Tabs
+  // external data 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => tabs.handleOpen(newValue);
-  const listTabs = tabs.entries.map((tab, index) => <Tab key={index} value={index} label={tab.label} />);
-  const listPanels = tabs.entries.map((tab, index) => <TabPanel key={index} index={index} value={tabs.open}>{tab.panel}</TabPanel>);
   
   return (
     <div className={classes.root}>
@@ -105,7 +85,12 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            <Tabs value={tabs.open} onChange={handleTabChange}>{listTabs}</Tabs>
+            <Tabs value={tabs.open} onChange={handleTabChange}>
+              { tabs.entries.map((tab, index) => 
+                  <Tab key={index} value={index} label={tab.label} />
+                )
+              }
+            </Tabs>
           </Typography>
           <IconButton color="inherit" className={classes.appBarIcon}>
             <Badge badgeContent={4} color="secondary">
@@ -125,12 +110,46 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
             <ChevronLeftIcon className={classes.appBarIcon}/>
           </IconButton>
         </div>
-        {menus}
+        <Divider/>
+        <List>
+          <ListSubheader inset>Operation</ListSubheader>
+          { operations.map((item, index) => (
+              <ListItem key={index} button onClick={() => handleDialogOpen(index)}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label}/>
+              </ListItem>)
+            )
+          }
+        </List>
+        <Divider/>
+        <List>
+          <ListSubheader inset>Views</ListSubheader>
+          { views.map((item, index) => (
+              <ListItem button key={index} onClick={() => item.onClick()}>
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItem>)
+            )
+          }
+        </List>
       </Drawer>
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>{listDialogs}{listPanels}</Container>
+        <Container maxWidth="lg" className={classes.container}>
+          { operations.map((item, index) => (
+              <React.Fragment key={index}>
+                {item.dialog(dialogOpen === index, handleDialogClose)}
+              </React.Fragment>)
+            )
+          }
+          { tabs.entries.map((tab, index) => (
+              <TabPanel key={index} index={index} value={tabs.open}>
+                {tab.panel}
+              </TabPanel>)
+            )
+          }
+        </Container>
       </main>
     </div>
   );

@@ -15,7 +15,7 @@ import Divider from '@material-ui/core/Divider';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      
+
     },
     cardHeader: {
       padding: theme.spacing(1, 2),
@@ -138,7 +138,7 @@ const ConfigureUserGroups: React.FC<ConfigureUserGroupsProps> = ({groups}) => {
     </Card>
   );
 
-  return (<Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
+  return (<Grid container spacing={2} justify="center" alignItems="flex-start" className={classes.root}>
       <Grid item>{customList('Available Groups', left)}</Grid>
       <Grid item>
         <Grid container direction="column" alignItems="center" >

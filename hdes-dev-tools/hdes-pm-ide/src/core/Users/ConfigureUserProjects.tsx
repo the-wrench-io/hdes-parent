@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     list: {
       width: 200,
+      maxHeight: 400,
       overflow: 'auto'
     },
     button: {
@@ -120,12 +121,11 @@ const ConfigureUserProjects: React.FC<ConfigureUserProjectsProps> = ({projects})
           const labelId = `transfer-list-all-item-${value}-label`;
 
           return (
-            <ListItem key={value} role="listitem" button onClick={handleToggle(value)}>
-              <ListItemIcon>
-                <Checkbox
+            <ListItem key={value} role="listitem" button onClick={handleToggle(value)} >
+              <ListItemIcon >
+                <Checkbox size='small' disableRipple
                   checked={checked.indexOf(value) !== -1}
                   tabIndex={-1}
-                  disableRipple
                   inputProps={{ 'aria-labelledby': labelId }}
                 />
               </ListItemIcon>
@@ -138,13 +138,14 @@ const ConfigureUserProjects: React.FC<ConfigureUserProjectsProps> = ({projects})
     </Card>
   );
 
-  return (<Grid container spacing={2} justify="center" alignItems="center" className={classes.root}>
+  return (<Grid container spacing={2} justify="center" alignItems="flex-start" className={classes.root}>
       <Grid item>{customList('Available Projects', left)}</Grid>
       <Grid item>
         <Grid container direction="column" alignItems="center" >
           <Button
             variant="outlined"
             size="small"
+            color="primary"
             className={classes.button}
             onClick={handleCheckedRight}
             disabled={leftChecked.length === 0}
@@ -155,6 +156,7 @@ const ConfigureUserProjects: React.FC<ConfigureUserProjectsProps> = ({projects})
           <Button
             variant="outlined"
             size="small"
+            color="primary"
             className={classes.button}
             onClick={handleCheckedLeft}
             disabled={rightChecked.length === 0}

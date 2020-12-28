@@ -3,8 +3,11 @@ import ReactDOM from 'react-dom';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
+import { Resources } from './core/Resources';
 
 import App from './App';
+
+
 import reportWebVitals from './reportWebVitals';
 
 
@@ -71,10 +74,14 @@ const theme = createMuiTheme({
 });
 
 
+const config = {};
+
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <App />
+      <Resources.Provider config={config} >
+        <App />
+      </Resources.Provider>
     </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')

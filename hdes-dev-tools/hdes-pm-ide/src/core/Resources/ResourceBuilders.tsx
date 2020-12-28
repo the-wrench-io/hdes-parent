@@ -1,8 +1,7 @@
+import Backend from './Backend'; 
 
 
-
-
-export default class User {
+export class GenericUserBuilder implements Backend.UserBuilder {
   id?: string; 
   name?: string; 
   externalId?: string;
@@ -13,32 +12,33 @@ export default class User {
     this.id = id
   }
 
-  withName(name: string) {
-    this.name = name;
-    return this;
+
+  as(): Backend.UserBuilder {
+    const result = this as unknown as Backend.UserBuilder;
+    return result;
   }
-  
+  withName(name: string): Backend.UserBuilder {
+    this.name = name;
+    return this.as();
+  }
   withExternalId(externalId: string) {
     this.externalId = externalId;
-    return this;
+    return this.as();
   }
-  
   withProjects(projects: string[]) {
     this.projects = projects;
-    return this;
+    return this.as();
   }
-  
   withGroups(groups: string[]) {
     this.groups = groups;
-    return this;
+    return this.as();
   }
-  
-  from(from: User) {
+  from(from: Backend.UserBuilder) {
     this.id = from.id;
     this.name = from.name;
     this.externalId = from.externalId;
     this.groups = Object.assign([], from.groups);
     this.projects = Object.assign([], from.projects);
-    return this;
+    return this.as();
   }
 };

@@ -1,5 +1,5 @@
 import ConfigureUser from './ConfigureUser';
 import AddUser from './AddUser';
-import User from './User';
+import UsersView from './UsersView';
 
-export { ConfigureUser, AddUser, User };
+export { ConfigureUser, AddUser, UsersView };

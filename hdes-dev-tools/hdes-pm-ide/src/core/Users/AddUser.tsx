@@ -17,7 +17,8 @@ import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 
-import User from './User';
+import { Resources, Backend } from '.././Resources';
+
 import ConfigureUserBasic from './ConfigureUserBasic';
 import ConfigureUserProjects from './ConfigureUserProjects';
 import ConfigureUserGroups from './ConfigureUserGroups';
@@ -80,7 +81,7 @@ const DialogActions = withStyles((theme: Theme) => ({
 
 interface AddUserProps {
   open: boolean;
-  handleConf: (step: number, user: User) => void;
+  handleConf: (step: number, user: Backend.UserBuilder) => void;
   handleClose: () => void;
 };
 
@@ -105,8 +106,8 @@ const useStyles = makeStyles((theme: Theme) =>
 const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   const classes = useStyles();
   
-  const [user, setUser] = React.useState(new User());
-  
+  const { service } = React.useContext(Resources.Context);
+  const [user, setUser] = React.useState(service.users.builder());
   
   const [activeStep, setActiveStep] = React.useState(0);
   const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1)
@@ -115,7 +116,7 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   const tearDown = () => {
     handleClose();
     handleReset();
-    setUser(new User());
+    setUser(service.users.builder());
   };
   
   const steps = [
