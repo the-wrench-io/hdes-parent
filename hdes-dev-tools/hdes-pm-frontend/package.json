@@ -1,5 +1,5 @@
 {
-  "name": "hdes-pm-ide",
+  "name": "hdes-pm-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

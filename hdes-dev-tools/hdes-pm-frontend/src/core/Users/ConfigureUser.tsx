@@ -56,7 +56,7 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
         externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
     <ConfigureUserProjects 
-        projects={{ all: [], selected: []}} 
+        projects={{ all: [], selected: []}}
         onChange={(newSelection) => setUser(user.withProjects(newSelection))} />,
         
     <ConfigureUserGroups

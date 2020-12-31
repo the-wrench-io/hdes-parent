@@ -110,8 +110,10 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   const [user, setUser] = React.useState(service.users.builder());
   
   const [activeStep, setActiveStep] = React.useState(0);
+  
   const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1)
   const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1)
+  
   const handleReset = () => setActiveStep(0);
   const tearDown = () => {
     handleClose();
@@ -121,8 +123,8 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   
   const steps = [
     <ConfigureUserBasic 
-        name={{onChange: (newValue) => setUser(user.withName(newValue))}}
-        externalId={{onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
+        name={{defaultValue: user.name, onChange: (newValue) => setUser(user.withName(newValue))}}
+        externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
     <ConfigureUserProjects 
         projects={{ all: [], selected: []}} 

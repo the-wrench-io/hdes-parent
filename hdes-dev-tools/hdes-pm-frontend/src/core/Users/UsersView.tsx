@@ -32,7 +32,7 @@ interface UserViewProps {
 
 const UsersView: React.FC<UserViewProps> = ({top, seeMore}) => {
   const { service } = React.useContext(Resources.Context);
-  const [users, setUsers] = React.useState<Backend.User[]>([]);
+  const [users, setUsers] = React.useState<Backend.UserResource[]>([]);
   React.useEffect(() => service.users.query({ top }).onSuccess(setUsers), [service.users, top])
   
   const classes = useStyles();
@@ -57,12 +57,12 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore}) => {
         </TableHead>
         <TableBody>
           {users.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.externalId}</TableCell>
-              <TableCell>{row.groups}</TableCell>
-              <TableCell>{row.projects}</TableCell>
-              <TableCell>{moment(row.created).format(DATE_FORMAT)}</TableCell>
+            <TableRow key={row.user.id}>
+              <TableCell>{row.user.name}</TableCell>
+              <TableCell>{row.user.externalId}</TableCell>
+              <TableCell>{Object.keys(row.groups).length}</TableCell>
+              <TableCell>{Object.keys(row.projects).length}</TableCell>
+              <TableCell>{moment(row.user.created).format(DATE_FORMAT)}</TableCell>
               <TableCell><IconButton size="small" onClick={openAdd} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
             </TableRow>
           ))}
