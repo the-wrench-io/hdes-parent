@@ -13,20 +13,10 @@ import IconButton from '@material-ui/core/IconButton';
 
 import AddUserToProject from './AddUserToProject';
 import { Title } from '.././Views';
+import { Resources, Backend } from '.././Resources';
 
-// Generate Order Data
-function createData(id: string, name: string, users: number, modifiedDaysAgo: number, created: Date) {
-  return { id, name, users, modifiedDaysAgo, created : moment(created).format(DATE_FORMAT) };
-}
 
 const DATE_FORMAT = "MMM Do YY";
- 
-const rows = [
-  createData('0', 'scoring project', 2, 10, new Date("2019-01-16")),
-  createData('1', 'casco pricing project', 2, 10, new Date("2018-01-16")),
-  createData('2', 'risk project', 2, 10, new Date("2017-01-16")),
-  createData('3', 'room condition project', 2, 10, new Date("2015-01-16"))
-];
 
 
 const useStyles = makeStyles((theme) => ({
@@ -44,6 +34,10 @@ interface ProjectsViewProps {
 const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore}) => {
   const classes = useStyles();
   
+  const { service } = React.useContext(Resources.Context);
+  const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
+  React.useEffect(() => service.projects.query({ top }).onSuccess(setProjects), [service.projects, top])
+  
   const [open, setOpen] = React.useState(false);
   const openAdd = () => setOpen(true);
   const closeAdd = () => setOpen(false);
@@ -57,18 +51,16 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore}) => {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Users</TableCell>
-            <TableCell>Modified last</TableCell>
             <TableCell>Created</TableCell>
             <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
-            <TableRow key={row.id}>
-              <TableCell>{row.name}</TableCell>
-              <TableCell>{row.users}</TableCell>
-              <TableCell>{row.modifiedDaysAgo} day(s) ago</TableCell>
-              <TableCell>{row.created}</TableCell>
+          {projects.map((row) => (
+            <TableRow key={row.project.id}>
+              <TableCell>{row.project.name}</TableCell>
+              <TableCell>{Object.keys(row.users).length}</TableCell>
+              <TableCell>{moment(row.project.created).format(DATE_FORMAT)}</TableCell>
               <TableCell><IconButton size="small" onClick={openAdd} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
             </TableRow>
           ))}

@@ -29,7 +29,6 @@ interface UserViewProps {
   seeMore?: () => void
 };
 
-
 const UsersView: React.FC<UserViewProps> = ({top, seeMore}) => {
   const { service } = React.useContext(Resources.Context);
   const [users, setUsers] = React.useState<Backend.UserResource[]>([]);

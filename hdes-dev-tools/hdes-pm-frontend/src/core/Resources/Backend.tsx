@@ -2,8 +2,19 @@
 declare namespace Backend {
   
   interface Service {
-    users: UserService
-    projects: ProjectService
+    users: UserService;
+    projects: ProjectService;
+    groups: GroupService;
+
+    onUpdate: (listener: (newService: Service) => void) => void;
+  }
+  
+  interface GroupService {
+    query: (args?: {top?: number}) => GroupQuery,
+  }
+  
+  interface GroupQuery {
+    onSuccess: (handle: (groups: GroupResource[]) => void) => void;
   }
   
   interface ProjectService {
@@ -15,8 +26,9 @@ declare namespace Backend {
   }
   
   interface UserService {
-    query: (args?: {top?: number}) => UserQuery,
-    builder: () => UserBuilder
+    query: (args?: {top?: number}) => UserQuery;
+    builder: () => UserBuilder;
+    save: (builder: UserBuilder) => { onSuccess: (handle: (user: UserResource) => void) => void; };
   }
   
   interface UserQuery {
@@ -30,6 +42,15 @@ declare namespace Backend {
     groups: Record<string, Group>;
     groupUsers: Record<string, GroupUser>;
   }
+  
+  interface GroupResource {
+    group: Group;
+    users: Record<string, User>;
+    access: Record<string, Access>;
+    groupUsers: Record<string, GroupUser>;
+    projects: Record<string, Project>;
+  }
+  
   
   interface UserResource {
     user: User;

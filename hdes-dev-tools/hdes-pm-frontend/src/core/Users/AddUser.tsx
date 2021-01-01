@@ -108,17 +108,23 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   
   const { service } = React.useContext(Resources.Context);
   const [user, setUser] = React.useState(service.users.builder());
-  
   const [activeStep, setActiveStep] = React.useState(0);
   
-  const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1)
-  const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1)
-  
+  const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
+  const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
   const handleReset = () => setActiveStep(0);
   const tearDown = () => {
     handleClose();
     handleReset();
     setUser(service.users.builder());
+  };
+
+  const handleFinish = () => {
+    service.users.save(user)
+      .onSuccess(resource => {
+        tearDown();
+        console.log(resource)
+      });
   };
   
   const steps = [
@@ -167,9 +173,12 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
         ) : (
           <div>
             <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>Back</Button>
-            <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>
-              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-            </Button>
+            
+              {activeStep === steps.length - 1 ? 
+                (<Button variant="contained" color="primary" onClick={handleFinish} className={classes.button}>Finish</Button>) :
+                (<Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>Next</Button>)
+              }
+            
           </div>
         )}
         

@@ -19,7 +19,7 @@ import { Backend } from './core/Resources';
 import Shell from './core/Shell';
 import { AddUser, ConfigureUser, UsersView } from './core/Users';
 import { AddProject, ProjectsView } from './core/Projects';
-import { AddGroup } from './core/Groups';
+import { AddGroup, GroupsView } from './core/Groups';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -72,7 +72,7 @@ function App() {
   const classes = useStyles();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
   
-  const listGroups = () => {};
+  const listGroups = () => addSessionItem({unique: true, label: 'Groups', panel: <GroupsView />}, session);
   const listProjects = () => addSessionItem({unique: true, label: 'Projects', panel: <ProjectsView />}, session);
   const listUsers = () => addSessionItem({unique: true, label: 'User', panel: <UsersView />}, session);
 
