@@ -26,7 +26,7 @@ declare namespace Backend {
   }
   
   interface UserService {
-    query: (args?: {top?: number}) => UserQuery;
+    query: (args?: {top?: number, id?: string}) => UserQuery;
     builder: () => UserBuilder;
     save: (builder: UserBuilder) => { onSuccess: (handle: (user: UserResource) => void) => void; };
   }
