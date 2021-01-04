@@ -5,13 +5,14 @@ export class GenericUserBuilder implements Backend.UserBuilder {
   id?: string; 
   name?: string; 
   externalId?: string;
-  groups?: string[];
-  projects?: string[] 
+  groups: string[];
+  projects: string[] 
   
   constructor(id?: string) {
     this.id = id
+    this.groups = [];
+    this.projects = [];
   }
-
 
   as(): Backend.UserBuilder {
     const result = this as unknown as Backend.UserBuilder;

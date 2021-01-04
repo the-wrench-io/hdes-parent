@@ -107,6 +107,15 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   const classes = useStyles();
   
   const { service } = React.useContext(Resources.Context);
+  
+  const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
+  const [groups, setGroups] = React.useState<Backend.GroupResource[]>([]);
+  React.useEffect(() => {  
+    service.projects.query().onSuccess(setProjects)
+    service.groups.query().onSuccess(setGroups)
+  }, [service, service.projects, service.groups])
+  
+
   const [user, setUser] = React.useState(service.users.builder());
   const [activeStep, setActiveStep] = React.useState(0);
   
@@ -133,11 +142,11 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
         externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
     <ConfigureUserProjects 
-        projects={{ all: [], selected: []}} 
+        projects={{all: projects, selected: user.projects}}
         onChange={(newSelection) => setUser(user.withProjects(newSelection))} />,
         
     <ConfigureUserGroups
-        groups={{ all: [], selected: []}} 
+        groups={{ all: groups, selected: user.groups}} 
         onChange={(newSelection) => setUser(user.withGroups(newSelection))} />    
   ];
   

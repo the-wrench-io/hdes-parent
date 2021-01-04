@@ -79,13 +79,13 @@ function App() {
   
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
               <Paper className={fixedHeightPaper}>
-                <ProjectsView top={5} seeMore={listProjects}/>
+                <ProjectsView top={4} seeMore={listProjects}/>
               </Paper>
             </Grid>)
 
   const users = (<Grid key="2" item xs={12} md={8} lg={9}>
               <Paper className={fixedHeightPaper}>
-                <UsersView top={5} seeMore={listUsers}/>
+                <UsersView top={4} seeMore={listUsers}/>
               </Paper>
             </Grid>)
   

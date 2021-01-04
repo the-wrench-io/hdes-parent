@@ -64,8 +64,8 @@ declare namespace Backend {
     id?: string; 
     name?: string; 
     externalId?: string;
-    groups?: string[];
-    projects?: string[];
+    groups: string[];
+    projects: string[];
 
     withName: (name: string) => UserBuilder;
     withExternalId: (externalId: string) => UserBuilder;
