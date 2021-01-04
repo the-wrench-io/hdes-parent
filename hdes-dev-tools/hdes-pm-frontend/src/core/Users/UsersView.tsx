@@ -11,6 +11,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
+import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 
 import { Title, DateFormat } from '.././Views';
 import { Resources, Backend } from '.././Resources';
@@ -23,9 +24,11 @@ const useStyles = makeStyles((theme) => ({
   },
   popover: {
     pointerEvents: 'none',
+    
   },
   paper: {
-    padding: theme.spacing(1),
+    //backgroundColor: 'transparent',
+    //padding: theme.spacing(1),
   },
 }));
 
@@ -64,6 +67,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore}) => {
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
+            <TableCell></TableCell>
             <TableCell>External Id</TableCell>
             <TableCell>Groups</TableCell>
             <TableCell>Projects</TableCell>
@@ -75,15 +79,22 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore}) => {
           {users.map((row) => (
             <TableRow key={row.user.id}>
               <TableCell>
-                <div>
                 <Typography aria-haspopup="true"
                   aria-owns={openPopover ? 'mouse-over-popover' : undefined}
                   onMouseEnter={(event) => handlePopoverOpen(event, row)} onMouseLeave={handlePopoverClose} >
                   {row.user.name}
                 </Typography>
-                </div>
               </TableCell>
-              <TableCell>{row.user.externalId}</TableCell>
+              <TableCell>
+                <Typography aria-haspopup="true"
+                  aria-owns={openPopover ? 'mouse-over-popover' : undefined}
+                  onMouseEnter={(event) => handlePopoverOpen(event, row)} onMouseLeave={handlePopoverClose} >
+                  <VisibilityOutlinedIcon fontSize='small'/>
+                </Typography>
+              </TableCell>
+              <TableCell>
+                {row.user.externalId}
+              </TableCell>
               <TableCell>{Object.keys(row.groups).length}</TableCell>
               <TableCell>{Object.keys(row.projects).length}</TableCell>
               <TableCell><DateFormat>{row.user.created}</DateFormat></TableCell>
