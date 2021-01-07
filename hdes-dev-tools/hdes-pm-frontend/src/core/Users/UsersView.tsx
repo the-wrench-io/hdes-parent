@@ -35,20 +35,17 @@ const useStyles = makeStyles((theme) => ({
 
 interface UserViewProps {
   top?: number,
-  seeMore?: () => void
+  seeMore?: () => void,
+  onEdit: (user: Backend.UserBuilder) => void
 };
 
-const UsersView: React.FC<UserViewProps> = ({top, seeMore}) => {
+const UsersView: React.FC<UserViewProps> = ({top, seeMore, onEdit}) => {
   const { service } = React.useContext(Resources.Context);
   const [users, setUsers] = React.useState<Backend.UserResource[]>([]);
   React.useEffect(() => service.users.query({ top }).onSuccess(setUsers), [service.users, top])
   
   const classes = useStyles();
   
-  const [open, setOpen] = React.useState(false);
-  const openAdd = () => setOpen(true);
-  const closeAdd = () => setOpen(false);
-
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [openPopoverRow, setOpenPopoverRow] = React.useState<Backend.UserResource>();
   const handlePopoverOpen = (event: any, row: Backend.UserResource) => {
@@ -98,7 +95,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore}) => {
               <TableCell>{Object.keys(row.groups).length}</TableCell>
               <TableCell>{Object.keys(row.projects).length}</TableCell>
               <TableCell><DateFormat>{row.user.created}</DateFormat></TableCell>
-              <TableCell><IconButton size="small" onClick={openAdd} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
+              <TableCell><IconButton size="small" onClick={() => onEdit(service.users.builder(row))} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
             </TableRow>
           ))}
         </TableBody>

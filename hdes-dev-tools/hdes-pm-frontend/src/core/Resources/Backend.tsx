@@ -27,7 +27,7 @@ declare namespace Backend {
   
   interface UserService {
     query: (args?: {top?: number, id?: string}) => UserQuery;
-    builder: () => UserBuilder;
+    builder: (from?: UserResource) => UserBuilder;
     save: (builder: UserBuilder) => { onSuccess: (handle: (user: UserResource) => void) => void; };
   }
   
@@ -67,6 +67,7 @@ declare namespace Backend {
     groups: string[];
     projects: string[];
 
+    withResource: (from: Backend.UserResource) => UserBuilder;
     withName: (name: string) => UserBuilder;
     withExternalId: (externalId: string) => UserBuilder;
     withProjects: (projects: string[]) => UserBuilder;

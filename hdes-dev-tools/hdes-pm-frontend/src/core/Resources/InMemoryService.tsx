@@ -166,8 +166,12 @@ class InMemoryUserService implements Backend.UserService {
   query() {
     return new InMemoryUserQuery(this.store);
   }
-  builder() {
-    return new GenericUserBuilder();
+  builder(from?: Backend.UserResource) {
+    const result = new GenericUserBuilder();
+    if(from) {
+      result.withResource(from);
+    }
+    return result;
   }
   save(builder: Backend.UserBuilder) {
     const store = this.store;

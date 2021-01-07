@@ -24,14 +24,15 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import ShellStyles from './ShellStyles' 
 
 
-type ShellProps = {
-  operations: { 
+interface ShellProps {
+  init: number,
+  operations: {
     label: string, icon: React.ReactNode,
     dialog: (open: boolean, handleClose: () => void) => React.ReactNode
   } [],
   views: { label: string, icon: React.ReactNode, onClick: () => void }[],
   tabs: {
-    open: number,
+    open?: number,
     handleOpen: (index: number) => void,
     entries: { label: string, panel: React.ReactNode }[]
   }
@@ -74,6 +75,12 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
   // external data 
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => tabs.handleOpen(newValue);
   
+  React.useEffect(() => {
+    if(tabs.entries.length === 0) {
+      views[0].onClick();
+    }
+  }, [tabs.entries.length, views]);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -144,7 +151,7 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
             )
           }
           { tabs.entries.map((tab, index) => (
-              <TabPanel key={index} index={index} value={tabs.open}>
+              <TabPanel key={index} index={index} value={tabs.open ? tabs.open : 0}>
                 {tab.panel}
               </TabPanel>)
             )

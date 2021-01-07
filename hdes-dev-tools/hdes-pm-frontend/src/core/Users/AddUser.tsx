@@ -11,8 +11,6 @@ import CloseIcon from '@material-ui/icons/Close';
 import TabIcon from '@material-ui/icons/Tab';
 import Typography from '@material-ui/core/Typography';
 
-import Grid from '@material-ui/core/Grid';
-
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -22,6 +20,7 @@ import { Resources, Backend } from '.././Resources';
 import ConfigureUserBasic from './ConfigureUserBasic';
 import ConfigureUserProjects from './ConfigureUserProjects';
 import ConfigureUserGroups from './ConfigureUserGroups';
+import ConfigureUserSummary from './ConfigureUserSummary';
 
 
 const styles = (theme: Theme) =>
@@ -122,6 +121,7 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
   const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
   const handleReset = () => setActiveStep(0);
+  
   const tearDown = () => {
     handleClose();
     handleReset();
@@ -132,7 +132,6 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
     service.users.save(user)
       .onSuccess(resource => {
         tearDown();
-        console.log(resource)
       });
   };
   
@@ -165,32 +164,20 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
           <Step><StepLabel>Add Groups</StepLabel></Step>
         </Stepper>   
         {steps[activeStep]}   
+        {activeStep === steps.length ? (<ConfigureUserSummary user={user} projects={projects} groups={groups} />): null}
       </DialogContent>
-      
       <DialogActions>
         {activeStep === steps.length ? (
-          <Grid container>
-            <Grid container item justify="center">
-              <Typography className={classes.instructions}>All steps completed</Typography>  
-            </Grid>
-            
-            <Grid container item justify="center">
-              <Button color="secondary" onClick={handleReset} className={classes.button}>Reset</Button>
-              <Button variant="contained" color="primary" onClick={handleReset} className={classes.button}>Confirm And Create New User</Button>
-            </Grid>
-          </Grid>
+          <div>
+            <Button color="secondary" onClick={handleReset} className={classes.button}>Reset</Button>
+            <Button variant="contained" color="primary" onClick={handleFinish} className={classes.button}>Confirm</Button>
+          </div>
         ) : (
           <div>
-            <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>Back</Button>
-            
-              {activeStep === steps.length - 1 ? 
-                (<Button variant="contained" color="primary" onClick={handleFinish} className={classes.button}>Finish</Button>) :
-                (<Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>Next</Button>)
-              }
-            
+            <Button color="secondary" disabled={activeStep === 0} onClick={handleBack} className={classes.button}>Back</Button>
+            <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>Next</Button>
           </div>
         )}
-        
       </DialogActions>
     </Dialog>);
 }

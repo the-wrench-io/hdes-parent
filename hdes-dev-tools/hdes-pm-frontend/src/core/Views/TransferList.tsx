@@ -26,7 +26,7 @@ function union(a: string[], b: string[]) {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-
+      maxWidth: '600px'
     },
     cardHeader: {
       padding: theme.spacing(1, 2),
@@ -58,7 +58,7 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
   
   const classes = useStyles();
   const [checked, setChecked] = React.useState<string[]>([]);
-  const [left, setLeft] = React.useState<string[]>(list.available.values);
+  const [left, setLeft] = React.useState<string[]>(list.available.values.filter(id => !list.selected.values.includes(id)));
   const [right, setRight] = React.useState<string[]>(list.selected.values);
 
   const leftChecked = intersection(checked, left);
@@ -81,11 +81,14 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
   const numberOfChecked = (items: string[]) => intersection(checked, items).length;
 
   const handleToggleAll = (items: string[]) => () => {
+    let newChecked: string[];
     if (numberOfChecked(items) === items.length) {
-      setChecked(not(checked, items));
+      newChecked = not(checked, items);
     } else {
-      setChecked(union(checked, items));
+      newChecked = union(checked, items);
     }
+    onChange(newChecked);
+    setChecked(newChecked);
   };
 
   const handleCheckedRight = () => {

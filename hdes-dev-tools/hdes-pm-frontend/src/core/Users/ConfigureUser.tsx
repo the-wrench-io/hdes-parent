@@ -14,11 +14,16 @@ import { Resources, Backend } from '.././Resources';
 import ConfigureUserBasic from './ConfigureUserBasic';
 import ConfigureUserProjects from './ConfigureUserProjects';
 import ConfigureUserGroups from './ConfigureUserGroups';
+import ConfigureUserSummary from './ConfigureUserSummary';
 
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
-    root: {},
+    root: {
+      width: '100%',
+      maxWidth: '600px',
+      padding: theme.spacing(1, 2),
+    },
     button: {},
     instructions: {
       marginTop: theme.spacing(1),
@@ -56,6 +61,13 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
   const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1)
   const handleReset = () => setActiveStep(0);
   
+  const handleFinish = () => {
+    service.users.save(user).onSuccess(resource => {
+      
+      
+    });
+  };
+  
   const steps = [
     <ConfigureUserBasic 
         name={{defaultValue: user.name, onChange: (newValue) => setUser(user.withName(newValue))}}
@@ -75,10 +87,9 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
       <Step><StepLabel>User Info</StepLabel></Step>
       <Step><StepLabel>User Projects</StepLabel></Step>
       <Step><StepLabel>Add Groups</StepLabel></Step>
-    </Stepper>   
-    
+    </Stepper>
     {steps[activeStep]}
-    
+    {activeStep === steps.length ? (<ConfigureUserSummary user={user} projects={projects} groups={groups} />): null}
     <form noValidate autoComplete="off">
       {activeStep === steps.length ? (
         <Grid container>
@@ -88,15 +99,13 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
           
           <Grid container item justify="center">
             <Button color="secondary" onClick={handleReset} className={classes.button}>Reset</Button>
-            <Button variant="contained" color="primary" onClick={handleReset} className={classes.button}>Confirm And Create New User</Button>
+            <Button variant="contained" color="primary" onClick={handleFinish} className={classes.button}>Confirm</Button>
           </Grid>
         </Grid>
       ) : (
         <Grid container justify="flex-end">
           <Button color="secondary" disabled={activeStep === 0} onClick={handleBack} className={classes.button}>Back</Button>
-          <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>
-            {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-          </Button>
+          <Button variant="contained" color="primary" onClick={handleNext} className={classes.button}>Next</Button>
         </Grid>
       )}
     </form>

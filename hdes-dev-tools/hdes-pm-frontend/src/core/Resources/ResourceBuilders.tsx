@@ -42,4 +42,12 @@ export class GenericUserBuilder implements Backend.UserBuilder {
     this.projects = Object.assign([], from.projects);
     return this.as();
   }
+  withResource(from: Backend.UserResource) {
+    this.id = from.user.id;
+    this.name = from.user.name;
+    this.externalId = from.user.externalId;
+    this.groups = Object.keys(from.groups);
+    this.projects = Object.keys(from.projects);
+    return this.as();
+  }
 };

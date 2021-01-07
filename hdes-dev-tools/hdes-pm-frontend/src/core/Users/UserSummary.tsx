@@ -6,11 +6,8 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 
-
 import { Title, DateFormat } from '.././Views';
 import { Backend } from '.././Resources';
-
-
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -54,9 +51,7 @@ const UserSummary: React.FC<UserSummaryProps> = ({resource}) => {
             <Avatar>U</Avatar>
           </Grid>
           <Grid item xs>
-            <Typography>
-              <Title secondary>{resource.user.name} / {resource.user.externalId} / <DateFormat>{resource.user.created}</DateFormat></Title>
-            </Typography>
+            <Title secondary>{resource.user.name} / {resource.user.externalId} / <DateFormat>{resource.user.created}</DateFormat></Title>
           </Grid>
         </Grid>
       </Paper>
