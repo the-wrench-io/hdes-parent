@@ -40,22 +40,26 @@ const useStyles = makeStyles((theme: Theme) =>
 
 
 interface ConfigureUserProps {
-  user: Backend.UserBuilder,
+  getUser: () => Backend.UserBuilder,
+  setUser: (user: Backend.UserBuilder) => void;
   activeStep: number
 };
 
 const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
   const classes = useStyles();
   const { service } = React.useContext(Resources.Context);
-  
+ 
   const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
   const [groups, setGroups] = React.useState<Backend.GroupResource[]>([]);
-  React.useEffect(() => {  
+
+  React.useEffect(() => {
     service.projects.query().onSuccess(setProjects)
     service.groups.query().onSuccess(setGroups)
   }, [service, service.projects, service.groups])
-
-  const [user, setUser] = React.useState(service.users.builder().from(props.user));  
+ 
+  const user = props.getUser();
+  const setUser = props.setUser;
+   
   const [activeStep, setActiveStep] = React.useState(props.activeStep);
   const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1)
   const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1)
@@ -63,7 +67,6 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
   
   const handleFinish = () => {
     service.users.save(user).onSuccess(resource => {
-      
       
     });
   };
@@ -74,11 +77,11 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
         externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
     <ConfigureUserProjects 
-        projects={{all: projects, selected: props.user.projects}}
+        projects={{all: projects, selected: user.projects}}
         onChange={(newSelection) => setUser(user.withProjects(newSelection))} />,
         
     <ConfigureUserGroups
-        groups={{ all: groups, selected: props.user.groups}}
+        groups={{ all: groups, selected: user.groups}}
         onChange={(newSelection) => setUser(user.withGroups(newSelection))} />    
   ];
   

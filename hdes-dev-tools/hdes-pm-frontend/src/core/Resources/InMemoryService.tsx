@@ -285,6 +285,7 @@ class DemoService implements Backend.Service {
   listener?: (newService: Backend.Service) => void;
   
   constructor() {
+    console.log('creating demo service');
     const updateChanges = () => {
       if(this.listener) {
         this.listener(new InMemoryService(new Date(), this.store, this.listener));
@@ -311,6 +312,7 @@ class InMemoryService implements Backend.Service {
   updatedAt: Date;
   
   constructor(updatedAt: Date, store: Store, listener: (newService: Backend.Service) => void) {
+    console.log('creating in-memory service');
     this.listener = listener;
     this.store = store;
     this.users = new InMemoryUserService(this.store);

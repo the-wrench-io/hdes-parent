@@ -26,15 +26,15 @@ import ShellStyles from './ShellStyles'
 
 interface ShellProps {
   init: number,
-  operations: {
-    label: string, icon: React.ReactNode,
-    dialog: (open: boolean, handleClose: () => void) => React.ReactNode
-  } [],
+  dialogs: {
+    items: { id: string, label: string, icon: React.ReactNode }[],
+    onClick: (id: string) => void
+  },
   views: { label: string, icon: React.ReactNode, onClick: () => void }[],
   tabs: {
-    open?: number,
-    handleOpen: (index: number) => void,
-    entries: { label: string, panel: React.ReactNode }[]
+    active?: number,
+    onClick: (index: number) => void,
+    items: { label: string, panel: React.ReactNode }[]
   }
 };
 
@@ -58,7 +58,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
   );
 }
 
-const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
+const Shell: React.FC<ShellProps> = ({dialogs, views, tabs}) => {
   
   const classes = ShellStyles();
   
@@ -67,19 +67,14 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
   const handleDrawerOpen = () => setDrawerOpen(true);
   const handleDrawerClose = () => setDrawerOpen(false);
   
-  // Operations and views
-  const [dialogOpen, setDialogOpen] = React.useState(-1);
-  const handleDialogOpen = (index: number) => setDialogOpen(index);
-  const handleDialogClose = () => setDialogOpen(-1);
-  
   // external data 
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => tabs.handleOpen(newValue);
+  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => tabs.onClick(newValue);
   
   React.useEffect(() => {
-    if(tabs.entries.length === 0) {
+    if(tabs.items.length === 0) {
       views[0].onClick();
     }
-  }, [tabs.entries.length, views]);
+  }, [tabs.items.length, views]);
 
   return (
     <div className={classes.root}>
@@ -92,8 +87,8 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
             <MenuIcon />
           </IconButton>
           <Typography component="h1" variant="h6" color="inherit" noWrap className={classes.title}>
-            <Tabs value={tabs.open} onChange={handleTabChange}>
-              { tabs.entries.map((tab, index) => 
+            <Tabs value={tabs.active} onChange={handleTabChange}>
+              { tabs.items.map((tab, index) => 
                   <Tab key={index} value={index} label={tab.label} />
                 )
               }
@@ -120,8 +115,8 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
         <Divider/>
         <List>
           <ListSubheader inset>Operation</ListSubheader>
-          { operations.map((item, index) => (
-              <ListItem key={index} button onClick={() => handleDialogOpen(index)}>
+          { dialogs.items.map((item, index) => (
+              <ListItem key={index} button onClick={() => dialogs.onClick(item.id)}>
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label}/>
               </ListItem>)
@@ -144,14 +139,8 @@ const Shell: React.FC<ShellProps> = ({operations, views, tabs}) => {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          { operations.map((item, index) => (
-              <React.Fragment key={index}>
-                {item.dialog(dialogOpen === index, handleDialogClose)}
-              </React.Fragment>)
-            )
-          }
-          { tabs.entries.map((tab, index) => (
-              <TabPanel key={index} index={index} value={tabs.open ? tabs.open : 0}>
+          { tabs.items.map((tab, index) => (
+              <TabPanel key={index} index={index} value={tabs.active ? tabs.active : 0}>
                 {tab.panel}
               </TabPanel>)
             )

@@ -58,8 +58,14 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
   
   const classes = useStyles();
   const [checked, setChecked] = React.useState<string[]>([]);
-  const [left, setLeft] = React.useState<string[]>(list.available.values.filter(id => !list.selected.values.includes(id)));
-  const [right, setRight] = React.useState<string[]>(list.selected.values);
+  
+  const [left, setLeft] = React.useState<string[]>([]);
+  const [right, setRight] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    setLeft(list.available.values.filter(id => !list.selected.values.includes(id)));
+    setRight(list.selected.values);
+  }, [list])
 
   const leftChecked = intersection(checked, left);
   const rightChecked = intersection(checked, right);
@@ -103,7 +109,25 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
     setChecked(not(checked, rightChecked));
   };
 
-  const customList = (title: React.ReactNode, items: string[]) => (
+
+  const createList = (items: string[]) => {
+    return items.map((value: string) => {
+          const labelId = `transfer-list-all-item-${value}-label`;
+          return (
+            <ListItem key={value} role="listitem" button onClick={handleToggle(value)}>
+              <ListItemIcon>
+                <Checkbox disableRipple tabIndex={-1}
+                  checked={checked.indexOf(value) !== -1}
+                  inputProps={{ 'aria-labelledby': labelId }} />
+              </ListItemIcon>
+              <ListItemText id={labelId} primary={list.onRender(value)} />
+            </ListItem>
+          );
+        })
+  }
+
+  const customList = (title: React.ReactNode, items: string[]) => 
+  (
     <Card raised={false} elevation={0} className={classes.card}>
     
       <CardHeader className={classes.cardHeader} title={title}
@@ -120,24 +144,11 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
       
       <Divider />
       <List className={classes.list} dense component="div" role="list">
-        {items.map((value: string) => {
-          const labelId = `transfer-list-all-item-${value}-label`;
-          return (
-            <ListItem key={value} role="listitem" button onClick={handleToggle(value)}>
-              <ListItemIcon>
-                <Checkbox disableRipple tabIndex={-1}
-                  checked={checked.indexOf(value) !== -1}
-                  inputProps={{ 'aria-labelledby': labelId }} />
-              </ListItemIcon>
-              <ListItemText id={labelId} primary={list.onRender(value)} />
-            </ListItem>
-          );
-        })}
+        {createList(items)}
         <ListItem />
       </List>
     </Card>
   );
-
   
   return (<Grid container spacing={2} justify="center" alignItems="flex-start" className={classes.root}>
     <Grid item>{customList(list.available.header, left)}</Grid>

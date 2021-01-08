@@ -80,7 +80,7 @@ const DialogActions = withStyles((theme: Theme) => ({
 
 interface AddUserProps {
   open: boolean;
-  handleConf: (step: number, user: Backend.UserBuilder) => void;
+  handleConf: (user: Backend.UserBuilder, step: number) => void;
   handleClose: () => void;
 };
 
@@ -153,8 +153,8 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
       <DialogTitle id="form-dialog-title" 
         onClose={tearDown} 
         onTab={() => {
-          handleConf(activeStep, user)
           tearDown()
+          handleConf(user, activeStep)
         }}>Add New User</DialogTitle>
       
       <DialogContent className={classes.dialog}>
