@@ -18,7 +18,9 @@ declare namespace Backend {
   }
   
   interface ProjectService {
-    query: (args?: {top?: number}) => ProjectQuery,    
+    query: (args?: {top?: number}) => ProjectQuery;
+    builder: (from?: ProjectResource) => ProjectBuilder;
+    save: (builder: ProjectBuilder) => { onSuccess: (handle: (project: ProjectResource) => void) => void; };
   }
   
   interface ProjectQuery {
@@ -41,6 +43,19 @@ declare namespace Backend {
     access: Record<string, Access>;
     groups: Record<string, Group>;
     groupUsers: Record<string, GroupUser>;
+  }
+  
+  interface ProjectBuilder {
+    id?: string; 
+    name?: string; 
+    groups: string[];
+    users: string[];
+
+    withResource: (from: ProjectResource) => ProjectBuilder;
+    withName: (name: string) => ProjectBuilder;
+    withUsers: (users: string[]) => ProjectBuilder;
+    withGroups: (groups: string[]) => ProjectBuilder;
+    from: (from: ProjectBuilder) => ProjectBuilder;
   }
   
   interface GroupResource {
@@ -67,7 +82,7 @@ declare namespace Backend {
     groups: string[];
     projects: string[];
 
-    withResource: (from: Backend.UserResource) => UserBuilder;
+    withResource: (from: UserResource) => UserBuilder;
     withName: (name: string) => UserBuilder;
     withExternalId: (externalId: string) => UserBuilder;
     withProjects: (projects: string[]) => UserBuilder;

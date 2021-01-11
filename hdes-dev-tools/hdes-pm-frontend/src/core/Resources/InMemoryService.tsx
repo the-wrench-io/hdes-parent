@@ -1,5 +1,6 @@
 import Backend from './Backend';
-import { GenericUserBuilder } from './ResourceBuilders';
+import { GenericUserBuilder } from './GenericUserBuilder';
+import { GenericProjectBuilder } from './GenericProjectBuilder';
 import createDemoData from './DemoData';
 
 
@@ -238,7 +239,133 @@ class InMemoryProjectService implements Backend.ProjectService {
   query() {
     return new InMemoryProjectQuery(this.store);
   }
+  builder(from?: Backend.ProjectResource) {
+    const result = new GenericProjectBuilder();
+    if(from) {
+      result.withResource(from);
+    }
+    return result;
+  }
+  save(builder: Backend.ProjectBuilder)  {
+    const store = this.store;
+    return {
+      onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
+          
+        // user entry
+        const newProject: Backend.Project = {
+          id: uuid(),
+          rev: uuid(), 
+          name: builder.name ? builder.name : "",
+          created: new Date()
+        };
+        
+        // direct access to users
+        const newAccess: Backend.Access[] = [];
+        if(builder.users) {
+          for(let userId of builder.users) {
+            newAccess.push({
+              id: uuid(), 
+              rev: uuid(), 
+              name: "inmemory", 
+              projectId: newProject.id,
+              userId: userId,
+              created: new Date()
+            });
+          }
+        }
+        
+        // direct access to groups
+        if(builder.groups) {
+          for(let groupId of builder.groups) {
+            newAccess.push({
+              id: uuid(), 
+              rev: uuid(), 
+              name: "inmemory", 
+              projectId: newProject.id,
+              groupId: groupId,
+              created: new Date()
+            });
+          }
+        }
+        
+        store.access.push(...newAccess);
+        store.projects.push(newProject);
+        store.setUpdates();
+        
+        const access = store.getAccess({projectId: newProject.id});
+        const groups = store.getGroups(access);
+        const groupUsers = store.getGroupUsers(groups);
+        const users = store.getUsers(access);
+        callback({ project: newProject, access, groups, groupUsers, users }) 
+      
+        
+      }
+    }
+  }
 }
+
+/*
+
+  save(builder: Backend.ProjectBuilder) {
+    const store = this.store;
+    return {
+      onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
+        
+        
+      }
+    }
+  }
+
+{
+        
+        // user entry
+        const newProject: Backend.Project = {
+          id: uuid(),
+          rev: uuid(), 
+          name: builder.name ? builder.name : "",
+          created: new Date()
+        };
+        
+        // direct access to users
+        const newAccess: Backend.Access[] = [];
+        if(builder.users) {
+          for(let userId of builder.users) {
+            newAccess.push({
+              id: uuid(), 
+              rev: uuid(), 
+              name: "inmemory", 
+              projectId: newProject.id,
+              userId: userId,
+              created: new Date()
+            });
+          }
+        }
+        
+        // direct access to groups
+        if(builder.groups) {
+          for(let groupId of builder.groups) {
+            newAccess.push({
+              id: uuid(), 
+              rev: uuid(), 
+              name: "inmemory", 
+              projectId: newProject.id,
+              groupId: groupId,
+              created: new Date()
+            });
+          }
+        }
+        
+        store.access.push(...newAccess);
+        store.projects.push(newProject);
+        store.setUpdates();
+        
+        const access = store.getAccess({projectId: newProject.id});
+        const groups = store.getGroups(access);
+        const groupUsers = store.getGroupUsers(groups);
+        const users = store.getUsers(access);
+        callback({ project: newProject, access, groups, groupUsers, users }) 
+      }
+*/
 
 
 class InMemoryGroupQuery implements Backend.GroupQuery {

@@ -66,6 +66,7 @@ function App() {
     setData: (id: string, data: any) => setSession((session) => session.withTabData(id, data))
   };
 
+  const confProjectInTab = (project: Backend.ProjectBuilder, activeStep?: number) => {};
   const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(tabData, dialogs.user.id, user, activeStep));
   const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: <React.Fragment>{projects}{users}</React.Fragment>});
   const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: <GroupsView />});
@@ -93,7 +94,7 @@ function App() {
 
   return (<React.Fragment>
     <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={confUserInTab} />
-    <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} />
+    <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={confProjectInTab}/>
     <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} />
   
     <Shell init={0} 
