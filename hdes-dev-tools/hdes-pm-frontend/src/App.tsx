@@ -18,7 +18,7 @@ import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined'
 import { Resources, Backend, Session } from './core/Resources';
 
 import Shell from './core/Shell';
-import { AddUser, ConfigureUser, UsersView } from './core/Users';
+import { AddUser, ConfigureUserInTab, UsersView } from './core/Users';
 import { AddProject, ProjectsView } from './core/Projects';
 import { AddGroup, GroupsView } from './core/Groups';
 
@@ -57,20 +57,16 @@ function App() {
       return index ? session.withTab(index) : session.withDialog(id);
     });
   };
+  
   const handleDialogClose = () => setSession((session) => session.withDialog());
   const changeTab = (index: number) => setSession((session) => session.withTab(index));
   const addTab = (newItem: Session.Tab) => setSession((session) => session.withTab(newItem));
-  const setTabData = (id: string, data: any) => setSession((session) => session.withTabData(id, data));
-  
-  const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => {
-    const id: string = user.id ? user.id : dialogs.user.id;
-    const label: string = user.id ? user.name + '' : 'create user';
-    const panel = <ConfigureUser activeStep={activeStep ? activeStep : 0} 
-      setUser={(data) => setTabData(id, data)} 
-      getUser={() => session.getTabData(id, user)} />;
-    addTab({id, label, panel});
+  const tabData = {
+    getData: (id: string, defaultData?: any): any => session.getTabData(id, defaultData),
+    setData: (id: string, data: any) => setSession((session) => session.withTabData(id, data))
   };
-  
+
+  const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(tabData, dialogs.user.id, user, activeStep));
   const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: <React.Fragment>{projects}{users}</React.Fragment>});
   const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: <GroupsView />});
   const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: <ProjectsView />});

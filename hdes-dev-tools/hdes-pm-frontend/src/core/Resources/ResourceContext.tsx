@@ -25,34 +25,16 @@ type ResourceProviderProps = {
 };
 
 
-type ProviderState = {
-  service: Backend.Service;
-  session: Session.Instance;
-}
-
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ config, children }) => {
-
-  const [providerState, setProviderState] = React.useState<ProviderState>({
-    session: startSession, service: demoService
-  });
-
-  const {service, session} = providerState;
-  const setSession = (command: (session: Session.Instance) => Session.Instance  ) => setProviderState(
-    prev => ({session: command(prev.session), service: prev.service})
-  );
-  const setService = (newService: Backend.Service) => setProviderState(
-    prev => {
-      return ({session: prev.session, service: newService});
-    }
-  );
-
-
-
-  //React.useEffect(() => service.onUpdate((newService: Backend.Service) => setService(newService)), [config, service])
+  const [service, setService] = React.useState<Backend.Service>(demoService);
+  const [session, setSession] = React.useState<Session.Instance>(startSession);
+  
+  React.useEffect(() => service.onUpdate((newService: Backend.Service) => setService(newService)), [config, service])
   
   return (
-    <ResourceContext.Provider value={{ 
-      service, session, setSession: (command) => setSession(command)
+    <ResourceContext.Provider value={{
+      service, session, 
+      setSession: (command: (session: Session.Instance) => Session.Instance) => setSession((prev) => command(prev))
     }}>
       {children}
     </ResourceContext.Provider>

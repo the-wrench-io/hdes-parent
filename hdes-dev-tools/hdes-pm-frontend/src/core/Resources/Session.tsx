@@ -18,12 +18,15 @@ declare namespace Session {
     dialogId?: string;
     
     withDialog(dialogId?: string): Instance;
+  
     withTabData(tabId: string, data: any): Instance;
     withTab(newTabOrTabIndex: Tab | number): Instance;
     findTab(newTabId: string): number | undefined;
     getTabData(tabId: string, defaultData: any): any;
   }
 }
+
+
 
 class GenericInstance implements Session.Instance {  
   tabs: Session.Tab[];

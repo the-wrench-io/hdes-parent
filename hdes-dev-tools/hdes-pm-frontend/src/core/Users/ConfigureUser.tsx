@@ -42,7 +42,8 @@ const useStyles = makeStyles((theme: Theme) =>
 interface ConfigureUserProps {
   getUser: () => Backend.UserBuilder,
   setUser: (user: Backend.UserBuilder) => void;
-  activeStep: number
+  getActiveStep: () => number;
+  setActiveStep: (command: (old: number) => number) => void;
 };
 
 const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
@@ -59,11 +60,11 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
  
   const user = props.getUser();
   const setUser = props.setUser;
-   
-  const [activeStep, setActiveStep] = React.useState(props.activeStep);
-  const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1)
-  const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1)
-  const handleReset = () => setActiveStep(0);
+  
+  const activeStep = props.getActiveStep();
+  const handleNext = () => props.setActiveStep((prevActiveStep) => prevActiveStep + 1)
+  const handleBack = () => props.setActiveStep((prevActiveStep) => prevActiveStep - 1)
+  const handleReset = () => props.setActiveStep(() => 0);
   
   const handleFinish = () => {
     service.users.save(user).onSuccess(resource => {
