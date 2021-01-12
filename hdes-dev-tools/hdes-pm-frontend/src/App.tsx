@@ -16,11 +16,10 @@ import LibraryBooksOutlinedIcon from '@material-ui/icons/LibraryBooksOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 
 import { Resources, Backend, Session } from './core/Resources';
-
 import Shell from './core/Shell';
 import { AddUser, ConfigureUserInTab, UsersView } from './core/Users';
-import { AddProject, ProjectsView } from './core/Projects';
-import { AddGroup, GroupsView } from './core/Groups';
+import { AddProject, ConfigureProjectInTab, ProjectsView } from './core/Projects';
+import { AddGroup, ConfigureGroupInTab, GroupsView } from './core/Groups';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -45,12 +44,11 @@ const makeDialogs = () => {
 
 function App() {
   const { session, setSession } = React.useContext(Resources.Context);
-  
+
   const classes = useStyles();
   const dialogs = makeDialogs();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);  
   
-
   const handleDialogOpen = (id: string) => {
     setSession((session) => {
       const index = session.findTab(id);
@@ -61,17 +59,16 @@ function App() {
   const handleDialogClose = () => setSession((session) => session.withDialog());
   const changeTab = (index: number) => setSession((session) => session.withTab(index));
   const addTab = (newItem: Session.Tab) => setSession((session) => session.withTab(newItem));
-  const tabData = {
-    getData: (id: string, defaultData?: any): any => session.getTabData(id, defaultData),
-    setData: (id: string, data: any) => setSession((session) => session.withTabData(id, data))
-  };
+  const setTabData = (id: string, updateCommand: (oldData: any) => any) => setSession((session) => session.withTabData(id, updateCommand))
 
-  const confProjectInTab = (project: Backend.ProjectBuilder, activeStep?: number) => {};
-  const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(tabData, dialogs.user.id, user, activeStep));
-  const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: <React.Fragment>{projects}{users}</React.Fragment>});
-  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: <GroupsView />});
-  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: <ProjectsView />});
-  const listUsers     = () => addTab({id: 'users', label: 'Users', panel: <UsersView onEdit={confUserInTab}/>});
+  const confProjectInTab = (project: Backend.ProjectBuilder, activeStep?: number) => addTab(ConfigureProjectInTab(setTabData, dialogs.project.id, project, activeStep));
+  const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(setTabData, dialogs.user.id, user, activeStep));
+  const confGroupInTab = (group: Backend.GroupBuilder, activeStep?: number) => addTab(ConfigureGroupInTab(setTabData, dialogs.group.id, group, activeStep));
+  
+  const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: () => <React.Fragment>{projects}{users}</React.Fragment>});
+  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: () => <GroupsView />});
+  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: () => <ProjectsView />});
+  const listUsers     = () => addTab({id: 'users', label: 'Users', panel: () => <UsersView onEdit={confUserInTab}/>});
 
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
               <Paper className={fixedHeightPaper}>
@@ -95,9 +92,10 @@ function App() {
   return (<React.Fragment>
     <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={confUserInTab} />
     <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={confProjectInTab}/>
-    <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} />
+    <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} handleConf={confGroupInTab}/>
   
-    <Shell init={0} 
+    <Shell init={0}
+      session={session} 
       views={views}
       dialogs={{items: [dialogs.group, dialogs.user, dialogs.project], onClick: handleDialogOpen}}
       tabs={{items: session.tabs, active: session.history.open, onClick: changeTab }} />

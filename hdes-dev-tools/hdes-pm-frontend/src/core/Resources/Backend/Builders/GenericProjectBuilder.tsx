@@ -1,4 +1,4 @@
-import Backend from './Backend'; 
+import Backend from './../Backend';  
 
 
 export class GenericProjectBuilder implements Backend.ProjectBuilder {

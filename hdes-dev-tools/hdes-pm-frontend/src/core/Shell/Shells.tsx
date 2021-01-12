@@ -21,10 +21,14 @@ import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
 
+
+import { Session } from './../Resources';
 import ShellStyles from './ShellStyles' 
 
 
+
 interface ShellProps {
+  session: Session.Instance,
   init: number,
   dialogs: {
     items: { id: string, label: string, icon: React.ReactNode }[],
@@ -34,7 +38,7 @@ interface ShellProps {
   tabs: {
     active?: number,
     onClick: (index: number) => void,
-    items: { label: string, panel: React.ReactNode }[]
+    items: { label: string, panel: (session: any) => React.ReactNode }[]
   }
 };
 
@@ -58,7 +62,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
   );
 }
 
-const Shell: React.FC<ShellProps> = ({dialogs, views, tabs}) => {
+const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs}) => {
   
   const classes = ShellStyles();
   
@@ -141,7 +145,7 @@ const Shell: React.FC<ShellProps> = ({dialogs, views, tabs}) => {
         <Container maxWidth="lg" className={classes.container}>
           { tabs.items.map((tab, index) => (
               <TabPanel key={index} index={index} value={tabs.active ? tabs.active : 0}>
-                {tab.panel}
+                {tab.panel(session)}
               </TabPanel>)
             )
           }

@@ -6,13 +6,13 @@ interface FieldProps {
   onChange: (fieldValue: string) => void; 
 }
 
-interface ConfigureProjectBasicProps {
+interface ConfigureGroupBasicProps {
   name: FieldProps;
 };
 
-const ConfigureProjectBasic: React.FC<ConfigureProjectBasicProps> = ({name}) => {
+const ConfigureGroupBasic: React.FC<ConfigureGroupBasicProps> = ({name}) => {
   return (<React.Fragment>
-    <TextField autoFocus margin="dense" id="name" label="Project name" type="text" fullWidth
+    <TextField autoFocus margin="dense" id="name" label="Group name" type="text" fullWidth
       onChange={({target}) => name.onChange(target.value)}
       defaultValue={name.defaultValue ? name.defaultValue : ''}/>
       
@@ -20,4 +20,4 @@ const ConfigureProjectBasic: React.FC<ConfigureProjectBasicProps> = ({name}) => 
   
 }
 
-export default ConfigureProjectBasic;
+export default ConfigureGroupBasic;

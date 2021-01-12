@@ -1,6 +1,5 @@
 import * as React from "react";
-import { DemoService } from './InMemoryService';
-import Backend from './Backend';
+import { Backend, DemoService } from './Backend';
 import { Session, createSession } from './Session';
 
 type ResourceContextType = {
@@ -15,7 +14,7 @@ const startSession = createSession();
 
 const ResourceContext = React.createContext<ResourceContextType>({
   service: demoService,
-  session: createSession(),
+  session: startSession,
   setSession: (current) => current 
 });
 

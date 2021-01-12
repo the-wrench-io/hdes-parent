@@ -1,4 +1,5 @@
-import Backend from './Backend'; 
+import Backend from './../Backend'; 
+ 
 
 export class GenericUserBuilder implements Backend.UserBuilder {
   private _id?: string; 

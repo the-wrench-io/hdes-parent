@@ -11,7 +11,6 @@ import Collapse from '@material-ui/core/Collapse';
 import Divider from '@material-ui/core/Divider';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
-import PersonOutlinedIcon from '@material-ui/icons/PersonOutlined';
 import LibraryBooksOutlinedIcon from '@material-ui/icons/LibraryBooksOutlined';
 import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 
@@ -59,11 +58,8 @@ const ConfigureUserSummary: React.FC<ConfigureUserSummaryProps> = (props) => {
   return (<div className={classes.root}>
     <List className={classes.root} component="nav" 
       aria-labelledby="nested-list-subheader"
-      subheader={<ListSubheader component="div" id="nested-list-subheader">User summary</ListSubheader>}>
-      <ListItem>
-        <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
-        <ListItemText primary={props.user.name + ' / ' + props.user.externalId} />
-      </ListItem>
+      subheader={<ListSubheader component="div" id="nested-list-subheader">{`User '${props.user.name} / ${props.user.externalId}' summary`}</ListSubheader>}>
+
       <Divider />
       
       <ListItem button onClick={() => setOpenGroups(!openGroups)}>

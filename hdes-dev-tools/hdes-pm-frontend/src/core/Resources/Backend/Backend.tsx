@@ -10,7 +10,9 @@ declare namespace Backend {
   }
   
   interface GroupService {
-    query: (args?: {top?: number}) => GroupQuery,
+    query: (args?: {top?: number}) => GroupQuery;
+    builder: (from?: GroupResource) => GroupBuilder;
+    save: (builder: GroupBuilder) => { onSuccess: (handle: (project: GroupResource) => void) => void; };
   }
   
   interface GroupQuery {
@@ -64,6 +66,19 @@ declare namespace Backend {
     access: Record<string, Access>;
     groupUsers: Record<string, GroupUser>;
     projects: Record<string, Project>;
+  }
+  
+  interface GroupBuilder {
+    id?: string; 
+    name?: string; 
+    projects: string[];
+    users: string[];
+
+    withResource: (from: GroupResource) => GroupBuilder;
+    withName: (name: string) => GroupBuilder;
+    withUsers: (users: string[]) => GroupBuilder;
+    withProjects: (projectes: string[]) => GroupBuilder;
+    from: (from: GroupBuilder) => GroupBuilder;
   }
   
   
