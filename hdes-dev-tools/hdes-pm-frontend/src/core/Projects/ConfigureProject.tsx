@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ConfigureProjectProps {
   getProject: () => Backend.ProjectBuilder,
-  setProject: (user: Backend.ProjectBuilder) => void;
+  setProject: (project: Backend.ProjectBuilder) => void;
   getActiveStep: () => number;
   setActiveStep: (command: (old: number) => number) => void;
 };
@@ -56,7 +56,7 @@ const ConfigureProject: React.FC<ConfigureProjectProps> = (props) => {
   React.useEffect(() => {
     service.users.query().onSuccess(setUsers)
     service.groups.query().onSuccess(setGroups)
-  }, [service, service.projects, service.groups])
+  }, [service, service.users, service.groups])
  
   const project = props.getProject();
   const setProject = props.setProject;
@@ -92,7 +92,7 @@ const ConfigureProject: React.FC<ConfigureProjectProps> = (props) => {
       <Step><StepLabel>Add Groups</StepLabel></Step>
     </Stepper>
     {steps[activeStep]}
-    {activeStep === steps.length ? (<ConfigureProjectSummary project={project} users={users} groups={groups} />): null}
+    {activeStep === steps.length ? (users.length === 0 && project.users.length > 0 ? '...loading' : <ConfigureProjectSummary project={project} users={users} groups={groups} />): null}
     <form noValidate autoComplete="off">
       {activeStep === steps.length ? (
         <Grid container>

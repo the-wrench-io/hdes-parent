@@ -92,7 +92,7 @@ const ConfigureGroup: React.FC<ConfigureGroupProps> = (props) => {
       <Step><StepLabel>Add Groups</StepLabel></Step>
     </Stepper>
     {steps[activeStep]}
-    {activeStep === steps.length ? (<ConfigureGroupSummary group={group} users={users} projects={projects} />): null}
+    {activeStep === steps.length ? (users.length === 0 && group.users.length > 0 ? '...loading' : <ConfigureGroupSummary group={group} users={users} projects={projects} />): null}
     <form noValidate autoComplete="off">
       {activeStep === steps.length ? (
         <Grid container>
