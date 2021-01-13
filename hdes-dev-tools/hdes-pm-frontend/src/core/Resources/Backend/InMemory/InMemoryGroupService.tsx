@@ -6,17 +6,24 @@ import { Store } from './InMemoryStore';
 
 class InMemoryGroupQuery implements Backend.GroupQuery {
   store: Store;
-  constructor(store: Store) {
+  args?: {top?: number};
+  
+  constructor(store: Store, args?: {top?: number}) {
     this.store = store;
+    this.args = args;
   }
   
   onSuccess(handle: (users: Backend.GroupResource[]) => void) {
     const store = this.store;
-    const result: Backend.GroupResource[] = this.store.groups.map(group => {
     
+    let src = store.groups.sort((p1, p2) => p1.created.getTime() - p2.created.getTime());
+    if(this.args && this.args.top) {
+      src = src.slice(0, this.args.top);
+    }
+    const result: Backend.GroupResource[] = src.map(group => {
       const groups:Record<string, Backend.Group> = {};
       groups[group.id] = group;
-    
+  
       const access = store.getAccess({groupId: group.id});
       const users = store.getUsers(access);
       const groupUsers = store.getGroupUsers(groups);
@@ -33,13 +40,13 @@ class InMemoryGroupService implements Backend.GroupService {
   constructor(store: Store) {
     this.store = store;
   }
-  query() {
-    return new InMemoryGroupQuery(this.store);
+  query(args?: {top?: number}) {
+    return new InMemoryGroupQuery(this.store, args);
   }
   builder(from?: Backend.GroupResource) {
     const result = new GenericGroupBuilder();
     if(from) {
-      result.withResource(from);
+      return result.withResource(from);
     }
     return result;
   }

@@ -5,13 +5,20 @@ import { Store } from './InMemoryStore';
 
 class InMemoryUserQuery implements Backend.UserQuery {
   store: Store;
-  constructor(store: Store) {
+  args?: {top?: number};
+  
+  constructor(store: Store, args?: {top?: number}) {
     this.store = store;
+    this.args = args;
   }
   
   onSuccess(handle: (users: Backend.UserResource[]) => void) {
     const store = this.store;
-    const result: Backend.UserResource[] = this.store.users.map(user => {    
+    let users = store.users.sort((p1, p2) => p1.created.getTime() - p2.created.getTime());
+    if(this.args && this.args.top) {
+      users = users.slice(0, this.args.top);
+    }
+    const result: Backend.UserResource[] = users.map(user => {    
       const access = store.getAccess({userId: user.id});
       const groups = store.getGroups(access);
       const groupUsers = store.getGroupUsers(groups);
@@ -28,13 +35,13 @@ class InMemoryUserService implements Backend.UserService {
     this.store = store;
   }
   
-  query() {
-    return new InMemoryUserQuery(this.store);
+  query(args?: {top?: number}) {
+    return new InMemoryUserQuery(this.store, args);
   }
   builder(from?: Backend.UserResource) {
     const result = new GenericUserBuilder();
     if(from) {
-      result.withResource(from);
+      return result.withResource(from);
     }
     return result;
   }

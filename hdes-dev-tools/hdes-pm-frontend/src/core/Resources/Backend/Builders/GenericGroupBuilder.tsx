@@ -15,6 +15,9 @@ export class GenericGroupBuilder implements Backend.GroupBuilder {
     this._users = users ? users : [];
     this._projects =  projects ? projects : [];
   }
+  get id(): string | undefined {
+    return this._id;
+  }
   get name(): string | undefined {
     return this._name;
   }

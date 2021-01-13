@@ -9,11 +9,14 @@ interface Store {
   groupUsers: Backend.GroupUser[],
   
   setUpdates: () => void;
-  getAccess: (params: {projectId?: string, userId?: string, groupId?: string}) => Record<string, Backend.Access>,
-  getGroups: (access: Record<string, Backend.Access>) => Record<string, Backend.Group>
-  getGroupUsers: (groups: Record<string, Backend.Group>) => Record<string, Backend.GroupUser>
-  getUsers: (access: Record<string, Backend.Access>) => Record<string, Backend.User>
-  getProjects: (access: Record<string, Backend.Access>) => Record<string, Backend.Project>
+  getAccess: (params: {projectId?: string, userId?: string, groupId?: string}) => Record<string, Backend.Access>;
+  getGroups: (access: Record<string, Backend.Access>) => Record<string, Backend.Group>;
+  getGroupUsers: (groups: Record<string, Backend.Group>) => Record<string, Backend.GroupUser>;
+  getUsers: (access: Record<string, Backend.Access>) => Record<string, Backend.User>;
+  getProjects: (access: Record<string, Backend.Access>) => Record<string, Backend.Project>;
+  setProject: (project: Backend.ProjectBuilder) => Backend.ProjectResource;
+  getProject: (projectId: string) => Backend.ProjectResource;
+  toProjectResource: (project: Backend.Project) => Backend.ProjectResource;
   uuid: () => string;
 }
 
@@ -32,6 +35,82 @@ class InMemoryStore implements Store {
     this.groupUsers = groupUsers;
     this.groups = groups;
     this.setUpdates = setUpdates;
+  }
+  
+  toProjectResource = (project: Backend.Project): Backend.ProjectResource => {
+    const access = this.getAccess({projectId: project.id});
+    const groups = this.getGroups(access);
+    const groupUsers = this.getGroupUsers(groups);
+    const users = this.getUsers(access);
+    return { project, access, groups, groupUsers, users }
+  } 
+  
+  getProject = (projectId: string): Backend.ProjectResource => {
+    const project = this.projects.filter(p => p.id === projectId)[0];
+    return this.toProjectResource(project);
+  }
+  
+  setProject = (builder: Backend.ProjectBuilder): Backend.ProjectResource => {
+    const id = builder.id;
+    if(!id) {
+      throw new Error('Project id must be defined');
+    }
+    
+    const projectId: string = id;
+    
+    const prevResource = this.getProject(projectId);
+    const prevState = prevResource.project;
+    const newState: Backend.Project = {
+      id: projectId, rev: this.uuid(), created: prevState.created,
+      name: builder.name ? builder.name : prevState.name
+    };
+    const index = this.projects.indexOf(prevState, 0);
+    this.projects.splice(index, 1);
+    this.projects.push(newState);
+    
+    const prevUsers = Object.keys(prevResource.users);
+    const prevGroups = Object.keys(prevResource.groups);
+
+    // remove access
+    const accessToRemove: Backend.Access[] = []; 
+    
+    // from users
+    prevUsers
+      .filter(p => !builder.users.includes(p))
+      .map(id => this.access
+        .filter(a => a.userId === id)
+        .filter(a => a.projectId === id)
+        .forEach(a => accessToRemove.push(a)));
+
+    // from groups
+    prevGroups
+      .filter(p => !builder.groups.includes(p))
+      .map(id => this.access
+        .filter(a => a.groupId === id)
+        .filter(a => a.projectId === id)
+        .forEach(a => accessToRemove.push(a)));
+
+    accessToRemove.forEach(a => {
+      const index = this.access.indexOf(a, 0);
+      this.access.splice(index, 1);
+    });
+    
+    // add access
+    builder.users
+      .filter(p => !prevUsers.includes(p))
+      .forEach(id => this.access.push({
+        id: this.uuid(), rev: this.uuid(), created: new Date(), name: "",
+        userId: id, 
+        projectId: projectId}));
+
+    builder.groups
+      .filter(p => !prevGroups.includes(p))
+      .forEach(id => this.access.push({
+        id: this.uuid(), rev: this.uuid(), created: new Date(), name: "",
+        groupId: id, 
+        projectId: projectId}));
+        
+    return this.toProjectResource(newState); 
   }
   
   uuid = ():string => {

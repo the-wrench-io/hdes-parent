@@ -18,7 +18,7 @@ class TabData {
   get user(): Backend.UserBuilder {
     return this._user;
   }  
-  withActiveStep(activeStep: number) {console.log("active step")
+  withActiveStep(activeStep: number) {
     return new TabData(this._user, activeStep);
   }
   withUser(user: Backend.UserBuilder) {

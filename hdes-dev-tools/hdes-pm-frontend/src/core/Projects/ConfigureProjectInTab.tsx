@@ -26,7 +26,12 @@ class TabData {
   }
 }
 
-const ConfigureProjectInTab = (setData: (id: string, updateCommand: (oldData: any) => any) => void, defaultId: string, project: Backend.ProjectBuilder, activeStep?: number): Session.Tab => {
+const ConfigureProjectInTab = (
+  setData: (id: string, updateCommand: (oldData: any) => any) => void, 
+  defaultId: string, 
+  project: Backend.ProjectBuilder, 
+  activeStep?: number): Session.Tab => {
+  
   const id: string = project.id ? project.id : defaultId;
   const label: string = project.id ? project.name + '' : 'add project';
   const init = new TabData(project, activeStep ? activeStep : 0);

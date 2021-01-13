@@ -32,14 +32,14 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-interface ProjectSummaryProps {
-  resource: Backend.ProjectResource
+interface GroupSummaryProps {
+  resource: Backend.GroupResource
 };
 
-const ProjectSummary: React.FC<ProjectSummaryProps> = ({resource}) => {
+const GroupSummary: React.FC<GroupSummaryProps> = ({resource}) => {
   const classes = useStyles();
   
-  let groups = Object.values(resource.groups).map(p => p.name).join(", ");
+  let projects = Object.values(resource.projects).map(p => p.name).join(", ");
   let users = Object.values(resource.users).map(p => p.name).join(", ");
 
   return (<div className={classes.root}>
@@ -47,10 +47,10 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({resource}) => {
       <Paper className={classes.paper}>
         <Grid container wrap="nowrap" spacing={2}>
           <Grid item>
-            <Avatar>U</Avatar>
+            <Avatar>G</Avatar>
           </Grid>
           <Grid item xs>
-            <Title secondary>{resource.project.name} / <DateFormat>{resource.project.created}</DateFormat></Title>
+            <Title secondary>{resource.group.name} / <DateFormat>{resource.group.created}</DateFormat></Title>
           </Grid>
         </Grid>
       </Paper>
@@ -68,10 +68,10 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({resource}) => {
       <Paper className={classes.paper}>
         <Grid container wrap="nowrap" spacing={2}>
           <Grid item>
-            <Avatar>G</Avatar>
+            <Avatar>P</Avatar>
           </Grid>
           <Grid item xs>
-            <Typography>{groups}</Typography>
+            <Typography>{projects}</Typography>
           </Grid>
         </Grid>
       </Paper>
@@ -79,5 +79,5 @@ const ProjectSummary: React.FC<ProjectSummaryProps> = ({resource}) => {
   );
 }
 
-export default ProjectSummary;
+export default GroupSummary;
 

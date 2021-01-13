@@ -18,6 +18,9 @@ export class GenericUserBuilder implements Backend.UserBuilder {
     this._groups = groups ? groups : [];
     this._projects =  projects ? projects : [];
   }
+  get id(): string | undefined {
+    return this._id;
+  }
   get name(): string | undefined {
     return this._name;
   }

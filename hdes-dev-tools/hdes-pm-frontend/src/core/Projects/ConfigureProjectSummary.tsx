@@ -39,8 +39,6 @@ interface ConfigureProjectSummaryProps {
 const ConfigureProjectSummary: React.FC<ConfigureProjectSummaryProps> = (props) => {
   const classes = useStyles();
   
-  console.log(props)
-  
   const groupUsers: React.ReactNode[] = [];
   let groupUsersTotal = 0;
   for(const id of props.project.groups) {

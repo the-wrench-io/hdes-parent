@@ -16,6 +16,9 @@ export class GenericProjectBuilder implements Backend.ProjectBuilder {
     this._groups = groups ? groups : [];
     this._users =  users ? users : [];
   }
+  get id(): string | undefined {
+    return this._id;
+  }
   get name(): string | undefined {
     return this._name;
   }

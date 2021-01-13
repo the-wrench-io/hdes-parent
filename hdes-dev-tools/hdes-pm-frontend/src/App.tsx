@@ -66,13 +66,13 @@ function App() {
   const confGroupInTab = (group: Backend.GroupBuilder, activeStep?: number) => addTab(ConfigureGroupInTab(setTabData, dialogs.group.id, group, activeStep));
   
   const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: () => <React.Fragment>{projects}{users}</React.Fragment>});
-  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: () => <GroupsView />});
-  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: () => <ProjectsView />});
+  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: () => <GroupsView onEdit={confGroupInTab}/>});
+  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: () => <ProjectsView onEdit={confProjectInTab}/>});
   const listUsers     = () => addTab({id: 'users', label: 'Users', panel: () => <UsersView onEdit={confUserInTab}/>});
 
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
               <Paper className={fixedHeightPaper}>
-                <ProjectsView top={4} seeMore={listProjects}/>
+                <ProjectsView top={4} seeMore={listProjects} onEdit={confProjectInTab}/>
               </Paper>
             </Grid>)
 

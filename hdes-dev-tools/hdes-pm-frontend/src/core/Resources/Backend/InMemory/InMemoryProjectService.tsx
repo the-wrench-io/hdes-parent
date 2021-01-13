@@ -5,21 +5,20 @@ import { Store } from './InMemoryStore';
 
 class InMemoryProjectQuery implements Backend.ProjectQuery {
   store: Store;
-  constructor(store: Store) {
+  args?: {top?: number};
+  
+  constructor(store: Store, args?: {top?: number}) {
     this.store = store;
+    this.args = args;
   }
   
   onSuccess(handle: (users: Backend.ProjectResource[]) => void) {
-    const store = this.store;
-    const result: Backend.ProjectResource[] = store.projects.map(project => {
-      const access = store.getAccess({projectId: project.id});
-      const groups = store.getGroups(access);
-      const groupUsers = store.getGroupUsers(groups);
-      const users = store.getUsers(access);
-      return { project, access, groups, groupUsers, users};
-      
-    });
-    handle(result);
+    const { store } = this;
+    let projects = store.projects.sort((p1, p2) => p1.created.getTime() - p2.created.getTime());
+    if(this.args && this.args.top) {
+      projects = projects.slice(0, this.args.top);
+    }
+    handle(projects.map(store.toProjectResource));
   }
 }
 
@@ -28,13 +27,13 @@ class InMemoryProjectService implements Backend.ProjectService {
   constructor(store: Store) {
     this.store = store;
   }
-  query() {
-    return new InMemoryProjectQuery(this.store);
+  query(args?: {top?: number}) {
+    return new InMemoryProjectQuery(this.store, args);
   }
   builder(from?: Backend.ProjectResource) {
     const result = new GenericProjectBuilder();
     if(from) {
-      result.withResource(from);
+      return result.withResource(from);
     }
     return result;
   }
@@ -43,6 +42,11 @@ class InMemoryProjectService implements Backend.ProjectService {
     return {
       onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
           
+        // delete old resources
+        if(builder.id) {
+          return store.setProject(builder);
+        }
+                  
         // user entry
         const newProject: Backend.Project = {
           id: store.uuid(),
@@ -83,14 +87,7 @@ class InMemoryProjectService implements Backend.ProjectService {
         store.access.push(...newAccess);
         store.projects.push(newProject);
         store.setUpdates();
-        
-        const access = store.getAccess({projectId: newProject.id});
-        const groups = store.getGroups(access);
-        const groupUsers = store.getGroupUsers(groups);
-        const users = store.getUsers(access);
-        callback({ project: newProject, access, groups, groupUsers, users }) 
-      
-        
+        callback(store.getProject(newProject.id)) 
       }
     }
   }
