@@ -56,12 +56,22 @@ function App() {
     });
   };
   
+  const onConfirm = (
+    tabId: string, resource: 
+      Backend.ProjectResource | 
+      Backend.UserResource | 
+      Backend.GroupResource) => {
+    
+    console.log("confirm")
+    setSession((session) => session.deleteTab(tabId));
+  };
+  
   const handleDialogClose = () => setSession((session) => session.withDialog());
   const changeTab = (index: number) => setSession((session) => session.withTab(index));
   const addTab = (newItem: Session.Tab) => setSession((session) => session.withTab(newItem));
   const setTabData = (id: string, updateCommand: (oldData: any) => any) => setSession((session) => session.withTabData(id, updateCommand))
 
-  const confProjectInTab = (project: Backend.ProjectBuilder, activeStep?: number) => addTab(ConfigureProjectInTab(setTabData, dialogs.project.id, project, activeStep));
+  const confProjectInTab = (project: Backend.ProjectBuilder, activeStep?: number) => addTab(ConfigureProjectInTab(setTabData, onConfirm, dialogs.project.id, project, activeStep));
   const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(setTabData, dialogs.user.id, user, activeStep));
   const confGroupInTab = (group: Backend.GroupBuilder, activeStep?: number) => addTab(ConfigureGroupInTab(setTabData, dialogs.group.id, group, activeStep));
   

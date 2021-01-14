@@ -44,6 +44,7 @@ interface ConfigureProjectProps {
   setProject: (project: Backend.ProjectBuilder) => void;
   getActiveStep: () => number;
   setActiveStep: (command: (old: number) => number) => void;
+  onConfirm: (resource: Backend.ProjectResource) => void;
 };
 
 const ConfigureProject: React.FC<ConfigureProjectProps> = (props) => {
@@ -67,8 +68,9 @@ const ConfigureProject: React.FC<ConfigureProjectProps> = (props) => {
   const handleReset = () => props.setActiveStep(() => 0);
   
   const handleFinish = () => {
+    
     service.projects.save(project).onSuccess(resource => {
-      
+      props.onConfirm(resource);
     });
   };
   

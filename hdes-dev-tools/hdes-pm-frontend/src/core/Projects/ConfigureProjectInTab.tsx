@@ -27,7 +27,8 @@ class TabData {
 }
 
 const ConfigureProjectInTab = (
-  setData: (id: string, updateCommand: (oldData: any) => any) => void, 
+  setData: (id: string, updateCommand: (oldData: any) => any) => void,
+  onConfirm: (tabId: string, project: Backend.ProjectResource) => void,
   defaultId: string, 
   project: Backend.ProjectBuilder, 
   activeStep?: number): Session.Tab => {
@@ -57,6 +58,7 @@ const ConfigureProjectInTab = (
 
     
     return (<ConfigureProject 
+      onConfirm={(resource) => onConfirm(id, resource)}
       getActiveStep={getActiveStep} 
       setActiveStep={setActiveStep} 
       setProject={setProject} 

@@ -22,6 +22,7 @@ declare namespace Session {
     withTab(newTabOrTabIndex: Tab | number): Instance;
     findTab(newTabId: string): number | undefined;
     getTabData(tabId: string): any;
+    deleteTab(tabId: string): Session.Instance;
   }
 }
 

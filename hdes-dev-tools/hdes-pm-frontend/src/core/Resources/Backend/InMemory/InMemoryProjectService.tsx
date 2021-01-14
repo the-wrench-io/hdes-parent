@@ -37,14 +37,15 @@ class InMemoryProjectService implements Backend.ProjectService {
     }
     return result;
   }
-  save(builder: Backend.ProjectBuilder)  {
+  save(builder: Backend.ProjectBuilder) {
     const store = this.store;
     return {
       onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
           
         // delete old resources
         if(builder.id) {
-          return store.setProject(builder);
+          callback(store.setProject(builder))
+          store.setUpdates(); 
         }
                   
         // user entry
@@ -83,11 +84,12 @@ class InMemoryProjectService implements Backend.ProjectService {
             });
           }
         }
-        
+      
         store.access.push(...newAccess);
         store.projects.push(newProject);
-        store.setUpdates();
-        callback(store.getProject(newProject.id)) 
+        callback(store.getProject(newProject.id))
+        
+        store.setUpdates(); 
       }
     }
   }

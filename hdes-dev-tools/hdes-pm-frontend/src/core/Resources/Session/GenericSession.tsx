@@ -68,6 +68,15 @@ class GenericInstance implements Session.Instance {
     console.error(this);
     throw new Error (`cant find tab: '${tabId}'`);
   }
+  deleteTab(tabId: string): Session.Instance {
+    const tabs: Session.Tab[] = [];
+    for(const tab of this.tabs) {
+      if(tabId !== tab.id) {
+        tabs.push(tab);
+      }
+    }
+    return this.next(this.history, tabs);
+  }
 }
 
 const createSession = () => new GenericInstance();

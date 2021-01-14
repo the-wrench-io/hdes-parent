@@ -13,9 +13,8 @@ import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 
-import { Title, DateFormat } from '.././Views';
+import { Title, DateFormat, Summary } from '.././Views';
 import { Resources, Backend } from '.././Resources';
-import ProjectSummary from './ProjectSummary';
 
  
 const useStyles = makeStyles((theme) => ({
@@ -106,7 +105,7 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onEdit}) => {
           transformOrigin={{ vertical: 'top', horizontal: 'left' }}
           onClose={handlePopoverClose}
           disableRestoreFocus>
-        {openPopoverRow ? <ProjectSummary resource={openPopoverRow}/> : null}
+        {openPopoverRow ? <Summary resource={openPopoverRow}/> : null}
       </Popover>
       { seeMore ? 
         (<div className={classes.seeMore}>
