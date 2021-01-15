@@ -2,7 +2,7 @@ import React from 'react';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
+import Divider from '@material-ui/core/Divider';
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 
@@ -16,6 +16,7 @@ const useStyles = makeStyles((theme: Theme) =>
     root: {
       flexGrow: 1,
       overflow: 'hidden',
+      
       padding: theme.spacing(0, 1),
     },
     paper: {
@@ -85,42 +86,34 @@ const Summary: React.FC<SummaryProps> = ({resource}) => {
     })).map();
     
   return (<div className={classes.root}>
-    <Paper className={classes.paper}>
-      <Grid container wrap="nowrap" spacing={2}>
-        <Grid item>
-          <Avatar className={classes.title}>{view.letter}</Avatar>
-        </Grid>
-        <Grid item xs>
+    <div className={classes.paper}>
+      <Grid container spacing={1}>
+        <Grid item xs={2}><Avatar className={classes.title}>{view.letter}</Avatar></Grid>
+        <Grid item xs={10}>
           <Typography component="h2" variant="h6" gutterBottom>
             {view.name} / <DateFormat>{view.created}</DateFormat>
           </Typography>
         </Grid>
-      </Grid>
-    </Paper>
-    
-    {!view.users ? null : (
-      <Paper className={classes.paper}>
-        <Grid container wrap="nowrap" spacing={2}>
-          <Grid item><Avatar className={classes.users}>U</Avatar></Grid>
-          <Grid item xs><Typography>{view.users}</Typography></Grid>
-        </Grid>
-      </Paper>)}
-
-    {!view.groups ? null : (
-      <Paper className={classes.paper}>
-        <Grid container wrap="nowrap" spacing={2}>
-          <Grid item><Avatar className={classes.groups}>G</Avatar></Grid>
-          <Grid item xs><Typography>{view.groups}</Typography></Grid>
-        </Grid>
-      </Paper>)}
-
-    {!view.projects ? null : (
-      <Paper className={classes.paper}>
-        <Grid container wrap="nowrap" spacing={2}>
-          <Grid item><Avatar className={classes.projects}>P</Avatar></Grid>
-          <Grid item xs><Typography>{view.projects}</Typography></Grid>
-        </Grid>
-      </Paper>)}      
+        {!view.users ? null : (
+          <React.Fragment>
+            <Grid item xs={12}><Divider /></Grid>
+            <Grid item xs={2}><Avatar className={classes.users}>U</Avatar></Grid>
+            <Grid item xs={10}><Typography>{view.users}</Typography></Grid>
+          </React.Fragment>)}
+        {!view.groups ? null : (
+          <React.Fragment>
+            <Grid item xs={12}><Divider /></Grid>
+            <Grid item xs={2}><Avatar className={classes.groups}>G</Avatar></Grid>
+            <Grid item xs={10}><Typography>{view.groups}</Typography></Grid>
+          </React.Fragment>)}
+        {!view.projects ? null : (
+          <React.Fragment>            
+            <Grid item xs={12}><Divider /></Grid>
+            <Grid item xs={2}><Avatar className={classes.projects}>P</Avatar></Grid>
+            <Grid item xs={10}><Typography>{view.projects}</Typography></Grid>
+          </React.Fragment>)}
+        </Grid>    
+      </div>
     </div>
   );
 }

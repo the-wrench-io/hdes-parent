@@ -99,6 +99,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onEdit}) => {
           ))}
         </TableBody>
       </Table>
+      
       <Popover id="mouse-over-popover"
           className={classes.popover}
           classes={{paper: classes.paper }}
@@ -110,6 +111,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onEdit}) => {
           disableRestoreFocus>
         {openPopoverRow ? <Summary resource={openPopoverRow}/> : null}
       </Popover>
+      
       { seeMore ? 
         (<div className={classes.seeMore}>
           <Link color="primary" href="#" onClick={(event: MouseEvent) => {
