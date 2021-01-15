@@ -20,8 +20,7 @@ import { Backend } from '.././Resources';
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
-      backgroundColor: theme.palette.background.paper,
+      width: '100%'
     },
     nested: {
       paddingLeft: theme.spacing(4),
