@@ -75,7 +75,7 @@ class GenericInstance implements Session.Instance {
         tabs.push(tab);
       }
     }
-    return this.next(this.history, tabs);
+    return this.next(this.history, tabs).withTab(tabs.length - 1);
   }
 }
 

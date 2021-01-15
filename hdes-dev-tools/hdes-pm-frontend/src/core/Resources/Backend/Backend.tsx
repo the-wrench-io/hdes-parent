@@ -8,7 +8,7 @@ declare namespace Backend {
 
     onUpdate: (listener: (newService: Service) => void) => void;
   }
-  
+
   interface GroupService {
     query: (args?: {top?: number}) => GroupQuery;
     builder: (from?: GroupResource) => GroupBuilder;

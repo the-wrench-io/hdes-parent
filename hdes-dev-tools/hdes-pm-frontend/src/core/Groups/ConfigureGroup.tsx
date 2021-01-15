@@ -44,6 +44,7 @@ interface ConfigureGroupProps {
   setGroup: (group: Backend.GroupBuilder) => void;
   getActiveStep: () => number;
   setActiveStep: (command: (old: number) => number) => void;
+  onConfirm: (resource: Backend.GroupResource) => void;
 };
 
 const ConfigureGroup: React.FC<ConfigureGroupProps> = (props) => {
@@ -68,7 +69,7 @@ const ConfigureGroup: React.FC<ConfigureGroupProps> = (props) => {
   
   const handleFinish = () => {
     service.groups.save(group).onSuccess(resource => {
-      
+      props.onConfirm(resource);
     });
   };
   

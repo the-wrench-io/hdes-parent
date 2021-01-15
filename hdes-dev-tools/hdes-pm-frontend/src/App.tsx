@@ -20,6 +20,7 @@ import Shell from './core/Shell';
 import { AddUser, ConfigureUserInTab, UsersView } from './core/Users';
 import { AddProject, ConfigureProjectInTab, ProjectsView } from './core/Projects';
 import { AddGroup, ConfigureGroupInTab, GroupsView } from './core/Groups';
+import { ResourceSaved } from './core/Views';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -44,6 +45,11 @@ const makeDialogs = () => {
 
 function App() {
   const { session, setSession } = React.useContext(Resources.Context);
+  const [ resourceSaved, setResourceSaved ] = React.useState<undefined |
+      Backend.ProjectResource | 
+      Backend.UserResource | 
+      Backend.GroupResource>();
+
 
   const classes = useStyles();
   const dialogs = makeDialogs();
@@ -62,7 +68,7 @@ function App() {
       Backend.UserResource | 
       Backend.GroupResource) => {
     
-    console.log("confirm")
+    setResourceSaved(resource);
     setSession((session) => session.deleteTab(tabId));
   };
   
@@ -72,8 +78,8 @@ function App() {
   const setTabData = (id: string, updateCommand: (oldData: any) => any) => setSession((session) => session.withTabData(id, updateCommand))
 
   const confProjectInTab = (project: Backend.ProjectBuilder, activeStep?: number) => addTab(ConfigureProjectInTab(setTabData, onConfirm, dialogs.project.id, project, activeStep));
-  const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(setTabData, dialogs.user.id, user, activeStep));
-  const confGroupInTab = (group: Backend.GroupBuilder, activeStep?: number) => addTab(ConfigureGroupInTab(setTabData, dialogs.group.id, group, activeStep));
+  const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(setTabData, onConfirm, dialogs.user.id, user, activeStep));
+  const confGroupInTab = (group: Backend.GroupBuilder, activeStep?: number) => addTab(ConfigureGroupInTab(setTabData, onConfirm, dialogs.group.id, group, activeStep));
   
   const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: () => <React.Fragment>{projects}{users}</React.Fragment>});
   const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: () => <GroupsView onEdit={confGroupInTab}/>});
@@ -100,6 +106,7 @@ function App() {
   ];
 
   return (<React.Fragment>
+    <ResourceSaved resource={resourceSaved} onClose={() => setResourceSaved(undefined)}/>
     <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={confUserInTab} />
     <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={confProjectInTab}/>
     <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} handleConf={confGroupInTab}/>

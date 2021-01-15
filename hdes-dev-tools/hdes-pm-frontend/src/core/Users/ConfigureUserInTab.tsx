@@ -26,7 +26,13 @@ class TabData {
   }
 }
 
-const ConfigureUserInTab = (setData: (id: string, updateCommand: (oldData: any) => any) => void, defaultId: string, user: Backend.UserBuilder, activeStep?: number): Session.Tab => {
+const ConfigureUserInTab = (
+  setData: (id: string, updateCommand: (oldData: any) => any) => void,
+  onConfirm: (tabId: string, user: Backend.UserResource) => void, 
+  defaultId: string, 
+  user: Backend.UserBuilder, 
+  activeStep?: number): Session.Tab => {
+  
   const id: string = user.id ? user.id : defaultId;
   const label: string = user.id ? user.name + '' : 'add user';
   const init = new TabData(user, activeStep ? activeStep : 0);
@@ -51,6 +57,7 @@ const ConfigureUserInTab = (setData: (id: string, updateCommand: (oldData: any) 
     };
     
     return (<ConfigureUser 
+      onConfirm={(resource) => onConfirm(id, resource)}
       getActiveStep={getActiveStep} 
       setActiveStep={setActiveStep} 
       setUser={setUser} 

@@ -44,6 +44,7 @@ interface ConfigureUserProps {
   setUser: (user: Backend.UserBuilder) => void;
   getActiveStep: () => number;
   setActiveStep: (command: (old: number) => number) => void;
+  onConfirm: (resource: Backend.UserResource) => void;
 };
 
 const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
@@ -68,7 +69,7 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
   
   const handleFinish = () => {
     service.users.save(user).onSuccess(resource => {
-      
+      props.onConfirm(resource);
     });
   };
   

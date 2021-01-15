@@ -27,7 +27,13 @@ class TabData {
   }
 }
 
-const ConfigureGroupInTab = (setData: (id: string, updateCommand: (oldData: any) => any) => void, defaultId: string, group: Backend.GroupBuilder, activeStep?: number): Session.Tab => {
+const ConfigureGroupInTab = (
+  setData: (id: string, updateCommand: (oldData: any) => any) => void,
+  onConfirm: (tabId: string, group: Backend.GroupResource) => void,
+  defaultId: string, 
+  group: Backend.GroupBuilder, 
+  activeStep?: number): Session.Tab => {
+  
   const id: string = group.id ? group.id : defaultId;
   const label: string = group.id ? group.name + '' : 'add group';
   const init = new TabData(group, activeStep ? activeStep : 0);
@@ -52,6 +58,7 @@ const ConfigureGroupInTab = (setData: (id: string, updateCommand: (oldData: any)
     };
 
     return (<ConfigureGroup
+      onConfirm={(resource) => onConfirm(id, resource)}
       getActiveStep={getActiveStep} 
       setActiveStep={setActiveStep} 
       setGroup={setGroup} 
