@@ -1,4 +1,4 @@
-import { Backend } from './../Resources';
+import { Backend } from './Backend';
 
 
 const isProject = (resource: any) : resource is Backend.ProjectResource => {
@@ -13,12 +13,12 @@ const isGroup = (resource: any) : resource is Backend.GroupResource => {
 
 
 class ResourceMapper<T> {
-  private _resource?: Backend.ProjectResource | Backend.UserResource | Backend.GroupResource; 
+  private _resource?: Backend.AnyResource; 
   private _userMapper?: (src: Backend.UserResource) => T;
   private _groupMapper?: (src: Backend.GroupResource) => T;
   private _projectMapper?: (src: Backend.ProjectResource) => T;
   
-  constructor(resource?: Backend.ProjectResource | Backend.UserResource | Backend.GroupResource) {
+  constructor(resource?: Backend.AnyResource) {
     this._resource = resource;
   }
   user(mapper: (src: Backend.UserResource) => T) : ResourceMapper<T> {

@@ -53,7 +53,8 @@ class InMemoryUserService implements Backend.UserService {
         // user entry
         const newUser: Backend.User = {
           id: store.uuid(),
-          rev: store.uuid(), 
+          rev: store.uuid(),
+          token: builder.token ? builder.token : "",
           name: builder.name ? builder.name : "",
           externalId: builder.externalId, 
           created: new Date()

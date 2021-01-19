@@ -20,7 +20,8 @@ import Grid from '@material-ui/core/Grid';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import NotificationsIcon from '@material-ui/icons/Notifications';
-
+import InputBase from '@material-ui/core/InputBase';
+import SearchIcon from '@material-ui/icons/Search';
 
 import { Session } from './../Resources';
 import ShellStyles from './ShellStyles' 
@@ -34,11 +35,18 @@ interface ShellProps {
     items: { id: string, label: string, icon: React.ReactNode }[],
     onClick: (id: string) => void
   },
-  views: { label: string, icon: React.ReactNode, onClick: () => void }[],
+  views: { 
+    label: string, 
+    icon: React.ReactNode, 
+    onClick: () => void 
+  }[],
   tabs: {
     active?: number,
     onClick: (index: number) => void,
     items: { label: string, panel: (session: any) => React.ReactNode }[]
+  },
+  search: {
+    onChange: (keyword: string) => void,
   }
 };
 
@@ -62,7 +70,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
   );
 }
 
-const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs}) => {
+const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs, search}) => {
   
   const classes = ShellStyles();
   
@@ -98,6 +106,18 @@ const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs}) => {
               }
             </Tabs>
           </Typography>
+          
+            <div className={classes.search}>
+              <div className={classes.searchIcon}><SearchIcon /></div>
+              <InputBase placeholder="Search…"
+                onChange={({target}) => search.onChange(target.value)}
+                inputProps={{ 'aria-label': 'search' }}
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }} />
+            </div>
+          
           <IconButton color="inherit" className={classes.appBarIcon}>
             <Badge badgeContent={4} color="secondary">
               <NotificationsIcon />
@@ -116,6 +136,7 @@ const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs}) => {
             <ChevronLeftIcon className={classes.appBarIcon}/>
           </IconButton>
         </div>
+        
         <Divider/>
         <List>
           <ListSubheader inset>Operation</ListSubheader>

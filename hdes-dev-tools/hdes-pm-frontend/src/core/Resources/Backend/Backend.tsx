@@ -1,6 +1,8 @@
 
 declare namespace Backend {
   
+  type AnyResource = Backend.ProjectResource | Backend.UserResource | Backend.GroupResource;
+  
   interface Service {
     users: UserService;
     projects: ProjectService;
@@ -94,12 +96,14 @@ declare namespace Backend {
     id?: string; 
     name?: string; 
     externalId?: string;
+    token?: string;
     groups: string[];
     projects: string[];
 
     withResource: (from: UserResource) => UserBuilder;
     withName: (name: string) => UserBuilder;
     withExternalId: (externalId: string) => UserBuilder;
+    withToken: (token: string) => UserBuilder;
     withProjects: (projects: string[]) => UserBuilder;
     withGroups: (groups: string[]) => UserBuilder;
     from: (from: UserBuilder) => UserBuilder;
@@ -109,6 +113,7 @@ declare namespace Backend {
     id: string;
     rev: string;
     name: string;
+    token: string;
     externalId?: string;
     created: Date;
   }

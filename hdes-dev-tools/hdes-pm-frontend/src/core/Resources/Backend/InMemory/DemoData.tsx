@@ -3,10 +3,10 @@ import Backend from './../Backend';
 
 const createDemoData = () => {
   const users: Backend.User[] = [
-      {id: "1", rev: "1r6", name: "bob",         externalId: "sarg@city",      created: new Date("2019-01-01")},
-      {id: "2", rev: "2r6", name: "sam",         externalId: "guard@city",     created: new Date("2019-01-01")},
-      {id: "3", rev: "3r6", name: "goblin",      externalId: "",               created: new Date("2019-01-01")},
-      {id: "4", rev: "4r6", name: "bridgetroll", externalId: "guards@bridges", created: new Date("2019-01-01")},
+      {id: "1", rev: "1r6", name: "bob",         externalId: "sarg@city",      created: new Date("2019-01-01"), token: "sdkfhksdfh"},
+      {id: "2", rev: "2r6", name: "sam",         externalId: "guard@city",     created: new Date("2019-01-01"), token: "sdfjkxcghjgf"},
+      {id: "3", rev: "3r6", name: "goblin",      externalId: "",               created: new Date("2019-01-01"), token: "vxmcnbghrf"},
+      {id: "4", rev: "4r6", name: "bridgetroll", externalId: "guards@bridges", created: new Date("2019-01-01"), token: "cjlkjhyuk"},
   ];
   const projects: Backend.Project[] = [
     {id: "5", rev: "1xb", name: "scoring project 1", created: new Date("2010-01-01")},
@@ -32,7 +32,6 @@ const createDemoData = () => {
     {id: "003", rev: "3ywt", projectId: "7", groupId: "10", name: "", created: new Date("2010-01-01")},
     {id: "004", rev: "4ywt", projectId: "8", groupId: "10", name: "", created: new Date("2010-01-01")},
     {id: "005", rev: "5ywt", projectId: "9", groupId: "10", name: "", created: new Date("2010-01-01")},
-    
     
     {id: "006", rev: "6ywt", projectId: "5", groupId: "11", name: "", created: new Date("2010-01-01")},
     {id: "007", rev: "7ywt", projectId: "8", groupId: "11", name: "", created: new Date("2010-01-01")},

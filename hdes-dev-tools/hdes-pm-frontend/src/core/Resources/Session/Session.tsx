@@ -16,7 +16,9 @@ declare namespace Session {
     tabs: Tab[];
     history: History;
     dialogId?: string;
+    search?: string;
     
+    withSearch(keyword: string): Instance;
     withDialog(dialogId?: string): Instance;
     withTabData(tabId: string, updateCommand: (oldData: any) => any): Instance;
     withTab(newTabOrTabIndex: Tab | number): Instance;

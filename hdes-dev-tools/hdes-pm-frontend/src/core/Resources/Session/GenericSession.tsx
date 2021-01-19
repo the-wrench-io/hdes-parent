@@ -5,11 +5,17 @@ class GenericInstance implements Session.Instance {
   private _tabs: Session.Tab[];
   private _history: Session.History;
   private _dialogId?: string;
+  private _search;
   
-  constructor(tabs?: Session.Tab[], history?: Session.History, dialogId?: string) {
+  constructor(tabs?: Session.Tab[], history?: Session.History, dialogId?: string, search?: string) {
     this._tabs = tabs ? tabs : [];
     this._history = history ? history : { open: 0 };
     this._dialogId = dialogId;
+    this._search = search ? search : '';
+  }
+  
+  get search() {
+    return this._search;
   }
   get tabs() {
     return this._tabs;
@@ -20,12 +26,17 @@ class GenericInstance implements Session.Instance {
   get dialogId() {
     return this._dialogId;
   }
-  private next(history: Session.History, tabs?: Session.Tab[]): Session.Instance {
-    return new GenericInstance(tabs ? tabs : this.tabs, history, this.dialogId);
+
+  withSearch(search?: string): Session.Instance {
+    return new GenericInstance(this._tabs, this._history, this._dialogId, search);
   }
   withDialog(dialogId?: string): Session.Instance {
-    return new GenericInstance(this._tabs, this._history, dialogId);
+    return new GenericInstance(this._tabs, this._history, dialogId, this._search);
   }
+  private next(history: Session.History, tabs?: Session.Tab[]): Session.Instance {
+    return new GenericInstance(tabs ? tabs : this.tabs, history, this.dialogId, this._search);
+  }
+  
   withTabData(tabId: string, updateCommand: (oldData: any) => any): Session.Instance {
     const tabs: Session.Tab[] = [];
     for(const tab of this.tabs) {

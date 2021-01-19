@@ -16,11 +16,13 @@ import LibraryBooksOutlinedIcon from '@material-ui/icons/LibraryBooksOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 
 import { Resources, Backend, Session } from './core/Resources';
-import Shell from './core/Shell';
 import { AddUser, ConfigureUserInTab, UsersView } from './core/Users';
 import { AddProject, ConfigureProjectInTab, ProjectsView } from './core/Projects';
 import { AddGroup, ConfigureGroupInTab, GroupsView } from './core/Groups';
 import { ResourceSaved } from './core/Views';
+import { SearchView } from './core/Search';
+
+import Shell from './core/Shell';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -43,34 +45,32 @@ const makeDialogs = () => {
   }
 }
 
-function App() {
-  const { session, setSession } = React.useContext(Resources.Context);
-  const [ resourceSaved, setResourceSaved ] = React.useState<undefined |
-      Backend.ProjectResource | 
-      Backend.UserResource | 
-      Backend.GroupResource>();
 
+function App() {
+  const { service, session, setSession } = React.useContext(Resources.Context);
+  const [ resourceSaved, setResourceSaved ] = React.useState<undefined | Backend.AnyResource>();
 
   const classes = useStyles();
   const dialogs = makeDialogs();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);  
-  
-  const handleDialogOpen = (id: string) => {
-    setSession((session) => {
-      const index = session.findTab(id);
-      return index ? session.withTab(index) : session.withDialog(id);
-    });
+
+  const handleSearchFor = (keyword: string) => {
+    if(keyword.length > 0) {
+      listSearch();
+      setSession((session) => session.withSearch(keyword))
+    }
   };
+  const handleDialogOpen = (id: string) => setSession((session) => {
+    const index = session.findTab(id);
+    return index ? session.withTab(index) : session.withDialog(id);
+  });
   
   const onConfirm = (
-    tabId: string, resource: 
-      Backend.ProjectResource | 
-      Backend.UserResource | 
-      Backend.GroupResource) => {
-    
+    tabId: string, resource: Backend.AnyResource) => {
     setResourceSaved(resource);
     setSession((session) => session.deleteTab(tabId));
   };
+  
   
   const handleDialogClose = () => setSession((session) => session.withDialog());
   const changeTab = (index: number) => setSession((session) => session.withTab(index));
@@ -85,18 +85,22 @@ function App() {
   const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: () => <GroupsView onEdit={confGroupInTab}/>});
   const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: () => <ProjectsView onEdit={confProjectInTab}/>});
   const listUsers     = () => addTab({id: 'users', label: 'Users', panel: () => <UsersView onEdit={confUserInTab}/>});
+  const listSearch    = () => addTab({id: 'search', label: 'Search...', panel: () => <SearchView
+    onProject={(r) => confProjectInTab(service.projects.builder(r))}
+    onGroup={(r) => confGroupInTab(service.groups.builder(r))}
+    onUser={(r) => confUserInTab(service.users.builder(r))} /> });
 
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <ProjectsView top={4} seeMore={listProjects} onEdit={confProjectInTab}/>
-              </Paper>
-            </Grid>)
+      <Paper className={fixedHeightPaper}>
+        <ProjectsView top={4} seeMore={listProjects} onEdit={confProjectInTab}/>
+      </Paper>
+    </Grid>);
 
   const users = (<Grid key="2" item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
-                <UsersView top={4} seeMore={listUsers} onEdit={confUserInTab}/>
-              </Paper>
-            </Grid>)
+      <Paper className={fixedHeightPaper}>
+        <UsersView top={4} seeMore={listUsers} onEdit={confUserInTab}/>
+      </Paper>
+    </Grid>);
   
   const views = [
     { label: 'Dashboard', icon: <AppsOutlinedIcon />, onClick: listDashboard},
@@ -115,7 +119,8 @@ function App() {
       session={session} 
       views={views}
       dialogs={{items: [dialogs.group, dialogs.user, dialogs.project], onClick: handleDialogOpen}}
-      tabs={{items: session.tabs, active: session.history.open, onClick: changeTab }} />
+      tabs={{items: session.tabs, active: session.history.open, onClick: changeTab }} 
+      search={{ onChange: handleSearchFor }} />
   </React.Fragment>);
 }
 
