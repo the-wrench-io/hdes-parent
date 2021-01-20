@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Backend, Session } from '.././Resources';
 import ConfigureGroup from './ConfigureGroup';
-
+import ConfigureGroupSummary from './ConfigureGroupSummary';
 
 
 class TabData {
@@ -31,7 +31,8 @@ const ConfigureGroupInTab = (
   setData: (id: string, updateCommand: (oldData: any) => any) => void,
   onConfirm: (tabId: string, group: Backend.GroupResource) => void,
   defaultId: string, 
-  group: Backend.GroupBuilder, 
+  group: Backend.GroupBuilder,
+  edit?: boolean,  
   activeStep?: number): Session.Tab => {
   
   const id: string = group.id ? group.id : defaultId;
@@ -39,6 +40,12 @@ const ConfigureGroupInTab = (
   const init = new TabData(group, activeStep ? activeStep : 0);
       
   const panel = (session: Session.Instance) => {
+    
+    if(!edit) {
+      return (<ConfigureGroupSummary group={group} />);
+    }
+    
+    
     const getGroup = (): Backend.GroupBuilder => {
       const data = session.getTabData(id) as TabData;
       return data.group;

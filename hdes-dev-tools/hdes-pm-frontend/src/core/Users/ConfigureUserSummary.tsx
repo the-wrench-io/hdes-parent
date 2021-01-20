@@ -2,7 +2,6 @@ import React from 'react';
 
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 
-import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -14,16 +13,19 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import LibraryBooksOutlinedIcon from '@material-ui/icons/LibraryBooksOutlined';
 import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 
-
-import { Backend } from '.././Resources';
+import { Title } from '.././Views';
+import { Backend, Resources } from '.././Resources';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       width: '100%',
     },
-    nested: {
+    primary: {
       paddingLeft: theme.spacing(4),
+    },
+    secondary: {
+      paddingLeft: theme.spacing(6),
     },
   }),
 );
@@ -31,54 +33,72 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ConfigureUserSummaryProps {
   user: Backend.UserBuilder;
-  projects: Backend.ProjectResource[];
-  groups: Backend.GroupResource[];
+  projects?: Backend.ProjectResource[];
+  groups?: Backend.GroupResource[];
 };
 
 const ConfigureUserSummary: React.FC<ConfigureUserSummaryProps> = (props) => {
   const classes = useStyles();
-  
-  const groups = props.groups.filter(r => props.user.groups.includes(r.group.id));
-  const groupProjects: React.ReactNode[] = [];
-  let groupProjectTotal = 0;
-  for(const group of groups) {
-    const children: Backend.Project[] = Object.values(group.projects);
-    groupProjectTotal += children.length;
-    children.forEach((p, key) => groupProjects.push(<ListItem key={`${key}-${group.group.id}`} button className={classes.nested}>
-        <ListItemIcon><GroupOutlinedIcon /></ListItemIcon>
-        <ListItemText primary={`${p.name} - inherited: ${group.group.name}`} />
-      </ListItem>));
-  }
-    
-  const projects = props.projects.filter(r => props.user.projects.includes(r.project.id)).map(r => r.project); 
+
+  const { service } = React.useContext(Resources.Context);
+  const [projects, setProjects] = React.useState<Backend.ProjectResource[] | undefined>(props.projects);
+  const [groups, setGroups] = React.useState<Backend.GroupResource[] | undefined>(props.groups);
   const [openProject, setOpenProjects] = React.useState(true);
   const [openGroups, setOpenGroups] = React.useState(true);
 
-  return (<div className={classes.root}>
-    <List className={classes.root} component="nav" 
-      aria-labelledby="nested-list-subheader"
-      subheader={<ListSubheader component="div" id="nested-list-subheader">{`User '${props.user.name} / ${props.user.externalId}' summary`}</ListSubheader>}>
 
+  React.useEffect(() => {
+    if(!projects || !groups) {
+      service.projects.query().onSuccess(setProjects)
+      service.groups.query().onSuccess(setGroups)
+    }
+  }, [service, service.users, service.groups, groups, projects])
+
+  if(!projects || !groups) {
+    return <div>Loading...</div>;
+  }
+
+  return (<div className={classes.root}>
+    <List className={classes.root} component="nav" aria-labelledby="nested-list-subheader">
+      <Title>User {props.user.name} / {props.user.externalId}</Title>
       <Divider />
       
       <ListItem button onClick={() => setOpenGroups(!openGroups)}>
-        <ListItemText primary={`Groups to join: (${groups.length})`} />
+        <ListItemText primary={`Groups that user belongs to: (${groups.length})`} />
         {openGroups ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
       <Collapse in={openGroups} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {groups.map(p => <ListItem key={p.group.id} button className={classes.nested}><ListItemIcon><GroupOutlinedIcon /></ListItemIcon><ListItemText primary={p.group.name} /></ListItem>)}
+          { groups.map(p => (
+            <React.Fragment>
+              <ListItem key={p.group.id} button className={classes.primary}>
+                <ListItemIcon><GroupOutlinedIcon /></ListItemIcon>
+                <ListItemText primary={p.group.name} />
+              </ListItem>
+              { Object.values(p.projects).map((u, key) => (
+                <ListItem key={`${key}-${u.id}`} button className={classes.secondary}>
+                  <ListItemIcon><LibraryBooksOutlinedIcon /></ListItemIcon>
+                  <ListItemText secondary={u.name} />
+                </ListItem>
+              )) }
+            </React.Fragment>
+          ))}
         </List>
       </Collapse>
 
       <ListItem button onClick={() => setOpenProjects(!openProject)}>
-        <ListItemText primary={`Projects to join: (${projects.length + groupProjectTotal})`} />
+        <ListItemText primary={`Projects that user has access to: (${projects.length})`} />
         {openProject ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
       <Collapse in={openProject} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          {projects.map(p => <ListItem key={p.id} button className={classes.nested}><ListItemIcon><LibraryBooksOutlinedIcon /></ListItemIcon><ListItemText primary={p.name} /></ListItem>)}
-          {groupProjects}
+          { projects.map(p => p.project).map(p => (
+              <ListItem key={p.id} button className={classes.primary}>
+                <ListItemIcon><LibraryBooksOutlinedIcon /></ListItemIcon>
+                <ListItemText primary={p.name} />
+              </ListItem>)
+            )
+          }
         </List>
       </Collapse>
       

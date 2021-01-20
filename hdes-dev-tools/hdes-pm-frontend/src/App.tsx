@@ -77,8 +77,8 @@ function App() {
     };
     const tab: Session.Tab = new Mapper.Builder<Session.Tab>(props.builder)
       .project(project => ConfigureProjectInTab(setTabData, onConfirm, dialogs.project.id, project, props.edit, props.activeStep))
-      .group(group => ConfigureGroupInTab(setTabData, onConfirm, dialogs.group.id, group, props.activeStep))
-      .user(user => ConfigureUserInTab(setTabData, onConfirm, dialogs.user.id, user, props.activeStep))
+      .group(group => ConfigureGroupInTab(setTabData, onConfirm, dialogs.group.id, group, props.edit, props.activeStep))
+      .user(user => ConfigureUserInTab(setTabData, onConfirm, dialogs.user.id, user, props.edit, props.activeStep))
       .map();
       
     addTab(tab);

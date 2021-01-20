@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Backend, Session } from '.././Resources';
 import ConfigureUser from './ConfigureUser';
+import ConfigureUserSummary from './ConfigureUserSummary';
 
 
 class TabData {
@@ -31,6 +32,7 @@ const ConfigureUserInTab = (
   onConfirm: (tabId: string, user: Backend.UserResource) => void, 
   defaultId: string, 
   user: Backend.UserBuilder, 
+  edit?: boolean, 
   activeStep?: number): Session.Tab => {
   
   const id: string = user.id ? user.id : defaultId;
@@ -38,6 +40,10 @@ const ConfigureUserInTab = (
   const init = new TabData(user, activeStep ? activeStep : 0);
 
   const panel = (session: Session.Instance) => {
+    if(!edit) {
+      return (<ConfigureUserSummary user={user} />);
+    }
+
     const getUser = (): Backend.UserBuilder => {
       const data = session.getTabData(id) as TabData;
       return data.user;
