@@ -12,11 +12,13 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
+import TabUnselectedOutlinedIcon from '@material-ui/icons/TabUnselectedOutlined';
 
 import { Title, Summary, DateFormat } from '.././Views';
 import { Resources, Backend } from '.././Resources';
 
- 
+
+
 const useStyles = makeStyles((theme) => ({
   seeMore: {
     marginTop: theme.spacing(3),
@@ -35,11 +37,11 @@ const useStyles = makeStyles((theme) => ({
 interface GroupsViewProps {
   top?: number,
   seeMore?: () => void,
-  onEdit: (user: Backend.GroupBuilder) => void
+  onSelect: (props: {builder: Backend.GroupBuilder, edit?: boolean, activeStep?: number}) => void
   
 };
 
-const GroupsView: React.FC<GroupsViewProps> = ({top, seeMore, onEdit}) => {
+const GroupsView: React.FC<GroupsViewProps> = ({top, seeMore, onSelect}) => {
   const { service } = React.useContext(Resources.Context);
   const [groups, setGroups] = React.useState<Backend.GroupResource[]>([]);
   React.useEffect(() => service.groups.query({ top }).onSuccess(setGroups), [service.groups, top])
@@ -91,7 +93,14 @@ const GroupsView: React.FC<GroupsViewProps> = ({top, seeMore, onEdit}) => {
               <TableCell>{Object.keys(row.projects).length}</TableCell>
               <TableCell>{Object.keys(row.users).length}</TableCell>
               <TableCell><DateFormat>{row.group.created}</DateFormat></TableCell>
-              <TableCell><IconButton size="small" onClick={() => onEdit(service.groups.builder(row))} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
+              <TableCell>
+                <IconButton size="small" onClick={() => onSelect({builder: service.groups.builder(row)})} color="inherit">
+                  <TabUnselectedOutlinedIcon />
+                </IconButton>
+                <IconButton size="small" onClick={() => onSelect({ builder: service.groups.builder(row), edit: true })} color="inherit">
+                  <EditOutlinedIcon/>
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

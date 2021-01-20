@@ -2,9 +2,12 @@ import { ResourceProvider as Provider, ResourceContext as Context } from './Reso
 
 import { Backend }  from './Backend';
 import { Session }  from './Session';
-import { ResourceMapper as Mapper }  from './ResourceMapper';
+import { ResourceMapper as Resource }  from './ResourceMapper';
+import { ResourceBuilderMapper as Builder }  from './ResourceBuilderMapper';
 
-const Resources = { Provider, Context, Mapper };
-export { Resources };
+const Mapper = { Resource, Builder };
+const Resources = { Provider, Context };
+
+export { Resources, Mapper };
 
 export type { Backend, Session };

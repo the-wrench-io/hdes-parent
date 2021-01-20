@@ -15,7 +15,7 @@ import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 import LibraryBooksOutlinedIcon from '@material-ui/icons/LibraryBooksOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
 
-import { Resources, Backend, Session } from './core/Resources';
+import { Resources, Backend, Session, Mapper } from './core/Resources';
 import { AddUser, ConfigureUserInTab, UsersView } from './core/Users';
 import { AddProject, ConfigureProjectInTab, ProjectsView } from './core/Projects';
 import { AddGroup, ConfigureGroupInTab, GroupsView } from './core/Groups';
@@ -77,28 +77,30 @@ function App() {
   const addTab = (newItem: Session.Tab) => setSession((session) => session.withTab(newItem));
   const setTabData = (id: string, updateCommand: (oldData: any) => any) => setSession((session) => session.withTabData(id, updateCommand))
 
-  const confProjectInTab = (project: Backend.ProjectBuilder, activeStep?: number) => addTab(ConfigureProjectInTab(setTabData, onConfirm, dialogs.project.id, project, activeStep));
-  const confUserInTab = (user: Backend.UserBuilder, activeStep?: number) => addTab(ConfigureUserInTab(setTabData, onConfirm, dialogs.user.id, user, activeStep));
-  const confGroupInTab = (group: Backend.GroupBuilder, activeStep?: number) => addTab(ConfigureGroupInTab(setTabData, onConfirm, dialogs.group.id, group, activeStep));
+  const openInTab = (props: {builder: Backend.AnyBuilder, edit?: boolean, activeStep?: number}) => {
+    const tab: Session.Tab = new Mapper.Builder<Session.Tab>(props.builder)
+      .project(project => ConfigureProjectInTab(setTabData, onConfirm, dialogs.project.id, project, props.activeStep))
+      .group(group => ConfigureGroupInTab(setTabData, onConfirm, dialogs.group.id, group, props.activeStep))
+      .user(user => ConfigureUserInTab(setTabData, onConfirm, dialogs.user.id, user, props.activeStep))
+      .map();
+    addTab(tab);
+  }
   
   const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: () => <React.Fragment>{projects}{users}</React.Fragment>});
-  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: () => <GroupsView onEdit={confGroupInTab}/>});
-  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: () => <ProjectsView onEdit={confProjectInTab}/>});
-  const listUsers     = () => addTab({id: 'users', label: 'Users', panel: () => <UsersView onEdit={confUserInTab}/>});
-  const listSearch    = () => addTab({id: 'search', label: 'Search...', panel: () => <SearchView
-    onProject={(r) => confProjectInTab(service.projects.builder(r))}
-    onGroup={(r) => confGroupInTab(service.groups.builder(r))}
-    onUser={(r) => confUserInTab(service.users.builder(r))} /> });
+  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: () => <GroupsView onSelect={openInTab}/>});
+  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: () => <ProjectsView onSelect={openInTab}/>});
+  const listUsers     = () => addTab({id: 'users', label: 'Users', panel: () => <UsersView onSelect={openInTab}/>});
+  const listSearch    = () => addTab({id: 'search', label: 'Search...', panel: () => <SearchView onSelect={openInTab} />});
 
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
       <Paper className={fixedHeightPaper}>
-        <ProjectsView top={4} seeMore={listProjects} onEdit={confProjectInTab}/>
+        <ProjectsView top={4} seeMore={listProjects} onSelect={openInTab}/>
       </Paper>
     </Grid>);
 
   const users = (<Grid key="2" item xs={12} md={8} lg={9}>
       <Paper className={fixedHeightPaper}>
-        <UsersView top={4} seeMore={listUsers} onEdit={confUserInTab}/>
+        <UsersView top={4} seeMore={listUsers} onSelect={openInTab}/>
       </Paper>
     </Grid>);
   
@@ -111,9 +113,9 @@ function App() {
 
   return (<React.Fragment>
     <ResourceSaved resource={resourceSaved} onClose={() => setResourceSaved(undefined)}/>
-    <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={confUserInTab} />
-    <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={confProjectInTab}/>
-    <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} handleConf={confGroupInTab}/>
+    <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={openInTab} />
+    <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={openInTab}/>
+    <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} handleConf={openInTab}/>
   
     <Shell init={0}
       session={session} 

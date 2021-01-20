@@ -22,6 +22,9 @@ export class GenericProjectBuilder implements Backend.ProjectBuilder {
   get name(): string | undefined {
     return this._name;
   }
+  get resourceType(): "project" {
+    return "project";
+  }
   withName(name: string): Backend.ProjectBuilder {
     return new GenericProjectBuilder(this._id, name, this._groups, this._users);
   }

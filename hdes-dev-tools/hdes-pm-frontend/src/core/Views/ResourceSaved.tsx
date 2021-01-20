@@ -3,7 +3,7 @@ import Snackbar from '@material-ui/core/Snackbar';
 import { makeStyles, Theme } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import { Backend, Resources } from './../Resources';
+import { Backend, Mapper } from './../Resources';
 
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -48,7 +48,7 @@ const ResourceSaved: React.FC<ResourceSavedProps> = ({resource, onClose}) => {
     onClose();
   };
   
-  const view = new Resources.Mapper<View>(resource)
+  const view = new Mapper.Resource<View>(resource)
     .project(resource => ({ name: resource.project.name }))
     .group(resource => ({ name: resource.group.name }))
     .user(resource => ({ name: resource.user.name }))

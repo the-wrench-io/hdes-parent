@@ -12,6 +12,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
+import TabUnselectedOutlinedIcon from '@material-ui/icons/TabUnselectedOutlined';
 
 import { Title, Summary, DateFormat } from '.././Views';
 import { Resources, Backend } from '.././Resources';
@@ -35,10 +36,10 @@ const useStyles = makeStyles((theme) => ({
 interface UserViewProps {
   top?: number,
   seeMore?: () => void,
-  onEdit: (user: Backend.UserBuilder) => void
+  onSelect: (props: {builder: Backend.UserBuilder, edit?: boolean, activeStep?: number}) => void
 };
 
-const UsersView: React.FC<UserViewProps> = ({top, seeMore, onEdit}) => {
+const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
   const { service } = React.useContext(Resources.Context);
   const [users, setUsers] = React.useState<Backend.UserResource[]>([]);
   React.useEffect(() => service.users.query({ top }).onSuccess(setUsers), [service.users, top])
@@ -94,7 +95,14 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onEdit}) => {
               <TableCell>{Object.keys(row.groups).length}</TableCell>
               <TableCell>{Object.keys(row.projects).length}</TableCell>
               <TableCell><DateFormat>{row.user.created}</DateFormat></TableCell>
-              <TableCell><IconButton size="small" onClick={() => onEdit(service.users.builder(row))} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
+              <TableCell>
+                <IconButton size="small" onClick={() => onSelect({builder: service.users.builder(row)})} color="inherit">
+                  <TabUnselectedOutlinedIcon />
+                </IconButton>
+                <IconButton size="small" onClick={() => onSelect({builder: service.users.builder(row), edit: true})} color="inherit">
+                  <EditOutlinedIcon/>
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

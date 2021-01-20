@@ -18,7 +18,7 @@ import ConfigureUserSummary from './ConfigureUserSummary';
 
 interface AddUserProps {
   open: boolean;
-  handleConf: (user: Backend.UserBuilder, step: number) => void;
+  handleConf: (conf: {builder: Backend.UserBuilder, activeStep: number, edit: true}) => void;
   handleClose: () => void;
 };
 
@@ -65,7 +65,7 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   
   const onTab = () => {
     onClose()
-    handleConf(user, activeStep)
+    handleConf({builder: user, activeStep, edit: true})
   }
 
   const steps = [

@@ -14,7 +14,7 @@ import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import TabUnselectedOutlinedIcon from '@material-ui/icons/TabUnselectedOutlined';
 
 import { Summary, Title, DateFormat } from '.././Views';
-import { Resources, Backend } from '.././Resources';
+import { Resources, Backend, Mapper } from '.././Resources';
 
 const useStyles = makeStyles((theme) => ({
   seeMore: {
@@ -46,12 +46,10 @@ type SearchResults = {
 }
 
 interface SearchViewProps {
-  onProject: (resource: Backend.ProjectResource, edit?: boolean) => void;
-  onGroup: (resource: Backend.GroupResource, edit?: boolean) => void;
-  onUser: (resource: Backend.UserResource, edit?: boolean) => void;
+  onSelect: (props: {builder: Backend.AnyBuilder, edit?: boolean, activeStep?: number}) => void
 };
 
-const SearchView: React.FC<SearchViewProps> = ({onGroup, onProject, onUser}) => {
+const SearchView: React.FC<SearchViewProps> = ({ onSelect }) => {
   const { service, session } = React.useContext(Resources.Context);
   const [users, setUsers] = React.useState<Backend.UserResource[]>([]);
   const [groups, setGroups] = React.useState<Backend.GroupResource[]>([]);
@@ -78,14 +76,14 @@ const SearchView: React.FC<SearchViewProps> = ({onGroup, onProject, onUser}) => 
   }, [session, users, groups, projects])
   
 
-  const toView = (resource: Backend.AnyResource) => new Resources.Mapper<View>(resource)
+  const toView = (resource: Backend.AnyResource) => new Mapper.Resource<View>(resource)
     .project(resource => ({
       id: resource.project.id,
       name: resource.project.name,
       created: resource.project.created,
       src: resource,
       type: "projects",
-      onClick: (edit?) => onProject(resource, edit)
+      onClick: (edit?) => onSelect({builder: service.projects.builder(resource), edit})
     }))
     .group(resource => ({
       id: resource.group.id,
@@ -93,7 +91,7 @@ const SearchView: React.FC<SearchViewProps> = ({onGroup, onProject, onUser}) => 
       created: resource.group.created,
       src: resource,
       type: "groups",
-      onClick: (edit?) => onGroup(resource, edit)
+      onClick: (edit?) => onSelect({builder: service.groups.builder(resource), edit})
     }))
     .user(resource => ({
       id: resource.user.id,
@@ -101,7 +99,7 @@ const SearchView: React.FC<SearchViewProps> = ({onGroup, onProject, onUser}) => 
       created: resource.user.created,
       src: resource,
       type: "users",
-      onClick: (edit?) => onUser(resource, edit)
+      onClick: (edit?) => onSelect({builder: service.users.builder(resource), edit})
     })).map();
 
   const classes = useStyles();
@@ -115,8 +113,6 @@ const SearchView: React.FC<SearchViewProps> = ({onGroup, onProject, onUser}) => 
     setAnchorEl(null)
   };
   const openPopover = Boolean(anchorEl);
-  
-  
 
   const createTable = (items: Backend.AnyResource[]) => items.map(toView).map((row) => (
       <TableRow key={row.id}>

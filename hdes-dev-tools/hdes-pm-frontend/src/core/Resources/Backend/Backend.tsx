@@ -1,7 +1,12 @@
 
 declare namespace Backend {
   
-  type AnyResource = Backend.ProjectResource | Backend.UserResource | Backend.GroupResource;
+  type AnyResource = ProjectResource | UserResource | GroupResource;
+  type AnyBuilder = ProjectBuilder | UserBuilder | GroupBuilder;
+  
+  interface ResourceBuilder {
+    resourceType: 'user' | 'project' | 'group';
+  }
   
   interface Service {
     users: UserService;
@@ -49,7 +54,7 @@ declare namespace Backend {
     groupUsers: Record<string, GroupUser>;
   }
   
-  interface ProjectBuilder {
+  interface ProjectBuilder extends ResourceBuilder {
     id?: string; 
     name?: string; 
     groups: string[];
@@ -70,7 +75,7 @@ declare namespace Backend {
     projects: Record<string, Project>;
   }
   
-  interface GroupBuilder {
+  interface GroupBuilder extends ResourceBuilder {
     id?: string; 
     name?: string; 
     projects: string[];
@@ -92,7 +97,7 @@ declare namespace Backend {
     groupUsers: Record<string, GroupUser>;
   }
 
-  interface UserBuilder {
+  interface UserBuilder extends ResourceBuilder {
     id?: string; 
     name?: string; 
     externalId?: string;

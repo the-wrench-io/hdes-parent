@@ -4,7 +4,7 @@ export class GenericGroupBuilder implements Backend.GroupBuilder {
   private _id?: string; 
   private _name?: string; 
   private _users: string[];
-  private _projects: string[] 
+  private _projects: string[]
   
   constructor(
     id?: string, name?: string, 
@@ -14,6 +14,9 @@ export class GenericGroupBuilder implements Backend.GroupBuilder {
     this._name = name;
     this._users = users ? users : [];
     this._projects =  projects ? projects : [];
+  }
+  get resourceType(): "group" {
+    return "group";
   }
   get id(): string | undefined {
     return this._id;

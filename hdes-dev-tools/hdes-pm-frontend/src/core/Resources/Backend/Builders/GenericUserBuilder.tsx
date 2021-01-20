@@ -39,6 +39,9 @@ export class GenericUserBuilder implements Backend.UserBuilder {
   get groups(): string[] {
     return this._groups;
   }
+  get resourceType(): "user" {
+    return "user";
+  }
   withToken(token: string): Backend.UserBuilder {
     return new GenericUserBuilder(this._id, token, this._name, this._externalId, this._groups, this._projects);
   }

@@ -12,6 +12,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
+import TabUnselectedOutlinedIcon from '@material-ui/icons/TabUnselectedOutlined';
 
 import { Title, DateFormat, Summary } from '.././Views';
 import { Resources, Backend } from '.././Resources';
@@ -35,11 +36,10 @@ const useStyles = makeStyles((theme) => ({
 interface ProjectsViewProps {
   top?: number,
   seeMore?: () => void,
-  onEdit: (project: Backend.ProjectBuilder) => void
-  
+  onSelect: (props: {builder: Backend.ProjectBuilder, edit?: boolean, activeStep?: number}) => void
 };
 
-const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onEdit}) => {
+const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onSelect}) => {
   const { service } = React.useContext(Resources.Context);
   const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
   React.useEffect(() => service.projects.query({ top }).onSuccess(setProjects), [service.projects, top])
@@ -91,7 +91,14 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onEdit}) => {
               <TableCell>{Object.keys(row.groups).length}</TableCell>
               <TableCell>{Object.keys(row.users).length}</TableCell>
               <TableCell><DateFormat>{row.project.created}</DateFormat></TableCell>
-              <TableCell><IconButton size="small" onClick={() => onEdit(service.projects.builder(row))} color="inherit"><EditOutlinedIcon/></IconButton></TableCell>
+              <TableCell>
+                <IconButton size="small" onClick={() => onSelect({builder: service.projects.builder(row)})} color="inherit">
+                  <TabUnselectedOutlinedIcon />
+                </IconButton>
+                <IconButton size="small" onClick={() => onSelect({ builder: service.projects.builder(row), edit: true })} color="inherit">
+                  <EditOutlinedIcon/>
+                </IconButton>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

@@ -18,7 +18,7 @@ import ConfigureGroupSummary from './ConfigureGroupSummary';
 
 type AddGroupProps = {
   open: boolean;
-  handleConf: (project: Backend.GroupBuilder, step: number) => void;
+  handleConf: (conf: {builder: Backend.GroupBuilder, activeStep: number, edit: true}) => void;
   handleClose: () => void;
 };
 
@@ -57,7 +57,7 @@ const AddGroup: React.FC<AddGroupProps> = ({open, handleClose, handleConf}) => {
   };
   const onTab = () => {
     onClose()
-    handleConf(group, activeStep)
+    handleConf({builder: group, activeStep, edit: true})
   }
 
   const handleFinish = () => {

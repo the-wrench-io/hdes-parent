@@ -18,7 +18,7 @@ import ConfigureProjectSummary from './ConfigureProjectSummary';
 
 type AddProjectProps = {
   open: boolean;
-  handleConf: (project: Backend.ProjectBuilder, step: number) => void;
+  handleConf: (conf: {builder: Backend.ProjectBuilder, activeStep: number, edit: true}) => void;
   handleClose: () => void;
 };
 
@@ -57,7 +57,7 @@ const AddProject: React.FC<AddProjectProps> = ({open, handleClose, handleConf}) 
   };
   const onTab = () => {
     onClose()
-    handleConf(project, activeStep)
+    handleConf({builder: project, activeStep, edit: true})
   }
 
   const handleFinish = () => {

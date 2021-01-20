@@ -7,7 +7,7 @@ import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 
 import DateFormat from './DateFormat';
-import { Backend, Resources } from '.././Resources';
+import { Backend, Mapper } from '.././Resources';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -61,7 +61,7 @@ interface SummaryProps {
 
 const Summary: React.FC<SummaryProps> = ({resource}) => {
   const classes = useStyles();
-  const view = new Resources.Mapper<View>(resource)
+  const view = new Mapper.Resource<View>(resource)
     .project(resource => ({
       name: resource.project.name,
       created: resource.project.created,
