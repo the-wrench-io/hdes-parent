@@ -56,8 +56,12 @@ class GenericInstance implements Session.Instance {
     
     const newTab = newTabOrTabIndex as Session.Tab;
     const alreadyOpen = this.findTab(newTab.id);
-    if(alreadyOpen !== undefined) {
+    const updateTab = alreadyOpen !== undefined && !this.tabs[alreadyOpen].edit && newTab.edit === true;
+    if(alreadyOpen && !updateTab) {
       return this.next({ previous: this.history, open: alreadyOpen });
+    }
+    if(updateTab) {
+      return this.deleteTab(newTab.id).withTab(newTab);
     }
     return this.next({ previous: this.history, open: this.tabs.length}, this.tabs.concat(newTab));
   }

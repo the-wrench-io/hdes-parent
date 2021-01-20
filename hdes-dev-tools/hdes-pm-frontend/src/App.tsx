@@ -47,12 +47,13 @@ const makeDialogs = () => {
 
 
 function App() {
-  const { session, setSession } = React.useContext(Resources.Context);
-  const [ resourceSaved, setResourceSaved ] = React.useState<undefined | Backend.AnyResource>();
-
   const classes = useStyles();
   const dialogs = makeDialogs();
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);  
+
+  
+  const { session, setSession } = React.useContext(Resources.Context);
+  const [ resourceSaved, setResourceSaved ] = React.useState<undefined | Backend.AnyResource>();
 
   const handleSearchFor = (keyword: string) => {
     if(keyword.length > 0) {

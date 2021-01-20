@@ -70,7 +70,7 @@ const ConfigureProjectInTab = (
       setProject={setProject} 
       getProject={getProject} />);
   }
-  return {id, label, panel, data: init};
+  return {id, label, panel, data: init, edit};
 };
 
 export default ConfigureProjectInTab;

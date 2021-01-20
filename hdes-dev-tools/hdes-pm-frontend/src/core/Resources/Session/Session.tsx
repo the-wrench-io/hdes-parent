@@ -5,6 +5,7 @@ declare namespace Session {
     label: string;
     panel: (instance: Instance) => React.ReactNode;
     data?: any;
+    edit?: boolean;
   }
   
   interface History {
