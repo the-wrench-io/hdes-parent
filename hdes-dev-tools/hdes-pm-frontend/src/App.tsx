@@ -47,7 +47,7 @@ const makeDialogs = () => {
 
 
 function App() {
-  const { service, session, setSession } = React.useContext(Resources.Context);
+  const { session, setSession } = React.useContext(Resources.Context);
   const [ resourceSaved, setResourceSaved ] = React.useState<undefined | Backend.AnyResource>();
 
   const classes = useStyles();
