@@ -65,24 +65,22 @@ function App() {
     return index ? session.withTab(index) : session.withDialog(id);
   });
   
-  const onConfirm = (
-    tabId: string, resource: Backend.AnyResource) => {
-    setResourceSaved(resource);
-    setSession((session) => session.deleteTab(tabId));
-  };
-  
-  
   const handleDialogClose = () => setSession((session) => session.withDialog());
   const changeTab = (index: number) => setSession((session) => session.withTab(index));
   const addTab = (newItem: Session.Tab) => setSession((session) => session.withTab(newItem));
   const setTabData = (id: string, updateCommand: (oldData: any) => any) => setSession((session) => session.withTabData(id, updateCommand))
 
   const openInTab = (props: {builder: Backend.AnyBuilder, edit?: boolean, activeStep?: number}) => {
+    const onConfirm = (tabId: string, resource: Backend.AnyResource) => {
+      setResourceSaved(resource);
+      setSession((session) => session.deleteTab(tabId));
+    };
     const tab: Session.Tab = new Mapper.Builder<Session.Tab>(props.builder)
-      .project(project => ConfigureProjectInTab(setTabData, onConfirm, dialogs.project.id, project, props.activeStep))
+      .project(project => ConfigureProjectInTab(setTabData, onConfirm, dialogs.project.id, project, props.edit, props.activeStep))
       .group(group => ConfigureGroupInTab(setTabData, onConfirm, dialogs.group.id, group, props.activeStep))
       .user(user => ConfigureUserInTab(setTabData, onConfirm, dialogs.user.id, user, props.activeStep))
       .map();
+      
     addTab(tab);
   }
   
@@ -104,22 +102,17 @@ function App() {
       </Paper>
     </Grid>);
   
-  const views = [
-    { label: 'Dashboard', icon: <AppsOutlinedIcon />, onClick: listDashboard},
-    { label: 'List Groups', icon: <GroupOutlinedIcon />, onClick: listGroups},
-    { label: 'List Users', icon: <PersonOutlineOutlinedIcon />, onClick: listUsers},
-    { label: 'List Projects', icon: <LibraryBooksOutlinedIcon />, onClick: listProjects}
-  ];
-
   return (<React.Fragment>
     <ResourceSaved resource={resourceSaved} onClose={() => setResourceSaved(undefined)}/>
     <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={openInTab} />
     <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={openInTab}/>
     <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} handleConf={openInTab}/>
   
-    <Shell init={0}
-      session={session} 
-      views={views}
+    <Shell init={0} session={session} views={[
+        { label: 'Dashboard', icon: <AppsOutlinedIcon />, onClick: listDashboard},
+        { label: 'List Groups', icon: <GroupOutlinedIcon />, onClick: listGroups},
+        { label: 'List Users', icon: <PersonOutlineOutlinedIcon />, onClick: listUsers},
+        { label: 'List Projects', icon: <LibraryBooksOutlinedIcon />, onClick: listProjects} ]}
       dialogs={{items: [dialogs.group, dialogs.user, dialogs.project], onClick: handleDialogOpen}}
       tabs={{items: session.tabs, active: session.history.open, onClick: changeTab }} 
       search={{ onChange: handleSearchFor }} />

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Backend, Session } from '.././Resources';
 import ConfigureProject from './ConfigureProject';
+import ConfigureProjectSummary from './ConfigureProjectSummary';
 
 
 class TabData {
@@ -30,7 +31,8 @@ const ConfigureProjectInTab = (
   setData: (id: string, updateCommand: (oldData: any) => any) => void,
   onConfirm: (tabId: string, project: Backend.ProjectResource) => void,
   defaultId: string, 
-  project: Backend.ProjectBuilder, 
+  project: Backend.ProjectBuilder,
+  edit?: boolean, 
   activeStep?: number): Session.Tab => {
   
   const id: string = project.id ? project.id : defaultId;
@@ -38,6 +40,11 @@ const ConfigureProjectInTab = (
   const init = new TabData(project, activeStep ? activeStep : 0);
 
   const panel = (session: Session.Instance) => {
+    
+    if(!edit) {
+      return (<ConfigureProjectSummary project={project} />);
+    }
+    
     const getProject = (): Backend.ProjectBuilder => {
       const data = session.getTabData(id) as TabData;
       return data.project;
@@ -56,7 +63,6 @@ const ConfigureProjectInTab = (
       setData(id, (oldData: TabData) => oldData.withActiveStep(command(oldData.activeStep)));
     };
 
-    
     return (<ConfigureProject 
       onConfirm={(resource) => onConfirm(id, resource)}
       getActiveStep={getActiveStep} 

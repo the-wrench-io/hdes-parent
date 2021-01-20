@@ -15,7 +15,7 @@ import PersonOutlinedIcon from '@material-ui/icons/PersonOutlined';
 import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 
 
-import { Backend } from '.././Resources';
+import { Resources, Backend } from '.././Resources';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -31,27 +31,41 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ConfigureProjectSummaryProps {
   project: Backend.ProjectBuilder;
-  users: Backend.UserResource[];
-  groups: Backend.GroupResource[];
+  users?: Backend.UserResource[];
+  groups?: Backend.GroupResource[];
 };
 
 const ConfigureProjectSummary: React.FC<ConfigureProjectSummaryProps> = (props) => {
   const classes = useStyles();
   
+  const { service } = React.useContext(Resources.Context);
+  const [openUsers, setOpenUsers] = React.useState(true);
+  const [openGroups, setOpenGroups] = React.useState(true);
+  const [users, setUsers] = React.useState<Backend.UserResource[] | undefined>(props.users);
+  const [groups, setGroups] = React.useState<Backend.GroupResource[] | undefined>(props.groups);
+
+  React.useEffect(() => {
+    if(!users || !groups) {
+      service.users.query().onSuccess(setUsers)
+      service.groups.query().onSuccess(setGroups)
+    }
+  }, [service, service.users, service.groups, groups, users])
+
+  if(!users || !groups) {
+    return <div>Loading...</div>;
+  }
+  
   const groupUsers: React.ReactNode[] = [];
   let groupUsersTotal = 0;
   for(const id of props.project.groups) {
-    const group = props.groups.filter(p => p.group.id === id)[0];
+    const group = groups.filter(p => p.group.id === id)[0];
     const children: Backend.Project[] = Object.values(group.users);
     groupUsersTotal += children.length;
     children.forEach((p, key) => groupUsers.push(<ListItem key={`${key}-${group.group.id}`} button className={classes.nested}>
         <ListItemIcon><PersonOutlinedIcon /></ListItemIcon>
-        <ListItemText primary={`${p.name} - inherited: ${group.group.name}`} />
+        <ListItemText primary={`${p.name} - from group access: ${group.group.name}`} />
       </ListItem>));
   }
-     
-  const [openUsers, setOpenUsers] = React.useState(true);
-  const [openGroups, setOpenGroups] = React.useState(true);
 
   return (<div className={classes.root}>
     <List className={classes.root} component="nav" 
@@ -61,25 +75,25 @@ const ConfigureProjectSummary: React.FC<ConfigureProjectSummaryProps> = (props) 
       <Divider />
       
       <ListItem button onClick={() => setOpenGroups(!openGroups)}>
-        <ListItemText primary={`Groups to join: (${props.project.groups.length})`} />
+        <ListItemText primary={`Groups that have access: (${props.project.groups.length})`} />
         {openGroups ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
       <Collapse in={openGroups} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {props.project.groups
-            .map(id => props.groups.filter(p => p.group.id === id)[0].group)
+            .map(id => groups.filter(p => p.group.id === id)[0].group)
             .map(p => <ListItem key={p.id} button className={classes.nested}><ListItemIcon><GroupOutlinedIcon /></ListItemIcon><ListItemText primary={p.name} /></ListItem>)}
         </List>
       </Collapse>
 
       <ListItem button onClick={() => setOpenUsers(!openUsers)}>
-        <ListItemText primary={`Users to join: (${props.project.users.length + groupUsersTotal})`} />
+        <ListItemText primary={`Users that have access: (${props.project.users.length + groupUsersTotal})`} />
         {openUsers ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
       <Collapse in={openUsers} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {props.project.users
-            .map(id => props.users.filter(p => p.user.id === id)[0].user)
+            .map(id => users.filter(p => p.user.id === id)[0].user)
             .map(p => <ListItem key={p.id} button className={classes.nested}><ListItemIcon><PersonOutlinedIcon /></ListItemIcon><ListItemText primary={p.name} /></ListItem>)}
           {groupUsers}
         </List>
