@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Backend, Session } from '.././Resources';
+import { Backend, Session, Resources } from '.././Resources';
 import ConfigureProject from './ConfigureProject';
 import ConfigureProjectSummary from './ConfigureProjectSummary';
 
@@ -27,9 +27,9 @@ class TabData {
   }
 }
 
+interface PanelProps {}
+
 const ConfigureProjectInTab = (
-  setData: (id: string, updateCommand: (oldData: any) => any) => void,
-  onConfirm: (tabId: string, project: Backend.ProjectResource) => void,
   defaultId: string, 
   project: Backend.ProjectBuilder,
   edit?: boolean, 
@@ -39,8 +39,11 @@ const ConfigureProjectInTab = (
   const label: string = project.id ? project.name + '' : 'add project';
   const init = new TabData(project, activeStep ? activeStep : 0);
 
-  const panel = (session: Session.Instance) => {
+  const Panel: React.FC<PanelProps> = () => {
     
+    const { session, setSession } = React.useContext(Resources.Context);
+    const setTabData = (c: (oldData: any) => any) => setSession((session) => session.setTabData(id, c))
+
     if(!edit) {
       return (<ConfigureProjectSummary project={project} />);
     }
@@ -51,7 +54,7 @@ const ConfigureProjectInTab = (
     };  
     
     const setProject = (project: Backend.ProjectBuilder): void => {
-      setData(id, (oldData: TabData) => oldData.withProject(project));
+      setTabData((oldData: TabData) => oldData.withProject(project));
     };
     
     const getActiveStep = (): number => {
@@ -60,17 +63,21 @@ const ConfigureProjectInTab = (
     }  
   
     const setActiveStep = (command: (old: number) => number): void => {
-      setData(id, (oldData: TabData) => oldData.withActiveStep(command(oldData.activeStep)));
+      setTabData((oldData: TabData) => oldData.withActiveStep(command(oldData.activeStep)));
     };
 
+
+
     return (<ConfigureProject 
-      onConfirm={(resource) => onConfirm(id, resource)}
+      onConfirm={(resource) => setSession((session) => session.onConfirm(id, resource))}
       getActiveStep={getActiveStep} 
       setActiveStep={setActiveStep} 
       setProject={setProject} 
       getProject={getProject} />);
   }
-  return {id, label, panel, data: init, edit};
+  
+  
+  return {id, label, panel: <Panel />, data: init, edit};
 };
 
 export default ConfigureProjectInTab;

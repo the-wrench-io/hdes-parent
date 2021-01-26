@@ -3,20 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.resys.hdes</groupId>
-    <artifactId>hdes-build-parent</artifactId>
+    <artifactId>hdes-quarkus-plugins</artifactId>
     <version>999-SNAPSHOT</version>
-    <relativePath>../hdes-build-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>hdes-dev-tools</artifactId>
+  <artifactId>hdes-projects-quarkus-parent</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>hdes-pm-repo</module>
-    <module>hdes-object-repo</module>
-    <module>hdes-object-repo-mongodb</module>
-    <module>hdes-ui-frontend</module>
-    <module>hdes-ui-backend</module>
+    <module>deployment</module>
+    <module>runtime</module>
   </modules>
 
 </project>

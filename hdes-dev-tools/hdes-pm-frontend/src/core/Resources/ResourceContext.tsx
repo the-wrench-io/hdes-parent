@@ -1,11 +1,11 @@
 import * as React from "react";
 import { Backend, DemoService } from './Backend';
-import { Session, createSession } from './Session';
+import { Session, createSession, sessionReducer, sessionActions, SessionAction } from './Session';
 
 type ResourceContextType = {
   service: Backend.Service;
   session: Session.Instance;
-  setSession: ( command: (session: Session.Instance) => Session.Instance  ) => void;
+  setSession: (command: (mutator: typeof sessionActions) => SessionAction) => void;
   updates?: Date;
 }
 
@@ -15,7 +15,7 @@ const startSession = createSession();
 const ResourceContext = React.createContext<ResourceContextType>({
   service: demoService,
   session: startSession,
-  setSession: (current) => current 
+  setSession: (command) => console.log(command) 
 });
 
 type ResourceProviderProps = {
@@ -25,15 +25,13 @@ type ResourceProviderProps = {
 
 
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ config, children }) => {
-  const [service, setService] = React.useState<Backend.Service>(demoService);
-  const [session, setSession] = React.useState<Session.Instance>(startSession);
-  
-  React.useEffect(() => service.onUpdate((newService: Backend.Service) => setService(newService)), [config, service])
+
+  const [session, sessionDispatch] = React.useReducer(sessionReducer, startSession);
   
   return (
     <ResourceContext.Provider value={{
-      service, session, 
-      setSession: (command: (session: Session.Instance) => Session.Instance) => setSession((prev) => command(prev))
+      service: demoService, 
+      session, setSession: (command) => sessionDispatch(command(sessionActions))
     }}>
       {children}
     </ResourceContext.Provider>

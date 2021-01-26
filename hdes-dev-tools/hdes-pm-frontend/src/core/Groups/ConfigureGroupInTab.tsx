@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Backend, Session } from '.././Resources';
+import { Backend, Session, Resources } from '.././Resources';
 import ConfigureGroup from './ConfigureGroup';
 import ConfigureGroupSummary from './ConfigureGroupSummary';
 
@@ -27,9 +27,9 @@ class TabData {
   }
 }
 
+interface PanelProps {}
+
 const ConfigureGroupInTab = (
-  setData: (id: string, updateCommand: (oldData: any) => any) => void,
-  onConfirm: (tabId: string, group: Backend.GroupResource) => void,
   defaultId: string, 
   group: Backend.GroupBuilder,
   edit?: boolean,  
@@ -39,20 +39,21 @@ const ConfigureGroupInTab = (
   const label: string = group.id ? group.name + '' : 'add group';
   const init = new TabData(group, activeStep ? activeStep : 0);
       
-  const panel = (session: Session.Instance) => {
-    
+  const Panel: React.FC<PanelProps> = () => {
+    const { session, setSession } = React.useContext(Resources.Context);
+    const setData = (c: (oldData: any) => any) => setSession((session) => session.setTabData(id, c))
+
     if(!edit) {
       return (<ConfigureGroupSummary group={group} />);
     }
-    
-    
+
     const getGroup = (): Backend.GroupBuilder => {
       const data = session.getTabData(id) as TabData;
       return data.group;
     };  
     
     const setGroup = (group: Backend.GroupBuilder): void => {
-      setData(id, (oldData: TabData) => oldData.withGroup(group));
+      setData((oldData: TabData) => oldData.withGroup(group));
     };
     
     const getActiveStep = (): number => {
@@ -61,17 +62,17 @@ const ConfigureGroupInTab = (
     }  
   
     const setActiveStep = (command: (old: number) => number): void => {
-      setData(id, (oldData: TabData) => oldData.withActiveStep(command(oldData.activeStep)));
+      setData((oldData: TabData) => oldData.withActiveStep(command(oldData.activeStep)));
     };
 
     return (<ConfigureGroup
-      onConfirm={(resource) => onConfirm(id, resource)}
+      onConfirm={(resource) => setSession((session) => session.onConfirm(id, resource))}
       getActiveStep={getActiveStep} 
       setActiveStep={setActiveStep} 
       setGroup={setGroup} 
       getGroup={getGroup} />);
   };
-  return {id, label, panel, data: init};
+  return {id, label, panel: <Panel />, data: init};
 };
 
 export default ConfigureGroupInTab;

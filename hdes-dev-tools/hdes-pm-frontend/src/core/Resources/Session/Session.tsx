@@ -3,7 +3,7 @@ declare namespace Session {
   interface Tab {
     id: string;
     label: string;
-    panel: (instance: Instance) => React.ReactNode;
+    panel: React.ReactNode;
     data?: any;
     edit?: boolean;
   }

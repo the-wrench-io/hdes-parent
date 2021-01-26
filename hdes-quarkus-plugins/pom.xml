@@ -5,15 +5,14 @@
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-build-parent</artifactId>
     <version>999-SNAPSHOT</version>
-    <relativePath>../../hdes-build-parent/pom.xml</relativePath>
+    <relativePath>../hdes-build-parent/pom.xml</relativePath>
   </parent>
 
-  <artifactId>hdes-ui</artifactId>
+  <artifactId>hdes-quarkus-plugins</artifactId>
   <packaging>pom</packaging>
 
   <modules>
-    <module>hdes-ui-frontend</module>
-    <module>hdes-ui-backend</module>
+    <module>hdes-projects-quarkus-parent</module>
     <module>hdes-ui-quarkus-parent</module>
   </modules>
 

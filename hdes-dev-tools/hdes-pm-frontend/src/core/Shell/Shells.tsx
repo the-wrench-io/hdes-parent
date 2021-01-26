@@ -23,13 +23,11 @@ import NotificationsIcon from '@material-ui/icons/Notifications';
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
 
-import { Session } from './../Resources';
 import ShellStyles from './ShellStyles' 
 
 
 
 interface ShellProps {
-  session: Session.Instance,
   init: number,
   dialogs: {
     items: { id: string, label: string, icon: React.ReactNode }[],
@@ -43,7 +41,7 @@ interface ShellProps {
   tabs: {
     active?: number,
     onClick: (index: number) => void,
-    items: { label: string, panel: (session: any) => React.ReactNode }[]
+    items: { label: string, panel: React.ReactNode }[]
   },
   search: {
     onChange: (keyword: string) => void,
@@ -70,7 +68,7 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
   );
 }
 
-const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs, search}) => {
+const Shell: React.FC<ShellProps> = ({dialogs, views, tabs, search}) => {
   
   const classes = ShellStyles();
   
@@ -80,7 +78,7 @@ const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs, search}) =>
   const handleDrawerClose = () => setDrawerOpen(false);
   
   // external data 
-  const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => tabs.onClick(newValue);
+  const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => tabs.onClick(newValue);
   
   React.useEffect(() => {
     if(tabs.items.length === 0) {
@@ -166,7 +164,7 @@ const Shell: React.FC<ShellProps> = ({session, dialogs, views, tabs, search}) =>
         <Container maxWidth="lg" className={classes.container}>
           { tabs.items.map((tab, index) => (
               <TabPanel key={index} index={index} value={tabs.active ? tabs.active : 0}>
-                {tab.panel(session)}
+                {tab.panel}
               </TabPanel>)
             )
           }
