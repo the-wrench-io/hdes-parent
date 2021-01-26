@@ -1,8 +1,8 @@
 ---
-name: "Hdes UI"
+name: "Hdes Projects"
 metadata:
   keywords:
-  - "hdes-ui"
+  - "hdes-projects"
   guide: ""
   status: stable
   unlisted: true
