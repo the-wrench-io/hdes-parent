@@ -94,12 +94,8 @@
         <artifactId>hdes-ui-quarkus</artifactId>
         <version>${project.version}</version>
       </dependency>
-      
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-pm</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+
+
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-pm-frontend</artifactId>
@@ -112,9 +108,15 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-pm-runtime</artifactId>
+        <artifactId>hdes-projects-quarkus</artifactId>
+        <version>${project.version}</version>
+      </dependency>      
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-projects-quarkus</artifactId>
         <version>${project.version}</version>
       </dependency>
+      
     </dependencies>
   </dependencyManagement>
 </project>

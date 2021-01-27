@@ -12,6 +12,8 @@
 	<artifactId>hdes-projects-quarkus-deployment</artifactId>
 
 	<dependencies>
+  
+  <!-- 
 		<dependency>
 			<groupId>io.resys.hdes</groupId>
 			<artifactId>hdes-ui-frontend</artifactId>
@@ -22,9 +24,10 @@
 			<artifactId>hdes-ui-backend</artifactId>
 			<scope>compile</scope>
 		</dependency>
+     -->
 		<dependency>
 			<groupId>io.resys.hdes</groupId>
-			<artifactId>hdes-ui-quarkus</artifactId>
+			<artifactId>hdes-projects-quarkus</artifactId>
 		</dependency>
 
 		<dependency>

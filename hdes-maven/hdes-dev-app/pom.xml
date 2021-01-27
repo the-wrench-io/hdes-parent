@@ -36,10 +36,19 @@
       <artifactId>quarkus-core</artifactId>
     </dependency>
 
+<!--
+    <dependency>
+      <groupId>io.resys.hdes</groupId>
+      <artifactId>hdes-projects-quarkus</artifactId>
+    </dependency>
+
+ 
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-ui-quarkus</artifactId>
     </dependency>
+-->
+
   </dependencies>
 
   <build>

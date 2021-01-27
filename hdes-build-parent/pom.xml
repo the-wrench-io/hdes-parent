@@ -31,7 +31,7 @@
 
     <antlr.version>4.8-1</antlr.version>
 
-    <mongodb.version>4.1.1</mongodb.version>
+    <mongodb.version>3.12.7</mongodb.version>
     <javapoet.version>1.12.1</javapoet.version>
 
     <commons-io.version>2.5</commons-io.version>
@@ -288,10 +288,9 @@
       <!-- DB-s -->
       <dependency>
         <groupId>org.mongodb</groupId>
-        <artifactId>mongodb-driver-sync</artifactId>
+        <artifactId>mongo-java-driver</artifactId>
         <version>${mongodb.version}</version>
       </dependency>
-
 
       <!-- Commons -->
       <dependency>

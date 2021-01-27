@@ -12,11 +12,14 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hdes-pm-repo</module>
+    <module>hdes-pm-frontend</module>
+    <module>hdes-pm-backend</module>
     <module>hdes-object-repo</module>
     <module>hdes-object-repo-mongodb</module>
+    <!-- 
     <module>hdes-ui-frontend</module>
     <module>hdes-ui-backend</module>
+     -->
   </modules>
 
 </project>

@@ -54,6 +54,7 @@
     <module>hdes-core</module>
     <module>hdes-maven</module>
     <module>hdes-dev-tools</module>
+    <module>hdes-quarkus-plugins</module>
   </modules>
 
   <properties>

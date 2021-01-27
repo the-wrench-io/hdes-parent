@@ -34,14 +34,14 @@ import java.util.List;
 import java.util.function.Function;
 
 import io.quarkus.bootstrap.model.AppArtifact;
-import io.resys.hdes.ui.quarkus.runtime.HdesBackendRecorder;
+import io.resys.hdes.pm.quarkus.runtime.HdesProjectsRecorder;
 
 public class HdesArtifactResolver {
   private static final String META_INF_MANIFEST_MF = "META-INF/MANIFEST.MF";
   private final List<StoredUrl> pathList = new ArrayList<>();
 
   public HdesArtifactResolver() {
-    ClassLoader cl = HdesBackendRecorder.class.getClassLoader();
+    ClassLoader cl = HdesProjectsRecorder.class.getClassLoader();
     try {
       Enumeration<URL> res = cl.getResources(META_INF_MANIFEST_MF);
       while (res.hasMoreElements()) {

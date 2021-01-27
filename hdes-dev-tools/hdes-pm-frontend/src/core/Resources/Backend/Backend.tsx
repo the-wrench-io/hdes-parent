@@ -55,7 +55,8 @@ declare namespace Backend {
   }
   
   interface ProjectBuilder extends ResourceBuilder {
-    id?: string; 
+    id?: string;
+    rev?: string;
     name?: string; 
     groups: string[];
     users: string[];
@@ -77,6 +78,7 @@ declare namespace Backend {
   
   interface GroupBuilder extends ResourceBuilder {
     id?: string; 
+    rev?: string;
     name?: string; 
     projects: string[];
     users: string[];
@@ -100,6 +102,7 @@ declare namespace Backend {
   interface UserBuilder extends ResourceBuilder {
     id?: string; 
     name?: string; 
+    rev?: string;
     externalId?: string;
     token?: string;
     groups: string[];
