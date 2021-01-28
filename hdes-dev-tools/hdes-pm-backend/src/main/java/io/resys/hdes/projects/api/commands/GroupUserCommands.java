@@ -36,7 +36,6 @@ public interface GroupUserCommands {
     GroupUser id(String id) throws PmException;
     
     Optional<GroupUser> find(String id) throws PmException;
-    
     GroupUserQueryBuilder groupId(String groupId);
     GroupUserQueryBuilder userId(String userId);
     List<GroupUser> find() throws PmException;

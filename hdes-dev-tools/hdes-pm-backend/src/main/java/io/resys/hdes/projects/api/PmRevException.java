@@ -1,5 +1,7 @@
 package io.resys.hdes.projects.api;
 
+import java.util.function.Supplier;
+
 /*-
  * #%L
  * hdes-pm-repo
@@ -27,13 +29,13 @@ public class PmRevException extends RuntimeException {
   
   private final RevisionConflict conflict;
   
-  public PmRevException(RevisionConflict conflict, String message, Throwable cause) {
-    super(message, cause);
+  public PmRevException(RevisionConflict conflict, Supplier<String> msg, Throwable cause) {
+    super(msg.get(), cause);
     this.conflict = conflict;
   }
 
-  public PmRevException(RevisionConflict conflict, String message) {
-    super(message);
+  public PmRevException(RevisionConflict conflict, Supplier<String> msg) {
+    super(msg.get());
     this.conflict = conflict;
   }
   

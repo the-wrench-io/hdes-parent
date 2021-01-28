@@ -3,6 +3,7 @@ package io.resys.hdes.projects.spi.support;
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.Optional;
 
 /*-
@@ -57,12 +58,33 @@ public class RepoAssert {
       return Long.toHexString(timestamp);
     }
   }
-  
+
+  public static void notEmptyAtLeastOne(Supplier<String> message, String ...fields) {
+    for(String field : fields) {
+      if (field != null && !field.isBlank()) {
+        return;
+      }
+    }
+    throw new PmRepoException(getMessage(message));
+  }
+  public static void notEmptyAll(Supplier<String> message, String ...fields) {
+    for(String field : fields) {
+      if (field == null || field.isBlank()) {
+        break;
+      }
+    }
+    throw new PmRepoException(getMessage(message));
+  }
   public static void notNull(Object object, Supplier<String> message) {
     if (object == null) {
       throw new PmRepoException(getMessage(message));
     }
   }
+  public static void notEmpty(List<?> object, Supplier<String> message) {
+    if (object == null || object.isEmpty()) {
+      throw new PmRepoException(getMessage(message));
+    }
+  }  
   public static void notEmpty(String object, Supplier<String> message) {
     if (object == null || object.isBlank()) {
       throw new PmRepoException(getMessage(message));
@@ -72,6 +94,9 @@ public class RepoAssert {
     if (!expression) {
       throw new PmRepoException(getMessage(message));
     }
+  }
+  public static void fail(Supplier<String> message) {
+    throw new PmRepoException(getMessage(message));
   }
   private static String getMessage(Supplier<String> supplier) {
     return (supplier != null ? supplier.get() : null);

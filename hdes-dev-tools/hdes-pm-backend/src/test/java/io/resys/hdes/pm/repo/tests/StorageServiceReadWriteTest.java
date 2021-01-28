@@ -1,7 +1,5 @@
 package io.resys.hdes.pm.repo.tests;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.Assertions;
 
 /*-
@@ -26,12 +24,15 @@ import org.junit.jupiter.api.Assertions;
 
 import org.junit.jupiter.api.Test;
 
+import io.resys.hdes.projects.api.ImmutableBatchGroup;
+import io.resys.hdes.projects.api.ImmutableBatchProject;
+import io.resys.hdes.projects.api.ImmutableBatchUser;
 import io.resys.hdes.projects.api.PmRepository;
-import io.resys.hdes.projects.api.PmRepository.Access;
+import io.resys.hdes.projects.api.PmRepository.Group;
 import io.resys.hdes.projects.api.PmRepository.Project;
+import io.resys.hdes.projects.api.PmRepository.ProjectResource;
 import io.resys.hdes.projects.api.PmRepository.User;
-import io.resys.hdes.projects.api.commands.BatchCommands.ProjectResource;
-import io.resys.hdes.projects.api.commands.BatchCommands.UserResource;
+import io.resys.hdes.projects.api.PmRepository.UserResource;
 import io.resys.hdes.projects.spi.mongodb.MongoPmRepository;
 
 public class StorageServiceReadWriteTest {
@@ -39,60 +40,57 @@ public class StorageServiceReadWriteTest {
   @Test
   public void createProjectUserAndAccess() {
     MongoDbFactory.instance(transaction -> {
-      PmRepository repo = MongoPmRepository.builder().transaction(transaction).build();
+
+      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
       
       // Project create and find
-      Project project = repo.projects().create().name("scoring project 1").build();
-      Optional<Project> persistedProject = repo.projects().query().findByName(project.getName());
-      Assertions.assertEquals(project.getName(), persistedProject.get().getName());
+      Project project = repo.create().project(ImmutableBatchProject.builder().name("scoring project 1").build()).getProject();
+      Project persistedProject = repo.query().project().get(project.getName()).getProject();
+      Assertions.assertEquals(project.getName(), persistedProject.getName());
       
       // User create and find
-      User user = repo.users().create().value("admin-user").build();
-      Optional<User> persistedUser = repo.users().query().findByValue(user.getName());
-      Assertions.assertEquals(user.getName(), persistedUser.get().getName());
+      User user = repo.create().user(ImmutableBatchUser.builder().addProjects(persistedProject.getId()).name("admin-user").email("admin@trolls.com").build()).getUser();
+      UserResource persistedUser = repo.query().users().get(user.getName());
+      Assertions.assertEquals(user.getName(), persistedUser.getUser().getName());
+      Assertions.assertEquals(1, persistedUser.getAccess().size());
       
-      // Access create and find
-      Access access = repo.access().create().name("admin-user-access-to-project-1").userId(user.getId()).projectId(project.getId()).build();
-      Optional<Access> persisteAccess = repo.access().query().findByName(access.getName());
-      Assertions.assertEquals(access.getName(), persisteAccess.get().getName());
     });
   }
-  
+
   @Test
   public void createAndQueryUsersAndProjectBatch() {
     MongoDbFactory.instance(transaction -> {
-      PmRepository repo = MongoPmRepository.builder().transaction(transaction).build();
-      ProjectResource project = repo.batch().createProject()
-        .projectName("pricing-project")
-        .users("user-1", "user-2", "user-3")
-        .createUser(true)
-        .build();
-   
-      UserResource user1 = repo.batch().queryUsers().get("user-1");
-      Assertions.assertEquals(1, user1.getAccess().size());
-      Assertions.assertTrue(user1.getProjects().containsKey(project.getProject().getId()));
+      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
       
+      User user1 = repo.create().user(ImmutableBatchUser.builder().name("admin-user1").email("admin@trolls.com").build()).getUser();
+      User user2 = repo.create().user(ImmutableBatchUser.builder().name("admin-user2").email("admin@trolls.com").build()).getUser();
+      User user3 = repo.create().user(ImmutableBatchUser.builder().name("admin-user3").email("admin@trolls.com").build()).getUser();
+      
+      repo.create().project(ImmutableBatchProject.builder()
+          .name("pricing-project")
+          .addUsers(user1.getId(), user2.getId(), user3.getId())
+          .build());
+   
+      ProjectResource project = repo.query().project().get("pricing-project");
+      Assertions.assertEquals(3, project.getAccess().size());
     });
   }
-  
   
   @Test
   public void createAndQueryUsersGroupsAndProjectBatch() {
     MongoDbFactory.instance(transaction -> {
-      PmRepository repo = MongoPmRepository.builder().transaction(transaction).build();
+      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
       
-      ProjectResource project = repo.batch().createProject()
-        .projectName("pricing-project")
-        .groups("Group X1", "Group X2")
-        .createUser(true)
-        .build();
-   
-      repo.batch().createGroupUsers().createUser(true).users("user-1").groupId("Group X1").build();
+      Group group1 = repo.create().group(ImmutableBatchGroup.builder().name("admins-1").build()).getGroup();
+      Group group2 = repo.create().group(ImmutableBatchGroup.builder().name("admins-2").build()).getGroup();
+      Group group3 = repo.create().group(ImmutableBatchGroup.builder().name("admins-3").build()).getGroup();
       
-      UserResource user1 = repo.batch().queryUsers().get("user-1");
-      Assertions.assertEquals(1, user1.getAccess().size());
-      Assertions.assertEquals(1, user1.getGroupUsers().size());
-      Assertions.assertTrue(user1.getProjects().containsKey(project.getProject().getId()));
+      ProjectResource project = repo.create().project(ImmutableBatchProject.builder()
+          .name("pricing-project")
+          .addGroups(group1.getId(), group2.getId(), group3.getId())
+          .build());
+      
+      Assertions.assertEquals(3, project.getAccess().size());
       
     });
   }

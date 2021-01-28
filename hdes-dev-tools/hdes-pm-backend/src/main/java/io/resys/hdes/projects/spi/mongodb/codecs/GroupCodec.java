@@ -33,18 +33,14 @@ import io.resys.hdes.projects.api.PmRepository.Group;
 
 
 public class GroupCodec implements Codec<Group> {
-  
-  public static final String ID = "_id";
-  public static final String REV = "rev";
   public static final String NAME = "name";
-  private static final String CREATED = "created";
   
   @Override
   public void encode(BsonWriter writer, Group command, EncoderContext encoderContext) {
     writer.writeStartDocument();
-    writer.writeString(ID, command.getId());
-    writer.writeString(REV, command.getRev());
-    writer.writeString(CREATED, command.getCreated().toString());
+    writer.writeString(CodecUtil.ID, command.getId());
+    writer.writeString(CodecUtil.REV, command.getRev());
+    writer.writeString(CodecUtil.CREATED, command.getCreated().toString());
     writer.writeString(NAME, command.getName());
     writer.writeEndDocument();
   }
@@ -53,9 +49,9 @@ public class GroupCodec implements Codec<Group> {
   public Group decode(BsonReader reader, DecoderContext decoderContext) {
     reader.readStartDocument();
     Group result = ImmutableGroup.builder()
-      .id(reader.readString(ID))
-      .rev(reader.readString(REV))
-      .created(LocalDateTime.parse(reader.readString(CREATED)))
+      .id(reader.readString(CodecUtil.ID))
+      .rev(reader.readString(CodecUtil.REV))
+      .created(LocalDateTime.parse(reader.readString(CodecUtil.CREATED)))
       .name(reader.readString(NAME))
       .build();
     reader.readEndDocument();

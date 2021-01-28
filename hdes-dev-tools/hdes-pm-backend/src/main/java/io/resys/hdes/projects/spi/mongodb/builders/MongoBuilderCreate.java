@@ -1,0 +1,437 @@
+package io.resys.hdes.projects.spi.mongodb.builders;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import io.resys.hdes.projects.api.ImmutableAccess;
+import io.resys.hdes.projects.api.ImmutableConstraintViolation;
+import io.resys.hdes.projects.api.ImmutableGroup;
+import io.resys.hdes.projects.api.ImmutableGroupUser;
+import io.resys.hdes.projects.api.ImmutableProject;
+import io.resys.hdes.projects.api.ImmutableUser;
+import io.resys.hdes.projects.api.PmException;
+import io.resys.hdes.projects.api.PmException.ConstraintType;
+import io.resys.hdes.projects.api.PmException.ErrorType;
+import io.resys.hdes.projects.api.PmRepository.Access;
+import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupUser;
+import io.resys.hdes.projects.api.PmRepository.Project;
+import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery;
+import io.resys.hdes.projects.spi.mongodb.queries.MongoQueryDefault;
+import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper;
+import io.resys.hdes.projects.spi.support.RepoAssert;
+
+public class MongoBuilderCreate implements MongoBuilder {
+
+  private final MongoWrapper mongo;
+  private final MongoQuery query;
+  private final ImmutableMongoBuilderTree.Builder collect;
+  
+  public MongoBuilderCreate(MongoWrapper mongo) {
+    this.mongo = mongo;
+    this.query = new MongoQueryDefault(mongo);
+    this.collect = ImmutableMongoBuilderTree.builder();
+  }
+
+  @Override
+  public MongoBuilderTree build() {
+    return collect.build();
+  }
+  
+  @Override
+  public ProjectVisitor visitProject() {
+    return new ProjectVisitor() {
+      private String name;
+      private List<String> users;
+      private List<String> groups;
+      
+      @Override
+      public Project build() throws PmException {
+        RepoAssert.notEmpty(name, () -> "name not defined!");
+        Optional<Project> conflict = query.project().name(name).findOne();
+        if(conflict.isPresent()) {
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(conflict.get().getId())
+              .rev(conflict.get().getRev())
+              .constraint(ConstraintType.NOT_UNIQUE)
+              .type(ErrorType.PROJECT)
+              .build(), () -> "entity: 'project' with name: '" + name + "' already exists!");
+        }
+        
+        Project project = ImmutableProject.builder()
+            .id(UUID.randomUUID().toString())
+            .rev(UUID.randomUUID().toString())
+            .name(name)
+            .created(LocalDateTime.now())
+            .build();
+        
+        mongo.getDb().getCollection(mongo.getConfig().getProjects(), Project.class).insertOne(project);
+
+        mongo.getDb().getCollection(mongo.getConfig().getProjects(), Project.class).find()
+        .forEach((Consumer<Project>) x -> {
+          System.out.println(x);
+        });;
+
+        
+        collect.putProject(project.getId(), project);
+        
+        if(users != null) {
+          this.users.stream()
+            .map(id -> query.user().id(id).get())
+            .forEach(user -> visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
+        }
+        if(groups != null) {
+          this.groups.stream()
+            .map(id -> query.group().id(id).get())
+            .forEach(group -> visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
+        }
+        return project;
+      }
+      @Override
+      public ProjectVisitor visit(Project project) {
+        return visitId(project.getId())
+            .visitRev(project.getRev())
+            .visitName(project.getName());
+      }
+      @Override
+      public ProjectVisitor visitUsers(List<String> users) {
+        this.users = users;
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitGroups(List<String> groups) {
+        this.groups = groups;
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitName(String name) {
+        this.name = name;
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitRev(String rev) {
+        RepoAssert.fail(() -> "rev can't be defined!");
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitId(String id) {
+        RepoAssert.fail(() -> "id can't be defined!");
+        return this;
+      }
+    };
+  }
+  @Override
+  public GroupVisitor visitGroup() {
+    return new GroupVisitor() {
+      private String name;
+      private List<String> users;
+      private List<String> projects;
+      
+      @Override
+      public Group build() {
+        RepoAssert.notEmpty(name, () -> "name not defined!");
+        Optional<Group> conflict = query.group().name(name).findOne();
+        if(conflict.isPresent()) {
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(conflict.get().getId())
+              .rev(conflict.get().getRev())
+              .constraint(ConstraintType.NOT_UNIQUE)
+              .type(ErrorType.GROUP)
+              .build(), () -> "entity: 'group' with name: '" + name + "' already exists!");
+        }
+        
+        Group group = ImmutableGroup.builder()
+            .id(UUID.randomUUID().toString())
+            .rev(UUID.randomUUID().toString())
+            .name(name)
+            .created(LocalDateTime.now())
+            .build();
+        
+        mongo.getDb().getCollection(mongo.getConfig().getGroups(), Group.class).insertOne(group);
+        collect.putGroups(group.getId(), group);
+        
+        if(users != null) {
+          this.users.stream()
+            .map(id -> query.user().id(id).get())
+            .forEach(user -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
+        }
+        if(projects != null) {
+          this.projects.stream()
+            .map(id -> query.project().id(id).get())
+            .forEach(project -> visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
+        }
+        return group;
+      }
+      @Override
+      public GroupVisitor visit(Group entity) {
+        return visitName(entity.getName());
+      }
+      @Override
+      public GroupVisitor visitUsers(List<String> users) {
+        this.users = users;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitProjects(List<String> projects) {
+        this.projects = projects;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitName(String name) {
+        this.name = name;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitRev(String rev) {
+        RepoAssert.fail(() -> "rev can't be defined!");
+        return this;
+      }
+      @Override
+      public GroupVisitor visitId(String id) {
+        RepoAssert.fail(() -> "id can't be defined!");
+        return this;
+      }
+    };
+  }
+  @Override
+  public UserVisitor visitUser() {
+    return new UserVisitor() {
+      private String name;
+      private String email;
+      private String externalId;
+      private List<String> groups;
+      private List<String> projects;
+      
+      @Override
+      public User build() {
+        RepoAssert.notEmpty(name, () -> "name not defined!");
+        RepoAssert.notEmpty(email, () -> "email not defined!");
+
+        Optional<User> conflict = query.user().name(name).findOne();
+        if(conflict.isPresent()) {
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(conflict.get().getId())
+              .rev(conflict.get().getRev())
+              .constraint(ConstraintType.NOT_UNIQUE)
+              .type(ErrorType.USER)
+              .build(), () -> "entity: 'user' with name: '" + name + "' already exists!");
+        }
+        
+        User user = ImmutableUser.builder()
+            .id(UUID.randomUUID().toString())
+            .rev(UUID.randomUUID().toString())
+            .name(name)
+            .externalId(Optional.ofNullable(externalId))
+            .email(email)
+            .token(UUID.randomUUID().toString())
+            .created(LocalDateTime.now())
+            .build();
+        
+        mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class).insertOne(user);
+        collect.putUser(user.getId(), user);
+        
+        if(groups != null) {
+          this.groups.stream()
+            .map(id -> query.group().id(id).get())
+            .forEach(group -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
+        }
+        if(projects != null) {
+          this.projects.stream()
+            .map(id -> query.project().id(id).get())
+            .forEach(project -> visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
+        }
+        return user;
+      }
+      @Override
+      public UserVisitor visitProjects(List<String> projects) {
+        this.projects = projects;
+        return this;
+      }
+      @Override
+      public UserVisitor visitName(String name) {
+        this.name = name;
+        return this;
+      }
+      @Override
+      public UserVisitor visitGroups(List<String> groups) {
+        this.groups = groups;
+        return this;
+      }
+      @Override
+      public UserVisitor visitEmail(String email) {
+        this.email = email;
+        return this;
+      }
+      @Override
+      public UserVisitor visitExternalId(String externalId) {
+        this.externalId = externalId;
+        return this;
+      }
+      @Override
+      public UserVisitor visitToken(String token) {
+        RepoAssert.fail(() -> "token can't be defined!");
+        return this;
+      }
+      @Override
+      public UserVisitor visit(User entity) {
+        return visitName(entity.getName())
+            .visitExternalId(entity.getExternalId().orElse(null))
+            .visitEmail(entity.getEmail());
+      }
+      @Override
+      public UserVisitor visitRev(String rev) {
+        RepoAssert.fail(() -> "rev can't be defined!");
+        return this;
+      }
+      @Override
+      public UserVisitor visitId(String id) {
+        RepoAssert.fail(() -> "id can't be defined!");
+        return this;
+      }
+    };
+  }
+
+  @Override
+  public GroupUserVisitor visitGroupUser() {
+    return new GroupUserVisitor() {
+      private String userId;
+      private String groupId;
+      @Override
+      public GroupUser build() {
+        RepoAssert.notEmpty(userId, () -> "userId not defined!");
+        RepoAssert.notEmpty(groupId, () -> "groupId not defined!");
+        Optional<GroupUser> conflict = query.groupUser().user(userId).group(groupId).findOne();
+        if(conflict.isPresent()) {
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(conflict.get().getId())
+              .rev(conflict.get().getRev())
+              .constraint(ConstraintType.NOT_UNIQUE)
+              .type(ErrorType.GROUP_USER)
+              .build(), () -> "entity: 'group user' with userId: '" + userId + "' and groupId: '" + groupId + "' already exists!");
+        }
+        
+        GroupUser groupUser = ImmutableGroupUser.builder()
+            .id(UUID.randomUUID().toString())
+            .rev(UUID.randomUUID().toString())
+            .userId(userId)
+            .groupId(groupId)
+            .created(LocalDateTime.now())
+            .build();
+        
+        mongo.getDb().getCollection(mongo.getConfig().getGroupUsers(), GroupUser.class).insertOne(groupUser);
+        collect.putGroupUsers(groupUser.getId(), groupUser);
+        return groupUser;
+      }
+      @Override
+      public GroupUserVisitor visitRev(String rev) {
+        RepoAssert.fail(() -> "rev can't be defined!");
+        return this;
+      }
+      @Override
+      public GroupUserVisitor visitId(String id) {
+        RepoAssert.fail(() -> "id can't be defined!");
+        return this;
+      }
+      @Override
+      public GroupUserVisitor visit(GroupUser entity) {
+        return visitUser(entity.getUserId())
+            .visitGroup(entity.getGroupId());
+      } 
+      @Override
+      public GroupUserVisitor visitUser(String userId) {
+        this.userId = userId;
+        return this;
+      }      
+      @Override
+      public GroupUserVisitor visitGroup(String groupId) {
+        this.groupId = groupId;
+        return this;
+      }
+    };
+  }
+
+  @Override
+  public AccessVisitor visitAccess() {
+    return new AccessVisitor() {
+      private String userId;
+      private String groupId;
+      private String projectId;
+      private String comment;
+      
+      @Override
+      public Access build() {
+        RepoAssert.notEmptyAtLeastOne(() -> "userId or groupId not defined!", groupId, userId);
+        RepoAssert.notEmpty(projectId, () -> "projectId not defined!");
+        
+        Optional<Access> conflict = query.access().project(projectId).user(userId).group(groupId).findOne();
+        if(conflict.isPresent()) {
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(conflict.get().getId())
+              .rev(conflict.get().getRev())
+              .constraint(ConstraintType.NOT_UNIQUE)
+              .type(ErrorType.ACCESS)
+              .build(), () -> "entity: 'access' with "
+                  + "projectId: '" + projectId + "' and "
+                  + "userId: '" + userId + "' and "
+                  + "groupId: '" + groupId  + "' and "
+                  + "userId: '" + userId  + "' already exists!");
+        }
+        
+        Access access = ImmutableAccess.builder()
+            .id(UUID.randomUUID().toString())
+            .rev(UUID.randomUUID().toString())
+            .userId(Optional.ofNullable(userId))
+            .groupId(Optional.ofNullable(groupId))
+            .projectId(projectId)
+            .comment(Optional.ofNullable(comment))
+            .created(LocalDateTime.now())
+            .build();
+        
+        mongo.getDb().getCollection(mongo.getConfig().getAccess(), Access.class).insertOne(access);
+        collect.putAccess(access.getId(), access);
+        return access;
+      }
+      @Override
+      public AccessVisitor visitUser(String userId) {
+        this.userId = userId;
+        return this;
+      }
+      @Override
+      public AccessVisitor visitProject(String projectId) {
+        this.projectId = projectId;
+        return this;
+      }
+      @Override
+      public AccessVisitor visitGroup(String groupId) {
+        this.groupId = groupId;
+        return this;
+      }
+      @Override
+      public AccessVisitor visitComment(String comment) {
+        this.comment = comment;
+        return this;
+      }
+      @Override
+      public AccessVisitor visit(Access entity) {
+        return visitComment(entity.getComment().orElse(null))
+            .visitGroup(entity.getGroupId().orElse(null))
+            .visitUser(entity.getUserId().orElse(null))
+            .visitProject(entity.getProjectId());
+      }
+      @Override
+      public AccessVisitor visitRev(String rev) {
+        RepoAssert.fail(() -> "rev can't be defined!");
+        return this;
+      }
+      @Override
+      public AccessVisitor visitId(String id) {
+        RepoAssert.fail(() -> "id can't be defined!");
+        return this;
+      }
+    };
+  }
+}

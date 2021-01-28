@@ -55,6 +55,8 @@ public interface ProjectCommands {
   
   interface ProjectCreateBuilder {
     ProjectCreateBuilder name(String name);
+    ProjectCreateBuilder users(List<String> users);
+    ProjectCreateBuilder groups(List<String> groups);
     Project build() throws PmException;
   }
 }

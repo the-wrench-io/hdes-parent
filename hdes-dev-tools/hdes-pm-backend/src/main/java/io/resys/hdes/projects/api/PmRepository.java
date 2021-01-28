@@ -22,24 +22,113 @@ package io.resys.hdes.projects.api;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.projects.api.commands.AccessCommands;
-import io.resys.hdes.projects.api.commands.BatchCommands;
-import io.resys.hdes.projects.api.commands.GroupCommands;
-import io.resys.hdes.projects.api.commands.ProjectCommands;
-import io.resys.hdes.projects.api.commands.UserCommands;
-
 public interface PmRepository {
 
-  ProjectCommands projects();
-  UserCommands users();
-  GroupCommands groups();
+  BatchBuilder update();
+  BatchBuilder create();
+  BatchDelete delete();
+  BatchQuery query();
+
+  interface BatchDelete {
+    Project project(String projectId, String rev);
+    Group group(String groupId, String rev);
+    User user(String userId, String rev);
+  }
   
-  AccessCommands access();
-  BatchCommands batch();
+  interface BatchBuilder {
+    ProjectResource project(BatchProject project);
+    GroupResource group(BatchGroup group);
+    UserResource user(BatchUser user);
+  }
+  
+  interface BatchQuery {
+    BatchUserQuery users();
+    BatchGroupQuery groups();
+    BatchProjectQuery project();
+  }
+  
+  interface BatchProjectQuery {
+    ProjectResource get(String idOrName);
+    ProjectResource get(String id, String rev);
+    List<ProjectResource> find();
+  }
+  
+  interface BatchUserQuery {
+    UserResource get(String idOrValueOrExternalIdOrToken);
+    List<UserResource> find();
+  }
+
+  interface BatchGroupQuery {
+    GroupResource get(String idOrName);
+    List<GroupResource> find();
+  }
+  
+  interface BatchResource extends Serializable {}
+  interface BatchMutator extends Serializable {
+    @Nullable
+    String getId();
+    @Nullable
+    String getRev();
+  }
+  
+  @Value.Immutable
+  interface BatchProject extends BatchMutator {
+    String getName();
+    List<String> getUsers();
+    List<String> getGroups();
+  }
+
+  @Value.Immutable
+  interface BatchGroup extends BatchMutator {
+    String getName();
+    List<String> getUsers();
+    List<String> getProjects();
+  }
+
+  @Value.Immutable
+  interface BatchUser extends BatchMutator {
+    String getName();
+    String getEmail();
+    @Nullable
+    String getExternalId();
+    List<String> getProjects();
+    List<String> getGroups();
+  }
+  
+  @Value.Immutable
+  interface ProjectResource extends BatchResource {
+    Project getProject();
+    Map<String, User> getUsers();
+    Map<String, Access> getAccess();
+    Map<String, Group> getGroups();
+    Map<String, GroupUser> getGroupUsers();
+  }
+  
+  @Value.Immutable
+  interface UserResource extends BatchResource {
+    User getUser();
+    Map<String, Project> getProjects();
+    Map<String, Access> getAccess();
+    Map<String, Group> getGroups();
+    Map<String, GroupUser> getGroupUsers();
+  }
+  
+  @Value.Immutable
+  interface GroupResource extends BatchResource {
+    Group getGroup();
+    Map<String, User> getUsers();
+    Map<String, Project> getProjects();
+    Map<String, Access> getAccess();
+    Map<String, GroupUser> getGroupUser();
+  }
   
   @Value.Immutable
   interface Project extends Serializable {
@@ -56,6 +145,7 @@ public interface PmRepository {
     LocalDateTime getCreated();
     Optional<String> getExternalId();
     String getName();
+    String getEmail();
     String getToken();
   }
   
@@ -82,7 +172,7 @@ public interface PmRepository {
     String getRev();
     LocalDateTime getCreated();
     String getProjectId();
-    String getName();
+    Optional<String> getComment();
     
     Optional<String> getUserId();
     Optional<String> getGroupId();

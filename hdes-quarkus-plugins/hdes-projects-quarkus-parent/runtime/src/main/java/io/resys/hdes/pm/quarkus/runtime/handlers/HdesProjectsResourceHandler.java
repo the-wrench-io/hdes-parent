@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import io.quarkus.arc.Arc;
 import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
+import io.resys.hdes.projects.api.ImmutableBatchProject;
 import io.resys.hdes.projects.api.ImmutableProject;
+import io.resys.hdes.projects.api.PmRepository.BatchProject;
 import io.resys.hdes.projects.api.PmRepository.Project;
-import io.resys.hdes.projects.api.commands.BatchCommands.BatchProject;
-import io.resys.hdes.projects.api.commands.BatchCommands.ProjectResource;
-import io.resys.hdes.projects.api.commands.ImmutableBatchProject;
+import io.resys.hdes.projects.api.PmRepository.ProjectResource;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -56,28 +56,28 @@ public class HdesProjectsResourceHandler implements Handler<RoutingContext>  {
     try {
       switch (event.request().method()) {
       case GET:
-        Collection<ProjectResource> defs = ctx.repo().batch().queryProjects().find();
+        Collection<ProjectResource> defs = ctx.repo().query().project().find();
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(defs)));    
         break;
         
       case DELETE:
         Project toDelete = ctx.reader().build(event.getBody().getBytes(), ImmutableProject.class);
-        Project deleted = ctx.repo().projects().delete().id(toDelete.getId()).rev(toDelete.getRev()).build();
+        Project deleted = ctx.repo().delete().project(toDelete.getId(), toDelete.getRev());
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(deleted)));    
         break;
         
       case POST:
         BatchProject create = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchProject.class);
-        ProjectResource created = ctx.repo().batch().createOrUpdateProject(create);
+        ProjectResource created = ctx.repo().create().project(create);
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(created)));    
         break;
         
       case PUT:
         BatchProject update = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchProject.class);
-        ProjectResource updated = ctx.repo().batch().createOrUpdateProject(update);
+        ProjectResource updated = ctx.repo().update().project(update);
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(updated)));    
         break;

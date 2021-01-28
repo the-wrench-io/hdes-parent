@@ -35,20 +35,19 @@ import io.resys.hdes.projects.api.PmRepository.User;
 
 public class UserCodec implements Codec<User> {
   
-  public static final String ID = "_id";
-  public static final String REV = "rev";
   public static final String EXTERNAL_ID = "externalId";
-  private static final String CREATED = "created";
+  public static final String EMAIL = "email";
   public static final String NAME = "name";
   public static final String TOKEN = "token";
   
   @Override
   public void encode(BsonWriter writer, User command, EncoderContext encoderContext) {
     writer.writeStartDocument();
-    writer.writeString(ID, command.getId());
-    writer.writeString(REV, command.getRev());
-    writer.writeString(CREATED, command.getCreated().toString());
+    writer.writeString(CodecUtil.ID, command.getId());
+    writer.writeString(CodecUtil.REV, command.getRev());
+    writer.writeString(CodecUtil.CREATED, command.getCreated().toString());
     writer.writeString(NAME, command.getName());
+    writer.writeString(EMAIL, command.getEmail());
     writer.writeString(TOKEN, command.getToken());  
     
     if (command.getExternalId().isPresent()) {
@@ -64,10 +63,11 @@ public class UserCodec implements Codec<User> {
   public User decode(BsonReader reader, DecoderContext decoderContext) {
     reader.readStartDocument();
     User result = ImmutableUser.builder()
-      .id(reader.readString(ID))
-      .rev(reader.readString(REV))
-      .created(LocalDateTime.parse(reader.readString(CREATED)))
+      .id(reader.readString(CodecUtil.ID))
+      .rev(reader.readString(CodecUtil.REV))
+      .created(LocalDateTime.parse(reader.readString(CodecUtil.CREATED)))
       .name(reader.readString(NAME))
+      .email(reader.readString(EMAIL))
       .token(reader.readString(TOKEN))
       .externalId(Optional.ofNullable(CodecUtil.readNull(EXTERNAL_ID, reader) ? null : reader.readString()))
       .build();

@@ -23,6 +23,7 @@ package io.resys.hdes.pm.repo.tests;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.bson.codecs.DocumentCodecProvider;
 import org.bson.codecs.ValueCodecProvider;
@@ -43,20 +44,32 @@ import de.flapdoodle.embed.mongo.config.Net;
 import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.runtime.Network;
 import io.resys.hdes.projects.spi.mongodb.codecs.PMCodecProvider;
-import io.resys.hdes.projects.spi.mongodb.commands.MongoPersistentCommand.MongoTransaction;
+import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper.MongoTransaction;
 
 public class MongoDbFactory {
   private static final MongodStarter starter = MongodStarter.getDefaultInstance();
   private MongodExecutable executable;
   private MongodProcess process;
   private MongoClient client;
+  
+  public static class MockMongoTransaction implements MongoTransaction {
+    private final MongoClient client;
+    public MockMongoTransaction(MongoClient client) {
+      super();
+      this.client = client;
+    }
+    @Override
+    public <T> T accept(Function<MongoClient, T> action) {
+      return action.apply(client);
+    }
+    
+  }
 
   public static void instance(Consumer<MongoTransaction> consumer) {
     MongoDbFactory config = new MongoDbFactory();
     try {
       config.setUp();
-      MongoTransaction transaction = r -> r.accept(config.client);
-      consumer.accept(transaction);
+      consumer.accept(new MockMongoTransaction(config.client));
     } finally {
       config.tearDown();
     }

@@ -1,6 +1,7 @@
 package io.resys.hdes.pm.quarkus.runtime;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
@@ -23,7 +24,7 @@ import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
 import io.resys.hdes.pm.quarkus.runtime.context.ImmutableHdesProjectsContext;
 import io.resys.hdes.projects.spi.mongodb.MongoPmRepository;
 import io.resys.hdes.projects.spi.mongodb.codecs.PMCodecProvider;
-import io.resys.hdes.projects.spi.mongodb.commands.MongoPersistentCommand.MongoTransaction;
+import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper.MongoTransaction;
 
 @ApplicationScoped
 public class HdesProjectsContextProducer {
@@ -33,6 +34,19 @@ public class HdesProjectsContextProducer {
   public HdesProjectsContextProducer setLocal(String connectionUrl) {
     this.connectionUrl = connectionUrl;
     return this;
+  }
+  
+  private static class MongoTransactionDefault implements MongoTransaction {
+    private final MongoClient client;
+    public MongoTransactionDefault(MongoClient client) {
+      super();
+      this.client = client;
+    }
+    @Override
+    public <T> T accept(Function<MongoClient, T> action) {
+      return action.apply(client);
+    }
+    
   }
 
   @Produces
@@ -56,10 +70,10 @@ public class HdesProjectsContextProducer {
         .build());
 
     ObjectMapper objectMapper = new ObjectMapper();
-    MongoTransaction transaction = (consumer) -> consumer.accept(client);    
+    MongoTransaction transaction = new MongoTransactionDefault(client);    
     return new ImmutableHdesProjectsContext(
         objectMapper,
-        MongoPmRepository.builder().transaction(transaction).build()
+        MongoPmRepository.config().transaction(transaction).build()
     );
   }
   

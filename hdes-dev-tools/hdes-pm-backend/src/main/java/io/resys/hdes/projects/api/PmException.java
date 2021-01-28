@@ -1,5 +1,7 @@
 package io.resys.hdes.projects.api;
 
+import java.util.function.Supplier;
+
 /*-
  * #%L
  * hdes-pm-repo
@@ -36,13 +38,13 @@ public class PmException extends RuntimeException {
     PROJECT, USER, ACCESS, GROUP, GROUP_USER
   }
   
-  public PmException(ConstraintViolation value, String message, Throwable cause) {
-    super(message, cause);
+  public PmException(ConstraintViolation value, Supplier<String> msg, Throwable cause) {
+    super(msg.get(), cause);
     this.value = value;
   }
 
-  public PmException(ConstraintViolation value, String message) {
-    super(message);
+  public PmException(ConstraintViolation value, Supplier<String> msg) {
+    super(msg.get());
     this.value = value;
   }
   

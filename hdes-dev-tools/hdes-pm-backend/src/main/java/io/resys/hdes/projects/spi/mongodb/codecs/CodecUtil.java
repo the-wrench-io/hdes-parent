@@ -24,7 +24,11 @@ import org.bson.BsonReader;
 import org.bson.BsonType;
 
 public class CodecUtil {
-
+  public static final String ID = "_id";
+  public static final String REV = "rev";
+  public static final String CREATED = "created";
+  
+  
   public static boolean readNull(String id, BsonReader reader) {
     reader.readName(id);
     if (reader.getCurrentBsonType() == BsonType.NULL) {

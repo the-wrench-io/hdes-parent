@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import io.quarkus.arc.Arc;
 import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
+import io.resys.hdes.projects.api.ImmutableBatchGroup;
 import io.resys.hdes.projects.api.ImmutableGroup;
+import io.resys.hdes.projects.api.PmRepository.BatchGroup;
 import io.resys.hdes.projects.api.PmRepository.Group;
-import io.resys.hdes.projects.api.commands.BatchCommands.BatchGroup;
-import io.resys.hdes.projects.api.commands.BatchCommands.GroupResource;
-import io.resys.hdes.projects.api.commands.ImmutableBatchGroup;
+import io.resys.hdes.projects.api.PmRepository.GroupResource;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -56,28 +56,28 @@ public class HdesGroupsResourceHandler implements Handler<RoutingContext>  {
     try {
       switch (event.request().method()) {
       case GET:
-        Collection<GroupResource> defs = ctx.repo().batch().queryGroups().find();
+        Collection<GroupResource> defs = ctx.repo().query().groups().find();
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(defs)));    
         break;
         
       case DELETE:
         Group toDelete = ctx.reader().build(event.getBody().getBytes(), ImmutableGroup.class);
-        Group deleted = ctx.repo().groups().delete().id(toDelete.getId()).rev(toDelete.getRev()).build();
+        Group deleted = ctx.repo().delete().group(toDelete.getId(), toDelete.getRev());
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(deleted)));    
         break;
         
       case POST:
         BatchGroup create = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchGroup.class);
-        GroupResource created = ctx.repo().batch().createOrUpdateGroup(create);
+        GroupResource created = ctx.repo().create().group(create);
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(created)));    
         break;
         
       case PUT:
         BatchGroup update = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchGroup.class);
-        GroupResource updated = ctx.repo().batch().createOrUpdateGroup(update);
+        GroupResource updated = ctx.repo().update().group(update);
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(updated)));    
         break;

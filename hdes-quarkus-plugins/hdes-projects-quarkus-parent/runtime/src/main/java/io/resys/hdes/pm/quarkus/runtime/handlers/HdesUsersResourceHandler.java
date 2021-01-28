@@ -32,11 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import io.quarkus.arc.Arc;
 import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
+import io.resys.hdes.projects.api.ImmutableBatchUser;
 import io.resys.hdes.projects.api.ImmutableUser;
+import io.resys.hdes.projects.api.PmRepository.BatchUser;
 import io.resys.hdes.projects.api.PmRepository.User;
-import io.resys.hdes.projects.api.commands.BatchCommands.BatchUser;
-import io.resys.hdes.projects.api.commands.BatchCommands.UserResource;
-import io.resys.hdes.projects.api.commands.ImmutableBatchUser;
+import io.resys.hdes.projects.api.PmRepository.UserResource;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -56,28 +56,28 @@ public class HdesUsersResourceHandler implements Handler<RoutingContext>  {
     try {
       switch (event.request().method()) {
       case GET:
-        Collection<UserResource> defs = ctx.repo().batch().queryUsers().find();
+        Collection<UserResource> defs = ctx.repo().query().users().find();
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(defs)));    
         break;
         
       case DELETE:
         User toDelete = ctx.reader().build(event.getBody().getBytes(), ImmutableUser.class);
-        User deleted = ctx.repo().users().delete().id(toDelete.getId()).rev(toDelete.getRev()).build();
+        User deleted = ctx.repo().delete().user(toDelete.getId(), toDelete.getRev());
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(deleted)));    
         break;
         
       case POST:
         BatchUser create = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchUser.class);
-        UserResource created = ctx.repo().batch().createOrUpdateUser(create);
+        UserResource created = ctx.repo().create().user(create);
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(created)));    
         break;
         
       case PUT:
         BatchUser update = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchUser.class);
-        UserResource updated = ctx.repo().batch().createOrUpdateUser(update);
+        UserResource updated = ctx.repo().update().user(update);
         response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
         response.end(Buffer.buffer(ctx.writer().build(updated)));    
         break;
