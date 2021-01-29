@@ -1,5 +1,6 @@
 package io.resys.hdes.projects.spi.mongodb.queries;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,7 @@ public interface MongoQuery {
     // set the query type to OR
     Q or();
     
+    Q id(Collection<String> id);
     Q id(String id);
     Q rev(String rev);
     
@@ -31,6 +33,7 @@ public interface MongoQuery {
     T get();
     Optional<T> findOne();
     List<T> findAll();
+    void delete();
     
     Bson filters();
   }
@@ -61,7 +64,10 @@ public interface MongoQuery {
   interface AccessQuery extends Query<AccessQuery, Access> {
     AccessQuery comment(String comment);
     AccessQuery user(String userId);
+    AccessQuery user(Collection<String> userId);
     AccessQuery group(String groupId);
+    AccessQuery group(Collection<String> groupId);
     AccessQuery project(String projectId);
+    AccessQuery project(Collection<String> projectId);
   }
 }

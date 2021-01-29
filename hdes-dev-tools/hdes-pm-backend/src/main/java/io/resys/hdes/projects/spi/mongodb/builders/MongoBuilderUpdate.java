@@ -1,7 +1,12 @@
 package io.resys.hdes.projects.spi.mongodb.builders;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.model.Updates;
 
@@ -32,7 +37,8 @@ import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper;
 import io.resys.hdes.projects.spi.support.RepoAssert;
 
 public class MongoBuilderUpdate implements MongoBuilder {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoBuilderUpdate.class);
+  
   private final MongoWrapper mongo;
   private final MongoQuery query;
   private final ImmutableMongoBuilderTree.Builder collect;
@@ -45,7 +51,13 @@ public class MongoBuilderUpdate implements MongoBuilder {
 
   @Override
   public MongoBuilderTree build() {
-    return collect.build();
+    MongoBuilderTree tree = collect.build();
+    if(LOGGER.isDebugEnabled()) {
+      LOGGER.debug(new StringBuilder()
+          .append("Tree has been UPDATED: ").append(System.lineSeparator())
+          .append(tree.toString()).toString());
+    }
+    return tree;
   }
   
   @Override
@@ -62,30 +74,68 @@ public class MongoBuilderUpdate implements MongoBuilder {
         RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);        
         RepoAssert.notEmpty(name, () -> "name not defined!");
         
-        QueryResultWithAccess<Project> queryResult = query.project().id(id).rev(rev).getWithFilter();
-
-        final var newRev = UUID.randomUUID().toString();
-        mongo.getDb().getCollection(mongo.getConfig().getProjects(), Project.class)
-          .updateOne(queryResult.getFilter(), Updates.combine(
-            Updates.set(ProjectCodec.NAME, name), 
-            Updates.set(CodecUtil.REV, newRev)));
-        
-        final var project = ImmutableProject.builder()
-            .from(queryResult.getValue())
-            .name(name).rev(newRev)
-            .build();
+        final var queryResult = query.project().id(id).rev(rev).getWithFilter();
+        final Project project;
+        if(name.equals(queryResult.getValue().getName())) {
+          project = queryResult.getValue();
+        } else {
+          final var newRev = UUID.randomUUID().toString();
+          mongo.getDb().getCollection(mongo.getConfig().getProjects(), Project.class)
+            .updateOne(queryResult.getFilter(), Updates.combine(
+              Updates.set(ProjectCodec.NAME, name), 
+              Updates.set(CodecUtil.REV, newRev)));
+          project = ImmutableProject.builder()
+              .from(queryResult.getValue())
+              .name(name).rev(newRev)
+              .build();
+        }
         collect.putProject(project.getId(), project);
+        if(users == null && groups == null) {
+          return project;
+        }
+        
+        // Association updates
+        final var currentAccess = query.access().project(id).findAll();
         
         if(users != null) {
+          final var currentUsers = currentAccess.stream()
+              .filter(a -> a.getUserId().isPresent())
+              .map(a -> a.getUserId().get())
+              .collect(Collectors.toList());
+
+          // delete users
+          final var deleteUsers = currentUsers.stream()
+            .filter(a -> !users.contains(a))
+            .collect(Collectors.toList());
+          query.access().user(deleteUsers).delete();
+          
+          // create new users
           this.users.stream()
+            .filter(userId -> !currentUsers.contains(userId))
             .map(id -> query.user().id(id).get())
             .forEach(user -> visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
         }
+        
         if(groups != null) {
+          final var currentGroups = currentAccess.stream()
+              .filter(a -> a.getGroupId().isPresent())
+              .map(a -> a.getGroupId().get())
+              .collect(Collectors.toList());
+        
+          // delete groups
+          final var deleteGroups = currentGroups.stream()
+            .filter(a -> !groups.contains(a))
+            .collect(Collectors.toList());
+          query.access().group(deleteGroups).delete();
+          
+          
+          // create new groups
           this.groups.stream()
+            .filter(groupId -> !currentGroups.contains(groupId))
             .map(id -> query.group().id(id).get())
             .forEach(group -> visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
         }
+        
         return project;
       }
       @Override
@@ -135,32 +185,69 @@ public class MongoBuilderUpdate implements MongoBuilder {
         RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);      
         RepoAssert.notEmpty(name, () -> "name not defined!");
         
-        QueryResultWithAccess<Group> queryResult = query.group().id(id).rev(rev).getWithFilter();
-        final var newRev = UUID.randomUUID().toString();
+        final var queryResult = query.group().id(id).rev(rev).getWithFilter();
+        final Group group;
         
-        mongo.getDb().getCollection(mongo.getConfig().getGroups(), Group.class)
-          .updateOne(queryResult.getFilter(), Updates.combine(
-            Updates.set(GroupCodec.NAME, name), 
-            Updates.set(CodecUtil.REV, newRev)));
-        
-        Group group = ImmutableGroup.builder()
-            .from(queryResult.getValue())
-            .rev(newRev)
-            .name(name)
-            .build();
-        
+        if(name.equals(queryResult.getValue().getName())) {
+          group = queryResult.getValue();
+        } else {
+          final var newRev = UUID.randomUUID().toString();
+          mongo.getDb().getCollection(mongo.getConfig().getGroups(), Group.class)
+            .updateOne(queryResult.getFilter(), Updates.combine(
+              Updates.set(GroupCodec.NAME, name), 
+              Updates.set(CodecUtil.REV, newRev)));
+          
+          group = ImmutableGroup.builder()
+              .from(queryResult.getValue())
+              .rev(newRev)
+              .name(name)
+              .build();
+        }
         collect.putGroups(group.getId(), group);
+        if(users == null && projects == null) {
+          return group;
+        }
+        
+        // Association updates
+        final var currentAccess = query.access().group(id).findAll();
         
         if(users != null) {
+          final var currentUsers = currentAccess.stream()
+              .filter(a -> a.getUserId().isPresent())
+              .map(a -> a.getUserId().get())
+              .collect(Collectors.toList());
+
+          // delete users
+          final var deleteUsers = currentUsers.stream()
+            .filter(a -> !users.contains(a))
+            .collect(Collectors.toList());
+          query.access().user(deleteUsers).delete();
+          
+          // create new users
           this.users.stream()
+            .filter(userId -> !currentUsers.contains(userId))
             .map(id -> query.user().id(id).get())
             .forEach(user -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
         }
         if(projects != null) {
+          final var currentProjects = currentAccess.stream()
+              .map(a -> a.getProjectId())
+              .collect(Collectors.toList());
+
+          // delete projects
+          final var deleteProjects = currentProjects.stream()
+            .filter(a -> !projects.contains(a))
+            .collect(Collectors.toList());
+          query.access().project(deleteProjects).delete();
+          
+          
+          // create new projects
           this.projects.stream()
+            .filter(projectId -> !currentProjects.contains(projectId))
             .map(id -> query.project().id(id).get())
             .forEach(project -> visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
         }
+        
         return group;
       }
       @Override
@@ -213,7 +300,6 @@ public class MongoBuilderUpdate implements MongoBuilder {
         RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);    
         RepoAssert.notEmpty(name, () -> "define name!");
         RepoAssert.notEmpty(email, () -> "define email!");
-        RepoAssert.notEmpty(externalId, () -> "define externalId!");
         RepoAssert.notEmpty(token, () -> "define token!");
         
         QueryResultWithAccess<User> queryResult = query.user().id(id).rev(rev).getWithFilter();
@@ -227,32 +313,71 @@ public class MongoBuilderUpdate implements MongoBuilder {
               .build(), () -> "entity: 'user' with token: '" + token + "' already exists!");
         }
         
-        final var newRev = UUID.randomUUID().toString();
-        mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class)
-        .updateOne(queryResult.getFilter(), Updates.combine(
-          Updates.set(UserCodec.NAME, name), 
-          Updates.set(UserCodec.EMAIL, email), 
-          Updates.set(UserCodec.EXTERNAL_ID, externalId),
-          Updates.set(UserCodec.TOKEN, token),
-          Updates.set(CodecUtil.REV, newRev)));
-      
-        User user = ImmutableUser.builder()
-            .from(queryResult.getValue())
-            .rev(newRev)
-            .name(name)
-            .email(email)
-            .externalId(externalId)
-            .token(token)
-            .build();
+        final User user;
+        if(queryResult.getValue().equals(ImmutableUser.builder()
+            .name(name).email(email).token(token)
+            .externalId(Optional.ofNullable(externalId))
+            .from(queryResult.getValue()).build())) {
+          user = queryResult.getValue();
+        } else {
+          final var newRev = UUID.randomUUID().toString();
+          mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class)
+          .updateOne(queryResult.getFilter(), Updates.combine(
+            Updates.set(UserCodec.NAME, name), 
+            Updates.set(UserCodec.EMAIL, email), 
+            Updates.set(UserCodec.EXTERNAL_ID, externalId),
+            Updates.set(UserCodec.TOKEN, token),
+            Updates.set(CodecUtil.REV, newRev)));
         
+          user = ImmutableUser.builder()
+              .from(queryResult.getValue())
+              .rev(newRev)
+              .name(name)
+              .email(email)
+              .externalId(externalId)
+              .token(token)
+              .build();          
+        }
+        
+        if(groups == null && projects == null) {
+          return user;
+        }
+        
+        // Association updates
+        final var currentAccess = query.access().user(id).findAll();
         
         if(groups != null) {
+          final var currentGroups = currentAccess.stream()
+              .filter(a -> a.getGroupId().isPresent())
+              .map(a -> a.getGroupId().get())
+              .collect(Collectors.toList());
+
+          // delete groups
+          final var deleteGroups = currentGroups.stream()
+            .filter(a -> !groups.contains(a))
+            .collect(Collectors.toList());
+          query.access().group(deleteGroups).delete();
+          
+          // create new groups
           this.groups.stream()
+            .filter(groupId -> !currentGroups.contains(groupId))
             .map(id -> query.group().id(id).get())
             .forEach(group -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
         }
         if(projects != null) {
+          final var currentProjects = currentAccess.stream()
+              .map(a -> a.getProjectId())
+              .collect(Collectors.toList());
+
+          // delete project
+          final var deleteProjects = currentProjects.stream()
+            .filter(a -> !projects.contains(a))
+            .collect(Collectors.toList());
+          query.access().project(deleteProjects).delete();
+          
+          // create new projects
           this.projects.stream()
+            .filter(projectId -> !currentProjects.contains(projectId))
             .map(id -> query.project().id(id).get())
             .forEach(project -> visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
         }

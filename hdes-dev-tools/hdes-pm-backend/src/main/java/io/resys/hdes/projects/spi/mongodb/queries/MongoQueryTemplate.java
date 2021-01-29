@@ -1,6 +1,7 @@
 package io.resys.hdes.projects.spi.mongodb.queries;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +32,10 @@ public abstract class MongoQueryTemplate<Q, T> implements Query<Q, T> {
     super();
     this.mongo = mongo;
   }
-  
+  public Q id(Collection<String> id) {
+    filters.add(Filters.in(CodecUtil.ID, id));
+    return (Q) this;
+  }  
   public Q id(String id) {
     filters.add(Filters.eq(CodecUtil.ID, id));
     return (Q) this;
@@ -43,6 +47,12 @@ public abstract class MongoQueryTemplate<Q, T> implements Query<Q, T> {
   
   protected abstract MongoCollection<T> getCollection();
   protected abstract ErrorType getErrorType();
+  
+  @Override
+  public void delete() {
+    RepoAssert.notNull(filters, () -> "there must be at least one filter!");
+    getCollection().deleteMany(filters());    
+  }
   
   @Override
   public T get() {

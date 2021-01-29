@@ -1,5 +1,7 @@
 package io.resys.hdes.projects.spi.mongodb.queries;
 
+import java.util.Collection;
+
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 
@@ -14,6 +16,18 @@ public class MongoQueryAccess extends MongoQueryTemplate<MongoQuery.AccessQuery,
   public MongoQueryAccess(MongoWrapper mongo) {
     super(mongo);
   }
+  public AccessQuery user(Collection<String> id) {
+    filters.add(Filters.in(AccessCodec.USER_ID, id));
+    return this;
+  }
+  public AccessQuery group(Collection<String> id) {
+    filters.add(Filters.in(AccessCodec.GROUP_ID, id));
+    return this;
+  }
+  public AccessQuery project(Collection<String> id) {
+    filters.add(Filters.in(AccessCodec.PROJECT_ID, id));
+    return this;
+  }   
   @Override
   public AccessQuery comment(String comment) {
     filters.add(Filters.eq(AccessCodec.COMMENT, comment));

@@ -2,6 +2,9 @@ package io.resys.hdes.projects.spi.mongodb.builders;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.resys.hdes.projects.api.PmException;
 import io.resys.hdes.projects.api.PmRepository.Access;
 import io.resys.hdes.projects.api.PmRepository.Group;
@@ -15,7 +18,8 @@ import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper;
 import io.resys.hdes.projects.spi.support.RepoAssert;
 
 public class MongoBuilderDelete implements MongoBuilder {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoBuilderDelete.class);
+  
   private final MongoWrapper mongo;
   private final MongoQuery query;
   private final ImmutableMongoBuilderTree.Builder collect;
@@ -28,7 +32,13 @@ public class MongoBuilderDelete implements MongoBuilder {
 
   @Override
   public MongoBuilderTree build() {
-    return collect.build();
+    MongoBuilderTree tree = collect.build();
+    if(LOGGER.isDebugEnabled()) {
+      LOGGER.debug(new StringBuilder()
+          .append("Tree has been DELETED: ").append(System.lineSeparator())
+          .append(tree.toString()).toString());
+    }
+    return tree;
   }
   
   @Override

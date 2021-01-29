@@ -6,6 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.resys.hdes.projects.api.ImmutableAccess;
 import io.resys.hdes.projects.api.ImmutableConstraintViolation;
 import io.resys.hdes.projects.api.ImmutableGroup;
@@ -26,7 +29,8 @@ import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper;
 import io.resys.hdes.projects.spi.support.RepoAssert;
 
 public class MongoBuilderCreate implements MongoBuilder {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoBuilderCreate.class);
+  
   private final MongoWrapper mongo;
   private final MongoQuery query;
   private final ImmutableMongoBuilderTree.Builder collect;
@@ -39,7 +43,13 @@ public class MongoBuilderCreate implements MongoBuilder {
 
   @Override
   public MongoBuilderTree build() {
-    return collect.build();
+    MongoBuilderTree tree = collect.build();
+    if(LOGGER.isDebugEnabled()) {
+      LOGGER.debug(new StringBuilder()
+          .append("Tree has been CREATED: ").append(System.lineSeparator())
+          .append(tree.toString()).toString());
+    }
+    return tree;
   }
   
   @Override
