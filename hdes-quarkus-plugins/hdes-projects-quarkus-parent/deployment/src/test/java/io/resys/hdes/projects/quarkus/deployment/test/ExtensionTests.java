@@ -1,4 +1,4 @@
-package io.resys.hdes.ui.quarkus.deployment.test;
+package io.resys.hdes.projects.quarkus.deployment.test;
 
 /*-
  * #%L
@@ -34,23 +34,29 @@ import io.restassured.RestAssured;
 public class ExtensionTests {
   @RegisterExtension
   final static QuarkusUnitTest config = new QuarkusUnitTest()
-      .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addAsResource(new StringAsset("quarkus.hdes.enable=true"), "application.properties")
-          .addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
-          );
+    .setBeforeAllCustomizer(() -> {
+      MongoDbFactory.get().setUp();
+    })
+    .setAfterAllCustomizer(() -> {
+      MongoDbFactory.get().tearDown();
+    })
+    .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
+      .addAsResource(new StringAsset("quarkus.hdes-projects.connection-url=localhost:12345"), "application.properties")
+      .addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
+    );
 
   @Test
   public void responsesIndex() {
-    RestAssured.when().get("/hdes-ui").then().statusCode(200);
-    RestAssured.when().get("/hdes-ui/index.html").then().statusCode(200);
+    RestAssured.when().get("q/hdes/projects-ui").then().statusCode(200);
+    RestAssured.when().get("/q/hdes/projects-ui/index.html").then().statusCode(200);
   }
   
   @Test
   public void responsesDef() {
-    RestAssured.when().get("/hdes-ui/services/defs").then().statusCode(200);
+    RestAssured.when().get("/hdes/projects-services/projects").then().statusCode(200);
   }
   
-  @Test
+  //@Test
   public void responsesDebug() {
     RestAssured.given().body("{}").when().post("/hdes-ui/services/debug/superBranch/superResource").then().statusCode(200);
   }

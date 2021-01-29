@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.resys.hdes</groupId>
@@ -8,7 +9,7 @@
   </parent>
   <artifactId>hdes-pm-frontend</artifactId>
   <build>
-  <!--
+
     <plugins>
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
@@ -31,21 +32,22 @@
         <groupId>com.github.eirslett</groupId>
         <artifactId>frontend-maven-plugin</artifactId>
         <version>${eirslett.version}</version>
+        <configuration>
+          <installDirectory>target</installDirectory>
+          <nodeVersion>${node.version}</nodeVersion>
+          <yarnVersion>${yarn.version}</yarnVersion>
+        </configuration>
+        
         <executions>
           <execution>
-            <id>install node and npm</id>
+            <id>install node and yarn</id>
             <goals>
-              <goal>install-node-and-npm</goal>
+              <goal>install-node-and-yarn</goal>
             </goals>
-            <configuration>
-              <nodeVersion>${node.version}</nodeVersion>
-              <npmVersion>${npm.version}</npmVersion>
-            </configuration>
           </execution>
-          
-           
+
           <execution>
-            <id>yarn</id>
+            <id>yarn install</id>
             <goals>
               <goal>yarn</goal>
             </goals>
@@ -54,27 +56,18 @@
             </configuration>
           </execution>
           <execution>
-            <id>yarn rebuild node-sass</id>
-            <goals>
-              <goal>yarn</goal>
-            </goals>
-            <configuration>
-              <arguments>rebuild node-sass</arguments>
-            </configuration>
-          </execution>
-          <execution>
             <id>yarn run build</id>
             <goals>
               <goal>yarn</goal>
             </goals>
             <configuration>
-              <arguments>yarn build</arguments>
+              <arguments>build</arguments>
             </configuration>
           </execution>
         </executions>
       </plugin>
 
-           
+
       <plugin>
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.1.0</version>
@@ -126,6 +119,6 @@
       </plugin>
 
     </plugins>
-               -->
+
   </build>
 </project>

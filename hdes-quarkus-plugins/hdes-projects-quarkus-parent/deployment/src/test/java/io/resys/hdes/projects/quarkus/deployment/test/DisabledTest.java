@@ -1,4 +1,4 @@
-package io.resys.hdes.ui.quarkus.deployment.test;
+package io.resys.hdes.projects.quarkus.deployment.test;
 
 /*-
  * #%L
@@ -35,13 +35,15 @@ public class DisabledTest {
   @RegisterExtension
   final static QuarkusUnitTest config = new QuarkusUnitTest()
       .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-          .addAsResource(new StringAsset("quarkus.hdes.enable=false"), "application.properties")
-          .addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
+          .addAsResource(new StringAsset("quarkus.hdes-projects.connection-url=localhost:12345"), "application.properties")
+          //.addAsResource(new StringAsset("quarkus.hdes-projects.enable=false"), "application.properties")
+          //.addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
+          //.addAsResource(new StringAsset("quarkus.http.port=8090"), "application.properties")
           );
 
   @Test
   public void shouldUseDefaultConfig() {
-    RestAssured.when().get("/hdes-ui").then().statusCode(404);
-    RestAssured.when().get("/hdes-ui/index.html").then().statusCode(404);
+    RestAssured.when().get("/hdes-projects").then().statusCode(404);
+    RestAssured.when().get("/hdes-projects/index.html").then().statusCode(404);
   }
 }

@@ -16,7 +16,7 @@
     <maven.compiler.source>${jdk.version}</maven.compiler.source>
     <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 
-    <quarkus.version>1.10.3.Final</quarkus.version>
+    <quarkus.version>1.11.1.Final</quarkus.version>
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.24</slf4j.version>
     <jackson.version>2.10.2</jackson.version>
@@ -39,9 +39,10 @@
     <commons-codec.version>1.13</commons-codec.version>
     <commons-lang.version>3.9</commons-lang.version>
 
-    <node.version>v10.16.3</node.version>
-    <npm.version>6.11.3</npm.version>
-    <eirslett.version>1.8.0</eirslett.version>
+    <node.version>v14.13.0</node.version>
+    <yarn.version>v1.22.5</yarn.version>
+    <npm.version>6.14.8</npm.version>
+    <eirslett.version>1.11.0</eirslett.version>
     <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
   </properties>
 
