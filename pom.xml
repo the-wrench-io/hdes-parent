@@ -52,9 +52,9 @@
     <module>hdes-build-parent</module>
     <module>hdes-bom</module>
     <module>hdes-core</module>
-    <module>hdes-maven</module>
-    <module>hdes-dev-tools</module>
     <module>hdes-quarkus-plugins</module>
+    <module>hdes-dev-tools</module>
+    <module>hdes-maven</module>
   </modules>
 
   <properties>

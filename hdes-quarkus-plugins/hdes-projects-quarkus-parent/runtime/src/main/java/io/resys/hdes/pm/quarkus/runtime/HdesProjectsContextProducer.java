@@ -34,8 +34,8 @@ import org.bson.codecs.jsr310.Jsr310CodecProvider;
 import org.bson.internal.ProvidersCodecRegistry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
@@ -80,13 +80,11 @@ public class HdesProjectsContextProducer {
       new ValueCodecProvider()
     ));
     
+
     MongoClient client = MongoClients.create(
         MongoClientSettings.builder()
         .codecRegistry(codecRegistry)
-        .applyToConnectionPoolSettings(builder -> builder.build())
-        .applyToClusterSettings(builder -> builder
-            .hosts(Arrays.asList(new ServerAddress(connectionUrl)))
-            .build() )
+        .applyConnectionString(new ConnectionString(connectionUrl))
         .build());
 
     ObjectMapper objectMapper = new ObjectMapper();

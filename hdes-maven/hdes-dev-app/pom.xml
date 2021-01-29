@@ -10,54 +10,21 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.immutables</groupId>
-      <artifactId>value</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-qute</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-core</artifactId>
     </dependency>
 
-<!--
+
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-projects-quarkus</artifactId>
     </dependency>
-
- 
-    <dependency>
-      <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-ui-quarkus</artifactId>
-    </dependency>
--->
-
   </dependencies>
 
   <build>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-      </resource>
-      <resource>
-        <directory>src/main/hdes</directory>
       </resource>
     </resources>
     <plugins>
@@ -73,24 +40,6 @@
           </execution>
         </executions>
       </plugin>
-      
-      <!-- 
-      <plugin>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-maven-plugin</artifactId>
-        <version>${project.version}</version>
-        <configuration>
-          <package>io.resys.hdes.testproject</package>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>hdes</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-       -->
     </plugins>
   </build>
 </project>
