@@ -10,14 +10,19 @@ interface ConfigureUserBasicProps {
   name: FieldProps;
   token: FieldProps;
   externalId: FieldProps;
+  email: FieldProps;
 };
 
-const ConfigureUserBasic: React.FC<ConfigureUserBasicProps> = ({name, token, externalId}) => {
+const ConfigureUserBasic: React.FC<ConfigureUserBasicProps> = ({name, token, externalId, email}) => {
   return (<React.Fragment>
   
     <TextField autoFocus margin="dense" id="name" label="User name" type="text" fullWidth
       onChange={({target}) => name.onChange(target.value)}
       defaultValue={name.defaultValue ? name.defaultValue : ''}/>
+
+    <TextField margin="dense" id="email" label="Email" type="text" fullWidth 
+      onChange={({target}) => email.onChange(target.value)}
+      defaultValue={email.defaultValue ? email.defaultValue : ''}/>
       
     <TextField margin="dense" id="externalId" label="External ID" type="text" fullWidth 
       onChange={({target}) => externalId.onChange(target.value)}

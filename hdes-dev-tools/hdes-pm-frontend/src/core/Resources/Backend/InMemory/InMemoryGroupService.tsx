@@ -16,7 +16,7 @@ class InMemoryGroupQuery implements Backend.GroupQuery {
   onSuccess(handle: (users: Backend.GroupResource[]) => void) {
     const store = this.store;
     
-    let src = store.groups.sort((p1, p2) => p1.created.getTime() - p2.created.getTime());
+    let src = store.groups.sort((p1, p2) => (p1.created as Date).getTime() - (p2.created as Date).getTime());
     if(this.args && this.args.top) {
       src = src.slice(0, this.args.top);
     }

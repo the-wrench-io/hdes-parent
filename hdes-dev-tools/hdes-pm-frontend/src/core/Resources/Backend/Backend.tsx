@@ -101,13 +101,15 @@ declare namespace Backend {
 
   interface UserBuilder extends ResourceBuilder {
     id?: string; 
-    name?: string; 
+    name?: string;
+    email?: string; 
     rev?: string;
     externalId?: string;
     token?: string;
     groups: string[];
     projects: string[];
 
+    withEmail: (email: string) => UserBuilder;
     withResource: (from: UserResource) => UserBuilder;
     withName: (name: string) => UserBuilder;
     withExternalId: (externalId: string) => UserBuilder;
@@ -115,21 +117,30 @@ declare namespace Backend {
     withProjects: (projects: string[]) => UserBuilder;
     withGroups: (groups: string[]) => UserBuilder;
     from: (from: UserBuilder) => UserBuilder;
+    build: () => {
+      id?: string;  
+      rev?: string;
+      externalId?: string;
+      name: string;
+      email: string;
+      groups: string[];
+      projects: string[] };
   }
   
   interface User {
     id: string;
     rev: string;
     name: string;
+    email: string;
     token: string;
     externalId?: string;
-    created: Date;
+    created: Date | number[];
   }
   
   interface Access {
     id: string;
     rev: string;
-    created: Date;
+    created: Date | number[];
     name: string;
     projectId: string;
     groupId?: string;
@@ -139,14 +150,14 @@ declare namespace Backend {
   interface Group {
     id: string;
     rev: string;
-    created: Date;
+    created: Date | number[];
     name: string;
   }
 
   interface GroupUser {
     id: string;
     rev: string;
-    created: Date;
+    created: Date | number[];
     userId: string;
     groupId: string;
   }
@@ -154,8 +165,21 @@ declare namespace Backend {
   interface Project {
     id: string;
     rev: string;
-    created: Date;
+    created: Date | number[];
     name: string;
+  }
+  
+  interface ServerConfig {
+    ctx: string;
+    users: string;
+    projects: string;
+    groups: string;
+    headers: {}
+  }
+  
+  interface ServerError {
+    id: string,
+    messages: { code: string, value: string}[]
   }
 }
 export default Backend;

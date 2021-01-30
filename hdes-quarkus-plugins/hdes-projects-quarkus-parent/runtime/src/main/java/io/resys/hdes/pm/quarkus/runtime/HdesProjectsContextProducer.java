@@ -34,6 +34,8 @@ import org.bson.codecs.jsr310.Jsr310CodecProvider;
 import org.bson.internal.ProvidersCodecRegistry;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoClient;
@@ -79,7 +81,6 @@ public class HdesProjectsContextProducer {
       new Jsr310CodecProvider(),
       new ValueCodecProvider()
     ));
-    
 
     MongoClient client = MongoClients.create(
         MongoClientSettings.builder()
@@ -87,7 +88,11 @@ public class HdesProjectsContextProducer {
         .applyConnectionString(new ConnectionString(connectionUrl))
         .build());
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new Jdk8Module())
+        .registerModule(new Jdk8Module())
+        .registerModule(new JavaTimeModule());
+    
     MongoTransaction transaction = new MongoTransactionDefault(client);    
     return new ImmutableHdesProjectsContext(
         objectMapper,

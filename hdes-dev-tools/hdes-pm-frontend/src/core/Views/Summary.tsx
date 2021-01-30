@@ -19,13 +19,16 @@ const useStyles = makeStyles((theme: Theme) =>
       padding: theme.spacing(0, 1),
     },
     paper: {
-      maxWidth: 500,
+      maxWidth: 900,
       margin: `${theme.spacing(1)}px auto`,
       padding: theme.spacing(1),
       
     },
+    avatar: {
+      marginLeft: '10px'
+    },
     title: {
-      background: theme.palette.primary.main
+      background: theme.palette.primary.main,
     },
     users: {
       background: theme.palette.secondary.dark
@@ -48,7 +51,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type View = {
   name: string;
-  created: Date;
+  created: Date | number[];
   letter: string;
   users?: string;
   groups?: string; 
@@ -89,7 +92,7 @@ const Summary: React.FC<SummaryProps> = ({resource}) => {
       <Grid container spacing={1}>
         <Grid item xs={2}><Avatar className={classes.title}>{view.letter}</Avatar></Grid>
         <Grid item xs={10}>
-          <Typography component="h2" variant="h6" gutterBottom>
+          <Typography className={classes.avatar} component="h2" variant="h6" gutterBottom>
             {view.name} / <DateFormat>{view.created}</DateFormat>
           </Typography>
         </Grid>

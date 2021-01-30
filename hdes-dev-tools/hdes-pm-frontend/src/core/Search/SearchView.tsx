@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 type View = {
   id: string;
   name: string;
-  created: Date;
+  created: Date | number[];
   type: string;
   src: Backend.AnyResource;
   onClick: (edit?: boolean) => void;

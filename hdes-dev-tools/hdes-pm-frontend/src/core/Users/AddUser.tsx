@@ -72,6 +72,7 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
     <ConfigureUserBasic 
         name={{defaultValue: user.name, onChange: (newValue) => setUser(user.withName(newValue))}}
         token={{defaultValue: user.token, onChange: (newValue) => setUser(user.withToken(newValue))}}
+        email={{defaultValue: user.email, onChange: (newValue) => setUser(user.withEmail(newValue))}}
         externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
     <ConfigureUserProjects 

@@ -42,4 +42,17 @@ public class HdesProjectsConfig {
    */
   @ConfigItem
   String connectionUrl;
+  
+  
+  public String getProjects() {
+    return backendPath + "/projects";
+  }
+  
+  public String getUsers() {
+    return backendPath + "/users";
+  }
+  
+  public String getGroups() {
+    return backendPath + "/groups";
+  }
 }

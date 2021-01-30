@@ -19,92 +19,53 @@ package io.resys.hdes.pm.quarkus.runtime.handlers;
  * #L%
  */
 
-import java.nio.charset.Charset;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 
-import javax.enterprise.inject.spi.CDI;
-
-import org.apache.commons.codec.binary.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import io.quarkus.arc.Arc;
 import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
 import io.resys.hdes.projects.api.ImmutableBatchProject;
 import io.resys.hdes.projects.api.ImmutableProject;
 import io.resys.hdes.projects.api.PmRepository.BatchProject;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.ProjectResource;
-import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
+public class HdesProjectsResourceHandler extends HdesResourceHandler {
 
-public class HdesProjectsResourceHandler implements Handler<RoutingContext>  {
-  private static final Logger LOGGER = LoggerFactory.getLogger(HdesProjectsResourceHandler.class);
-  
   @Override
-  public void handle(RoutingContext event) {
-    boolean active = HandlerHelper.active();
-    HttpServerResponse response = event.response();
-    HdesProjectsContext ctx = CDI.current().select(HdesProjectsContext.class).get();
-    
-    try {
-      switch (event.request().method()) {
-      case GET:
-        Collection<ProjectResource> defs = ctx.repo().query().project().find();
-        response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
-        response.end(Buffer.buffer(ctx.writer().build(defs)));    
-        break;
-        
-      case DELETE:
-        Project toDelete = ctx.reader().build(event.getBody().getBytes(), ImmutableProject.class);
-        Project deleted = ctx.repo().delete().project(toDelete.getId(), toDelete.getRev());
-        response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
-        response.end(Buffer.buffer(ctx.writer().build(deleted)));    
-        break;
-        
-      case POST:
-        BatchProject create = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchProject.class);
-        ProjectResource created = ctx.repo().create().project(create);
-        response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
-        response.end(Buffer.buffer(ctx.writer().build(created)));    
-        break;
-        
-      case PUT:
-        BatchProject update = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchProject.class);
-        ProjectResource updated = ctx.repo().update().project(update);
-        response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
-        response.end(Buffer.buffer(ctx.writer().build(updated)));    
-        break;
-      default:
-        break;
-      }
-    } catch(Exception e) {
-      HandlerHelper.catch422(e, ctx, response);
-    } finally {
-      if (active) {
-        Arc.container().requestContext().terminate();
-      }
-    }
-  }
-  
-  protected String exceptionHash(String msg) {
-    try {
-      MessageDigest md5 = MessageDigest.getInstance("MD5");
-      md5.reset();
-      md5.update(msg.getBytes(Charset.forName("UTF-8")));
-      byte[] digest = md5.digest();
-      return Hex.encodeHexString(digest);
-    } catch (NoSuchAlgorithmException ex) {
-      // Fall back to just hex timestamp in this improbable situation
-      LOGGER.warn("MD5 Digester not found, falling back to timestamp hash", ex);
-      long timestamp = System.currentTimeMillis();
-      return Long.toHexString(timestamp);
+  protected void handleResource(RoutingContext event, HttpServerResponse response, HdesProjectsContext ctx) {
+
+    switch (event.request().method()) {
+    case GET:
+      Collection<ProjectResource> defs = ctx.repo().query().project().find();
+      response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+      response.end(Buffer.buffer(ctx.writer().build(defs)));
+      break;
+
+    case DELETE:
+      Project toDelete = ctx.reader().build(event.getBody().getBytes(), ImmutableProject.class);
+      Project deleted = ctx.repo().delete().project(toDelete.getId(), toDelete.getRev());
+      response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+      response.end(Buffer.buffer(ctx.writer().build(deleted)));
+      break;
+
+    case POST:
+      BatchProject create = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchProject.class);
+      ProjectResource created = ctx.repo().create().project(create);
+      response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+      response.end(Buffer.buffer(ctx.writer().build(created)));
+      break;
+
+    case PUT:
+      BatchProject update = ctx.reader().build(event.getBody().getBytes(), ImmutableBatchProject.class);
+      ProjectResource updated = ctx.repo().update().project(update);
+      response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+      response.end(Buffer.buffer(ctx.writer().build(updated)));
+      break;
+    default:
+      break;
     }
   }
 }

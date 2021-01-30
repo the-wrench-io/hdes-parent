@@ -14,7 +14,7 @@ class InMemoryProjectQuery implements Backend.ProjectQuery {
   
   onSuccess(handle: (users: Backend.ProjectResource[]) => void) {
     const { store } = this;
-    let projects = store.projects.sort((p1, p2) => p1.created.getTime() - p2.created.getTime());
+    let projects = store.projects.sort((p1, p2) => (p1.created as Date).getTime() - (p2.created as Date).getTime());
     if(this.args && this.args.top) {
       projects = projects.slice(0, this.args.top);
     }

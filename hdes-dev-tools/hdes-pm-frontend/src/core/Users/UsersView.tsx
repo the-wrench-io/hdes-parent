@@ -65,6 +65,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell></TableCell>
+            <TableCell>Email</TableCell>
             <TableCell>External Id</TableCell>
             <TableCell>Groups</TableCell>
             <TableCell>Projects</TableCell>
@@ -88,6 +89,9 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
                   onMouseEnter={(event) => handlePopoverOpen(event, row)} onMouseLeave={handlePopoverClose} >
                   <VisibilityOutlinedIcon fontSize='small'/>
                 </Typography>
+              </TableCell>
+              <TableCell>
+                {row.user.email}
               </TableCell>
               <TableCell>
                 {row.user.externalId}

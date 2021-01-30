@@ -30,6 +30,9 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 public interface PmRepository {
 
   BatchBuilder update();
@@ -80,6 +83,8 @@ public interface PmRepository {
   }
   
   @Value.Immutable
+  @JsonSerialize(as = ImmutableBatchProject.class)
+  @JsonDeserialize(as = ImmutableBatchProject.class)
   interface BatchProject extends BatchMutator {
     String getName();
     List<String> getUsers();
@@ -87,6 +92,8 @@ public interface PmRepository {
   }
 
   @Value.Immutable
+  @JsonSerialize(as = ImmutableBatchGroup.class)
+  @JsonDeserialize(as = ImmutableBatchGroup.class)
   interface BatchGroup extends BatchMutator {
     String getName();
     List<String> getUsers();
@@ -94,6 +101,8 @@ public interface PmRepository {
   }
 
   @Value.Immutable
+  @JsonSerialize(as = ImmutableBatchUser.class)
+  @JsonDeserialize(as = ImmutableBatchUser.class)
   interface BatchUser extends BatchMutator {
     String getName();
     String getEmail();
@@ -104,6 +113,8 @@ public interface PmRepository {
   }
   
   @Value.Immutable
+  @JsonSerialize(as = ImmutableProjectResource.class)
+  @JsonDeserialize(as = ImmutableProjectResource.class)
   interface ProjectResource extends BatchResource {
     Project getProject();
     Map<String, User> getUsers();
@@ -113,6 +124,8 @@ public interface PmRepository {
   }
   
   @Value.Immutable
+  @JsonSerialize(as = ImmutableUserResource.class)
+  @JsonDeserialize(as = ImmutableUserResource.class)
   interface UserResource extends BatchResource {
     User getUser();
     Map<String, Project> getProjects();
@@ -122,6 +135,8 @@ public interface PmRepository {
   }
   
   @Value.Immutable
+  @JsonSerialize(as = ImmutableGroupResource.class)
+  @JsonDeserialize(as = ImmutableGroupResource.class)
   interface GroupResource extends BatchResource {
     Group getGroup();
     Map<String, User> getUsers();
@@ -130,6 +145,8 @@ public interface PmRepository {
     Map<String, GroupUser> getGroupUser();
   }
   
+  @JsonSerialize(as = ImmutableProject.class)
+  @JsonDeserialize(as = ImmutableProject.class)
   @Value.Immutable
   interface Project extends Serializable {
     String getId();
@@ -137,7 +154,9 @@ public interface PmRepository {
     String getName();
     LocalDateTime getCreated();
   }
-  
+
+  @JsonSerialize(as = ImmutableUser.class)
+  @JsonDeserialize(as = ImmutableUser.class)
   @Value.Immutable
   interface User extends Serializable {
     String getId();
@@ -149,6 +168,8 @@ public interface PmRepository {
     String getToken();
   }
   
+  @JsonSerialize(as = ImmutableGroup.class)
+  @JsonDeserialize(as = ImmutableGroup.class)
   @Value.Immutable
   interface Group extends Serializable {
     String getId();
@@ -157,6 +178,8 @@ public interface PmRepository {
     String getName();
   }
   
+  @JsonSerialize(as = ImmutableUser.class)
+  @JsonDeserialize(as = ImmutableUser.class)
   @Value.Immutable
   interface GroupUser extends Serializable {
     String getId();
@@ -166,6 +189,8 @@ public interface PmRepository {
     String getGroupId();
   }
   
+  @JsonSerialize(as = ImmutableAccess.class)
+  @JsonDeserialize(as = ImmutableAccess.class)
   @Value.Immutable
   interface Access extends Serializable {
     String getId();

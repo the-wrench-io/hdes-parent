@@ -1,3 +1,3 @@
-import { InMemoryService, DemoService } from './InMemoryService';
+import { DemoService } from './InMemoryService';
 
-export { InMemoryService, DemoService };
+export { DemoService };

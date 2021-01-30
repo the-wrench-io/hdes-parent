@@ -14,7 +14,7 @@ class InMemoryUserQuery implements Backend.UserQuery {
   
   onSuccess(handle: (users: Backend.UserResource[]) => void) {
     const store = this.store;
-    let users = store.users.sort((p1, p2) => p1.created.getTime() - p2.created.getTime());
+    let users = store.users.sort((p1, p2) => (p1.created as Date).getTime() - (p2.created as Date).getTime());
     if(this.args && this.args.top) {
       users = users.slice(0, this.args.top);
     }
@@ -56,6 +56,7 @@ class InMemoryUserService implements Backend.UserService {
           rev: store.uuid(),
           token: builder.token ? builder.token : "",
           name: builder.name ? builder.name : "",
+          email: builder.email ? builder.email : "",
           externalId: builder.externalId, 
           created: new Date()
         };

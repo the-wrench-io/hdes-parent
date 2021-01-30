@@ -1,18 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ThemeProvider } from '@material-ui/core/styles';
-import { Resources } from './core/Resources';
+import { Resources, Backend } from './core/Resources';
 import { theme } from './core/Themes';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
-
-const config = {};
+declare global {
+  interface Window { hdesconfig: Backend.ServerConfig | undefined }
+}
 
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
-      <Resources.Provider config={config} >
+      <Resources.Provider>
         <App />
       </Resources.Provider>
     </ThemeProvider>

@@ -1,5 +1,7 @@
 import Backend  from './Backend';
-import { InMemoryService, DemoService }  from './InMemory';
+import { DemoService }  from './InMemory';
+import { ServerService }  from './Server';
+
 
 export type { Backend };
-export { InMemoryService, DemoService };
+export { ServerService, DemoService };

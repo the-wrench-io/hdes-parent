@@ -46,16 +46,23 @@ public class ExtensionTests {
     );
 
   @Test
-  public void responsesIndex() {
+  public void getUI() {
     RestAssured.when().get("q/hdes/projects-ui").then().statusCode(200);
     RestAssured.when().get("/q/hdes/projects-ui/index.html").then().statusCode(200);
   }
   
   @Test
-  public void responsesDef() {
+  public void getProjects() {
     RestAssured.when().get("/hdes/projects-services/projects").then().statusCode(200);
   }
-  
+  @Test
+  public void getPostUsers() {
+    RestAssured.when().get("/hdes/projects-services/users").then().statusCode(200);
+    RestAssured.given()
+    .body(""" 
+        {"name": "good user", "email": "good@gmail.com"}
+        """).when().post("/hdes/projects-services/users").then().statusCode(200);
+  }  
   //@Test
   public void responsesDebug() {
     RestAssured.given().body("{}").when().post("/hdes-ui/services/debug/superBranch/superResource").then().statusCode(200);

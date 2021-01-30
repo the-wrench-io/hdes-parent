@@ -76,6 +76,7 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
   const steps = [
     <ConfigureUserBasic 
         token={{defaultValue: user.token, onChange: (newValue) => setUser(user.withToken(newValue))}}
+        email={{defaultValue: user.email, onChange: (newValue) => setUser(user.withEmail(newValue))}}
         name={{defaultValue: user.name, onChange: (newValue) => setUser(user.withName(newValue))}}
         externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
