@@ -25,7 +25,7 @@ const useStyles = makeStyles((theme: Theme) =>
       
     },
     avatar: {
-      marginLeft: '10px'
+      // marginLeft: '10px'
     },
     title: {
       background: theme.palette.primary.main,

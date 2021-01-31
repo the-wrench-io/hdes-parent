@@ -10,6 +10,20 @@ declare global {
   interface Window { hdesconfig: Backend.ServerConfig | undefined }
 }
 
+
+  
+  /* testing 
+  window.hdesconfig = {
+    ctx: "http://localhost:8080/hdes/projects-services",
+    users: "http://localhost:8080/hdes/projects-services/users",
+    groups: "http://localhost:8080/hdes/projects-services/groups",
+    projects: "http://localhost:8080/hdes/projects-services/projects",
+    headers: {}
+  };
+  /* */
+  
+  
+
 ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>

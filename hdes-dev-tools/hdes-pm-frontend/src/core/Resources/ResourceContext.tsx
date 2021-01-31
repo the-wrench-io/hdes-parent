@@ -10,19 +10,6 @@ type ResourceContextType = {
 }
 
 const createService = (hdesconfig: Backend.ServerConfig | undefined) : Backend.Service => {
-  
-  if(!hdesconfig?.ctx) {
-    /* testing */
-    hdesconfig = {
-      ctx: "http://localhost:8080/hdes/projects-services",
-      users: "http://localhost:8080/hdes/projects-services/users",
-      groups: "http://localhost:8080/hdes/projects-services/groups",
-      projects: "http://localhost:8080/hdes/projects-services/projects",
-      headers: {}
-    };
-    /* */
-  }
-  
   if(hdesconfig?.ctx) {
     return new ServerService(hdesconfig);  
   }

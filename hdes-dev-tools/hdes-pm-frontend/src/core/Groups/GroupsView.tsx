@@ -93,7 +93,7 @@ const GroupsView: React.FC<GroupsViewProps> = ({top, seeMore, onSelect}) => {
               <TableCell>{Object.keys(row.projects).length}</TableCell>
               <TableCell>{Object.keys(row.users).length}</TableCell>
               <TableCell><DateFormat>{row.group.created}</DateFormat></TableCell>
-              <TableCell>
+              <TableCell align="right">
                 <IconButton size="small" onClick={() => onSelect({builder: service.groups.builder(row)})} color="inherit">
                   <TabUnselectedOutlinedIcon />
                 </IconButton>

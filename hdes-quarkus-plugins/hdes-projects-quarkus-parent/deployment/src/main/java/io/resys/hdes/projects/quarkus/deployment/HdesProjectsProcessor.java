@@ -26,7 +26,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
-import io.quarkus.arc.deployment.BeanContainerBuildItem;
 import io.quarkus.arc.deployment.BeanContainerListenerBuildItem;
 import io.quarkus.bootstrap.model.AppArtifact;
 import io.quarkus.deployment.annotations.BuildProducer;
@@ -63,7 +62,6 @@ public class HdesProjectsProcessor {
   
   HdesProjectsConfig hdesProjectsConfig;
   
-  
   @BuildStep
   FeatureBuildItem feature() {
     return new FeatureBuildItem(FEATURE_BUILD_ITEM);
@@ -71,7 +69,7 @@ public class HdesProjectsProcessor {
 
   @BuildStep
   @Record(ExecutionTime.STATIC_INIT)
-  void registerHdesProjectsBeanExtension(
+  void backendBeans(
       HdesProjectsRecorder recorder,
       BuildProducer<AdditionalBeanBuildItem> buildItems,
       BuildProducer<BeanContainerListenerBuildItem> beans) {
@@ -86,54 +84,45 @@ public class HdesProjectsProcessor {
   
   @BuildStep
   @Record(ExecutionTime.RUNTIME_INIT)
-  void registerHdesProjectsBackendExtension(
+  void backendHandlers(
       HdesProjectsRecorder recorder,
-      HttpRootPathBuildItem httpRootPathBuildItem,
-      BodyHandlerBuildItem bodyHandlerBuildItem,
-      BuildProducer<RouteBuildItem> routes,
-      BuildProducer<NotFoundPageDisplayableEndpointBuildItem> displayableEndpoints) {
+      BodyHandlerBuildItem body,
+      BuildProducer<RouteBuildItem> routes) {
     
     if ("/".equals(hdesProjectsConfig.backendPath)) {
       throw new ConfigurationError("quarkus.hdes-projects.backendPath was set to \"/\", this is not allowed as it blocks the application from serving anything else.");
     }
 
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getUsers(), bodyHandlerBuildItem.getHandler()))
+        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getUsers(), body.getHandler()))
         .handler(recorder.userHandler())
         .blockingRoute()
         .build());
     
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getGroups(), bodyHandlerBuildItem.getHandler()))
+        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getGroups(), body.getHandler()))
         .handler(recorder.groupHandler())
         .blockingRoute()
         .build());
     
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getProjects(), bodyHandlerBuildItem.getHandler()))
+        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getProjects(), body.getHandler()))
         .handler(recorder.projectHandler())
         .blockingRoute()
         .build());
-    /*
-    String projectsPath =  httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects());
-    routes.produce(RouteBuildItem.builder().route(projectsPath).handler(BodyHandler.create()).build());
-    routes.produce(RouteBuildItem.builder().route(projectsPath).handler(new HdesProjectsResourceHandler()).handlerType(HandlerType.BLOCKING).build());
-    displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(projectsPath));
-    */
   }
   
   @BuildStep
   @Record(ExecutionTime.RUNTIME_INIT)
-  public void registerProjectsUiHandler(
+  public void frontendHandler(
     HdesProjectsRecorder recorder,
     BuildProducer<RouteBuildItem> routes,
-    HdesProjectsBuildItem finalDestinationBuildItem,
-    LaunchModeBuildItem launchMode,
+    HdesUIBuildItem buildItem,
     HdesProjectsConfig uiConfig) throws Exception {
 
     Handler<RoutingContext> handler = recorder.uiHandler(
-        finalDestinationBuildItem.getUiFinalDestination(),
-        finalDestinationBuildItem.getUiPath());
+        buildItem.getUiFinalDestination(),
+        buildItem.getUiPath());
 
     routes.produce(
       new RouteBuildItem.Builder()
@@ -151,15 +140,11 @@ public class HdesProjectsProcessor {
   
   @BuildStep
   @Record(ExecutionTime.STATIC_INIT)
-  public void registerHdesProjectsUiServletExtension(
-      HdesProjectsRecorder recorder,
-      BuildProducer<RouteBuildItem> routes,
-      BeanContainerBuildItem container,
-      
-      BuildProducer<HdesProjectsBuildItem> hdesProjectsUiBuildProducer,
+  public void frontendBeans(
+      BuildProducer<HdesUIBuildItem> buildProducer,
       
       BuildProducer<GeneratedResourceBuildItem> generatedResources,
-      BuildProducer<NativeImageResourceBuildItem> nativeImageResourceBuildItemBuildProducer,
+      BuildProducer<NativeImageResourceBuildItem> nativeImage,
       
       NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
       CurateOutcomeBuildItem curateOutcomeBuildItem,
@@ -190,7 +175,7 @@ public class HdesProjectsProcessor {
         .build());
       
       
-      hdesProjectsUiBuildProducer.produce(new HdesProjectsBuildItem(tempPath.toAbsolutePath().toString(),
+      buildProducer.produce(new HdesUIBuildItem(tempPath.toAbsolutePath().toString(),
               nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath)));
       displayableEndpoints.produce(new NotFoundPageDisplayableEndpointBuildItem(
               nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath + "/"), "HDES Projects UI"));
@@ -222,9 +207,9 @@ public class HdesProjectsProcessor {
         }
         fileName = FINAL_DESTINATION + "/" + fileName;
         generatedResources.produce(new GeneratedResourceBuildItem(fileName, content));
-        nativeImageResourceBuildItemBuildProducer.produce(new NativeImageResourceBuildItem(fileName));
+        nativeImage.produce(new NativeImageResourceBuildItem(fileName));
       }
-      hdesProjectsUiBuildProducer.produce(new HdesProjectsBuildItem(
+      buildProducer.produce(new HdesUIBuildItem(
         FINAL_DESTINATION,
         nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath)));
     }

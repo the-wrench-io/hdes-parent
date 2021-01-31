@@ -56,11 +56,14 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
     }
     
     case SessionActionType.addTab: {
-      if(!action.addTab) {
-        console.error("Action data error", action);
-        return state;
+      if(action.addTab) {
+        return state.withTab(action.addTab); 
       }
-      return state.withTab(action.addTab);
+      if(action.changeTab !== undefined) {
+        return state.withTab(action.changeTab);  
+      }
+      console.error("Action data error", action);
+      return state;
     }
     
     case SessionActionType.changeTab: {

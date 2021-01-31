@@ -73,7 +73,7 @@ const ConfigureProjectSummary: React.FC<ConfigureProjectSummaryProps> = (props) 
         <List component="div" disablePadding>
           {props.project.groups
             .map(id => groups.filter(p => p.group.id === id)[0])
-            .map(p => (<React.Fragment>              
+            .map((p, pId) => (<React.Fragment key={pId}>              
                 <ListItem key={p.group.id} button className={classes.primary}>
                   <ListItemIcon><GroupOutlinedIcon /></ListItemIcon>
                   <ListItemText primary={p.group.name} />

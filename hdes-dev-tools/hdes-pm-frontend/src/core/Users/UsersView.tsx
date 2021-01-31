@@ -99,7 +99,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
               <TableCell>{Object.keys(row.groups).length}</TableCell>
               <TableCell>{Object.keys(row.projects).length}</TableCell>
               <TableCell><DateFormat>{row.user.created}</DateFormat></TableCell>
-              <TableCell>
+              <TableCell align="right">
                 <IconButton size="small" onClick={() => onSelect({builder: service.users.builder(row)})} color="inherit">
                   <TabUnselectedOutlinedIcon />
                 </IconButton>

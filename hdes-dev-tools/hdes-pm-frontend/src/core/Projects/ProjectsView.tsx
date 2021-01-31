@@ -91,7 +91,7 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onSelect}) => 
               <TableCell>{Object.keys(row.groups).length}</TableCell>
               <TableCell>{Object.keys(row.users).length}</TableCell>
               <TableCell><DateFormat>{row.project.created}</DateFormat></TableCell>
-              <TableCell>
+              <TableCell align="right">
                 <IconButton size="small" onClick={() => onSelect({builder: service.projects.builder(row)})} color="inherit">
                   <TabUnselectedOutlinedIcon />
                 </IconButton>
