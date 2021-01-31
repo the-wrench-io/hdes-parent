@@ -35,8 +35,10 @@ class ServerStore implements Store {
       })
       .catch(errors => this.setErrors(errors, url, init))
       .then(data => {
-        
-        console.log(data);
+        const method = init?.method;
+        if(method === "POST" || method === "PUT" || method === "POST") {
+          this.setUpdates()
+        }
         return data
       }) 
   }

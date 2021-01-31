@@ -141,6 +141,7 @@ public class HdesProjectsProcessor {
   @BuildStep
   @Record(ExecutionTime.STATIC_INIT)
   public void frontendBeans(
+      HdesProjectsRecorder recorder,
       BuildProducer<HdesUIBuildItem> buildProducer,
       
       BuildProducer<GeneratedResourceBuildItem> generatedResources,

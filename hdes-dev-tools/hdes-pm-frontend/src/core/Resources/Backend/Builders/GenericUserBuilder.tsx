@@ -51,8 +51,7 @@ export class GenericUserBuilder implements Backend.UserBuilder {
   }
   get resourceType(): "user" {
     return "user";
-  }
-  
+  }  
   build() {
     return {
       id: this._id,  

@@ -8,52 +8,41 @@ import createDemoData from './DemoData';
 
 
 class DemoService implements Backend.Service {
-  users: Backend.UserService;
-  projects: Backend.ProjectService;
-  groups: Backend.GroupService;
-  store: Store;
-  listener?: (newService: Backend.Service) => void;
+  private _users: Backend.UserService;
+  private _projects: Backend.ProjectService;
+  private _groups: Backend.GroupService;
+  private _store: Store;
+  private _listeners: Backend.ServiceListeners;
   
   constructor() {
     console.log('creating demo service');
     const updateChanges = () => {
-      if(this.listener) {
-        this.listener(new InMemoryService(new Date(), this.store, this.listener));
-      }
+      this.listeners.onSave();
     }
     const demo = createDemoData();
-    this.store = new InMemoryStore(updateChanges, demo.users, demo.projects, demo.access, demo.groups, demo.groupUsers);
-    this.users = new InMemoryUserService(this.store);
-    this.projects = new InMemoryProjectService(this.store);
-    this.groups = new InMemoryGroupService(this.store);
+    this._store = new InMemoryStore(updateChanges, demo.users, demo.projects, demo.access, demo.groups, demo.groupUsers);
+    this._users = new InMemoryUserService(this._store);
+    this._projects = new InMemoryProjectService(this._store);
+    this._groups = new InMemoryGroupService(this._store);
+    this._listeners = { onSave: () => console.log("saved resources") };
   }
 
-  onUpdate = (listener: (newService: Backend.Service) => void) => {
-    this.listener = listener;
+  get users() {
+    return this._users;
   }
-}
-
-class InMemoryService implements Backend.Service {
-  users: Backend.UserService;
-  projects: Backend.ProjectService;
-  groups: Backend.GroupService;
-  store: Store;
-  listener: (newService: Backend.Service) => void;
-  updatedAt: Date;
-  
-  constructor(updatedAt: Date, store: Store, listener: (newService: Backend.Service) => void) {
-    console.log('creating in-memory service');
-    this.listener = listener;
-    this.store = store;
-    this.users = new InMemoryUserService(this.store);
-    this.projects = new InMemoryProjectService(this.store);
-    this.groups = new InMemoryGroupService(this.store);
-    this.updatedAt = updatedAt;
+  get projects() {
+    return this._projects;
   }
-
-  onUpdate = (listener: (newService: Backend.Service) => void) => {
-    this.listener = listener;
+  get groups() {
+    return this._groups;
+  }
+  get listeners() {
+    return this._listeners;
+  }
+  withListeners(listeners: Backend.ServiceListeners) {
+    this._listeners = listeners;
+    return this;
   }
 }
 
-export { DemoService, InMemoryService };
+export { DemoService };

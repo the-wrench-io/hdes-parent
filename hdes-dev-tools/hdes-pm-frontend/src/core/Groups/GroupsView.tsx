@@ -42,9 +42,9 @@ interface GroupsViewProps {
 };
 
 const GroupsView: React.FC<GroupsViewProps> = ({top, seeMore, onSelect}) => {
-  const { service } = React.useContext(Resources.Context);
-  const [groups, setGroups] = React.useState<Backend.GroupResource[]>([]);
-  React.useEffect(() => service.groups.query({ top }).onSuccess(setGroups), [service.groups, top])
+  const { session, service } = React.useContext(Resources.Context);
+  const { groups } = session.data;
+
   
   const classes = useStyles();
   

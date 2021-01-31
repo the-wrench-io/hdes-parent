@@ -51,18 +51,8 @@ interface SearchViewProps {
 
 const SearchView: React.FC<SearchViewProps> = ({ onSelect }) => {
   const { service, session } = React.useContext(Resources.Context);
-  const [users, setUsers] = React.useState<Backend.UserResource[]>([]);
-  const [groups, setGroups] = React.useState<Backend.GroupResource[]>([]);
-  const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
-  
+  const { users, projects, groups } = session.data;
   const [searchResults, setSearchResults] = React.useState<SearchResults>({users: [], projects: [], groups: []});
-  
-  React.useEffect(() => {
-    service.users.query().onSuccess(setUsers)
-    service.groups.query().onSuccess(setGroups)
-    service.projects.query().onSuccess(setProjects)
-  }, [service.users, service.groups, service.projects])
-  
 
   React.useEffect(() => {
     const keyword = session.search;
@@ -75,7 +65,6 @@ const SearchView: React.FC<SearchViewProps> = ({ onSelect }) => {
     }
   }, [session, users, groups, projects])
   
-
   const toView = (resource: Backend.AnyResource) => new Mapper.Resource<View>(resource)
     .project(resource => ({
       id: resource.project.id,

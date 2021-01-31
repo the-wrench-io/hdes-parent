@@ -33,15 +33,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const AddGroup: React.FC<AddGroupProps> = ({open, handleClose, handleConf}) => {
   const classes = useStyles();
-  const { service } = React.useContext(Resources.Context);
   
-  const [users, setUsers] = React.useState<Backend.UserResource[]>([]);
-  const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
-  React.useEffect(() => {  
-    service.users.query().onSuccess(setUsers)
-    service.projects.query().onSuccess(setProjects)
-  }, [service, service.users, service.projects])
-  
+  const { service, session } = React.useContext(Resources.Context);
+  const { users, projects } = session.data;
 
   const [group, setGroup] = React.useState(service.groups.builder());
   const [activeStep, setActiveStep] = React.useState(0);

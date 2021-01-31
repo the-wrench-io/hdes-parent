@@ -47,4 +47,13 @@ export class GenericGroupBuilder implements Backend.GroupBuilder {
   withResource(from: Backend.GroupResource): Backend.GroupBuilder {
     return new GenericGroupBuilder(from.group.id, from.group.name, Object.keys(from.users), Object.keys(from.projects), from.group.rev);
   }
+  build() {
+    return {
+      id: this._id,  
+      rev: this._rev,
+      name: this._name ? this._name : "",
+      projects: this._projects,
+      users: this._users
+    };
+  }
 };

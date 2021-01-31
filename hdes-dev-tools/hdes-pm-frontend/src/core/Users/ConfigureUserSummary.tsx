@@ -40,23 +40,12 @@ interface ConfigureUserSummaryProps {
 const ConfigureUserSummary: React.FC<ConfigureUserSummaryProps> = (props) => {
   const classes = useStyles();
 
-  const { service } = React.useContext(Resources.Context);
-  const [projects, setProjects] = React.useState<Backend.ProjectResource[] | undefined>(props.projects);
-  const [groups, setGroups] = React.useState<Backend.GroupResource[] | undefined>(props.groups);
+  const { session } = React.useContext(Resources.Context);
+  const { groups, projects } = session.data;
+
   const [openProject, setOpenProjects] = React.useState(true);
   const [openGroups, setOpenGroups] = React.useState(true);
 
-
-  React.useEffect(() => {
-    if(!projects || !groups) {
-      service.projects.query().onSuccess(setProjects)
-      service.groups.query().onSuccess(setGroups)
-    }
-  }, [service, service.users, service.groups, groups, projects])
-
-  if(!projects || !groups) {
-    return <div>Loading...</div>;
-  }
 
   return (<div className={classes.root}>
     <List className={classes.root} component="nav" aria-labelledby="nested-list-subheader">
@@ -69,8 +58,8 @@ const ConfigureUserSummary: React.FC<ConfigureUserSummaryProps> = (props) => {
       </ListItem>
       <Collapse in={openGroups} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          { groups.map(p => (
-            <React.Fragment>
+          { groups.map((p, index) => (
+            <React.Fragment key={index}>
               <ListItem key={p.group.id} button className={classes.primary}>
                 <ListItemIcon><GroupOutlinedIcon /></ListItemIcon>
                 <ListItemText primary={p.group.name} />

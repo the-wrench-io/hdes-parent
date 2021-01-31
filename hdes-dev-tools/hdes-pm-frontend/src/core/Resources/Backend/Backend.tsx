@@ -8,12 +8,16 @@ declare namespace Backend {
     resourceType: 'user' | 'project' | 'group';
   }
   
+  interface ServiceListeners {
+    onSave: () => void;
+  }
+  
   interface Service {
     users: UserService;
     projects: ProjectService;
     groups: GroupService;
-
-    onUpdate: (listener: (newService: Service) => void) => void;
+    listeners: ServiceListeners;
+    withListeners: (listeners: ServiceListeners) => Service;
   }
 
   interface GroupService {
@@ -66,6 +70,12 @@ declare namespace Backend {
     withUsers: (users: string[]) => ProjectBuilder;
     withGroups: (groups: string[]) => ProjectBuilder;
     from: (from: ProjectBuilder) => ProjectBuilder;
+    build: () => {
+      id?: string;  
+      rev?: string;
+      name: string;
+      groups: string[];
+      users: string[] };
   }
   
   interface GroupResource {
@@ -88,6 +98,12 @@ declare namespace Backend {
     withUsers: (users: string[]) => GroupBuilder;
     withProjects: (projectes: string[]) => GroupBuilder;
     from: (from: GroupBuilder) => GroupBuilder;
+    build: () => {
+      id?: string;  
+      rev?: string;
+      name: string;
+      projects: string[];
+      users: string[] };
   }
   
   

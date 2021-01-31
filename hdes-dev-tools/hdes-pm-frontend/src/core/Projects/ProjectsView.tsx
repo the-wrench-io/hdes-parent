@@ -40,10 +40,9 @@ interface ProjectsViewProps {
 };
 
 const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onSelect}) => {
-  const { service } = React.useContext(Resources.Context);
-  const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
-  React.useEffect(() => service.projects.query({ top }).onSuccess(setProjects), [service.projects, top])
-  
+
+  const { service, session } = React.useContext(Resources.Context);
+  const { projects } = session.data;
   const classes = useStyles();
   
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);

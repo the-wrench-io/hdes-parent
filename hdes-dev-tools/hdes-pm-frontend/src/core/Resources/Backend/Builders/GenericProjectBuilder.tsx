@@ -34,6 +34,7 @@ export class GenericProjectBuilder implements Backend.ProjectBuilder {
   get groups(): string[] {
     return this._groups;
   }
+  
   withName(name: string): Backend.ProjectBuilder {
     return new GenericProjectBuilder(this._id, name, this._groups, this._users, this._rev);
   }
@@ -48,5 +49,14 @@ export class GenericProjectBuilder implements Backend.ProjectBuilder {
   }
   withResource(from: Backend.ProjectResource) {
     return new GenericProjectBuilder(from.project.id, from.project.name, Object.keys(from.groups), Object.keys(from.users), from.project.rev);
+  }
+  build() {
+    return {
+      id: this._id,  
+      rev: this._rev,
+      name: this._name ? this._name : "",
+      groups: this._groups,
+      users: this._users
+    };
   }
 };

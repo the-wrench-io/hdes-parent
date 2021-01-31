@@ -42,22 +42,11 @@ interface ConfigureProjectSummaryProps {
 const ConfigureProjectSummary: React.FC<ConfigureProjectSummaryProps> = (props) => {
   const classes = useStyles();
   
-  const { service } = React.useContext(Resources.Context);
+  const { session } = React.useContext(Resources.Context);
+  const { users, groups } = session.data;
+  
   const [openUsers, setOpenUsers] = React.useState(true);
   const [openGroups, setOpenGroups] = React.useState(true);
-  const [users, setUsers] = React.useState<Backend.UserResource[] | undefined>(props.users);
-  const [groups, setGroups] = React.useState<Backend.GroupResource[] | undefined>(props.groups);
-
-  React.useEffect(() => {
-    if(!users || !groups) {
-      service.users.query().onSuccess(setUsers)
-      service.groups.query().onSuccess(setGroups)
-    }
-  }, [service, service.users, service.groups, groups, users])
-
-  if(!users || !groups) {
-    return <div>Loading...</div>;
-  }
 
   return (<div className={classes.root}>
     <List className={classes.root} component="nav" aria-labelledby="nested-list-subheader">

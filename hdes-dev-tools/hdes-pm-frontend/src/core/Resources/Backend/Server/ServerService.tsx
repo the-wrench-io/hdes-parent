@@ -7,30 +7,39 @@ import { ServerUserService } from './ServerUserService';
 
 
 class ServerService implements Backend.Service {
-  users: Backend.UserService;
-  projects: Backend.ProjectService;
-  groups: Backend.GroupService;
-  config: Backend.ServerConfig;
-  listener?: (newService: Backend.Service) => void;
-  
-  constructor(config: Backend.ServerConfig) {
-    this.config = config;
-    console.log('creating server service');
-    const updateChanges = () => {
-      if(this.listener) {
-        this.listener(this);
-      }
-    }
+  private _users: Backend.UserService;
+  private _projects: Backend.ProjectService;
+  private _groups: Backend.GroupService;
+  private _config: Backend.ServerConfig;
+  private _listeners: Backend.ServiceListeners;
     
+  constructor(config: Backend.ServerConfig) {
+    console.log('creating server service', config);
+    const updateChanges = () => {
+      this.listeners.onSave();
+    }
+    this._config = config;    
     const store = new ServerStore(updateChanges, config);
-
-    this.users = new ServerUserService(store);
-    this.projects = new InMemoryProjectService(store);
-    this.groups = new InMemoryGroupService(store);
+    this._users = new ServerUserService(store);
+    this._projects = new InMemoryProjectService(store);
+    this._groups = new InMemoryGroupService(store);
+    this._listeners = { onSave: () => console.log("saved resources") };
   }
-
-  onUpdate = (listener: (newService: Backend.Service) => void) => {
-    this.listener = listener;
+  get users() {
+    return this._users;
+  }
+  get projects() {
+    return this._projects;
+  }
+  get groups() {
+    return this._groups;
+  }
+  get listeners() {
+    return this._listeners;
+  }
+  withListeners(listeners: Backend.ServiceListeners) {
+    this._listeners = listeners;
+    return this;
   }
 }
 

@@ -1,4 +1,27 @@
 import { Session } from './Session';
+import { Backend } from '../Backend'; 
+
+
+class GenericData implements Session.Data {
+  private _users: Backend.UserResource[];
+  private _projects: Backend.ProjectResource[];
+  private _groups: Backend.GroupResource[]; 
+  
+  constructor(projects?: Backend.ProjectResource[], groups?: Backend.GroupResource[], users?: Backend.UserResource[]) {
+    this._users = users ? users : [];
+    this._projects = projects ? projects : [];
+    this._groups = groups ? groups : [];
+  }
+  get users() {
+    return this._users;
+  }
+  get projects() {
+    return this._projects;
+  }
+  get groups() {
+    return this._groups;
+  }
+}
 
 
 class GenericInstance implements Session.Instance {  
@@ -6,14 +29,21 @@ class GenericInstance implements Session.Instance {
   private _history: Session.History;
   private _dialogId?: string;
   private _search;
+  private _data: Session.Data;
   
-  constructor(tabs?: Session.Tab[], history?: Session.History, dialogId?: string, search?: string) {
+  constructor(tabs?: Session.Tab[], history?: Session.History, dialogId?: string, search?: string, data?: Session.Data) {
     this._tabs = tabs ? tabs : [];
     this._history = history ? history : { open: 0 };
     this._dialogId = dialogId;
     this._search = search ? search : '';
+    this._data = data ? data : new GenericData();
   }
-  
+  private next(history: Session.History, tabs?: Session.Tab[]): Session.Instance {
+    return new GenericInstance(tabs ? tabs : this.tabs, history, this.dialogId, this._search, this._data);
+  }
+  get data() {
+    return this._data;
+  }
   get search() {
     return this._search;
   }
@@ -26,17 +56,19 @@ class GenericInstance implements Session.Instance {
   get dialogId() {
     return this._dialogId;
   }
-
+  withData(init: Session.DataInit): Session.Instance {
+    const users = init.users ? init.users : this._data.users;
+    const groups = init.groups ? init.groups : this._data.groups;
+    const projects = init.projects ? init.projects : this._data.projects;
+    const newData: Session.Data = new GenericData(projects, groups, users);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, newData);
+  }
   withSearch(search?: string): Session.Instance {
-    return new GenericInstance(this._tabs, this._history, this._dialogId, search);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, search, this._data);
   }
   withDialog(dialogId?: string): Session.Instance {
-    return new GenericInstance(this._tabs, this._history, dialogId, this._search);
-  }
-  private next(history: Session.History, tabs?: Session.Tab[]): Session.Instance {
-    return new GenericInstance(tabs ? tabs : this.tabs, history, this.dialogId, this._search);
-  }
-  
+    return new GenericInstance(this._tabs, this._history, dialogId, this._search, this._data);
+  }  
   withTabData(tabId: string, updateCommand: (oldData: any) => any): Session.Instance {
     const tabs: Session.Tab[] = [];
     for(const tab of this.tabs) {

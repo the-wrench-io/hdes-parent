@@ -49,7 +49,8 @@ class ServerUserService implements Backend.UserService {
         };
           
         const url: string = store.config.users
-        store.fetch<Backend.UserResource>(url, init).then(callback) 
+        store.fetch<Backend.UserResource>(url, init)
+          .then(callback)
       }
     }
   }

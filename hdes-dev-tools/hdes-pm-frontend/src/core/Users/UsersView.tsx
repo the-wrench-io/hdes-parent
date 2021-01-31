@@ -40,10 +40,9 @@ interface UserViewProps {
 };
 
 const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
-  const { service } = React.useContext(Resources.Context);
-  const [users, setUsers] = React.useState<Backend.UserResource[]>([]);
-  React.useEffect(() => service.users.query({ top }).onSuccess(setUsers), [service.users, top])
-  
+  const { service, session } = React.useContext(Resources.Context);
+  const { users } = session.data;
+
   const classes = useStyles();
   
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);

@@ -1,3 +1,4 @@
+import {Backend} from '../Backend';
 
 declare namespace Session {
   interface Tab {
@@ -13,12 +14,26 @@ declare namespace Session {
     open: number;
   }
   
+  interface Data {
+    users: Backend.UserResource[];
+    projects: Backend.ProjectResource[];
+    groups: Backend.GroupResource[]; 
+  }
+  
+  interface DataInit {
+    users?: Backend.UserResource[]; 
+    projects?: Backend.ProjectResource[], 
+    groups?: Backend.GroupResource[];
+  }
+  
   interface Instance {  
     tabs: Tab[];
     history: History;
     dialogId?: string;
     search?: string;
+    data: Data
     
+    withData(newData: DataInit): Instance;
     withSearch(keyword: string): Instance;
     withDialog(dialogId?: string): Instance;
     withTabData(tabId: string, updateCommand: (oldData: any) => any): Instance;

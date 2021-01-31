@@ -49,15 +49,9 @@ interface ConfigureUserProps {
 
 const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
   const classes = useStyles();
-  const { service } = React.useContext(Resources.Context);
- 
-  const [projects, setProjects] = React.useState<Backend.ProjectResource[]>([]);
-  const [groups, setGroups] = React.useState<Backend.GroupResource[]>([]);
+  const { service, session } = React.useContext(Resources.Context);
+  const { groups, projects } = session.data;
 
-  React.useEffect(() => {
-    service.projects.query().onSuccess(setProjects)
-    service.groups.query().onSuccess(setGroups)
-  }, [service, service.projects, service.groups])
  
   const user = props.getUser();
   const setUser = props.setUser;

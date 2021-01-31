@@ -3,12 +3,13 @@ import { Session } from './Session';
 
 enum SessionActionType {
   addTab, removeTab, changeTab, savedTab, onConfirm,
-  setTabData, setDialog, setSearch,
+  setTabData, setDialog, setSearch, setData
 }
 
 interface SessionAction {
   type: SessionActionType;
   
+  setData?: Session.DataInit;
   setDialog?: string;
   setSearch?: { keyword?: string, tab?: Session.Tab };
   addTab?: Session.Tab;
@@ -20,6 +21,7 @@ interface SessionAction {
 }
 
 const sessionActions = {
+  setData: (setData: Session.DataInit) => ({ type: SessionActionType.setData, setData }),
   addTab: (addTab: Session.Tab) => ({ type: SessionActionType.addTab, addTab }),
   removeTab: (removeTab: string) => ({ type: SessionActionType.removeTab, removeTab}),
   changeTab: (changeTab: number) => ({ type: SessionActionType.addTab, changeTab}),
@@ -42,7 +44,14 @@ const sessionActions = {
 
 const sessionReducer = (state: Session.Instance, action: SessionAction): Session.Instance => {
   switch (action.type) {
-    
+    case SessionActionType.setData: {
+      if(!action.setData) {
+        console.error("Action data error", action);
+        return state;
+      }
+      return state.withData(action.setData);
+    }
+        
     case SessionActionType.onConfirm: {
       if(!action.onConfirm) {
         console.error("Action data error", action);
