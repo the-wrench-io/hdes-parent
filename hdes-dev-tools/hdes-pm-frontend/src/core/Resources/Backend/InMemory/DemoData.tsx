@@ -3,10 +3,10 @@ import Backend from './../Backend';
 
 const createDemoData = () => {
   const users: Backend.User[] = [
-      {id: "1", rev: "1r6", name: "bob",         email: "sarg@city",      created: new Date("2019-01-01"), token: "sdkfhksdfh"},
-      {id: "2", rev: "2r6", name: "sam",         email: "guard@city",     created: new Date("2019-01-01"), token: "sdfjkxcghjgf"},
-      {id: "3", rev: "3r6", name: "goblin",      email: "",               created: new Date("2019-01-01"), token: "vxmcnbghrf"},
-      {id: "4", rev: "4r6", name: "bridgetroll", email: "guards@bridges", created: new Date("2019-01-01"), token: "cjlkjhyuk"},
+      {id: "1", rev: "1r6", name: "bob",         email: "sarg@city",      created: new Date("2019-01-01"), token: "sdkfhksdfh", status: "ENABLED"},
+      {id: "2", rev: "2r6", name: "sam",         email: "guard@city",     created: new Date("2019-01-01"), token: "sdfjkxcghjgf", status: "ENABLED"},
+      {id: "3", rev: "3r6", name: "goblin",      email: "",               created: new Date("2019-01-01"), token: "vxmcnbghrf", status: "ENABLED"},
+      {id: "4", rev: "4r6", name: "bridgetroll", email: "guards@bridges", created: new Date("2019-01-01"), token: "cjlkjhyuk", status: "PENDING"},
   ];
   const projects: Backend.Project[] = [
     {id: "5", rev: "1xb", name: "scoring project 1", created: new Date("2010-01-01")},

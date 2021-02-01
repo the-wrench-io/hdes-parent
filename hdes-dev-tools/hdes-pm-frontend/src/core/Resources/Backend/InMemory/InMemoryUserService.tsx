@@ -50,10 +50,17 @@ class InMemoryUserService implements Backend.UserService {
     return {
       onSuccess: (callback: (resource: Backend.UserResource) => void) => {
         
+        if(builder.id) {
+          callback(store.setUser(builder))
+          store.setUpdates(); 
+          return;
+        }
+        
         // user entry
         const newUser: Backend.User = {
           id: store.uuid(),
           rev: store.uuid(),
+          status: builder.status ? builder.status: "ENABLED",
           token: builder.token ? builder.token : "",
           name: builder.name ? builder.name : "",
           email: builder.email ? builder.email : "",

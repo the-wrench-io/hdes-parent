@@ -114,6 +114,7 @@ declare namespace Backend {
     groups: Record<string, Group>;
     groupUsers: Record<string, GroupUser>;
   }
+  
 
   interface UserBuilder extends ResourceBuilder {
     id?: string; 
@@ -122,6 +123,7 @@ declare namespace Backend {
     rev?: string;
     externalId?: string;
     token?: string;
+    status?: UserStatus;
     groups: string[];
     projects: string[];
 
@@ -132,6 +134,7 @@ declare namespace Backend {
     withToken: (token: string) => UserBuilder;
     withProjects: (projects: string[]) => UserBuilder;
     withGroups: (groups: string[]) => UserBuilder;
+    withStatus: (status: Backend.UserStatus) => Backend.UserBuilder;
     from: (from: UserBuilder) => UserBuilder;
     build: () => {
       id?: string;  
@@ -139,9 +142,12 @@ declare namespace Backend {
       externalId?: string;
       name: string;
       email: string;
+      status?: UserStatus;
       groups: string[];
       projects: string[] };
   }
+  
+  type UserStatus = "PENDING" | "ENABLED" | "DISABLED";
   
   interface User {
     id: string;
@@ -149,6 +155,7 @@ declare namespace Backend {
     name: string;
     email: string;
     token: string;
+    status: UserStatus;
     externalId?: string;
     created: Date | number[];
   }

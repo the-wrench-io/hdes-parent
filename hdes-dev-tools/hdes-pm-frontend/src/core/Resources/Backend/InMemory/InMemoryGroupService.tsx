@@ -54,7 +54,13 @@ class InMemoryGroupService implements Backend.GroupService {
     const store = this.store;
     return {
       onSuccess: (callback: (resource: Backend.GroupResource) => void) => {
-          
+        
+        if(builder.id) {
+          callback(store.setGroup(builder))
+          store.setUpdates();
+          return; 
+        }
+        
         // user entry
         const newGroup: Backend.Group = {
           id: store.uuid(),

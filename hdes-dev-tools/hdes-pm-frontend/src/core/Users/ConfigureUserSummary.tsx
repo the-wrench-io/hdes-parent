@@ -49,7 +49,7 @@ const ConfigureUserSummary: React.FC<ConfigureUserSummaryProps> = (props) => {
 
   return (<div className={classes.root}>
     <List className={classes.root} component="nav" aria-labelledby="nested-list-subheader">
-      <Title>User {props.user.name} / {props.user.externalId}</Title>
+      <Title>User {props.user.name} / {props.user.status}</Title>
       <Divider />
       
       <ListItem button onClick={() => setOpenGroups(!openGroups)}>

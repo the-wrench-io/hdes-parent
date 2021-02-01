@@ -45,7 +45,8 @@ class InMemoryProjectService implements Backend.ProjectService {
         // delete old resources
         if(builder.id) {
           callback(store.setProject(builder))
-          store.setUpdates(); 
+          store.setUpdates();
+          return; 
         }
                   
         // user entry

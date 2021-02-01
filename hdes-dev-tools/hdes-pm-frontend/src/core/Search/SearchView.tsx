@@ -84,7 +84,7 @@ const SearchView: React.FC<SearchViewProps> = ({ onSelect }) => {
     }))
     .user(resource => ({
       id: resource.user.id,
-      name: resource.user.name,
+      name: resource.user.name + ' / ' + resource.user.status,
       created: resource.user.created,
       src: resource,
       type: "users",

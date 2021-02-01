@@ -14,9 +14,10 @@ import GroupAddOutlinedIcon from '@material-ui/icons/GroupAddOutlined';
 import GroupOutlinedIcon from '@material-ui/icons/GroupOutlined';
 import LibraryBooksOutlinedIcon from '@material-ui/icons/LibraryBooksOutlined';
 import PersonOutlineOutlinedIcon from '@material-ui/icons/PersonOutlineOutlined';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 
 import { Resources, Backend, Session, Mapper } from './core/Resources';
-import { AddUser, ConfigureUserInTab, UsersView } from './core/Users';
+import { AddUser, ConfigureUserInTab, UsersView, ApproveView } from './core/Users';
 import { AddProject, ConfigureProjectInTab, ProjectsView } from './core/Projects';
 import { AddGroup, ConfigureGroupInTab, GroupsView } from './core/Groups';
 import { ResourceSaved } from './core/Views';
@@ -86,6 +87,7 @@ function App() {
   const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: <ProjectsView onSelect={openInTab}/>});
   const listUsers     = () => addTab({id: 'users', label: 'Users', panel: <UsersView onSelect={openInTab}/>});
   const listSearch    = () => addTab({id: 'search', label: 'Search...', panel: <SearchView onSelect={openInTab} />});
+  const listApprovals = () => addTab({id: 'approvals', label: 'Approvals', panel: <ApproveView onSelect={openInTab} />});
 
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
       <Paper className={fixedHeightPaper}>
@@ -108,6 +110,7 @@ function App() {
     <Shell init={0} 
       views={[
         { label: 'Dashboard', icon: <AppsOutlinedIcon />, onClick: listDashboard},
+        { label: 'List Approvals', icon: <ThumbUpIcon />, onClick: listApprovals},
         { label: 'List Groups', icon: <GroupOutlinedIcon />, onClick: listGroups},
         { label: 'List Users', icon: <PersonOutlineOutlinedIcon />, onClick: listUsers},
         { label: 'List Projects', icon: <LibraryBooksOutlinedIcon />, onClick: listProjects} ]}

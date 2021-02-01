@@ -28,10 +28,11 @@ const ConfigureUserBasic: React.FC<ConfigureUserBasicProps> = ({name, token, ext
       onChange={({target}) => externalId.onChange(target.value)}
       defaultValue={externalId.defaultValue ? externalId.defaultValue : ''}/>
 
-    <TextField margin="dense" id="token" label="Token" type="password" fullWidth
+{ token.defaultValue ? 
+    (<TextField margin="dense" id="token" label="Token" type="password" fullWidth
       onChange={({target}) => token.onChange(target.value)}
-      defaultValue={token.defaultValue ? token.defaultValue : ''}/>
-      
+      defaultValue={token.defaultValue ? token.defaultValue : ''}/>) : null
+}
   </React.Fragment>);
   
 }

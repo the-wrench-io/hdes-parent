@@ -13,6 +13,8 @@ import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import TabUnselectedOutlinedIcon from '@material-ui/icons/TabUnselectedOutlined';
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+
 
 import { Title, Summary, DateFormat } from '.././Views';
 import { Resources, Backend } from '.././Resources';
@@ -39,7 +41,7 @@ interface UserViewProps {
   onSelect: (props: {builder: Backend.UserBuilder, edit?: boolean, activeStep?: number}) => void
 };
 
-const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
+const ApproveView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
   const { service, session } = React.useContext(Resources.Context);
   const { users } = session.data;
 
@@ -56,12 +58,22 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
   };
   const openPopover = Boolean(anchorEl);
   
+  const handleApprove = (user: Backend.UserBuilder) => {
+    service.users.save(user
+      .withStatus("ENABLED"))
+      .onSuccess(resource => {
+
+      });
+  };
+
+  
   return (
     <React.Fragment>
-      <Title>{top ? 'Recent Users' : 'All Users'}</Title>
+      <Title>{top ? 'Recent Approvals' : 'All Approvals'}</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
+            <TableCell>Accept</TableCell>
             <TableCell>Name</TableCell>
             <TableCell></TableCell>
             <TableCell>Email</TableCell>
@@ -73,8 +85,13 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {users.filter(u => u.user.status === 'ENABLED').map((row) => (
+          {users.filter(u => u.user.status === 'PENDING').map((row) => (
             <TableRow key={row.user.id}>
+              <TableCell>
+                <IconButton size="small" onClick={() => handleApprove(service.users.builder(row))} color="secondary">
+                  <ThumbUpIcon />
+                </IconButton>
+              </TableCell>
               <TableCell>
                 <Typography aria-haspopup="true"
                   aria-owns={openPopover ? 'mouse-over-popover' : undefined}
@@ -129,7 +146,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
             event.preventDefault();
             seeMore();
           }}>
-            See more users
+            See more approvals
           </Link>
         </div>) :
         null
@@ -138,5 +155,5 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
   );
 }
 
-export default UsersView;
+export default ApproveView;
 
