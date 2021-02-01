@@ -69,6 +69,25 @@ public abstract class HdesResourceHandler implements Handler<RoutingContext> {
     }
   }
   
+  public static void catch404(String id, HdesProjectsContext ctx, HttpServerResponse response) {
+    
+    // Log error
+    String log = new StringBuilder().append("Token not found with id: ").append(id).toString();
+    String hash = RepoAssert.exceptionHash(log);
+    LOGGER.error(hash + " - " + log);
+    
+    // Msg back to ui
+    List<StatusMessage> messages = Arrays.asList(ImmutableStatusMessage.builder()
+        .id("not-found")
+        .value(log)
+        .logCode(hash)
+        .logStack(log)
+        .build());
+    response.headers().set(HttpHeaders.CONTENT_TYPE, "application/json; charset=UTF-8");
+    response.setStatusCode(422);
+    response.end(Buffer.buffer(ctx.writer().build(messages)));
+  }
+  
   public static void catch422(Exception e, HdesProjectsContext ctx, HttpServerResponse response) {
     String stack = ExceptionUtils.getStackTrace(e);
     

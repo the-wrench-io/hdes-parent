@@ -21,14 +21,19 @@ package io.resys.hdes.projects.spi.mongodb.batch;
  */
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.resys.hdes.projects.api.ImmutableTokenAccessResource;
+import io.resys.hdes.projects.api.ImmutableTokenResource;
 import io.resys.hdes.projects.api.PmRepository.BatchGroupQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchProjectQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchQuery;
+import io.resys.hdes.projects.api.PmRepository.BatchTokensQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchUserQuery;
 import io.resys.hdes.projects.api.PmRepository.GroupResource;
 import io.resys.hdes.projects.api.PmRepository.ProjectResource;
+import io.resys.hdes.projects.api.PmRepository.TokenResource;
 import io.resys.hdes.projects.api.PmRepository.UserResource;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery;
 
@@ -39,6 +44,32 @@ public class BatchQueryDefault implements BatchQuery {
   public BatchQueryDefault(MongoQuery query) {
     super();
     this.query = query;
+  }
+  
+  @Override
+  public BatchTokensQuery tokens() {
+    return new BatchTokensQuery() {
+      
+      @Override
+      public Optional<TokenResource> findOne(String token) {
+        final var user = query.user().token(token).findOne();
+        if(user.isEmpty()) {
+          return Optional.empty();
+        }
+        final UserResource resource = ResourceMapper.map(query, user.get());
+        return Optional.of(ImmutableTokenResource.builder()
+            .name(resource.getUser().getName())
+            .email(resource.getUser().getEmail())
+            .id(resource.getUser().getToken())
+            .addAllAccess(resource.getProjects().values().stream()
+                .map(p -> ImmutableTokenAccessResource.builder()
+                    .name(p.getName())
+                    .id(p.getId())
+                    .build())
+                .collect(Collectors.toList()))
+            .build());
+      }
+    };
   }
   
   @Override
@@ -115,5 +146,4 @@ public class BatchQueryDefault implements BatchQuery {
       }
     };
   }
-  
 }

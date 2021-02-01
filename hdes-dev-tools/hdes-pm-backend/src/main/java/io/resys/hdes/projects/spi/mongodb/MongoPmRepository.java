@@ -205,7 +205,6 @@ public class MongoPmRepository implements PmRepository {
           return ResourceMapper.map(query, created);
         });
       }
-        
       @Override
       public ProjectResource project(BatchProject project) {
         return tx.accept(client -> {
@@ -271,6 +270,7 @@ public class MongoPmRepository implements PmRepository {
       if (config == null) {
         config = ImmutableMongoDbConfig.builder()
             .db("PM")
+            .transactions("transactions")
             .projects("projects")
             .users("users")
             .access("access")

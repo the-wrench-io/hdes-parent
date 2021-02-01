@@ -28,13 +28,13 @@ public class HdesProjectsConfig {
   /**
    * projects UI path, anything except '/'
    */
-  @ConfigItem(defaultValue = "/hdes/projects-ui")
+  @ConfigItem(defaultValue = "/hdes-pm/ui")
   String frontendPath;
 
   /**
    * projects services path, anything except '/'
    */
-  @ConfigItem(defaultValue = "/hdes/projects-services")
+  @ConfigItem(defaultValue = "/hdes-pm/rest-api")
   String backendPath;
   
   /**
@@ -45,14 +45,17 @@ public class HdesProjectsConfig {
   
   
   public String getProjects() {
-    return backendPath + "/projects";
+    return backendPath + "/resources/projects";
   }
   
   public String getUsers() {
-    return backendPath + "/users";
+    return backendPath + "/resources/users";
   }
   
   public String getGroups() {
-    return backendPath + "/groups";
+    return backendPath + "/resources/groups";
+  }
+  public String getTokens() {
+    return backendPath + "/tokens/:id";
   }
 }

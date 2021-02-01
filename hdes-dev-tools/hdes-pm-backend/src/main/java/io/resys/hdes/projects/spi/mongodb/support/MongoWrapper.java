@@ -36,6 +36,7 @@ public interface MongoWrapper {
   @Value.Immutable
   interface MongoDbConfig {
     String getDb();
+    String getTransactions();
     String getProjects();
     String getUsers();
     String getGroups();

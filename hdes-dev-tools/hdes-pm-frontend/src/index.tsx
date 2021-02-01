@@ -14,15 +14,13 @@ declare global {
   
   /* testing 
   window.hdesconfig = {
-    ctx: "http://localhost:8080/hdes/projects-services",
-    users: "http://localhost:8080/hdes/projects-services/users",
-    groups: "http://localhost:8080/hdes/projects-services/groups",
-    projects: "http://localhost:8080/hdes/projects-services/projects",
+    ctx:      "http://localhost:8080/hdes-pm/rest-api/resources",
+    users:    "http://localhost:8080/hdes-pm/rest-api/resources/users",
+    groups:   "http://localhost:8080/hdes-pm/rest-api/resources/groups",
+    projects: "http://localhost:8080/hdes-pm/rest-api/resources/projects",
     headers: {}
   };
   /* */
-  
-  
 
 ReactDOM.render(
   <React.StrictMode>

@@ -47,24 +47,27 @@ public class ExtensionTests {
 
   @Test
   public void getUI() {
-    RestAssured.when().get("q/hdes/projects-ui").then().statusCode(200);
-    RestAssured.when().get("/q/hdes/projects-ui/index.html").then().statusCode(200);
+    RestAssured.when().get("/hdes-pm/ui").then().statusCode(200);
+    RestAssured.when().get("q/hdes-pm/ui").then().statusCode(200);
+    RestAssured.when().get("/q/hdes-pm/ui/index.html").then().statusCode(200);
   }
   
   @Test
   public void getProjects() {
-    RestAssured.when().get("/hdes/projects-services/projects").then().statusCode(200);
+    RestAssured.when().get("/hdes-pm/rest-api/resources/projects").then().statusCode(200);
   }
   @Test
   public void getPostUsers() {
-    RestAssured.when().get("/hdes/projects-services/users").then().statusCode(200);
+    RestAssured.when().get("/hdes-pm/rest-api/resources/users").then().statusCode(200);
     RestAssured.given()
-    .body(""" 
+    .body("""
         {"name": "good user", "email": "good@gmail.com"}
-        """).when().post("/hdes/projects-services/users").then().statusCode(200);
-  }  
-  //@Test
-  public void responsesDebug() {
-    RestAssured.given().body("{}").when().post("/hdes-ui/services/debug/superBranch/superResource").then().statusCode(200);
+        """).when().post("/hdes-pm/rest-api/resources/users")
+    .then()
+    .statusCode(200);
+    
+    String token = RestAssured.when().get("/hdes-pm/rest-api/resources/users").jsonPath().get("[0].user.token");
+    RestAssured.given().basePath("/hdes-pm/rest-api/tokens").pathParam("id", token).get("/{id}").then().statusCode(200);
+
   }
 }

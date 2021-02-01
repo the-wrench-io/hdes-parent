@@ -59,9 +59,14 @@ public interface PmRepository {
   }
   
   interface BatchQuery {
+    BatchTokensQuery tokens();
     BatchUserQuery users();
     BatchGroupQuery groups();
     BatchProjectQuery project();
+  }
+
+  interface BatchTokensQuery {
+    Optional<TokenResource> findOne(String token);
   }
   
   interface BatchProjectQuery {
@@ -161,6 +166,25 @@ public interface PmRepository {
     Map<String, Project> getProjects();
     Map<String, Access> getAccess();
     Map<String, GroupUser> getGroupUser();
+  }
+  
+  
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableTokenResource.class)
+  @JsonDeserialize(as = ImmutableTokenResource.class)
+  interface TokenResource extends BatchResource {
+    String getName();
+    String getEmail();
+    String getId();
+    List<TokenAccessResource> getAccess();
+  }
+  
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableTokenAccessResource.class)
+  @JsonDeserialize(as = ImmutableTokenAccessResource.class)
+  interface TokenAccessResource extends BatchResource {
+    String getId();
+    String getName();
   }
   
   @JsonSerialize(as = ImmutableProject.class)

@@ -94,6 +94,12 @@ public class HdesProjectsProcessor {
     }
 
     routes.produce(new RouteBuildItem.Builder()
+        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getTokens(), body.getHandler()))
+        .handler(recorder.tokenHandler())
+        .blockingRoute()
+        .build());
+    
+    routes.produce(new RouteBuildItem.Builder()
         .routeFunction(recorder.routeFunction(hdesProjectsConfig.getUsers(), body.getHandler()))
         .handler(recorder.userHandler())
         .blockingRoute()

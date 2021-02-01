@@ -32,6 +32,7 @@ import io.quarkus.vertx.http.runtime.CurrentVertxRequest;
 import io.resys.hdes.pm.quarkus.runtime.handlers.HdesGroupsResourceHandler;
 import io.resys.hdes.pm.quarkus.runtime.handlers.HdesProjectsResourceHandler;
 import io.resys.hdes.pm.quarkus.runtime.handlers.HdesProjectsUiStaticHandler;
+import io.resys.hdes.pm.quarkus.runtime.handlers.HdesTokensResourceHandler;
 import io.resys.hdes.pm.quarkus.runtime.handlers.HdesUsersResourceHandler;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.Route;
@@ -87,11 +88,26 @@ public class HdesProjectsRecorder {
     return new HdesUsersResourceHandler();
   }
 
+  public Handler<RoutingContext> tokenHandler() {
+    Instance<CurrentIdentityAssociation> identityAssociations = CDI.current().select(CurrentIdentityAssociation.class);
+    CurrentIdentityAssociation association;
+    if (identityAssociations.isResolvable()) {
+      association = identityAssociations.get();
+    } else {
+      association = null;
+    }
+    CurrentVertxRequest currentVertxRequest = CDI.current().select(CurrentVertxRequest.class).get();
+    return new HdesTokensResourceHandler();
+  }
+
+  
   public Function<Router, Route> routeFunction(String rootPath, Handler<RoutingContext> bodyHandler) {
     return new Function<Router, Route>() {
       @Override
       public Route apply(Router router) {
-        return router.route(rootPath).handler(bodyHandler);
+        return router
+            .route(rootPath)
+            .handler(bodyHandler);
       }
     };
   }
