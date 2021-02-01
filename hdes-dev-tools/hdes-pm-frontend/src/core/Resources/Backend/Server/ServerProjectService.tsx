@@ -15,7 +15,7 @@ class ServerProjectQuery implements Backend.ProjectQuery {
   onSuccess(handle: (users: Backend.ProjectResource[]) => void) {
     const store = this.store;
     const init: RequestInit = { method: 'GET', credentials: 'same-origin', headers: store.config.headers }
-    const url: string = store.config.users
+    const url: string = store.config.projects
     store.fetch<Backend.ProjectResource[]>(url, init).then(handle)
   }
 }
@@ -47,7 +47,7 @@ class ServerProjectService implements Backend.ProjectService {
           body: JSON.stringify(builder.build())
         };
           
-        const url: string = store.config.users
+        const url: string = store.config.projects
         store.fetch<Backend.ProjectResource>(url, init)
           .then(callback)
       }

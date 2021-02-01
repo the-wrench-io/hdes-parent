@@ -57,6 +57,7 @@ class GenericInstance implements Session.Instance {
     return this._dialogId;
   }
   withData(init: Session.DataInit): Session.Instance {
+    console.log(init);
     const users = init.users ? init.users : this._data.users;
     const groups = init.groups ? init.groups : this._data.groups;
     const projects = init.projects ? init.projects : this._data.projects;
