@@ -24,7 +24,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,13 +100,6 @@ public class MongoBuilderCreate implements MongoBuilder {
             .build();
         
         mongo.getDb().getCollection(mongo.getConfig().getProjects(), Project.class).insertOne(project);
-
-        mongo.getDb().getCollection(mongo.getConfig().getProjects(), Project.class).find()
-        .forEach((Consumer<Project>) x -> {
-          System.out.println(x);
-        });;
-
-        
         collect.putProject(project.getId(), project);
         
         if(users != null) {

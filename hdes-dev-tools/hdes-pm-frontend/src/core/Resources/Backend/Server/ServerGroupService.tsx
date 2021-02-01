@@ -41,7 +41,7 @@ class ServerGroupService implements Backend.GroupService {
     return {
       onSuccess: (callback: (resource: Backend.GroupResource) => void) => {
         const init: RequestInit = { 
-          method: 'POST', 
+          method: builder.id ? 'PUT' : 'POST',
           credentials: 'same-origin', 
           headers: store.config.headers,
           body: JSON.stringify(builder.build())

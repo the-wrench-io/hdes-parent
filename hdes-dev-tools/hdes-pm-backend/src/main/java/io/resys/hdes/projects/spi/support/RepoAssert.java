@@ -70,10 +70,9 @@ public class RepoAssert {
   public static void notEmptyAll(Supplier<String> message, String ...fields) {
     for(String field : fields) {
       if (field == null || field.isBlank()) {
-        break;
+        throw new PmRepoException(getMessage(message));
       }
     }
-    throw new PmRepoException(getMessage(message));
   }
   public static void notNull(Object object, Supplier<String> message) {
     if (object == null) {

@@ -326,7 +326,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
         QueryResultWithAccess<User> queryResult = query.user().id(id).rev(rev).getWithFilter();
         
         User oldValue = queryResult.getValue();
-        if(token.equals(oldValue.getToken()) && query.user().token(token).findOne().isPresent()) {
+        if(token != null && token.equals(oldValue.getToken()) && query.user().token(token).findOne().isPresent()) {
           throw new PmException(ImmutableConstraintViolation.builder()
               .id(queryResult.getValue().getId())
               .rev(queryResult.getValue().getRev())
@@ -364,20 +364,12 @@ public class MongoBuilderUpdate implements MongoBuilder {
             updates.add(Updates.set(UserCodec.TOKEN, token));
           }
           if(status != null && !status.equals(oldValue.getStatus())) {
-            updates.add(Updates.set(UserCodec.STATUS, status));
+            updates.add(Updates.set(UserCodec.STATUS, status.name()));
           }
           mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class)
           .updateOne(queryResult.getFilter(), Updates.combine(updates));
         
-          user = ImmutableUser.builder()
-              .from(queryResult.getValue())
-              .rev(newRev)
-              .name(name)
-              .email(email)
-              .status(status)
-              .externalId(externalId)
-              .token(token)
-              .build();          
+          user = query.user().id(id).get();          
         }
         
         if(groups == null && projects == null) {

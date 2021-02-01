@@ -41,7 +41,7 @@ class ServerProjectService implements Backend.ProjectService {
     return {
       onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
         const init: RequestInit = { 
-          method: 'POST', 
+          method: builder.id ? 'PUT' : 'POST', 
           credentials: 'same-origin', 
           headers: store.config.headers,
           body: JSON.stringify(builder.build())

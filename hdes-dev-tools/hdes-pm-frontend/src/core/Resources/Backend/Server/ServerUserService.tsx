@@ -41,7 +41,7 @@ class ServerUserService implements Backend.UserService {
     return {
       onSuccess: (callback: (resource: Backend.UserResource) => void) => {
         const init: RequestInit = { 
-          method: 'POST', 
+          method: builder.id ? 'PUT' : 'POST',
           credentials: 'same-origin', 
           headers: store.config.headers,
           body: JSON.stringify(builder.build())
