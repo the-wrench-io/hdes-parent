@@ -39,8 +39,7 @@ class ServerUserService implements Backend.UserService {
   save(builder: Backend.UserBuilder) {
     const store = this.store;
     return {
-      onSuccess: (callback: (resource: Backend.UserResource) => void) => {        
-        const store = this.store;
+      onSuccess: (callback: (resource: Backend.UserResource) => void) => {
         const init: RequestInit = { 
           method: 'POST', 
           credentials: 'same-origin', 

@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -47,8 +48,13 @@ public interface PmRepository {
   }
   
   interface BatchBuilder {
+    ProjectResource project(Consumer<ImmutableBatchProject.Builder> builder);
     ProjectResource project(BatchProject project);
+    
+    GroupResource group(Consumer<ImmutableBatchGroup.Builder> builder);
     GroupResource group(BatchGroup group);
+    
+    UserResource user(Consumer<ImmutableBatchUser.Builder> builder);
     UserResource user(BatchUser user);
   }
   
@@ -86,8 +92,11 @@ public interface PmRepository {
   @JsonSerialize(as = ImmutableBatchProject.class)
   @JsonDeserialize(as = ImmutableBatchProject.class)
   interface BatchProject extends BatchMutator {
+    @Nullable
     String getName();
+    @Nullable
     List<String> getUsers();
+    @Nullable
     List<String> getGroups();
   }
 
@@ -95,8 +104,11 @@ public interface PmRepository {
   @JsonSerialize(as = ImmutableBatchGroup.class)
   @JsonDeserialize(as = ImmutableBatchGroup.class)
   interface BatchGroup extends BatchMutator {
+    @Nullable
     String getName();
+    @Nullable
     List<String> getUsers();
+    @Nullable
     List<String> getProjects();
   }
 
@@ -104,11 +116,17 @@ public interface PmRepository {
   @JsonSerialize(as = ImmutableBatchUser.class)
   @JsonDeserialize(as = ImmutableBatchUser.class)
   interface BatchUser extends BatchMutator {
+    @Nullable
     String getName();
+    @Nullable
     String getEmail();
     @Nullable
     String getExternalId();
+    @Nullable
+    UserStatus getStatus();
+    @Nullable
     List<String> getProjects();
+    @Nullable
     List<String> getGroups();
   }
   
@@ -166,6 +184,11 @@ public interface PmRepository {
     String getName();
     String getEmail();
     String getToken();
+    UserStatus getStatus();
+  }
+  
+  enum UserStatus {
+    PENDING, ENABLED, DISABLED
   }
   
   @JsonSerialize(as = ImmutableGroup.class)

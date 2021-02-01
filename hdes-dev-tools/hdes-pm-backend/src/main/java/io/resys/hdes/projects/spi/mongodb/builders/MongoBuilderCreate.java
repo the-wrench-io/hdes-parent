@@ -43,6 +43,7 @@ import io.resys.hdes.projects.api.PmRepository.Group;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQueryDefault;
 import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper;
@@ -232,7 +233,8 @@ public class MongoBuilderCreate implements MongoBuilder {
     return new UserVisitor() {
       private String name;
       private String email;
-      private String externalId;
+      private Optional<String> externalId;
+      private UserStatus status;
       private List<String> groups;
       private List<String> projects;
       
@@ -255,8 +257,9 @@ public class MongoBuilderCreate implements MongoBuilder {
             .id(UUID.randomUUID().toString())
             .rev(UUID.randomUUID().toString())
             .name(name)
-            .externalId(Optional.ofNullable(externalId))
+            .externalId(externalId == null ? Optional.empty() : externalId)
             .email(email)
+            .status(status == null ? UserStatus.PENDING : status)
             .token(UUID.randomUUID().toString())
             .created(LocalDateTime.now())
             .build();
@@ -297,8 +300,13 @@ public class MongoBuilderCreate implements MongoBuilder {
         return this;
       }
       @Override
-      public UserVisitor visitExternalId(String externalId) {
+      public UserVisitor visitExternalId(Optional<String> externalId) {
         this.externalId = externalId;
+        return this;
+      }
+      @Override
+      public UserVisitor visitStatus(UserStatus status) {
+        this.status = status;
         return this;
       }
       @Override
@@ -309,7 +317,8 @@ public class MongoBuilderCreate implements MongoBuilder {
       @Override
       public UserVisitor visit(User entity) {
         return visitName(entity.getName())
-            .visitExternalId(entity.getExternalId().orElse(null))
+            .visitStatus(entity.getStatus())
+            .visitExternalId(entity.getExternalId())
             .visitEmail(entity.getEmail());
       }
       @Override

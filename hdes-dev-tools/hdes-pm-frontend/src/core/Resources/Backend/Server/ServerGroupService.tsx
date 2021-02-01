@@ -3,7 +3,7 @@ import { GenericGroupBuilder } from './../Builders';
 import { Store } from './ServerStore';
 
 
-class ServerUserQuery implements Backend.GroupQuery {
+class ServerGroupQuery implements Backend.GroupQuery {
   store: Store;
   args?: {top?: number};
   
@@ -20,14 +20,14 @@ class ServerUserQuery implements Backend.GroupQuery {
   }
 }
 
-class ServerUserService implements Backend.GroupService {
+class ServerGroupService implements Backend.GroupService {
   store: Store;
   constructor(store: Store) {
     this.store = store;
   }
   
   query(args?: {top?: number}) {
-    return new ServerUserQuery(this.store, args);
+    return new ServerGroupQuery(this.store, args);
   }
   builder(from?: Backend.GroupResource) {
     const result = new GenericGroupBuilder();
@@ -39,8 +39,7 @@ class ServerUserService implements Backend.GroupService {
   save(builder: Backend.GroupBuilder) {
     const store = this.store;
     return {
-      onSuccess: (callback: (resource: Backend.GroupResource) => void) => {        
-        const store = this.store;
+      onSuccess: (callback: (resource: Backend.GroupResource) => void) => {
         const init: RequestInit = { 
           method: 'POST', 
           credentials: 'same-origin', 
@@ -56,4 +55,4 @@ class ServerUserService implements Backend.GroupService {
   }
 }
 
-export { ServerUserService };
+export { ServerGroupService };

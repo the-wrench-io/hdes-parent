@@ -3,7 +3,7 @@ import { GenericProjectBuilder } from './../Builders';
 import { Store } from './ServerStore';
 
 
-class ServerUserQuery implements Backend.ProjectQuery {
+class ServerProjectQuery implements Backend.ProjectQuery {
   store: Store;
   args?: {top?: number};
   
@@ -20,14 +20,14 @@ class ServerUserQuery implements Backend.ProjectQuery {
   }
 }
 
-class ServerUserService implements Backend.ProjectService {
+class ServerProjectService implements Backend.ProjectService {
   store: Store;
   constructor(store: Store) {
     this.store = store;
   }
   
   query(args?: {top?: number}) {
-    return new ServerUserQuery(this.store, args);
+    return new ServerProjectQuery(this.store, args);
   }
   builder(from?: Backend.ProjectResource) {
     const result = new GenericProjectBuilder();
@@ -39,8 +39,7 @@ class ServerUserService implements Backend.ProjectService {
   save(builder: Backend.ProjectBuilder) {
     const store = this.store;
     return {
-      onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {        
-        const store = this.store;
+      onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
         const init: RequestInit = { 
           method: 'POST', 
           credentials: 'same-origin', 
@@ -56,4 +55,4 @@ class ServerUserService implements Backend.ProjectService {
   }
 }
 
-export { ServerUserService };
+export { ServerProjectService };

@@ -22,6 +22,7 @@ package io.resys.hdes.projects.spi.mongodb.builders;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -32,6 +33,7 @@ import io.resys.hdes.projects.api.PmRepository.Group;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 
 public interface MongoBuilder {
 
@@ -71,22 +73,23 @@ public interface MongoBuilder {
   }
   
   interface ProjectVisitor extends Builder<ProjectVisitor, Project> {
-    ProjectVisitor visitName(String name);
+    ProjectVisitor visitName(@Nullable String name);
     ProjectVisitor visitUsers(@Nullable List<String> users);
     ProjectVisitor visitGroups(@Nullable List<String> groups);
   }
   
   interface GroupVisitor extends Builder<GroupVisitor, Group> {
-    GroupVisitor visitName(String name);
+    GroupVisitor visitName(@Nullable String name);
     GroupVisitor visitUsers(@Nullable List<String> users);
     GroupVisitor visitProjects(@Nullable List<String> projects);
   }
 
   interface UserVisitor extends Builder<UserVisitor, User> {
-    UserVisitor visitName(String name);
-    UserVisitor visitExternalId(String externalId);
-    UserVisitor visitToken(String token);
-    UserVisitor visitEmail(String email);
+    UserVisitor visitName(@Nullable String name);
+    UserVisitor visitStatus(@Nullable UserStatus status);
+    UserVisitor visitExternalId(@Nullable Optional<String> externalId);
+    UserVisitor visitToken(@Nullable String token);
+    UserVisitor visitEmail(@Nullable String email);
     UserVisitor visitGroups(@Nullable List<String> groups);
     UserVisitor visitProjects(@Nullable List<String> projects);
   }

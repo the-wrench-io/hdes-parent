@@ -31,6 +31,7 @@ import org.bson.codecs.EncoderContext;
 
 import io.resys.hdes.projects.api.ImmutableUser;
 import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 
 
 public class UserCodec implements Codec<User> {
@@ -39,6 +40,7 @@ public class UserCodec implements Codec<User> {
   public static final String EMAIL = "email";
   public static final String NAME = "name";
   public static final String TOKEN = "token";
+  public static final String STATUS = "status";
   
   @Override
   public void encode(BsonWriter writer, User command, EncoderContext encoderContext) {
@@ -49,6 +51,7 @@ public class UserCodec implements Codec<User> {
     writer.writeString(NAME, command.getName());
     writer.writeString(EMAIL, command.getEmail());
     writer.writeString(TOKEN, command.getToken());  
+    writer.writeString(STATUS, command.getStatus().name());  
     
     if (command.getExternalId().isPresent()) {
       writer.writeString(EXTERNAL_ID, command.getExternalId().get());
@@ -69,6 +72,7 @@ public class UserCodec implements Codec<User> {
       .name(reader.readString(NAME))
       .email(reader.readString(EMAIL))
       .token(reader.readString(TOKEN))
+      .status(UserStatus.valueOf(reader.readString(STATUS)))
       .externalId(Optional.ofNullable(CodecUtil.readNull(EXTERNAL_ID, reader) ? null : reader.readString()))
       .build();
     reader.readEndDocument();

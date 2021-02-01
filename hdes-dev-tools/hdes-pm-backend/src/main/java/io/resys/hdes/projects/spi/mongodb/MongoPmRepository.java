@@ -1,5 +1,12 @@
 package io.resys.hdes.projects.spi.mongodb;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import io.resys.hdes.projects.api.ImmutableBatchGroup;
+import io.resys.hdes.projects.api.ImmutableBatchProject;
+import io.resys.hdes.projects.api.ImmutableBatchUser;
+
 /*-
  * #%L
  * hdes-pm-backend
@@ -85,6 +92,24 @@ public class MongoPmRepository implements PmRepository {
   public BatchBuilder update() {
     return new BatchBuilder() {
       @Override
+      public UserResource user(Consumer<ImmutableBatchUser.Builder> consumer) {
+        ImmutableBatchUser.Builder builder = ImmutableBatchUser.builder();
+        consumer.accept(builder);
+        return user(builder.build());
+      }
+      @Override
+      public ProjectResource project(Consumer<ImmutableBatchProject.Builder> consumer) {
+        ImmutableBatchProject.Builder builder = ImmutableBatchProject.builder();
+        consumer.accept(builder);
+        return project(builder.build());
+      }
+      @Override
+      public GroupResource group(Consumer<ImmutableBatchGroup.Builder> consumer) {
+        ImmutableBatchGroup.Builder builder = ImmutableBatchGroup.builder();
+        consumer.accept(builder);
+        return group(builder.build());
+      }
+      @Override
       public UserResource user(BatchUser user) {
         return tx.accept(client -> {
           final var mongo = ImmutableMongoWrapper.builder().db(client.getDatabase(config.getDb())).config(config).client(client).build();
@@ -95,8 +120,9 @@ public class MongoPmRepository implements PmRepository {
               .visitId(user.getId())
               .visitRev(user.getRev())
               .visitName(user.getName())
-              .visitExternalId(user.getExternalId())
+              .visitExternalId(user.getExternalId() == null ? null : Optional.of(user.getExternalId()))
               .visitEmail(user.getEmail())
+              .visitStatus(user.getStatus())
               .visitGroups(user.getGroups())
               .visitProjects(user.getProjects())
               .build();
@@ -121,7 +147,6 @@ public class MongoPmRepository implements PmRepository {
           return ResourceMapper.map(query, updated);
         });
       }
-      
       @Override
       public GroupResource group(BatchGroup group) {
         return tx.accept(client -> {
@@ -146,6 +171,24 @@ public class MongoPmRepository implements PmRepository {
   public BatchBuilder create() {
     return new BatchBuilder() {
       @Override
+      public UserResource user(Consumer<ImmutableBatchUser.Builder> consumer) {
+        ImmutableBatchUser.Builder builder = ImmutableBatchUser.builder();
+        consumer.accept(builder);
+        return user(builder.build());
+      }
+      @Override
+      public ProjectResource project(Consumer<ImmutableBatchProject.Builder> consumer) {
+        ImmutableBatchProject.Builder builder = ImmutableBatchProject.builder();
+        consumer.accept(builder);
+        return project(builder.build());
+      }
+      @Override
+      public GroupResource group(Consumer<ImmutableBatchGroup.Builder> consumer) {
+        ImmutableBatchGroup.Builder builder = ImmutableBatchGroup.builder();
+        consumer.accept(builder);
+        return group(builder.build());
+      }
+      @Override
       public UserResource user(BatchUser user) {
         return tx.accept(client -> {
           final var mongo = ImmutableMongoWrapper.builder().db(client.getDatabase(config.getDb())).config(config).client(client).build();
@@ -153,7 +196,7 @@ public class MongoPmRepository implements PmRepository {
           final var builder = new MongoBuilderCreate(mongo);
           User created = builder.visitUser()
               .visitName(user.getName())
-              .visitExternalId(user.getExternalId())
+              .visitExternalId(user.getExternalId() == null ? null : Optional.of(user.getExternalId()))
               .visitEmail(user.getEmail())
               .visitGroups(user.getGroups())
               .visitProjects(user.getProjects())

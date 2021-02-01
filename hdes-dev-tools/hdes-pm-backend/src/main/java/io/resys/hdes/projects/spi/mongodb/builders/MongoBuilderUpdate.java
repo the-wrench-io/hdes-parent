@@ -1,5 +1,7 @@
 package io.resys.hdes.projects.spi.mongodb.builders;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * hdes-pm-backend
@@ -25,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bson.conversions.Bson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +47,7 @@ import io.resys.hdes.projects.api.PmRepository.Group;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 import io.resys.hdes.projects.spi.mongodb.codecs.AccessCodec;
 import io.resys.hdes.projects.spi.mongodb.codecs.CodecUtil;
 import io.resys.hdes.projects.spi.mongodb.codecs.GroupCodec;
@@ -310,21 +314,19 @@ public class MongoBuilderUpdate implements MongoBuilder {
       private String rev;
       private String name;
       private String email;
-      private String externalId;
+      private Optional<String> externalId;
       private String token;
+      private UserStatus status;
       private List<String> groups;
       private List<String> projects;
       
       @Override
       public User build() {
         RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);    
-        RepoAssert.notEmpty(name, () -> "define name!");
-        RepoAssert.notEmpty(email, () -> "define email!");
-        RepoAssert.notEmpty(token, () -> "define token!");
-        
         QueryResultWithAccess<User> queryResult = query.user().id(id).rev(rev).getWithFilter();
         
-        if(token.equals(queryResult.getValue().getToken()) && query.user().token(token).findOne().isPresent()) {
+        User oldValue = queryResult.getValue();
+        if(token.equals(oldValue.getToken()) && query.user().token(token).findOne().isPresent()) {
           throw new PmException(ImmutableConstraintViolation.builder()
               .id(queryResult.getValue().getId())
               .rev(queryResult.getValue().getRev())
@@ -334,26 +336,45 @@ public class MongoBuilderUpdate implements MongoBuilder {
         }
         
         final User user;
-        if(queryResult.getValue().equals(ImmutableUser.builder()
-            .name(name).email(email).token(token)
-            .externalId(Optional.ofNullable(externalId))
-            .from(queryResult.getValue()).build())) {
+        if(queryResult.getValue().equals(
+            ImmutableUser.builder().from(queryResult.getValue())
+            .name(name == null ? oldValue.getName() : name)
+            .email(email == null ? oldValue.getEmail() : email)
+            .token(token == null ? oldValue.getToken() : token)
+            .status(status == null ? oldValue.getStatus() : status)
+            .externalId(externalId == null ? oldValue.getExternalId() : externalId)
+            .build())) {
+          
           user = queryResult.getValue();
         } else {
           final var newRev = UUID.randomUUID().toString();
+          final List<Bson> updates = new ArrayList<>();
+          updates.add(Updates.set(CodecUtil.REV, newRev));
+          
+          if(name != null && !name.equals(oldValue.getName())) {
+            updates.add(Updates.set(UserCodec.NAME, name));
+          }
+          if(email != null && !email.equals(oldValue.getEmail())) {
+            updates.add(Updates.set(UserCodec.EMAIL, email));
+          }
+          if(externalId != null && !externalId.equals(oldValue.getExternalId())) {
+            updates.add(Updates.set(UserCodec.EXTERNAL_ID, externalId));
+          }
+          if(token != null && !token.equals(oldValue.getToken())) {
+            updates.add(Updates.set(UserCodec.TOKEN, token));
+          }
+          if(status != null && !status.equals(oldValue.getStatus())) {
+            updates.add(Updates.set(UserCodec.STATUS, status));
+          }
           mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class)
-          .updateOne(queryResult.getFilter(), Updates.combine(
-            Updates.set(UserCodec.NAME, name), 
-            Updates.set(UserCodec.EMAIL, email), 
-            Updates.set(UserCodec.EXTERNAL_ID, externalId),
-            Updates.set(UserCodec.TOKEN, token),
-            Updates.set(CodecUtil.REV, newRev)));
+          .updateOne(queryResult.getFilter(), Updates.combine(updates));
         
           user = ImmutableUser.builder()
               .from(queryResult.getValue())
               .rev(newRev)
               .name(name)
               .email(email)
+              .status(status)
               .externalId(externalId)
               .token(token)
               .build();          
@@ -429,8 +450,13 @@ public class MongoBuilderUpdate implements MongoBuilder {
         return this;
       }
       @Override
-      public UserVisitor visitExternalId(String externalId) {
+      public UserVisitor visitExternalId(Optional<String> externalId) {
         this.externalId = externalId;
+        return this;
+      }
+      @Override
+      public UserVisitor visitStatus(UserStatus status) {
+        this.status = status;
         return this;
       }
       @Override
@@ -438,8 +464,9 @@ public class MongoBuilderUpdate implements MongoBuilder {
         return visitId(entity.getId())
             .visitRev(entity.getRev())
             .visitName(entity.getName())
+            .visitStatus(entity.getStatus())
             .visitToken(entity.getToken())
-            .visitExternalId(entity.getExternalId().orElse(null))
+            .visitExternalId(entity.getExternalId())
             .visitEmail(entity.getEmail());
       }
       @Override

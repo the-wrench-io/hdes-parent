@@ -21,6 +21,7 @@ package io.resys.hdes.projects.spi.mongodb.builders;
  */
 
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import io.resys.hdes.projects.api.PmRepository.Group;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery.QueryResultWithAccess;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQueryDefault;
@@ -205,7 +207,11 @@ public class MongoBuilderDelete implements MongoBuilder {
         return this;
       }
       @Override
-      public UserVisitor visitExternalId(String externalId) {
+      public UserVisitor visitExternalId(Optional<String> externalId) {
+        return this;
+      }
+      @Override
+      public UserVisitor visitStatus(UserStatus status) {
         return this;
       }
       @Override
