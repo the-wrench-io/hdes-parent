@@ -58,7 +58,6 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
   
   const classes = useStyles();
   const [checked, setChecked] = React.useState<string[]>([]);
-  
   const [left, setLeft] = React.useState<string[]>([]);
   const [right, setRight] = React.useState<string[]>([]);
 
@@ -80,7 +79,6 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
       newChecked.splice(currentIndex, 1);
     }
 
-    onChange(newChecked)
     setChecked(newChecked);
   };
 
@@ -93,7 +91,6 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
     } else {
       newChecked = union(checked, items);
     }
-    onChange(newChecked);
     setChecked(newChecked);
   };
 
@@ -110,24 +107,22 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
   };
 
 
-  const createList = (items: string[]) => {
-    return items.map((value: string) => {
-          const labelId = `transfer-list-all-item-${value}-label`;
-          return (
-            <ListItem key={value} role="listitem" button onClick={handleToggle(value)}>
-              <ListItemIcon>
-                <Checkbox disableRipple tabIndex={-1}
-                  checked={checked.indexOf(value) !== -1}
-                  inputProps={{ 'aria-labelledby': labelId }} />
-              </ListItemIcon>
-              <ListItemText id={labelId} primary={list.onRender(value)} />
-            </ListItem>
-          );
-        })
-  }
+  const createList = (items: string[]) => (items.map((value: string) => {
+    const labelId = `transfer-list-all-item-${value}-label`;
+    return (
+      <ListItem key={value} role="listitem" button onClick={handleToggle(value)}>
+        <ListItemIcon>
+          <Checkbox disableRipple tabIndex={-1}
+            checked={checked.indexOf(value) !== -1}
+            inputProps={{ 'aria-labelledby': labelId }} />
+        </ListItemIcon>
+        <ListItemText id={labelId} primary={list.onRender(value)} />
+      </ListItem>
+    );
+  }))
+  
 
-  const customList = (title: React.ReactNode, items: string[]) => 
-  (
+  const customList = (title: React.ReactNode, items: string[]) => (
     <Card raised={false} elevation={0} className={classes.card}>
     
       <CardHeader className={classes.cardHeader} title={title}
