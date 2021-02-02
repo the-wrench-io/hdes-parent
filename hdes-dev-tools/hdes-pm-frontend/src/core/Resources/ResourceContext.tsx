@@ -36,16 +36,23 @@ type ResourceProviderProps = {
 
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   const [session, sessionDispatch] = React.useReducer(sessionReducer, startSession);  
-  const [service, serviceDispatch] = React.useReducer(serviceReducer, startService.withListeners({
-    onSave: () => {
+  
+  const [service] = React.useReducer(serviceReducer, startService.withListeners({
+    onSave: (saved: Backend.AnyResource) => {
+      sessionDispatch(sessionActions.setResourceSaved(saved))
+
+      // refresh
       service.users.query().onSuccess(users => sessionDispatch(sessionActions.setData({users})))
       service.projects.query().onSuccess(projects => sessionDispatch(sessionActions.setData({projects})))
       service.groups.query().onSuccess(groups => sessionDispatch(sessionActions.setData({groups})))
-    }
+      
+    },
+    onError: (error: Backend.ServerError) => {
+
+    } 
   }));
 
   React.useEffect(() => {
-    console.log("init context", service, serviceDispatch);
     service.users.query().onSuccess(users => sessionDispatch(sessionActions.setData({users})))
     service.projects.query().onSuccess(projects => sessionDispatch(sessionActions.setData({projects})))
     service.groups.query().onSuccess(groups => sessionDispatch(sessionActions.setData({groups})))

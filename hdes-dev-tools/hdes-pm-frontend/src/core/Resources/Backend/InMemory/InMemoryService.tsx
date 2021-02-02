@@ -16,15 +16,18 @@ class DemoService implements Backend.Service {
   
   constructor() {
     console.log('creating demo service');
-    const updateChanges = () => {
-      this.listeners.onSave();
+    const onSave = (saved: Backend.AnyResource) => {
+      this.listeners.onSave(saved);
     }
     const demo = createDemoData();
-    this._store = new InMemoryStore(updateChanges, demo.users, demo.projects, demo.access, demo.groups, demo.groupUsers);
+    this._store = new InMemoryStore(onSave, demo.users, demo.projects, demo.access, demo.groups, demo.groupUsers);
     this._users = new InMemoryUserService(this._store);
     this._projects = new InMemoryProjectService(this._store);
     this._groups = new InMemoryGroupService(this._store);
-    this._listeners = { onSave: () => console.log("saved resources") };
+    this._listeners = { 
+      onSave: (resource) => console.log("saved resources", resource),
+      onError: (error) => console.error("error", error), 
+    };
   }
 
   get users() {

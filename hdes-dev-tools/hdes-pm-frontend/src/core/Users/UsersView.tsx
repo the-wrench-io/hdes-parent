@@ -58,7 +58,7 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
   
   return (
     <React.Fragment>
-      <Title>{top ? 'Recent Users' : 'All Users'}</Title>
+      {top ? <Title>Recent Users</Title> : null}
       <Table size="small">
         <TableHead>
           <TableRow>

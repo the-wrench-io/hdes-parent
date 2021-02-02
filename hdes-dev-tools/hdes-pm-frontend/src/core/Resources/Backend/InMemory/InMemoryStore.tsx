@@ -8,7 +8,8 @@ interface Store {
   groups: Backend.Group[],
   groupUsers: Backend.GroupUser[],
   
-  setUpdates: () => void;
+  onSave: (resource: Backend.AnyResource) => void;
+  
   getAccess: (params: {projectId?: string, userId?: string, groupId?: string}) => Record<string, Backend.Access>;
   getGroupUsers: (groups: Record<string, Backend.Group>) => Record<string, Backend.GroupUser>;
   
@@ -36,15 +37,22 @@ class InMemoryStore implements Store {
   access: Backend.Access[];
   groups: Backend.Group[];
   groupUsers: Backend.GroupUser[];
-  setUpdates: () => void;
+  onSave: (resource: Backend.AnyResource) => void;
 
-  constructor(setUpdates: () => void, users: Backend.User[], projects: Backend.Project[], access: Backend.Access[], groups: Backend.Group[], groupUsers: Backend.GroupUser[]) {
+  constructor(
+    onSave: (resource: Backend.AnyResource) => void, 
+    users: Backend.User[], 
+    projects: Backend.Project[], 
+    access: Backend.Access[], 
+    groups: Backend.Group[], 
+    groupUsers: Backend.GroupUser[]) {
+    
     this.users = users;
     this.projects = projects;
     this.access = access;
     this.groupUsers = groupUsers;
     this.groups = groups;
-    this.setUpdates = setUpdates;
+    this.onSave = onSave;
   }
   
   toProjectResource = (project: Backend.Project): Backend.ProjectResource => {

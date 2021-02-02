@@ -9,7 +9,8 @@ declare namespace Backend {
   }
   
   interface ServiceListeners {
-    onSave: () => void;
+    onSave: (saved: AnyResource) => void;
+    onError: (error: ServerError) => void;
   }
   
   interface Service {

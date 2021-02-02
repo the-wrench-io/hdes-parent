@@ -5,7 +5,6 @@ import { ServerGroupService } from './ServerGroupService';
 import { ServerUserService } from './ServerUserService';
 
 
-
 class ServerService implements Backend.Service {
   private _users: Backend.UserService;
   private _projects: Backend.ProjectService;
@@ -14,14 +13,20 @@ class ServerService implements Backend.Service {
     
   constructor(config: Backend.ServerConfig) {
     console.log('creating server service', config);
-    const updateChanges = () => {
-      this.listeners.onSave();
+    const onSave = (resource: Backend.AnyResource) => {
+      this.listeners.onSave(resource);
     }
-    const store = new ServerStore(updateChanges, config);
+    const onError = (error: Backend.ServerError) => {
+      this.listeners.onError(error);
+    }
+    const store = new ServerStore(onSave, onError, config);
     this._users = new ServerUserService(store);
     this._projects = new ServerProjectService(store);
     this._groups = new ServerGroupService(store);
-    this._listeners = { onSave: () => console.log("saved resources") };
+    this._listeners = { 
+      onSave: (resource) => console.log("saved resources", resource),
+      onError: (error) => console.error("error", error), 
+    };
   }
   get users() {
     return this._users;

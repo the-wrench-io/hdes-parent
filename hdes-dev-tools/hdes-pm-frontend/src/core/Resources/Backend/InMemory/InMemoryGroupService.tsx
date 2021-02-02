@@ -56,8 +56,9 @@ class InMemoryGroupService implements Backend.GroupService {
       onSuccess: (callback: (resource: Backend.GroupResource) => void) => {
         
         if(builder.id) {
-          callback(store.setGroup(builder))
-          store.setUpdates();
+          const saved = store.setGroup(builder);
+          callback(saved)
+          store.onSave(saved);
           return; 
         }
         
@@ -98,14 +99,18 @@ class InMemoryGroupService implements Backend.GroupService {
         store.groups.push(newGroup);
         store.access.push(...newAccess);
         store.groupUsers.push(...newGroupUsers);
-        store.setUpdates();
+
         
         const access = store.getAccess({groupId: newGroup.id});
         const projects = store.getProjects(access);
         const groups = store.getGroups(access);
         const groupUsers = store.getGroupUsers(groups);
         const users = store.getUsers(access);
-        callback({ group: newGroup, access, groupUsers, users, projects }) 
+        
+        const created = { group: newGroup, access, groupUsers, users, projects };
+        callback(created)
+        store.onSave(created);
+         
       }
     }
   }

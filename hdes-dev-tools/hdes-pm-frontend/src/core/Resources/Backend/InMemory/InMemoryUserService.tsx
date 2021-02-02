@@ -51,8 +51,9 @@ class InMemoryUserService implements Backend.UserService {
       onSuccess: (callback: (resource: Backend.UserResource) => void) => {
         
         if(builder.id) {
-          callback(store.setUser(builder))
-          store.setUpdates(); 
+          const saved = store.setUser(builder);
+          callback(saved)
+          store.onSave(saved); 
           return;
         }
         
@@ -99,13 +100,15 @@ class InMemoryUserService implements Backend.UserService {
         store.groupUsers.push(...newGroupUsers);
         store.access.push(...newAccess);
         store.users.push(newUser);
-        store.setUpdates();
         
         const access = store.getAccess({userId: newUser.id});
         const groups = store.getGroups(access);
         const groupUsers = store.getGroupUsers(groups);
         const projects = store.getProjects(access);
-        callback({ user: newUser, access, groups, groupUsers, projects }) 
+        const created = { user: newUser, access, groups, groupUsers, projects }
+        
+        callback(created)
+        store.onSave(created); 
       }
     }
   }

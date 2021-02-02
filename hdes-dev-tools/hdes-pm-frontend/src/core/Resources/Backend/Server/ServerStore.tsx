@@ -5,21 +5,31 @@ import Backend from './../Backend';
 interface Store {
   config: Backend.ServerConfig;
   setErrors: (value: Backend.ServerError | string, url: string, request: RequestInit) => void;
-  setUpdates: () => void;
+  onSave: (resource: Backend.AnyResource) => void;
   fetch<T>(url: string, init?: RequestInit): Promise<T>;
 }
 
 class ServerStore implements Store {
   private _config: Backend.ServerConfig;
-  setUpdates: () => void;
+  private _onSave: (resource: Backend.AnyResource) => void;
+  private _onError: (error: Backend.ServerError) => void;
 
-  constructor(setUpdates: () => void, config: Backend.ServerConfig) {
-    this.setUpdates = setUpdates;
+  constructor(
+    onSave: (resource: Backend.AnyResource) => void,
+    onError: (error: Backend.ServerError) => void, 
+    config: Backend.ServerConfig) {
+    
+    this._onSave = onSave;
+    this._onError = onError;
     this._config = config;
   }
   
   get config() {
     return this._config;
+  }
+  
+  onSave(resource: Backend.AnyResource) {
+    this._onSave(resource);
   }
   
   fetch<T>(url: string, init?: RequestInit): Promise<T> {
@@ -36,8 +46,8 @@ class ServerStore implements Store {
       .catch(errors => this.setErrors(errors, url, init))
       .then(data => {
         const method = init?.method;
-        if(method === "POST" || method === "PUT" || method === "POST") {
-          this.setUpdates()
+        if(method === "POST" || method === "PUT" || method === "DELETE") {
+          this.onSave(data)
         }
         return data
       }) 

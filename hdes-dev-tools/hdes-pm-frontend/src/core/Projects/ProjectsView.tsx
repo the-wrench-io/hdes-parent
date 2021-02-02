@@ -58,7 +58,7 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onSelect}) => 
   
   return (
     <React.Fragment>
-      <Title>{top ? 'Recent Projects' : 'All Projects'}</Title>
+      {top ? <Title>Recent Projects</Title> : null}
       <Table size="small">
         <TableHead>
           <TableRow>

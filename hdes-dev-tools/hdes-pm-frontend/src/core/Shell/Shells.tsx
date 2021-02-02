@@ -14,17 +14,20 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import IconButton from '@material-ui/core/IconButton';
-import Badge from '@material-ui/core/Badge';
+
 import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import NotificationsIcon from '@material-ui/icons/Notifications';
+
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
+import ClickAwayListener from '@material-ui/core/ClickAwayListener';
+import Grow from '@material-ui/core/Grow';
+import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
 
 import ShellStyles from './ShellStyles' 
-
 
 
 interface ShellProps {
@@ -45,7 +48,11 @@ interface ShellProps {
   },
   search: {
     onChange: (keyword: string) => void,
-  }
+  },
+  badges: {
+    badge: React.ReactNode;
+    panel: React.ReactNode;
+  }[]
 };
 
 interface TabPanelProps {
@@ -68,10 +75,44 @@ const TabPanel: React.FC<TabPanelProps> = ({ children, value, index, ...other })
   );
 }
 
-const Shell: React.FC<ShellProps> = ({dialogs, views, tabs, search}) => {
+interface ShellBadgeProps {
+  open: boolean;
+  badgeRef: HTMLElement|null,
+  handleClose: () => void;
+  children: React.ReactNode;
+}
+
+const ShellBadge: React.FC<ShellBadgeProps> = ({open, handleClose, children, badgeRef}) => {
+  return (<Popper open={open} anchorEl={badgeRef} role={undefined} transition disablePortal>
+  {({ TransitionProps, placement }) => (
+    <Grow
+      {...TransitionProps}
+      style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+    >
+      <Paper>
+        <ClickAwayListener onClickAway={handleClose}>
+          <div>
+            {children}
+          </div>
+        </ClickAwayListener>
+      </Paper>
+    </Grow>
+  )}
+</Popper>);
+}
+
+
+const Shell: React.FC<ShellProps> = ({dialogs, views, tabs, search, badges}) => {
   
   const classes = ShellStyles();
-  
+  const [openBadge, setOpenBadge] = React.useState<number>(-1);
+  const [badgeRef, setBadgeRef] = React.useState<HTMLElement | null>(null);
+    
+  const handleBadgeOpen = (event: any, index: number) => {
+    setOpenBadge(index);
+    setBadgeRef(event.currentTarget);
+  }
+    
   // Drawer
   const [drawerOpen, setDrawerOpen] = React.useState(true);
   const handleDrawerOpen = () => setDrawerOpen(true);
@@ -85,6 +126,7 @@ const Shell: React.FC<ShellProps> = ({dialogs, views, tabs, search}) => {
       views[0].onClick();
     }
   }, [tabs.items.length, views]);
+
 
   return (
     <div className={classes.root}>
@@ -105,22 +147,22 @@ const Shell: React.FC<ShellProps> = ({dialogs, views, tabs, search}) => {
             </Tabs>
           </Typography>
           
-            <div className={classes.search}>
-              <div className={classes.searchIcon}><SearchIcon /></div>
-              <InputBase placeholder="Search…"
-                onChange={({target}) => search.onChange(target.value)}
-                inputProps={{ 'aria-label': 'search' }}
-                classes={{
-                  root: classes.inputRoot,
-                  input: classes.inputInput,
-                }} />
-            </div>
-          
-          <IconButton color="inherit" className={classes.appBarIcon}>
-            <Badge badgeContent={4} color="secondary">
-              <NotificationsIcon />
-            </Badge>
-          </IconButton>
+          <div className={classes.search}>
+            <div className={classes.searchIcon}><SearchIcon /></div>
+            <InputBase placeholder="Search…"
+              onChange={({target}) => search.onChange(target.value)}
+              inputProps={{ 'aria-label': 'search' }}
+              classes={{
+                root: classes.inputRoot,
+                input: classes.inputInput,
+              }} />
+          </div>
+          {badges.map((b, index) => (
+            <IconButton key={index} color="inherit" className={classes.appBarIcon} onClick={(event) => handleBadgeOpen(event, index)}>
+              {b.badge}
+              <ShellBadge badgeRef={badgeRef} open={index === openBadge} handleClose={() => setOpenBadge(-1)}>{b.panel}</ShellBadge>
+            </IconButton>
+          ))}
         </Toolbar>
       </AppBar>
 

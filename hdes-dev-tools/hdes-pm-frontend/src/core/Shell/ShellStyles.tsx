@@ -40,6 +40,7 @@ const ShellStyles = makeStyles((theme) => ({
   },
   appBarIcon: {
     color: theme.palette.primary.main,
+    marginRight: 100,
   },
   menuButtonHidden: {
     display: 'none',

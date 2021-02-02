@@ -20,7 +20,7 @@ import { Resources, Backend, Session, Mapper } from './core/Resources';
 import { AddUser, ConfigureUserInTab, UsersView, ApproveView } from './core/Users';
 import { AddProject, ConfigureProjectInTab, ProjectsView } from './core/Projects';
 import { AddGroup, ConfigureGroupInTab, GroupsView } from './core/Groups';
-import { ResourceSaved } from './core/Views';
+import { NotificationSaved, NotificationSavedBadge } from './core/Notifications';
 import { SearchView } from './core/Search';
 
 import Shell from './core/Shell';
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const makeDialogs = () => {
+const useDialogs = () => {
   return {
     user:     { id: 'add-user', label: 'Add User', icon: <PersonAddOutlinedIcon />},
     project:  { id: 'add-project', label: 'Add Project', icon: <LibraryAddOutlinedIcon /> },
@@ -46,15 +46,12 @@ const makeDialogs = () => {
   }
 }
 
-
 function App() {
   const classes = useStyles();
-  const dialogs = makeDialogs();
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);  
-
-  
+  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+      
+  const dialogs = useDialogs();
   const { session, setSession } = React.useContext(Resources.Context);
-  const [ resourceSaved, setResourceSaved ] = React.useState<undefined | Backend.AnyResource>();
 
   const handleSearchFor = (keyword: string) => {
     if(keyword.length > 0) {
@@ -62,23 +59,20 @@ function App() {
       setSession((session) => session.setSearch(keyword))
     }
   };
+  
   const handleDialogOpen = (id: string) => setSession((action) => {
     const index = session.findTab(id);
     return index ? action.changeTab(index) : action.setDialog(id);
   });
-  
   const handleDialogClose = () => setSession((session) => session.setDialog());
   const changeTab = (index: number) => setSession((session) => session.changeTab(index));
   const addTab = (newItem: Session.Tab) => setSession((session) => session.addTab(newItem));
-
   const openInTab = (props: {builder: Backend.AnyBuilder, edit?: boolean, activeStep?: number}) => {
-
     const tab: Session.Tab = new Mapper.Builder<Session.Tab>(props.builder)
       .project(project => ConfigureProjectInTab(dialogs.project.id, project, props.edit, props.activeStep))
       .group(group => ConfigureGroupInTab(dialogs.group.id, group, props.edit, props.activeStep))
       .user(user => ConfigureUserInTab(dialogs.user.id, user, props.edit, props.activeStep))
       .map();
-      
     addTab(tab);
   }
   
@@ -102,7 +96,8 @@ function App() {
     </Grid>);
   
   return (<React.Fragment>
-    <ResourceSaved resource={resourceSaved} onClose={() => setResourceSaved(undefined)}/>
+    <NotificationSaved />
+    
     <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={openInTab} />
     <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={openInTab}/>
     <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} handleConf={openInTab}/>
@@ -117,7 +112,7 @@ function App() {
       dialogs={{items: [dialogs.group, dialogs.user, dialogs.project], onClick: handleDialogOpen}} 
       search={{ onChange: handleSearchFor }}
       tabs={{items: session.tabs, active: session.history.open, onClick: changeTab}}
-      >
+      badges={[ NotificationSavedBadge ]}>
       
     </Shell>
   </React.Fragment>);

@@ -61,7 +61,7 @@ const GroupsView: React.FC<GroupsViewProps> = ({top, seeMore, onSelect}) => {
   
   return (
     <React.Fragment>
-      <Title>{top ? 'Recent Groups' : 'All Groups'}</Title>
+      {top ? <Title>Recent Groups</Title> : null}
       <Table size="small">
         <TableHead>
           <TableRow>

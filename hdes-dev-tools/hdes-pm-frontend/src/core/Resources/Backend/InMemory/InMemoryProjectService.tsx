@@ -44,8 +44,9 @@ class InMemoryProjectService implements Backend.ProjectService {
           
         // delete old resources
         if(builder.id) {
-          callback(store.setProject(builder))
-          store.setUpdates();
+          const saved = store.setProject(builder);
+          callback(saved)
+          store.onSave(saved);
           return; 
         }
                   
@@ -88,9 +89,10 @@ class InMemoryProjectService implements Backend.ProjectService {
       
         store.access.push(...newAccess);
         store.projects.push(newProject);
-        callback(store.getProject(newProject.id))
         
-        store.setUpdates(); 
+        const created = store.getProject(newProject.id);
+        callback(created)
+        store.onSave(created); 
       }
     }
   }

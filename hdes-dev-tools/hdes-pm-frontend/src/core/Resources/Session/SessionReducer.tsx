@@ -2,8 +2,10 @@ import { Backend } from '../Backend';
 import { Session } from './Session';
 
 enum SessionActionType {
-  addTab, removeTab, changeTab, savedTab, onConfirm,
-  setTabData, setDialog, setSearch, setData
+  addTab, removeTab, changeTab, onConfirm,
+  setTabData, setDialog, setSearch, setData,
+   
+  setResourceSaved, setServerError
 }
 
 interface SessionAction {
@@ -15,7 +17,8 @@ interface SessionAction {
   addTab?: Session.Tab;
   removeTab?: string;
   changeTab?: number;
-  savedTab?: Backend.AnyResource;
+  setServerError?: Backend.ServerError;
+  setResourceSaved?: Backend.AnyResource;
   onConfirm?: {tabId: string, resource: Backend.AnyResource};
   setTabData?: {id: string, updateCommand: (oldData: any) => any};
 }
@@ -25,7 +28,10 @@ const sessionActions = {
   addTab: (addTab: Session.Tab) => ({ type: SessionActionType.addTab, addTab }),
   removeTab: (removeTab: string) => ({ type: SessionActionType.removeTab, removeTab}),
   changeTab: (changeTab: number) => ({ type: SessionActionType.addTab, changeTab}),
-  savedTab: (savedTab: Backend.AnyResource) => ({ type: SessionActionType.savedTab, savedTab }), 
+  
+  setResourceSaved: (setResourceSaved: Backend.AnyResource) => ({ type: SessionActionType.setResourceSaved, setResourceSaved }), 
+  setServerError: (setServerError: Backend.ServerError) => ({ type: SessionActionType.setServerError, setServerError }),
+   
   
   setTabData: (id: string, updateCommand: (oldData: any) => any): SessionAction => ({
     type: SessionActionType.setTabData, 
@@ -59,9 +65,7 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       }
 
       return state
-        //setResourceSaved(resource);
         .deleteTab(action.onConfirm.tabId);
-    
     }
     
     case SessionActionType.addTab: {
@@ -91,15 +95,20 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       return state.deleteTab(action.removeTab);      
     }
     
-    case SessionActionType.savedTab: {
-      if(!action.savedTab) {
+    case SessionActionType.setResourceSaved: {
+      if(!action.setResourceSaved) {
         console.error("Action data error", action);
         return state;
       }
-              //setResourceSaved(resource);
-      return state      
+      return state.withSaved(action.setResourceSaved)    
     }
-    
+    case SessionActionType.setServerError: {
+      if(!action.setServerError) {
+        console.error("Action data error", action);
+        return state;
+      }
+      return state.withErrors(action.setServerError)    
+    }    
     case SessionActionType.setTabData: {
       if(!action.setTabData) {
         console.error("Action data error", action);

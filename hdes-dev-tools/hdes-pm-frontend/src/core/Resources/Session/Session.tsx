@@ -31,13 +31,20 @@ declare namespace Session {
     history: History;
     dialogId?: string;
     search?: string;
-    data: Data
+    data: Data;
+
+    saved: Backend.AnyResource[];
+    errors: Backend.ServerError[];
+
+    withErrors(newError: Backend.ServerError): Instance;
+    withSaved(newResource: Backend.AnyResource): Instance;
     
     withData(newData: DataInit): Instance;
     withSearch(keyword: string): Instance;
     withDialog(dialogId?: string): Instance;
     withTabData(tabId: string, updateCommand: (oldData: any) => any): Instance;
     withTab(newTabOrTabIndex: Tab | number): Instance;
+
     findTab(newTabId: string): number | undefined;
     getTabData(tabId: string): any;
     deleteTab(tabId: string): Session.Instance;
