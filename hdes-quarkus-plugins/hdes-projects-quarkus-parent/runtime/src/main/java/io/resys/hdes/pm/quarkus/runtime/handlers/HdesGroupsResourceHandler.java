@@ -21,6 +21,8 @@ package io.resys.hdes.pm.quarkus.runtime.handlers;
 
 import java.util.Collection;
 
+import io.quarkus.security.identity.CurrentIdentityAssociation;
+import io.quarkus.vertx.http.runtime.CurrentVertxRequest;
 import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
 import io.resys.hdes.projects.api.ImmutableBatchGroup;
 import io.resys.hdes.projects.api.ImmutableGroup;
@@ -33,6 +35,12 @@ import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
 public class HdesGroupsResourceHandler extends HdesResourceHandler {
+
+  public HdesGroupsResourceHandler(
+      CurrentIdentityAssociation currentIdentityAssociation,
+      CurrentVertxRequest currentVertxRequest) {
+    super(currentIdentityAssociation, currentVertxRequest);
+  }
 
   @Override
   protected void handleResource(RoutingContext event, HttpServerResponse response, HdesProjectsContext ctx) {

@@ -30,6 +30,10 @@ import org.slf4j.LoggerFactory;
 
 import io.quarkus.arc.Arc;
 import io.quarkus.arc.ManagedContext;
+import io.quarkus.security.identity.CurrentIdentityAssociation;
+import io.quarkus.security.identity.SecurityIdentity;
+import io.quarkus.vertx.http.runtime.CurrentVertxRequest;
+import io.quarkus.vertx.http.runtime.security.QuarkusHttpUser;
 import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
 import io.resys.hdes.projects.spi.support.ImmutableStatusMessage;
 import io.resys.hdes.projects.spi.support.RepoAssert;
@@ -42,13 +46,37 @@ import io.vertx.ext.web.RoutingContext;
 
 public abstract class HdesResourceHandler implements Handler<RoutingContext> {
   private static final Logger LOGGER = LoggerFactory.getLogger(HdesResourceHandler.class);
-
+  private final CurrentIdentityAssociation currentIdentityAssociation;
+  private final CurrentVertxRequest currentVertxRequest;
+  
+  public HdesResourceHandler(
+      CurrentIdentityAssociation currentIdentityAssociation,
+      CurrentVertxRequest currentVertxRequest) {
+    super();
+    this.currentIdentityAssociation = currentIdentityAssociation;
+    this.currentVertxRequest = currentVertxRequest;
+  }
+  
   protected abstract void handleResource(RoutingContext event, HttpServerResponse response, HdesProjectsContext ctx);
+  
+  protected void handleSecurity(RoutingContext event) {
+    if (currentIdentityAssociation != null) {
+      QuarkusHttpUser existing = (QuarkusHttpUser) event.user();
+      if (existing != null) {
+        SecurityIdentity identity = existing.getSecurityIdentity();
+        currentIdentityAssociation.setIdentity(identity);
+      } else {
+        currentIdentityAssociation.setIdentity(QuarkusHttpUser.getSecurityIdentity(event, null));
+      }
+    }
+    currentVertxRequest.setCurrent(event);
+  }
   
   @Override
   public void handle(RoutingContext event) {
     ManagedContext requestContext = Arc.container().requestContext();
     if (requestContext.isActive()) {
+      handleSecurity(event);      
       HttpServerResponse response = event.response();
       HdesProjectsContext ctx = CDI.current().select(HdesProjectsContext.class).get();
       try {
@@ -56,16 +84,17 @@ public abstract class HdesResourceHandler implements Handler<RoutingContext> {
       } catch (Exception e) {
         catch422(e, ctx, response);
       }
-      
-    } else {
-      HttpServerResponse response = event.response();
-      HdesProjectsContext ctx = CDI.current().select(HdesProjectsContext.class).get();
-      try {
-        requestContext.activate();
-        handleResource(event, response, ctx);
-      } finally {
-        requestContext.terminate();
-      }
+     return; 
+    }
+    
+    HttpServerResponse response = event.response();
+    HdesProjectsContext ctx = CDI.current().select(HdesProjectsContext.class).get();
+    try {
+      requestContext.activate();
+      handleSecurity(event);
+      handleResource(event, response, ctx);
+    } finally {
+      requestContext.terminate();
     }
   }
   

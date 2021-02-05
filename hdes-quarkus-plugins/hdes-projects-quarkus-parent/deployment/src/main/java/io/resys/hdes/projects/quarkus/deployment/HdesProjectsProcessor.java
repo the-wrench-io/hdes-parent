@@ -25,6 +25,9 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.BeanContainerListenerBuildItem;
 import io.quarkus.bootstrap.model.AppArtifact;
@@ -51,6 +54,7 @@ import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 public class HdesProjectsProcessor {
+  private static final Logger LOGGER = LoggerFactory.getLogger(HdesProjectsProcessor.class);
   private static final String WEBJAR_GROUP_ID = "io.resys.hdes";
   private static final String WEBJAR_ARTIFACT_ID = "hdes-pm-frontend";
   private static final String WEBJAR_PREFIX = "META-INF/resources/webjars/" + WEBJAR_ARTIFACT_ID;
@@ -79,7 +83,7 @@ public class HdesProjectsProcessor {
     }
 
     buildItems.produce(AdditionalBeanBuildItem.builder().setUnremovable().addBeanClass(HdesProjectsContextProducer.class).build());
-    beans.produce(new BeanContainerListenerBuildItem(recorder.listener(hdesProjectsConfig.connectionUrl)));
+    beans.produce(new BeanContainerListenerBuildItem(recorder.listener(hdesProjectsConfig.connectionUrl, hdesProjectsConfig.initUserName)));
   }
   
   @BuildStep

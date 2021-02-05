@@ -44,6 +44,16 @@ public class HdesProjectsConfig {
   String connectionUrl;
   
   
+  /**
+   * SecurityIdentity identity = ...
+   * JsonWebToken webToken = (JsonWebToken) identity.getPrincipal();
+   * String userName = webToken.getClaim("user_name");
+   * 
+   * adds role = "hdes-projects-admin"  
+   */
+  @ConfigItem(defaultValue = "initUserName")
+  String initUserName;
+  
   public String getProjects() {
     return backendPath + "/resources/projects";
   }

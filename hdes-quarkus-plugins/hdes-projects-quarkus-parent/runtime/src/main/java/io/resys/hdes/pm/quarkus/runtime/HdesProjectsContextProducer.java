@@ -52,8 +52,15 @@ import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper.MongoTransaction;
 public class HdesProjectsContextProducer {
   
   private String connectionUrl;
+  private String adminInitUserName;
   
-  public HdesProjectsContextProducer setLocal(String connectionUrl) {
+
+  public HdesProjectsContextProducer setInitAdminUserName(String adminInitUserName) {
+    this.adminInitUserName = adminInitUserName;
+    return this;
+  }
+
+  public HdesProjectsContextProducer setConnectionUrl(String connectionUrl) {
     this.connectionUrl = connectionUrl;
     return this;
   }
@@ -69,6 +76,11 @@ public class HdesProjectsContextProducer {
       return action.apply(client);
     }
     
+  }
+  
+  @Produces
+  public HdesProjectSecurityAugmentor hdesProjectSecurityAugmentor() {
+    return new HdesProjectSecurityAugmentor(adminInitUserName);
   }
 
   @Produces

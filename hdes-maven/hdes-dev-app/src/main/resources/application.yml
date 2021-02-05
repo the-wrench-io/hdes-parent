@@ -18,13 +18,29 @@
 # #L%
 ###
 
-#quarkus.hdes.enable=true
-#quarkus.hdes.local=/home/olev/Development/hdes/hdes-maven/hdes-dev-app/src/main/hdes
-#quarkus.hdes.local=src/main/hdes
 
+quarkus:
 
-quarkus.hdes-projects.connection-url=mongodb://appUser:123456@localhost:27017/PM?authSource=PM
+  http:
+    cors: true
+    auth: 
+      policy:
+        hdes-role-policy:
+          roles-allowed: hdes-projects-admin
+      permission:
+        deny1:
+          paths: /hdes-pm/*
+          policy: hdes-role-policy
+        deny2:
+          paths: /hdes-pm/*
+          policy: authenticated
 
+  log:
+    level: DEBUG
+    category: 
+      io.resys.hdes:
+        level: DEBUG
 
-quarkus.log.category."io.resys.hdes".level=DEBUG
-quarkus.http.cors=true
+  hdes-projects:
+    init-user-name: olev.mutso@resys.io
+    connection-url: mongodb://appUser:123456@localhost:27017/PM?authSource=PM

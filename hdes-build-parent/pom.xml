@@ -22,6 +22,8 @@
     <jackson.version>2.10.2</jackson.version>
     <immutables.version>2.8.2</immutables.version>
 
+    <microprofile.version>1.1.1</microprofile.version>
+
     <findbugs.version>3.0.2</findbugs.version>
     <googlejavaformat.version>1.9</googlejavaformat.version>
 
@@ -181,6 +183,13 @@
 
   <dependencyManagement>
     <dependencies>
+    
+      <dependency>
+        <groupId>org.eclipse.microprofile.jwt</groupId>
+        <artifactId>microprofile-jwt-auth-api</artifactId>
+        <version>${microprofile.version}</version>
+      </dependency>
+          
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-bom</artifactId>

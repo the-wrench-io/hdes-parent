@@ -42,10 +42,10 @@ import io.vertx.ext.web.RoutingContext;
 @Recorder
 public class HdesProjectsRecorder {
 
-  public BeanContainerListener listener(String connectionUrl) {
+  public BeanContainerListener listener(String connectionUrl, String initAdminUserName) {
     return beanContainer -> {
       HdesProjectsContextProducer producer = beanContainer.instance(HdesProjectsContextProducer.class);
-      producer.setLocal(connectionUrl);
+      producer.setConnectionUrl(connectionUrl).setInitAdminUserName(initAdminUserName);
     };
   }
 
@@ -62,7 +62,7 @@ public class HdesProjectsRecorder {
       association = null;
     }
     CurrentVertxRequest currentVertxRequest = CDI.current().select(CurrentVertxRequest.class).get();
-    return new HdesGroupsResourceHandler();
+    return new HdesGroupsResourceHandler(association, currentVertxRequest);
   }
   public Handler<RoutingContext> projectHandler() {
     Instance<CurrentIdentityAssociation> identityAssociations = CDI.current().select(CurrentIdentityAssociation.class);
@@ -73,7 +73,7 @@ public class HdesProjectsRecorder {
       association = null;
     }
     CurrentVertxRequest currentVertxRequest = CDI.current().select(CurrentVertxRequest.class).get();
-    return new HdesProjectsResourceHandler();
+    return new HdesProjectsResourceHandler(association, currentVertxRequest);
   }
   
   public Handler<RoutingContext> userHandler() {
@@ -85,7 +85,7 @@ public class HdesProjectsRecorder {
       association = null;
     }
     CurrentVertxRequest currentVertxRequest = CDI.current().select(CurrentVertxRequest.class).get();
-    return new HdesUsersResourceHandler();
+    return new HdesUsersResourceHandler(association, currentVertxRequest);
   }
 
   public Handler<RoutingContext> tokenHandler() {
@@ -97,7 +97,7 @@ public class HdesProjectsRecorder {
       association = null;
     }
     CurrentVertxRequest currentVertxRequest = CDI.current().select(CurrentVertxRequest.class).get();
-    return new HdesTokensResourceHandler();
+    return new HdesTokensResourceHandler(association, currentVertxRequest);
   }
 
   
@@ -105,9 +105,7 @@ public class HdesProjectsRecorder {
     return new Function<Router, Route>() {
       @Override
       public Route apply(Router router) {
-        return router
-            .route(rootPath)
-            .handler(bodyHandler);
+        return router.route(rootPath).handler(bodyHandler);
       }
     };
   }
