@@ -19,7 +19,7 @@ const ConfigureProjectGroups: React.FC<ConfigureProjectGroupsProps> = ({groups, 
   
   return (<TransferList onChange={onChange}
     list={{
-     available: { header: "Available Groups", values: groups.all.map(p => p.group.id) },
+     available: { header: "Available Groups", values: groups.all.filter(g => g.group.type !== 'ADMIN').map(p => p.group.id) },
      selected: { header: "Selected Groups",  values: groups.selected },
      onRender: (id) => records[id].group.name
     }} />);

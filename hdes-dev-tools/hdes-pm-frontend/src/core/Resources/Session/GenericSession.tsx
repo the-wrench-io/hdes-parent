@@ -80,7 +80,7 @@ class GenericInstance implements Session.Instance {
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, errors);
   }
   withSaved(newResource: Backend.AnyResource): Session.Instance {
-    const saved = this._saved;
+    const saved = [...this._saved];
     saved.push(newResource);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, saved, this._errors);
   }

@@ -60,12 +60,12 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
   const handleNext = () => props.setActiveStep((prevActiveStep) => prevActiveStep + 1)
   const handleBack = () => props.setActiveStep((prevActiveStep) => prevActiveStep - 1)
   const handleReset = () => props.setActiveStep(() => 0);
+  const handleFinish = () => service.users.save(user).onSuccess(props.onConfirm);
   
-  const handleFinish = () => {
-    service.users.save(user).onSuccess(resource => {
-      props.onConfirm(resource);
-    });
-  };
+  const userInAdminGroup = user.groups
+  .map(groupId => groups.filter(g => g.group.id === groupId)[0])
+  .map(g => g.group.type).includes("ADMIN");
+
   
   const steps = [
     <ConfigureUserBasic 
@@ -74,20 +74,21 @@ const ConfigureUser: React.FC<ConfigureUserProps> = (props) => {
         name={{defaultValue: user.name, onChange: (newValue) => setUser(user.withName(newValue))}}
         externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
-    <ConfigureUserProjects 
+    <ConfigureUserGroups
+        groups={{ all: groups, selected: user.groups}}
+        onChange={(newSelection) => setUser(user.withGroups(newSelection))} />,
+        
+    <ConfigureUserProjects userInAdminGroup={userInAdminGroup}
         projects={{all: projects, selected: user.projects}}
         onChange={(newSelection) => setUser(user.withProjects(newSelection))} />,
         
-    <ConfigureUserGroups
-        groups={{ all: groups, selected: user.groups}}
-        onChange={(newSelection) => setUser(user.withGroups(newSelection))} />    
   ];
   
   return (<div className={classes.root}>
     <Stepper alternativeLabel activeStep={activeStep} className={classes.stepper}>
       <Step><StepLabel>User Info</StepLabel></Step>
-      <Step><StepLabel>User Projects</StepLabel></Step>
       <Step><StepLabel>Add Groups</StepLabel></Step>
+      <Step><StepLabel>Add Projects</StepLabel></Step>
     </Stepper>
     {steps[activeStep]}
     {activeStep === steps.length ? (<ConfigureUserSummary user={user} projects={projects} groups={groups} />): null}

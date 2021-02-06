@@ -69,22 +69,26 @@ const ConfigureGroup: React.FC<ConfigureGroupProps> = (props) => {
   
   const steps = [
     <ConfigureGroupBasic 
-        name={{defaultValue: group.name, onChange: (newValue) => setGroup(group.withName(newValue))}} />,
-
+        id={group.id}
+        name={{defaultValue: group.name, onChange: (newValue) => setGroup(group.withName(newValue))}} 
+        matcher={{defaultValue: group.matcher, onChange: (newValue) => setGroup(group.withMatcher(newValue))}}
+        type={{defaultValue: group.type, onChange: (newValue) => setGroup(group.withType(newValue))}}/>,
+        
     <ConfigureGroupUsers 
         users={{all: users, selected: group.users}}
         onChange={(newSelection) => setGroup(group.withUsers(newSelection))} />,
-        
+
     <ConfigureGroupProjects
+        adminGroup={group.type === "ADMIN"}
         projects={{ all: projects, selected: group.projects}}
-        onChange={(newSelection) => setGroup(group.withProjects(newSelection))} />    
+        onChange={(newSelection) => setGroup(group.withProjects(newSelection))} /> 
   ];
   
   return (<div className={classes.root}>
     <Stepper alternativeLabel activeStep={activeStep} className={classes.stepper}>
       <Step><StepLabel>Group Info</StepLabel></Step>
       <Step><StepLabel>Add Users</StepLabel></Step>
-      <Step><StepLabel>Add Groups</StepLabel></Step>
+      <Step><StepLabel>Add Projects</StepLabel></Step>
     </Stepper>
     {steps[activeStep]}
     {activeStep === steps.length ? (users.length === 0 && group.users.length > 0 ? '...loading' : <ConfigureGroupSummary group={group} users={users} projects={projects} />): null}

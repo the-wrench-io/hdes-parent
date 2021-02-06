@@ -95,15 +95,20 @@ const TransferList: React.FC<TransferListProps> = ({list, onChange}) => {
   };
 
   const handleCheckedRight = () => {
-    setRight(right.concat(leftChecked));
+    const rightValues = right.concat(leftChecked);
+    setRight(rightValues);
     setLeft(not(left, leftChecked));
     setChecked(not(checked, leftChecked));
+    onChange(rightValues)
+    
   };
 
   const handleCheckedLeft = () => {
     setLeft(left.concat(rightChecked));
-    setRight(not(right, rightChecked));
+    const rightValues = not(right, rightChecked);
+    setRight(rightValues);
     setChecked(not(checked, rightChecked));
+    onChange(rightValues)
   };
 
 

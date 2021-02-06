@@ -42,6 +42,7 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
   const handleNext = () => setActiveStep((prevActiveStep) => prevActiveStep + 1);
   const handleBack = () => setActiveStep((prevActiveStep) => prevActiveStep - 1);
   const handleReset = () => setActiveStep(0);
+  const handleFinish = () => service.users.save(user).onSuccess(onClose);
   
   const onClose = () => {
     handleClose();
@@ -49,17 +50,14 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
     setUser(service.users.builder());
   };
 
-  const handleFinish = () => {
-    service.users.save(user)
-      .onSuccess(resource => {
-        onClose();
-      });
-  };
-  
   const onTab = () => {
     onClose()
     handleConf({builder: user, activeStep, edit: true})
   }
+  
+  const userInAdminGroup = user.groups
+    .map(groupId => groups.filter(g => g.group.id === groupId)[0])
+    .map(g => g.group.type).includes("ADMIN");
 
   const steps = [
     <ConfigureUserBasic 
@@ -68,20 +66,20 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
         email={{defaultValue: user.email, onChange: (newValue) => setUser(user.withEmail(newValue))}}
         externalId={{defaultValue: user.externalId, onChange: (newValue) => setUser(user.withExternalId(newValue))}} />,
 
-    <ConfigureUserProjects 
-        projects={{all: projects, selected: user.projects}}
-        onChange={(newSelection) => setUser(user.withProjects(newSelection))} />,
-        
     <ConfigureUserGroups
         groups={{ all: groups, selected: user.groups}} 
-        onChange={(newSelection) => setUser(user.withGroups(newSelection))} />    
+        onChange={(newSelection) => setUser(user.withGroups(newSelection))} />,
+
+    <ConfigureUserProjects 
+        projects={{all: projects, selected: user.projects}} userInAdminGroup={userInAdminGroup}
+        onChange={(newSelection) => setUser(user.withProjects(newSelection))} />    
   ];
   
   const content = (<React.Fragment>
       <Stepper alternativeLabel activeStep={activeStep}>
         <Step><StepLabel>User Info</StepLabel></Step>
-        <Step><StepLabel>User Projects</StepLabel></Step>
         <Step><StepLabel>Add Groups</StepLabel></Step>
+        <Step><StepLabel>Add Projects</StepLabel></Step>
       </Stepper>   
       {steps[activeStep]}   
       {activeStep === steps.length ? (<ConfigureUserSummary user={user} projects={projects} groups={groups} />): null}

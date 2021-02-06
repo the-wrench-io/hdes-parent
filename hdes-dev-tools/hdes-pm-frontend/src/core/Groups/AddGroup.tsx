@@ -54,24 +54,20 @@ const AddGroup: React.FC<AddGroupProps> = ({open, handleClose, handleConf}) => {
     handleConf({builder: group, activeStep, edit: true})
   }
 
-  const handleFinish = () => {
-    service.groups.save(group)
-      .onSuccess(resource => {
-        onClose();
-      });
-  };
+  const handleFinish = () => service.groups.save(group).onSuccess(onClose);
   
   const steps = [
     <ConfigureGroupBasic 
-        name={{defaultValue: group.name, onChange: (newValue) => setGroup(group.withName(newValue))}}/>,
-
+        id={group.id}
+        name={{defaultValue: group.name, onChange: (newValue) => setGroup(group.withName(newValue))}}
+        matcher={{defaultValue: group.matcher, onChange: (newValue) => setGroup(group.withMatcher(newValue))}}
+        type={{defaultValue: group.type, onChange: (newValue) => setGroup(group.withType(newValue))}} />,
     <ConfigureGroupUsers 
         users={{all: users, selected: group.users}}
         onChange={(newSelection) => setGroup(group.withUsers(newSelection))} />,
-        
-    <ConfigureGroupProjects
+    <ConfigureGroupProjects adminGroup={group.type === "ADMIN"}
         projects={{ all: projects, selected: group.projects}} 
-        onChange={(newSelection) => setGroup(group.withProjects(newSelection))} />   
+        onChange={(newSelection) => setGroup(group.withProjects(newSelection))} />
   ];
 
   const content = <React.Fragment>

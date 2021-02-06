@@ -5,6 +5,7 @@ import { Backend } from '.././Resources';
 
 
 interface ConfigureUserProjectsProps {
+  userInAdminGroup: boolean;
   projects: {
     all: Backend.ProjectResource[];
     selected: string[];

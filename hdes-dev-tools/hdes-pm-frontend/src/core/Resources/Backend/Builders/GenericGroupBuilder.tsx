@@ -28,6 +28,12 @@ export class GenericGroupBuilder implements Backend.GroupBuilder {
   get id(): string | undefined {
     return this._id;
   }
+  get type(): Backend.GroupType | undefined {
+    return this._type;
+  }
+  get matcher(): string | undefined {
+    return this._matcher;
+  }
   get name(): string | undefined {
     return this._name;
   }

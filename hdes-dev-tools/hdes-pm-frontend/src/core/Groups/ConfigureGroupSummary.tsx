@@ -49,20 +49,35 @@ const ConfigureProjectSummary: React.FC<ConfigureProjectSummaryProps> = (props) 
   return (<div className={classes.root}>
     <List className={classes.root} component="nav" aria-labelledby="nested-list-subheader">
       
-      <Title>Group {props.group.name}</Title>
+      <Title>{props.group.name}</Title>
+      
+      <ListItem button>
+        <ListItemText primary={`Group Matcher: (${props.group.matcher})`} />
+      </ListItem>
+
+      <ListItem button>
+        <ListItemText primary={`Group Type: (${props.group.type})`} />
+      </ListItem>
+      
       <Divider />
       
-      <ListItem button onClick={() => setOpenProjects(!openProjects)}>
-        <ListItemText primary={`Projects to what there is access: (${props.group.projects.length})`} />
-        {openProjects ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      <Collapse in={openProjects} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          {props.group.projects
-            .map(id => projects.filter(p => p.project.id === id)[0].project)
-            .map(p => <ListItem key={p.id} button className={classes.primary}><ListItemIcon><LibraryBooksOutlinedIcon /></ListItemIcon><ListItemText primary={p.name} /></ListItem>)}
-        </List>
-      </Collapse>
+      { props.group.type === 'ADMIN' ? 
+        (<ListItem button>
+          <ListItemText primary={`Group will have access to all of the PROJECTS`} />
+        </ListItem>) 
+        : 
+        (<><ListItem button onClick={() => setOpenProjects(!openProjects)}>
+          <ListItemText primary={`Projects to what there is access: (${props.group.projects.length})`} />
+          {openProjects ? <ExpandLess /> : <ExpandMore />}
+        </ListItem>
+        <Collapse in={openProjects} timeout="auto" unmountOnExit>
+          <List component="div" disablePadding>
+            {props.group.projects
+              .map(id => projects.filter(p => p.project.id === id)[0].project)
+              .map(p => <ListItem key={p.id} button className={classes.primary}><ListItemIcon><LibraryBooksOutlinedIcon /></ListItemIcon><ListItemText primary={p.name} /></ListItem>)}
+          </List>
+        </Collapse></>)
+      }
 
       <ListItem button onClick={() => setOpenUsers(!openUsers)}>
         <ListItemText primary={`Users that are part of the group: (${props.group.users.length})`} />
