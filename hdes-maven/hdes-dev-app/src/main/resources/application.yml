@@ -20,7 +20,7 @@
 
 
 quarkus:
-
+    
 
   http:
     cors: true
