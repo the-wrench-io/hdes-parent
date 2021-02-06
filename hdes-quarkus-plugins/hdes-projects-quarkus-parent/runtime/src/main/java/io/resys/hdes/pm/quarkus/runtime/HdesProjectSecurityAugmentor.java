@@ -23,17 +23,20 @@ package io.resys.hdes.pm.quarkus.runtime;
 import java.util.function.Supplier;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.quarkus.security.identity.AuthenticationRequestContext;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.identity.SecurityIdentityAugmentor;
 import io.quarkus.security.runtime.QuarkusSecurityIdentity;
 import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
+import io.resys.hdes.projects.api.PmException;
 import io.smallrye.mutiny.Uni;
 
 
 public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(HdesProjectSecurityAugmentor.class);
   public static final String ADMIN_ROLE = "hdes-projects-admin";
   private final String adminInitUserName;
   private final HdesProjectsContext hdesProjectsBackend;
@@ -66,7 +69,11 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
         
         builder.addRole(ADMIN_ROLE);
       } else {
-        hdesProjectsBackend.repo().create().user(userBuilder -> userBuilder.name(userName));
+        try {
+          hdesProjectsBackend.repo().create().user(userBuilder -> userBuilder.name(userName));
+        } catch(PmException e) {
+          LOGGER.error(e.getMessage() + System.lineSeparator() + e.getValue(), e);
+        }
       }
     }
 
