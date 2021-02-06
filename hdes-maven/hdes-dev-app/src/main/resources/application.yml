@@ -21,6 +21,7 @@
 
 quarkus:
 
+
   http:
     cors: true
     auth: 
