@@ -29,6 +29,7 @@ import org.immutables.value.Value;
 
 import io.resys.hdes.projects.api.PmRepository.Access;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
@@ -52,6 +53,7 @@ public interface MongoQuery {
     QueryResultWithAccess<T> getWithFilter();
     T get();
     Optional<T> findOne();
+    Optional<T> findFirst();
     List<T> findAll();
     void delete();
     
@@ -68,7 +70,9 @@ public interface MongoQuery {
     ProjectQuery name(String name);
   }
   interface GroupQuery extends Query<GroupQuery, Group> {
+    GroupQuery type(GroupType groupType);
     GroupQuery name(String name);
+    Collection<Group> matches(String ...values);
   }
   interface UserQuery extends Query<UserQuery, User> {
     UserQuery externalId(String externalId);

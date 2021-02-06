@@ -29,6 +29,7 @@ import io.resys.hdes.projects.api.ImmutableBatchProject;
 import io.resys.hdes.projects.api.ImmutableBatchUser;
 import io.resys.hdes.projects.api.PmRepository;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupResource;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.ProjectResource;
 import io.resys.hdes.projects.api.PmRepository.User;
@@ -91,6 +92,37 @@ public class StorageServiceReadWriteTest {
           .build());
       
       Assertions.assertEquals(3, project.getAccess().size());
+      
+    });
+  }
+  
+  @Test
+  public void groupMatcherTest() {
+    MongoDbFactory.instance(transaction -> {
+      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
+      
+      Group group1 = repo.create().group(ImmutableBatchGroup.builder().name("admins-1").matcher(".*@trolls\\.com$").build()).getGroup();
+      Group group2 = repo.create().group(ImmutableBatchGroup.builder().name("admins-2").matcher(".*@humans\\.com$").build()).getGroup();
+      Group group3 = repo.create().group(ImmutableBatchGroup.builder().name("admins-3").build()).getGroup();
+      
+      User user1 = repo.create().user(ImmutableBatchUser.builder().name("rockbreaker").email("rockbreaker@trolls.com").build()).getUser();
+      User user2 = repo.create().user(ImmutableBatchUser.builder().name("bridgeguard").email("bridgeguard@trolls.com").build()).getUser();
+      User user3 = repo.create().user(ImmutableBatchUser.builder().name("walker").email("walker@humans.com").build()).getUser();
+      
+      // trolls
+      GroupResource groupResource = repo.query().groups().get(group1.getId());
+      Assertions.assertEquals(2, groupResource.getUsers().size());
+      Assertions.assertTrue(groupResource.getUsers().containsKey(user1.getId()));
+      Assertions.assertTrue(groupResource.getUsers().containsKey(user2.getId()));
+
+      // humans
+      groupResource = repo.query().groups().get(group2.getId());
+      Assertions.assertEquals(1, groupResource.getUsers().size());
+      Assertions.assertTrue(groupResource.getUsers().containsKey(user3.getId()));
+      
+      // empty group
+      groupResource = repo.query().groups().get(group3.getId());
+      Assertions.assertEquals(0, groupResource.getUsers().size());
       
     });
   }

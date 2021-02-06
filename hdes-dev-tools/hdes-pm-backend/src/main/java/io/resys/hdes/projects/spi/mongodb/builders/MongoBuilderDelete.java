@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import io.resys.hdes.projects.api.PmException;
 import io.resys.hdes.projects.api.PmRepository.Access;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
@@ -152,6 +153,14 @@ public class MongoBuilderDelete implements MongoBuilder {
       }
       @Override
       public GroupVisitor visitName(String name) {
+        return this;
+      }
+      @Override
+      public GroupVisitor visitMatcher(String matcher) {
+        return this;
+      }
+      @Override
+      public GroupVisitor visitType(GroupType type) {
         return this;
       }
       @Override

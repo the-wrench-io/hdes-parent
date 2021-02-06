@@ -127,6 +127,18 @@ public abstract class MongoQueryTemplate<Q, T> implements Query<Q, T> {
     
     return Optional.empty();
   }
+  
+  @Override
+  public Optional<T> findFirst() {
+    RepoAssert.notNull(filters, () -> "there must be at least one filter!");
+
+    MongoCollection<T> collection = getCollection();
+      
+    if(filters.isEmpty()) {
+      return Optional.ofNullable(collection.find().first());
+    }
+    return Optional.ofNullable(collection.find(filters()).first()); 
+  }
 
   @Override
   public List<T> findAll() {

@@ -1,5 +1,7 @@
 package io.resys.hdes.projects.spi.mongodb.batch;
 
+import java.util.Collection;
+
 /*-
  * #%L
  * hdes-pm-backend
@@ -26,12 +28,14 @@ import java.util.stream.Collectors;
 
 import io.resys.hdes.projects.api.ImmutableTokenAccessResource;
 import io.resys.hdes.projects.api.ImmutableTokenResource;
+import io.resys.hdes.projects.api.PmRepository.BatchAdminsQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchGroupQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchProjectQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchTokensQuery;
 import io.resys.hdes.projects.api.PmRepository.BatchUserQuery;
 import io.resys.hdes.projects.api.PmRepository.GroupResource;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.ProjectResource;
 import io.resys.hdes.projects.api.PmRepository.TokenResource;
 import io.resys.hdes.projects.api.PmRepository.UserResource;
@@ -143,6 +147,25 @@ public class BatchQueryDefault implements BatchQuery {
         return query.project().findAll().stream()
             .map(u -> ResourceMapper.map(query, u))
             .collect(Collectors.toList());
+      }
+    };
+  }
+
+  @Override
+  public BatchAdminsQuery admins() {
+    return new BatchAdminsQuery() {
+      @Override
+      public boolean isAdmin(String userName) {
+        final var user = query.user().id(userName).name(userName).findOne();
+        if(user.isEmpty()) {
+          return false;
+        }
+        Collection<String> groups = query.groupUser().user(user.get().getId())
+          .findAll().stream()
+          .map(groupUser -> groupUser.getGroupId())
+          .collect(Collectors.toSet());
+        
+        return query.group().id(groups).type(GroupType.ADMIN).findFirst().isPresent();
       }
     };
   }

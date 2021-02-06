@@ -159,6 +159,7 @@ public class MongoPmRepository implements PmRepository {
               .visitName(group.getName())
               .visitProjects(group.getProjects())
               .visitUsers(group.getUsers())
+              .visitMatcher(group.getMatcher())
               .build(); 
           builder.build();
           return ResourceMapper.map(query, updated);
@@ -230,6 +231,7 @@ public class MongoPmRepository implements PmRepository {
               .visitName(group.getName())
               .visitProjects(group.getProjects())
               .visitUsers(group.getUsers())
+              .visitMatcher(group.getMatcher())
               .build(); 
           builder.build();
           return ResourceMapper.map(query, created);

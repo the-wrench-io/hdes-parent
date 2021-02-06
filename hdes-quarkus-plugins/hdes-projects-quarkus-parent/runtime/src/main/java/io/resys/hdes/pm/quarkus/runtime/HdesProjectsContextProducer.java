@@ -79,8 +79,8 @@ public class HdesProjectsContextProducer {
   }
   
   @Produces
-  public HdesProjectSecurityAugmentor hdesProjectSecurityAugmentor() {
-    return new HdesProjectSecurityAugmentor(adminInitUserName);
+  public HdesProjectSecurityAugmentor hdesProjectSecurityAugmentor(HdesProjectsContext hdesProjectsBackend) {
+    return new HdesProjectSecurityAugmentor(adminInitUserName, hdesProjectsBackend);
   }
 
   @Produces

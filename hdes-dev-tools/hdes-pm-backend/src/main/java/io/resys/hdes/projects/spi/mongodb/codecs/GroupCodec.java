@@ -1,6 +1,7 @@
 package io.resys.hdes.projects.spi.mongodb.codecs;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 /*-
  * #%L
@@ -30,10 +31,13 @@ import org.bson.codecs.EncoderContext;
 
 import io.resys.hdes.projects.api.ImmutableGroup;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 
 
 public class GroupCodec implements Codec<Group> {
   public static final String NAME = "name";
+  public static final String MATCHER = "matcher";
+  public static final String GROUP_TYPE = "type";
   
   @Override
   public void encode(BsonWriter writer, Group command, EncoderContext encoderContext) {
@@ -42,6 +46,13 @@ public class GroupCodec implements Codec<Group> {
     writer.writeString(CodecUtil.REV, command.getRev());
     writer.writeString(CodecUtil.CREATED, command.getCreated().toString());
     writer.writeString(NAME, command.getName());
+    writer.writeString(GROUP_TYPE, command.getType().name());
+    if (command.getMatcher().isPresent()) {
+      writer.writeString(MATCHER, command.getMatcher().get());
+    } else {
+      writer.writeNull(MATCHER);
+    }
+    
     writer.writeEndDocument();
   }
 
@@ -53,6 +64,8 @@ public class GroupCodec implements Codec<Group> {
       .rev(reader.readString(CodecUtil.REV))
       .created(LocalDateTime.parse(reader.readString(CodecUtil.CREATED)))
       .name(reader.readString(NAME))
+      .type(GroupType.valueOf(reader.readString(GROUP_TYPE)))
+      .matcher(Optional.ofNullable(CodecUtil.readNull(MATCHER, reader) ? null : reader.readString()))
       .build();
     reader.readEndDocument();
     return result;

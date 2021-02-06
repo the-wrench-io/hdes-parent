@@ -44,6 +44,7 @@ import io.resys.hdes.projects.api.PmException.ConstraintType;
 import io.resys.hdes.projects.api.PmException.ErrorType;
 import io.resys.hdes.projects.api.PmRepository.Access;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
@@ -201,6 +202,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
       private String id;
       private String rev;
       private String name;
+      private String matcher;
       private List<String> users;
       private List<String> projects;
       
@@ -209,21 +211,27 @@ public class MongoBuilderUpdate implements MongoBuilder {
         RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);      
         RepoAssert.notEmpty(name, () -> "name not defined!");
         
+        final String matcher = this.matcher == null || this.matcher.isBlank() ? null : this.matcher;
         final var queryResult = query.group().id(id).rev(rev).getWithFilter();
         final Group group;
         
-        if(name.equals(queryResult.getValue().getName())) {
+        if( name.equals(queryResult.getValue().getName()) &&
+            (matcher == null && queryResult.getValue().getMatcher().isEmpty() ||
+             queryResult.getValue().getMatcher().orElse("").equals(matcher)) ) {
+          
           group = queryResult.getValue();
         } else {
           final var newRev = UUID.randomUUID().toString();
           mongo.getDb().getCollection(mongo.getConfig().getGroups(), Group.class)
             .updateOne(queryResult.getFilter(), Updates.combine(
               Updates.set(GroupCodec.NAME, name), 
+              Updates.set(GroupCodec.MATCHER, matcher), 
               Updates.set(CodecUtil.REV, newRev)));
           
           group = ImmutableGroup.builder()
               .from(queryResult.getValue())
               .rev(newRev)
+              .matcher(Optional.ofNullable(matcher))
               .name(name)
               .build();
         }
@@ -253,7 +261,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
             .map(id -> query.user().id(id).get())
             .forEach(user -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
         }
-        if(projects != null) {
+        if(projects != null && group.getType() == GroupType.USER) {
           final var currentProjects = currentAccess.stream()
               .map(a -> a.getProjectId())
               .collect(Collectors.toList());
@@ -305,6 +313,16 @@ public class MongoBuilderUpdate implements MongoBuilder {
         this.id = id;
         return this;
       }
+      @Override
+      public GroupVisitor visitMatcher(String matcher) {
+        this.matcher = matcher;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitType(GroupType type) {
+        // group type can't be updated
+        return this;
+      }
     };
   }
   @Override
@@ -338,34 +356,24 @@ public class MongoBuilderUpdate implements MongoBuilder {
         final User user;
         if(queryResult.getValue().equals(
             ImmutableUser.builder().from(queryResult.getValue())
-            .name(name == null ? oldValue.getName() : name)
-            .email(email == null ? oldValue.getEmail() : email)
-            .token(token == null ? oldValue.getToken() : token)
-            .status(status == null ? oldValue.getStatus() : status)
-            .externalId(externalId == null ? oldValue.getExternalId() : externalId)
+            .name(name)
+            .email(Optional.ofNullable(email))
+            .token(token)
+            .status(status)
+            .externalId(externalId)
             .build())) {
           
           user = queryResult.getValue();
         } else {
           final var newRev = UUID.randomUUID().toString();
           final List<Bson> updates = new ArrayList<>();
-          updates.add(Updates.set(CodecUtil.REV, newRev));
+          updates.add(Updates.set(CodecUtil.REV, newRev));          
+          updates.add(Updates.set(UserCodec.NAME, name));
+          updates.add(Updates.set(UserCodec.EMAIL, email));
+          updates.add(Updates.set(UserCodec.EXTERNAL_ID, externalId));
+          updates.add(Updates.set(UserCodec.TOKEN, token));
+          updates.add(Updates.set(UserCodec.STATUS, status.name()));
           
-          if(name != null && !name.equals(oldValue.getName())) {
-            updates.add(Updates.set(UserCodec.NAME, name));
-          }
-          if(email != null && !email.equals(oldValue.getEmail())) {
-            updates.add(Updates.set(UserCodec.EMAIL, email));
-          }
-          if(externalId != null && !externalId.equals(oldValue.getExternalId())) {
-            updates.add(Updates.set(UserCodec.EXTERNAL_ID, externalId));
-          }
-          if(token != null && !token.equals(oldValue.getToken())) {
-            updates.add(Updates.set(UserCodec.TOKEN, token));
-          }
-          if(status != null && !status.equals(oldValue.getStatus())) {
-            updates.add(Updates.set(UserCodec.STATUS, status.name()));
-          }
           mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class)
           .updateOne(queryResult.getFilter(), Updates.combine(updates));
         
@@ -459,7 +467,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
             .visitStatus(entity.getStatus())
             .visitToken(entity.getToken())
             .visitExternalId(entity.getExternalId())
-            .visitEmail(entity.getEmail());
+            .visitEmail(entity.getEmail().orElse(null));
       }
       @Override
       public UserVisitor visitRev(String rev) {

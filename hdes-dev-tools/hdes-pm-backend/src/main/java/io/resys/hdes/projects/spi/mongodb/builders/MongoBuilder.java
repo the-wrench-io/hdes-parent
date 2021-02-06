@@ -30,6 +30,7 @@ import org.immutables.value.Value;
 
 import io.resys.hdes.projects.api.PmRepository.Access;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
@@ -80,8 +81,10 @@ public interface MongoBuilder {
   
   interface GroupVisitor extends Builder<GroupVisitor, Group> {
     GroupVisitor visitName(@Nullable String name);
+    GroupVisitor visitType(@Nullable GroupType type);
     GroupVisitor visitUsers(@Nullable List<String> users);
     GroupVisitor visitProjects(@Nullable List<String> projects);
+    GroupVisitor visitMatcher(@Nullable String matcher);
   }
 
   interface UserVisitor extends Builder<UserVisitor, User> {

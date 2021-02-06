@@ -1,5 +1,11 @@
 package io.resys.hdes.projects.spi.mongodb.queries;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Consumer;
+
 /*-
  * #%L
  * hdes-pm-backend
@@ -25,6 +31,7 @@ import com.mongodb.client.model.Filters;
 
 import io.resys.hdes.projects.api.PmException.ErrorType;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.spi.mongodb.codecs.GroupCodec;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery.GroupQuery;
 import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper;
@@ -44,10 +51,32 @@ public class MongoQueryGroup extends MongoQueryTemplate<MongoQuery.GroupQuery, G
   protected ErrorType getErrorType() {
     return ErrorType.GROUP;
   }
-
+  @Override
+  public GroupQuery type(GroupType groupType) {
+    filters.add(Filters.eq(GroupCodec.GROUP_TYPE, groupType.name()));
+    return this;
+  }
   @Override
   public GroupQuery name(String name) {
     filters.add(Filters.eq(GroupCodec.NAME, name));
     return this;
+  }
+  @Override
+  public Collection<Group> matches(String ...values) {
+    if(values.length == 0) {
+      return Collections.emptyList();
+    }
+    
+    List<Group> result = new ArrayList<>();
+    getCollection()
+      .find(Filters.not(Filters.eq(GroupCodec.MATCHER, null)))
+      .forEach((Consumer<Group>) group -> {
+        for(String value : values) {
+          if(value != null && !value.isBlank() && value.matches(group.getMatcher().get())) {
+            result.add(group);
+          }
+        }
+      });
+    return Collections.unmodifiableList(result);
   }
 }

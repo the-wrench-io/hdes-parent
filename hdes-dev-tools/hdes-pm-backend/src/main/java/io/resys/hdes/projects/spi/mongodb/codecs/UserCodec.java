@@ -49,9 +49,14 @@ public class UserCodec implements Codec<User> {
     writer.writeString(CodecUtil.REV, command.getRev());
     writer.writeString(CodecUtil.CREATED, command.getCreated().toString());
     writer.writeString(NAME, command.getName());
-    writer.writeString(EMAIL, command.getEmail());
     writer.writeString(TOKEN, command.getToken());  
     writer.writeString(STATUS, command.getStatus().name());  
+    
+    if (command.getEmail().isPresent()) {
+      writer.writeString(EMAIL, command.getEmail().get());
+    } else {
+      writer.writeNull(EMAIL);
+    }
     
     if (command.getExternalId().isPresent()) {
       writer.writeString(EXTERNAL_ID, command.getExternalId().get());
@@ -70,9 +75,9 @@ public class UserCodec implements Codec<User> {
       .rev(reader.readString(CodecUtil.REV))
       .created(LocalDateTime.parse(reader.readString(CodecUtil.CREATED)))
       .name(reader.readString(NAME))
-      .email(reader.readString(EMAIL))
       .token(reader.readString(TOKEN))
       .status(UserStatus.valueOf(reader.readString(STATUS)))
+      .email(Optional.ofNullable(CodecUtil.readNull(EMAIL, reader) ? null : reader.readString()))
       .externalId(Optional.ofNullable(CodecUtil.readNull(EXTERNAL_ID, reader) ? null : reader.readString()))
       .build();
     reader.readEndDocument();

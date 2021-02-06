@@ -28,17 +28,20 @@ import io.quarkus.security.identity.AuthenticationRequestContext;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.identity.SecurityIdentityAugmentor;
 import io.quarkus.security.runtime.QuarkusSecurityIdentity;
+import io.resys.hdes.pm.quarkus.runtime.context.HdesProjectsContext;
 import io.smallrye.mutiny.Uni;
 
 
 public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
 
-  public static final String ADMIN_INIT = "hdes-projects-admin";
+  public static final String ADMIN_ROLE = "hdes-projects-admin";
   private final String adminInitUserName;
+  private final HdesProjectsContext hdesProjectsBackend;
   
-  public HdesProjectSecurityAugmentor(String adminInitUserName) {
+  public HdesProjectSecurityAugmentor(String adminInitUserName, HdesProjectsContext hdesProjectsBackend) {
     super();
     this.adminInitUserName = adminInitUserName;
+    this.hdesProjectsBackend = hdesProjectsBackend;
   }
   
   @Override
@@ -57,8 +60,13 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
     if(identity.getPrincipal() instanceof JsonWebToken) {
       JsonWebToken webToken = (JsonWebToken) identity.getPrincipal();
       String userName = webToken.getClaim("user_name");
-      if(userName != null && userName.equals(adminInitUserName)) {
-        builder.addRole(ADMIN_INIT);
+      
+      if( userName != null && userName.equals(adminInitUserName) || 
+          hdesProjectsBackend.repo().query().admins().isAdmin(userName)) {
+        
+        builder.addRole(ADMIN_ROLE);
+      } else {
+        hdesProjectsBackend.repo().create().user(userBuilder -> userBuilder.name(userName));
       }
     }
 

@@ -59,12 +59,17 @@ public interface PmRepository {
   }
   
   interface BatchQuery {
+    BatchAdminsQuery admins();
     BatchTokensQuery tokens();
     BatchUserQuery users();
     BatchGroupQuery groups();
     BatchProjectQuery project();
   }
 
+  interface BatchAdminsQuery {
+    boolean isAdmin(String userName);
+  }
+  
   interface BatchTokensQuery {
     Optional<TokenResource> findOne(String token);
   }
@@ -111,6 +116,8 @@ public interface PmRepository {
   interface BatchGroup extends BatchMutator {
     @Nullable
     String getName();
+    @Nullable
+    String getMatcher();
     @Nullable
     List<String> getUsers();
     @Nullable
@@ -174,7 +181,7 @@ public interface PmRepository {
   @JsonDeserialize(as = ImmutableTokenResource.class)
   interface TokenResource extends BatchResource {
     String getName();
-    String getEmail();
+    Optional<String> getEmail();
     String getId();
     List<TokenAccessResource> getAccess();
   }
@@ -205,14 +212,10 @@ public interface PmRepository {
     String getRev();
     LocalDateTime getCreated();
     Optional<String> getExternalId();
+    Optional<String> getEmail();
     String getName();
-    String getEmail();
     String getToken();
     UserStatus getStatus();
-  }
-  
-  enum UserStatus {
-    PENDING, ENABLED, DISABLED
   }
   
   @JsonSerialize(as = ImmutableGroup.class)
@@ -222,6 +225,8 @@ public interface PmRepository {
     String getId();
     String getRev();
     LocalDateTime getCreated();
+    GroupType getType();
+    Optional<String> getMatcher(); 
     String getName();
   }
   
@@ -248,5 +253,12 @@ public interface PmRepository {
     
     Optional<String> getUserId();
     Optional<String> getGroupId();
+  }
+  
+  enum UserStatus {
+    PENDING, ENABLED, DISABLED
+  }
+  enum GroupType {
+    USER, ADMIN
   }
 }

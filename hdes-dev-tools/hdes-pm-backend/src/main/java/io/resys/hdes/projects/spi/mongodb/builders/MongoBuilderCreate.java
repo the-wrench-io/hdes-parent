@@ -21,9 +21,14 @@ package io.resys.hdes.projects.spi.mongodb.builders;
  */
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +44,7 @@ import io.resys.hdes.projects.api.PmException.ConstraintType;
 import io.resys.hdes.projects.api.PmException.ErrorType;
 import io.resys.hdes.projects.api.PmRepository.Access;
 import io.resys.hdes.projects.api.PmRepository.Group;
+import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
@@ -76,8 +82,8 @@ public class MongoBuilderCreate implements MongoBuilder {
   public ProjectVisitor visitProject() {
     return new ProjectVisitor() {
       private String name;
-      private List<String> users;
-      private List<String> groups;
+      private Set<String> users;
+      private Set<String> groups;
       
       @Override
       public Project build() throws PmException {
@@ -92,7 +98,7 @@ public class MongoBuilderCreate implements MongoBuilder {
               .build(), () -> "entity: 'project' with name: '" + name + "' already exists!");
         }
         
-        Project project = ImmutableProject.builder()
+        final var project = ImmutableProject.builder()
             .id(UUID.randomUUID().toString())
             .rev(UUID.randomUUID().toString())
             .name(name)
@@ -122,12 +128,12 @@ public class MongoBuilderCreate implements MongoBuilder {
       }
       @Override
       public ProjectVisitor visitUsers(List<String> users) {
-        this.users = users;
+        this.users = users == null ? null : new HashSet<>(users);
         return this;
       }
       @Override
       public ProjectVisitor visitGroups(List<String> groups) {
-        this.groups = groups;
+        this.groups = groups == null ? null : new HashSet<>(groups);
         return this;
       }
       @Override
@@ -151,8 +157,10 @@ public class MongoBuilderCreate implements MongoBuilder {
   public GroupVisitor visitGroup() {
     return new GroupVisitor() {
       private String name;
-      private List<String> users;
-      private List<String> projects;
+      private Set<String> users;
+      private Set<String> projects;
+      private GroupType type;
+      private String matcher;
       
       @Override
       public Group build() {
@@ -167,10 +175,14 @@ public class MongoBuilderCreate implements MongoBuilder {
               .build(), () -> "entity: 'group' with name: '" + name + "' already exists!");
         }
         
-        Group group = ImmutableGroup.builder()
+        final var matcher = this.matcher == null || this.matcher.isBlank() ? null : this.matcher;
+        final var type = this.type != null ? this.type : GroupType.USER;
+        final var group = ImmutableGroup.builder()
             .id(UUID.randomUUID().toString())
             .rev(UUID.randomUUID().toString())
             .name(name)
+            .type(type)
+            .matcher(Optional.ofNullable(matcher))
             .created(LocalDateTime.now())
             .build();
         
@@ -182,12 +194,20 @@ public class MongoBuilderCreate implements MongoBuilder {
             .map(id -> query.user().id(id).get())
             .forEach(user -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
         }
-        if(projects != null) {
+        
+        // Save only for user projects, ADMIN groups have access to everything
+        if(projects != null && type == GroupType.USER) {
           this.projects.stream()
             .map(id -> query.project().id(id).get())
             .forEach(project -> visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
         }
         return group;
+      }
+
+      @Override
+      public GroupVisitor visitType(@Nullable GroupType type) {
+        this.type = type;
+        return this;
       }
       @Override
       public GroupVisitor visit(Group entity) {
@@ -195,17 +215,22 @@ public class MongoBuilderCreate implements MongoBuilder {
       }
       @Override
       public GroupVisitor visitUsers(List<String> users) {
-        this.users = users;
+        this.users = users == null ? null : new HashSet<>(users);
         return this;
       }
       @Override
       public GroupVisitor visitProjects(List<String> projects) {
-        this.projects = projects;
+        this.projects = projects == null ? null : new HashSet<>(projects);
         return this;
       }
       @Override
       public GroupVisitor visitName(String name) {
         this.name = name;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitMatcher(String matcher) {
+        this.matcher = matcher;
         return this;
       }
       @Override
@@ -227,13 +252,12 @@ public class MongoBuilderCreate implements MongoBuilder {
       private String email;
       private Optional<String> externalId;
       private UserStatus status;
-      private List<String> groups;
-      private List<String> projects;
+      private Set<String> groups;
+      private Set<String> projects;
       
       @Override
       public User build() {
         RepoAssert.notEmpty(name, () -> "name not defined!");
-        RepoAssert.notEmpty(email, () -> "email not defined!");
 
         Optional<User> conflict = query.user().name(name).findOne();
         if(conflict.isPresent()) {
@@ -245,12 +269,23 @@ public class MongoBuilderCreate implements MongoBuilder {
               .build(), () -> "entity: 'user' with name: '" + name + "' already exists!");
         }
         
-        User user = ImmutableUser.builder()
+        Set<String> groupMatches = query.group().matches(name, email).stream()
+            .map(g -> g.getId())
+            .collect(Collectors.toSet());
+        if(!groupMatches.isEmpty()) {
+          if(groups == null) {
+            groups = new HashSet<>();
+          }
+          groups.addAll(groupMatches);
+        }
+        
+        
+        final var user = ImmutableUser.builder()
             .id(UUID.randomUUID().toString())
             .rev(UUID.randomUUID().toString())
             .name(name)
             .externalId(externalId == null ? Optional.empty() : externalId)
-            .email(email)
+            .email(Optional.of(email))
             .status(status == null ? UserStatus.PENDING : status)
             .token(UUID.randomUUID().toString())
             .created(LocalDateTime.now())
@@ -273,7 +308,7 @@ public class MongoBuilderCreate implements MongoBuilder {
       }
       @Override
       public UserVisitor visitProjects(List<String> projects) {
-        this.projects = projects;
+        this.projects = projects == null ? null : new HashSet<>(projects);
         return this;
       }
       @Override
@@ -283,7 +318,7 @@ public class MongoBuilderCreate implements MongoBuilder {
       }
       @Override
       public UserVisitor visitGroups(List<String> groups) {
-        this.groups = groups;
+        this.groups = groups == null ? null : new HashSet<>(groups);
         return this;
       }
       @Override
@@ -311,7 +346,7 @@ public class MongoBuilderCreate implements MongoBuilder {
         return visitName(entity.getName())
             .visitStatus(entity.getStatus())
             .visitExternalId(entity.getExternalId())
-            .visitEmail(entity.getEmail());
+            .visitEmail(entity.getEmail().orElse(null));
       }
       @Override
       public UserVisitor visitRev(String rev) {
