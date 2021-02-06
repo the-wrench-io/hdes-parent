@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.bson.conversions.Bson;
@@ -211,10 +213,22 @@ public class MongoBuilderUpdate implements MongoBuilder {
         RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);      
         RepoAssert.notEmpty(name, () -> "name not defined!");
         
-        final String matcher = this.matcher == null || this.matcher.isBlank() ? null : this.matcher;
         final var queryResult = query.group().id(id).rev(rev).getWithFilter();
-        final Group group;
+        final String matcher = this.matcher == null || this.matcher.isBlank() ? null : this.matcher;
+        if(matcher != null) {
+          try {
+            Pattern.compile(matcher);
+          } catch(PatternSyntaxException e) {
+            throw new PmException(ImmutableConstraintViolation.builder()
+                .id(queryResult.getValue().getId())
+                .rev(queryResult.getValue().getRev())
+                .constraint(ConstraintType.INVALID_DATA)
+                .type(ErrorType.GROUP)
+                .build(), () -> "entity: 'group' with name: '" + name + "' has error in the matcher: '" + matcher + "', " + e.getMessage() + "!");
+          }
+        }
         
+        final Group group;
         if( name.equals(queryResult.getValue().getName()) &&
             (matcher == null && queryResult.getValue().getMatcher().isEmpty() ||
              queryResult.getValue().getMatcher().orElse("").equals(matcher)) ) {

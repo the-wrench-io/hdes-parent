@@ -64,7 +64,7 @@ class InMemoryUserService implements Backend.UserService {
           status: builder.status ? builder.status: "ENABLED",
           token: builder.token ? builder.token : "",
           name: builder.name ? builder.name : "",
-          email: builder.email ? builder.email : "",
+          email: builder.email,
           externalId: builder.externalId, 
           created: new Date()
         };
@@ -85,6 +85,20 @@ class InMemoryUserService implements Backend.UserService {
         
         // access to groups
         const newGroupUsers: Backend.GroupUser[] = [];
+        for(const group of store.groups) {
+          if(group.matcher && (
+            newUser.name.match(group.matcher) || (
+            newUser.email && newUser.email.match(group.matcher)))
+          ) {
+            newGroupUsers.push({
+              id: store.uuid(), 
+              rev: store.uuid(), 
+              groupId: group.id,
+              userId: newUser.id,
+              created: new Date()
+            });
+          }
+        }
         if(builder.groups) {
           for(let groupId of builder.groups) {
             newGroupUsers.push({

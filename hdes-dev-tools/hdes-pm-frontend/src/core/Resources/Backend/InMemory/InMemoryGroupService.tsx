@@ -65,7 +65,9 @@ class InMemoryGroupService implements Backend.GroupService {
         // user entry
         const newGroup: Backend.Group = {
           id: store.uuid(),
-          rev: store.uuid(), 
+          rev: store.uuid(),
+          type: builder.type ? builder.type : "USER",
+          matcher: builder.matcher,
           name: builder.name ? builder.name : "",
           created: new Date()
         };

@@ -64,7 +64,7 @@ export class GenericUserBuilder implements Backend.UserBuilder {
       rev: this._rev,
       externalId: this._externalId,
       name: this._name ? this._name : "",
-      email: this._email ? this._email : "",
+      email: this._email,
       groups: this._groups,
       projects: this._projects,
       status: this._status

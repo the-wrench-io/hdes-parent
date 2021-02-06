@@ -103,6 +103,8 @@ class InMemoryStore implements Store {
       id: groupId, rev: this.uuid(), 
       created: prevState.created,
       name: builder.name ? builder.name : prevState.name,
+      matcher: builder.matcher,
+      type: builder.type ? builder.type : prevState.type,
     };
     const index = this.groups.indexOf(prevState, 0);
     this.groups.splice(index, 1);

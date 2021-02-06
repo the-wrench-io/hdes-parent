@@ -91,11 +91,15 @@ declare namespace Backend {
     id?: string; 
     rev?: string;
     name?: string; 
+    matcher?: string; 
+    type?: GroupType;
     projects: string[];
     users: string[];
 
     withResource: (from: GroupResource) => GroupBuilder;
     withName: (name: string) => GroupBuilder;
+    withMatcher: (matcher: string) => GroupBuilder;
+    withType: (type: GroupType) => GroupBuilder;
     withUsers: (users: string[]) => GroupBuilder;
     withProjects: (projectes: string[]) => GroupBuilder;
     from: (from: GroupBuilder) => GroupBuilder;
@@ -103,6 +107,8 @@ declare namespace Backend {
       id?: string;  
       rev?: string;
       name: string;
+      type?: GroupType;
+      matcher?: string; 
       projects: string[];
       users: string[] };
   }
@@ -142,22 +148,23 @@ declare namespace Backend {
       rev?: string;
       externalId?: string;
       name: string;
-      email: string;
+      email?: string;
       status?: UserStatus;
       groups: string[];
       projects: string[] };
   }
   
   type UserStatus = "PENDING" | "ENABLED" | "DISABLED";
+  type GroupType = "USER" | "ADMIN";
   
   interface User {
     id: string;
     rev: string;
     name: string;
-    email: string;
     token: string;
     status: UserStatus;
     externalId?: string;
+    email?: string;
     created: Date | number[];
   }
   
@@ -175,6 +182,8 @@ declare namespace Backend {
     id: string;
     rev: string;
     created: Date | number[];
+    type: GroupType;
+    matcher?: string; 
     name: string;
   }
 

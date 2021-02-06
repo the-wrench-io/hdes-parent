@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -176,6 +178,20 @@ public class MongoBuilderCreate implements MongoBuilder {
         }
         
         final var matcher = this.matcher == null || this.matcher.isBlank() ? null : this.matcher;
+        if(matcher != null) {
+          try {
+            Pattern.compile(matcher);
+          } catch(PatternSyntaxException e) {
+            throw new PmException(ImmutableConstraintViolation.builder()
+                .id("not-created")
+                .rev("not-created")
+                .constraint(ConstraintType.INVALID_DATA)
+                .type(ErrorType.GROUP)
+                .build(), () -> "entity: 'group' with name: '" + name + "' has error in the matcher: '" + matcher + "', " + e.getMessage() + "!");
+          }
+        }
+        
+        
         final var type = this.type != null ? this.type : GroupType.USER;
         final var group = ImmutableGroup.builder()
             .id(UUID.randomUUID().toString())
@@ -211,7 +227,9 @@ public class MongoBuilderCreate implements MongoBuilder {
       }
       @Override
       public GroupVisitor visit(Group entity) {
-        return visitName(entity.getName());
+        return visitName(entity.getName())
+            .visitType(entity.getType())
+            .visitMatcher(entity.getMatcher().orElse(null));
       }
       @Override
       public GroupVisitor visitUsers(List<String> users) {

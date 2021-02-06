@@ -31,7 +31,7 @@ public class PmException extends RuntimeException {
   private final ConstraintViolation value;
   
   public static enum ConstraintType {
-    NOT_FOUND, NOT_UNIQUE
+    NOT_FOUND, NOT_UNIQUE, INVALID_DATA
   }
   
   public static enum ErrorType {

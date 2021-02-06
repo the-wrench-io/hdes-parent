@@ -16,8 +16,8 @@ const createDemoData = () => {
     {id: "9", rev: "5xb", name: "risk project 10",   created: new Date("2010-01-01")},
   ];
   const groups: Backend.Group[] = [
-    {id: "10", rev: "1yb", name: "humans",   created: new Date("2010-01-01")},
-    {id: "11", rev: "2yb", name: "monsters", created: new Date("2010-01-01")},  
+    {id: "10", rev: "1yb", name: "humans", type: "USER",  created: new Date("2010-01-01")},
+    {id: "11", rev: "2yb", name: "monsters", type: "USER", created: new Date("2010-01-01")},  
   ];
   const groupUsers: Backend.GroupUser[] = [
     {id: "12", rev: "1ky", userId: "1", groupId: "10", created: new Date("2010-01-01")},
