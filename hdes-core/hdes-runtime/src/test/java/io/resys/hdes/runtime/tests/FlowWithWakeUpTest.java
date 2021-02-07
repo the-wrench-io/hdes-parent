@@ -38,42 +38,7 @@ public class FlowWithWakeUpTest {
   
   @Test
   public void simpleFlow() {
-    String src = """
-        service-task FormPromise({}) : { dataId: STRING, userValue: INTEGER } {
-          promise { timeout: 100 } 
-          
-          io.resys.hdes.runtime.test.CreateSessionCommand { formId: 'SuperForm' }
-        }
-        
-        decision-table ScoringDT({ arg: INTEGER }) : { score: INTEGER } {
-          findFirst({
-            when( _ between 1 and 30 ) add({ 10 })
-            when( ? ) add({ 20 })
-          })
-        }
-
-        flow SimpleFlow({ arg1: INTEGER, arg2: INTEGER }):{ score: INTEGER, userValue: INTEGER }
-        {
-          InitialScoring() {
-            ScoringDT({ arg: arg1 }) continue 
-          }
-
-          UserInput() {
-            await FormPromise({}) continue 
-          }
-
-          DecisionStep() {
-            if(UserInput.userValue > 10) continue
-            else return { InitialScoring.score, UserInput.userValue }
-          }
-          ExtraScoring () { 
-            ScoringDT({ arg: UserInput.userValue }) 
-            return { _score, UserInput.userValue } 
-          }
-        }
-        """;
-
-    TestRunner runner = TestUtil.runtime().src(src).build("SimpleFlow");
+    TestRunner runner = TestUtil.runtime().src(fileSrc("simpleFlow")).build("SimpleFlow");
     TraceEnd output = runner.accepts()
         .value("arg1", 11)
         .value("arg2", 2)
@@ -89,11 +54,17 @@ public class FlowWithWakeUpTest {
     HashMap<String, Serializable> promiseData = new HashMap<>();
     promiseData.put("userValue", 100);
     output = runner.wakeup().accepts(await.getDataId(), promiseData).build(output);
-    Assertions.assertEquals("""
----
-score: 20
-userValue: 100
-        """, yaml(output.getBody()));
+    Assertions.assertEquals(fileYaml("simpleFlow"), yaml(output.getBody()));
       
   }
+  
+  private static String fileSrc(String file) {
+    String value = TestUtil.file("FlowWithWakeUpTest/" + file + ".hdes");
+    return value;
+  }
+  
+  private static String fileYaml(String file) {
+    String value = TestUtil.file("FlowWithWakeUpTest/" + file + ".yml");
+    return value;
+  } 
 }

@@ -60,9 +60,7 @@ public class ExtensionTests {
   public void getPostUsers() {
     RestAssured.when().get("/hdes-pm/rest-api/resources/users").then().statusCode(200);
     RestAssured.given()
-    .body("""
-        {"name": "good user", "email": "good@gmail.com"}
-        """).when().post("/hdes-pm/rest-api/resources/users")
+    .body("{\"name\": \"good user\", \"email\": \"good@gmail.com\"}").when().post("/hdes-pm/rest-api/resources/users")
     .then()
     .statusCode(200);
     

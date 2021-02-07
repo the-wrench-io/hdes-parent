@@ -31,104 +31,45 @@ import io.resys.hdes.executor.api.Trace.TraceEnd;
 public class FlowWithDecisionAndDtTest {
   @Test
   public void flowWithNoSteps() {
-    String src = """
-        flow EmptyFlow ({ arg1: INTEGER, arg2: INTEGER }) : { }
-        {
-        }
-      """;
-    
-    TraceEnd output = TestUtil.runtime().src(src).build("EmptyFlow")
+    TraceEnd output = TestUtil.runtime().src(fileSrc("flowWithNoSteps")).build("EmptyFlow")
         .accepts()
         .value("arg1", 11)
         .value("arg2", 2)
         .build();
 
-    Assertions.assertEquals("--- {}\n", yaml(output.getBody()));
+    Assertions.assertEquals(fileYaml("flowWithNoSteps"), yaml(output.getBody()));
   }
   
   @Test
   public void flowWithDecisionAndSplit() {
-    String src = """
-        decision-table Scoring({ arg: integer }) : { score: integer } {
-          findFirst({
-            when( _ between 1 and 30) add({ 10 })
-            when( ? ) add({ 20 })
-          })
-        }
-
-        flow SimpleFlow ({ arg1: INTEGER, arg2: INTEGER }) : { score: INTEGER }
-        {
-            
-          InitialScoring() {
-            Scoring({ arg: arg1 }) return Decision()
-          }
-          
-          Decision() {
-            if( InitialScoring.score > 10 ) return ExtraScoring()
-            else return { InitialScoring.score } 
-          }
-        
-          ExtraScoring() {
-            Scoring({ arg: arg2 }) return { _score }
-          }
-        }
-        """;
     
-    
-    TraceEnd output = TestUtil.runtime().src(src).build("SimpleFlow")
+    TraceEnd output = TestUtil.runtime().src(fileSrc("flowWithDecisionAndSplit")).build("SimpleFlow")
         .accepts()
         .value("arg1", 11)
         .value("arg2", 2)
         .build();
     
-    Assertions.assertEquals("""
-      ---
-      score: 10
-      """, yaml(output.getBody()));
+    Assertions.assertEquals(fileYaml("flowWithDecisionAndSplit"), yaml(output.getBody()));
   }
   
   @Test
   public void flowWithParalDecisionAndSplit() {
-    String src = """
-        decision-table Scoring ({ arg: INTEGER }) : { score: INTEGER } {
-          findFirst({
-            when ( _ between 1 and 30 ).add({ 10 })
-            when ( ? ).add({ 20 })
-          })
-        }
-        
-        flow SimpleFlow({ arg1: INTEGER, arg2: INTEGER }) : { total: INTEGER }
-        {
-            
-          InitialScoring() {
-            Scoring ({ arg: arg1 })
-            Scoring ({ arg: arg2 })
-            as({ total: _0.score + _1.score })
-            return Decision()
-          }
-          
-          Decision() {
-            if (InitialScoring.total > 10) return ExtraScoring()
-            else return { InitialScoring.total } 
-          }
-        
-          ExtraScoring() {
-            Scoring({ arg: arg2 })
-            return { total: _score + InitialScoring.total }
-          }
-        }
-        """;
-    
-    
-    TraceEnd output = TestUtil.runtime().src(src).build("SimpleFlow")
+    TraceEnd output = TestUtil.runtime().src(fileSrc("flowWithParalDecisionAndSplit")).build("SimpleFlow")
         .accepts()
         .value("arg1", 11)
         .value("arg2", 2)
         .build();
     
-    Assertions.assertEquals("""
-      ---
-      total: 30
-      """, yaml(output.getBody()));
+    Assertions.assertEquals(fileYaml("flowWithParalDecisionAndSplit"), yaml(output.getBody()));
   }
+  
+  private static String fileSrc(String file) {
+    String value = TestUtil.file("FlowWithDecisionAndDtTest/" + file + ".hdes");
+    return value;
+  }
+  
+  private static String fileYaml(String file) {
+    String value = TestUtil.file("FlowWithDecisionAndDtTest/" + file + ".yml");
+    return value;
+  } 
 }

@@ -34,43 +34,25 @@ public class FlowWithLoopTest {
   
   @Test
   public void loop() {
-    String src = """ 
-        decision-table Scoring({ arg: integer }) : { score: integer }
-        {  
-          findFirst({ 
-            when( _ between 1 and 10 ).add({ 10 }) 
-            when( ? ).add({ 20 }) 
-          })
-        } 
-        
-        flow SimpleFlow ({ classifiers: integer[] }):{ total: integer }  
-        { 
-        
-          InitialScoring() {
-          
-            map(classifiers).to({
-              ScoreClassifier() { 
-                Scoring ({arg: _ }) return { _score } 
-              }
-            })
-            
-            return { total: sum(_.map(scoring -> scoring.score)) }
-          }
-        }
-      """;
-
-    TraceEnd output = TestUtil.runtime().src(src).build("SimpleFlow")
+    TraceEnd output = TestUtil.runtime().src(fileSrc("loop")).build("SimpleFlow")
         .accepts()
         .value("classifiers", new ArrayList<>(Arrays.asList(10, 12)))
         .build();
     
     yaml(output.getBody());
     
-    Assertions.assertEquals("""
-      ---
-      total: 30
-      """, yaml(output.getBody()));
+    Assertions.assertEquals(fileYaml("loop"), yaml(output.getBody()));
     
   }
+  
+  private static String fileSrc(String file) {
+    String value = TestUtil.file("FlowWithLoopTest/" + file + ".hdes");
+    return value;
+  }
+  
+  private static String fileYaml(String file) {
+    String value = TestUtil.file("FlowWithLoopTest/" + file + ".yml");
+    return value;
+  } 
 
 }

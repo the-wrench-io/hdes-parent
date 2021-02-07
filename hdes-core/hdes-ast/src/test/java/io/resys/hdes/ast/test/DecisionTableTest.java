@@ -40,74 +40,38 @@ public class DecisionTableTest {
   
   @Test
   public void basic() throws IOException {
-    ContentNode node = parse("""
-      decision-table mappingDT({}):{}        { map(STRING) to(INTEGER) when() }
-      decision-table matchingFirstDT({}):{}  { findFirst({}) } 
-      decision-table matchingFirstALL({}):{} { findAll({}) }
-    """);
-    
+    ContentNode node = parse("basic");
     assetNode(node, "basic");
   }
 
   @Test
   public void headers() throws IOException {
-    ContentNode node = parse("""
-      decision-table basic({ name, lastName: STRING, value?: INTEGER }) : { } { 
-        map(STRING) to(INTEGER) when()
-      }
-        
-    """);
+    ContentNode node = parse("headers");
     assetNode(node, "headers");
   }
 
   @Test
   public void values() throws IOException {
-    ContentNode node = 
-    parse("""
-        decision-table basic({ firstName: STRING lastName: STRING }):{} {
-          map(string) to(integer)
-          when( _ = 'bob', _ = 'sam', _ = 'viv' )
-          
-          firstName({1, 2, 3 })
-          lastName({3, 10, 20 })
-        }
-        """);
+    ContentNode node = parse("values");
     assetNode(node, "values");
   }
 
   @Test
   public void matchExpressions() throws IOException {
-    ContentNode node = 
-    parse("""
-        decision-table basic({ name: STRING, lastName: STRING }):{ value: INTEGER, exp: INTEGER = value + 20}
-        {
-          findFirst({
-            when(_ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman'  or _ = 'man' ).add({ 4590 })
-            when(_ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or _ = 'man2').add({ 4590 })
-          })
-        }
-        """);
+    ContentNode node = parse("matchExpressions");
     assetNode(node, "matchExpressions");
   }
   
   @Test
   public void equalityExpressions() throws IOException {
-    ContentNode node = 
-    parse("""
-        decision-table basic({ value0: INTEGER, value1: INTEGER }): { value: INTEGER } {  
-          findAll({
-            when( _ > 10, _ <= 20 ).add({ 4570 })
-            when( _ > 10, _ <= 20 and _ > 10 ).add({ 4570 })
-            when( _ = 6,  _ != 20 and _ > 10 ).add({ 4570 })
-          })
-        }
-        """);
+    ContentNode node = parse("equalityExpressions");
     assetNode(node, "equalityExpressions");
   }
   
   
   
-  public ContentNode parse(String value) {
+  public ContentNode parse(String file) {
+    String value = DataFormatTestUtil.file("ast/DecisionTableTest_" + file + ".hdes");
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     HdesParser parser = new HdesParser(tokens);

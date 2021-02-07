@@ -38,140 +38,56 @@ public class FlowTest {
   
   @Test
   public void basic() throws IOException {
-    parse("""
-        flow x1 ({}):{} {}
-        flow x2 ({ arg1: integer, arg2: integer }):{} {}
-        flow x3 ({ arg0: {}}):{} {}
-        flow x4 ({ person: { firstName: integer, lastName: integer }}):{} {}
-       """);
+    parse("basic");
   }
 
   @Test
   public void taskWhenThen() throws IOException {
-    parse("""      
-        flow AgeProductSelection( { age: integer, office: string } ):
-                                  { products: { name: string }[], log: string } {
-          GetAgeScore() {
-            if (age > 80) return NoProductAvailable()
-            else continue
-          }
-          
-          SelectProducts() {
-            ProductDecisionTable({ inputAge: age })
-            
-            return { products: $call, log: 'found some products from dt' }
-          }
-          
-          NoProductAvailable() {
-            return { products: [], log: 'sorry nothing to sell' }
-          }
-        }
-     """);
+    parse("taskWhenThen");
   }
 
   @Test
   public void taskThen() throws IOException {
-    parse("""
-        flow x({ arg1: integer arg2: integer }): {}
-        {
-            firstTask() { XXX({ }) return nextTask() }
-            nextTask() { return {} } 
-        }   
-     """);
+    parse("taskThen");
   }
 
   @Test
   public void taskManualTask() throws IOException {
-    parse("""
-       service-task ServiceX({}):{} {
-         pkg.name.ClassName {}
-       }
-       
-       flow x({ arg1: integer, arg2: integer }):{} {
-         firstTask() { await ServiceX({}) return {} }
-       }
-     """);
+    parse("taskManualTask");
   }
 
   @Test
   public void taskServiceTask() throws IOException {
-    parse("""
-       flow x({ arg1: integer, arg2: integer }):{} {
-         firstTask() { bestServiceTask({}) return {} } 
-       }
-     """);
+    parse("taskServiceTask");
   }
 
   @Test
   public void taskFlowTaskOverArray() throws IOException {
-    parse("""
-       flow x({ arg1: integer, arg2: integer, x: integer[] }) : { log: string } {
-         firstTask() {
-           map(x).to({
-              nestedStep() { 
-                 bestDT({ input: _ }) 
-                 return { out: _bestDTOutput }
-              }
-           }).as({summary: 'loop completed'}) return { log: _summary }
-         }
-       }
-     """);
+    parse("taskFlowTaskOverArray");
   }
   
   @Test
   public void simpleIterationOverArray() throws IOException {
-    parse("""
-       flow x({ arg1: integer, arg2: integer, x: integer[] }): {} 
-       {
-           firstTask() {
-             map(x).to({ 
-               bestDT({ input: _ })
-             }) 
-             return {}
-           }
-       }
-     """);
+    parse("simpleIterationOverArray");
   }
 
   @Test
   public void taskOverDTOutputArray() throws IOException {
-    parse("""
-       flow x({ arg1: integer, arg2?: integer, x: integer[] }): { code: integer, summary: { value: integer }[] }
-       {
-         firstTask () { bestDtTask ({}) continue } 
-         nextTask () {
-           DoSmth ({ value : firstTask.key }) 
-           return { code: 5 }
-         }
-       }
-      """);
+    parse("taskOverDTOutputArray");
   }
 
   @Test
   public void taskDTArray() throws IOException {
-    parse("""
-       flow x({ arg1: integer, arg2: integer }):{}
-       {
-         firstTask() { bestDtTask({}) return {} } 
-       }
-     """);
+    parse("taskDTArray");
   }
 
   @Test
-  public void mapping() throws IOException {
-    parse("""
-       flow x ({ arg1: integer, arg2: integer }): {} {
-          firstTask() {
-            bestDtTask({ input1: arg1.x1, input2: arg2.x1 })
-            return { input1: arg1.x1, input2: arg2.x1 }
-          }
-        }
-     """);
+  public void taskMapping() throws IOException {
+    parse("taskMapping");
   }
   
-  
-
-  public void parse(String value) {
+  public void parse(String file) {
+    String value = DataFormatTestUtil.file("ast/FlowTest_" + file + ".hdes");
     HdesLexer lexer = new HdesLexer(CharStreams.fromString(value));
     CommonTokenStream tokens = new CommonTokenStream(lexer);
     HdesParser parser = new HdesParser(tokens);

@@ -22,11 +22,14 @@ package io.resys.hdes.runtime.tests;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -158,6 +161,14 @@ public class TestUtil {
     }
   }
 
+  
+  public static String file(String name) {
+    try {
+      return IOUtils.toString(TestUtil.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
   
   public static ObjectMapper getJson() {
     return json;
