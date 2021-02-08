@@ -4,7 +4,7 @@ on:
     tags:
       - 'v*-alpha' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-name: release parse test 6
+name: Create release from a tag v.1
 jobs:
   build:
     name: Create Release
@@ -39,7 +39,7 @@ jobs:
 
     - uses: joschi/setup-jdk@v1
       with:
-        java-version: '15'
+        java-version: '11'
     
     - name: Maven release
       run: ./hdes-build-parent/release.sh
