@@ -42,7 +42,7 @@ public class StorageServiceReadWriteTest {
   public void createProjectUserAndAccess() {
     MongoDbFactory.instance(transaction -> {
 
-      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
+      PmRepository repo = MongoPmRepository.config().dbName("PM").transaction(transaction).build();
       
       // Project create and find
       Project project = repo.create().project(ImmutableBatchProject.builder().name("scoring project 1").build()).getProject();
@@ -61,7 +61,7 @@ public class StorageServiceReadWriteTest {
   @Test
   public void createAndQueryUsersAndProjectBatch() {
     MongoDbFactory.instance(transaction -> {
-      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
+      PmRepository repo = MongoPmRepository.config().dbName("PM").transaction(transaction).build();
       
       User user1 = repo.create().user(ImmutableBatchUser.builder().name("admin-user1").email("admin@trolls.com").build()).getUser();
       User user2 = repo.create().user(ImmutableBatchUser.builder().name("admin-user2").email("admin@trolls.com").build()).getUser();
@@ -80,7 +80,7 @@ public class StorageServiceReadWriteTest {
   @Test
   public void createAndQueryUsersGroupsAndProjectBatch() {
     MongoDbFactory.instance(transaction -> {
-      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
+      PmRepository repo = MongoPmRepository.config().dbName("PM").transaction(transaction).build();
       
       Group group1 = repo.create().group(ImmutableBatchGroup.builder().name("admins-1").build()).getGroup();
       Group group2 = repo.create().group(ImmutableBatchGroup.builder().name("admins-2").build()).getGroup();
@@ -99,7 +99,7 @@ public class StorageServiceReadWriteTest {
   @Test
   public void groupMatcherTest() {
     MongoDbFactory.instance(transaction -> {
-      PmRepository repo = MongoPmRepository.config().transaction(transaction).build();
+      PmRepository repo = MongoPmRepository.config().dbName("PM").transaction(transaction).build();
       
       Group group1 = repo.create().group(ImmutableBatchGroup.builder().name("admins-1").matcher(".*@trolls\\.com$").build()).getGroup();
       Group group2 = repo.create().group(ImmutableBatchGroup.builder().name("admins-2").matcher(".*@humans\\.com$").build()).getGroup();

@@ -256,7 +256,8 @@ public class MongoPmRepository implements PmRepository {
   public static class Config {
     private MongoTransaction transaction;
     private MongoDbConfig config;
-
+    private String dbName;
+    
     public Config transaction(MongoTransaction transaction) {
       this.transaction = transaction;
       return this;
@@ -266,12 +267,17 @@ public class MongoPmRepository implements PmRepository {
       this.config = config;
       return this;
     }
-
+    public Config dbName(String dbName) {
+      this.dbName = dbName;
+      return this;
+    }
     public MongoPmRepository build() {
       RepoAssert.notNull(transaction, () -> "transaction not defined!");
+      RepoAssert.notEmpty(dbName, () -> "dbName not defined!");
+      
       if (config == null) {
         config = ImmutableMongoDbConfig.builder()
-            .db("PM")
+            .db(dbName)
             .transactions("transactions")
             .projects("projects")
             .users("users")

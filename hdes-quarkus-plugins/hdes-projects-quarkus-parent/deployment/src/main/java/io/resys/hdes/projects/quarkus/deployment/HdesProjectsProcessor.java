@@ -83,7 +83,10 @@ public class HdesProjectsProcessor {
     }
 
     buildItems.produce(AdditionalBeanBuildItem.builder().setUnremovable().addBeanClass(HdesProjectsContextProducer.class).build());
-    beans.produce(new BeanContainerListenerBuildItem(recorder.listener(hdesProjectsConfig.connectionUrl, hdesProjectsConfig.initUserName)));
+    beans.produce(new BeanContainerListenerBuildItem(recorder.listener(
+        hdesProjectsConfig.connectionUrl, 
+        hdesProjectsConfig.initUserName,
+        hdesProjectsConfig.dbName)));
   }
   
   @BuildStep

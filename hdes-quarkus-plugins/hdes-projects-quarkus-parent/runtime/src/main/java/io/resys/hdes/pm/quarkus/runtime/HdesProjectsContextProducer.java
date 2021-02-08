@@ -52,6 +52,7 @@ import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper.MongoTransaction;
 public class HdesProjectsContextProducer {
   
   private String connectionUrl;
+  private String dbName;
   private String adminInitUserName;
   
 
@@ -59,9 +60,12 @@ public class HdesProjectsContextProducer {
     this.adminInitUserName = adminInitUserName;
     return this;
   }
-
   public HdesProjectsContextProducer setConnectionUrl(String connectionUrl) {
     this.connectionUrl = connectionUrl;
+    return this;
+  }
+  public HdesProjectsContextProducer setDbName(String dbName) {
+    this.dbName = dbName;
     return this;
   }
   
@@ -75,7 +79,6 @@ public class HdesProjectsContextProducer {
     public <T> T accept(Function<MongoClient, T> action) {
       return action.apply(client);
     }
-    
   }
   
   @Produces
@@ -108,7 +111,10 @@ public class HdesProjectsContextProducer {
     MongoTransaction transaction = new MongoTransactionDefault(client);    
     return new ImmutableHdesProjectsContext(
         objectMapper,
-        MongoPmRepository.config().transaction(transaction).build()
+        MongoPmRepository.config()
+          .dbName(dbName)
+          .transaction(transaction)
+          .build()
     );
   }
   

@@ -42,10 +42,13 @@ import io.vertx.ext.web.RoutingContext;
 @Recorder
 public class HdesProjectsRecorder {
 
-  public BeanContainerListener listener(String connectionUrl, String initAdminUserName) {
+  public BeanContainerListener listener(String connectionUrl, String initAdminUserName, String dbName) {
     return beanContainer -> {
       HdesProjectsContextProducer producer = beanContainer.instance(HdesProjectsContextProducer.class);
-      producer.setConnectionUrl(connectionUrl).setInitAdminUserName(initAdminUserName);
+      producer
+        .setDbName(dbName)
+        .setConnectionUrl(connectionUrl)
+        .setInitAdminUserName(initAdminUserName);
     };
   }
 

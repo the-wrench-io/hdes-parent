@@ -43,6 +43,11 @@ public class HdesProjectsConfig {
   @ConfigItem
   String connectionUrl;
   
+  /**
+   * Mongo DB NAME
+   */
+  @ConfigItem(defaultValue = "PM")
+  String dbName;  
   
   /**
    * SecurityIdentity identity = ...
