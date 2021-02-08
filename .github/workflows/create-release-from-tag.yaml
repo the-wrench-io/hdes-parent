@@ -4,7 +4,7 @@ on:
     tags:
       - 'v*-alpha' # Push events to matching v*, i.e. v1.0, v20.15.10
 
-name: Create release from a tag v.1
+name: Create release from a tag v.2
 jobs:
   build:
     name: Create Release
@@ -37,7 +37,7 @@ jobs:
       with:
         ref: main
 
-    - uses: joschi/setup-jdk@v1
+    - uses: joschi/setup-jdk@v2
       with:
         java-version: '11'
     
