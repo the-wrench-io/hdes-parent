@@ -50,6 +50,7 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
   @Override
   public Uni<SecurityIdentity> augment(SecurityIdentity identity, AuthenticationRequestContext context) {
     if(identity.isAnonymous()) {
+      LOGGER.debug("User anonymous : " + identity.getPrincipal());
       return Uni.createFrom().item(identity);
     }
     return Uni.createFrom().item(build(identity));
@@ -59,7 +60,9 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
     // create a new builder and copy principal, attributes, credentials and roles
     // from the original identity
     QuarkusSecurityIdentity.Builder builder = QuarkusSecurityIdentity.builder(identity);
-
+    if(LOGGER.isDebugEnabled()) {
+      LOGGER.debug("Augmenting user: " + identity.getPrincipal().getName());
+    }
     if(identity.getPrincipal() instanceof JsonWebToken) {
       JsonWebToken webToken = (JsonWebToken) identity.getPrincipal();
       String userName = webToken.getClaim("user_name");
@@ -75,6 +78,8 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
           LOGGER.error(e.getMessage() + System.lineSeparator() + e.getValue(), e);
         }
       }
+    } else {
+      LOGGER.debug("Unknown principal: " + identity.getPrincipal());
     }
 
     return builder::build;

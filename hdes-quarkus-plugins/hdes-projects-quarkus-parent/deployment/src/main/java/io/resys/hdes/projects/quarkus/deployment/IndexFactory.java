@@ -70,7 +70,10 @@ public class IndexFactory {
         byte[] bytes = FileUtil.readFileContents(stream);
         this.indexFileContent = new String(bytes, StandardCharsets.UTF_8);
       } catch (Exception e) {
-        throw new ConfigurationError("Failed to create frontend index.html");
+        throw new ConfigurationError(new StringBuilder("Failed to create frontend index.html, ")
+            .append("msg = ").append(e.getMessage()).append(System.lineSeparator()).append(",")
+            .append("path = ").append(path).append("!")
+            .toString());
       }
       return this;
     }
