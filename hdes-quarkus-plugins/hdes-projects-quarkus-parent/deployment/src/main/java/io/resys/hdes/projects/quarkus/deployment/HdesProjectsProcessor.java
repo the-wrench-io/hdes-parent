@@ -172,13 +172,13 @@ public class HdesProjectsProcessor {
     final String frontendPath = httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath));
     
     if (launch.getLaunchMode().isDevOrTest()) {
-      Path tempPath = WebJarUtil.copyResourcesForDevOrTest(curateOutcomeBuildItem, launch, artifact, WEBJAR_PREFIX + "/" + artifact.getVersion());
+      Path tempPath = WebJarUtil.copyResourcesForDevOrTest(curateOutcomeBuildItem, launch, artifact, WEBJAR_PREFIX + artifact.getVersion());
       
       // Update index.html
       Path index = tempPath.resolve("index.html");
       
       WebJarUtil.updateFile(index, IndexFactory.builder()
-        .frontend(frontendPath)
+        .frontend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath))
         .backend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath))
         .backendProjects(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects()))
         .backendGroups(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getGroups()))
@@ -204,7 +204,6 @@ public class HdesProjectsProcessor {
       for (Map.Entry<String, byte[]> file : files.entrySet()) {
         String fileName = file.getKey();
         byte[] content;
-        
         if (fileName.endsWith("index.html")) {
           content = IndexFactory.builder()
               .frontend(frontendPath)
@@ -214,6 +213,7 @@ public class HdesProjectsProcessor {
               .backendUsers(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers()))
               .index(file.getValue())
               .build();
+            
         } else {
           content = file.getValue();
         }
