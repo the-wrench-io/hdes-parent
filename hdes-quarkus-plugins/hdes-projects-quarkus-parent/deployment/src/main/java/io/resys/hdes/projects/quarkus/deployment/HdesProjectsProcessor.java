@@ -133,16 +133,16 @@ public class HdesProjectsProcessor {
     HdesUIBuildItem buildItem,
     HdesProjectsConfig uiConfig,
     BodyHandlerBuildItem body) throws Exception {
-
+    
     Handler<RoutingContext> handler = recorder.uiHandler(buildItem.getUiFinalDestination(), buildItem.getUiPath());
 
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(uiConfig.frontendPath, body.getHandler()))
+        .route(uiConfig.frontendPath)
         .handler(handler)
         .nonApplicationRoute()
         .build());
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(uiConfig.frontendPath + "/*", body.getHandler()))
+        .route(uiConfig.frontendPath + "/*")
         .handler(handler)
         .nonApplicationRoute()
         .build());
@@ -168,14 +168,15 @@ public class HdesProjectsProcessor {
       throw new ConfigurationError("quarkus.hdes-projects.frontendPath was set to \"/\", this is not allowed as it blocks the application from serving anything else.");
     }
     
-    final AppArtifact artifact = WebJarUtil.getAppArtifact(curateOutcomeBuildItem, WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID);
-    final String frontendPath = httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath));
-    
+    final AppArtifact artifact = WebJarUtil.getAppArtifact(curateOutcomeBuildItem, WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID);    
     if (launch.getLaunchMode().isDevOrTest()) {
       Path tempPath = WebJarUtil.copyResourcesForDevOrTest(curateOutcomeBuildItem, launch, artifact, WEBJAR_PREFIX + artifact.getVersion());
       
       // Update index.html
       Path index = tempPath.resolve("index.html");
+      
+      
+      
       
       WebJarUtil.updateFile(index, IndexFactory.builder()
         .frontend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath))
@@ -200,7 +201,10 @@ public class HdesProjectsProcessor {
       }
     
     } else {
-      Map<String, byte[]> files = WebJarUtil.copyResourcesForProduction(curateOutcomeBuildItem, artifact, WEBJAR_PREFIX);
+      final String frontendPath = httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath));
+      Map<String, byte[]> files = WebJarUtil.copyResourcesForProduction(curateOutcomeBuildItem, artifact, WEBJAR_PREFIX + artifact.getVersion());
+
+      boolean indexReplaced = false; 
       for (Map.Entry<String, byte[]> file : files.entrySet()) {
         String fileName = file.getKey();
         byte[] content;
@@ -213,7 +217,7 @@ public class HdesProjectsProcessor {
               .backendUsers(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers()))
               .index(file.getValue())
               .build();
-            
+          indexReplaced = true;
         } else {
           content = file.getValue();
         }
@@ -221,6 +225,14 @@ public class HdesProjectsProcessor {
         fileName = FINAL_DESTINATION + "/" + fileName;
         generatedResources.produce(new GeneratedResourceBuildItem(fileName, content));
         nativeImage.produce(new NativeImageResourceBuildItem(fileName));
+      }
+      
+      if(!indexReplaced) {
+        throw new ConfigurationError(new StringBuilder("Failed to create frontend index.html, ")
+            .append("artifact = ").append(artifact).append(System.lineSeparator()).append(",")
+            .append("path = ").append(frontendPath).append("!")
+            .append("final destination = ").append(FINAL_DESTINATION).append("!")
+            .toString());
       }
       
       buildProducer.produce(new HdesUIBuildItem(FINAL_DESTINATION, frontendPath));

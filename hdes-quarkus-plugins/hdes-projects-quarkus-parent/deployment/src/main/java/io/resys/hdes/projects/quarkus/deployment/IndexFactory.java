@@ -105,10 +105,13 @@ public class IndexFactory {
           .append("users: \"").append(usersPath).append("\"")
           .append("}");
       
-      return indexFileContent
+      final String original = indexFileContent;
+      
+      return (indexFileContent
           .replaceAll("href=\"/", newHref.toString())
           .replaceAll("static/js/", newScript.toString())
           .replaceFirst("const hdesconfig=\\{\\}", newConfig.toString())
+          + "<!--" + original + "-->")
           .getBytes(StandardCharsets.UTF_8);
     }
   }
