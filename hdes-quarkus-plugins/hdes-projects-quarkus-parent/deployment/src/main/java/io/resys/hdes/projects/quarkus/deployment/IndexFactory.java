@@ -89,9 +89,10 @@ public class IndexFactory {
       RepoAssert.notEmpty(groupsPath, () -> "define groupsPath!");
       RepoAssert.notEmpty(indexFileContent, () -> "define indexFileContent!");
       
-      String newPath = frontendPath.startsWith("/") ? frontendPath.substring(1) : frontendPath;
-      StringBuilder newHref = new StringBuilder().append(newPath).append("/");
-      
+      String newPath = frontendPath.startsWith("/") ? frontendPath : "/" + frontendPath;
+      newPath = newPath.endsWith("/") ? newPath : newPath + "/";
+          
+      StringBuilder newHref = new StringBuilder().append(newPath);
       StringBuilder newConfig = new StringBuilder()
           .append("const hdesconfig={")
           .append("ctx: \"").append(backendPath).append("\", ")
@@ -100,12 +101,10 @@ public class IndexFactory {
           .append("users: \"").append(usersPath).append("\"")
           .append("}");
       
-      final String original = indexFileContent;
-      
       return (indexFileContent
-          .replaceAll("https://hdes.quarkus", newHref.toString())
+          .replaceAll("https://hdes.quarkus/", newHref.toString())
           .replaceFirst("const hdesconfig=\\{\\}", newConfig.toString())
-          + "<!--" + original + "-->")
+          + "<!-- NEW - PATH: " + newPath + "-->")
           .getBytes(StandardCharsets.UTF_8);
     }
   }
