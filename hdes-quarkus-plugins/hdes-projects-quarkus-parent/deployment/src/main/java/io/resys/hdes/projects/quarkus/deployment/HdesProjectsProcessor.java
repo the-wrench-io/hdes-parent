@@ -175,6 +175,9 @@ public class HdesProjectsProcessor {
       // Update index.html
       Path index = tempPath.resolve("index.html");
       
+      
+      
+      
       WebJarUtil.updateFile(index, IndexFactory.builder()
         .frontend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath))
         .backend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath))
@@ -199,8 +202,9 @@ public class HdesProjectsProcessor {
     
     } else {
       final String frontendPath = httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath));
-      Map<String, byte[]> files = WebJarUtil.copyResourcesForProduction(curateOutcomeBuildItem, artifact, WEBJAR_PREFIX);
+      Map<String, byte[]> files = WebJarUtil.copyResourcesForProduction(curateOutcomeBuildItem, artifact, WEBJAR_PREFIX + artifact.getVersion());
 
+      boolean indexReplaced = false; 
       for (Map.Entry<String, byte[]> file : files.entrySet()) {
         String fileName = file.getKey();
         byte[] content;
@@ -213,7 +217,7 @@ public class HdesProjectsProcessor {
               .backendUsers(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers()))
               .index(file.getValue())
               .build();
-            
+          indexReplaced = true;
         } else {
           content = file.getValue();
         }
@@ -221,6 +225,14 @@ public class HdesProjectsProcessor {
         fileName = FINAL_DESTINATION + "/" + fileName;
         generatedResources.produce(new GeneratedResourceBuildItem(fileName, content));
         nativeImage.produce(new NativeImageResourceBuildItem(fileName));
+      }
+      
+      if(!indexReplaced) {
+        throw new ConfigurationError(new StringBuilder("Failed to create frontend index.html, ")
+            .append("artifact = ").append(artifact).append(System.lineSeparator()).append(",")
+            .append("path = ").append(frontendPath).append("!")
+            .append("final destination = ").append(FINAL_DESTINATION).append("!")
+            .toString());
       }
       
       buildProducer.produce(new HdesUIBuildItem(FINAL_DESTINATION, frontendPath));
