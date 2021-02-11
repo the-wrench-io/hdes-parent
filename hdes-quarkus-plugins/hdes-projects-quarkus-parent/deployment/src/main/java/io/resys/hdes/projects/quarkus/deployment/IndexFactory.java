@@ -90,12 +90,7 @@ public class IndexFactory {
       RepoAssert.notEmpty(indexFileContent, () -> "define indexFileContent!");
       
       String newPath = frontendPath.startsWith("/") ? frontendPath.substring(1) : frontendPath;
-      StringBuilder newScript = new StringBuilder()
-          .append(newPath)
-          .append("/static/js/");
-      
-      StringBuilder newHref = new StringBuilder()
-          .append("href=\"").append("/").append(newPath).append("/");
+      StringBuilder newHref = new StringBuilder().append(newPath).append("/");
       
       StringBuilder newConfig = new StringBuilder()
           .append("const hdesconfig={")
@@ -108,8 +103,7 @@ public class IndexFactory {
       final String original = indexFileContent;
       
       return (indexFileContent
-          .replaceAll("href=\"/", newHref.toString())
-          .replaceAll("static/js/", newScript.toString())
+          .replaceAll("https://hdes.quarkus", newHref.toString())
           .replaceFirst("const hdesconfig=\\{\\}", newConfig.toString())
           + "<!--" + original + "-->")
           .getBytes(StandardCharsets.UTF_8);
