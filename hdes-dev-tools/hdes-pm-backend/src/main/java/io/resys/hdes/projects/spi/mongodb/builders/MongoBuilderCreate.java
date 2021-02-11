@@ -303,7 +303,7 @@ public class MongoBuilderCreate implements MongoBuilder {
             .rev(UUID.randomUUID().toString())
             .name(name)
             .externalId(externalId == null ? Optional.empty() : externalId)
-            .email(Optional.of(email))
+            .email(Optional.ofNullable(email))
             .status(status == null ? UserStatus.PENDING : status)
             .token(UUID.randomUUID().toString())
             .created(LocalDateTime.now())
