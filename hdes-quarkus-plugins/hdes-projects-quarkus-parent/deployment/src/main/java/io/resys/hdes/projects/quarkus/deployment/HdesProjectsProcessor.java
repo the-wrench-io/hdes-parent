@@ -57,7 +57,7 @@ public class HdesProjectsProcessor {
   private static final Logger LOGGER = LoggerFactory.getLogger(HdesProjectsProcessor.class);
   private static final String WEBJAR_GROUP_ID = "io.resys.hdes";
   private static final String WEBJAR_ARTIFACT_ID = "hdes-pm-frontend";
-  private static final String WEBJAR_PREFIX = "META-INF/resources/webjars/" + WEBJAR_ARTIFACT_ID;
+  private static final String WEBJAR_PREFIX = "META-INF/resources/webjars/" + WEBJAR_ARTIFACT_ID + "/";
   private static final String FINAL_DESTINATION = "META-INF/hdes-pm-files";
   public static final String FEATURE_BUILD_ITEM = "hdes-projects";
   
@@ -131,21 +131,18 @@ public class HdesProjectsProcessor {
     HdesProjectsRecorder recorder,
     BuildProducer<RouteBuildItem> routes,
     HdesUIBuildItem buildItem,
-    HdesProjectsConfig uiConfig) throws Exception {
+    HdesProjectsConfig uiConfig,
+    BodyHandlerBuildItem body) throws Exception {
 
-    Handler<RoutingContext> handler = recorder.uiHandler(
-        buildItem.getUiFinalDestination(),
-        buildItem.getUiPath());
+    Handler<RoutingContext> handler = recorder.uiHandler(buildItem.getUiFinalDestination(), buildItem.getUiPath());
 
-    routes.produce(
-      new RouteBuildItem.Builder()
-        .route(uiConfig.frontendPath)
+    routes.produce(new RouteBuildItem.Builder()
+        .routeFunction(recorder.routeFunction(uiConfig.frontendPath, body.getHandler()))
         .handler(handler)
         .nonApplicationRoute()
         .build());
-    routes.produce(
-      new RouteBuildItem.Builder()
-        .route(uiConfig.frontendPath + "/*")
+    routes.produce(new RouteBuildItem.Builder()
+        .routeFunction(recorder.routeFunction(uiConfig.frontendPath + "/*", body.getHandler()))
         .handler(handler)
         .nonApplicationRoute()
         .build());
@@ -171,8 +168,9 @@ public class HdesProjectsProcessor {
       throw new ConfigurationError("quarkus.hdes-projects.frontendPath was set to \"/\", this is not allowed as it blocks the application from serving anything else.");
     }
     
-    AppArtifact artifact = WebJarUtil.getAppArtifact(curateOutcomeBuildItem, WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID);
-    final String frontendPath = httpRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath);
+    final AppArtifact artifact = WebJarUtil.getAppArtifact(curateOutcomeBuildItem, WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID);
+    final String frontendPath = httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath));
+    
     if (launch.getLaunchMode().isDevOrTest()) {
       Path tempPath = WebJarUtil.copyResourcesForDevOrTest(curateOutcomeBuildItem, launch, artifact, WEBJAR_PREFIX + "/" + artifact.getVersion());
       
@@ -206,6 +204,7 @@ public class HdesProjectsProcessor {
       for (Map.Entry<String, byte[]> file : files.entrySet()) {
         String fileName = file.getKey();
         byte[] content;
+        
         if (fileName.endsWith("index.html")) {
           content = IndexFactory.builder()
               .frontend(frontendPath)
@@ -215,17 +214,16 @@ public class HdesProjectsProcessor {
               .backendUsers(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers()))
               .index(file.getValue())
               .build();
-            
         } else {
           content = file.getValue();
         }
+        
         fileName = FINAL_DESTINATION + "/" + fileName;
         generatedResources.produce(new GeneratedResourceBuildItem(fileName, content));
         nativeImage.produce(new NativeImageResourceBuildItem(fileName));
       }
-      buildProducer.produce(new HdesUIBuildItem(
-        FINAL_DESTINATION,
-        nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath)));
+      
+      buildProducer.produce(new HdesUIBuildItem(FINAL_DESTINATION, frontendPath));
     }
   }
 }

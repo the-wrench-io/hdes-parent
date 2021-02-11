@@ -42,6 +42,7 @@ public class ExtensionTests {
     })
     .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
       .addAsResource(new StringAsset("quarkus.hdes-projects.connection-url=mongodb://localhost:12345"), "application.properties")
+      .addAsResource(new StringAsset("quarkus.hdes-projects.dbName=PM"), "application.properties")
       .addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
     );
 
