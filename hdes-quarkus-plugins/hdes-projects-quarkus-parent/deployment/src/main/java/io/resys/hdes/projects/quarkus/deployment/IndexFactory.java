@@ -100,12 +100,10 @@ public class IndexFactory {
           .append("users: \"").append(usersPath).append("\"")
           .append("}");
       
-      final String original = indexFileContent;
-      
       return (indexFileContent
           .replaceAll("https://hdes.quarkus", newHref.toString())
           .replaceFirst("const hdesconfig=\\{\\}", newConfig.toString())
-          + "<!--" + original + "-->")
+          + "<!-- NEW - PATH: " + newPath + "-->")
           .getBytes(StandardCharsets.UTF_8);
     }
   }

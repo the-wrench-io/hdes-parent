@@ -176,8 +176,6 @@ public class HdesProjectsProcessor {
       Path index = tempPath.resolve("index.html");
       
       
-      
-      
       WebJarUtil.updateFile(index, IndexFactory.builder()
         .frontend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath))
         .backend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath))

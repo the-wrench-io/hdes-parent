@@ -82,6 +82,8 @@ public class HdesProjectsContextProducer {
   }
   
   @Produces
+  @Singleton
+  @DefaultBean
   public HdesProjectSecurityAugmentor hdesProjectSecurityAugmentor(HdesProjectsContext hdesProjectsBackend) {
     return new HdesProjectSecurityAugmentor(adminInitUserName, hdesProjectsBackend);
   }

@@ -50,7 +50,6 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
   @Override
   public Uni<SecurityIdentity> augment(SecurityIdentity identity, AuthenticationRequestContext context) {
     if(identity.isAnonymous()) {
-      LOGGER.debug("User anonymous : " + identity.getPrincipal());
       return Uni.createFrom().item(identity);
     }
     return Uni.createFrom().item(build(identity));
@@ -66,6 +65,7 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
     if(identity.getPrincipal() instanceof JsonWebToken) {
       JsonWebToken webToken = (JsonWebToken) identity.getPrincipal();
       String userName = webToken.getClaim("user_name");
+      LOGGER.debug("Augmenting user name: " + userName);
       
       if( userName != null && userName.equals(adminInitUserName) || 
           hdesProjectsBackend.repo().query().admins().isAdmin(userName)) {
@@ -73,8 +73,10 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
         builder.addRole(ADMIN_ROLE);
       } else {
         try {
+          LOGGER.debug("Creating user: " + identity.getPrincipal());
           hdesProjectsBackend.repo().create().user(userBuilder -> userBuilder.name(userName));
         } catch(PmException e) {
+          LOGGER.debug("Failed to create user: " + identity.getPrincipal());
           LOGGER.error(e.getMessage() + System.lineSeparator() + e.getValue(), e);
         }
       }
