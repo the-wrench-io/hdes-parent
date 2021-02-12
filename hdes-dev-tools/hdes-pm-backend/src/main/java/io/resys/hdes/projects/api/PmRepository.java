@@ -82,6 +82,7 @@ public interface PmRepository {
   
   interface BatchUserQuery {
     UserResource get(String idOrValueOrExternalIdOrToken);
+    boolean isUser(String userName);
     List<UserResource> find();
   }
 
@@ -122,6 +123,8 @@ public interface PmRepository {
     List<String> getUsers();
     @Nullable
     List<String> getProjects();
+    @Nullable
+    GroupType getType();
   }
 
   @Value.Immutable
@@ -230,8 +233,8 @@ public interface PmRepository {
     String getName();
   }
   
-  @JsonSerialize(as = ImmutableUser.class)
-  @JsonDeserialize(as = ImmutableUser.class)
+  @JsonSerialize(as = ImmutableGroupUser.class)
+  @JsonDeserialize(as = ImmutableGroupUser.class)
   @Value.Immutable
   interface GroupUser extends Serializable {
     String getId();

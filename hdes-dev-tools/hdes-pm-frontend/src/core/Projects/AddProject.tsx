@@ -62,7 +62,8 @@ const AddProject: React.FC<AddProjectProps> = ({open, handleClose, handleConf}) 
   };
   
   const steps = [
-    <ConfigureProjectBasic 
+    <ConfigureProjectBasic
+        id={project.id}
         name={{defaultValue: project.name, onChange: (newValue) => setProject(project.withName(newValue))}}/>,
 
     <ConfigureProjectUsers 

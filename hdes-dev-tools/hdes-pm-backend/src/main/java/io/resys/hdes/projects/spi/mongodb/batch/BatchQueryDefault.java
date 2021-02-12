@@ -39,6 +39,7 @@ import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.ProjectResource;
 import io.resys.hdes.projects.api.PmRepository.TokenResource;
 import io.resys.hdes.projects.api.PmRepository.UserResource;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery;
 
 public class BatchQueryDefault implements BatchQuery {
@@ -79,6 +80,11 @@ public class BatchQueryDefault implements BatchQuery {
   @Override
   public BatchUserQuery users() {
     return new BatchUserQuery() {
+      
+      public boolean isUser(String userName) {
+        return query.user().name(userName).findFirst().isPresent();
+      }
+      
       @Override
       public UserResource get(String idOrValueOrExternalIdOrToken) {
         final var any = idOrValueOrExternalIdOrToken;
@@ -156,7 +162,7 @@ public class BatchQueryDefault implements BatchQuery {
     return new BatchAdminsQuery() {
       @Override
       public boolean isAdmin(String userName) {
-        final var user = query.user().id(userName).name(userName).findOne();
+        final var user = query.user().name(userName).status(UserStatus.ENABLED).name(userName).findOne();
         if(user.isEmpty()) {
           return false;
         }

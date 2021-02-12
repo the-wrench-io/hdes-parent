@@ -61,6 +61,7 @@ const AddUser: React.FC<AddUserProps> = ({open, handleClose, handleConf}) => {
 
   const steps = [
     <ConfigureUserBasic 
+        id={user.id}
         name={{defaultValue: user.name, onChange: (newValue) => setUser(user.withName(newValue))}}
         token={{defaultValue: user.token, onChange: (newValue) => setUser(user.withToken(newValue))}}
         email={{defaultValue: user.email, onChange: (newValue) => setUser(user.withEmail(newValue))}}

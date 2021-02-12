@@ -69,11 +69,13 @@ public class MongoBuilderUpdate implements MongoBuilder {
   private final MongoWrapper mongo;
   private final MongoQuery query;
   private final ImmutableMongoBuilderTree.Builder collect;
+  private final MongoBuilderCreate create;
   
   public MongoBuilderUpdate(MongoWrapper mongo) {
     this.mongo = mongo;
     this.query = new MongoQueryDefault(mongo);
     this.collect = ImmutableMongoBuilderTree.builder();
+    this.create = new MongoBuilderCreate(mongo);
   }
 
   @Override
@@ -140,7 +142,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
           this.users.stream()
             .filter(userId -> !currentUsers.contains(userId))
             .map(id -> query.user().id(id).get())
-            .forEach(user -> visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
+            .forEach(user -> create.visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
         }
         
         if(groups != null) {
@@ -160,7 +162,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
           this.groups.stream()
             .filter(groupId -> !currentGroups.contains(groupId))
             .map(id -> query.group().id(id).get())
-            .forEach(group -> visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
+            .forEach(group -> create.visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
         }
         
         return project;
@@ -273,7 +275,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
           this.users.stream()
             .filter(userId -> !currentUsers.contains(userId))
             .map(id -> query.user().id(id).get())
-            .forEach(user -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
+            .forEach(user -> create.visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
         }
         if(projects != null && group.getType() == GroupType.USER) {
           final var currentProjects = currentAccess.stream()
@@ -291,7 +293,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
           this.projects.stream()
             .filter(projectId -> !currentProjects.contains(projectId))
             .map(id -> query.project().id(id).get())
-            .forEach(project -> visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
+            .forEach(project -> create.visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
         }
         
         return group;
@@ -372,9 +374,9 @@ public class MongoBuilderUpdate implements MongoBuilder {
             ImmutableUser.builder().from(queryResult.getValue())
             .name(name)
             .email(Optional.ofNullable(email))
-            .token(token)
+            .token(token == null ? queryResult.getValue().getToken() : token)
+            .externalId(externalId == null ? queryResult.getValue().getExternalId() : externalId)
             .status(status)
-            .externalId(externalId)
             .build())) {
           
           user = queryResult.getValue();
@@ -385,7 +387,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
           updates.add(Updates.set(UserCodec.NAME, name));
           updates.add(Updates.set(UserCodec.EMAIL, email));
           updates.add(Updates.set(UserCodec.EXTERNAL_ID, externalId));
-          updates.add(Updates.set(UserCodec.TOKEN, token));
+          updates.add(Updates.set(UserCodec.TOKEN, token == null ? queryResult.getValue().getToken() : token));
           updates.add(Updates.set(UserCodec.STATUS, status.name()));
           
           mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class)
@@ -402,9 +404,9 @@ public class MongoBuilderUpdate implements MongoBuilder {
         final var currentAccess = query.access().user(id).findAll();
         
         if(groups != null) {
-          final var currentGroups = currentAccess.stream()
-              .filter(a -> a.getGroupId().isPresent())
-              .map(a -> a.getGroupId().get())
+          final var currentGroups = query.groupUser().user(id)
+              .findAll().stream()
+              .map(a -> a.getGroupId())
               .collect(Collectors.toList());
 
           // delete groups
@@ -417,7 +419,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
           this.groups.stream()
             .filter(groupId -> !currentGroups.contains(groupId))
             .map(id -> query.group().id(id).get())
-            .forEach(group -> visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
+            .forEach(group -> create.visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
         }
         if(projects != null) {
           final var currentProjects = currentAccess.stream()
@@ -434,7 +436,7 @@ public class MongoBuilderUpdate implements MongoBuilder {
           this.projects.stream()
             .filter(projectId -> !currentProjects.contains(projectId))
             .map(id -> query.project().id(id).get())
-            .forEach(project -> visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
+            .forEach(project -> create.visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
         }
         return user;
       }

@@ -70,6 +70,7 @@ const ConfigureProject: React.FC<ConfigureProjectProps> = (props) => {
   
   const steps = [
     <ConfigureProjectBasic 
+        id={project.id}
         name={{defaultValue: project.name, onChange: (newValue) => setProject(project.withName(newValue))}} />,
 
     <ConfigureProjectUsers 

@@ -174,10 +174,10 @@ public class HdesProjectsProcessor {
       
       // Update index.html
       Path index = tempPath.resolve("index.html");
-      
+      final String frontendPath = httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath));
       
       WebJarUtil.updateFile(index, IndexFactory.builder()
-        .frontend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.frontendPath))
+        .frontend(frontendPath)
         .backend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath))
         .backendProjects(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects()))
         .backendGroups(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getGroups()))

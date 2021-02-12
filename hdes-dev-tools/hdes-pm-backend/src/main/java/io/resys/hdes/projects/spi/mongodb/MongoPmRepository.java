@@ -232,6 +232,7 @@ public class MongoPmRepository implements PmRepository {
               .visitProjects(group.getProjects())
               .visitUsers(group.getUsers())
               .visitMatcher(group.getMatcher())
+              .visitType(group.getType())
               .build(); 
           builder.build();
           return ResourceMapper.map(query, created);
