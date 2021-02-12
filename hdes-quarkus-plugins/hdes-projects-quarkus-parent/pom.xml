@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-quarkus-plugins</artifactId>
-    <version>0.1.10</version>
+    <version>999-SNAPSHOT</version>
   </parent>
 
   <artifactId>hdes-projects-quarkus-parent</artifactId>
