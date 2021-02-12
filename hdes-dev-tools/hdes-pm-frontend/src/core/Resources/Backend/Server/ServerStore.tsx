@@ -49,11 +49,11 @@ class ServerStore implements Store {
         if(method === "POST" || method === "PUT" || method === "DELETE") {
           this.onSave(data)
         }
-        return data
+        return data ? data : []
       }) 
   }
   
-  setErrors(value: Backend.ServerError | string, url: string, init?: RequestInit) {
+  setErrors(value: any, url: string, init?: RequestInit) {
     console.error(value, url, init)
   }
 }
