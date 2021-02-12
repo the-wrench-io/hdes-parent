@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-core</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.1.8</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>hdes-compiler</artifactId>
