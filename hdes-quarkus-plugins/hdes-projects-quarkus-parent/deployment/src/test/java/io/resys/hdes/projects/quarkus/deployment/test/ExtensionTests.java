@@ -55,18 +55,18 @@ public class ExtensionTests {
   
   @Test
   public void getProjects() {
-    RestAssured.when().get("/hdes-pm/rest-api/resources/projects").then().statusCode(200);
+    RestAssured.when().get("q/hdes-pm/rest-api/resources/projects").then().statusCode(200);
   }
   @Test
   public void getPostUsers() {
-    RestAssured.when().get("/hdes-pm/rest-api/resources/users").then().statusCode(200);
+    RestAssured.when().get("q/hdes-pm/rest-api/resources/users").then().statusCode(200);
     RestAssured.given()
-    .body("{\"name\": \"good user\", \"email\": \"good@gmail.com\"}").when().post("/hdes-pm/rest-api/resources/users")
+    .body("{\"name\": \"good user\", \"email\": \"good@gmail.com\"}").when().post("q/hdes-pm/rest-api/resources/users")
     .then()
     .statusCode(200);
     
-    String token = RestAssured.when().get("/hdes-pm/rest-api/resources/users").jsonPath().get("[0].user.token");
-    RestAssured.given().basePath("/hdes-pm/rest-api/tokens").pathParam("id", token).get("/{id}").then().statusCode(200);
+    String token = RestAssured.when().get("q/hdes-pm/rest-api/resources/users").jsonPath().get("[0].user.token");
+    RestAssured.given().basePath("q/hdes-pm/rest-api/tokens").pathParam("id", token).get("/{id}").then().statusCode(200);
 
   }
 }

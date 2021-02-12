@@ -62,11 +62,9 @@ public class HdesProjectsConfig {
   public String getProjects() {
     return backendPath + "/resources/projects";
   }
-  
   public String getUsers() {
     return backendPath + "/resources/users";
   }
-  
   public String getGroups() {
     return backendPath + "/resources/groups";
   }

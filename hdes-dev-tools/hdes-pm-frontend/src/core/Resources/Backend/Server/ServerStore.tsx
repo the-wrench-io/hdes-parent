@@ -36,7 +36,9 @@ class ServerStore implements Store {
     if(!url) {
       throw new Error("can't fetch with undefined url")
     }
-    return fetch(url, init)
+    
+    const finalInit = init ? init : {};
+    return fetch(url, finalInit)
       .then(response => {
         if (!response.ok) {
           throw new Error(response.statusText)

@@ -93,6 +93,8 @@ public class HdesProjectsProcessor {
   @Record(ExecutionTime.RUNTIME_INIT)
   void backendHandlers(
       HdesProjectsRecorder recorder,
+      NonApplicationRootPathBuildItem nonApplicationRootPathBuildItem,
+      HttpRootPathBuildItem httpRootPathBuildItem,
       BodyHandlerBuildItem body,
       BuildProducer<RouteBuildItem> routes) {
     
@@ -101,25 +103,25 @@ public class HdesProjectsProcessor {
     }
 
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getTokens(), body.getHandler()))
+        .routeFunction(recorder.routeFunction(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getTokens())), body.getHandler()))
         .handler(recorder.tokenHandler())
         .blockingRoute()
         .build());
     
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getUsers(), body.getHandler()))
+        .routeFunction(recorder.routeFunction(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers())), body.getHandler()))
         .handler(recorder.userHandler())
         .blockingRoute()
         .build());
     
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getGroups(), body.getHandler()))
+        .routeFunction(recorder.routeFunction(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getGroups())), body.getHandler()))
         .handler(recorder.groupHandler())
         .blockingRoute()
         .build());
     
     routes.produce(new RouteBuildItem.Builder()
-        .routeFunction(recorder.routeFunction(hdesProjectsConfig.getProjects(), body.getHandler()))
+        .routeFunction(recorder.routeFunction(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects())), body.getHandler()))
         .handler(recorder.projectHandler())
         .blockingRoute()
         .build());
@@ -178,10 +180,10 @@ public class HdesProjectsProcessor {
       
       WebJarUtil.updateFile(index, IndexFactory.builder()
         .frontend(frontendPath)
-        .backend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath))
-        .backendProjects(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects()))
-        .backendGroups(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getGroups()))
-        .backendUsers(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers()))
+        .backend(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath)))
+        .backendProjects(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects())))
+        .backendGroups(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getGroups())))
+        .backendUsers(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers())))
         .index(index)
         .build());
       
@@ -209,10 +211,10 @@ public class HdesProjectsProcessor {
         if (fileName.endsWith("index.html")) {
           content = IndexFactory.builder()
               .frontend(frontendPath)
-              .backend(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath))
-              .backendProjects(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects()))
-              .backendGroups(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getGroups()))
-              .backendUsers(httpRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers()))
+              .backend(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.backendPath)))
+              .backendProjects(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getProjects())))
+              .backendGroups(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getGroups())))
+              .backendUsers(httpRootPathBuildItem.adjustPath(nonApplicationRootPathBuildItem.adjustPath(hdesProjectsConfig.getUsers())))
               .index(file.getValue())
               .build();
           indexReplaced = true;
