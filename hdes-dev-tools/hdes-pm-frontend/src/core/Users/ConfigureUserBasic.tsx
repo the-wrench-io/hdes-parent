@@ -8,16 +8,19 @@ interface FieldProps {
 }
 
 interface ConfigureUserBasicProps {
+  id?: string;
   name: FieldProps;
   token: FieldProps;
   externalId: FieldProps;
   email: FieldProps;
 };
 
-const ConfigureUserBasic: React.FC<ConfigureUserBasicProps> = ({name, token, externalId, email}) => {
+const ConfigureUserBasic: React.FC<ConfigureUserBasicProps> = ({id, name, token, externalId, email}) => {
   const { session } = React.useContext(Resources.Context);
   
-  const nameNotUnique = session.data.users.filter(g => g.user.name === name.defaultValue).length > 0;
+  const nameNotUnique = session.data.users
+    .filter(g => g.user.id !== id)
+    .filter(g => g.user.name === name.defaultValue).length > 0;
   const nameMustBeDefine = (name.defaultValue ? name.defaultValue.trim(): '').length === 0;
   
   let helperText = undefined;

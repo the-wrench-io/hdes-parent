@@ -59,10 +59,10 @@ export class GenericGroupBuilder implements Backend.GroupBuilder {
     return new GenericGroupBuilder(this._id, this._name, users, this._projects, this._rev, this._type, this._matcher);
   }
   from(from: Backend.GroupBuilder): Backend.GroupBuilder {
-    return new GenericGroupBuilder(from.id, from.name, Object.assign([], from.users), Object.assign([], from.projects), from.rev, this._type, this._matcher);
+    return new GenericGroupBuilder(from.id, from.name, Object.assign([], from.users), Object.assign([], from.projects), from.rev, from.type, from.matcher);
   }
   withResource(from: Backend.GroupResource): Backend.GroupBuilder {
-    return new GenericGroupBuilder(from.group.id, from.group.name, Object.keys(from.users), Object.keys(from.projects), from.group.rev, this._type, this._matcher);
+    return new GenericGroupBuilder(from.group.id, from.group.name, Object.keys(from.users), Object.keys(from.projects), from.group.rev, from.group.type, from.group.matcher);
   }
   build() {
     return {

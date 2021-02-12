@@ -59,13 +59,9 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
     // create a new builder and copy principal, attributes, credentials and roles
     // from the original identity
     QuarkusSecurityIdentity.Builder builder = QuarkusSecurityIdentity.builder(identity);
-    if(LOGGER.isDebugEnabled()) {
-      LOGGER.debug("Augmenting user: " + identity.getPrincipal().getName());
-    }
     if(identity.getPrincipal() instanceof JsonWebToken) {
       JsonWebToken webToken = (JsonWebToken) identity.getPrincipal();
       String userName = webToken.getClaim("user_name");
-      LOGGER.debug("Augmenting user name: " + userName);
       
       if( userName != null && userName.equals(adminInitUserName) || 
           hdesProjectsBackend.repo().query().admins().isAdmin(userName)) {
@@ -73,10 +69,13 @@ public class HdesProjectSecurityAugmentor implements SecurityIdentityAugmentor {
         builder.addRole(ADMIN_ROLE);
       } else {
         try {
-          LOGGER.debug("Creating user: " + identity.getPrincipal());
-          hdesProjectsBackend.repo().create().user(userBuilder -> userBuilder.name(userName));
+          if(hdesProjectsBackend.repo().query().users().isUser(userName)) {
+            LOGGER.debug("User already created: " + identity.getPrincipal());
+          } else {
+            LOGGER.debug("Creating user: " + identity.getPrincipal());
+            hdesProjectsBackend.repo().create().user(userBuilder -> userBuilder.name(userName));            
+          }
         } catch(PmException e) {
-          LOGGER.debug("Failed to create user: " + identity.getPrincipal());
           LOGGER.error(e.getMessage() + System.lineSeparator() + e.getValue(), e);
         }
       }

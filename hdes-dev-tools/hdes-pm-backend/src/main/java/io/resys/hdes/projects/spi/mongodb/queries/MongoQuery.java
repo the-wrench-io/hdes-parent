@@ -33,6 +33,7 @@ import io.resys.hdes.projects.api.PmRepository.GroupType;
 import io.resys.hdes.projects.api.PmRepository.GroupUser;
 import io.resys.hdes.projects.api.PmRepository.Project;
 import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 
 public interface MongoQuery {
 
@@ -78,6 +79,7 @@ public interface MongoQuery {
     UserQuery externalId(String externalId);
     UserQuery name(String name);
     UserQuery token(String token);
+    UserQuery status(UserStatus status);
   }
 
   interface GroupUserQuery extends Query<GroupUserQuery, GroupUser> {

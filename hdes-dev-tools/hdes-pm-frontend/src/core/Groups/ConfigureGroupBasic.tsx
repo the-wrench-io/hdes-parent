@@ -29,7 +29,9 @@ const ConfigureGroupBasic: React.FC<ConfigureGroupBasicProps> = ({id, name, matc
     }
   };
   
-  const nameNotUnique = session.data.groups.filter(g => g.group.name === name.defaultValue).length > 0;
+  const nameNotUnique = session.data.groups
+    .filter(g => g.group.id !== id)
+    .filter(g => g.group.name === name.defaultValue).length > 0;
   const nameMustBeDefine = (name.defaultValue ? name.defaultValue.trim(): '').length === 0;
   
   let helperText = undefined;
@@ -47,8 +49,8 @@ const ConfigureGroupBasic: React.FC<ConfigureGroupBasicProps> = ({id, name, matc
       onChange={({target}) => name.onChange(target.value)} 
       defaultValue={name.defaultValue ? name.defaultValue : ''}/>
     
-    <TextField margin="dense" id="matcher" label="Group matcher regex - example: '.*@resys\\.io$'" type="text" fullWidth
-      onChange={({target}) => name.onChange(target.value)}
+    <TextField margin="dense" id="matcher" label="Group matcher regex - example: '.*@resys\.io$'" type="text" fullWidth
+      onChange={({target}) => matcher.onChange(target.value)}
       defaultValue={matcher.defaultValue ? matcher.defaultValue : ''}/>
     
     <FormControlLabel

@@ -8,14 +8,17 @@ interface FieldProps {
 }
 
 interface ConfigureProjectBasicProps {
+  id?: string;
   name: FieldProps;
 };
 
-const ConfigureProjectBasic: React.FC<ConfigureProjectBasicProps> = ({name}) => {
+const ConfigureProjectBasic: React.FC<ConfigureProjectBasicProps> = ({id, name}) => {
   
   const { session } = React.useContext(Resources.Context);
   
-  const nameNotUnique = session.data.projects.filter(g => g.project.name === name.defaultValue).length > 0;
+  const nameNotUnique = session.data.projects
+    .filter(g => g.project.id !== id)
+    .filter(g => g.project.name === name.defaultValue).length > 0;
   const nameMustBeDefine = (name.defaultValue ? name.defaultValue.trim(): '').length === 0;
   
   let helperText = undefined;

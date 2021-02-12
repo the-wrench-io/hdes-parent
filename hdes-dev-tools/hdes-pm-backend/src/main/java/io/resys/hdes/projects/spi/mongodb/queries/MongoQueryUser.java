@@ -25,6 +25,7 @@ import com.mongodb.client.model.Filters;
 
 import io.resys.hdes.projects.api.PmException.ErrorType;
 import io.resys.hdes.projects.api.PmRepository.User;
+import io.resys.hdes.projects.api.PmRepository.UserStatus;
 import io.resys.hdes.projects.spi.mongodb.codecs.UserCodec;
 import io.resys.hdes.projects.spi.mongodb.queries.MongoQuery.UserQuery;
 import io.resys.hdes.projects.spi.mongodb.support.MongoWrapper;
@@ -51,6 +52,12 @@ public class MongoQueryUser extends MongoQueryTemplate<MongoQuery.UserQuery, Use
     return this;
   }
   @Override
+  public UserQuery status(UserStatus status) {
+    filters.add(Filters.eq(UserCodec.STATUS, status.name()));
+    return this;
+  }
+
+  @Override
   protected MongoCollection<User> getCollection() {
     MongoCollection<User> collection = mongo.getDb().getCollection(mongo.getConfig().getUsers(), User.class);
     return collection;
@@ -59,5 +66,4 @@ public class MongoQueryUser extends MongoQueryTemplate<MongoQuery.UserQuery, Use
   protected ErrorType getErrorType() {
     return ErrorType.USER;
   }
-
 }
