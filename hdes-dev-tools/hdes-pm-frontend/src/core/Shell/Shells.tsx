@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { useTheme } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import Drawer from '@material-ui/core/Drawer';
 import AppBar from '@material-ui/core/AppBar';
@@ -19,6 +20,7 @@ import Container from '@material-ui/core/Container';
 import Grid from '@material-ui/core/Grid';
 import MenuIcon from '@material-ui/icons/Menu';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 import InputBase from '@material-ui/core/InputBase';
 import SearchIcon from '@material-ui/icons/Search';
@@ -105,6 +107,7 @@ const ShellBadge: React.FC<ShellBadgeProps> = ({open, handleClose, children, bad
 const Shell: React.FC<ShellProps> = ({dialogs, views, tabs, search, badges}) => {
   
   const classes = ShellStyles();
+  const theme = useTheme();
   const [openBadge, setOpenBadge] = React.useState<number>(-1);
   const [badgeRef, setBadgeRef] = React.useState<HTMLElement | null>(null);
     
@@ -173,7 +176,7 @@ const Shell: React.FC<ShellProps> = ({dialogs, views, tabs, search, badges}) => 
         
         <div className={classes.toolbarIcon}>
           <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon className={classes.appBarIcon}/>
+            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>
         </div>
         

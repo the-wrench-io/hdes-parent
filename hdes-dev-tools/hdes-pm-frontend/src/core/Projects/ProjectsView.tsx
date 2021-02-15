@@ -5,6 +5,7 @@ import Popover from '@material-ui/core/Popover';
 import Typography from '@material-ui/core/Typography';
 import Link from '@material-ui/core/Link';
 import EditOutlinedIcon from '@material-ui/icons/EditOutlined';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -36,10 +37,11 @@ const useStyles = makeStyles((theme) => ({
 interface ProjectsViewProps {
   top?: number,
   seeMore?: () => void,
+  onDelete: (user: Backend.ProjectResource) => void,
   onSelect: (props: {builder: Backend.ProjectBuilder, edit?: boolean, activeStep?: number}) => void
 };
 
-const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onSelect}) => {
+const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onSelect, onDelete}) => {
 
   const { service, session } = React.useContext(Resources.Context);
   const { projects } = session.data;
@@ -96,6 +98,9 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({top, seeMore, onSelect}) => 
                 </IconButton>
                 <IconButton size="small" onClick={() => onSelect({ builder: service.projects.builder(row), edit: true })} color="inherit">
                   <EditOutlinedIcon/>
+                </IconButton>
+                <IconButton size="small" onClick={() => onDelete(row)} color="inherit">
+                  <DeleteOutlineIcon/>
                 </IconButton>
               </TableCell>
             </TableRow>

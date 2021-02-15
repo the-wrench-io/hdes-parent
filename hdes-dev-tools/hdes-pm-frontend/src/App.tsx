@@ -22,6 +22,8 @@ import { AddProject, ConfigureProjectInTab, ProjectsView } from './core/Projects
 import { AddGroup, ConfigureGroupInTab, GroupsView } from './core/Groups';
 import { NotificationSaved, NotificationSavedBadge } from './core/Notifications';
 import { SearchView } from './core/Search';
+import { DeleteDialog } from './core/Views';
+
 
 import Shell from './core/Shell';
 
@@ -48,11 +50,16 @@ const useDialogs = () => {
 
 function App() {
   const classes = useStyles();
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
-      
   const dialogs = useDialogs();
+  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  
+  const [ deleteResource, setDeleteResource ] = React.useState<Backend.AnyResource | undefined>();
   const { session, setSession } = React.useContext(Resources.Context);
 
+  const handleDeleteOpen = (resource: Backend.AnyResource) => {
+    setDeleteResource(resource)
+  }
+  
   const handleSearchFor = (keyword: string) => {
     if(keyword.length > 0) {
       listSearch();
@@ -77,27 +84,27 @@ function App() {
   }
   
   const listDashboard = () => addTab({id: 'dashboard', label: 'Dashboard', panel: <React.Fragment>{projects}{users}</React.Fragment>});
-  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: <GroupsView onSelect={openInTab}/>});
-  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: <ProjectsView onSelect={openInTab}/>});
-  const listUsers     = () => addTab({id: 'users', label: 'Users', panel: <UsersView onSelect={openInTab}/>});
+  const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: <GroupsView onSelect={openInTab} onDelete={handleDeleteOpen} />});
+  const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: <ProjectsView onSelect={openInTab} onDelete={handleDeleteOpen}/>});
+  const listUsers     = () => addTab({id: 'users', label: 'Users', panel: <UsersView onSelect={openInTab} onDelete={handleDeleteOpen}/>});
   const listSearch    = () => addTab({id: 'search', label: 'Search...', panel: <SearchView onSelect={openInTab} />});
   const listApprovals = () => addTab({id: 'approvals', label: 'Approvals', panel: <ApproveView onSelect={openInTab} />});
 
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
       <Paper className={fixedHeightPaper}>
-        <ProjectsView top={4} seeMore={listProjects} onSelect={openInTab}/>
+        <ProjectsView top={4} seeMore={listProjects} onSelect={openInTab} onDelete={handleDeleteOpen}/>
       </Paper>
     </Grid>);
 
   const users = (<Grid key="2" item xs={12} md={8} lg={9}>
       <Paper className={fixedHeightPaper}>
-        <UsersView top={4} seeMore={listUsers} onSelect={openInTab}/>
+        <UsersView top={4} seeMore={listUsers} onSelect={openInTab} onDelete={handleDeleteOpen}/>
       </Paper>
     </Grid>);
   
   return (<React.Fragment>
     <NotificationSaved />
-    
+    <DeleteDialog onClose={() => setDeleteResource(undefined)} resource={deleteResource} />
     <AddUser open={session.dialogId === dialogs.user.id} handleClose={handleDialogClose} handleConf={openInTab} />
     <AddProject open={session.dialogId === dialogs.project.id} handleClose={handleDialogClose} handleConf={openInTab}/>
     <AddGroup open={session.dialogId === dialogs.group.id} handleClose={handleDialogClose} handleConf={openInTab}/>
