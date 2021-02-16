@@ -19,13 +19,17 @@ class DemoService implements Backend.Service {
     const onSave = (saved: Backend.AnyResource) => {
       this.listeners.onSave(saved);
     }
+    const onDelete = (deleted: Backend.AnyResource) => {
+      this.listeners.onDelete(deleted);
+    }
     const demo = createDemoData();
-    this._store = new InMemoryStore(onSave, demo.users, demo.projects, demo.access, demo.groups, demo.groupUsers);
+    this._store = new InMemoryStore(onSave, onDelete, demo.users, demo.projects, demo.access, demo.groups, demo.groupUsers);
     this._users = new InMemoryUserService(this._store);
     this._projects = new InMemoryProjectService(this._store);
     this._groups = new InMemoryGroupService(this._store);
     this._listeners = { 
       onSave: (resource) => console.log("saved resources", resource),
+      onDelete: (resource) => console.log("deleted resources", resource),
       onError: (error) => console.error("error", error), 
     };
   }

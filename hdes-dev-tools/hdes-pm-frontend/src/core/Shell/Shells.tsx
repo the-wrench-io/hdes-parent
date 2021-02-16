@@ -46,7 +46,7 @@ interface ShellProps {
   tabs: {
     active?: number,
     onClick: (index: number) => void,
-    items: { label: string, panel: React.ReactNode }[]
+    items: readonly { label: string, panel: React.ReactNode }[]
   },
   search: {
     onChange: (keyword: string) => void,

@@ -36,6 +36,22 @@ class ServerUserService implements Backend.UserService {
     }
     return result;
   }
+  delete(resource: Backend.UserResource) {
+    const store = this.store;
+    return {
+      onSuccess: (callback: (resource: Backend.UserResource) => void) => {
+        const init: RequestInit = { 
+          method: 'DELETE',
+          credentials: 'same-origin', 
+          headers: store.config.headers,
+          body: JSON.stringify(resource)
+        };
+          
+        const url: string = store.config.users
+        store.fetch<Backend.UserResource>(url, init).then(callback)
+      }
+    }
+  }
   save(builder: Backend.UserBuilder) {
     const store = this.store;
     return {

@@ -5,7 +5,7 @@ enum SessionActionType {
   addTab, removeTab, changeTab, onConfirm,
   setTabData, setDialog, setSearch, setData,
    
-  setResourceSaved, setServerError
+  setResourceSaved, setResourceDeleted, setServerError
 }
 
 interface SessionAction {
@@ -19,6 +19,7 @@ interface SessionAction {
   changeTab?: number;
   setServerError?: Backend.ServerError;
   setResourceSaved?: Backend.AnyResource;
+  setResourceDeleted?: Backend.AnyResource;
   onConfirm?: {tabId: string, resource: Backend.AnyResource};
   setTabData?: {id: string, updateCommand: (oldData: any) => any};
 }
@@ -29,7 +30,8 @@ const sessionActions = {
   removeTab: (removeTab: string) => ({ type: SessionActionType.removeTab, removeTab}),
   changeTab: (changeTab: number) => ({ type: SessionActionType.addTab, changeTab}),
   
-  setResourceSaved: (setResourceSaved: Backend.AnyResource) => ({ type: SessionActionType.setResourceSaved, setResourceSaved }), 
+  setResourceSaved: (setResourceSaved: Backend.AnyResource) => ({ type: SessionActionType.setResourceSaved, setResourceSaved }),
+  setResourceDeleted: (setResourceDeleted: Backend.AnyResource) => ({ type: SessionActionType.setResourceDeleted, setResourceDeleted }), 
   setServerError: (setServerError: Backend.ServerError) => ({ type: SessionActionType.setServerError, setServerError }),
    
   
@@ -102,6 +104,15 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       }
       return state.withSaved(action.setResourceSaved)    
     }
+    
+    case SessionActionType.setResourceDeleted: {
+      if(!action.setResourceDeleted) {
+        console.error("Action data error", action);
+        return state;
+      }
+      return state.withDeleted(action.setResourceDeleted)    
+    }
+    
     case SessionActionType.setServerError: {
       if(!action.setServerError) {
         console.error("Action data error", action);

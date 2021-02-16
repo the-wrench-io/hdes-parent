@@ -36,6 +36,22 @@ class ServerProjectService implements Backend.ProjectService {
     }
     return result;
   }
+  delete(resource: Backend.ProjectResource) {
+    const store = this.store;
+    return {
+      onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
+        const init: RequestInit = { 
+          method: 'DELETE', 
+          credentials: 'same-origin', 
+          headers: store.config.headers,
+          body: JSON.stringify(resource)
+        };
+          
+        const url: string = store.config.projects
+        store.fetch<Backend.ProjectResource>(url, init).then(callback)
+      }
+    }
+  }
   save(builder: Backend.ProjectBuilder) {
     const store = this.store;
     return {

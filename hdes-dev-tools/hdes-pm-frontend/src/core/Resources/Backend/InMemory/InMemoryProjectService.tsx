@@ -14,7 +14,7 @@ class InMemoryProjectQuery implements Backend.ProjectQuery {
   
   onSuccess(handle: (users: Backend.ProjectResource[]) => void) {
     const { store } = this;
-    let projects = store.projects.sort((p1, p2) => (p1.created as Date).getTime() - (p2.created as Date).getTime());
+    let projects = [...store.projects].sort((p1, p2) => (p1.created as Date).getTime() - (p2.created as Date).getTime());
     if(this.args && this.args.top) {
       projects = projects.slice(0, this.args.top);
     }
@@ -37,6 +37,14 @@ class InMemoryProjectService implements Backend.ProjectService {
     }
     return result;
   }
+  delete(project: Backend.ProjectResource): Backend.ServiceCallback<Backend.ProjectResource> {
+    const store = this.store;
+    return {
+      onSuccess: (callback: (resource: Backend.ProjectResource) => void) => {
+        callback(store.deleteProject(project))
+      }
+    }
+  }
   save(builder: Backend.ProjectBuilder) {
     const store = this.store;
     return {
@@ -46,53 +54,9 @@ class InMemoryProjectService implements Backend.ProjectService {
         if(builder.id) {
           const saved = store.setProject(builder);
           callback(saved)
-          store.onSave(saved);
           return; 
         }
-                  
-        // user entry
-        const newProject: Backend.Project = {
-          id: store.uuid(),
-          rev: store.uuid(), 
-          name: builder.name ? builder.name : "",
-          created: new Date()
-        };
-        
-        // direct access to users
-        const newAccess: Backend.Access[] = [];
-        if(builder.users) {
-          for(let userId of builder.users) {
-            newAccess.push({
-              id: store.uuid(), 
-              rev: store.uuid(), 
-              name: "inmemory", 
-              projectId: newProject.id,
-              userId: userId,
-              created: new Date()
-            });
-          }
-        }
-        
-        // direct access to groups
-        if(builder.groups) {
-          for(let groupId of builder.groups) {
-            newAccess.push({
-              id: store.uuid(), 
-              rev: store.uuid(), 
-              name: "inmemory", 
-              projectId: newProject.id,
-              groupId: groupId,
-              created: new Date()
-            });
-          }
-        }
-      
-        store.access.push(...newAccess);
-        store.projects.push(newProject);
-        
-        const created = store.getProject(newProject.id);
-        callback(created)
-        store.onSave(created); 
+        callback(store.addProject(builder)) 
       }
     }
   }

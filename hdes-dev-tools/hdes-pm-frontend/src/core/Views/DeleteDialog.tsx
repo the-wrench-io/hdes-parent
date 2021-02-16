@@ -114,11 +114,7 @@ const DeleteNewDialog: React.FC<DeleteDialogProps> = ({onClose, resource}) => {
     setOpen(false);
     onClose();
   }
-  
-  const handleDelete = () => {
     
-  }
-  
   if(!resource) {
     return null;
   }
@@ -142,6 +138,14 @@ const DeleteNewDialog: React.FC<DeleteDialogProps> = ({onClose, resource}) => {
       groups: Object.values(user.groups).map(p => p.name).join(", "),
       projects: Object.values(user.projects).map(p => p.name).join(", ")
     })).map();
+    
+  const handleDelete = () => {
+    new Mapper.Resource<Backend.ServiceCallback<Backend.AnyResource>>(resource)
+      .project(project => service.projects.delete(project))
+      .group(group => service.groups.delete(group))
+      .user(user => service.users.delete(user))
+      .map().onSuccess(onClose)
+  }    
     
   const connection = view.groups || view.projects || view.users ? (<span className={classes.text}>
     <DialogContentText>

@@ -34,8 +34,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ConfigureProjectSummaryProps {
   group: Backend.GroupBuilder;
-  users?: Backend.UserResource[];
-  projects?: Backend.ProjectResource[];
+  users?: readonly Backend.UserResource[];
+  projects?: readonly Backend.ProjectResource[];
 };
 
 const ConfigureProjectSummary: React.FC<ConfigureProjectSummaryProps> = (props) => {

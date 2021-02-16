@@ -48,8 +48,21 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
       
     },
     onError: (error: Backend.ServerError) => {
-
-    } 
+      sessionDispatch(sessionActions.setServerError(error))
+      
+      // refresh
+      service.users.query().onSuccess(users => sessionDispatch(sessionActions.setData({users})))
+      service.projects.query().onSuccess(projects => sessionDispatch(sessionActions.setData({projects})))
+      service.groups.query().onSuccess(groups => sessionDispatch(sessionActions.setData({groups})))
+    },
+    onDelete: (deleted: Backend.AnyResource) => {
+      sessionDispatch(sessionActions.setResourceDeleted(deleted))
+      
+      // refresh
+      service.users.query().onSuccess(users => sessionDispatch(sessionActions.setData({users})))
+      service.projects.query().onSuccess(projects => sessionDispatch(sessionActions.setData({projects})))
+      service.groups.query().onSuccess(groups => sessionDispatch(sessionActions.setData({groups})))
+    }
   }));
 
   React.useEffect(() => {
