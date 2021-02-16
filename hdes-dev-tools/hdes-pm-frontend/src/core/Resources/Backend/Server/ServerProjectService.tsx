@@ -44,7 +44,7 @@ class ServerProjectService implements Backend.ProjectService {
           method: 'DELETE', 
           credentials: 'same-origin', 
           headers: store.config.headers,
-          body: JSON.stringify(resource)
+          body: JSON.stringify(resource.project)
         };
           
         const url: string = store.config.projects

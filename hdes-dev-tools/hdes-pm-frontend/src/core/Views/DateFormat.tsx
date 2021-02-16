@@ -10,6 +10,5 @@ export default function DateFormat(props: { children: Date | number[] }) {
   }
   
   const date = props.children as number[];
-  
-  return (<React.Fragment>{moment(new Date(date[date.length -1])).format(DATE_FORMAT)}</React.Fragment>);
+  return (<React.Fragment>{`${date[0]}-${date[1]}M-${date[2]}`}</React.Fragment>);
 }

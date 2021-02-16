@@ -87,8 +87,8 @@ function App() {
   const listGroups    = () => addTab({id: 'groups', label: 'Groups', panel: <GroupsView onSelect={openInTab} onDelete={handleDeleteOpen} />});
   const listProjects  = () => addTab({id: 'projects', label: 'Projects', panel: <ProjectsView onSelect={openInTab} onDelete={handleDeleteOpen}/>});
   const listUsers     = () => addTab({id: 'users', label: 'Users', panel: <UsersView onSelect={openInTab} onDelete={handleDeleteOpen}/>});
-  const listSearch    = () => addTab({id: 'search', label: 'Search...', panel: <SearchView onSelect={openInTab} />});
-  const listApprovals = () => addTab({id: 'approvals', label: 'Approvals', panel: <ApproveView onSelect={openInTab} />});
+  const listSearch    = () => addTab({id: 'search', label: 'Search...', panel: <SearchView onSelect={openInTab} onDelete={handleDeleteOpen}/>});
+  const listApprovals = () => addTab({id: 'approvals', label: 'Approvals', panel: <ApproveView onSelect={openInTab} onDelete={handleDeleteOpen}/>});
 
   const projects = (<Grid key="1" item xs={12} md={8} lg={9}>
       <Paper className={fixedHeightPaper}>

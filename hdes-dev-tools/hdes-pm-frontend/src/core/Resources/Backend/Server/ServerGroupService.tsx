@@ -44,7 +44,7 @@ class ServerGroupService implements Backend.GroupService {
           method: 'DELETE',
           credentials: 'same-origin', 
           headers: store.config.headers,
-          body: JSON.stringify(resource)
+          body: JSON.stringify(resource.group)
         };
           
         const url: string = store.config.groups

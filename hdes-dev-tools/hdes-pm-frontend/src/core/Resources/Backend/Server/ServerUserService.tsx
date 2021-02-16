@@ -44,7 +44,7 @@ class ServerUserService implements Backend.UserService {
           method: 'DELETE',
           credentials: 'same-origin', 
           headers: store.config.headers,
-          body: JSON.stringify(resource)
+          body: JSON.stringify(resource.user)
         };
           
         const url: string = store.config.users
