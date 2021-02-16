@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-dev-tools</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>0.1.11</version>
   </parent>
   <packaging>jar</packaging>
   <artifactId>hdes-object-repo-mongodb</artifactId>
