@@ -36,6 +36,22 @@ class ServerGroupService implements Backend.GroupService {
     }
     return result;
   }
+  delete(resource: Backend.GroupResource) {
+    const store = this.store;
+    return {
+      onSuccess: (callback: (resource: Backend.GroupResource) => void) => {
+        const init: RequestInit = { 
+          method: 'DELETE',
+          credentials: 'same-origin', 
+          headers: store.config.headers,
+          body: JSON.stringify(resource.group)
+        };
+          
+        const url: string = store.config.groups
+        store.fetch<Backend.GroupResource>(url, init).then(callback)
+      }
+    }
+  }
   save(builder: Backend.GroupBuilder) {
     const store = this.store;
     return {
@@ -48,8 +64,7 @@ class ServerGroupService implements Backend.GroupService {
         };
           
         const url: string = store.config.groups
-        store.fetch<Backend.GroupResource>(url, init)
-          .then(callback)
+        store.fetch<Backend.GroupResource>(url, init).then(callback)
       }
     }
   }

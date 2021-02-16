@@ -33,19 +33,21 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ConfigureUserSummaryProps {
   user: Backend.UserBuilder;
-  projects?: Backend.ProjectResource[];
-  groups?: Backend.GroupResource[];
+  projects?: readonly Backend.ProjectResource[];
+  groups?: readonly Backend.GroupResource[];
 };
 
 const ConfigureUserSummary: React.FC<ConfigureUserSummaryProps> = (props) => {
   const classes = useStyles();
 
   const { session } = React.useContext(Resources.Context);
-  const { groups, projects } = session.data;
+  const data = session.data;
+
+  const groups = data.groups.filter(g => props.user.groups.includes(g.group.id));
+  const projects = data.projects.filter(g => props.user.projects.includes(g.project.id));
 
   const [openProject, setOpenProjects] = React.useState(true);
   const [openGroups, setOpenGroups] = React.useState(true);
-
 
   return (<div className={classes.root}>
     <List className={classes.root} component="nav" aria-labelledby="nested-list-subheader">

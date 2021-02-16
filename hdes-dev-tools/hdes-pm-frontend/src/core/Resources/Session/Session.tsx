@@ -15,9 +15,9 @@ declare namespace Session {
   }
   
   interface Data {
-    users: Backend.UserResource[];
-    projects: Backend.ProjectResource[];
-    groups: Backend.GroupResource[]; 
+    users: readonly Backend.UserResource[];
+    projects: readonly Backend.ProjectResource[];
+    groups: readonly Backend.GroupResource[]; 
   }
   
   interface DataInit {
@@ -27,17 +27,19 @@ declare namespace Session {
   }
   
   interface Instance {  
-    tabs: Tab[];
+    tabs: readonly Tab[];
     history: History;
     dialogId?: string;
     search?: string;
     data: Data;
 
-    saved: Backend.AnyResource[];
-    errors: Backend.ServerError[];
+    saved: readonly Backend.AnyResource[];
+    deleted: readonly Backend.AnyResource[];
+    errors: readonly Backend.ServerError[];
 
     withErrors(newError: Backend.ServerError): Instance;
     withSaved(newResource: Backend.AnyResource): Instance;
+    withDeleted(deletedResource: Backend.AnyResource): Instance;
     
     withData(newData: DataInit): Instance;
     withSearch(keyword: string): Instance;

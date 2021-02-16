@@ -8,8 +8,13 @@ declare namespace Backend {
     resourceType: 'user' | 'project' | 'group';
   }
   
+  interface ServiceCallback<T> {
+    onSuccess: (handle: (resource: T) => void) => void; 
+  }
+  
   interface ServiceListeners {
     onSave: (saved: AnyResource) => void;
+    onDelete: (saved: AnyResource) => void;
     onError: (error: ServerError) => void;
   }
   
@@ -24,7 +29,8 @@ declare namespace Backend {
   interface GroupService {
     query: (args?: {top?: number}) => GroupQuery;
     builder: (from?: GroupResource) => GroupBuilder;
-    save: (builder: GroupBuilder) => { onSuccess: (handle: (project: GroupResource) => void) => void; };
+    delete: (value: GroupResource) => ServiceCallback<GroupResource>;
+    save: (builder: GroupBuilder) => ServiceCallback<GroupResource>;
   }
   
   interface GroupQuery {
@@ -34,7 +40,8 @@ declare namespace Backend {
   interface ProjectService {
     query: (args?: {top?: number}) => ProjectQuery;
     builder: (from?: ProjectResource) => ProjectBuilder;
-    save: (builder: ProjectBuilder) => { onSuccess: (handle: (project: ProjectResource) => void) => void; };
+    delete: (value: ProjectResource) => ServiceCallback<ProjectResource>;
+    save: (builder: ProjectBuilder) => ServiceCallback<ProjectResource>;
   }
   
   interface ProjectQuery {
@@ -44,7 +51,8 @@ declare namespace Backend {
   interface UserService {
     query: (args?: {top?: number, id?: string}) => UserQuery;
     builder: (from?: UserResource) => UserBuilder;
-    save: (builder: UserBuilder) => { onSuccess: (handle: (user: UserResource) => void) => void; };
+    delete: (value: UserResource) => ServiceCallback<UserResource>;
+    save: (builder: UserBuilder) => ServiceCallback<UserResource>;
   }
   
   interface UserQuery {

@@ -12,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import TabUnselectedOutlinedIcon from '@material-ui/icons/TabUnselectedOutlined';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 
 import { Summary, Title, DateFormat } from '.././Views';
 import { Resources, Backend, Mapper } from '.././Resources';
@@ -46,10 +47,11 @@ type SearchResults = {
 }
 
 interface SearchViewProps {
+  onDelete: (resource: Backend.AnyResource) => void,
   onSelect: (props: {builder: Backend.AnyBuilder, edit?: boolean, activeStep?: number}) => void
 };
 
-const SearchView: React.FC<SearchViewProps> = ({ onSelect }) => {
+const SearchView: React.FC<SearchViewProps> = ({ onSelect, onDelete }) => {
   const { service, session } = React.useContext(Resources.Context);
   const { users, projects, groups } = session.data;
   const [searchResults, setSearchResults] = React.useState<SearchResults>({users: [], projects: [], groups: []});
@@ -123,6 +125,7 @@ const SearchView: React.FC<SearchViewProps> = ({ onSelect }) => {
         <TableCell>
           <IconButton about="open in tab" size="small" onClick={() => row.onClick()} color="inherit"><TabUnselectedOutlinedIcon/></IconButton>
           <IconButton about="edit in tab" size="small" onClick={() => row.onClick(true)} color="inherit"><EditOutlinedIcon/></IconButton>
+          <IconButton size="small" onClick={() => onDelete(row.src)} color="inherit"><DeleteOutlineIcon/></IconButton>
         </TableCell>
       </TableRow>
     ));

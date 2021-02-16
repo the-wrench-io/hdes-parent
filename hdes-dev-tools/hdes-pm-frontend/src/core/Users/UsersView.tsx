@@ -13,6 +13,8 @@ import TableRow from '@material-ui/core/TableRow';
 import IconButton from '@material-ui/core/IconButton';
 import VisibilityOutlinedIcon from '@material-ui/icons/VisibilityOutlined';
 import TabUnselectedOutlinedIcon from '@material-ui/icons/TabUnselectedOutlined';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+
 
 import { Title, Summary, DateFormat } from '.././Views';
 import { Resources, Backend } from '.././Resources';
@@ -36,10 +38,11 @@ const useStyles = makeStyles((theme) => ({
 interface UserViewProps {
   top?: number,
   seeMore?: () => void,
+  onDelete: (user: Backend.UserResource) => void,
   onSelect: (props: {builder: Backend.UserBuilder, edit?: boolean, activeStep?: number}) => void
 };
 
-const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
+const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect, onDelete}) => {
   const { service, session } = React.useContext(Resources.Context);
   const { users } = session.data;
 
@@ -104,6 +107,9 @@ const UsersView: React.FC<UserViewProps> = ({top, seeMore, onSelect}) => {
                 </IconButton>
                 <IconButton size="small" onClick={() => onSelect({builder: service.users.builder(row), edit: true})} color="inherit">
                   <EditOutlinedIcon/>
+                </IconButton>
+                <IconButton size="small" onClick={() => onDelete(row)} color="inherit">
+                  <DeleteOutlineIcon/>
                 </IconButton>
               </TableCell>
             </TableRow>

@@ -16,14 +16,18 @@ class ServerService implements Backend.Service {
     const onSave = (resource: Backend.AnyResource) => {
       this.listeners.onSave(resource);
     }
+    const onDelete = (resource: Backend.AnyResource) => {
+      this.listeners.onDelete(resource);
+    }
     const onError = (error: Backend.ServerError) => {
       this.listeners.onError(error);
     }
-    const store = new ServerStore(onSave, onError, config);
+    const store = new ServerStore(onSave, onDelete, onError, config);
     this._users = new ServerUserService(store);
     this._projects = new ServerProjectService(store);
     this._groups = new ServerGroupService(store);
     this._listeners = { 
+      onDelete: (resource) => console.log("deleted resources", resource),
       onSave: (resource) => console.log("saved resources", resource),
       onError: (error) => console.error("error", error), 
     };

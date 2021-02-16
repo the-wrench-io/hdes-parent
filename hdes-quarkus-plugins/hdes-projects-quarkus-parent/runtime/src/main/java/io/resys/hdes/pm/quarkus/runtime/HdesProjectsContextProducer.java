@@ -107,7 +107,6 @@ public class HdesProjectsContextProducer {
 
     ObjectMapper objectMapper = new ObjectMapper()
         .registerModule(new Jdk8Module())
-        .registerModule(new Jdk8Module())
         .registerModule(new JavaTimeModule());
     
     MongoTransaction transaction = new MongoTransactionDefault(client);    

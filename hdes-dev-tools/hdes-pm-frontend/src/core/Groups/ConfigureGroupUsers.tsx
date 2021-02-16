@@ -6,7 +6,7 @@ import { Backend } from '.././Resources';
 
 interface ConfigureProjectUsersProps {
   users: {
-    all: Backend.UserResource[];
+    all: readonly Backend.UserResource[];
     selected: string[];
   };
   onChange: (newSelection: string[]) => void;

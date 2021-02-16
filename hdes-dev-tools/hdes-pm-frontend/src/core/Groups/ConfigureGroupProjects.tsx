@@ -7,7 +7,7 @@ import { Backend } from '.././Resources';
 interface ConfigureGroupProjectsProps {
   adminGroup: boolean;
   projects: {
-    all: Backend.ProjectResource[];
+    all: readonly Backend.ProjectResource[];
     selected: string[];
   };
   onChange: (newSelection: string[]) => void;

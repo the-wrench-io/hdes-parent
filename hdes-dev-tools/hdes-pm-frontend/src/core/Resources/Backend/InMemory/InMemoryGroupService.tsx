@@ -16,7 +16,7 @@ class InMemoryGroupQuery implements Backend.GroupQuery {
   onSuccess(handle: (users: Backend.GroupResource[]) => void) {
     const store = this.store;
     
-    let src = store.groups.sort((p1, p2) => (p1.created as Date).getTime() - (p2.created as Date).getTime());
+    let src = [...store.groups].sort((p1, p2) => (p1.created as Date).getTime() - (p2.created as Date).getTime());
     if(this.args && this.args.top) {
       src = src.slice(0, this.args.top);
     }
@@ -49,70 +49,25 @@ class InMemoryGroupService implements Backend.GroupService {
       return result.withResource(from);
     }
     return result;
+  }  
+  delete(group: Backend.GroupResource): Backend.ServiceCallback<Backend.GroupResource> {
+    const store = this.store;
+    return {
+      onSuccess: (callback: (resource: Backend.GroupResource) => void) => {
+        callback(store.deleteGroup(group))
+      }
+    }
   }
   save(builder: Backend.GroupBuilder)  {
     const store = this.store;
     return {
       onSuccess: (callback: (resource: Backend.GroupResource) => void) => {
-        
         if(builder.id) {
           const saved = store.setGroup(builder);
           callback(saved)
-          store.onSave(saved);
           return; 
         }
-        
-        // user entry
-        const newGroup: Backend.Group = {
-          id: store.uuid(),
-          rev: store.uuid(),
-          type: builder.type ? builder.type : "USER",
-          matcher: builder.matcher,
-          name: builder.name ? builder.name : "",
-          created: new Date()
-        };
-
-
-        const newGroupUsers: Backend.GroupUser[] = [];
-        for(let userId of builder.users) {
-          newGroupUsers.push({
-            id: store.uuid(), 
-            rev: store.uuid(), 
-            groupId: newGroup.id,
-            userId: userId,
-            created: new Date()
-          });
-        }
-        
-        const newAccess: Backend.Access[] = [];
-        for(let projectId of builder.projects) {
-          newAccess.push({
-            id: store.uuid(), 
-            rev: store.uuid(), 
-            name: "inmemory", 
-            projectId: projectId,
-            groupId: newGroup.id,
-            created: new Date()
-          });
-        }
-      
-
-        
-        store.groups.push(newGroup);
-        store.access.push(...newAccess);
-        store.groupUsers.push(...newGroupUsers);
-
-        
-        const access = store.getAccess({groupId: newGroup.id});
-        const projects = store.getProjects(access);
-        const groups = store.getGroups(access);
-        const groupUsers = store.getGroupUsers(groups);
-        const users = store.getUsers(access);
-        
-        const created = { group: newGroup, access, groupUsers, users, projects };
-        callback(created)
-        store.onSave(created);
-         
+        callback(store.addGroup(builder))         
       }
     }
   }
