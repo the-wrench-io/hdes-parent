@@ -25,11 +25,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import io.resys.hdes.assetdb.api.AssetClient.Changes;
-import io.resys.hdes.assetdb.api.AssetClient.CommitBuilder;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
-import io.resys.hdes.assetdb.api.AssetClient.RebaseBuilder;
 import io.resys.hdes.assetdb.api.AssetClient.Ref;
 import io.resys.hdes.assetdb.api.AssetClient.RefStatus;
+import io.resys.hdes.assetdb.api.AssetCommands.CommitBuilder;
+import io.resys.hdes.assetdb.api.AssetCommands.RebaseBuilder;
 import io.resys.hdes.assetdb.api.exceptions.CommitException;
 import io.resys.hdes.assetdb.spi.RepoAssert;
 

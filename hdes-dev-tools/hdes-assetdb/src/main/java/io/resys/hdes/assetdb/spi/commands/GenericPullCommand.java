@@ -1,7 +1,7 @@
 package io.resys.hdes.assetdb.spi.commands;
 
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
-import io.resys.hdes.assetdb.api.AssetClient.PullCommand;
+import io.resys.hdes.assetdb.api.AssetCommands.PullCommand;
 
 public abstract class GenericPullCommand implements PullCommand {
 

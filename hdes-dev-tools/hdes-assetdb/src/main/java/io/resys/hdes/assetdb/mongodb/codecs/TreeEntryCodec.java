@@ -26,17 +26,17 @@ import org.bson.codecs.Codec;
 import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
-import io.resys.hdes.assetdb.api.ImmutableTreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
+import io.resys.hdes.assetdb.api.ImmutableTreeValue;
 
 
-public class TreeEntryCodec implements Codec<TreeEntry> {
+public class TreeEntryCodec implements Codec<TreeValue> {
   
   public static final String NAME = "name";
   private static final String BLOB = "blob";
   
   @Override
-  public void encode(BsonWriter writer, TreeEntry command, EncoderContext encoderContext) {
+  public void encode(BsonWriter writer, TreeValue command, EncoderContext encoderContext) {
     writer.writeStartDocument();
     writer.writeString(NAME, command.getName());
     writer.writeString(BLOB, command.getBlob());
@@ -44,9 +44,9 @@ public class TreeEntryCodec implements Codec<TreeEntry> {
   }
 
   @Override
-  public TreeEntry decode(BsonReader reader, DecoderContext decoderContext) {
+  public TreeValue decode(BsonReader reader, DecoderContext decoderContext) {
     reader.readStartDocument();
-    TreeEntry result = ImmutableTreeEntry.builder()
+    TreeValue result = ImmutableTreeValue.builder()
       .name(reader.readString(NAME))
       .blob(reader.readString(BLOB))
       .build();
@@ -55,7 +55,7 @@ public class TreeEntryCodec implements Codec<TreeEntry> {
   }
 
   @Override
-  public Class<TreeEntry> getEncoderClass() {
-    return TreeEntry.class;
+  public Class<TreeValue> getEncoderClass() {
+    return TreeValue.class;
   }
 }

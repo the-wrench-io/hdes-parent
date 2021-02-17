@@ -27,12 +27,12 @@ import io.resys.hdes.assetdb.api.AssetClient.Blob;
 import io.resys.hdes.assetdb.api.AssetClient.Commit;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.Snapshot;
-import io.resys.hdes.assetdb.api.AssetClient.SnapshotBuilder;
-import io.resys.hdes.assetdb.api.AssetClient.SnapshotEntry;
+import io.resys.hdes.assetdb.api.AssetClient.SnapshotValue;
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
+import io.resys.hdes.assetdb.api.AssetCommands.SnapshotBuilder;
 import io.resys.hdes.assetdb.api.ImmutableSnapshot;
-import io.resys.hdes.assetdb.api.ImmutableSnapshotEntry;
+import io.resys.hdes.assetdb.api.ImmutableSnapshotValue;
 import io.resys.hdes.assetdb.api.exceptions.CommitException;
 import io.resys.hdes.assetdb.spi.RepoAssert;
 
@@ -70,12 +70,12 @@ public class GenericSnapshotBuilder implements SnapshotBuilder {
     Commit commit = CommitQuery.builder(objects).commit(id).get();
     Tree tree = (Tree) objects.getValues().get(commit.getTree());
     
-    List<SnapshotEntry> values = new ArrayList<>();
-    for(TreeEntry entry : tree.getValues().values()) {
+    List<SnapshotValue> values = new ArrayList<>();
+    for(TreeValue entry : tree.getValues().values()) {
       Blob blob = (Blob) objects.getValues().get(entry.getBlob());
-      values.add(ImmutableSnapshotEntry.builder()
+      values.add(ImmutableSnapshotValue.builder()
           .name(entry.getName())
-          .blob(blob.getValue())
+          .content(blob.getValue())
           .build());
     }
     

@@ -30,16 +30,16 @@ import java.util.Optional;
 import io.resys.hdes.assetdb.api.AssetClient;
 import io.resys.hdes.assetdb.api.AssetClient.Blob;
 import io.resys.hdes.assetdb.api.AssetClient.Commit;
-import io.resys.hdes.assetdb.api.AssetClient.CommitBuilder;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.Ref;
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
+import io.resys.hdes.assetdb.api.AssetCommands.CommitBuilder;
 import io.resys.hdes.assetdb.api.ImmutableBlob;
 import io.resys.hdes.assetdb.api.ImmutableCommit;
 import io.resys.hdes.assetdb.api.ImmutableRef;
 import io.resys.hdes.assetdb.api.ImmutableTree;
-import io.resys.hdes.assetdb.api.ImmutableTreeEntry;
+import io.resys.hdes.assetdb.api.ImmutableTreeValue;
 import io.resys.hdes.assetdb.api.exceptions.CommitException;
 import io.resys.hdes.assetdb.api.exceptions.EmptyCommitException;
 import io.resys.hdes.assetdb.spi.RepoAssert;
@@ -48,7 +48,7 @@ import io.resys.hdes.assetdb.spi.mapper.ObjectRepositoryMapper;
 public abstract class GenericCommitBuilder implements CommitBuilder {
   private final static String FAKE_ID = "!-unknown-atm-!";
   
-  private final List<TreeEntry> toAdd = new ArrayList<>();
+  private final List<TreeValue> toAdd = new ArrayList<>();
   private final List<Object> newObjects = new ArrayList<>();
   private final List<String> toDelete = new ArrayList<>();
   
@@ -74,14 +74,14 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
   @Override
   public CommitBuilder add(String name, String content) {
     Blob blob = blob(content);
-    toAdd.add(ImmutableTreeEntry.builder().blob(blob.getId()).name(name).build());
+    toAdd.add(ImmutableTreeValue.builder().blob(blob.getId()).name(name).build());
     return this;
   }
   
   @Override
   public CommitBuilder change(String name, String content) {
     Blob blob = blob(content);
-    toAdd.add(ImmutableTreeEntry.builder().blob(blob.getId()).name(name).build());
+    toAdd.add(ImmutableTreeValue.builder().blob(blob.getId()).name(name).build());
     return this;
   }
   @Override
@@ -94,7 +94,7 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
         .append(">>>>>>>").append("/n");
     
     Blob blob = blob(content.toString());
-    toAdd.add(ImmutableTreeEntry.builder().blob(blob.getId()).name(name).build());
+    toAdd.add(ImmutableTreeValue.builder().blob(blob.getId()).name(name).build());
     return this;
   }
   
@@ -144,7 +144,7 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     // First commit
     Optional<Commit> parent;
     Optional<Ref> ref;
-    Map<String, TreeEntry> oldTree;
+    Map<String, TreeValue> oldTree;
     if(objects.getRefs().isEmpty()) {
       oldTree = new HashMap<>();
       ref = Optional.of(ImmutableRef.builder()
@@ -175,11 +175,11 @@ public abstract class GenericCommitBuilder implements CommitBuilder {
     
     // create tree
     
-    Map<String, TreeEntry> newTree = new HashMap<>(oldTree);
+    Map<String, TreeValue> newTree = new HashMap<>(oldTree);
     
     
     // add
-    for (TreeEntry entry : this.toAdd) {
+    for (TreeValue entry : this.toAdd) {
       newTree.put(entry.getName(), entry);
     }
     

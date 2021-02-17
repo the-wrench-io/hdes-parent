@@ -25,7 +25,7 @@ import java.util.Collection;
 import io.resys.hdes.assetdb.api.AssetClient.Changes;
 import io.resys.hdes.assetdb.api.AssetClient.IsObject;
 import io.resys.hdes.assetdb.api.AssetClient.Ref;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
 
 public class CommitException extends RepoException {
   private static final long serialVersionUID = -2123781385633987779L;
@@ -50,7 +50,7 @@ public class CommitException extends RepoException {
           .toString();
     }
     
-    public String unknownEntryDeleted(String parent, String author, TreeEntry treeEntry) {
+    public String unknownEntryDeleted(String parent, String author, TreeValue treeEntry) {
       return new StringBuilder()
           .append("Commit by: ").append(author)
           .append(" that points to: ").append(parent)

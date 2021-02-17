@@ -29,7 +29,7 @@ import io.resys.hdes.assetdb.api.AssetClient.Commit;
 import io.resys.hdes.assetdb.api.AssetClient.Ref;
 import io.resys.hdes.assetdb.api.AssetClient.Tag;
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
 
 public class ObjectRepositoryCodeProvider implements CodecProvider {
 
@@ -53,7 +53,7 @@ public class ObjectRepositoryCodeProvider implements CodecProvider {
     if(Tree.class.isAssignableFrom(clazz)) {
       return (Codec<T>) tree;
     }
-    if(TreeEntry.class.isAssignableFrom(clazz)) {
+    if(TreeValue.class.isAssignableFrom(clazz)) {
       return (Codec<T>) treeEntry;
     }
     

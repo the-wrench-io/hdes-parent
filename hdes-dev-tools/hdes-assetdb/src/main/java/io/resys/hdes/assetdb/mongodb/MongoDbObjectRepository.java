@@ -28,7 +28,7 @@ import java.util.Map;
 import com.mongodb.client.MongoClient;
 
 import io.resys.hdes.assetdb.api.AssetClient;
-import io.resys.hdes.assetdb.api.AssetClient.Commands;
+import io.resys.hdes.assetdb.api.AssetCommands;
 import io.resys.hdes.assetdb.api.ImmutableObjects;
 import io.resys.hdes.assetdb.file.FileObjectsSerializerAndDeserializer;
 import io.resys.hdes.assetdb.mongodb.MongoCommand.MongoDbConfig;
@@ -43,7 +43,7 @@ import io.resys.hdes.assetdb.spi.commands.GenericTagBuilder;
 import io.resys.hdes.assetdb.spi.mapper.GenericObjectRepositoryMapper;
 import io.resys.hdes.assetdb.spi.mapper.ObjectRepositoryMapper;
 
-public class MongoDbObjectRepository implements Commands, AssetClient {
+public class MongoDbObjectRepository implements AssetCommands, AssetClient {
   private final ObjectRepositoryMapper<MongoClient> mapper;
   private Objects objects;
 
@@ -106,7 +106,7 @@ public class MongoDbObjectRepository implements Commands, AssetClient {
   }
 
   @Override
-  public Commands commands() {
+  public AssetCommands commands() {
     return this;
   }
 

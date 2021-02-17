@@ -33,14 +33,14 @@ import io.resys.hdes.assetdb.api.AssetClient.IsObject;
 import io.resys.hdes.assetdb.api.AssetClient.Ref;
 import io.resys.hdes.assetdb.api.AssetClient.Tag;
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
 import io.resys.hdes.assetdb.api.ImmutableBlob;
 import io.resys.hdes.assetdb.api.ImmutableCommit;
 import io.resys.hdes.assetdb.api.ImmutableHead;
 import io.resys.hdes.assetdb.api.ImmutableRef;
 import io.resys.hdes.assetdb.api.ImmutableTag;
 import io.resys.hdes.assetdb.api.ImmutableTree;
-import io.resys.hdes.assetdb.api.ImmutableTreeEntry;
+import io.resys.hdes.assetdb.api.ImmutableTreeValue;
 import io.resys.hdes.assetdb.api.exceptions.RepoException;
 import io.resys.hdes.assetdb.spi.mapper.ObjectRepositoryMapper.Deserializer;
 import io.resys.hdes.assetdb.spi.mapper.ObjectRepositoryMapper.Serializer;
@@ -101,7 +101,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
   
   private Tree visitTree(String id, String content) {
     String[] lines = content.split("/n");
-    Map<String, TreeEntry> values = new HashMap<>();
+    Map<String, TreeValue> values = new HashMap<>();
     for(int index = 1; index < lines.length; index++) {
       String line = lines[index];
       int sep = line.lastIndexOf(" ");
@@ -109,7 +109,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
       String name = line.substring(0, sep);
       String value = line.substring(sep);
       
-      values.put(name, ImmutableTreeEntry.builder()
+      values.put(name, ImmutableTreeValue.builder()
           .name(name)
           .blob(value)
           .build());
@@ -120,7 +120,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
   private byte[] visitTree(Tree tree) {
     StringBuilder result = new StringBuilder()
         .append(TYPE_TREE).append("/n");
-    for(TreeEntry entry : tree.getValues().values()) {
+    for(TreeValue entry : tree.getValues().values()) {
       result
       .append(entry.getName()).append(" ")
       .append(entry.getBlob()).append(" ")
@@ -164,7 +164,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
   @Override
   public Head visitHead(String id, byte[] content) {
     return ImmutableHead.builder()
-        .value(new String(content, StandardCharsets.UTF_8))
+        .name(new String(content, StandardCharsets.UTF_8))
         .build();
   }
 
@@ -180,7 +180,7 @@ public class FileObjectsSerializerAndDeserializer implements Serializer, Deseria
 
   @Override
   public byte[] visitHead(Head head) {
-    return head.getValue().getBytes(StandardCharsets.UTF_8);
+    return head.getName().getBytes(StandardCharsets.UTF_8);
   }
   
   @Override

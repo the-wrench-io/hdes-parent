@@ -31,7 +31,7 @@ import com.google.common.hash.Hashing;
 import io.resys.hdes.assetdb.api.AssetClient.Blob;
 import io.resys.hdes.assetdb.api.AssetClient.Commit;
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
 import io.resys.hdes.assetdb.api.ImmutableBlob;
 import io.resys.hdes.assetdb.api.ImmutableCommit;
 import io.resys.hdes.assetdb.api.ImmutableTree;
@@ -49,7 +49,7 @@ public class Sha1IdSupplier implements IdSupplier {
 
   @Override
   public Tree id(Tree tree) {
-    List<TreeEntry> source = new ArrayList<>(tree.getValues().values());
+    List<TreeValue> source = new ArrayList<>(tree.getValues().values());
     Collections.sort(source, comparator);
     String id = Hashing.sha1().hashString(source.toString(), Charsets.UTF_8).toString();
     return ImmutableTree.builder().from(tree).id(id).build();
@@ -64,9 +64,9 @@ public class Sha1IdSupplier implements IdSupplier {
         .build();
   }
 
-  static class TreeEntryComparator implements Comparator<TreeEntry> {
+  static class TreeEntryComparator implements Comparator<TreeValue> {
     @Override
-    public int compare(TreeEntry o1, TreeEntry o2) {
+    public int compare(TreeValue o1, TreeValue o2) {
       return o1.getName().compareTo(o2.getName());
     }
   }

@@ -40,7 +40,7 @@ import io.resys.hdes.assetdb.api.AssetClient.Head;
 import io.resys.hdes.assetdb.api.AssetClient.IsObject;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.Ref;
-import io.resys.hdes.assetdb.api.AssetClient.SnapshotEntry;
+import io.resys.hdes.assetdb.api.AssetClient.SnapshotValue;
 import io.resys.hdes.assetdb.api.AssetClient.Tag;
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
 import io.resys.hdes.assetdb.api.ImmutableObjects;
@@ -119,13 +119,13 @@ public class FileWriter implements Writer<File> {
       FileOutputStream fileOutputStream = new FileOutputStream(target);
       IOUtils.copy(new ByteArrayInputStream(serializer.visitHead(head)), fileOutputStream);
       
-      log.append("  - checking out").append(head.getValue()).append(System.lineSeparator());
+      log.append("  - checking out").append(head.getName()).append(System.lineSeparator());
       log.append("  - ").append(target.getPath()).append(System.lineSeparator());
-      for(SnapshotEntry entry : head.getSnapshot().getValues()) {
+      for(SnapshotValue entry : head.getSnapshot().getValues()) {
         File rootEntry = new File(config.getRoot(), entry.getName());
         log.append("  - ").append(rootEntry.getAbsolutePath()).append(System.lineSeparator());
         IOUtils.copy(
-            new ByteArrayInputStream(entry.getBlob().getBytes(StandardCharsets.UTF_8)), 
+            new ByteArrayInputStream(entry.getContent().getBytes(StandardCharsets.UTF_8)), 
             new FileOutputStream(FileUtils.mkFile(rootEntry))); 
       }
       

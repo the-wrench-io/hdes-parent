@@ -27,10 +27,10 @@ import io.resys.hdes.assetdb.api.AssetClient;
 import io.resys.hdes.assetdb.api.AssetClient.ChangeAction;
 import io.resys.hdes.assetdb.api.AssetClient.Changes;
 import io.resys.hdes.assetdb.api.AssetClient.Commit;
-import io.resys.hdes.assetdb.api.AssetClient.CommitBuilder;
-import io.resys.hdes.assetdb.api.AssetClient.MergeBuilder;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.RefStatus;
+import io.resys.hdes.assetdb.api.AssetCommands.CommitBuilder;
+import io.resys.hdes.assetdb.api.AssetCommands.MergeBuilder;
 import io.resys.hdes.assetdb.api.exceptions.CommitException;
 
 public abstract class GenericMergeBuilder implements MergeBuilder {

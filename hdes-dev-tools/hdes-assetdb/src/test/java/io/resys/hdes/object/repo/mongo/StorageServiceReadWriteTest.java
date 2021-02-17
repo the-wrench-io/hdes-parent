@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.assetdb.api.AssetClient;
 import io.resys.hdes.assetdb.api.AssetClient.Commit;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
+import io.resys.hdes.assetdb.api.AssetClient.Snapshot;
 import io.resys.hdes.assetdb.mongodb.MongoCommand;
 import io.resys.hdes.assetdb.mongodb.MongoDbObjectRepository;
 
@@ -41,7 +42,25 @@ public class StorageServiceReadWriteTest {
   @Test
   public void createRepository() {
     MongoDbConfig.instance(command -> {
-      create(command).commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("init").build();
+      
+      AssetClient client = create(command);
+      
+      Commit commit = client.commands().commit().author("me@me.com").comment("init")
+          .add("file 1", "contentxxxx")
+          .add("folder1/file2", "contenty")
+          .build();
+      
+      System.out.println("\r\n");
+      System.out.println("\r\n");
+      System.out.println("\r\n");
+      System.out.println("\r\n");
+      System.out.println(commit);
+      
+      
+      Snapshot snapshot = client.commands().snapshot().from(commit.getId()).build();
+      System.out.println(snapshot);
+      
+      
     });
   }
 

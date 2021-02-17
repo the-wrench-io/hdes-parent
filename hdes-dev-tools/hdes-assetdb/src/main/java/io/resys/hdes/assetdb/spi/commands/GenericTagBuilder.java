@@ -4,7 +4,7 @@ import io.resys.hdes.assetdb.api.AssetClient;
 import io.resys.hdes.assetdb.api.AssetClient.Commit;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.Tag;
-import io.resys.hdes.assetdb.api.AssetClient.TagBuilder;
+import io.resys.hdes.assetdb.api.AssetCommands.TagBuilder;
 import io.resys.hdes.assetdb.api.ImmutableTag;
 import io.resys.hdes.assetdb.api.exceptions.RefException;
 import io.resys.hdes.assetdb.spi.RepoAssert;

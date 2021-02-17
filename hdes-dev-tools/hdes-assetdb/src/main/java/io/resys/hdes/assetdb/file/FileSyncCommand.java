@@ -31,10 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.resys.hdes.assetdb.api.AssetClient;
-import io.resys.hdes.assetdb.api.AssetClient.CommitBuilder;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.Snapshot;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
+import io.resys.hdes.assetdb.api.AssetCommands.CommitBuilder;
 import io.resys.hdes.assetdb.api.exceptions.EmptyCommitException;
 import io.resys.hdes.assetdb.file.FileUtils.FileSystemConfig;
 
@@ -53,10 +53,10 @@ public class FileSyncCommand {
 
   public void build() {
     if (!objects.getHead().isPresent() ||
-        !objects.getRefs().containsKey(objects.getHead().get().getValue())) {
+        !objects.getRefs().containsKey(objects.getHead().get().getName())) {
       return;
     }
-    Snapshot snapshot = objectRepository.commands().snapshot().from(objects.getHead().get().getValue()).build();
+    Snapshot snapshot = objectRepository.commands().snapshot().from(objects.getHead().get().getName()).build();
     CommitBuilder builder = objectRepository.commands().commit()
         .author(FileSyncCommand.class.getName())
         .comment("syncing local files");
@@ -70,7 +70,7 @@ public class FileSyncCommand {
         builder.add(file.getName(), new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8));
       }
       
-      for(TreeEntry entry : snapshot.getTree().getValues().values()) {
+      for(TreeValue entry : snapshot.getTree().getValues().values()) {
         if(!files.contains(entry.getName())) {
           builder.delete(entry.getName());
         }

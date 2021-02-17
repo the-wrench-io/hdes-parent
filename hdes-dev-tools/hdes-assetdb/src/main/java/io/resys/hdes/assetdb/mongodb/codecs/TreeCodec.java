@@ -31,7 +31,7 @@ import org.bson.codecs.DecoderContext;
 import org.bson.codecs.EncoderContext;
 
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
 import io.resys.hdes.assetdb.api.ImmutableTree;
 
 public class TreeCodec implements Codec<Tree> {
@@ -52,7 +52,7 @@ public class TreeCodec implements Codec<Tree> {
     writer.writeString(ID, value.getId());
     writer.writeStartArray(VALUES);
     
-    for (TreeEntry command : value.getValues().values()) {
+    for (TreeValue command : value.getValues().values()) {
       entryCode.encode(writer, command, encoderContext);
     }
     writer.writeEndArray();
@@ -68,10 +68,10 @@ public class TreeCodec implements Codec<Tree> {
     
     reader.readName(VALUES);
     reader.readStartArray();
-    Map<String, TreeEntry> commands = new HashMap<>();
+    Map<String, TreeValue> commands = new HashMap<>();
     
     while(reader.readBsonType() != BsonType.END_OF_DOCUMENT) {
-      TreeEntry entry = entryCode.decode(reader, decoderContext);
+      TreeValue entry = entryCode.decode(reader, decoderContext);
       commands.put(entry.getName(), entry);
     }
     reader.readEndArray();

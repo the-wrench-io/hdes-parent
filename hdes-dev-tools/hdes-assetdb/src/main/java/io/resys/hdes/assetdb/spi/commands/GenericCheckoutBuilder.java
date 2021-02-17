@@ -23,10 +23,10 @@ package io.resys.hdes.assetdb.spi.commands;
 import java.util.Arrays;
 import java.util.List;
 
-import io.resys.hdes.assetdb.api.AssetClient.CheckoutBuilder;
 import io.resys.hdes.assetdb.api.AssetClient.Head;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.Snapshot;
+import io.resys.hdes.assetdb.api.AssetCommands.CheckoutBuilder;
 import io.resys.hdes.assetdb.api.ImmutableHead;
 
 public abstract class GenericCheckoutBuilder implements CheckoutBuilder {
@@ -48,7 +48,7 @@ public abstract class GenericCheckoutBuilder implements CheckoutBuilder {
   @Override
   public Objects build() {
     Snapshot snapshot = new GenericSnapshotBuilder(objects).from(name).build();
-    Head head = ImmutableHead.builder().value(name).snapshot(snapshot).build();
+    Head head = ImmutableHead.builder().name(name).snapshot(snapshot).build();
     return save(Arrays.asList(head));
   }
   

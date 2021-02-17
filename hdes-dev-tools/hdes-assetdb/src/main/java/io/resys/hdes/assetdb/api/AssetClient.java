@@ -34,99 +34,27 @@ public interface AssetClient {
   enum ChangeAction { MODIFIED, CREATED, DELETED, CONFLICT }
   
   Objects objects();
-  Commands commands();
-  
-  interface Commands {
-    StatusBuilder status();
-    CommitBuilder commit();
-    HistoryBuilder history();
-    SnapshotBuilder snapshot();
-    CheckoutBuilder checkout();
-    PullCommand pull();
-    MergeBuilder merge();
-    TagBuilder tag();
-  }
-  
-  interface PullCommand {
-    Object build();
-  }
-  
-  interface RebaseBuilder {
-    RebaseBuilder author(String author);
-    RebaseBuilder ref(String refName);
-    Objects build();
-  }
-  
-  interface MergeBuilder {
-    // ref name from what to merge to "master"
-    MergeBuilder ref(String name);
-    MergeBuilder author(String author);
-    Objects build();
-  }
-  
-  interface StatusBuilder {   
-    // Build overview of other refs related to 'master' ref
-    List<RefStatus> find();
-    
-    // Build overview of other ref(name) related to 'master' ref
-    RefStatus get(String name);
-  }
-  
-  interface TagBuilder {
-    // Name of the tag
-    TagBuilder name(String name);
-    // optional commit for what to add tag
-    TagBuilder commit(String commit);
-    // tags can be created only from master
-    Tag build();
-  }
-  
-  interface HistoryBuilder {
-    List<Commit> build();
-  }
-  
-  interface CheckoutBuilder {
-    // tag/commit/ref
-    CheckoutBuilder from(String name);
-    Objects build();
-  }
-  
-  interface SnapshotBuilder {
-    // tag/commit/ref
-    SnapshotBuilder from(String name);
-    Snapshot build();
-  }
-  
-  interface CommitBuilder {
-    CommitBuilder add(String name, String content);
-    CommitBuilder delete(String name);
-    CommitBuilder change(String name, String content);
-    CommitBuilder conflict(String name, String oldValue, String newValue);
-    
-    CommitBuilder ref(String name);
-    CommitBuilder parent(String commitId);
-    CommitBuilder author(String author);
-    CommitBuilder comment(String message);
-    CommitBuilder merge(String commitId);
-    Commit build();
-  }
+  AssetCommands commands();
 
+  // Snapshot of a commit with all of its content
   @Value.Immutable
   interface Snapshot {
     String getId();
     Tree getTree();
-    List<SnapshotEntry> getValues();
+    List<SnapshotValue> getValues();
   }
   
   @Value.Immutable
-  interface SnapshotEntry {
+  interface SnapshotValue {
+    // name of the resource
     String getName();
-    String getBlob();
+    // resource content (not blob id)
+    String getContent();
   }
 
   @Value.Immutable
   interface Head {
-    String getValue();
+    String getName();
     Snapshot getSnapshot();
   }
   
@@ -152,27 +80,34 @@ public interface AssetClient {
     Optional<String> getNewValue();
     Optional<String> getOldValue();
   }
-  
-  
-  @Value.Immutable
-  interface TreeEntry {
-    String getName();
-    String getBlob();
-  }
-  
+
+  // branch with a name
   @Value.Immutable
   interface Ref extends IsName {
+    // last commit in the branch
     String getCommit();
   }
 
   @Value.Immutable
   interface Tag extends IsName {
+    // id of a commit
     String getCommit();
   }
   
+  // World state 
   @Value.Immutable
   interface Tree extends IsObject {
-    Map<String, TreeEntry> getValues();
+    // resource name - blob id
+    Map<String, TreeValue> getValues();
+  }
+  
+  // Resource name - blob id(content in blob)
+  @Value.Immutable
+  interface TreeValue {
+    // Name of the resource
+    String getName();
+    // Id of the blob that holds content
+    String getBlob();
   }
   
   @Value.Immutable
@@ -180,11 +115,18 @@ public interface AssetClient {
     String getAuthor();
     LocalDateTime getDateTime();
     String getMessage();
+    
+    // Parent commit id
     Optional<String> getParent();
+    
+    // This commit is merge commit, that points to a commit in different branch
     Optional<String> getMerge();
+    
+    // Tree id that describes list of (resource name - content) entries
     String getTree();
   }
   
+  // Resource content
   @Value.Immutable
   interface Blob extends IsObject {
     String getValue();

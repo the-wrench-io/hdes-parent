@@ -35,9 +35,9 @@ import io.resys.hdes.assetdb.api.AssetClient.Commit;
 import io.resys.hdes.assetdb.api.AssetClient.Objects;
 import io.resys.hdes.assetdb.api.AssetClient.Ref;
 import io.resys.hdes.assetdb.api.AssetClient.RefStatus;
-import io.resys.hdes.assetdb.api.AssetClient.StatusBuilder;
 import io.resys.hdes.assetdb.api.AssetClient.Tree;
-import io.resys.hdes.assetdb.api.AssetClient.TreeEntry;
+import io.resys.hdes.assetdb.api.AssetClient.TreeValue;
+import io.resys.hdes.assetdb.api.AssetCommands.StatusBuilder;
 import io.resys.hdes.assetdb.api.ImmutableChanges;
 import io.resys.hdes.assetdb.api.ImmutableRefStatus;
 import io.resys.hdes.assetdb.api.exceptions.RefException;
@@ -94,9 +94,9 @@ public class GenericStatusBuilder implements StatusBuilder {
     Tree masterThen = (Tree) objects.getValues().get(getParentCommit(objects, refCommits).getTree());
     
     List<Changes> changes = new ArrayList<>();
-    for (TreeEntry mergable : tree.getValues().values()) {
-      TreeEntry now = masterNow.getValues().get(mergable.getName());
-      TreeEntry then = masterThen.getValues().get(mergable.getName());
+    for (TreeValue mergable : tree.getValues().values()) {
+      TreeValue now = masterNow.getValues().get(mergable.getName());
+      TreeValue then = masterThen.getValues().get(mergable.getName());
       
       // no changes in this ref
       if (now != null && now.getBlob().equals(mergable.getBlob())) {
@@ -129,7 +129,7 @@ public class GenericStatusBuilder implements StatusBuilder {
           .oldValue(latestMasterValue.getValue()).build());
     }
     // deletes
-    for (TreeEntry entry : masterNow.getValues().values()) {
+    for (TreeValue entry : masterNow.getValues().values()) {
       if (tree.getValues().containsKey(entry.getName())) {
         Blob blob = (Blob) objects.getValues().get(entry.getBlob());
         changes.add(ImmutableChanges.builder()

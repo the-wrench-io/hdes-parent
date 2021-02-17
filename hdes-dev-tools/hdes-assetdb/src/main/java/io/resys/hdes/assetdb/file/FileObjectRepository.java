@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Map;
 
 import io.resys.hdes.assetdb.api.AssetClient;
-import io.resys.hdes.assetdb.api.AssetClient.Commands;
-import io.resys.hdes.assetdb.file.FileUtils.FileSystemConfig;
+import io.resys.hdes.assetdb.api.AssetCommands;
 import io.resys.hdes.assetdb.api.ImmutableObjects;
+import io.resys.hdes.assetdb.file.FileUtils.FileSystemConfig;
 import io.resys.hdes.assetdb.spi.RepoAssert;
 import io.resys.hdes.assetdb.spi.commands.GenericCheckoutBuilder;
 import io.resys.hdes.assetdb.spi.commands.GenericCommitBuilder;
@@ -41,7 +41,7 @@ import io.resys.hdes.assetdb.spi.commands.GenericTagBuilder;
 import io.resys.hdes.assetdb.spi.mapper.GenericObjectRepositoryMapper;
 import io.resys.hdes.assetdb.spi.mapper.ObjectRepositoryMapper;
 
-public class FileObjectRepository implements Commands, AssetClient {
+public class FileObjectRepository implements AssetCommands, AssetClient {
   private final ObjectRepositoryMapper<File> mapper;
   private final FileSystemConfig config;
   private Objects objects;
@@ -137,7 +137,7 @@ public class FileObjectRepository implements Commands, AssetClient {
   }
 
   @Override
-  public Commands commands() {
+  public AssetCommands commands() {
     return this;
   }
 
