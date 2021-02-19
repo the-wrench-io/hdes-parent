@@ -20,8 +20,11 @@ declare namespace Backend {
   }
   
   interface ProjectService {
-    
+    query: () => ProjectQuery;    
   }
+  
+  interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
+  
   
   interface CommitService {
     
@@ -30,17 +33,33 @@ declare namespace Backend {
   interface SnapshotService {
     
   }
+
+  
+  interface ProjectResource {
+    project: Project;
+    heads: Record<string, Head>;
+  }
+  
+  interface Head {
+    id: string;
+    name: string;
+    commit: Commit;
+  }
   
   interface Project {
-    
+    id: string;
+    name: string;
   }
+  
   
   interface Snapshot {
     
   }
   
   interface Commit {
-    
+    id: string;
+    author: string;
+    dateTime: Date | number[];
   }
   
   interface ServerConfig {

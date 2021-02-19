@@ -40,7 +40,6 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   const [service] = React.useReducer(serviceReducer, startService.withListeners({
     onSave: (saved: Backend.Commit) => {
       sessionDispatch(sessionActions.setResourceSaved(saved))
-      
     },
     onError: (error: Backend.ServerError) => {
       sessionDispatch(sessionActions.setServerError(error))
@@ -51,7 +50,8 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   }));
 
   React.useEffect(() => {
-
+    service.projects.query().onSuccess(projects => sessionDispatch(sessionActions.setData({projects})))
+    
   }, [sessionDispatch, service])
   
   return (

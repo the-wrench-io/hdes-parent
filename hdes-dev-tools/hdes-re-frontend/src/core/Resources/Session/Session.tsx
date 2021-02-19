@@ -19,7 +19,7 @@ declare namespace Session {
   }
   
   interface DataInit { 
-    projects?: Backend.Project[], 
+    projects?: Backend.ProjectResource[], 
     snapshot?: Backend.Snapshot;
   }
   

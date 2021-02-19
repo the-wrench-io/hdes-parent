@@ -8,6 +8,7 @@ class InMemoryService implements Backend.Service {
   private _commits: Backend.CommitService;
   private _projects: Backend.ProjectService;
   private _listeners: Backend.ServiceListeners;
+  private _store: Store;
   
   constructor() {
     console.log('creating demo service');
@@ -17,9 +18,11 @@ class InMemoryService implements Backend.Service {
     const onDelete = (deleted: Backend.Commit) => {
       this.listeners.onDelete(deleted);
     }
-    const demo = createDemoData();
+    
+    const demoData = createDemoData();
+    this._store = new InMemoryStore(demoData.projects);
     this._snapshots = {};
-    this._projects = {};
+    this._projects = new InMemoryProjectService(this._store);
     this._commits = {};
     this._listeners = { 
       onSave: (resource) => console.log("saved resources", resource),
@@ -45,5 +48,47 @@ class InMemoryService implements Backend.Service {
     return this;
   }
 }
+
+class InMemoryProjectService implements Backend.ProjectService {
+  store: Store;
+  constructor(store: Store) {
+    this.store = store;
+  }
+  query() {
+    return new InMemoryProjectQuery(this.store);
+  }
+}
+
+class InMemoryProjectQuery implements Backend.ProjectQuery {
+  store: Store;
+  
+  constructor(store: Store) {
+    this.store = store;
+  }
+  
+  onSuccess(handle: (projects: Backend.ProjectResource[]) => void) {
+    const { store } = this;
+    const projects = [...store.projects];
+    handle(projects);
+  }
+}
+
+
+interface Store {
+  projects: Backend.ProjectResource[];
+}
+
+class InMemoryStore implements Store {
+  private _projects: Backend.ProjectResource[];
+  
+  constructor(projects: Backend.ProjectResource[]) {
+    this._projects = projects;
+  }
+  
+  get projects() {
+    return this._projects;
+  }
+}
+
 
 export { InMemoryService };

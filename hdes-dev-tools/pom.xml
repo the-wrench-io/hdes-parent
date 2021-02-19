@@ -15,8 +15,7 @@
     <module>hdes-pm-frontend</module>
     <module>hdes-pm-backend</module>
     
-    <module>hdes-wi-frontend</module>
-    <module>hdes-wi-backend</module>
+    <module>hdes-re-frontend</module>
     
     <module>hdes-assetdb</module>
   </modules>
