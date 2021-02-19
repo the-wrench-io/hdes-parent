@@ -2,9 +2,12 @@ import React from 'react';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
-
+import LibraryAddIcon from '@material-ui/icons/LibraryAdd';
+import AccountTreeIcon from '@material-ui/icons/AccountTree';
+import CallMergeIcon from '@material-ui/icons/CallMerge';
+import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import { Resources, Backend, Session } from './core/Resources';
+import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
 
 import { Tabs, TabPanel } from './core/Tabs';
 import Shell from './core/Shell';
@@ -31,9 +34,13 @@ function App() {
   const handleSearch = (keyword: string) => setSession((session) => session.setSearch(keyword))
 
 
-  const views = [{ id: 'add-resource', label: 'Add Resource', icon: <AddCircleOutlineIcon />, 
-    onClick: () => console.log("add") 
-  }];
+  const views = [
+    { id: 'resources', label: 'View Resources', icon: <LibraryBooksIcon />, onClick: () => console.log("add resource") },
+    { id: 'add-resource', label: 'Add Resource', icon: <LibraryAddIcon />, onClick: () => console.log("add resource") },
+    { id: 'branchs', label: 'Set Branch', icon: <AccountTreeIcon />, onClick: () => console.log("set branch") },
+    { id: 'merge', label: 'Merge To Main', icon: <CallMergeIcon />, onClick: () => console.log("Merge") },
+    { id: 'projects', label: 'View Projects', icon: <ViewQuiltIcon />, onClick: () => console.log("add resource") },
+  ];
   
   const view = (<div>sdfjksdfkhsdkfhsdhfksdhfksdhkfjh</div>)
   

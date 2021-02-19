@@ -3,17 +3,17 @@ import { Backend } from '../Backend';
 
 
 class GenericData implements Session.Data {
-  private _projects: Backend.Project[];
+  private _projects: Backend.ProjectResource[];
   private _snapshot: Backend.Snapshot; 
   
-  constructor(projects?: Backend.Project[], snapshot?: Backend.Snapshot) {
+  constructor(projects?: Backend.ProjectResource[], snapshot?: Backend.Snapshot) {
     this._snapshot = snapshot ? snapshot : {};
     this._projects = projects ? projects : [];
   }
   get snapshot() : Backend.Snapshot {
     return this._snapshot;
   }
-  get projects(): readonly Backend.Project[] {
+  get projects(): readonly Backend.ProjectResource[] {
     return this._projects;
   }
 }

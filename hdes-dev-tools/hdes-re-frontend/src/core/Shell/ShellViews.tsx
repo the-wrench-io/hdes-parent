@@ -3,6 +3,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import Grid from '@material-ui/core/Grid';
+import Tooltip from '@material-ui/core/Tooltip';
+import IconButton from '@material-ui/core/IconButton';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -10,7 +12,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1,
   },
   icons: {
-    paddingLeft: 9,
+    //paddingLeft: 9,
   },
 }));
 
@@ -30,12 +32,12 @@ interface ShellViewsProps {
 const ShellViews: React.FC<ShellViewsProps> = ({children, open}) => {
   const classes = useStyles();
   
-  const [ active, setActive ] = React.useState<ShellView|undefined>();
+  const [ active, setActive ] = React.useState<{index: number, view: ShellView}|undefined>();
   const [ view, setView ] = React.useState<React.ReactNode|undefined>();
 
-  const handleOnClick = (view: ShellView) => {
+  const handleOnClick = (index: number, view: ShellView) => {
     const viewNode = view.onClick();
-    setActive(view);
+    setActive({index, view});
     setView(viewNode ? viewNode : undefined);
   }
   
@@ -45,11 +47,15 @@ const ShellViews: React.FC<ShellViewsProps> = ({children, open}) => {
       <Grid item xs={3} className={classes.icons}>
         <List>
           { children.map((item, index) => (
-              <ListItem button key={index} onClick={() => handleOnClick(item)}>
-                {item.icon}
-              </ListItem>)
-            )
-          }
+            <Tooltip title={item.label} key={index}>
+              <ListItem>
+                <IconButton color={active?.index === index && open ? "primary" : "inherit"} 
+                  onClick={() => handleOnClick(index, item)}> 
+                  {item.icon}
+                </IconButton>
+              </ListItem>
+            </Tooltip>)
+          )}
         </List>
       </Grid>
       <Grid item xs={9}>{open ? view : null}</Grid>

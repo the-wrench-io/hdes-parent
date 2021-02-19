@@ -14,7 +14,7 @@ declare namespace Session {
   }
   
   interface Data {
-    projects: readonly Backend.Project[];
+    projects: readonly Backend.ProjectResource[];
     snapshot: Backend.Snapshot; 
   }
   
