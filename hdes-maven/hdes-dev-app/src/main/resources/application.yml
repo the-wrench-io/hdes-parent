@@ -42,7 +42,7 @@ quarkus:
       io.resys.hdes:
         level: DEBUG
 
-  hdes-projects:
+  hdes-pm:
     init-user-name: olev.mutso@resys.io
     connection-url: mongodb://appUser:123456@localhost:27017/PM?authSource=PM
     
