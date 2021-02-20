@@ -9,12 +9,35 @@ const createDemoData = (): { projects: Backend.ProjectResource[] } => {
 {
   const project: Backend.Project = { id: uuid(), name: "Risk project 1" }
   
-  const master = createHead("master", 10);
+  const master = createHead("main", 10);
   const dev = createHead("dev", 15);
+  const test1 = createHead("test1", 15);
+  const test5 = createHead("test5", 15);
   
   const heads: Record<string, Backend.Head> = {}
   heads[master.id] = master;
   heads[dev.id] = dev;
+  heads[test1.id] = test1;
+  heads[test5.id] = test5;
+  
+  projects.push({project, heads});
+}
+
+
+// project 2
+{
+  const project: Backend.Project = { id: uuid(), name: "Scoring project" }
+  
+  const master = createHead("main", 10);
+  const dev = createHead("dev", 15);
+  const test1 = createHead("test8", 15);
+  const test5 = createHead("test3", 15);
+  
+  const heads: Record<string, Backend.Head> = {}
+  heads[master.id] = master;
+  heads[dev.id] = dev;
+  heads[test1.id] = test1;
+  heads[test5.id] = test5;
   
   projects.push({project, heads});
 }

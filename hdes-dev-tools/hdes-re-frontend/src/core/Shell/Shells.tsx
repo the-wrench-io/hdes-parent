@@ -47,7 +47,7 @@ const Shell: React.FC<ShellProps> = ({views, tabs, search, badges}) => {
   const theme = useTheme();
     
   // Drawer
-  const [drawerOpen, setDrawerOpen] = React.useState(true);
+  const [drawerOpen, setDrawerOpen] = React.useState(false);
   const handleDrawerOpen = () => setDrawerOpen(true);
   const handleDrawerClose = () => setDrawerOpen(false);
 
