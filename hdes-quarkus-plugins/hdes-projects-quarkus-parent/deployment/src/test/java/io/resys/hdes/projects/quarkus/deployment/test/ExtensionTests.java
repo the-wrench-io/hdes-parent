@@ -41,8 +41,8 @@ public class ExtensionTests {
       MongoDbFactory.get().tearDown();
     })
     .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
-      .addAsResource(new StringAsset("quarkus.hdes-projects.connection-url=mongodb://localhost:12345"), "application.properties")
-      .addAsResource(new StringAsset("quarkus.hdes-projects.dbName=PM"), "application.properties")
+      .addAsResource(new StringAsset("quarkus.hdes-pm.connection-url=mongodb://localhost:12345"), "application.properties")
+      .addAsResource(new StringAsset("quarkus.hdes-pm.dbName=PM"), "application.properties")
       .addAsResource(new StringAsset("quarkus.profile=test"), "application.properties")
     );
 

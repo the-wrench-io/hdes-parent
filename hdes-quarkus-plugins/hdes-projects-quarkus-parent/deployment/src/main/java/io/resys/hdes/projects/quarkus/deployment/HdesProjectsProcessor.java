@@ -59,7 +59,7 @@ public class HdesProjectsProcessor {
   private static final String WEBJAR_ARTIFACT_ID = "hdes-pm-frontend";
   private static final String WEBJAR_PREFIX = "META-INF/resources/webjars/" + WEBJAR_ARTIFACT_ID + "/";
   private static final String FINAL_DESTINATION = "META-INF/hdes-pm-files";
-  public static final String FEATURE_BUILD_ITEM = "hdes-projects";
+  public static final String FEATURE_BUILD_ITEM = "hdes-pm";
   
   @Inject
   private LaunchModeBuildItem launch;

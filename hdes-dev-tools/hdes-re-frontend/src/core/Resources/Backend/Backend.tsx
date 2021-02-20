@@ -15,6 +15,7 @@ declare namespace Backend {
     projects: ProjectService;
     commits: CommitService;
     snapshots: SnapshotService;
+    heads: HeadService;
     listeners: ServiceListeners;
     withListeners: (listeners: ServiceListeners) => Service;
   }
@@ -24,6 +25,14 @@ declare namespace Backend {
   }
   
   interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
+  
+  interface HeadService {
+    query: () => ProjectQuery;    
+  }
+  
+  interface HeadQuery extends ServiceCallback<HeadResource[]>{}
+  
+  
   
   
   interface CommitService {

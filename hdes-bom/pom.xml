@@ -76,22 +76,22 @@
 
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-ui</artifactId>
+        <artifactId>hdes-assetdb</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-ui-frontend</artifactId>
+        <artifactId>hdes-re-frontend</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-ui-backend</artifactId>
+        <artifactId>hdes-re-backend</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-ui-quarkus</artifactId>
+        <artifactId>hdes-resources-quarkus</artifactId>
         <version>${project.version}</version>
       </dependency>
 
@@ -106,11 +106,6 @@
         <artifactId>hdes-pm-backend</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-projects-quarkus</artifactId>
-        <version>${project.version}</version>
-      </dependency>      
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-projects-quarkus</artifactId>

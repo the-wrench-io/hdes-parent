@@ -14,7 +14,7 @@
 
   <modules>
     <module>hdes-projects-quarkus-parent</module>
-    <!-- <module>hdes-ui-quarkus-parent</module> -->
+    <module>hdes-resources-quarkus-parent</module>
   </modules>
 
 </project>

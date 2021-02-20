@@ -7,7 +7,7 @@
     <artifactId>hdes-dev-tools</artifactId>
     <version>999-SNAPSHOT</version>
   </parent>
-  <artifactId>hdes-ed-frontend</artifactId>
+  <artifactId>hdes-re-frontend</artifactId>
   <description>Asset Resource Editor Front-End</description>
   <build>
     <plugins>

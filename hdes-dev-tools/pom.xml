@@ -14,10 +14,11 @@
   <modules>
     <module>hdes-pm-frontend</module>
     <module>hdes-pm-backend</module>
-    
+
+    <module>hdes-assetdb</module>    
     <module>hdes-re-frontend</module>
-    
-    <module>hdes-assetdb</module>
+    <module>hdes-re-backend</module>
+
   </modules>
 
 </project>
