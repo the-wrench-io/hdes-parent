@@ -7,6 +7,7 @@ class InMemoryService implements Backend.Service {
   private _snapshots: Backend.SnapshotService;
   private _commits: Backend.CommitService;
   private _projects: Backend.ProjectService;
+  private _heads: Backend.HeadService;
   private _listeners: Backend.ServiceListeners;
   private _store: Store;
   
@@ -20,9 +21,10 @@ class InMemoryService implements Backend.Service {
     }
     
     const demoData = createDemoData();
-    this._store = new InMemoryStore(demoData.projects);
+    this._store = new InMemoryStore(demoData.projects, demoData.heads);
     this._snapshots = {};
     this._projects = new InMemoryProjectService(this._store);
+    this._heads = new InMemoryHeadService(this._store);
     this._commits = {};
     this._listeners = { 
       onSave: (resource) => console.log("saved resources", resource),
@@ -33,6 +35,9 @@ class InMemoryService implements Backend.Service {
 
   get projects() {
     return this._projects;
+  }
+  get heads() {
+    return this._heads;
   }
   get commits() {
     return this._commits;
@@ -74,19 +79,49 @@ class InMemoryProjectQuery implements Backend.ProjectQuery {
 }
 
 
+class InMemoryHeadService implements Backend.HeadService {
+  store: Store;
+  constructor(store: Store) {
+    this.store = store;
+  }
+  query() {
+    return new InMemoryHeadQuery(this.store);
+  }
+}
+
+class InMemoryHeadQuery implements Backend.HeadQuery {
+  store: Store;
+  
+  constructor(store: Store) {
+    this.store = store;
+  }
+  
+  onSuccess(handle: (projects: Backend.HeadResource[]) => void) {
+    const { store } = this;
+    const heads = [...store.heads];
+    handle(heads);
+  }
+}
+
 interface Store {
   projects: Backend.ProjectResource[];
+  heads: Backend.HeadResource[];
 }
 
 class InMemoryStore implements Store {
   private _projects: Backend.ProjectResource[];
+  private _heads: Backend.HeadResource[];
   
-  constructor(projects: Backend.ProjectResource[]) {
+  constructor(projects: Backend.ProjectResource[], heads: Backend.HeadResource[]) {
     this._projects = projects;
+    this._heads = heads;
   }
   
   get projects() {
     return this._projects;
+  }
+  get heads() {
+    return this._heads;
   }
 }
 

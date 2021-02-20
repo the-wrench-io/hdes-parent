@@ -27,7 +27,7 @@ declare namespace Backend {
   interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
   
   interface HeadService {
-    query: () => ProjectQuery;    
+    query: () => HeadQuery;    
   }
   
   interface HeadQuery extends ServiceCallback<HeadResource[]>{}
@@ -51,7 +51,7 @@ declare namespace Backend {
   
   interface HeadResource {
     head: Head;
-    state: { commits: number, type: "ahead" | "behind" }
+    state?: { commits: number, type: "ahead" | "behind" }
   }
   
   interface Head {

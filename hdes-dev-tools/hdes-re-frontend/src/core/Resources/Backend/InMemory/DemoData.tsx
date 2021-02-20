@@ -1,7 +1,9 @@
 import Backend from './../Backend';
 
 
-const createDemoData = (): { projects: Backend.ProjectResource[] } => {
+const createDemoData = (): { 
+  projects: Backend.ProjectResource[],
+  heads: Backend.HeadResource[] } => {
 
   const projects: Backend.ProjectResource[] = [];
   
@@ -11,14 +13,14 @@ const createDemoData = (): { projects: Backend.ProjectResource[] } => {
   
   const master = createHead("main", 10);
   const dev = createHead("dev", 15);
-  const test1 = createHead("test1", 15);
+  const test1 = createHead("test1", 10);
   const test5 = createHead("test5", 15);
   
   const heads: Record<string, Backend.Head> = {}
-  heads[master.id] = master;
-  heads[dev.id] = dev;
-  heads[test1.id] = test1;
-  heads[test5.id] = test5;
+  heads[master.name] = master;
+  heads[dev.name] = dev;
+  heads[test1.name] = test1;
+  heads[test5.name] = test5;
   
   projects.push({project, heads});
 }
@@ -31,18 +33,32 @@ const createDemoData = (): { projects: Backend.ProjectResource[] } => {
   const master = createHead("main", 10);
   const dev = createHead("dev", 15);
   const test1 = createHead("test8", 15);
-  const test5 = createHead("test3", 15);
+  const test5 = createHead("test3", 10);
   
   const heads: Record<string, Backend.Head> = {}
-  heads[master.id] = master;
-  heads[dev.id] = dev;
-  heads[test1.id] = test1;
-  heads[test5.id] = test5;
+  heads[master.name] = master;
+  heads[dev.name] = dev;
+  heads[test1.name] = test1;
+  heads[test5.name] = test5;
   
   projects.push({project, heads});
 }
 
-  return { projects }
+
+  const heads: Backend.HeadResource[] = [];
+  projects.forEach(p => heads.push(...Object.values(p.heads).map(h => createHeadResource(p, h))))
+
+  return { projects, heads }
+}
+
+const createHeadResource = (project: Backend.ProjectResource, head: Backend.Head): Backend.HeadResource =>{
+  
+  const main = project.heads['main'];
+  const mainCommits = (main as DemoHead).commits;
+  const headCommits = (head as DemoHead).commits;
+  const diff = headCommits.length - headCommits.length;
+
+  return { head, state: diff === 0 ? undefined : { commits: Math.abs(diff), type: diff < 0 ? 'ahead' : 'behind'}};
 }
 
 const createHead = (name: string, commitCount: number) => {
@@ -61,7 +77,7 @@ const createHead = (name: string, commitCount: number) => {
   }
   
   const lastCommit = commits[commits.length - 1];
-  const head: Backend.Head = { id: uuid(), name, commit: lastCommit };
+  const head: DemoHead = { id: uuid(), name, commit: lastCommit, commits };
   
   return head;
 }
@@ -72,6 +88,10 @@ const uuid = ():string => {
     let value = char === "x" ? random : (random % 4 + 8);
     return value.toString(16)
   });
+}
+
+interface DemoHead extends Backend.Head {
+  commits: Backend.Commit[]
 }
 
 export default createDemoData;
