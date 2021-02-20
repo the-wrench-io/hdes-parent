@@ -8,6 +8,7 @@ const ShellStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   toolbar: {
+    //minHeight: 72,
     paddingRight: 24, // keep right padding when drawer closed
   },
   toolbarIcon: {
@@ -16,6 +17,15 @@ const ShellStyles = makeStyles((theme) => ({
     justifyContent: 'flex-end',
     padding: '0 8px',
     ...theme.mixins.toolbar,
+  },
+  views: {
+    //paddingTop: '10px',
+  },
+  content: {
+    //paddingTop: '10px',
+    flexGrow: 1,
+    height: '100vh',
+    overflow: 'auto',
   },
   appBar: {
     zIndex: theme.zIndex.drawer + 1,
@@ -107,11 +117,6 @@ const ShellStyles = makeStyles((theme) => ({
   },
   
   appBarSpacer: theme.mixins.toolbar,
-  content: {
-    flexGrow: 1,
-    height: '100vh',
-    overflow: 'auto',
-  },
   container: {
     //paddingTop: theme.spacing(4),
     paddingBottom: theme.spacing(4),

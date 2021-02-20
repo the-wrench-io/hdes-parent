@@ -40,6 +40,11 @@ declare namespace Backend {
     heads: Record<string, Head>;
   }
   
+  interface HeadResource {
+    head: Head;
+    state: { commits: number, type: "ahead" | "behind" }
+  }
+  
   interface Head {
     id: string;
     name: string;

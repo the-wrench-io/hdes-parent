@@ -7,6 +7,7 @@ import AccountTreeIcon from '@material-ui/icons/AccountTree';
 import CallMergeIcon from '@material-ui/icons/CallMerge';
 import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
+import CachedIcon from '@material-ui/icons/Cached';
 
 import { Resources, Backend, Session } from './core/Resources';
 import { Tabs, TabPanelRenderer } from './core/Tabs';
@@ -42,6 +43,7 @@ function App() {
     { id: 'branchs', label: 'Set Branch', icon: <AccountTreeIcon />, onClick: () => console.log("set branch") },
     { id: 'merge', label: 'Merge To Main', icon: <CallMergeIcon />, onClick: () => console.log("Merge") },
     { id: 'projects', label: 'View Projects', icon: <ViewQuiltIcon />, onClick: () => listProjects() },
+    { id: 'reload', label: 'Reload', icon: <CachedIcon />, onClick: () => console.log("Merge") },
   ];
   
   const view = (<div>sdfjksdfkhsdkfhsdhfksdhfksdhkfjh</div>)

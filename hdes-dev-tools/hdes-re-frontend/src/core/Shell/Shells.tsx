@@ -90,7 +90,9 @@ const Shell: React.FC<ShellProps> = ({views, tabs, search, badges}) => {
           </IconButton>
         </div>
 
-         <ShellViews open={drawerOpen}>{views}</ShellViews>
+        <div className={classes.views}>
+          <ShellViews open={drawerOpen}>{views}</ShellViews>
+        </div>
       </Drawer>
 
       <main className={classes.content}>
