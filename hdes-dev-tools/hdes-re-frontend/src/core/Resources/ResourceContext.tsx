@@ -7,6 +7,7 @@ import { ResourceContextActions, GenericResourceContextActions } from './Resourc
 
 type ResourceContextType = {
   session: Session.Instance;
+  service: Backend.Service;
   actions: ResourceContextActions;
 }
 
@@ -22,7 +23,8 @@ const startSession = createSession();
 
 const ResourceContext = React.createContext<ResourceContextType>({
   session: startSession,
-  actions: {} as ResourceContextActions
+  service: startService,
+  actions: {} as ResourceContextActions,
 });
 
 type ResourceProviderProps = {
@@ -34,9 +36,14 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(sessionDispatch), [sessionDispatch]);
   
   const [service] = React.useReducer(ServiceReducer, React.useMemo(() => startService.withListeners({
-      onSave: (saved: Backend.Commit) => actions.handleResourceSaved(saved),
+      onSave: (saved: Backend.AnyResource) => actions.handleResourceSaved(saved),
+      onDelete: (deleted: Backend.AnyResource) => {
+        actions.handleResourceDeleted(deleted);
+        service.projects.query().onSuccess(projects => actions.handleData({projects}))
+        service.heads.query().onSuccess(heads => actions.handleData({heads}))
+        
+      },
       onError: (error: Backend.ServerError) => actions.handleServerError(error),
-      onDelete: (deleted: Backend.Commit) => actions.handleResourceDeleted(deleted)
     }), [actions, startService]));
 
   React.useEffect(() => {
@@ -45,7 +52,7 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   }, [actions, service])
   
   return (
-    <ResourceContext.Provider value={{ session, actions }}>
+    <ResourceContext.Provider value={{ session, actions, service }}>
       {children}
     </ResourceContext.Provider>
   );

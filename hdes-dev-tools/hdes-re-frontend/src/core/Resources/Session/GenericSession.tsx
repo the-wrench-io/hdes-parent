@@ -4,11 +4,16 @@ import { Backend } from '../Backend';
 
 class GenericData implements Session.Data {
   private _projects: Backend.ProjectResource[];
+  private _heads: Backend.HeadResource[];
   private _snapshot: Backend.Snapshot; 
   
-  constructor(projects?: Backend.ProjectResource[], snapshot?: Backend.Snapshot) {
+  constructor(projects?: Backend.ProjectResource[], snapshot?: Backend.Snapshot, heads?: Backend.HeadResource[]) {
     this._snapshot = snapshot ? snapshot : {};
     this._projects = projects ? projects : [];
+    this._heads = heads ? heads : [];
+  }
+  get heads() : Backend.HeadResource[] {
+    return this._heads;
   }
   get snapshot() : Backend.Snapshot {
     return this._snapshot;
@@ -25,8 +30,8 @@ class GenericInstance implements Session.InstanceMutator {
   private _dialogId?: string;
   private _search;
   private _data: Session.Data;
-  private _saved: Backend.Commit[];
-  private _deleted: Backend.Commit[];
+  private _saved: Backend.AnyResource[];
+  private _deleted: Backend.AnyResource[];
   private _errors: Backend.ServerError[];
   
   constructor(
@@ -35,8 +40,8 @@ class GenericInstance implements Session.InstanceMutator {
     dialogId?: string, 
     search?: string, 
     data?: Session.Data,
-    saved?: Backend.Commit[],
-    deleted?: Backend.Commit[],
+    saved?: Backend.AnyResource[],
+    deleted?: Backend.AnyResource[],
     errors?: Backend.ServerError[]) {
       
     this._tabs = tabs ? tabs : [];
@@ -63,10 +68,10 @@ class GenericInstance implements Session.InstanceMutator {
   get dialogId() {
     return this._dialogId;
   }
-  get saved(): readonly Backend.Commit[] {
+  get saved(): readonly Backend.AnyResource[] {
     return this._saved;
   }
-  get deleted(): readonly Backend.Commit[] {
+  get deleted(): readonly Backend.AnyResource[] {
     return this._deleted;
   }
   get errors(): readonly Backend.ServerError[] {
@@ -81,12 +86,12 @@ class GenericInstance implements Session.InstanceMutator {
     errors.push(newError);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, this._deleted, errors);
   }
-  withSaved(newResource: Backend.Commit): Session.InstanceMutator {
+  withSaved(newResource: Backend.AnyResource): Session.InstanceMutator {
     const saved = [...this._saved];
     saved.push(newResource);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, saved, this._deleted, this._errors);
   }
-  withDeleted(deletedResource: Backend.Commit): Session.InstanceMutator {
+  withDeleted(deletedResource: Backend.AnyResource): Session.InstanceMutator {
     const deleted = [...this._deleted];
     deleted.push(deletedResource);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, deleted, this._errors);
@@ -94,7 +99,8 @@ class GenericInstance implements Session.InstanceMutator {
   withData(init: Session.DataInit): Session.InstanceMutator {
     const snapshot = init.snapshot ? init.snapshot : this._data.snapshot;
     const projects = init.projects ? init.projects : this._data.projects;
-    const newData: Session.Data = new GenericData([...projects], snapshot);
+    const heads = init.heads ? init.heads : this._data.heads;
+    const newData: Session.Data = new GenericData([...projects], snapshot, [...heads]);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, newData, this._saved, this._deleted, this._errors);
   }
   withSearch(search?: string): Session.InstanceMutator {

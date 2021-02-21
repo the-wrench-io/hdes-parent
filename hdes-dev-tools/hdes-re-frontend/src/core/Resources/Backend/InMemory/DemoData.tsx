@@ -68,7 +68,7 @@ const createProjectHeadState = (project: Backend.Project, heads: Record<string, 
     const diff = headCommits.length - mainCommits.length;
     const commits = Math.abs(diff);
     const type = diff === 0 ? 'same' : (diff > 0 ? 'ahead' : 'behind');
-    result[head.name] = { head: head.name, commits, type };
+    result[head.name] = { head: head.name, id: head.id, commits, type };
   }
   
   return result;

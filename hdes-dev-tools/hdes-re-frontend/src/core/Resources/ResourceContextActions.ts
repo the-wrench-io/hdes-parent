@@ -14,8 +14,8 @@ interface ResourceContextActions {
   handleTabAdd(newItem: Session.Tab<any>): void;
   handleTabChange(tabIndex: number): void;
   handleTabClose(tab: Session.Tab<any>): void;
-  handleResourceSaved(saved: Backend.Commit): void;
-  handleResourceDeleted(deleted: Backend.Commit): void;
+  handleResourceSaved(saved: Backend.AnyResource): void;
+  handleResourceDeleted(deleted: Backend.AnyResource): void;
   handleServerError(error: Backend.ServerError): void;
 }
 
@@ -29,8 +29,8 @@ const SessionActionBuilder = {
   removeTab: (removeTab: string): SessionReducerAction => ({ type: SessionReducerActionType.removeTab, removeTab}),
   changeTab: (changeTab: number): SessionReducerAction => ({ type: SessionReducerActionType.addTab, changeTab}),
   
-  setResourceSaved: (setResourceSaved: Backend.Commit): SessionReducerAction => ({ type: SessionReducerActionType.setResourceSaved, setResourceSaved }),
-  setResourceDeleted: (setResourceDeleted: Backend.Commit): SessionReducerAction => ({ type: SessionReducerActionType.setResourceDeleted, setResourceDeleted }), 
+  setResourceSaved: (setResourceSaved: Backend.AnyResource): SessionReducerAction => ({ type: SessionReducerActionType.setResourceSaved, setResourceSaved }),
+  setResourceDeleted: (setResourceDeleted: Backend.AnyResource): SessionReducerAction => ({ type: SessionReducerActionType.setResourceDeleted, setResourceDeleted }), 
   setServerError: (setServerError: Backend.ServerError): SessionReducerAction => ({ type: SessionReducerActionType.setServerError, setServerError }),
   
   setTabData: (id: string, updateCommand: (oldData: any) => any): SessionReducerAction => ({
@@ -65,10 +65,10 @@ class GenericResourceContextActions implements ResourceContextActions {
   handleTabClose(tab: Session.Tab<any>) {
     this._sessionDispatch(SessionActionBuilder.removeTab(tab.id));
   }
-  handleResourceSaved(saved: Backend.Commit) {
+  handleResourceSaved(saved: Backend.AnyResource) {
     this._sessionDispatch(SessionActionBuilder.setResourceSaved(saved));
   }
-  handleResourceDeleted(deleted: Backend.Commit) {
+  handleResourceDeleted(deleted: Backend.AnyResource) {
     this._sessionDispatch(SessionActionBuilder.setResourceSaved(deleted));
   }
   handleServerError(error: Backend.ServerError) {

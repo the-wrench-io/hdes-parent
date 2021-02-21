@@ -1,13 +1,15 @@
 
 declare namespace Backend {
   
+  type AnyResource = Commit | Head | Project;
+  
   interface ServiceCallback<T> {
     onSuccess: (handle: (resource: T) => void) => void; 
   }
   
   interface ServiceListeners {
-    onSave: (saved: Commit) => void;
-    onDelete: (deleted: Commit) => void;
+    onSave: (saved: AnyResource) => void;
+    onDelete: (deleted: AnyResource) => void;
     onError: (error: ServerError) => void;
   }
   
@@ -27,7 +29,8 @@ declare namespace Backend {
   interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
   
   interface HeadService {
-    query: () => HeadQuery;    
+    query: () => HeadQuery;
+    delete: (value: Head) => ServiceCallback<Head>;    
   }
   
   interface HeadQuery extends ServiceCallback<HeadResource[]>{}
@@ -47,11 +50,14 @@ declare namespace Backend {
   interface ProjectResource {
     project: Project;
     heads: Record<string, Head>;
+    
+    // head name
     states: Record<string, ProjectHeadState>;
   }
   
   interface ProjectHeadState {
-    head: string;
+    id: string;
+    head: string; //head name
     commits: number; 
     type: "ahead" | "behind" | "same";
   }
@@ -90,6 +96,7 @@ declare namespace Backend {
     
     headers: {}
   }
+  
   
   interface ServerError {
     id: string,

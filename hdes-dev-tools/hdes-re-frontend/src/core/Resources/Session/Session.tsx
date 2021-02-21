@@ -15,11 +15,13 @@ declare namespace Session {
   
   interface Data {
     projects: readonly Backend.ProjectResource[];
+    heads: readonly Backend.HeadResource[];
     snapshot: Backend.Snapshot; 
   }
   
   interface DataInit { 
     projects?: Backend.ProjectResource[], 
+    heads?: Backend.HeadResource[], 
     snapshot?: Backend.Snapshot;
   }
   
@@ -30,8 +32,8 @@ declare namespace Session {
     data: Data;
 
     tabs: readonly Tab<any>[];
-    saved: readonly Backend.Commit[];
-    deleted: readonly Backend.Commit[];
+    saved: readonly Backend.AnyResource[];
+    deleted: readonly Backend.AnyResource[];
     errors: readonly Backend.ServerError[];
     
     findTab(newTabId: string): number | undefined;
@@ -40,8 +42,8 @@ declare namespace Session {
   
   interface InstanceMutator extends Instance {
     withErrors(newError: Backend.ServerError): InstanceMutator;
-    withSaved(newResource: Backend.Commit): InstanceMutator;
-    withDeleted(deletedResource: Backend.Commit): InstanceMutator;
+    withSaved(newResource: Backend.AnyResource): InstanceMutator;
+    withDeleted(deletedResource: Backend.AnyResource): InstanceMutator;
     
     withData(newData: DataInit): InstanceMutator;
     withSearch(keyword: string): InstanceMutator;

@@ -13,15 +13,15 @@ class InMemoryService implements Backend.Service {
   
   constructor() {
     console.log('creating demo service');
-    const onSave = (saved: Backend.Commit) => {
+    const onSave = (saved: Backend.AnyResource) => {
       this.listeners.onSave(saved);
     }
-    const onDelete = (deleted: Backend.Commit) => {
+    const onDelete = (deleted: Backend.AnyResource) => {
       this.listeners.onDelete(deleted);
     }
     
     const demoData = createDemoData();
-    this._store = new InMemoryStore(demoData.projects, demoData.heads);
+    this._store = new InMemoryStore(onSave, onDelete, demoData.projects, demoData.heads);
     this._snapshots = {};
     this._projects = new InMemoryProjectService(this._store);
     this._heads = new InMemoryHeadService(this._store);
@@ -87,6 +87,14 @@ class InMemoryHeadService implements Backend.HeadService {
   query() {
     return new InMemoryHeadQuery(this.store);
   }
+  delete(head: Backend.Head) {
+    const { store } = this;
+    return {  
+      onSuccess(handle: (head: Backend.Head) => void) {
+        handle(store.deleteHead(head));
+      }
+    }
+  } 
 }
 
 class InMemoryHeadQuery implements Backend.HeadQuery {
@@ -106,13 +114,23 @@ class InMemoryHeadQuery implements Backend.HeadQuery {
 interface Store {
   projects: Backend.ProjectResource[];
   heads: Backend.HeadResource[];
+  deleteHead(head: Backend.Head): Backend.Head;
 }
 
 class InMemoryStore implements Store {
   private _projects: Backend.ProjectResource[];
   private _heads: Backend.HeadResource[];
+  private _onSave: (resource: Backend.AnyResource) => void;
+  private _onDelete: (resource: Backend.AnyResource) => void;
   
-  constructor(projects: Backend.ProjectResource[], heads: Backend.HeadResource[]) {
+  constructor(
+    onSave: (resource: Backend.AnyResource) => void,
+    onDelete: (resource: Backend.AnyResource) => void, 
+    projects: Backend.ProjectResource[],
+    heads: Backend.HeadResource[]) {
+    
+    this._onSave = onSave;
+    this._onDelete = onDelete;
     this._projects = projects;
     this._heads = heads;
   }
@@ -122,6 +140,36 @@ class InMemoryStore implements Store {
   }
   get heads() {
     return this._heads;
+  }
+  deleteHead(target: Backend.Head) {
+    const newProjects: Backend.ProjectResource[] = []
+    for(const project of this._projects) {
+      const newHeads: Record<string, Backend.Head> = {};
+      const newStates: Record<string, Backend.ProjectHeadState> = {};
+      
+      for(const head of Object.values(project.heads)){
+        if(head.id !== target.id) {
+          newHeads[head.name] = head;
+        }
+      }
+      for(const state of Object.values(project.states)){
+        if(state.head !== target.id) {
+          newStates[state.head] = state;
+        }
+      }      
+      const newProject: Backend.ProjectResource = { 
+        project: project.project,
+        heads: newHeads,
+        states: newStates,
+      }
+      newProjects.push(newProject);
+    }
+    
+    this._heads = [...this._heads.filter(h => h.head.id != target.id)];
+    this._projects = newProjects;
+    
+    this._onDelete(target);
+    return target;
   }
 }
 

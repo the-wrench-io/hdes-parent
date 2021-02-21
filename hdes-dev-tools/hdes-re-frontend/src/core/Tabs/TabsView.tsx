@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
   },
   close: {
     marginBottom: 'unset !important',
-    padding: '0px'
+    padding: 'unset !important'
   },
   closeSpacing: {
     flexGrow: 1
@@ -57,10 +57,8 @@ const TabsView: React.FC<TabsViewProps> = ({}) => {
       { tabs.map((tab, index) => (<Tab key={index} value={index} 
         classes={{wrapper: classes.tab, labelIcon: classes.tabLabel}}
         icon={(<>
-          <IconButton className={classes.close} onClick={(e) => handleTabClose(e, index)} >
-            <CloseIcon color="disabled" className={classes.closeIcon}/>
-          </IconButton>
-          <span className={classes.closeSpacing}></span></>)} 
+            <CloseIcon color="disabled" className={classes.closeIcon} onClick={(e) => handleTabClose(e, index)}/>
+            <span className={classes.closeSpacing}></span></>)} 
         label={tab.label} />)) }
     </Tabs>
   );

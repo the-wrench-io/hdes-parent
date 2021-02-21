@@ -10,6 +10,7 @@ import Tooltip from '@material-ui/core/Tooltip';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 
 import { Backend, Resources } from '../Resources';
+import HeadDeleteDialog from './HeadDeleteDialog';
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -24,24 +25,24 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const createHeadDesc = (project: Backend.ProjectResource, head: Backend.Head): React.ReactNode[] => {
+const createHeadDesc = (project: Backend.ProjectResource, head: Backend.Head): React.ReactNode => {
+  
   const headState = project.states[head.name];
-  const stateText: React.ReactNode[] = [];
   if(head.name === 'main') {
     const ahead = Object.values(project.states)
       .filter(s => s.type === 'ahead')
       .map(s => `${s.head} by ${s.commits}`);
     if(ahead.length > 0) {
-      stateText.push(<span>Main branch is behind of: {ahead.join(", ")} commits</span>);
+      return (<span>Main branch is behind of: {ahead.join(", ")} commits</span>);
     }
   } else if(headState.type === 'same') {
-    stateText.push(<span>Same assets as in main</span>);
+    return (<span>Same assets as in main</span>);
   } else if(headState.type === 'behind') {
-    stateText.push(<span>Assets are behind of main by: {headState.commits} commits</span>);
+    return (<span>Assets are behind of main by: {headState.commits} commits</span>);
   } else {
-    stateText.push(<span>Assets are ahead of main by: {headState.commits} commits</span>);
+    return (<span>Assets are ahead of main by: {headState.commits} commits</span>);
   }
-  return stateText; 
+  return null;
 }
 
 
@@ -53,9 +54,11 @@ interface HeadViewProps {
 const HeadView: React.FC<HeadViewProps> = ({project, head}) => {
   const classes = useStyles();
   const { session } = React.useContext(Resources.Context);
+  const [open, setOpen] = React.useState(false);
   
-  
-  return (<ListItem className={classes.root}>
+  return (<>
+    <HeadDeleteDialog open={open} onClose={() => setOpen(false)} resource={{head, project}} />
+    <ListItem className={classes.root}>
       <ListItemAvatar>
         <Tooltip title={"Edit This Branch"}>
           <IconButton edge="end" aria-label="open">
@@ -67,12 +70,13 @@ const HeadView: React.FC<HeadViewProps> = ({project, head}) => {
       <ListItemSecondaryAction>
         { head.name === 'main' ? null : (
           <Tooltip title={"Delete This Branch"}>
-            <IconButton edge="end" aria-label="delete branch">
+            <IconButton edge="end" aria-label="delete branch" onClick={() => setOpen(true)}>
               <DeleteForeverIcon />
             </IconButton>
           </Tooltip>)}
       </ListItemSecondaryAction>
-    </ListItem>);
+    </ListItem>
+    </>);
 }
 
 export default HeadView;

@@ -18,8 +18,8 @@ interface SessionReducerAction {
   removeTab?: string;
   changeTab?: number;
   setServerError?: Backend.ServerError;
-  setResourceSaved?: Backend.Commit;
-  setResourceDeleted?: Backend.Commit;
+  setResourceSaved?: Backend.AnyResource;
+  setResourceDeleted?: Backend.AnyResource;
   setTabData?: {id: string, updateCommand: (oldData: any) => any};
 }
 
