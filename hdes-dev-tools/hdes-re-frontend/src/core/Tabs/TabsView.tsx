@@ -38,7 +38,7 @@ interface TabsViewProps {};
 const TabsView: React.FC<TabsViewProps> = ({}) => {
   const classes = useStyles();
 
-  const { session, setSession } = React.useContext(Resources.Context);
+  const { session, actions } = React.useContext(Resources.Context);
   
   const active = session.history.open;
   const tabs = session.tabs;
@@ -46,11 +46,11 @@ const TabsView: React.FC<TabsViewProps> = ({}) => {
   
 
   const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
-    setSession((session) => session.changeTab(newValue));
+    actions.handleTabChange(newValue);
   };
 
   const handleTabClose = (_event: React.ChangeEvent<{}>, newValue: number) => {
-    setSession((session) => session.removeTab(activeTab.id));
+    actions.handleTabClose(activeTab);
   };
     
   return (<Tabs value={active} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">

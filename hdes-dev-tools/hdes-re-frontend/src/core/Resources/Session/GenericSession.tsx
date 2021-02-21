@@ -19,7 +19,7 @@ class GenericData implements Session.Data {
 }
 
 
-class GenericInstance implements Session.Instance {  
+class GenericInstance implements Session.InstanceMutator {  
   private _tabs: Session.Tab<any>[];
   private _history: Session.History;
   private _dialogId?: string;
@@ -72,38 +72,38 @@ class GenericInstance implements Session.Instance {
   get errors(): readonly Backend.ServerError[] {
     return this._errors;
   }
-  private next(history: Session.History, tabs?: Session.Tab<any>[]): Session.Instance {
+  private next(history: Session.History, tabs?: Session.Tab<any>[]): Session.InstanceMutator {
     const newTabs = tabs ? tabs : this.tabs;
     return new GenericInstance([...newTabs], history, this.dialogId, this._search, this._data, this._saved, this._deleted, this._errors);
   }
-  withErrors(newError: Backend.ServerError): Session.Instance {
+  withErrors(newError: Backend.ServerError): Session.InstanceMutator {
     const errors = this._errors;
     errors.push(newError);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, this._deleted, errors);
   }
-  withSaved(newResource: Backend.Commit): Session.Instance {
+  withSaved(newResource: Backend.Commit): Session.InstanceMutator {
     const saved = [...this._saved];
     saved.push(newResource);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, saved, this._deleted, this._errors);
   }
-  withDeleted(deletedResource: Backend.Commit): Session.Instance {
+  withDeleted(deletedResource: Backend.Commit): Session.InstanceMutator {
     const deleted = [...this._deleted];
     deleted.push(deletedResource);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, deleted, this._errors);
   }
-  withData(init: Session.DataInit): Session.Instance {
+  withData(init: Session.DataInit): Session.InstanceMutator {
     const snapshot = init.snapshot ? init.snapshot : this._data.snapshot;
     const projects = init.projects ? init.projects : this._data.projects;
     const newData: Session.Data = new GenericData([...projects], snapshot);
     return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, newData, this._saved, this._deleted, this._errors);
   }
-  withSearch(search?: string): Session.Instance {
+  withSearch(search?: string): Session.InstanceMutator {
     return new GenericInstance(this._tabs, this._history, this._dialogId, search, this._data, this._saved, this._deleted, this._errors);
   }
-  withDialog(dialogId?: string): Session.Instance {
+  withDialog(dialogId?: string): Session.InstanceMutator {
     return new GenericInstance(this._tabs, this._history, dialogId, this._search, this._data, this._saved, this._deleted, this._errors);
   }  
-  withTabData(tabId: string, updateCommand: (oldData: any) => any): Session.Instance {
+  withTabData(tabId: string, updateCommand: (oldData: any) => any): Session.InstanceMutator {
     const tabs: Session.Tab<any>[] = [];
     for(const tab of this.tabs) {
       if(tabId === tab.id) {
@@ -114,7 +114,7 @@ class GenericInstance implements Session.Instance {
     }
     return this.next(this.history, tabs);
   }
-  withTab(newTabOrTabIndex: Session.Tab<any> | number): Session.Instance {
+  withTab(newTabOrTabIndex: Session.Tab<any> | number): Session.InstanceMutator {
     if(typeof newTabOrTabIndex === 'number') {
       const tabIndex = newTabOrTabIndex as number;
       return this.next({ previous: this.history, open: tabIndex });
@@ -150,7 +150,7 @@ class GenericInstance implements Session.Instance {
     console.error(this);
     throw new Error (`cant find tab: '${tabId}'`);
   }
-  deleteTab(tabId: string): Session.Instance {
+  deleteTab(tabId: string): Session.InstanceMutator {
     const tabs: Session.Tab<any>[] = [];
     for(const tab of this.tabs) {
       if(tabId !== tab.id) {

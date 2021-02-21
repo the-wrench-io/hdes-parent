@@ -1,15 +1,15 @@
 import { Backend } from '../Backend';
-import { Session } from './Session';
+import { Session } from '../Session';
 
-enum SessionActionType {
+enum SessionReducerActionType {
   addTab, removeTab, changeTab,
   setTabData, setDialog, setSearch, setData,
    
   setResourceSaved, setResourceDeleted, setServerError
 }
 
-interface SessionAction {
-  type: SessionActionType;
+interface SessionReducerAction {
+  type: SessionReducerActionType;
   
   setData?: Session.DataInit;
   setDialog?: string;
@@ -23,37 +23,16 @@ interface SessionAction {
   setTabData?: {id: string, updateCommand: (oldData: any) => any};
 }
 
-const sessionActions = {
-  setData: (setData: Session.DataInit) => ({ type: SessionActionType.setData, setData }),
-  addTab: (addTab: Session.Tab<any>) => ({ type: SessionActionType.addTab, addTab }),
-  removeTab: (removeTab: string) => ({ type: SessionActionType.removeTab, removeTab}),
-  changeTab: (changeTab: number) => ({ type: SessionActionType.addTab, changeTab}),
-  
-  setResourceSaved: (setResourceSaved: Backend.Commit) => ({ type: SessionActionType.setResourceSaved, setResourceSaved }),
-  setResourceDeleted: (setResourceDeleted: Backend.Commit) => ({ type: SessionActionType.setResourceDeleted, setResourceDeleted }), 
-  setServerError: (setServerError: Backend.ServerError) => ({ type: SessionActionType.setServerError, setServerError }),
-   
-  
-  setTabData: (id: string, updateCommand: (oldData: any) => any): SessionAction => ({
-    type: SessionActionType.setTabData, 
-    setTabData: {id, updateCommand}
-  }),
- 
-  setDialog: (setDialog?: string) => ({ type: SessionActionType.setDialog, setDialog}),
-  setSearch: (keyword: string, tab?: Session.Tab<any>) => ({ type: SessionActionType.setSearch, setSearch: { keyword, tab }}),
-}
-
-
-const sessionReducer = (state: Session.Instance, action: SessionAction): Session.Instance => {
+const SessionReducer = (state: Session.InstanceMutator, action: SessionReducerAction): Session.InstanceMutator => {
   switch (action.type) {
-    case SessionActionType.setData: {
+    case SessionReducerActionType.setData: {
       if(!action.setData) {
         console.error("Action data error", action);
         return state;
       }
       return state.withData(action.setData);
     }
-    case SessionActionType.addTab: {
+    case SessionReducerActionType.addTab: {
       if(action.addTab) {
         return state.withTab(action.addTab); 
       }
@@ -64,7 +43,7 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       return state;
     }
     
-    case SessionActionType.changeTab: {
+    case SessionReducerActionType.changeTab: {
       if(!action.changeTab) {
         console.error("Action data error", action);
         return state;
@@ -72,7 +51,7 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       return state.withTab(action.changeTab);
     }
     
-    case SessionActionType.removeTab: {
+    case SessionReducerActionType.removeTab: {
       if(!action.removeTab) {
         console.error("Action data error", action);
         return state;
@@ -80,7 +59,7 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       return state.deleteTab(action.removeTab);      
     }
     
-    case SessionActionType.setResourceSaved: {
+    case SessionReducerActionType.setResourceSaved: {
       if(!action.setResourceSaved) {
         console.error("Action data error", action);
         return state;
@@ -88,7 +67,7 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       return state.withSaved(action.setResourceSaved)    
     }
     
-    case SessionActionType.setResourceDeleted: {
+    case SessionReducerActionType.setResourceDeleted: {
       if(!action.setResourceDeleted) {
         console.error("Action data error", action);
         return state;
@@ -96,14 +75,14 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       return state.withDeleted(action.setResourceDeleted)    
     }
     
-    case SessionActionType.setServerError: {
+    case SessionReducerActionType.setServerError: {
       if(!action.setServerError) {
         console.error("Action data error", action);
         return state;
       }
       return state.withErrors(action.setServerError)    
     }    
-    case SessionActionType.setTabData: {
+    case SessionReducerActionType.setTabData: {
       if(!action.setTabData) {
         console.error("Action data error", action);
         return state;
@@ -111,11 +90,11 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
       return state.withTabData(action.setTabData.id, action.setTabData.updateCommand);
     }
     
-    case SessionActionType.setDialog: {
+    case SessionReducerActionType.setDialog: {
       return state.withDialog(action.setDialog)
     }
     
-    case SessionActionType.setSearch: {
+    case SessionReducerActionType.setSearch: {
       const search = action.setSearch;
       if(!search) {
         console.error("Action data error", action);
@@ -132,5 +111,5 @@ const sessionReducer = (state: Session.Instance, action: SessionAction): Session
   }
 }
 
-export type { SessionAction }
-export { sessionActions, sessionReducer };
+export type { SessionReducerAction }
+export { SessionReducer, SessionReducerActionType };

@@ -1,16 +1,13 @@
 import * as React from "react";
 import { Backend, InMemoryService } from './Backend';
-import { Session, createSession, 
-  sessionReducer, sessionActions, SessionAction,
-  serviceReducer, //serviceActions, ServiceAction
- } from './Session';
+import { Session, createSession } from './Session';
+import { SessionReducer, ServiceReducer } from './Reducers';
+import { ResourceContextActions, GenericResourceContextActions } from './ResourceContextActions'
 
 
 type ResourceContextType = {
-  service: Backend.Service;
   session: Session.Instance;
-  setSession: (command: (mutator: typeof sessionActions) => SessionAction) => void;
-  updates?: Date;
+  actions: ResourceContextActions;
 }
 
 const createService = (hdesconfig: Backend.ServerConfig | undefined) : Backend.Service => {
@@ -24,41 +21,31 @@ const startService = createService(window.hdesconfig);
 const startSession = createSession();
 
 const ResourceContext = React.createContext<ResourceContextType>({
-  service: startService,
   session: startSession,
-  setSession: (command) => console.log(command) 
+  actions: {} as ResourceContextActions
 });
 
 type ResourceProviderProps = {
   children: React.ReactNode
 };
 
-
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
-  const [session, sessionDispatch] = React.useReducer(sessionReducer, startSession);  
+  const [session, sessionDispatch] = React.useReducer(SessionReducer, startSession);
+  const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(sessionDispatch), [sessionDispatch]);
   
-  const [service] = React.useReducer(serviceReducer, startService.withListeners({
-    onSave: (saved: Backend.Commit) => {
-      sessionDispatch(sessionActions.setResourceSaved(saved))
-    },
-    onError: (error: Backend.ServerError) => {
-      sessionDispatch(sessionActions.setServerError(error))
-    },
-    onDelete: (deleted: Backend.Commit) => {
-      sessionDispatch(sessionActions.setResourceDeleted(deleted))
-    }
-  }));
+  const [service] = React.useReducer(ServiceReducer, React.useMemo(() => startService.withListeners({
+      onSave: (saved: Backend.Commit) => actions.handleResourceSaved(saved),
+      onError: (error: Backend.ServerError) => actions.handleServerError(error),
+      onDelete: (deleted: Backend.Commit) => actions.handleResourceDeleted(deleted)
+    }), [actions, startService]));
 
   React.useEffect(() => {
-    service.projects.query().onSuccess(projects => sessionDispatch(sessionActions.setData({projects})))
+    service.projects.query().onSuccess(projects => actions.handleData({projects}))
     
-  }, [sessionDispatch, service])
+  }, [actions, service])
   
   return (
-    <ResourceContext.Provider value={{
-      service: service, 
-      session, setSession: (command) => sessionDispatch(command(sessionActions))
-    }}>
+    <ResourceContext.Provider value={{ session, actions }}>
       {children}
     </ResourceContext.Provider>
   );

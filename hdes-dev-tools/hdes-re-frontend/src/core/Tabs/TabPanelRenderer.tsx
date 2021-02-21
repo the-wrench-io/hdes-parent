@@ -11,7 +11,7 @@ interface TabPanelRendererProps {
 
 
 const TabPanelRenderer: React.FC<TabPanelRendererProps> = ({plugins}) => {
-  const { session, setSession } = React.useContext(Resources.Context);
+  const { session } = React.useContext(Resources.Context);
   const tabs = session.tabs;
 
   if(tabs.length === 0) {

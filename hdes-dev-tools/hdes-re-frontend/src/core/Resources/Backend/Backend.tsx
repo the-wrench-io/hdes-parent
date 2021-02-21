@@ -47,11 +47,17 @@ declare namespace Backend {
   interface ProjectResource {
     project: Project;
     heads: Record<string, Head>;
+    states: Record<string, ProjectHeadState>;
+  }
+  
+  interface ProjectHeadState {
+    head: string;
+    commits: number; 
+    type: "ahead" | "behind" | "same";
   }
   
   interface HeadResource {
     head: Head;
-    state?: { commits: number, type: "ahead" | "behind" }
   }
   
   interface Head {

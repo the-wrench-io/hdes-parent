@@ -22,7 +22,9 @@ const createDemoData = (): {
   heads[test1.name] = test1;
   heads[test5.name] = test5;
   
-  projects.push({project, heads});
+  const states = createProjectHeadState(project, heads);
+  
+  projects.push({project, heads, states});
 }
 
 
@@ -41,7 +43,9 @@ const createDemoData = (): {
   heads[test1.name] = test1;
   heads[test5.name] = test5;
   
-  projects.push({project, heads});
+  const states = createProjectHeadState(project, heads);
+  
+  projects.push({project, heads, states});
 }
 
 
@@ -52,14 +56,24 @@ const createDemoData = (): {
 }
 
 const createHeadResource = (project: Backend.ProjectResource, head: Backend.Head): Backend.HeadResource =>{
-  
-  const main = project.heads['main'];
-  const mainCommits = (main as DemoHead).commits;
-  const headCommits = (head as DemoHead).commits;
-  const diff = headCommits.length - headCommits.length;
-
-  return { head, state: diff === 0 ? undefined : { commits: Math.abs(diff), type: diff < 0 ? 'ahead' : 'behind'}};
+  return { head };
 }
+
+const createProjectHeadState = (project: Backend.Project, heads: Record<string, Backend.Head>): Record<string, Backend.ProjectHeadState> => {
+  const result: Record<string, Backend.ProjectHeadState> = {};
+  const main = heads['main'];
+  const mainCommits = (main as DemoHead).commits;
+  for(const head of Object.values(heads)) {
+    const headCommits = (head as DemoHead).commits;
+    const diff = headCommits.length - mainCommits.length;
+    const commits = Math.abs(diff);
+    const type = diff === 0 ? 'same' : (diff > 0 ? 'ahead' : 'behind');
+    result[head.name] = { head: head.name, commits, type };
+  }
+  
+  return result;
+}
+
 
 const createHead = (name: string, commitCount: number) => {
   const commits: Backend.Commit[] = [];

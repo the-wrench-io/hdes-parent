@@ -31,11 +31,10 @@ const useStyles = makeStyles((theme) => ({
 function App() {
   const classes = useStyles();
 
-  const { session, setSession } = React.useContext(Resources.Context);
-  const handleSearch = (keyword: string) => setSession((session) => session.setSearch(keyword))
-  const handleAddTab = (newItem: Session.Tab<any>) => setSession((session) => session.addTab(newItem));
+  const { session, actions } = React.useContext(Resources.Context);
+
   
-  const listProjects = () => handleAddTab({id: 'static/projects', label: 'Projects' });
+  const listProjects = () => actions.handleTabAdd({id: 'static/projects', label: 'Projects' });
   
   const views = [
     { id: 'assets', label: 'View Assets', icon: <LibraryBooksIcon />, onClick: () => console.log("add resource") },
@@ -58,7 +57,7 @@ function App() {
     <Shell 
       tabs={{items: <Tabs />, panel: tabPanel}}
       views={views}
-      search={{ onChange: handleSearch }}
+      search={{ onChange: actions.handleSearch }}
       badges={[  ]}>
     </Shell>
   </React.Fragment>);
