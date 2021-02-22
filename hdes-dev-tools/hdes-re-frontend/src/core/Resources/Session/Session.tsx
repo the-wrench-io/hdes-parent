@@ -25,11 +25,17 @@ declare namespace Session {
     snapshot?: Backend.Snapshot;
   }
   
+  interface Workspace {
+    project: Backend.Project;
+    head: Backend.Head;
+  }
+  
   interface Instance {  
     history: History;
     dialogId?: string;
     search?: string;
     data: Data;
+    workspace?: Workspace;
 
     tabs: readonly Tab<any>[];
     saved: readonly Backend.AnyResource[];
