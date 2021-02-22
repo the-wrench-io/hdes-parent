@@ -34,8 +34,7 @@ const HeadMergeView: React.FC<HeadMergeViewProps> = ({project, head}) => {
   const handleMerge = () => service.merge.save(head).onSuccess(handleClose)
   
   const headState = project.states[head.name];
-    
-  
+
   const button = { icon: (<CallMergeIcon />), tooltip: "Merge This Branch To Main" };  
   const dialog = {
     title: (<span>Merge branch: '<i>{head.name}</i>' to <i>'main'</i></span>),
