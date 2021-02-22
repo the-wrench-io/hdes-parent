@@ -5,12 +5,14 @@ enum SessionReducerActionType {
   addTab, removeTab, changeTab,
   setTabData, setDialog, setSearch, setData,
    
-  setResourceSaved, setResourceDeleted, setServerError
+  setResourceSaved, setResourceDeleted, setServerError,
+  setWorkspace
 }
 
 interface SessionReducerAction {
   type: SessionReducerActionType;
   
+  setWorkspace?: Session.Workspace;
   setData?: Session.DataInit;
   setDialog?: string;
   setSearch?: { keyword?: string, tab?: Session.Tab<any> };
@@ -25,6 +27,13 @@ interface SessionReducerAction {
 
 const SessionReducer = (state: Session.InstanceMutator, action: SessionReducerAction): Session.InstanceMutator => {
   switch (action.type) {
+    case SessionReducerActionType.setWorkspace: {
+      if(!action.setWorkspace) {
+        console.error("Action data error", action);
+        return state;
+      }
+      return state.withWorkspace(action.setWorkspace);
+    }    
     case SessionReducerActionType.setData: {
       if(!action.setData) {
         console.error("Action data error", action);

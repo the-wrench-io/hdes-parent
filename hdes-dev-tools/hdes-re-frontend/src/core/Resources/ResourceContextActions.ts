@@ -9,6 +9,7 @@ import { Backend } from './Backend'
 
 
 interface ResourceContextActions {
+  handleWorkspace(newWorkspace: Session.Workspace): void;
   handleData(data: Session.DataInit): void;
   handleSearch(keyword: string): void;
   handleTabAdd(newItem: Session.Tab<any>): void;
@@ -24,6 +25,7 @@ const ServiceActionBuilder = {
 }
 
 const SessionActionBuilder = {
+  setWorkspace: (setWorkspace: Session.Workspace): SessionReducerAction => ({ type: SessionReducerActionType.setWorkspace, setWorkspace }),
   setData: (setData: Session.DataInit): SessionReducerAction => ({ type: SessionReducerActionType.setData, setData }),
   addTab: (addTab: Session.Tab<any>): SessionReducerAction => ({ type: SessionReducerActionType.addTab, addTab }),
   removeTab: (removeTab: string): SessionReducerAction => ({ type: SessionReducerActionType.removeTab, removeTab}),
@@ -50,6 +52,9 @@ class GenericResourceContextActions implements ResourceContextActions {
   constructor(session: React.Dispatch<SessionReducerAction>) {
     this._sessionDispatch = session;
   }
+  handleWorkspace(newWorkspace: Session.Workspace) {
+    this._sessionDispatch(SessionActionBuilder.setWorkspace(newWorkspace)) 
+  }  
   handleData(data: Session.DataInit) {
     this._sessionDispatch(SessionActionBuilder.setData(data)) 
   }  

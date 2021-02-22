@@ -51,6 +51,7 @@ declare namespace Session {
     withSaved(newResource: Backend.AnyResource): InstanceMutator;
     withDeleted(deletedResource: Backend.AnyResource): InstanceMutator;
     
+    withWorkspace(newWorkspace: Workspace): InstanceMutator;
     withData(newData: DataInit): InstanceMutator;
     withSearch(keyword: string): InstanceMutator;
     withDialog(dialogId?: string): InstanceMutator;
