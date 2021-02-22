@@ -5,12 +5,14 @@ import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListItemText from '@material-ui/core/ListItemText';
 import IconButton from '@material-ui/core/IconButton';
-import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRight';
 import Tooltip from '@material-ui/core/Tooltip';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
+import SubdirectoryArrowRightIcon from '@material-ui/icons/SubdirectoryArrowRight';
 
-import { Backend, Resources } from '../Resources';
-import HeadDeleteDialog from './HeadDeleteDialog';
+import { Backend } from '../Resources';
+import HeadDeleteView from './HeadDeleteView';
+import HeadMergeView from './HeadMergeView';
+import HeadDescView from './HeadDescView';
+
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -25,27 +27,6 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const createHeadDesc = (project: Backend.ProjectResource, head: Backend.Head): React.ReactNode => {
-  
-  const headState = project.states[head.name];
-  if(head.name === 'main') {
-    const ahead = Object.values(project.states)
-      .filter(s => s.type === 'ahead')
-      .map(s => `${s.head} by ${s.commits}`);
-    if(ahead.length > 0) {
-      return (<span>Main branch is behind of: {ahead.join(", ")} commits</span>);
-    }
-  } else if(headState.type === 'same') {
-    return (<span>Same assets as in main</span>);
-  } else if(headState.type === 'behind') {
-    return (<span>Assets are behind of main by: {headState.commits} commits</span>);
-  } else {
-    return (<span>Assets are ahead of main by: {headState.commits} commits</span>);
-  }
-  return null;
-}
-
-
 interface HeadViewProps {
   project: Backend.ProjectResource,
   head: Backend.Head,
@@ -53,11 +34,14 @@ interface HeadViewProps {
 
 const HeadView: React.FC<HeadViewProps> = ({project, head}) => {
   const classes = useStyles();
-  const { session } = React.useContext(Resources.Context);
-  const [open, setOpen] = React.useState(false);
+  const secondaryActions: React.ReactChild[] = [];
+  
+  if(head.name !== 'main') {
+    secondaryActions.push(<HeadDeleteView project={project} head={head}/>);
+    secondaryActions.push(<HeadMergeView project={project} head={head}/>); 
+  }
   
   return (<>
-    <HeadDeleteDialog open={open} onClose={() => setOpen(false)} resource={{head, project}} />
     <ListItem className={classes.root}>
       <ListItemAvatar>
         <Tooltip title={"Edit This Branch"}>
@@ -66,14 +50,9 @@ const HeadView: React.FC<HeadViewProps> = ({project, head}) => {
           </IconButton>
         </Tooltip>
       </ListItemAvatar>
-      <ListItemText primary={head.name} secondary={createHeadDesc(project, head)} />
+      <ListItemText primary={head.name} secondary={<HeadDescView project={project} head={head} />} />
       <ListItemSecondaryAction>
-        { head.name === 'main' ? null : (
-          <Tooltip title={"Delete This Branch"}>
-            <IconButton edge="end" aria-label="delete branch" onClick={() => setOpen(true)}>
-              <DeleteForeverIcon />
-            </IconButton>
-          </Tooltip>)}
+        { secondaryActions.map((e, index) => <React.Fragment key={index}>{e}</React.Fragment>)}
       </ListItemSecondaryAction>
     </ListItem>
     </>);

@@ -18,6 +18,8 @@ declare namespace Backend {
     commits: CommitService;
     snapshots: SnapshotService;
     heads: HeadService;
+    merge: MergeService;
+    
     listeners: ServiceListeners;
     withListeners: (listeners: ServiceListeners) => Service;
   }
@@ -32,9 +34,12 @@ declare namespace Backend {
     query: () => HeadQuery;
     delete: (value: Head) => ServiceCallback<Head>;    
   }
+
+  interface MergeService {
+    save: (value: Head) => ServiceCallback<Head>;    
+  }
   
   interface HeadQuery extends ServiceCallback<HeadResource[]>{}
-  
   
   
   
