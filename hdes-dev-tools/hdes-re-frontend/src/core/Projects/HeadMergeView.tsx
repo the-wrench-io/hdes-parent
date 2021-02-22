@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createStyles, Theme, withStyles, WithStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 
@@ -32,10 +32,12 @@ const HeadMergeView: React.FC<HeadMergeViewProps> = ({project, head}) => {
 
   const handleClose = () => setOpen(false);
   const handleMerge = () => service.merge.save(head).onSuccess(handleClose)
-  
-  const headState = project.states[head.name];
 
-  const button = { icon: (<CallMergeIcon />), tooltip: "Merge This Branch To Main" };  
+  const headState = project.states[head.name];  
+  const disabled = headState.type !== 'ahead';
+
+
+  const button = { icon: (<CallMergeIcon />), tooltip: disabled ? "Can't merge branch that is behind of main": "Merge this branch to main" };  
   const dialog = {
     title: (<span>Merge branch: '<i>{head.name}</i>' to <i>'main'</i></span>),
     content: (<React.Fragment>
@@ -50,7 +52,7 @@ const HeadMergeView: React.FC<HeadMergeViewProps> = ({project, head}) => {
     actions: (<Button onClick={handleMerge} color="primary">Merge</Button>)
   }
   
-  return (<IconButtonDialog disabled={headState.type !== 'ahead'} button={button} dialog={dialog} state={{open, setOpen}}/>)
+  return (<IconButtonDialog disabled={disabled} button={button} dialog={dialog} state={{open, setOpen}}/>)
 }
 
 export default HeadMergeView;

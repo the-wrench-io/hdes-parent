@@ -184,7 +184,7 @@ class InMemoryStore implements Store {
       newProjects.push(newProject);
     }
     
-    this._heads = [...this._heads.filter(h => h.head.id != target.id)];
+    this._heads = [...this._heads.filter(h => h.head.id !== target.id)];
     this._projects = newProjects;
     
     this._onDelete(target);

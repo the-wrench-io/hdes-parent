@@ -1,8 +1,7 @@
 import * as React from "react";
 
 import { 
-  SessionReducerAction, SessionReducerActionType, 
-  ServiceReducerAction, ServiceReducerActionType } from './Reducers'
+  SessionReducerAction, SessionReducerActionType } from './Reducers'
 import { Session } from './Session'
 import { Backend } from './Backend'
 
@@ -18,10 +17,6 @@ interface ResourceContextActions {
   handleResourceSaved(saved: Backend.AnyResource): void;
   handleResourceDeleted(deleted: Backend.AnyResource): void;
   handleServerError(error: Backend.ServerError): void;
-}
-
-const ServiceActionBuilder = {
-  setData: (setListeners: Backend.ServiceListeners) => ({ type: ServiceReducerActionType.setListeners, setListeners }),
 }
 
 const SessionActionBuilder = {

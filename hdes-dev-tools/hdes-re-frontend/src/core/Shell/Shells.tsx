@@ -23,6 +23,7 @@ import ShellViews from './ShellViews';
 
 interface ShellProps {
   views: { 
+    id: string,
     label: string, 
     icon: React.ReactNode, 
     onClick: () => React.ReactNode | void, 

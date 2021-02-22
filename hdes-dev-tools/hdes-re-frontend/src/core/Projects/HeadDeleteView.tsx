@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createStyles, Theme, withStyles, WithStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, Theme, makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 
 import Divider from '@material-ui/core/Divider';

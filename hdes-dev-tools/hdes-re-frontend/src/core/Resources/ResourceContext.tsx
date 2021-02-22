@@ -35,16 +35,17 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   const [session, sessionDispatch] = React.useReducer(SessionReducer, startSession);
   const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(sessionDispatch), [sessionDispatch]);
   
-  const [service] = React.useReducer(ServiceReducer, React.useMemo(() => startService.withListeners({
-      onSave: (saved: Backend.AnyResource) => actions.handleResourceSaved(saved),
-      onDelete: (deleted: Backend.AnyResource) => {
-        actions.handleResourceDeleted(deleted);
-        service.projects.query().onSuccess(projects => actions.handleData({projects}))
-        service.heads.query().onSuccess(heads => actions.handleData({heads}))
-        
-      },
-      onError: (error: Backend.ServerError) => actions.handleServerError(error),
-    }), [actions, startService]));
+  const listeners = {
+    onSave: (saved: Backend.AnyResource) => actions.handleResourceSaved(saved),
+    onDelete: (deleted: Backend.AnyResource) => {
+      actions.handleResourceDeleted(deleted);
+      service.projects.query().onSuccess(projects => actions.handleData({projects}))
+      service.heads.query().onSuccess(heads => actions.handleData({heads}))
+    },
+    onError: (error: Backend.ServerError) => actions.handleServerError(error),
+  };
+
+  const [service] = React.useReducer(ServiceReducer, startService.withListeners(listeners));
 
   React.useEffect(() => {
     service.projects.query().onSuccess(projects => actions.handleData({projects}))

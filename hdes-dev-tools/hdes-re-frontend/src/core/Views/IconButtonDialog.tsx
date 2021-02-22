@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { createStyles, Theme, withStyles, WithStyles, makeStyles } from '@material-ui/core/styles';
+import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import MuiDialogTitle from '@material-ui/core/DialogTitle';
@@ -83,10 +83,10 @@ const IconButtonDialog: React.FC<IconButtonDialogProps> = ({disabled, button, di
   const handleClose = () => state.setOpen(false);
   
   return (<>
-    <Tooltip title={button.tooltip}>
+    <Tooltip title={button.tooltip}><span>
       <IconButton edge="end" aria-label={button.tooltip} onClick={handleOpen} disabled={disabled}>
         {button.icon}
-      </IconButton>
+      </IconButton></span>
     </Tooltip>
     <Dialog open={state.open} onClose={handleClose} aria-labelledby="form-dialog-title" maxWidth="sm" fullWidth>
       <DialogTitle id="form-dialog-title" onClose={handleClose}>{dialog.title}</DialogTitle>

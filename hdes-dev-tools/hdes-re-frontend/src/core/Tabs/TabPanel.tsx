@@ -27,7 +27,7 @@ const Panel: React.FC<PanelProps> = ({ children, value, index, ...other }) => {
 interface TabPanelProps {
 };
 
-const TabPanel: React.FC<TabPanelProps> = ({}) => {
+const TabPanel: React.FC<TabPanelProps> = () => {
   const { session } = React.useContext(Resources.Context);
   const tabs = session.tabs;
   const active = session.history.open;

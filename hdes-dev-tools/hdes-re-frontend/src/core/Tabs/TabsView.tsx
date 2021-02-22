@@ -2,9 +2,7 @@ import React from 'react';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 import CloseIcon from '@material-ui/icons/Close';
-import IconButton from '@material-ui/core/IconButton';
 import { makeStyles } from '@material-ui/core/styles';
-
 
 import { Resources } from '../Resources';
 
@@ -35,7 +33,7 @@ const useStyles = makeStyles((theme) => ({
 interface TabsViewProps {};
 
 
-const TabsView: React.FC<TabsViewProps> = ({}) => {
+const TabsView: React.FC<TabsViewProps> = () => {
   const classes = useStyles();
 
   const { session, actions } = React.useContext(Resources.Context);
