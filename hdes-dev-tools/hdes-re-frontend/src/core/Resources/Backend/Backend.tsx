@@ -29,48 +29,53 @@ declare namespace Backend {
   interface ProjectService {
     query: () => ProjectQuery;    
   }
-  
-  interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
-  
   interface HeadService {
     query: () => HeadQuery;
     delete: (value: Head) => ServiceCallback<Head>;    
   }
-
   interface MergeService {
-    save: (value: Head) => ServiceCallback<Head>;    
+    save: (value: Head) => ServiceCallback<Head>;
   }
-  
-  interface HeadQuery extends ServiceCallback<HeadResource[]>{}
-  
-  
-  
-  interface CommitService {
-    
-  }
-  
   interface SnapshotService {
-    
+    query: (head: Head) => SnapshotQuery;
   }
+  interface CommitService {
+    save: (changes: Asset[]) => ServiceCallback<SnapshotResource>;
+  }
+  
+  interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
+  interface HeadQuery extends ServiceCallback<HeadResource[]>{}  
+  interface SnapshotQuery extends ServiceCallback<SnapshotResource>{}
 
+  interface SnapshotResource {
+    head: Head;
+    blobs: Record<string, Asset>;       // name - asset
+    ast: Record<string, BodyNode>;      // asset name - ast
+    errors: Record<string, ErrorNode>;  // name name - error
+  }
   
   interface ProjectResource {
     project: Project;
     heads: Record<string, Head>;
     
     // head name
-    states: Record<string, ProjectHeadState>;
+    states: Record<string, HeadState>;
+  }
+  interface HeadResource {
+    head: Head;
   }
   
-  interface ProjectHeadState {
+  interface Asset {
+    id: string;
+    name: string;
+    src: string; 
+  }
+
+  interface HeadState {
     id: string;
     head: string; //head name
     commits: number; 
     type: "ahead" | "behind" | "same";
-  }
-  
-  interface HeadResource {
-    head: Head;
   }
   
   interface Head {
@@ -78,36 +83,40 @@ declare namespace Backend {
     name: string;
     commit: Commit;
   }
-  
+
   interface Project {
     id: string;
     name: string;
   }
-  
-  
-  interface Snapshot {
-    
-  }
-  
+
   interface Commit {
     id: string;
     author: string;
     dateTime: Date | number[];
   }
-  
+
   interface ServerConfig {
     ctx: string;    
     projects: string;
     commits: string;
     snapshots: string;
-    
-    headers: {}
+    headers: {};
   }
-  
-  
+
   interface ServerError {
     id: string,
     messages: { code: string, value: string}[]
+  }
+
+  interface ErrorNode {
+    id: string;
+    messages: {}[];
+  }
+
+  interface AstNode {
+  }
+
+  interface BodyNode extends AstNode {
   }
 }
 export default Backend;

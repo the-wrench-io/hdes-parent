@@ -197,8 +197,8 @@ class InMemoryStore implements Store {
   }
 }
 
-const createProjectHeadState = (heads: Record<string, Backend.Head>): Record<string, Backend.ProjectHeadState> => {
-  const result: Record<string, Backend.ProjectHeadState> = {};
+const createProjectHeadState = (heads: Record<string, Backend.Head>): Record<string, Backend.HeadState> => {
+  const result: Record<string, Backend.HeadState> = {};
   const main = heads['main'];
   const mainCommits = (main as DemoHead).commits;
   for(const head of Object.values(heads)) {
