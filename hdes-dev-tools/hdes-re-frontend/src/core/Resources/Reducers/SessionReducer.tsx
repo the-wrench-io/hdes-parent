@@ -6,12 +6,13 @@ enum SessionReducerActionType {
   setTabData, setDialog, setLink, setSearch, setData,
    
   setResourceSaved, setResourceDeleted, setServerError,
-  setWorkspace
+  setWorkspace, setListeners
 }
 
 interface SessionReducerAction {
   type: SessionReducerActionType;
   
+  setListeners?: Session.SessionListeners,
   setWorkspace?: Session.Workspace;
   setData?: Session.DataInit;
   setDialog?: string;
@@ -34,6 +35,13 @@ const SessionReducer = (state: Session.InstanceMutator, action: SessionReducerAc
         return state;
       }
       return state.withWorkspace(action.setWorkspace);
+    }    
+    case SessionReducerActionType.setListeners: {
+      if(!action.setListeners) {
+        console.error("Action data error", action);
+        return state;
+      }
+      return state.withListeners(action.setListeners);
     }    
     case SessionReducerActionType.setData: {
       if(!action.setData) {

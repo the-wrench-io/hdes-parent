@@ -43,7 +43,7 @@ function App() {
     { id: 'reload',     label: 'Reload', icon: <CachedIcon />, onClick: () => console.log("Merge") },
   ];
   
-  return (<React.Fragment>
+  return (
     <Shell tabs={<Tabs />} links={links}
       search={{ onChange: actions.handleSearch }}
       badges={[  ]}>
@@ -52,8 +52,7 @@ function App() {
         { id: projectsId, view: <ProjectsView setWorkspace={setWorkspace} /> },
         { view: <AssetsView />}
       ]}/>
-    </Shell>
-  </React.Fragment>);
+    </Shell>);
 }
 
 export default App;

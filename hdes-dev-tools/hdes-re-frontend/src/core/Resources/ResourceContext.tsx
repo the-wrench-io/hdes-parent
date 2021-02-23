@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Backend, InMemoryService } from './Backend';
 import { Session, createSession } from './Session';
-import { SessionReducer, ServiceReducer } from './Reducers';
+import { SessionReducer, ServiceReducer, SessionReducerActionType, ServiceReducerActionType } from './Reducers';
 import { ResourceContextActions, GenericResourceContextActions } from './ResourceContextActions'
 
 
@@ -18,12 +18,14 @@ const createService = (hdesconfig: Backend.ServerConfig | undefined) : Backend.S
   return new InMemoryService();
 }
 
-const startService = createService(window.hdesconfig);
-const startSession = createSession();
+const init = {
+  session: createSession(),
+  service: createService(window.hdesconfig),
+}
 
 const ResourceContext = React.createContext<ResourceContextType>({
-  session: startSession,
-  service: startService,
+  session: init.session,
+  service: init.service,
   actions: {} as ResourceContextActions,
 });
 
@@ -32,32 +34,37 @@ type ResourceProviderProps = {
 };
 
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
-  console.log("Context provider init");
-  
-  const serviceListeners = {
-    onSave: (saved: Backend.AnyResource) => actions.handleResourceSaved(saved),
-    onDelete: (deleted: Backend.AnyResource) => {
-      actions.handleResourceDeleted(deleted);
-      service.projects.query().onSuccess(projects => actions.handleData({projects}))
-      service.heads.query().onSuccess(heads => actions.handleData({heads}))
-    },
-    onError: (error: Backend.ServerError) => actions.handleServerError(error),
-  };
-  const sessionListeners: Session.SessionListeners = {
-    onWorkspace: (workspace: Session.Workspace) => {
-      //console.log("load workspace assets");
-    }
-  }
-  
-  const [session, sessionDispatch] = React.useReducer(SessionReducer, startSession.withListeners(sessionListeners));
-  const [service] = React.useReducer(ServiceReducer, startService.withListeners(serviceListeners));
+  const [session, sessionDispatch] = React.useReducer(SessionReducer, init.session);
+  const [service, serviceDispatch] = React.useReducer(ServiceReducer, init.service);
   const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(sessionDispatch), [sessionDispatch]);
-
+  
   React.useEffect(() => {
-    console.log("context effect")
+    console.log("init service listeners");
+    const listeners: Backend.ServiceListeners = {
+      id: "context-listeners",
+      onSave: (saved: Backend.AnyResource) => actions.handleResourceSaved(saved),
+      onDelete: (deleted: Backend.AnyResource) => {
+        actions.handleResourceDeleted(deleted);
+        service.projects.query().onSuccess(projects => actions.handleData({projects}))
+        service.heads.query().onSuccess(heads => actions.handleData({heads}))
+      },
+      onError: (error: Backend.ServerError) => actions.handleServerError(error),
+    };
+    
+    serviceDispatch({type: ServiceReducerActionType.setListeners, setListeners: listeners});
     service.projects.query().onSuccess(projects => actions.handleData({projects}))
     service.heads.query().onSuccess(heads => actions.handleData({heads}))
-  }, [actions, service])
+  }, [actions, service, serviceDispatch]);
+    
+  React.useEffect(() => {
+    console.log("init session listeners");
+    const listeners: Session.SessionListeners = {
+      onWorkspace: (workspace: Session.Workspace) => {
+        //console.log("load workspace assets");
+      }
+    }
+    sessionDispatch({type: SessionReducerActionType.setListeners, setListeners: listeners});
+  }, [actions, service, serviceDispatch]);
   
   return (
     <ResourceContext.Provider value={{ session, actions, service }}>

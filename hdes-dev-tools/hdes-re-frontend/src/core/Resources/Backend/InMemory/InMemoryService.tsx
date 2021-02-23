@@ -15,12 +15,21 @@ class InMemoryService implements Backend.Service {
   
   constructor() {
     console.log('creating demo service');
+    
+    const getId = () => {
+      return this._delegate.id;
+    }
+    
     this._listeners = {
+      get id() {
+        return getId();
+      },
       onSave: (saved: Backend.AnyResource, type: Backend.ResourceType) => this._delegate.onSave(saved, type),
       onDelete: (deleted: Backend.AnyResource, type: Backend.ResourceType) => this._delegate.onDelete(deleted, type),
       onError: (error: Backend.ServerError, type: Backend.ResourceType) => this._delegate.onError(error, type),
     }
     this._delegate = { 
+      id: 'log-listeners',
       onSave: (resource) => console.log("saved resources", resource),
       onDelete: (resource) => console.log("deleted resources", resource),
       onError: (error) => console.error("error", error), 
