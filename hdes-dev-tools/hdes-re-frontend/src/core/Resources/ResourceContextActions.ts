@@ -9,6 +9,7 @@ import { Backend } from './Backend'
 
 interface ResourceContextActions {
   handleWorkspace(newWorkspace: Session.Workspace): void;
+  handleLink(id?: string): void;
   handleData(data: Session.DataInit): void;
   handleSearch(keyword: string): void;
   handleTabAdd(newItem: Session.Tab<any>): void;
@@ -35,6 +36,7 @@ const SessionActionBuilder = {
     setTabData: {id, updateCommand}
   }),
  
+  setLink: (setLink?: string): SessionReducerAction => ({ type: SessionReducerActionType.setLink, setLink}),
   setDialog: (setDialog?: string): SessionReducerAction => ({ type: SessionReducerActionType.setDialog, setDialog}),
   setSearch: (keyword: string, tab?: Session.Tab<any>): SessionReducerAction => ({ type: SessionReducerActionType.setSearch, setSearch: { keyword, tab }}),
 }
@@ -55,6 +57,9 @@ class GenericResourceContextActions implements ResourceContextActions {
   }  
   handleSearch(keyword: string) {
     this._sessionDispatch(SessionActionBuilder.setSearch(keyword)) 
+  }  
+  handleLink(id: string) {
+    this._sessionDispatch(SessionActionBuilder.setLink(id)) 
   }
   handleTabAdd(newItem: Session.Tab<any>) {
     this._sessionDispatch(SessionActionBuilder.addTab(newItem)); 

@@ -36,6 +36,7 @@ declare namespace Session {
     search?: string;
     data: Data;
     workspace?: Workspace;
+    linkId?: string;
 
     tabs: readonly Tab<any>[];
     saved: readonly Backend.AnyResource[];
@@ -55,6 +56,7 @@ declare namespace Session {
     withData(newData: DataInit): InstanceMutator;
     withSearch(keyword: string): InstanceMutator;
     withDialog(dialogId?: string): InstanceMutator;
+    withLink(id?: string): InstanceMutator;
     withTabData(tabId: string, updateCommand: (oldData: any) => any): InstanceMutator;
     withTab(newTabOrTabIndex: Tab<any> | number): InstanceMutator;
     deleteTab(tabId: string): Session.InstanceMutator;

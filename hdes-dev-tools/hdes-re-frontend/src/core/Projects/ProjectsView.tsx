@@ -1,18 +1,19 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 
-import { Resources } from '../Resources';
+import { Resources, Session } from '../Resources';
 import ProjectView from './ProjectView';
 
 
 interface ProjectsViewProps {
+  setWorkspace: (newWorkspace: Session.Workspace) => void
 };
 
 
-const ProjectsView: React.FC<ProjectsViewProps> = () => {
+const ProjectsView: React.FC<ProjectsViewProps> = ({setWorkspace}) => {
   const { session } = React.useContext(Resources.Context);
 
-  const projects = session.data.projects.map(r => <ProjectView key={r.project.id} project={r}/>);
+  const projects = session.data.projects.map(r => <ProjectView key={r.project.id} project={r} setWorkspace={setWorkspace}/>);
 
   return (<div><List dense={true} disablePadding>{projects}</List></div>);
 }

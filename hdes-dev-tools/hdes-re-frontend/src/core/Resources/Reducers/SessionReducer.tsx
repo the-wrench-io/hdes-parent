@@ -3,7 +3,7 @@ import { Session } from '../Session';
 
 enum SessionReducerActionType {
   addTab, removeTab, changeTab,
-  setTabData, setDialog, setSearch, setData,
+  setTabData, setDialog, setLink, setSearch, setData,
    
   setResourceSaved, setResourceDeleted, setServerError,
   setWorkspace
@@ -15,6 +15,7 @@ interface SessionReducerAction {
   setWorkspace?: Session.Workspace;
   setData?: Session.DataInit;
   setDialog?: string;
+  setLink?: string;
   setSearch?: { keyword?: string, tab?: Session.Tab<any> };
   addTab?: Session.Tab<any>;
   removeTab?: string;
@@ -102,7 +103,9 @@ const SessionReducer = (state: Session.InstanceMutator, action: SessionReducerAc
     case SessionReducerActionType.setDialog: {
       return state.withDialog(action.setDialog)
     }
-    
+    case SessionReducerActionType.setLink: {
+      return state.withLink(action.setLink)
+    }
     case SessionReducerActionType.setSearch: {
       const search = action.setSearch;
       if(!search) {

@@ -32,49 +32,59 @@ interface ShellView {
 interface ShellLinksProps {
   open: boolean;
   children: ShellView[];
+  setOpen: (open: boolean) => void
 };
 
-type ActiveView = {index: number, view: ShellView} | undefined;
-
-const findActiveView = (session: Session.Instance, views: ShellView[]): ActiveView => {
-  
-  const openTab = session.tabs[session.history.open];
-  if(!openTab) {
-    return undefined;
-  }
-  let index = 0;
+const findActiveLink = (session: Session.Instance, views: ShellView[]): ShellView | undefined => {
   for(const view of views) {
-    if(view.id === openTab.id) {
-      return {index, view};
+    if(view.id === session.linkId) {
+      return view;
     }
-    index++;
   }
-  
   return undefined;
 }
 
-const ShellLinks: React.FC<ShellLinksProps> = ({children, open}) => {
+const ShellLinks: React.FC<ShellLinksProps> = ({children, open, setOpen}) => {
   const classes = useStyles();
-  const { session } = React.useContext(Resources.Context);
-  
-  const [ active, setActive ] = React.useState<ActiveView>();
+  const { session, actions } = React.useContext(Resources.Context);
+  const [ active, setActive ] = React.useState<string|undefined>();
   const [ view, setView ] = React.useState<React.ReactNode|undefined>();
 
   React.useEffect(() => {
-    if(!active) {
-      setActive(findActiveView(session, children));
+    if(!session.linkId) {
+      return;
     }
-  }, [active, session, children]) 
+    const link = findActiveLink(session, children);
+    if(!link) {
+      return;
+    }
 
+    const alreadyOpen = session.linkId === active;
+    if(alreadyOpen) {
+      return;
+    }
+    setActive(session.linkId);
+    const linkView = link.onClick();
+    if(linkView) {
+      setView(linkView);
+      setOpen(true);
+    }
+    
+  }, [active, setView, setActive, session, children, setOpen]) 
 
-  const handleOnClick = (index: number, view: ShellView) => {
-    const viewNode = view.onClick();
-    setActive({index, view});
-    setView(viewNode ? viewNode : undefined);
+  const handleOnClick = (link: ShellView) => {
+    const alreadyOpen = session.linkId === active;    
+    if(alreadyOpen && !view) {
+      const viewInTab = session.findTab(link.id);
+      if(viewInTab === undefined) {
+        actions.handleLink();
+      }
+    }  
+    actions.handleLink(link.id); 
   }
   
   const handleColor = (item: ShellView, index: number) => {
-    return active?.view.id === item.id && view ? "primary" : "inherit";
+    return active === item.id && view ? "primary" : "inherit";
   }
   
   return (<Grid container className={classes.root} spacing={0}>
@@ -83,7 +93,7 @@ const ShellLinks: React.FC<ShellLinksProps> = ({children, open}) => {
           { children.map((item, index) => (
             <Tooltip title={item.label} key={index}>
               <ListItem>
-                <IconButton disabled={item.enabled === false} color={handleColor(item, index)} onClick={() => handleOnClick(index, item)}> 
+                <IconButton disabled={item.enabled === false} color={handleColor(item, index)} onClick={() => handleOnClick(item)}> 
                   {item.icon}
                 </IconButton>
               </ListItem>
@@ -92,7 +102,7 @@ const ShellLinks: React.FC<ShellLinksProps> = ({children, open}) => {
         </List>
       </Grid>
       <Grid item xs={9}>
-        {open && view !== undefined ? (<>{view}</>) : null}
+        {open && view ? (<>{view}</>) : null}
       </Grid>
    </Grid> 
   );

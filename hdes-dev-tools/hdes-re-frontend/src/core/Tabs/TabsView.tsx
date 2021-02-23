@@ -42,7 +42,6 @@ const TabsView: React.FC<TabsViewProps> = () => {
   const tabs = session.tabs;
   const activeTab = session.tabs[active];
   
-
   const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
     actions.handleTabChange(newValue);
   };

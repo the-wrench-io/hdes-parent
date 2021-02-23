@@ -16,7 +16,7 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
-import { Backend } from '../Resources';
+import { Backend, Session } from '../Resources';
 import HeadView from './HeadView'
 
 
@@ -33,29 +33,32 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ProjectsViewProps {
   project: Backend.ProjectResource
+  setWorkspace: (newWorkspace: Session.Workspace) => void
 };
 
 
-const ProjectView: React.FC<ProjectsViewProps> = ({project}) => {
+const ProjectView: React.FC<ProjectsViewProps> = (props) => {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   
   const branches: React.ReactChild[] = [];
-  const heads = Object.values(project.heads);
+  const heads = Object.values(props.project.heads);
   const headSummary: React.ReactElement[] = [];
   
   let index = 1;
   for(const head of heads) {
+    const setWorkspace = () => props.setWorkspace({project: props.project.project, head});
+    
     const linkToHead = (
-      <Tooltip key={index + "-link"} title={`Edit: ${project.project.name}, branch: ${head.name}`}>
-        <Link component="button" variant="body2" onClick={() => { console.info("I'm a button."); }}>
+      <Tooltip key={index + "-link"} title={`Edit: ${props.project.project.name}, branch: ${head.name}`}>
+        <Link component="button" variant="body2" onClick={setWorkspace}>
           {head.name}
         </Link>
       </Tooltip>)
     headSummary.push(linkToHead);
 
     if(open) {
-      branches.push(<HeadView project={project} head={head}/>);
+      branches.push(<HeadView project={props.project} head={head} setWorkspace={setWorkspace}/>);
     } 
     
     if(heads.length > index++) {
@@ -64,13 +67,14 @@ const ProjectView: React.FC<ProjectsViewProps> = ({project}) => {
     }
   }
   
+  
   return (
     <div className={classes.root}>
       <ListItem>
         <ListItemAvatar>
           <Avatar><FolderIcon/></Avatar>
         </ListItemAvatar>
-        <ListItemText primary={project.project.name} secondary={<span>Contains {heads.length} branches: {headSummary}</span>} />
+        <ListItemText primary={props.project.project.name} secondary={<span>Contains {heads.length} branches: {headSummary}</span>} />
         <ListItemSecondaryAction>
           <Tooltip title={"Manage branches"}>
             <IconButton edge="end" aria-label="more-or-less" onClick={() => setOpen(!open)}>
@@ -79,7 +83,6 @@ const ProjectView: React.FC<ProjectsViewProps> = ({project}) => {
           </Tooltip>
         </ListItemSecondaryAction>
       </ListItem>
-      
       <Collapse in={open} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {branches.map((b, index) => <React.Fragment key={index}>{b}</React.Fragment>) }

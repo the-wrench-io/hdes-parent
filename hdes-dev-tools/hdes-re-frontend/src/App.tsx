@@ -7,29 +7,41 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
 import CachedIcon from '@material-ui/icons/Cached';
 
-import { Resources } from './core/Resources';
+import { Resources, Session } from './core/Resources';
 import { Tabs, TabPanel } from './core/Tabs';
 import { AssetsView } from './core/Assets';
 import { ProjectsView } from './core/Projects';
 import Shell from './core/Shell';
 
 
+const projectsId = 'static/projects';
+const assetsId = 'static/assets';
+
+
 function App() {
   const { actions, session } = React.useContext(Resources.Context);
   
-  const isWorkspace = session.workspace ? true : false;
+  const setWorkspace = (workspace: Session.Workspace) => {
+    const projectsTab = session.findTab(projectsId);
+    if(projectsTab !== undefined) {
+      actions.handleTabClose(session.tabs[projectsTab]);
+    }
+    actions.handleWorkspace(workspace)
+    actions.handleLink(assetsId);
+  }
   
-  const listProjects = () => actions.handleTabAdd({id: 'static/projects', label: 'Projects' });
+  const isWorkspace = session.workspace ? true : false;
+  const listProjects = () => actions.handleTabAdd({id: projectsId, label: 'Projects' });
+  
   const links = [
-    { id: 'assets', label: 'View Assets', icon: <LibraryBooksIcon />, onClick: () => console.log("add resource"), enabled: isWorkspace },
+    { id: assetsId, label: 'View Assets', icon: <LibraryBooksIcon />, onClick: () => (<span>show assets</span>), enabled: isWorkspace },
     { id: 'add-asset', label: 'Add Asset', icon: <LibraryAddIcon />, onClick: () => console.log("add resource"), enabled: isWorkspace },
     { id: 'branchs', label: 'Set Branch', icon: <AccountTreeIcon />, onClick: () => console.log("set branch"), enabled: isWorkspace },
     { id: 'merge', label: 'Merge To Main', icon: <CallMergeIcon />, onClick: () => console.log("Merge"), enabled: isWorkspace },
     
-    { id: 'static/projects', label: 'Projects', icon: <ViewQuiltIcon />, onClick: listProjects },
+    { id: projectsId, label: 'Projects', icon: <ViewQuiltIcon />, onClick: listProjects },
     { id: 'reload',     label: 'Reload', icon: <CachedIcon />, onClick: () => console.log("Merge") },
   ];
-
   
   return (<React.Fragment>
     <Shell tabs={<Tabs />} links={links}
@@ -37,7 +49,7 @@ function App() {
       badges={[  ]}>
       
       <TabPanel plugins={[
-        { id: 'static/projects', view: <ProjectsView /> },
+        { id: projectsId, view: <ProjectsView setWorkspace={setWorkspace} /> },
         { view: <AssetsView />}
       ]}/>
     </Shell>

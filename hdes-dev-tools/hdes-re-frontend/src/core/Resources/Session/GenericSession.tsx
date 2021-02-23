@@ -28,6 +28,7 @@ class GenericInstance implements Session.InstanceMutator {
   private _tabs: Session.Tab<any>[];
   private _history: Session.History;
   private _dialogId?: string;
+  private _linkId?: string;
   private _search;
   private _data: Session.Data;
   private _saved: Backend.AnyResource[];
@@ -38,7 +39,8 @@ class GenericInstance implements Session.InstanceMutator {
   constructor(
     tabs?: Session.Tab<any>[], 
     history?: Session.History, 
-    dialogId?: string, 
+    dialogId?: string,
+    linkId?: string,
     search?: string, 
     data?: Session.Data,
     saved?: Backend.AnyResource[],
@@ -49,12 +51,16 @@ class GenericInstance implements Session.InstanceMutator {
     this._tabs = tabs ? tabs : [];
     this._history = history ? history : { open: 0 };
     this._dialogId = dialogId;
+    this._linkId = linkId;
     this._search = search ? search : '';
     this._data = data ? data : new GenericData();
     this._saved = saved ? saved : [];
     this._deleted = deleted ? deleted : [];
     this._errors = errors ? errors : [];
     this._workspace = workspace;
+  }
+  get linkId() {
+    return this._linkId;
   }
   get data() {
     return this._data;
@@ -85,38 +91,41 @@ class GenericInstance implements Session.InstanceMutator {
   }
   private next(history: Session.History, tabs?: Session.Tab<any>[]): Session.InstanceMutator {
     const newTabs = tabs ? tabs : this.tabs;
-    return new GenericInstance([...newTabs], history, this.dialogId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance([...newTabs], history, this.dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }
   withWorkspace(workspace: Session.Workspace) {
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, this._deleted, this._errors, workspace);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, workspace);
   }
   withErrors(newError: Backend.ServerError): Session.InstanceMutator {
     const errors = this._errors;
     errors.push(newError);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, this._deleted, errors, this._workspace);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, errors, this._workspace);
   }
   withSaved(newResource: Backend.AnyResource): Session.InstanceMutator {
     const saved = [...this._saved];
     saved.push(newResource);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, saved, this._deleted, this._errors, this._workspace);
   }
   withDeleted(deletedResource: Backend.AnyResource): Session.InstanceMutator {
     const deleted = [...this._deleted];
     deleted.push(deletedResource);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, this._data, this._saved, deleted, this._errors, this._workspace);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, deleted, this._errors, this._workspace);
   }
   withData(init: Session.DataInit): Session.InstanceMutator {
     const snapshot = init.snapshot ? init.snapshot : this._data.snapshot;
     const projects = init.projects ? init.projects : this._data.projects;
     const heads = init.heads ? init.heads : this._data.heads;
     const newData: Session.Data = new GenericData([...projects], snapshot, [...heads]);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._search, newData, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, newData, this._saved, this._deleted, this._errors, this._workspace);
   }
   withSearch(search?: string): Session.InstanceMutator {
-    return new GenericInstance(this._tabs, this._history, this._dialogId, search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }
   withDialog(dialogId?: string): Session.InstanceMutator {
-    return new GenericInstance(this._tabs, this._history, dialogId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._tabs, this._history, dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+  }  
+  withLink(linkId?: string): Session.InstanceMutator {
+    return new GenericInstance(this._tabs, this._history, this._dialogId, linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }  
   withTabData(tabId: string, updateCommand: (oldData: any) => any): Session.InstanceMutator {
     const tabs: Session.Tab<any>[] = [];

@@ -30,9 +30,10 @@ const useStyles = makeStyles((theme: Theme) =>
 interface HeadViewProps {
   project: Backend.ProjectResource,
   head: Backend.Head,
+  setWorkspace: () => void;
 }
 
-const HeadView: React.FC<HeadViewProps> = ({project, head}) => {
+const HeadView: React.FC<HeadViewProps> = ({project, head, setWorkspace}) => {
   const classes = useStyles();
   const secondaryActions: React.ReactChild[] = [];
   
@@ -45,7 +46,7 @@ const HeadView: React.FC<HeadViewProps> = ({project, head}) => {
     <ListItem className={classes.root}>
       <ListItemAvatar>
         <Tooltip title={"Edit This Branch"}>
-          <IconButton edge="end" aria-label="open">
+          <IconButton edge="end" aria-label="open" onClick={setWorkspace}>
             <SubdirectoryArrowRightIcon color="primary" fontSize="small"/>
           </IconButton>
         </Tooltip>

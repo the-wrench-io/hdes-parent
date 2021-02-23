@@ -91,7 +91,7 @@ const Shell: React.FC<ShellProps> = ({links, tabs, search, badges, children}) =>
         </div>
 
         <div className={classes.views}>
-          <ShellLinks open={drawerOpen}>{links}</ShellLinks>
+          <ShellLinks open={drawerOpen} setOpen={setDrawerOpen}>{links}</ShellLinks>
         </div>
       </Drawer>
 
