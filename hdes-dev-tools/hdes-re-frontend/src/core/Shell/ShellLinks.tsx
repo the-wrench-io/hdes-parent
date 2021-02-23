@@ -24,11 +24,12 @@ const useStyles = makeStyles(() => ({
 interface ShellView {
   id: string;
   label: string; 
-  icon: React.ReactNode; 
-  onClick: () => React.ReactNode | void;   
+  icon: React.ReactNode;
+  enabled?: boolean, 
+  onClick: () => React.ReactNode | void;
 }
 
-interface ShellViewsProps {
+interface ShellLinksProps {
   open: boolean;
   children: ShellView[];
 };
@@ -52,7 +53,7 @@ const findActiveView = (session: Session.Instance, views: ShellView[]): ActiveVi
   return undefined;
 }
 
-const ShellViews: React.FC<ShellViewsProps> = ({children, open}) => {
+const ShellLinks: React.FC<ShellLinksProps> = ({children, open}) => {
   const classes = useStyles();
   const { session } = React.useContext(Resources.Context);
   
@@ -82,7 +83,7 @@ const ShellViews: React.FC<ShellViewsProps> = ({children, open}) => {
           { children.map((item, index) => (
             <Tooltip title={item.label} key={index}>
               <ListItem>
-                <IconButton color={handleColor(item, index)} onClick={() => handleOnClick(index, item)}> 
+                <IconButton disabled={item.enabled === false} color={handleColor(item, index)} onClick={() => handleOnClick(index, item)}> 
                   {item.icon}
                 </IconButton>
               </ListItem>
@@ -91,10 +92,10 @@ const ShellViews: React.FC<ShellViewsProps> = ({children, open}) => {
         </List>
       </Grid>
       <Grid item xs={9}>
-        {open ? (<>{view}</>) : null}
+        {open && view !== undefined ? (<>{view}</>) : null}
       </Grid>
    </Grid> 
   );
 }
 
-export default ShellViews;
+export default ShellLinks;

@@ -18,13 +18,14 @@ import SearchIcon from '@material-ui/icons/Search';
 
 import ShellStyles from './ShellStyles' 
 import ShellBadges from './ShellBadges';
-import ShellViews from './ShellViews';
+import ShellLinks from './ShellLinks';
 
 
 interface ShellProps {
-  views: { 
+  links: { 
     id: string,
     label: string, 
+    enabled?: boolean,
     icon: React.ReactNode, 
     onClick: () => React.ReactNode | void, 
   }[],
@@ -42,7 +43,7 @@ interface ShellProps {
   },
 };
 
-const Shell: React.FC<ShellProps> = ({views, tabs, search, badges}) => {
+const Shell: React.FC<ShellProps> = ({links, tabs, search, badges}) => {
   
   const classes = ShellStyles();
   const theme = useTheme();
@@ -92,7 +93,7 @@ const Shell: React.FC<ShellProps> = ({views, tabs, search, badges}) => {
         </div>
 
         <div className={classes.views}>
-          <ShellViews open={drawerOpen}>{views}</ShellViews>
+          <ShellLinks open={drawerOpen}>{links}</ShellLinks>
         </div>
       </Drawer>
 
