@@ -32,10 +32,9 @@ type ResourceProviderProps = {
 };
 
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
-  const [session, sessionDispatch] = React.useReducer(SessionReducer, startSession);
-  const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(sessionDispatch), [sessionDispatch]);
+  console.log("Context provider init");
   
-  const listeners = {
+  const serviceListeners = {
     onSave: (saved: Backend.AnyResource) => actions.handleResourceSaved(saved),
     onDelete: (deleted: Backend.AnyResource) => {
       actions.handleResourceDeleted(deleted);
@@ -44,12 +43,20 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
     },
     onError: (error: Backend.ServerError) => actions.handleServerError(error),
   };
-
-  const [service] = React.useReducer(ServiceReducer, startService.withListeners(listeners));
+  const sessionListeners: Session.SessionListeners = {
+    onWorkspace: (workspace: Session.Workspace) => {
+      //console.log("load workspace assets");
+    }
+  }
+  
+  const [session, sessionDispatch] = React.useReducer(SessionReducer, startSession.withListeners(sessionListeners));
+  const [service] = React.useReducer(ServiceReducer, startService.withListeners(serviceListeners));
+  const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(sessionDispatch), [sessionDispatch]);
 
   React.useEffect(() => {
+    console.log("context effect")
     service.projects.query().onSuccess(projects => actions.handleData({projects}))
-    
+    service.heads.query().onSuccess(heads => actions.handleData({heads}))
   }, [actions, service])
   
   return (

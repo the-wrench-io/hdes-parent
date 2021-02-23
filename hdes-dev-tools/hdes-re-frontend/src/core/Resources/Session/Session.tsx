@@ -30,6 +30,10 @@ declare namespace Session {
     head: Backend.Head;
   }
   
+  interface SessionListeners {
+    onWorkspace: (workspace: Workspace) => void;
+  }
+  
   interface Instance {  
     history: History;
     dialogId?: string;
@@ -48,6 +52,7 @@ declare namespace Session {
   }
   
   interface InstanceMutator extends Instance {
+    withListeners: (listeners: SessionListeners) => InstanceMutator;
     withErrors(newError: Backend.ServerError): InstanceMutator;
     withSaved(newResource: Backend.AnyResource): InstanceMutator;
     withDeleted(deletedResource: Backend.AnyResource): InstanceMutator;

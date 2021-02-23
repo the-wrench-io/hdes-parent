@@ -10,30 +10,29 @@ class InMemoryService implements Backend.Service {
   private _heads: Backend.HeadService;
   private _merge: Backend.MergeService;
   private _listeners: Backend.ServiceListeners;
+  private _delegate: Backend.ServiceListeners;
   private _store: Store;
   
   constructor() {
     console.log('creating demo service');
-    const onSave = (saved: Backend.AnyResource) => {
-      this.listeners.onSave(saved);
+    this._listeners = {
+      onSave: (saved: Backend.AnyResource, type: Backend.ResourceType) => this._delegate.onSave(saved, type),
+      onDelete: (deleted: Backend.AnyResource, type: Backend.ResourceType) => this._delegate.onDelete(deleted, type),
+      onError: (error: Backend.ServerError, type: Backend.ResourceType) => this._delegate.onError(error, type),
     }
-    const onDelete = (deleted: Backend.AnyResource) => {
-      this.listeners.onDelete(deleted);
-    }
-    
-    const demoData = createDemoData();
-    this._store = new InMemoryStore(onSave, onDelete, demoData.projects, demoData.heads);
-    this._snapshots = {};
-    this._projects = new InMemoryProjectService(this._store);
-    this._heads = new InMemoryHeadService(this._store);
-    this._merge = new InMemoryMergeService(this._store);
-    
-    this._commits = {};
-    this._listeners = { 
+    this._delegate = { 
       onSave: (resource) => console.log("saved resources", resource),
       onDelete: (resource) => console.log("deleted resources", resource),
       onError: (error) => console.error("error", error), 
     };
+    
+    const demoData = createDemoData();
+    this._store = new InMemoryStore(this._listeners, demoData.projects, demoData.heads);
+    this._snapshots = {};
+    this._projects = new InMemoryProjectService(this._store);
+    this._heads = new InMemoryHeadService(this._store);
+    this._merge = new InMemoryMergeService(this._store);
+    this._commits = {};
   }
 
   get projects() {
@@ -55,7 +54,7 @@ class InMemoryService implements Backend.Service {
     return this._listeners;
   }
   withListeners(listeners: Backend.ServiceListeners): Backend.Service {
-    this._listeners = listeners;
+    this._delegate = listeners;
     return this;
   }
 }
@@ -126,17 +125,14 @@ interface Store {
 class InMemoryStore implements Store {
   private _projects: Backend.ProjectResource[];
   private _heads: Backend.HeadResource[];
-  private _onSave: (resource: Backend.AnyResource) => void;
-  private _onDelete: (resource: Backend.AnyResource) => void;
+  private _listeners: Backend.ServiceListeners;
   
   constructor(
-    onSave: (resource: Backend.AnyResource) => void,
-    onDelete: (resource: Backend.AnyResource) => void, 
+    listeners: Backend.ServiceListeners, 
     projects: Backend.ProjectResource[],
     heads: Backend.HeadResource[]) {
     
-    this._onSave = onSave;
-    this._onDelete = onDelete;
+    this._listeners = listeners;
     this._projects = projects.map(p => {
       p.states = createProjectHeadState(p.heads);
       return p;
@@ -163,7 +159,7 @@ class InMemoryStore implements Store {
     project.states = createProjectHeadState(project.heads);
         
     this._projects = [...newProjects, project];
-    this._onSave(target);
+    this._listeners.onSave(target, "head");
     return target;  
   }
   deleteHead(target: Backend.Head) {
@@ -187,7 +183,7 @@ class InMemoryStore implements Store {
     this._heads = [...this._heads.filter(h => h.head.id !== target.id)];
     this._projects = newProjects;
     
-    this._onDelete(target);
+    this._listeners.onDelete(target, "head");
     return target;
   }
 }

@@ -35,8 +35,10 @@ class GenericInstance implements Session.InstanceMutator {
   private _deleted: Backend.AnyResource[];
   private _errors: Backend.ServerError[];
   private _workspace?: Session.Workspace;
+  private _listeners: Session.SessionListeners;
   
   constructor(
+    listeners: Session.SessionListeners,
     tabs?: Session.Tab<any>[], 
     history?: Session.History, 
     dialogId?: string,
@@ -47,7 +49,8 @@ class GenericInstance implements Session.InstanceMutator {
     deleted?: Backend.AnyResource[],
     errors?: Backend.ServerError[],
     workspace?: Session.Workspace) {
-      
+    
+    this._listeners = listeners;
     this._tabs = tabs ? tabs : [];
     this._history = history ? history : { open: 0 };
     this._dialogId = dialogId;
@@ -58,6 +61,9 @@ class GenericInstance implements Session.InstanceMutator {
     this._deleted = deleted ? deleted : [];
     this._errors = errors ? errors : [];
     this._workspace = workspace;
+  }
+  get listeners() {
+    return this._listeners;
   }
   get linkId() {
     return this._linkId;
@@ -91,41 +97,45 @@ class GenericInstance implements Session.InstanceMutator {
   }
   private next(history: Session.History, tabs?: Session.Tab<any>[]): Session.InstanceMutator {
     const newTabs = tabs ? tabs : this.tabs;
-    return new GenericInstance([...newTabs], history, this.dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._listeners, [...newTabs], history, this.dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }
   withWorkspace(workspace: Session.Workspace) {
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, workspace);
+    this.listeners.onWorkspace(workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, workspace);
+  }
+  withListeners(listeners: Session.SessionListeners) {
+    return new GenericInstance(listeners, this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }
   withErrors(newError: Backend.ServerError): Session.InstanceMutator {
     const errors = this._errors;
     errors.push(newError);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, errors, this._workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, errors, this._workspace);
   }
   withSaved(newResource: Backend.AnyResource): Session.InstanceMutator {
     const saved = [...this._saved];
     saved.push(newResource);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, saved, this._deleted, this._errors, this._workspace);
   }
   withDeleted(deletedResource: Backend.AnyResource): Session.InstanceMutator {
     const deleted = [...this._deleted];
     deleted.push(deletedResource);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, deleted, this._errors, this._workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, this._linkId, this._search, this._data, this._saved, deleted, this._errors, this._workspace);
   }
   withData(init: Session.DataInit): Session.InstanceMutator {
     const snapshot = init.snapshot ? init.snapshot : this._data.snapshot;
     const projects = init.projects ? init.projects : this._data.projects;
     const heads = init.heads ? init.heads : this._data.heads;
     const newData: Session.Data = new GenericData([...projects], snapshot, [...heads]);
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, this._search, newData, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, this._linkId, this._search, newData, this._saved, this._deleted, this._errors, this._workspace);
   }
   withSearch(search?: string): Session.InstanceMutator {
-    return new GenericInstance(this._tabs, this._history, this._dialogId, this._linkId, search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, this._linkId, search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }
   withDialog(dialogId?: string): Session.InstanceMutator {
-    return new GenericInstance(this._tabs, this._history, dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, dialogId, this._linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }  
   withLink(linkId?: string): Session.InstanceMutator {
-    return new GenericInstance(this._tabs, this._history, this._dialogId, linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
+    return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, linkId, this._search, this._data, this._saved, this._deleted, this._errors, this._workspace);
   }  
   withTabData(tabId: string, updateCommand: (oldData: any) => any): Session.InstanceMutator {
     const tabs: Session.Tab<any>[] = [];
@@ -185,5 +195,7 @@ class GenericInstance implements Session.InstanceMutator {
   }
 }
 
-const createSession = () => new GenericInstance();
+const createSession = () => new GenericInstance({
+  onWorkspace: () => {console.log("selected workspace")}
+});
 export { createSession };

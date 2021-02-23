@@ -2,15 +2,16 @@
 declare namespace Backend {
   
   type AnyResource = Commit | Head | Project;
+  type ResourceType = "commit" | "head" | "project";
   
   interface ServiceCallback<T> {
     onSuccess: (handle: (resource: T) => void) => void; 
   }
   
   interface ServiceListeners {
-    onSave: (saved: AnyResource) => void;
-    onDelete: (deleted: AnyResource) => void;
-    onError: (error: ServerError) => void;
+    onSave: (saved: AnyResource, type: ResourceType) => void;
+    onDelete: (deleted: AnyResource, type: ResourceType) => void;
+    onError: (error: ServerError, type: ResourceType) => void;
   }
   
   interface Service {
