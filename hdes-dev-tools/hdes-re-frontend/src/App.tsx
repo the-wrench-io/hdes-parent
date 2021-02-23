@@ -8,7 +8,7 @@ import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
 import CachedIcon from '@material-ui/icons/Cached';
 
 import { Resources } from './core/Resources';
-import { Tabs, TabPanelRenderer } from './core/Tabs';
+import { Tabs, TabPanel } from './core/Tabs';
 import { AssetsView } from './core/Assets';
 import { ProjectsView } from './core/Projects';
 import Shell from './core/Shell';
@@ -30,18 +30,16 @@ function App() {
     { id: 'reload',     label: 'Reload', icon: <CachedIcon />, onClick: () => console.log("Merge") },
   ];
 
-  const tabPanel = (<TabPanelRenderer plugins={[
-    { id: 'static/projects', view: <ProjectsView /> },
-    { view: <AssetsView />}
-  ]}/>);
-  
   
   return (<React.Fragment>
-    <Shell 
-      tabs={{items: <Tabs />, panel: tabPanel}}
-      links={links}
+    <Shell tabs={<Tabs />} links={links}
       search={{ onChange: actions.handleSearch }}
       badges={[  ]}>
+      
+      <TabPanel plugins={[
+        { id: 'static/projects', view: <ProjectsView /> },
+        { view: <AssetsView />}
+      ]}/>
     </Shell>
   </React.Fragment>);
 }

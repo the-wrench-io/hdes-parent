@@ -34,16 +34,14 @@ interface ShellProps {
     icon: React.ReactNode;
     onClick: () => React.ReactNode,
   }[],
-  tabs: { 
-    items: React.ReactNode, 
-    panel: React.ReactNode 
-  },
+  tabs: React.ReactNode,
   search: {
     onChange: (keyword: string) => void,
   },
+  children: React.ReactNode
 };
 
-const Shell: React.FC<ShellProps> = ({links, tabs, search, badges}) => {
+const Shell: React.FC<ShellProps> = ({links, tabs, search, badges, children}) => {
   
   const classes = ShellStyles();
   const theme = useTheme();
@@ -64,7 +62,7 @@ const Shell: React.FC<ShellProps> = ({links, tabs, search, badges}) => {
             <MenuIcon />
           </IconButton>
           <Typography noWrap component="h1" variant="h6" color="inherit" className={classes.title}>
-            {tabs.items}
+            {tabs}
           </Typography>
           
           <div className={classes.search}>
@@ -100,7 +98,7 @@ const Shell: React.FC<ShellProps> = ({links, tabs, search, badges}) => {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
-          <>{ tabs.panel }</>
+          <>{ children }</>
         </Container>
       </main>
     </div>

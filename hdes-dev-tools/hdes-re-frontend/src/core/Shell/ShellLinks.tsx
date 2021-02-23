@@ -74,7 +74,7 @@ const ShellLinks: React.FC<ShellLinksProps> = ({children, open}) => {
   }
   
   const handleColor = (item: ShellView, index: number) => {
-    return active?.view.id === item.id ? "primary" : "inherit";
+    return active?.view.id === item.id && view ? "primary" : "inherit";
   }
   
   return (<Grid container className={classes.root} spacing={0}>
