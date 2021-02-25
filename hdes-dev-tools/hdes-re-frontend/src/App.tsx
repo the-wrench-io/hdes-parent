@@ -9,7 +9,7 @@ import CachedIcon from '@material-ui/icons/Cached';
 
 import { Resources, Backend } from './core/Resources';
 import { Tabs, TabPanel } from './core/Tabs';
-import { AssetsView } from './core/Assets';
+import { AssetsView, AssetsTreeView } from './core/Assets';
 import { ProjectsView } from './core/Projects';
 import Shell from './core/Shell';
 
@@ -34,7 +34,7 @@ function App() {
   const listProjects = () => actions.handleTabAdd({id: projectsId, label: 'Projects' });
   
   const links = [
-    { id: assetsId, label: 'View Assets', icon: <LibraryBooksIcon />, onClick: () => (<span>show assets</span>), enabled: isWorkspace },
+    { id: assetsId, label: 'View Assets', icon: <LibraryBooksIcon />, onClick: () => (<AssetsTreeView />), enabled: isWorkspace },
     { id: 'add-asset', label: 'Add Asset', icon: <LibraryAddIcon />, onClick: () => console.log("add resource"), enabled: isWorkspace },
     { id: 'branchs', label: 'Set Branch', icon: <AccountTreeIcon />, onClick: () => console.log("set branch"), enabled: isWorkspace },
     { id: 'merge', label: 'Merge To Main', icon: <CallMergeIcon />, onClick: () => console.log("Merge"), enabled: isWorkspace },

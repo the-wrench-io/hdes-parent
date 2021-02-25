@@ -40,7 +40,7 @@ declare namespace Backend {
     query: (args: {head: Head}) => SnapshotQuery;
   }
   interface CommitService {
-    save: (changes: Asset[]) => ServiceCallback<SnapshotResource>;
+    save: (changes: AssetBlob[]) => ServiceCallback<SnapshotResource>;
   }
 
   interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
@@ -49,7 +49,8 @@ declare namespace Backend {
 
   interface SnapshotResource {
     head: Head;
-    blobs: Record<string, Asset>;       // name - asset
+    project: Project;
+    blobs: Record<string, AssetBlob>;       // name - asset
     ast: Record<string, BodyNode>;      // asset name - ast
     errors: Record<string, ErrorNode>;  // name name - error
   }
@@ -65,10 +66,11 @@ declare namespace Backend {
     head: Head;
   }
   
-  interface Asset {
+  interface AssetBlob {
     id: string;
     name: string;
     src: string; 
+    ast: string[]
   }
 
   interface HeadState {

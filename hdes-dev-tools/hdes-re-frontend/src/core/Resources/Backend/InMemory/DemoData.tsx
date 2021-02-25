@@ -53,6 +53,7 @@ const createDemoData = (): {
   for(const head of heads) {
     const snapshot: Backend.SnapshotResource = Object.assign({}, (DemoSnapshot as unknown as { default: any}).default);
     snapshot.head = head.head;
+    snapshot.project = projects.filter(p => Object.values(p.heads).filter(h => h.id === head.head.id).length > -1)[0].project;
     snapshots.push(snapshot);
   }
   

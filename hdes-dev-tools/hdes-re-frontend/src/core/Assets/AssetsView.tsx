@@ -10,7 +10,9 @@ interface AssetsViewProps {
 const AssetsView: React.FC<AssetsViewProps> = () => {
   //const { session } = React.useContext(Resources.Context);
   
-  return (<div>ASSETS</div>);
+  return (<div>ASSETS
+  
+  </div>);
 }
 
 export default AssetsView;

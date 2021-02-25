@@ -13,6 +13,8 @@ import { Resources, Session } from '../Resources';
 const useStyles = makeStyles(() => ({
   root: {
     flexGrow: 1,
+    height: '100%',
+    paddingBottom: '64px'
   },
   icons: {
     //paddingLeft: 9,

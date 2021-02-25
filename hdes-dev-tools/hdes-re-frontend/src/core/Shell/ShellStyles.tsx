@@ -20,6 +20,7 @@ const ShellStyles = makeStyles((theme) => ({
   },
   views: {
     //paddingTop: '10px',
+    height: '100%',
   },
   content: {
     //paddingTop: '10px',
