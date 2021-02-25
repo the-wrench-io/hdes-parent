@@ -1,12 +1,12 @@
 import React from 'react';
 import List from '@material-ui/core/List';
 
-import { Resources, Session } from '../Resources';
+import { Resources, Backend } from '../Resources';
 import ProjectView from './ProjectView';
 
 
 interface ProjectsViewProps {
-  setWorkspace: (newWorkspace: Session.Workspace) => void
+  setWorkspace: (head: Backend.Head) => void
 };
 
 

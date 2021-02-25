@@ -25,7 +25,7 @@ declare namespace Backend {
     listeners: ServiceListeners;
     withListeners: (listeners: ServiceListeners) => Service;
   }
-  
+
   interface ProjectService {
     query: () => ProjectQuery;    
   }
@@ -37,12 +37,12 @@ declare namespace Backend {
     save: (value: Head) => ServiceCallback<Head>;
   }
   interface SnapshotService {
-    query: (head: Head) => SnapshotQuery;
+    query: (args: {head: Head}) => SnapshotQuery;
   }
   interface CommitService {
     save: (changes: Asset[]) => ServiceCallback<SnapshotResource>;
   }
-  
+
   interface ProjectQuery extends ServiceCallback<ProjectResource[]>{}
   interface HeadQuery extends ServiceCallback<HeadResource[]>{}  
   interface SnapshotQuery extends ServiceCallback<SnapshotResource>{}

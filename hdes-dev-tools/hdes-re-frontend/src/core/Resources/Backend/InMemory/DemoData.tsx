@@ -1,9 +1,11 @@
-import Backend from './../Backend';
-
+import Backend from '../Backend';
+import uuid from './inmemuuid';
+import * as DemoSnapshot from './DemoSnapshotData.json';
 
 const createDemoData = (): { 
   projects: Backend.ProjectResource[],
-  heads: Backend.HeadResource[] } => {
+  heads: Backend.HeadResource[],
+  snapshots: Backend.SnapshotResource[] } => {
 
   const projects: Backend.ProjectResource[] = [];
   
@@ -44,11 +46,17 @@ const createDemoData = (): {
   projects.push({project, heads, states: {}});
 }
 
-
   const heads: Backend.HeadResource[] = [];
   projects.forEach(p => heads.push(...Object.values(p.heads).map(h => createHeadResource(p, h))))
 
-  return { projects, heads }
+  const snapshots: Backend.SnapshotResource[] = [];
+  for(const head of heads) {
+    const snapshot: Backend.SnapshotResource = Object.assign({}, (DemoSnapshot as unknown as { default: any}).default);
+    snapshot.head = head.head;
+    snapshots.push(snapshot);
+  }
+  
+  return { projects, heads, snapshots}
 }
 
 const createHeadResource = (project: Backend.ProjectResource, head: Backend.Head): Backend.HeadResource =>{
@@ -76,13 +84,6 @@ const createHead = (name: string, commitCount: number) => {
   return head;
 }
 
-const uuid = ():string => {
-  return "inmemory-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
-    let random = Math.random() * 16 | 0;
-    let value = char === "x" ? random : (random % 4 + 8);
-    return value.toString(16)
-  });
-}
 
 interface DemoHead extends Backend.Head {
   commits: Backend.Commit[]

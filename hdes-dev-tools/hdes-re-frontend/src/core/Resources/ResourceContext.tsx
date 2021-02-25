@@ -36,7 +36,7 @@ type ResourceProviderProps = {
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   const [session, sessionDispatch] = React.useReducer(SessionReducer, init.session);
   const [service, serviceDispatch] = React.useReducer(ServiceReducer, init.service);
-  const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(sessionDispatch), [sessionDispatch]);
+  const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(service, sessionDispatch), [service, sessionDispatch]);
   
   React.useEffect(() => {
     console.log("init service listeners");
@@ -60,7 +60,7 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
     console.log("init session listeners");
     const listeners: Session.SessionListeners = {
       onWorkspace: (workspace: Session.Workspace) => {
-        //console.log("load workspace assets");
+        
       }
     }
     sessionDispatch({type: SessionReducerActionType.setListeners, setListeners: listeners});

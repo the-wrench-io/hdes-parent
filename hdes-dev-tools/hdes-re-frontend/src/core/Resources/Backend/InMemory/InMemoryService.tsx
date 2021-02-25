@@ -36,12 +36,12 @@ class InMemoryService implements Backend.Service {
     };
     
     const demoData = createDemoData();
-    this._store = new InMemoryStore(this._listeners, demoData.projects, demoData.heads);
-    this._snapshots = {};
+    this._store = new InMemoryStore(this._listeners, demoData.projects, demoData.heads, demoData.snapshots);
+    this._snapshots = new InMemorySnapshotService(this._store);
     this._projects = new InMemoryProjectService(this._store);
     this._heads = new InMemoryHeadService(this._store);
     this._merge = new InMemoryMergeService(this._store);
-    this._commits = {};
+    this._commits = {} as Backend.CommitService;
   }
 
   get projects() {
@@ -65,6 +65,22 @@ class InMemoryService implements Backend.Service {
   withListeners(listeners: Backend.ServiceListeners): Backend.Service {
     this._delegate = listeners;
     return this;
+  }
+}
+
+class InMemorySnapshotService implements Backend.SnapshotService {
+  store: Store;
+  constructor(store: Store) {
+    this.store = store;
+  }
+  query(args: {head: Backend.Head}) {
+    const { store } = this;
+    return {
+      onSuccess(handle: (snapshot: Backend.SnapshotResource) => void) {
+        const snapshot = store.snapshots.filter(s => s.head.id === args.head.id)[0];
+        handle(snapshot);
+      }
+    };
   }
 }
 
@@ -127,6 +143,7 @@ class InMemoryHeadService implements Backend.HeadService {
 interface Store {
   projects: Backend.ProjectResource[];
   heads: Backend.HeadResource[];
+  snapshots: Backend.SnapshotResource[];
   deleteHead(head: Backend.Head): Backend.Head;
   mergeHead(head: Backend.Head): Backend.Head;
 }
@@ -135,12 +152,15 @@ class InMemoryStore implements Store {
   private _projects: Backend.ProjectResource[];
   private _heads: Backend.HeadResource[];
   private _listeners: Backend.ServiceListeners;
+  private _snapshots: Backend.SnapshotResource[];
   
   constructor(
     listeners: Backend.ServiceListeners, 
     projects: Backend.ProjectResource[],
-    heads: Backend.HeadResource[]) {
+    heads: Backend.HeadResource[],
+    snapshots: Backend.SnapshotResource[]) {
     
+    this._snapshots = snapshots;
     this._listeners = listeners;
     this._projects = projects.map(p => {
       p.states = createProjectHeadState(p.heads);
@@ -148,9 +168,11 @@ class InMemoryStore implements Store {
     });
     this._heads = heads;
   }
-  
   get projects() {
     return this._projects;
+  }  
+  get snapshots() {
+    return this._snapshots;
   }
   get heads() {
     return this._heads;

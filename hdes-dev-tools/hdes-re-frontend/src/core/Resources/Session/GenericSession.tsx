@@ -5,17 +5,17 @@ import { Backend } from '../Backend';
 class GenericData implements Session.Data {
   private _projects: Backend.ProjectResource[];
   private _heads: Backend.HeadResource[];
-  private _snapshot: Backend.Snapshot; 
+  private _snapshot?: Backend.SnapshotResource; 
   
-  constructor(projects?: Backend.ProjectResource[], snapshot?: Backend.Snapshot, heads?: Backend.HeadResource[]) {
-    this._snapshot = snapshot ? snapshot : {};
+  constructor(projects?: Backend.ProjectResource[], snapshot?: Backend.SnapshotResource, heads?: Backend.HeadResource[]) {
+    this._snapshot = snapshot;
     this._projects = projects ? projects : [];
     this._heads = heads ? heads : [];
   }
   get heads() : Backend.HeadResource[] {
     return this._heads;
   }
-  get snapshot() : Backend.Snapshot {
+  get snapshot() : Backend.SnapshotResource | undefined {
     return this._snapshot;
   }
   get projects(): readonly Backend.ProjectResource[] {

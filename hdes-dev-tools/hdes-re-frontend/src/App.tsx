@@ -7,7 +7,7 @@ import LibraryBooksIcon from '@material-ui/icons/LibraryBooks';
 import ViewQuiltIcon from '@material-ui/icons/ViewQuilt';
 import CachedIcon from '@material-ui/icons/Cached';
 
-import { Resources, Session } from './core/Resources';
+import { Resources, Backend } from './core/Resources';
 import { Tabs, TabPanel } from './core/Tabs';
 import { AssetsView } from './core/Assets';
 import { ProjectsView } from './core/Projects';
@@ -21,12 +21,12 @@ const assetsId = 'static/assets';
 function App() {
   const { actions, session } = React.useContext(Resources.Context);
   
-  const setWorkspace = (workspace: Session.Workspace) => {
+  const setWorkspace = (head: Backend.Head) => {
     const projectsTab = session.findTab(projectsId);
     if(projectsTab !== undefined) {
       actions.handleTabClose(session.tabs[projectsTab]);
     }
-    actions.handleWorkspace(workspace)
+    actions.handleWorkspace(head)
     actions.handleLink(assetsId);
   }
   

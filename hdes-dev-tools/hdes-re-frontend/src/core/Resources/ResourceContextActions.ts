@@ -8,7 +8,7 @@ import { Backend } from './Backend'
 
 
 interface ResourceContextActions {
-  handleWorkspace(newWorkspace: Session.Workspace): void;
+  handleWorkspace(head: Backend.Head): void;
   handleLink(id?: string): void;
   handleData(data: Session.DataInit): void;
   handleSearch(keyword: string): void;
@@ -46,11 +46,13 @@ const SessionActionBuilder = {
 class GenericResourceContextActions implements ResourceContextActions {
 
   private _sessionDispatch: React.Dispatch<SessionReducerAction>;
-  constructor(session: React.Dispatch<SessionReducerAction>) {
+  private _service: Backend.Service;
+  constructor(service: Backend.Service, session: React.Dispatch<SessionReducerAction>) {
     this._sessionDispatch = session;
+    this._service = service;
   }
-  handleWorkspace(newWorkspace: Session.Workspace) {
-    this._sessionDispatch(SessionActionBuilder.setWorkspace(newWorkspace)) 
+  handleWorkspace(head: Backend.Head) {
+    this._service.snapshots.query({head}).onSuccess(snapshot => this._sessionDispatch(SessionActionBuilder.setWorkspace({snapshot})));
   }  
   handleData(data: Session.DataInit) {
     this._sessionDispatch(SessionActionBuilder.setData(data)) 

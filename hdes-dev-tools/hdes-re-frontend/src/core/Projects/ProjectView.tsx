@@ -16,7 +16,7 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
-import { Backend, Session } from '../Resources';
+import { Backend } from '../Resources';
 import HeadView from './HeadView'
 
 
@@ -33,7 +33,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface ProjectsViewProps {
   project: Backend.ProjectResource
-  setWorkspace: (newWorkspace: Session.Workspace) => void
+  setWorkspace: (head: Backend.Head) => void
 };
 
 
@@ -47,7 +47,7 @@ const ProjectView: React.FC<ProjectsViewProps> = (props) => {
   
   let index = 1;
   for(const head of heads) {
-    const setWorkspace = () => props.setWorkspace({project: props.project.project, head});
+    const setWorkspace = () => props.setWorkspace(head);
     
     const linkToHead = (
       <Tooltip key={index + "-link"} title={`Edit: ${props.project.project.name}, branch: ${head.name}`}>

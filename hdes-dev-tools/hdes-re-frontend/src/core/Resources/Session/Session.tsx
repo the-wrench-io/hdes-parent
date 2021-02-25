@@ -16,18 +16,17 @@ declare namespace Session {
   interface Data {
     projects: readonly Backend.ProjectResource[];
     heads: readonly Backend.HeadResource[];
-    snapshot: Backend.Snapshot; 
+    snapshot?: Backend.SnapshotResource; 
   }
   
   interface DataInit { 
     projects?: Backend.ProjectResource[], 
     heads?: Backend.HeadResource[], 
-    snapshot?: Backend.Snapshot;
+    snapshot?: Backend.SnapshotResource;
   }
   
   interface Workspace {
-    project: Backend.Project;
-    head: Backend.Head;
+    snapshot: Backend.SnapshotResource;
   }
   
   interface SessionListeners {
