@@ -2,6 +2,8 @@ package io.resys.hdes.ast.api.nodes;
 
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 /*-
  * #%L
  * hdes-ast
@@ -32,6 +34,8 @@ public interface ServiceNode extends HdesNode {
   @Value.Immutable
   interface ServiceBody extends ServiceNode, BodyNode {
     CommandInvocation getCommand();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.BODY_SE; }
   }
   
   @Value.Immutable
@@ -39,11 +43,14 @@ public interface ServiceNode extends HdesNode {
     InvocationNode getClassName();
     ObjectMappingDef getMapping();
     Optional<ServicePromise> getPromise();
-    
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.SE_COMMAND; }
   }
   
   @Value.Immutable
   interface ServicePromise extends ServiceNode {
     Optional<ExpressionBody> getTimeout();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.SE_PROMISE; }
   }
 }

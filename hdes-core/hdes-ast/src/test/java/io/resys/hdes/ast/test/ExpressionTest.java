@@ -36,8 +36,8 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.ast.HdesLexer;
 import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.api.nodes.BodyNode.ScalarType;
+import io.resys.hdes.ast.api.nodes.HdesNode.ContentNode;
 import io.resys.hdes.ast.spi.antlr.visitors.HdesParserVisitor;
-import io.resys.hdes.ast.spi.antlr.visitors.HdesParserVisitor.ContentNode;
 
 public class ExpressionTest {
 

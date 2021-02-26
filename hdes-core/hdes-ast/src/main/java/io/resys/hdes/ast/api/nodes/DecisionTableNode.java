@@ -2,6 +2,8 @@ package io.resys.hdes.ast.api.nodes;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /*-
  * #%L
  * hdes-ast
@@ -38,16 +40,20 @@ public interface DecisionTableNode extends HdesNode {
     HitPolicy getHitPolicy();
     ObjectDef getConstants();
     ObjectDef getMatched();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.BODY_DT; }
   }
   
   @Value.Immutable
   interface HitPolicyFirst extends HitPolicy {
     List<RuleRow> getRows();
+    default HdesNodeType getNodeType() { return HdesNodeType.DT_HITPOLICY_FIRST; }
   }
  
   @Value.Immutable
   interface HitPolicyAll extends HitPolicy {
     List<RuleRow> getRows();
+    default HdesNodeType getNodeType() { return HdesNodeType.DT_HITPOLICY_ALL; }
   }
 
   @Value.Immutable
@@ -55,16 +61,19 @@ public interface DecisionTableNode extends HdesNode {
     WhenRuleRow getWhen();
     ThenRuleRow getThen();
     String getText();
+    default HdesNodeType getNodeType() { return HdesNodeType.DT_RULE_WHEN_THEN; }
   }
   
   @Value.Immutable
   interface WhenRuleRow extends DecisionTableNode {
     List<ExpressionBody> getValues();
+    default HdesNodeType getNodeType() { return HdesNodeType.DT_RULE_WHEN; }
   }
 
   @Value.Immutable
   interface ThenRuleRow extends DecisionTableNode {
     List<Literal> getValues();
+    default HdesNodeType getNodeType() { return HdesNodeType.DT_RULE_THEN; }
   }
   
   @Value.Immutable
@@ -74,11 +83,13 @@ public interface DecisionTableNode extends HdesNode {
     
     WhenRuleRow getWhen();
     List<MappingRow> getMapsTo();
+    default HdesNodeType getNodeType() { return HdesNodeType.DT_HITPOLICY_MAPPING; }
   }
 
   @Value.Immutable
   interface MappingRow extends DecisionTableNode {
     SimpleInvocation getAccepts();
     ThenRuleRow getThen();
+    default HdesNodeType getNodeType() { return HdesNodeType.DT_RULE_MAPPING; }
   }
 }

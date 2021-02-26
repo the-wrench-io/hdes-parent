@@ -151,8 +151,6 @@ public class ImmutableHdesTree implements HdesTree {
     return new NodeGetQuery() {
       @Override
       public <T extends HdesNode> T node(Class<T> type) {
-        
-        List<String> x;
         Optional<T> node = find().node(type);
         if(node.isEmpty()) {
           throw new HdesException("Context does not contain node: " + type + "!");

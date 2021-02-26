@@ -36,12 +36,12 @@ import org.slf4j.LoggerFactory;
 import io.resys.hdes.ast.HdesLexer;
 import io.resys.hdes.ast.HdesParser;
 import io.resys.hdes.ast.api.nodes.BodyNode;
+import io.resys.hdes.ast.api.nodes.HdesNode.ContentNode;
 import io.resys.hdes.ast.api.nodes.HdesNode.ErrorNode;
 import io.resys.hdes.ast.api.nodes.RootNode;
 import io.resys.hdes.ast.spi.ImmutableRootNode;
 import io.resys.hdes.ast.spi.antlr.util.HdesAntlrErrorListener;
 import io.resys.hdes.ast.spi.antlr.visitors.HdesParserVisitor;
-import io.resys.hdes.ast.spi.antlr.visitors.HdesParserVisitor.ContentNode;
 import io.resys.hdes.ast.spi.antlr.visitors.RootNodeDependencyVisitor;
 import io.resys.hdes.ast.spi.validators.RootNodeValidator;
 

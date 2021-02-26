@@ -26,6 +26,7 @@ values:
         line: 1
         col: 23
     value: "basic"
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "({name,lastName:STRING,value?:INTEGER}):{}"
@@ -58,6 +59,7 @@ values:
         empty: true
         present: false
       type: "STRING"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "name,lastName:STRING"
         start:
@@ -80,6 +82,7 @@ values:
         empty: true
         present: false
       type: "STRING"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "value?:INTEGER"
         start:
@@ -102,7 +105,9 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     returnDefs: []
+    nodeType: "TYPES"
   hitPolicy:
     token:
       text: "map(STRING)to(INTEGER)when()"
@@ -124,7 +129,9 @@ values:
           line: 2
           col: 35
       values: []
+      nodeType: "DT_RULE_WHEN"
     mapsTo: []
+    nodeType: "DT_HITPOLICY_MAPPING"
   constants:
     token:
       text: "({name,lastName:STRING,value?:INTEGER}):{}"
@@ -161,6 +168,8 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPE_OBJECT"
   matched:
     token:
       text: "({name,lastName:STRING,value?:INTEGER}):{}"
@@ -210,3 +219,8 @@ values:
           empty: true
           present: false
         type: "INTEGER"
+        nodeType: "TYPE_SCALAR"
+      nodeType: "TYPE_OBJECT"
+    nodeType: "TYPE_OBJECT"
+  nodeType: "BODY_DT"
+nodeType: "ROOT_CONTENT"

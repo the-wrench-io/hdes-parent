@@ -26,6 +26,7 @@ values:
         line: 1
         col: 21
     value: "basic"
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "({firstName:STRINGlastName:STRING}):{}"
@@ -58,6 +59,7 @@ values:
         empty: true
         present: false
       type: "STRING"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "lastName:STRING"
         start:
@@ -80,7 +82,9 @@ values:
         empty: true
         present: false
       type: "STRING"
+      nodeType: "TYPE_SCALAR"
     returnDefs: []
+    nodeType: "TYPES"
   hitPolicy:
     token:
       text: "map(string)to(integer)when(_='bob',_='sam',_='viv')firstName({1,2,3})lastName({3,10,20})"
@@ -120,6 +124,7 @@ values:
               line: 3
               col: 18
           value: ""
+          nodeType: "BODY_ID"
         headers:
           token:
             text: "_='bob'"
@@ -131,6 +136,7 @@ values:
               col: 18
           acceptDefs: []
           returnDefs: []
+          nodeType: "TYPES"
         src: "_ = 'bob'"
         value:
           token:
@@ -151,6 +157,7 @@ values:
               end:
                 line: 3
                 col: 10
+            nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
           right:
             token:
               text: "'bob'"
@@ -162,6 +169,9 @@ values:
                 col: 18
             type: "STRING"
             value: "bob"
+            nodeType: "TYPE_LITERAL"
+          nodeType: "EX_EQUALITY"
+        nodeType: "BODY_EX"
       - token:
           text: "_='sam'"
           start:
@@ -180,6 +190,7 @@ values:
               line: 3
               col: 29
           value: ""
+          nodeType: "BODY_ID"
         headers:
           token:
             text: "_='sam'"
@@ -191,6 +202,7 @@ values:
               col: 29
           acceptDefs: []
           returnDefs: []
+          nodeType: "TYPES"
         src: "_ = 'sam'"
         value:
           token:
@@ -211,6 +223,7 @@ values:
               end:
                 line: 3
                 col: 21
+            nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
           right:
             token:
               text: "'sam'"
@@ -222,6 +235,9 @@ values:
                 col: 29
             type: "STRING"
             value: "sam"
+            nodeType: "TYPE_LITERAL"
+          nodeType: "EX_EQUALITY"
+        nodeType: "BODY_EX"
       - token:
           text: "_='viv'"
           start:
@@ -240,6 +256,7 @@ values:
               line: 3
               col: 40
           value: ""
+          nodeType: "BODY_ID"
         headers:
           token:
             text: "_='viv'"
@@ -251,6 +268,7 @@ values:
               col: 40
           acceptDefs: []
           returnDefs: []
+          nodeType: "TYPES"
         src: "_ = 'viv'"
         value:
           token:
@@ -271,6 +289,7 @@ values:
               end:
                 line: 3
                 col: 32
+            nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
           right:
             token:
               text: "'viv'"
@@ -282,6 +301,10 @@ values:
                 col: 40
             type: "STRING"
             value: "viv"
+            nodeType: "TYPE_LITERAL"
+          nodeType: "EX_EQUALITY"
+        nodeType: "BODY_EX"
+      nodeType: "DT_RULE_WHEN"
     mapsTo:
     - token:
         text: "firstName({1,2,3})"
@@ -301,6 +324,7 @@ values:
             line: 5
             col: 12
         value: "firstName"
+        nodeType: "INVOCATION_SIMPLE"
       then:
         token:
           text: "{1,2,3}"
@@ -321,6 +345,7 @@ values:
               col: 15
           type: "INTEGER"
           value: "1"
+          nodeType: "TYPE_LITERAL"
         - token:
             text: "2"
             start:
@@ -331,6 +356,7 @@ values:
               col: 18
           type: "INTEGER"
           value: "2"
+          nodeType: "TYPE_LITERAL"
         - token:
             text: "3"
             start:
@@ -341,6 +367,9 @@ values:
               col: 21
           type: "INTEGER"
           value: "3"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "DT_RULE_THEN"
+      nodeType: "DT_RULE_MAPPING"
     - token:
         text: "lastName({3,10,20})"
         start:
@@ -359,6 +388,7 @@ values:
             line: 6
             col: 11
         value: "lastName"
+        nodeType: "INVOCATION_SIMPLE"
       then:
         token:
           text: "{3,10,20}"
@@ -379,6 +409,7 @@ values:
               col: 14
           type: "INTEGER"
           value: "3"
+          nodeType: "TYPE_LITERAL"
         - token:
             text: "10"
             start:
@@ -389,6 +420,7 @@ values:
               col: 18
           type: "INTEGER"
           value: "10"
+          nodeType: "TYPE_LITERAL"
         - token:
             text: "20"
             start:
@@ -399,6 +431,10 @@ values:
               col: 22
           type: "INTEGER"
           value: "20"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "DT_RULE_THEN"
+      nodeType: "DT_RULE_MAPPING"
+    nodeType: "DT_HITPOLICY_MAPPING"
   constants:
     token:
       text: "({firstName:STRINGlastName:STRING}):{}"
@@ -435,6 +471,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
@@ -457,6 +494,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
@@ -479,6 +517,8 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPE_OBJECT"
   matched:
     token:
       text: "({firstName:STRINGlastName:STRING}):{}"
@@ -528,6 +568,8 @@ values:
           empty: true
           present: false
         type: "INTEGER"
+        nodeType: "TYPE_SCALAR"
+      nodeType: "TYPE_OBJECT"
     - token:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
@@ -550,6 +592,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
@@ -572,3 +615,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPE_OBJECT"
+  nodeType: "BODY_DT"
+nodeType: "ROOT_CONTENT"

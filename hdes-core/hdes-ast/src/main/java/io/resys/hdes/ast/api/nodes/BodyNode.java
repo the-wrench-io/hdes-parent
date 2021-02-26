@@ -23,6 +23,8 @@ package io.resys.hdes.ast.api.nodes;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
@@ -36,6 +38,9 @@ public interface BodyNode extends HdesNode {
   interface Headers extends HdesNode {
     List<TypeDef> getAcceptDefs();
     List<TypeDef> getReturnDefs();
+    
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.TYPES; }
   }
   
   interface TypeDef extends HdesNode {
@@ -58,23 +63,32 @@ public interface BodyNode extends HdesNode {
   }
   
   @Value.Immutable
-  interface EmptyBody extends BodyNode { }
+  interface EmptyBody extends BodyNode {
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.BODY_EMPTY; }
+  }
   
   
   @Value.Immutable
   interface BodyId extends HdesNode {
     String getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.BODY_ID; }
   }
 
   @Value.Immutable
   interface Literal extends HdesNode {
     ScalarType getType();
     String getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.TYPE_LITERAL; }
   }
   
   @Value.Immutable
   interface ObjectDef extends TypeDef {
     List<TypeDef> getValues();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.TYPE_OBJECT; }
   }
   
   @Value.Immutable
@@ -83,5 +97,7 @@ public interface BodyNode extends HdesNode {
     Optional<ExpressionBody> getFormula();
     Optional<Boolean> getFormulaOverAll();
     ScalarType getType();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.TYPE_SCALAR; }
   }
 }

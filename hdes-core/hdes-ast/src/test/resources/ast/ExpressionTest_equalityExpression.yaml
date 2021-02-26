@@ -26,6 +26,7 @@ values:
         line: 1
         col: 19
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x=20"
@@ -37,6 +38,7 @@ values:
         col: 19
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x = 20"
   value:
     token:
@@ -58,6 +60,7 @@ values:
           line: 1
           col: 14
       value: "x"
+      nodeType: "INVOCATION_SIMPLE"
     right:
       token:
         text: "20"
@@ -69,6 +72,9 @@ values:
           col: 19
       type: "INTEGER"
       value: "20"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_EQUALITY"
+  nodeType: "BODY_EX"
 - token:
     text: "z!=10"
     start:
@@ -87,6 +93,7 @@ values:
         line: 2
         col: 20
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "z!=10"
@@ -98,6 +105,7 @@ values:
         col: 20
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "z != 10"
   value:
     token:
@@ -119,6 +127,7 @@ values:
           line: 2
           col: 14
       value: "z"
+      nodeType: "INVOCATION_SIMPLE"
     right:
       token:
         text: "10"
@@ -130,6 +139,9 @@ values:
           col: 20
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_EQUALITY"
+  nodeType: "BODY_EX"
 - token:
     text: "z!=w"
     start:
@@ -148,6 +160,7 @@ values:
         line: 3
         col: 19
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "z!=w"
@@ -159,6 +172,7 @@ values:
         col: 19
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "z != w"
   value:
     token:
@@ -180,6 +194,7 @@ values:
           line: 3
           col: 14
       value: "z"
+      nodeType: "INVOCATION_SIMPLE"
     right:
       token:
         text: "w"
@@ -190,3 +205,7 @@ values:
           line: 3
           col: 19
       value: "w"
+      nodeType: "INVOCATION_SIMPLE"
+    nodeType: "EX_EQUALITY"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

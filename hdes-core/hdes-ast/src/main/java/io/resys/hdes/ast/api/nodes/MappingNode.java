@@ -22,6 +22,8 @@ package io.resys.hdes.ast.api.nodes;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
@@ -37,26 +39,36 @@ public interface MappingNode extends HdesNode {
   @Value.Immutable  
   interface ObjectMappingDef extends MappingDef {
     List<MappingDef> getValues();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.MAPPING_OBJECT; }
   }
   
   @Value.Immutable
   interface FieldMappingDef extends MappingDef {
     SimpleInvocation getLeft();
     MappingDef getRight();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.MAPPING_FIELD; }
   }
   
   @Value.Immutable  
   interface ExpressionMappingDef extends MappingDef {
     ExpressionBody getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.MAPPING_EXP; }
   }
   
   @Value.Immutable  
   interface ArrayMappingDef extends MappingDef {
     List<MappingDef> getValues();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.MAPPING_ARRAY; }
   }
   
   @Value.Immutable  
   interface FastMappingDef extends MappingDef {
     InvocationNode getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.MAPPING_FAST; }
   }
 }

@@ -23,6 +23,8 @@ package io.resys.hdes.ast.api.nodes;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
@@ -51,6 +53,8 @@ public interface ExpressionNode extends HdesNode {
   interface ExpressionBody extends ExpressionNode, BodyNode {
     String getSrc();
     HdesNode getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.BODY_EX; }
   }
 
   /*
@@ -60,13 +64,19 @@ public interface ExpressionNode extends HdesNode {
     HdesNode getValue();
   }
   @Value.Immutable
-  interface NotUnary extends Unary { }
+  interface NotUnary extends Unary {
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_UNARY_NOT; }
+  }
 
   @Value.Immutable
-  interface NegateUnary extends Unary { }
+  interface NegateUnary extends Unary {
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_UNARY_NEGATE; }
+  }
   
   @Value.Immutable
-  interface PositiveUnary extends Unary { }
+  interface PositiveUnary extends Unary {
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_UNARY_POS; }
+  }
 
   /*
    * Conditions and expressions
@@ -76,6 +86,7 @@ public interface ExpressionNode extends HdesNode {
     EqualityType getType();
     HdesNode getLeft();
     HdesNode getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_EQUALITY; }
   }
 
   // operation ? val1 : val2 
@@ -84,6 +95,7 @@ public interface ExpressionNode extends HdesNode {
     EqualityOperation getOperation();
     HdesNode getLeft();
     HdesNode getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_CONDITIONAL; }
   }
 
   @Value.Immutable
@@ -91,24 +103,28 @@ public interface ExpressionNode extends HdesNode {
     HdesNode getValue();
     HdesNode getLeft();
     HdesNode getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_BETWEEN; }
   }
   
   @Value.Immutable
   interface InExpression extends ExpressionNode {
     HdesNode getLeft();
     List<HdesNode> getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_IN; }
   }
 
   @Value.Immutable
   interface AndExpression extends ExpressionNode {
     HdesNode getLeft();
     HdesNode getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_AND; }
   }
 
   @Value.Immutable
   interface OrExpression extends ExpressionNode {
     HdesNode getLeft();
     HdesNode getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_OR; }
   }
 
   @Value.Immutable
@@ -116,6 +132,7 @@ public interface ExpressionNode extends HdesNode {
     AdditiveType getType();
     HdesNode getLeft();
     HdesNode getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_ADDITIVE; }
   }
 
   @Value.Immutable
@@ -123,6 +140,7 @@ public interface ExpressionNode extends HdesNode {
     MultiplicativeType getType();
     HdesNode getLeft();
     HdesNode getRight();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_MULTIPLICATIVE; }
   }
   
   interface CallMethodExpression extends ExpressionNode {}
@@ -131,6 +149,7 @@ public interface ExpressionNode extends HdesNode {
   interface StaticMethodExpression extends CallMethodExpression {
     StaticMethodType getType();
     List<HdesNode> getValues();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_INSTANCE_STATIC_METHOD; }
   }
 
   @Value.Immutable
@@ -138,6 +157,7 @@ public interface ExpressionNode extends HdesNode {
     SimpleInvocation getName();
     List<HdesNode> getValues();
     Optional<HdesNode> getNext();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_INSTANCE_METHOD; }
   }
   
   @Value.Immutable
@@ -151,17 +171,20 @@ public interface ExpressionNode extends HdesNode {
     List<LambdaFilterExpression> getFilter();
     
     Optional<HdesNode> getNext();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_LAMBDA; }
   }
   
   @Value.Immutable
   interface LambdaSortExpression extends ExpressionNode {
     SimpleInvocation getParam();
     HdesNode getBody();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_LAMBDA_SORT; }
   }
   
   @Value.Immutable
   interface LambdaFilterExpression extends ExpressionNode {
     SimpleInvocation getParam();
     HdesNode getBody();
+    default HdesNodeType getNodeType() { return HdesNodeType.EX_LAMBDA_FILTER; }
   }
 }

@@ -34,12 +34,15 @@ import io.resys.hdes.ast.api.nodes.ServiceNode.ServiceBody;
 import io.resys.hdes.compiler.api.HdesCompiler.ResourceType;
 
 public interface CompilerNode extends HdesNode {
+  default HdesNodeType getNodeType() { return null; }
+  
   
   ServiceUnit st(ServiceBody node);
   FlowUnit fl(FlowBody node);
   DecisionTableUnit dt(DecisionTableBody node);  
   
   interface ServiceUnit extends HdesNode {
+    default HdesNodeType getNodeType() { return null; }
     CompilerType getType();
     ServiceBody getBody();
     
@@ -48,6 +51,7 @@ public interface CompilerNode extends HdesNode {
   }
   
   interface DecisionTableUnit extends HdesNode {
+    default HdesNodeType getNodeType() { return null; }
     CompilerType getType();
     DecisionTableBody getBody();
     CompilerEntry getListValue();
@@ -55,6 +59,7 @@ public interface CompilerNode extends HdesNode {
   }
   
   interface FlowUnit extends HdesNode {
+    default HdesNodeType getNodeType() { return null; }
     CompilerType getType();
     FlowBody getBody();
     

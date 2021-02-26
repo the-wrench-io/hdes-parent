@@ -1,5 +1,5 @@
 
-import { theme } from './DefaultTheme';
+import { theme, AppTheme } from './DefaultTheme';
 
-
+export type { AppTheme };
 export { theme };

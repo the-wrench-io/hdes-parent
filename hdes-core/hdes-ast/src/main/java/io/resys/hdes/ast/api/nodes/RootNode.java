@@ -23,6 +23,10 @@ package io.resys.hdes.ast.api.nodes;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
+import org.immutables.value.Value;
+
 import io.resys.hdes.ast.api.nodes.InvocationNode.SimpleInvocation;
 
 public interface RootNode extends HdesNode {
@@ -36,4 +40,7 @@ public interface RootNode extends HdesNode {
   BodyNode getBody(SimpleInvocation bodyId);
   String getOrigin(String id);
   List<ErrorNode> getErrors(String id);
+  
+  @Nullable @Value.Default
+  default HdesNodeType getNodeType() { return HdesNodeType.ROOT; }
 }

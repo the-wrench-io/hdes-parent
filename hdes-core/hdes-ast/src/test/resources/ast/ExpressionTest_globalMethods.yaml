@@ -26,6 +26,7 @@ values:
         line: 1
         col: 37
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "createEntity(10,20,40)"
@@ -37,6 +38,7 @@ values:
         col: 37
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "createEntity(10, 20, 40)"
   value:
     token:
@@ -57,6 +59,7 @@ values:
           line: 1
           col: 25
       value: "createEntity"
+      nodeType: "INVOCATION_SIMPLE"
     values:
     - token:
         text: "10"
@@ -68,6 +71,7 @@ values:
           col: 28
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "20"
         start:
@@ -78,6 +82,7 @@ values:
           col: 32
       type: "INTEGER"
       value: "20"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "40"
         start:
@@ -88,9 +93,12 @@ values:
           col: 36
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
     next:
       empty: true
       present: false
+    nodeType: "EX_INSTANCE_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "createPerson('sam','vimes').firstName"
     start:
@@ -109,6 +117,7 @@ values:
         line: 2
         col: 51
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "createPerson('sam','vimes').firstName"
@@ -120,6 +129,7 @@ values:
         col: 51
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "createPerson('sam', 'vimes').firstName"
   value:
     token:
@@ -140,6 +150,7 @@ values:
           line: 2
           col: 25
       value: "createPerson"
+      nodeType: "INVOCATION_SIMPLE"
     values:
     - token:
         text: "'sam'"
@@ -151,6 +162,7 @@ values:
           col: 31
       type: "STRING"
       value: "sam"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "'vimes'"
         start:
@@ -161,6 +173,10 @@ values:
           col: 40
       type: "STRING"
       value: "vimes"
+      nodeType: "TYPE_LITERAL"
     next:
       empty: false
       present: true
+    nodeType: "EX_INSTANCE_METHOD"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

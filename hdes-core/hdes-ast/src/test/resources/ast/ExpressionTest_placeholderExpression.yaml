@@ -26,6 +26,7 @@ values:
         line: 1
         col: 30
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "_>=20?30:40"
@@ -37,6 +38,7 @@ values:
         col: 30
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "_ >= 20 ? 30 : 40"
   value:
     token:
@@ -66,6 +68,7 @@ values:
           end:
             line: 1
             col: 14
+        nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
       right:
         token:
           text: "20"
@@ -77,6 +80,8 @@ values:
             col: 20
         type: "INTEGER"
         value: "20"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     left:
       token:
         text: "30"
@@ -88,6 +93,7 @@ values:
           col: 25
       type: "INTEGER"
       value: "30"
+      nodeType: "TYPE_LITERAL"
     right:
       token:
         text: "40"
@@ -99,6 +105,9 @@ values:
           col: 30
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_CONDITIONAL"
+  nodeType: "BODY_EX"
 - token:
     text: "stepx._value1>=20?30:40"
     start:
@@ -117,6 +126,7 @@ values:
         line: 2
         col: 42
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "stepx._value1>=20?30:40"
@@ -128,6 +138,7 @@ values:
         col: 42
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "stepx._value1 >= 20 ? 30 : 40"
   value:
     token:
@@ -167,6 +178,7 @@ values:
               line: 2
               col: 18
           value: "stepx"
+          nodeType: "INVOCATION_SIMPLE"
         value:
           token:
             text: "_value1"
@@ -177,6 +189,8 @@ values:
               line: 2
               col: 26
           value: "value1"
+          nodeType: "INVOCATION_NAMED_PLACEHOLDER"
+        nodeType: "INVOCATION_NESTED"
       right:
         token:
           text: "20"
@@ -188,6 +202,8 @@ values:
             col: 32
         type: "INTEGER"
         value: "20"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     left:
       token:
         text: "30"
@@ -199,6 +215,7 @@ values:
           col: 37
       type: "INTEGER"
       value: "30"
+      nodeType: "TYPE_LITERAL"
     right:
       token:
         text: "40"
@@ -210,6 +227,9 @@ values:
           col: 42
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_CONDITIONAL"
+  nodeType: "BODY_EX"
 - token:
     text: "_value1>=20?30:40"
     start:
@@ -228,6 +248,7 @@ values:
         line: 3
         col: 36
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "_value1>=20?30:40"
@@ -239,6 +260,7 @@ values:
         col: 36
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "_value1 >= 20 ? 30 : 40"
   value:
     token:
@@ -269,6 +291,7 @@ values:
             line: 3
             col: 20
         value: "value1"
+        nodeType: "INVOCATION_NAMED_PLACEHOLDER"
       right:
         token:
           text: "20"
@@ -280,6 +303,8 @@ values:
             col: 26
         type: "INTEGER"
         value: "20"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     left:
       token:
         text: "30"
@@ -291,6 +316,7 @@ values:
           col: 31
       type: "INTEGER"
       value: "30"
+      nodeType: "TYPE_LITERAL"
     right:
       token:
         text: "40"
@@ -302,3 +328,7 @@ values:
           col: 36
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_CONDITIONAL"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

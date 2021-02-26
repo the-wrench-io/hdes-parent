@@ -31,6 +31,7 @@ import io.resys.hdes.ast.api.nodes.RootNode;
 import io.resys.hdes.ast.spi.util.Assertions;
 
 public class ImmutableRootNode implements RootNode {
+  private static final long serialVersionUID = -2733235657644792282L;
   private final Map<String, BodyNode> body;
   private final Map<String, List<ErrorNode>> errors;
   // Source origin, body node id - location id

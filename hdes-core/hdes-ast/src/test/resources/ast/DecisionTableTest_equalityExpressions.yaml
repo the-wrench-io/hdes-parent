@@ -26,6 +26,7 @@ values:
         line: 1
         col: 21
     value: "basic"
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
@@ -58,6 +59,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "value1:INTEGER"
         start:
@@ -80,6 +82,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     returnDefs:
     - token:
         text: "value:INTEGER"
@@ -103,6 +106,8 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPES"
   hitPolicy:
     token:
       text: "findAll({when(_>10,_<=20).add({4570})when(_>10,_<=20and_>10).add({4570})when(_=6,_!=20and_>10).add({4570})})"
@@ -149,6 +154,7 @@ values:
                 line: 3
                 col: 17
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_>10"
@@ -160,6 +166,7 @@ values:
                 col: 17
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ > 10"
           value:
             token:
@@ -180,6 +187,7 @@ values:
                 end:
                   line: 3
                   col: 12
+              nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
             right:
               token:
                 text: "10"
@@ -191,6 +199,9 @@ values:
                   col: 17
               type: "INTEGER"
               value: "10"
+              nodeType: "TYPE_LITERAL"
+            nodeType: "EX_EQUALITY"
+          nodeType: "BODY_EX"
         - token:
             text: "_<=20"
             start:
@@ -209,6 +220,7 @@ values:
                 line: 3
                 col: 26
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_<=20"
@@ -220,6 +232,7 @@ values:
                 col: 26
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ <= 20"
           value:
             token:
@@ -240,6 +253,7 @@ values:
                 end:
                   line: 3
                   col: 20
+              nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
             right:
               token:
                 text: "20"
@@ -251,6 +265,10 @@ values:
                   col: 26
               type: "INTEGER"
               value: "20"
+              nodeType: "TYPE_LITERAL"
+            nodeType: "EX_EQUALITY"
+          nodeType: "BODY_EX"
+        nodeType: "DT_RULE_WHEN"
       then:
         token:
           text: "{4570}"
@@ -271,7 +289,10 @@ values:
               col: 39
           type: "INTEGER"
           value: "4570"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "DT_RULE_THEN"
       text: "when( _ > 10, _ <= 20 ).add({ 4570 })"
+      nodeType: "DT_RULE_WHEN_THEN"
     - token:
         text: "when(_>10,_<=20and_>10).add({4570})"
         start:
@@ -308,6 +329,7 @@ values:
                 line: 4
                 col: 17
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_>10"
@@ -319,6 +341,7 @@ values:
                 col: 17
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ > 10"
           value:
             token:
@@ -339,6 +362,7 @@ values:
                 end:
                   line: 4
                   col: 12
+              nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
             right:
               token:
                 text: "10"
@@ -350,6 +374,9 @@ values:
                   col: 17
               type: "INTEGER"
               value: "10"
+              nodeType: "TYPE_LITERAL"
+            nodeType: "EX_EQUALITY"
+          nodeType: "BODY_EX"
         - token:
             text: "_<=20and_>10"
             start:
@@ -368,6 +395,7 @@ values:
                 line: 4
                 col: 37
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_<=20and_>10"
@@ -379,6 +407,7 @@ values:
                 col: 37
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ <= 20 and _ > 10"
           value:
             token:
@@ -408,6 +437,7 @@ values:
                   end:
                     line: 4
                     col: 20
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "20"
@@ -419,6 +449,8 @@ values:
                     col: 26
                 type: "INTEGER"
                 value: "20"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
             right:
               token:
                 text: "_>10"
@@ -438,6 +470,7 @@ values:
                   end:
                     line: 4
                     col: 32
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "10"
@@ -449,6 +482,11 @@ values:
                     col: 37
                 type: "INTEGER"
                 value: "10"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
+            nodeType: "EX_AND"
+          nodeType: "BODY_EX"
+        nodeType: "DT_RULE_WHEN"
       then:
         token:
           text: "{4570}"
@@ -469,7 +507,10 @@ values:
               col: 50
           type: "INTEGER"
           value: "4570"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "DT_RULE_THEN"
       text: "when( _ > 10, _ <= 20 and _ > 10 ).add({ 4570 })"
+      nodeType: "DT_RULE_WHEN_THEN"
     - token:
         text: "when(_=6,_!=20and_>10).add({4570})"
         start:
@@ -506,6 +547,7 @@ values:
                 line: 5
                 col: 16
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_=6"
@@ -517,6 +559,7 @@ values:
                 col: 16
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ = 6"
           value:
             token:
@@ -537,6 +580,7 @@ values:
                 end:
                   line: 5
                   col: 12
+              nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
             right:
               token:
                 text: "6"
@@ -548,6 +592,9 @@ values:
                   col: 16
               type: "INTEGER"
               value: "6"
+              nodeType: "TYPE_LITERAL"
+            nodeType: "EX_EQUALITY"
+          nodeType: "BODY_EX"
         - token:
             text: "_!=20and_>10"
             start:
@@ -566,6 +613,7 @@ values:
                 line: 5
                 col: 37
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_!=20and_>10"
@@ -577,6 +625,7 @@ values:
                 col: 37
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ != 20 and _ > 10"
           value:
             token:
@@ -606,6 +655,7 @@ values:
                   end:
                     line: 5
                     col: 20
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "20"
@@ -617,6 +667,8 @@ values:
                     col: 26
                 type: "INTEGER"
                 value: "20"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
             right:
               token:
                 text: "_>10"
@@ -636,6 +688,7 @@ values:
                   end:
                     line: 5
                     col: 32
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "10"
@@ -647,6 +700,11 @@ values:
                     col: 37
                 type: "INTEGER"
                 value: "10"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
+            nodeType: "EX_AND"
+          nodeType: "BODY_EX"
+        nodeType: "DT_RULE_WHEN"
       then:
         token:
           text: "{4570}"
@@ -667,7 +725,11 @@ values:
               col: 50
           type: "INTEGER"
           value: "4570"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "DT_RULE_THEN"
       text: "when( _ = 6,  _ != 20 and _ > 10 ).add({ 4570 })"
+      nodeType: "DT_RULE_WHEN_THEN"
+    nodeType: "DT_HITPOLICY_ALL"
   constants:
     token:
       text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
@@ -704,6 +766,8 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPE_OBJECT"
   matched:
     token:
       text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
@@ -740,3 +804,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPE_OBJECT"
+  nodeType: "BODY_DT"
+nodeType: "ROOT_CONTENT"

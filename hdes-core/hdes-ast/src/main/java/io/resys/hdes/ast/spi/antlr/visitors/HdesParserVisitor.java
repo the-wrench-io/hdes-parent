@@ -62,6 +62,8 @@ import io.resys.hdes.ast.api.nodes.BodyNode.ScalarType;
 import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
 import io.resys.hdes.ast.api.nodes.ExpressionNode.ExpressionBody;
 import io.resys.hdes.ast.api.nodes.HdesNode;
+import io.resys.hdes.ast.api.nodes.HdesNode.ContentNode;
+import io.resys.hdes.ast.api.nodes.ImmutableContentNode;
 import io.resys.hdes.ast.api.nodes.ImmutableEmptyPlaceholder;
 import io.resys.hdes.ast.api.nodes.ImmutableHeaders;
 import io.resys.hdes.ast.api.nodes.ImmutableLiteral;
@@ -116,11 +118,6 @@ public class HdesParserVisitor extends FlowParserVisitor {
   public interface RedundentTypeDefName extends HdesNode {
     Boolean getRequired();
     String getValue();
-  }
-  
-  @Value.Immutable
-  public interface ContentNode extends HdesNode {
-    List<BodyNode> getValues();
   }
   
   @Override

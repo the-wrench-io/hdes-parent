@@ -1,4 +1,37 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createMuiTheme, Theme, ThemeOptions } from '@material-ui/core/styles';
+import { Palette, PaletteOptions } from '@material-ui/core/styles/createPalette';
+
+/*
+--rich-black-fogra-39: #0c0f0aff;
+--winter-sky: #ff206eff;
+--lemon-glacier: #fbff12ff;
+--turquoise: #41ead4ff;
+--white: #ffffffff;
+
+
+--rich-black-fogra-39: #0c0f0aff;
+--turquoise: #41ead4ff;
+--shadow: #7b7263ff;
+--acid-green: #c6ca53ff;
+--slate-blue: #7d53deff;
+*/
+interface AssetPalette {
+  assets: {
+    fl: string,
+    dt: string,
+    st: string
+  }
+}
+
+interface AppPaletteOptions extends PaletteOptions, AssetPalette {}
+interface AppPalette extends Palette, AssetPalette {}
+
+interface AppTheme extends Theme {
+  palette: AppPalette;
+}
+interface AppThemeOptions extends ThemeOptions {
+  palette: AppPaletteOptions;
+}
 
 const theme = createMuiTheme({
   palette: {
@@ -15,6 +48,11 @@ const theme = createMuiTheme({
     background: {
       default: '#0c0f0a',
     },
+    assets: {
+      fl: '#7d53deff',
+      dt: '#c6ca53ff',
+      st: '#7b7263ff'
+    }
   },
 
   props: {
@@ -60,6 +98,7 @@ const theme = createMuiTheme({
       }
     }
   }
-});
+} as AppThemeOptions);
 
+export type { AppTheme }
 export { theme };

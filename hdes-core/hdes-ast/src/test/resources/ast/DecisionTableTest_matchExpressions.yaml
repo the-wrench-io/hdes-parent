@@ -26,6 +26,7 @@ values:
         line: 1
         col: 21
     value: "basic"
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
@@ -58,6 +59,7 @@ values:
         empty: true
         present: false
       type: "STRING"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "lastName:STRING"
         start:
@@ -80,6 +82,7 @@ values:
         empty: true
         present: false
       type: "STRING"
+      nodeType: "TYPE_SCALAR"
     returnDefs:
     - token:
         text: "value:INTEGER"
@@ -103,6 +106,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "exp:INTEGER=value+20"
         start:
@@ -125,6 +129,8 @@ values:
         empty: false
         present: true
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPES"
   hitPolicy:
     token:
       text: "findFirst({when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})})"
@@ -171,6 +177,7 @@ values:
                 line: 4
                 col: 54
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_!='bob'or_='same'or_='professor'"
@@ -182,6 +189,7 @@ values:
                 col: 54
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ != 'bob'  or _ = 'same' or _ = 'professor'"
           value:
             token:
@@ -220,6 +228,7 @@ values:
                     end:
                       line: 4
                       col: 11
+                  nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
                 right:
                   token:
                     text: "'bob'"
@@ -231,6 +240,8 @@ values:
                       col: 20
                   type: "STRING"
                   value: "bob"
+                  nodeType: "TYPE_LITERAL"
+                nodeType: "EX_EQUALITY"
               right:
                 token:
                   text: "_='same'"
@@ -250,6 +261,7 @@ values:
                     end:
                       line: 4
                       col: 26
+                  nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
                 right:
                   token:
                     text: "'same'"
@@ -261,6 +273,9 @@ values:
                       col: 35
                   type: "STRING"
                   value: "same"
+                  nodeType: "TYPE_LITERAL"
+                nodeType: "EX_EQUALITY"
+              nodeType: "EX_OR"
             right:
               token:
                 text: "_='professor'"
@@ -280,6 +295,7 @@ values:
                   end:
                     line: 4
                     col: 40
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "'professor'"
@@ -291,6 +307,10 @@ values:
                     col: 54
                 type: "STRING"
                 value: "professor"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
+            nodeType: "EX_OR"
+          nodeType: "BODY_EX"
         - token:
             text: "_='woman'or_='man'"
             start:
@@ -309,6 +329,7 @@ values:
                 line: 4
                 col: 82
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_='woman'or_='man'"
@@ -320,6 +341,7 @@ values:
                 col: 82
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ = 'woman'  or _ = 'man'"
           value:
             token:
@@ -349,6 +371,7 @@ values:
                   end:
                     line: 4
                     col: 58
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "'woman'"
@@ -360,6 +383,8 @@ values:
                     col: 68
                 type: "STRING"
                 value: "woman"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
             right:
               token:
                 text: "_='man'"
@@ -379,6 +404,7 @@ values:
                   end:
                     line: 4
                     col: 74
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "'man'"
@@ -390,6 +416,11 @@ values:
                     col: 82
                 type: "STRING"
                 value: "man"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
+            nodeType: "EX_OR"
+          nodeType: "BODY_EX"
+        nodeType: "DT_RULE_WHEN"
       then:
         token:
           text: "{4590}"
@@ -410,8 +441,11 @@ values:
               col: 95
           type: "INTEGER"
           value: "4590"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "DT_RULE_THEN"
       text: "when(_ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman'  or _\
         \ = 'man' ).add({ 4590 })"
+      nodeType: "DT_RULE_WHEN_THEN"
     - token:
         text: "when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})"
         start:
@@ -448,6 +482,7 @@ values:
                 line: 5
                 col: 55
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_!='bob1'or_='same'or_='professor2'"
@@ -459,6 +494,7 @@ values:
                 col: 55
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ != 'bob1' or _ = 'same' or _ = 'professor2'"
           value:
             token:
@@ -497,6 +533,7 @@ values:
                     end:
                       line: 5
                       col: 11
+                  nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
                 right:
                   token:
                     text: "'bob1'"
@@ -508,6 +545,8 @@ values:
                       col: 21
                   type: "STRING"
                   value: "bob1"
+                  nodeType: "TYPE_LITERAL"
+                nodeType: "EX_EQUALITY"
               right:
                 token:
                   text: "_='same'"
@@ -527,6 +566,7 @@ values:
                     end:
                       line: 5
                       col: 26
+                  nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
                 right:
                   token:
                     text: "'same'"
@@ -538,6 +578,9 @@ values:
                       col: 35
                   type: "STRING"
                   value: "same"
+                  nodeType: "TYPE_LITERAL"
+                nodeType: "EX_EQUALITY"
+              nodeType: "EX_OR"
             right:
               token:
                 text: "_='professor2'"
@@ -557,6 +600,7 @@ values:
                   end:
                     line: 5
                     col: 40
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "'professor2'"
@@ -568,6 +612,10 @@ values:
                     col: 55
                 type: "STRING"
                 value: "professor2"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
+            nodeType: "EX_OR"
+          nodeType: "BODY_EX"
         - token:
             text: "_='woman2'or_='man2'"
             start:
@@ -586,6 +634,7 @@ values:
                 line: 5
                 col: 83
             value: ""
+            nodeType: "BODY_ID"
           headers:
             token:
               text: "_='woman2'or_='man2'"
@@ -597,6 +646,7 @@ values:
                 col: 83
             acceptDefs: []
             returnDefs: []
+            nodeType: "TYPES"
           src: "_ = 'woman2' or _ = 'man2'"
           value:
             token:
@@ -626,6 +676,7 @@ values:
                   end:
                     line: 5
                     col: 58
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "'woman2'"
@@ -637,6 +688,8 @@ values:
                     col: 69
                 type: "STRING"
                 value: "woman2"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
             right:
               token:
                 text: "_='man2'"
@@ -656,6 +709,7 @@ values:
                   end:
                     line: 5
                     col: 74
+                nodeType: "INVOCATION_EMPTY_PLACEHOLDER"
               right:
                 token:
                   text: "'man2'"
@@ -667,6 +721,11 @@ values:
                     col: 83
                 type: "STRING"
                 value: "man2"
+                nodeType: "TYPE_LITERAL"
+              nodeType: "EX_EQUALITY"
+            nodeType: "EX_OR"
+          nodeType: "BODY_EX"
+        nodeType: "DT_RULE_WHEN"
       then:
         token:
           text: "{4590}"
@@ -687,8 +746,12 @@ values:
               col: 95
           type: "INTEGER"
           value: "4590"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "DT_RULE_THEN"
       text: "when(_ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or _\
         \ = 'man2').add({ 4590 })"
+      nodeType: "DT_RULE_WHEN_THEN"
+    nodeType: "DT_HITPOLICY_FIRST"
   constants:
     token:
       text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
@@ -725,6 +788,8 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPE_OBJECT"
   matched:
     token:
       text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
@@ -761,6 +826,7 @@ values:
         empty: true
         present: false
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
     - token:
         text: "exp:INTEGER=value+20"
         start:
@@ -783,3 +849,7 @@ values:
         empty: false
         present: true
       type: "INTEGER"
+      nodeType: "TYPE_SCALAR"
+    nodeType: "TYPE_OBJECT"
+  nodeType: "BODY_DT"
+nodeType: "ROOT_CONTENT"

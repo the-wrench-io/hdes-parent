@@ -2,6 +2,8 @@ package io.resys.hdes.ast.api.nodes;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 /*-
  * #%L
  * hdes-ast
@@ -34,15 +36,22 @@ public interface InvocationNode extends HdesNode {
   @Value.Immutable
   interface NamedPlaceholder extends Placeholder {
     String getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.INVOCATION_NAMED_PLACEHOLDER; }
   }
 
   @Value.Immutable
-  interface EmptyPlaceholder extends Placeholder {}
+  interface EmptyPlaceholder extends Placeholder {
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.INVOCATION_EMPTY_PLACEHOLDER; }
+  }
   
   // Flat one name thats not a placeholder or nested name
   @Value.Immutable
   interface SimpleInvocation extends InvocationNode {
     String getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.INVOCATION_SIMPLE; }
   }
   
   @Value.Immutable
@@ -52,39 +61,22 @@ public interface InvocationNode extends HdesNode {
     
     // last value on nested invocation
     InvocationNode getValue();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.INVOCATION_NESTED; }
   }
   
   @Value.Immutable
   interface SortBy extends FlowNode {
     List<SortByDef> getValues();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.INVOCATION_SORTBY; }
   }
 
   @Value.Immutable
   interface SortByDef extends FlowNode {
     InvocationNode getName();
     Boolean getAsc();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.INVOCATION_SORTBY_DEF; }
   }
-  
-  /*
-   *   @Override
-  public SortBy visitSortBy(SortByContext ctx) {
-    Nodes nodes = nodes(ctx);
-    return ImmutableSortBy.builder().token(nodes.getToken()).values(nodes.list(SortByDef.class)).build();
-  }
-  
-  @Override
-  public SortByDef visitSortByArg(SortByArgContext ctx) {
-    Nodes nodes = nodes(ctx);
-    
-    final boolean asc;
-    if(ctx.getChildCount() > 1) {
-      TerminalNode node = (TerminalNode) ctx.getChild(1);
-      asc = node.getSymbol().getType() == HdesParser.ASC;
-    } else {
-      asc = true;
-    }
-    return ImmutableSortByDef.builder().token(nodes.getToken()).name(nodes.of(InvocationNode.class).get()).asc(asc).build();
-  }
-  
-   */
 }

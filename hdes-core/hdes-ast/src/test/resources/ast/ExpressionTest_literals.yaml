@@ -26,6 +26,7 @@ values:
         line: 1
         col: 16
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "-10"
@@ -37,6 +38,7 @@ values:
         col: 16
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "-10"
   value:
     token:
@@ -58,6 +60,9 @@ values:
           col: 16
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_UNARY_NEGATE"
+  nodeType: "BODY_EX"
 - token:
     text: "-10_000"
     start:
@@ -76,6 +81,7 @@ values:
         line: 2
         col: 20
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "-10_000"
@@ -87,6 +93,7 @@ values:
         col: 20
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "-10_000"
   value:
     token:
@@ -108,6 +115,9 @@ values:
           col: 20
       type: "INTEGER"
       value: "10000"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_UNARY_NEGATE"
+  nodeType: "BODY_EX"
 - token:
     text: "-10.5"
     start:
@@ -126,6 +136,7 @@ values:
         line: 3
         col: 18
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "-10.5"
@@ -137,6 +148,7 @@ values:
         col: 18
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "-10.5"
   value:
     token:
@@ -158,6 +170,9 @@ values:
           col: 18
       type: "DECIMAL"
       value: "10.5"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_UNARY_NEGATE"
+  nodeType: "BODY_EX"
 - token:
     text: "true"
     start:
@@ -176,6 +191,7 @@ values:
         line: 4
         col: 17
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "true"
@@ -187,6 +203,7 @@ values:
         col: 17
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "true"
   value:
     token:
@@ -199,6 +216,8 @@ values:
         col: 17
     type: "BOOLEAN"
     value: "true"
+    nodeType: "TYPE_LITERAL"
+  nodeType: "BODY_EX"
 - token:
     text: "false"
     start:
@@ -217,6 +236,7 @@ values:
         line: 5
         col: 18
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "false"
@@ -228,6 +248,7 @@ values:
         col: 18
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "false"
   value:
     token:
@@ -240,6 +261,8 @@ values:
         col: 18
     type: "BOOLEAN"
     value: "false"
+    nodeType: "TYPE_LITERAL"
+  nodeType: "BODY_EX"
 - token:
     text: "'words'"
     start:
@@ -258,6 +281,7 @@ values:
         line: 6
         col: 20
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "'words'"
@@ -269,6 +293,7 @@ values:
         col: 20
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "'words'"
   value:
     token:
@@ -281,3 +306,6 @@ values:
         col: 20
     type: "STRING"
     value: "words"
+    nodeType: "TYPE_LITERAL"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

@@ -26,6 +26,7 @@ values:
         line: 1
         col: 52
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "users.map(e->e.firstName).findFirst()"
@@ -37,6 +38,7 @@ values:
         col: 52
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "users.map(e -> e.firstName).findFirst()"
   value:
     token:
@@ -57,6 +59,7 @@ values:
           line: 1
           col: 18
       value: "users"
+      nodeType: "INVOCATION_SIMPLE"
     param:
       token:
         text: "e"
@@ -67,6 +70,7 @@ values:
           line: 1
           col: 24
       value: "e"
+      nodeType: "INVOCATION_SIMPLE"
     body:
       token:
         text: "e.firstName"
@@ -86,6 +90,7 @@ values:
             line: 1
             col: 29
         value: "e"
+        nodeType: "INVOCATION_SIMPLE"
       value:
         token:
           text: "firstName"
@@ -96,12 +101,16 @@ values:
             line: 1
             col: 39
         value: "firstName"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "INVOCATION_NESTED"
     findFirst: true
     sort: []
     filter: []
     next:
       empty: true
       present: false
+    nodeType: "EX_LAMBDA"
+  nodeType: "BODY_EX"
 - token:
     text: "users.map(e->e.firstName).filter(e->e='SAM').sort(e->e,ASC).findFirst()"
     start:
@@ -120,6 +129,7 @@ values:
         line: 2
         col: 93
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "users.map(e->e.firstName).filter(e->e='SAM').sort(e->e,ASC).findFirst()"
@@ -131,6 +141,7 @@ values:
         col: 93
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "users.map(e -> e.firstName).filter(e -> e = 'SAM').sort(e -> e, ASC).findFirst()"
   value:
     token:
@@ -151,6 +162,7 @@ values:
           line: 2
           col: 18
       value: "users"
+      nodeType: "INVOCATION_SIMPLE"
     param:
       token:
         text: "e"
@@ -161,6 +173,7 @@ values:
           line: 2
           col: 24
       value: "e"
+      nodeType: "INVOCATION_SIMPLE"
     body:
       token:
         text: "e.firstName"
@@ -180,6 +193,7 @@ values:
             line: 2
             col: 29
         value: "e"
+        nodeType: "INVOCATION_SIMPLE"
       value:
         token:
           text: "firstName"
@@ -190,6 +204,8 @@ values:
             line: 2
             col: 39
         value: "firstName"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "INVOCATION_NESTED"
     findFirst: true
     sort:
     - token:
@@ -210,6 +226,7 @@ values:
             line: 2
             col: 70
         value: "e"
+        nodeType: "INVOCATION_SIMPLE"
       body:
         token:
           text: "e"
@@ -220,6 +237,8 @@ values:
             line: 2
             col: 75
         value: "e"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "EX_LAMBDA_SORT"
     filter:
     - token:
         text: "filter(e->e='SAM')"
@@ -239,6 +258,7 @@ values:
             line: 2
             col: 49
         value: "e"
+        nodeType: "INVOCATION_SIMPLE"
       body:
         token:
           text: "e='SAM'"
@@ -259,6 +279,7 @@ values:
               line: 2
               col: 54
           value: "e"
+          nodeType: "INVOCATION_SIMPLE"
         right:
           token:
             text: "'SAM'"
@@ -270,6 +291,12 @@ values:
               col: 62
           type: "STRING"
           value: "SAM"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_EQUALITY"
+      nodeType: "EX_LAMBDA_FILTER"
     next:
       empty: true
       present: false
+    nodeType: "EX_LAMBDA"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

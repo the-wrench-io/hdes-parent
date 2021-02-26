@@ -26,6 +26,7 @@ values:
         line: 1
         col: 40
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "users.map(e->e.firstName)"
@@ -37,6 +38,7 @@ values:
         col: 40
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "users.map(e -> e.firstName)"
   value:
     token:
@@ -57,6 +59,7 @@ values:
           line: 1
           col: 18
       value: "users"
+      nodeType: "INVOCATION_SIMPLE"
     param:
       token:
         text: "e"
@@ -67,6 +70,7 @@ values:
           line: 1
           col: 24
       value: "e"
+      nodeType: "INVOCATION_SIMPLE"
     body:
       token:
         text: "e.firstName"
@@ -86,6 +90,7 @@ values:
             line: 1
             col: 29
         value: "e"
+        nodeType: "INVOCATION_SIMPLE"
       value:
         token:
           text: "firstName"
@@ -96,9 +101,14 @@ values:
             line: 1
             col: 39
         value: "firstName"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "INVOCATION_NESTED"
     findFirst: false
     sort: []
     filter: []
     next:
       empty: true
       present: false
+    nodeType: "EX_LAMBDA"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

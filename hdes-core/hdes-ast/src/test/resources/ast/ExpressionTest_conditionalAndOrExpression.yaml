@@ -26,6 +26,7 @@ values:
         line: 1
         col: 28
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x>6andz<t"
@@ -37,6 +38,7 @@ values:
         col: 28
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x > 6 and z < t"
   value:
     token:
@@ -67,6 +69,7 @@ values:
             line: 1
             col: 14
         value: "x"
+        nodeType: "INVOCATION_SIMPLE"
       right:
         token:
           text: "6"
@@ -78,6 +81,8 @@ values:
             col: 18
         type: "INTEGER"
         value: "6"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     right:
       token:
         text: "z<t"
@@ -98,6 +103,7 @@ values:
             line: 1
             col: 24
         value: "z"
+        nodeType: "INVOCATION_SIMPLE"
       right:
         token:
           text: "t"
@@ -108,6 +114,10 @@ values:
             line: 1
             col: 28
         value: "t"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "EX_EQUALITY"
+    nodeType: "EX_AND"
+  nodeType: "BODY_EX"
 - token:
     text: "x=20andy=10andz=100"
     start:
@@ -126,6 +136,7 @@ values:
         line: 2
         col: 42
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x=20andy=10andz=100"
@@ -137,6 +148,7 @@ values:
         col: 42
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x = 20 and y = 10 and z = 100"
   value:
     token:
@@ -176,6 +188,7 @@ values:
               line: 2
               col: 14
           value: "x"
+          nodeType: "INVOCATION_SIMPLE"
         right:
           token:
             text: "20"
@@ -187,6 +200,8 @@ values:
               col: 19
           type: "INTEGER"
           value: "20"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_EQUALITY"
       right:
         token:
           text: "y=10"
@@ -207,6 +222,7 @@ values:
               line: 2
               col: 25
           value: "y"
+          nodeType: "INVOCATION_SIMPLE"
         right:
           token:
             text: "10"
@@ -218,6 +234,9 @@ values:
               col: 30
           type: "INTEGER"
           value: "10"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_EQUALITY"
+      nodeType: "EX_AND"
     right:
       token:
         text: "z=100"
@@ -238,6 +257,7 @@ values:
             line: 2
             col: 36
         value: "z"
+        nodeType: "INVOCATION_SIMPLE"
       right:
         token:
           text: "100"
@@ -249,6 +269,10 @@ values:
             col: 42
         type: "INTEGER"
         value: "100"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
+    nodeType: "EX_AND"
+  nodeType: "BODY_EX"
 - token:
     text: "x=20andy=10orc>10"
     start:
@@ -267,6 +291,7 @@ values:
         line: 3
         col: 40
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x=20andy=10orc>10"
@@ -278,6 +303,7 @@ values:
         col: 40
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x = 20 and y = 10 or c > 10"
   value:
     token:
@@ -317,6 +343,7 @@ values:
               line: 3
               col: 14
           value: "x"
+          nodeType: "INVOCATION_SIMPLE"
         right:
           token:
             text: "20"
@@ -328,6 +355,8 @@ values:
               col: 19
           type: "INTEGER"
           value: "20"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_EQUALITY"
       right:
         token:
           text: "y=10"
@@ -348,6 +377,7 @@ values:
               line: 3
               col: 25
           value: "y"
+          nodeType: "INVOCATION_SIMPLE"
         right:
           token:
             text: "10"
@@ -359,6 +389,9 @@ values:
               col: 30
           type: "INTEGER"
           value: "10"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_EQUALITY"
+      nodeType: "EX_AND"
     right:
       token:
         text: "c>10"
@@ -379,6 +412,7 @@ values:
             line: 3
             col: 35
         value: "c"
+        nodeType: "INVOCATION_SIMPLE"
       right:
         token:
           text: "10"
@@ -390,3 +424,8 @@ values:
             col: 40
         type: "INTEGER"
         value: "10"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
+    nodeType: "EX_OR"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

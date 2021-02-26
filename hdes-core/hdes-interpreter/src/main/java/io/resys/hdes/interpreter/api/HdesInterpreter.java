@@ -59,6 +59,7 @@ public interface HdesInterpreter {
   
   interface DataAccessNode extends HdesNode {
     Serializable get(String name);
+    default HdesNodeType getNodeType() { return null; }
   }
   
   interface InterpratedNode {}

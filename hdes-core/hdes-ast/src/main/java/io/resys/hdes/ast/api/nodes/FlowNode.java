@@ -23,6 +23,8 @@ package io.resys.hdes.ast.api.nodes;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.ast.api.nodes.BodyNode.TypeDef;
@@ -35,6 +37,8 @@ public interface FlowNode extends HdesNode {
   @Value.Immutable
   interface FlowBody extends FlowNode, BodyNode { 
     Optional<Step> getStep();
+    @Nullable @Value.Default
+    default HdesNodeType getNodeType() { return HdesNodeType.BODY_FL; }
   }
   
   @Value.Immutable
@@ -44,11 +48,13 @@ public interface FlowNode extends HdesNode {
     StepPointer getPointer();
     Boolean getAwait();
     Optional<StepAs> getAs();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_STEP; }
   }
   
   @Value.Immutable
   interface StepAs extends FlowNode {
     ObjectMappingDef getMapping();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_STEP_AS; }
   }
   
   
@@ -59,11 +65,13 @@ public interface FlowNode extends HdesNode {
 
   @Value.Immutable
   interface EmptyAction extends StepAction {
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_ACTION_EMPTY; }
   }
   
   @Value.Immutable
   interface CallAction extends StepAction {
     List<CallDef> getCalls();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_ACTION_CALL; }
   }
   
   @Value.Immutable
@@ -72,6 +80,7 @@ public interface FlowNode extends HdesNode {
     SimpleInvocation getId();
     ObjectMappingDef getMapping();
     Boolean getAwait();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_CALL_DEF; }
   }
 
   @Value.Immutable
@@ -79,6 +88,7 @@ public interface FlowNode extends HdesNode {
     InvocationNode getOver();
     Optional<Step> getStep();
     Boolean getNested();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_ACTION_ITERATE; }
   }
   
   /**
@@ -89,27 +99,32 @@ public interface FlowNode extends HdesNode {
   @Value.Immutable
   interface SplitPointer extends StepPointer {
     List<StepPointer> getValues();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_POINTER_SPLIT; }
   }
 
   @Value.Immutable
   interface WhenPointer extends StepPointer {
     ExpressionBody getWhen();
     StepPointer getThen();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_POINTER_WHEN; }
   }
   
   @Value.Immutable
   interface ThenPointer extends StepPointer {
     SimpleInvocation getId();
     Step getStep();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_POINTER_THEN; }
   }
   
   @Value.Immutable
   interface EndPointer extends StepPointer {
     ObjectMappingDef getMapping();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_POINTER_END; }
   }
 
   @Value.Immutable
   interface IterationEndPointer extends StepPointer {
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_POINTER_ITERATE_END; }
   }
   
   @Value.Immutable
@@ -117,5 +132,6 @@ public interface FlowNode extends HdesNode {
     int getIndex();
     CallDef getCallDef();
     List<TypeDef> getValues();
+    default HdesNodeType getNodeType() { return HdesNodeType.FLOW_STEP_CALL_DEF; }
   }
 }

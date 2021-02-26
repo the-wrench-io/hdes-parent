@@ -26,6 +26,7 @@ values:
         line: 1
         col: 28
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "sum(10,20,40)"
@@ -37,6 +38,7 @@ values:
         col: 28
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "sum(10, 20, 40)"
   value:
     token:
@@ -59,6 +61,7 @@ values:
           col: 19
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "20"
         start:
@@ -69,6 +72,7 @@ values:
           col: 23
       type: "INTEGER"
       value: "20"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "40"
         start:
@@ -79,6 +83,9 @@ values:
           col: 27
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "min(10,20,40)"
     start:
@@ -97,6 +104,7 @@ values:
         line: 2
         col: 28
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "min(10,20,40)"
@@ -108,6 +116,7 @@ values:
         col: 28
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "min(10, 20, 40)"
   value:
     token:
@@ -130,6 +139,7 @@ values:
           col: 19
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "20"
         start:
@@ -140,6 +150,7 @@ values:
           col: 23
       type: "INTEGER"
       value: "20"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "40"
         start:
@@ -150,6 +161,9 @@ values:
           col: 27
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "max(10,20,40)"
     start:
@@ -168,6 +182,7 @@ values:
         line: 3
         col: 28
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "max(10,20,40)"
@@ -179,6 +194,7 @@ values:
         col: 28
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "max(10, 20, 40)"
   value:
     token:
@@ -201,6 +217,7 @@ values:
           col: 19
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "20"
         start:
@@ -211,6 +228,7 @@ values:
           col: 23
       type: "INTEGER"
       value: "20"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "40"
         start:
@@ -221,6 +239,9 @@ values:
           col: 27
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "avg(10,20,40)"
     start:
@@ -239,6 +260,7 @@ values:
         line: 4
         col: 28
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "avg(10,20,40)"
@@ -250,6 +272,7 @@ values:
         col: 28
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "avg(10, 20, 40)"
   value:
     token:
@@ -272,6 +295,7 @@ values:
           col: 19
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "20"
         start:
@@ -282,6 +306,7 @@ values:
           col: 23
       type: "INTEGER"
       value: "20"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "40"
         start:
@@ -292,3 +317,7 @@ values:
           col: 27
       type: "INTEGER"
       value: "40"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

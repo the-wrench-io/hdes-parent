@@ -26,6 +26,7 @@ values:
         line: 1
         col: 36
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "xin('aaa','bbb','x')"
@@ -37,6 +38,7 @@ values:
         col: 36
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x in('aaa', 'bbb', 'x')"
   value:
     token:
@@ -57,6 +59,7 @@ values:
           line: 1
           col: 14
       value: "x"
+      nodeType: "INVOCATION_SIMPLE"
     right:
     - token:
         text: "'aaa'"
@@ -68,6 +71,7 @@ values:
           col: 23
       type: "STRING"
       value: "aaa"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "'bbb'"
         start:
@@ -78,6 +82,7 @@ values:
           col: 30
       type: "STRING"
       value: "bbb"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "'x'"
         start:
@@ -88,6 +93,9 @@ values:
           col: 35
       type: "STRING"
       value: "x"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_IN"
+  nodeType: "BODY_EX"
 - token:
     text: "xin(y,x,z)"
     start:
@@ -106,6 +114,7 @@ values:
         line: 2
         col: 26
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "xin(y,x,z)"
@@ -117,6 +126,7 @@ values:
         col: 26
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x in(y, x, z)"
   value:
     token:
@@ -137,6 +147,7 @@ values:
           line: 2
           col: 14
       value: "x"
+      nodeType: "INVOCATION_SIMPLE"
     right:
     - token:
         text: "y"
@@ -147,6 +158,7 @@ values:
           line: 2
           col: 19
       value: "y"
+      nodeType: "INVOCATION_SIMPLE"
     - token:
         text: "x"
         start:
@@ -156,6 +168,7 @@ values:
           line: 2
           col: 22
       value: "x"
+      nodeType: "INVOCATION_SIMPLE"
     - token:
         text: "z"
         start:
@@ -165,6 +178,9 @@ values:
           line: 2
           col: 25
       value: "z"
+      nodeType: "INVOCATION_SIMPLE"
+    nodeType: "EX_IN"
+  nodeType: "BODY_EX"
 - token:
     text: "sum(y,x,z)"
     start:
@@ -183,6 +199,7 @@ values:
         line: 3
         col: 25
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "sum(y,x,z)"
@@ -194,6 +211,7 @@ values:
         col: 25
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "sum(y, x, z)"
   value:
     token:
@@ -215,6 +233,7 @@ values:
           line: 3
           col: 18
       value: "y"
+      nodeType: "INVOCATION_SIMPLE"
     - token:
         text: "x"
         start:
@@ -224,6 +243,7 @@ values:
           line: 3
           col: 21
       value: "x"
+      nodeType: "INVOCATION_SIMPLE"
     - token:
         text: "z"
         start:
@@ -233,6 +253,9 @@ values:
           line: 3
           col: 24
       value: "z"
+      nodeType: "INVOCATION_SIMPLE"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "sum(10,20,30)"
     start:
@@ -251,6 +274,7 @@ values:
         line: 4
         col: 28
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "sum(10,20,30)"
@@ -262,6 +286,7 @@ values:
         col: 28
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "sum(10, 20, 30)"
   value:
     token:
@@ -284,6 +309,7 @@ values:
           col: 19
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "20"
         start:
@@ -294,6 +320,7 @@ values:
           col: 23
       type: "INTEGER"
       value: "20"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "30"
         start:
@@ -304,6 +331,9 @@ values:
           col: 27
       type: "INTEGER"
       value: "30"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "sum(10_0000,0.20,30)"
     start:
@@ -322,6 +352,7 @@ values:
         line: 5
         col: 35
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "sum(10_0000,0.20,30)"
@@ -333,6 +364,7 @@ values:
         col: 35
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "sum(10_0000, 0.20, 30)"
   value:
     token:
@@ -355,6 +387,7 @@ values:
           col: 24
       type: "INTEGER"
       value: "100000"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "0.20"
         start:
@@ -365,6 +398,7 @@ values:
           col: 30
       type: "DECIMAL"
       value: "0.20"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "30"
         start:
@@ -375,6 +409,9 @@ values:
           col: 34
       type: "INTEGER"
       value: "30"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "sum(sum(),sum(sum(10,20)),x.value,30,z.value,v.x=10?sum(sum(10,20),t):100)"
     start:
@@ -393,6 +430,7 @@ values:
         line: 6
         col: 101
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "sum(sum(),sum(sum(10,20)),x.value,30,z.value,v.x=10?sum(sum(10,20),t):100)"
@@ -404,6 +442,7 @@ values:
         col: 101
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "sum(sum(), sum(sum(10, 20)), x.value, 30, z.value, v.x = 10 ? sum(sum(10,\
     \ 20), t) : 100)"
   value:
@@ -427,6 +466,7 @@ values:
           col: 22
       type: "SUM"
       values: []
+      nodeType: "EX_INSTANCE_STATIC_METHOD"
     - token:
         text: "sum(sum(10,20))"
         start:
@@ -457,6 +497,7 @@ values:
               col: 34
           type: "INTEGER"
           value: "10"
+          nodeType: "TYPE_LITERAL"
         - token:
             text: "20"
             start:
@@ -467,6 +508,9 @@ values:
               col: 38
           type: "INTEGER"
           value: "20"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_INSTANCE_STATIC_METHOD"
+      nodeType: "EX_INSTANCE_STATIC_METHOD"
     - token:
         text: "x.value"
         start:
@@ -485,6 +529,7 @@ values:
             line: 6
             col: 43
         value: "x"
+        nodeType: "INVOCATION_SIMPLE"
       value:
         token:
           text: "value"
@@ -495,6 +540,8 @@ values:
             line: 6
             col: 49
         value: "value"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "INVOCATION_NESTED"
     - token:
         text: "30"
         start:
@@ -505,6 +552,7 @@ values:
           col: 53
       type: "INTEGER"
       value: "30"
+      nodeType: "TYPE_LITERAL"
     - token:
         text: "z.value"
         start:
@@ -523,6 +571,7 @@ values:
             line: 6
             col: 56
         value: "z"
+        nodeType: "INVOCATION_SIMPLE"
       value:
         token:
           text: "value"
@@ -533,6 +582,8 @@ values:
             line: 6
             col: 62
         value: "value"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "INVOCATION_NESTED"
     - token:
         text: "v.x=10?sum(sum(10,20),t):100"
         start:
@@ -570,6 +621,7 @@ values:
                 line: 6
                 col: 65
             value: "v"
+            nodeType: "INVOCATION_SIMPLE"
           value:
             token:
               text: "x"
@@ -580,6 +632,8 @@ values:
                 line: 6
                 col: 67
             value: "x"
+            nodeType: "INVOCATION_SIMPLE"
+          nodeType: "INVOCATION_NESTED"
         right:
           token:
             text: "10"
@@ -591,6 +645,8 @@ values:
               col: 72
           type: "INTEGER"
           value: "10"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_EQUALITY"
       left:
         token:
           text: "sum(sum(10,20),t)"
@@ -622,6 +678,7 @@ values:
                 col: 85
             type: "INTEGER"
             value: "10"
+            nodeType: "TYPE_LITERAL"
           - token:
               text: "20"
               start:
@@ -632,6 +689,8 @@ values:
                 col: 89
             type: "INTEGER"
             value: "20"
+            nodeType: "TYPE_LITERAL"
+          nodeType: "EX_INSTANCE_STATIC_METHOD"
         - token:
             text: "t"
             start:
@@ -641,6 +700,8 @@ values:
               line: 6
               col: 93
           value: "t"
+          nodeType: "INVOCATION_SIMPLE"
+        nodeType: "EX_INSTANCE_STATIC_METHOD"
       right:
         token:
           text: "100"
@@ -652,6 +713,10 @@ values:
             col: 100
         type: "INTEGER"
         value: "100"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_CONDITIONAL"
+    nodeType: "EX_INSTANCE_STATIC_METHOD"
+  nodeType: "BODY_EX"
 - token:
     text: "x.value.children"
     start:
@@ -670,6 +735,7 @@ values:
         line: 7
         col: 29
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x.value.children"
@@ -681,6 +747,7 @@ values:
         col: 29
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x.value.children"
   value:
     token:
@@ -710,6 +777,7 @@ values:
             line: 7
             col: 14
         value: "x"
+        nodeType: "INVOCATION_SIMPLE"
       value:
         token:
           text: "value"
@@ -720,6 +788,8 @@ values:
             line: 7
             col: 20
         value: "value"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "INVOCATION_NESTED"
     value:
       token:
         text: "children"
@@ -730,6 +800,9 @@ values:
           line: 7
           col: 29
       value: "children"
+      nodeType: "INVOCATION_SIMPLE"
+    nodeType: "INVOCATION_NESTED"
+  nodeType: "BODY_EX"
 - token:
     text: "x.value.children.value"
     start:
@@ -748,6 +821,7 @@ values:
         line: 8
         col: 35
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x.value.children.value"
@@ -759,6 +833,7 @@ values:
         col: 35
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x.value.children.value"
   value:
     token:
@@ -797,6 +872,7 @@ values:
               line: 8
               col: 14
           value: "x"
+          nodeType: "INVOCATION_SIMPLE"
         value:
           token:
             text: "value"
@@ -807,6 +883,8 @@ values:
               line: 8
               col: 20
           value: "value"
+          nodeType: "INVOCATION_SIMPLE"
+        nodeType: "INVOCATION_NESTED"
       value:
         token:
           text: "children"
@@ -817,6 +895,8 @@ values:
             line: 8
             col: 29
         value: "children"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "INVOCATION_NESTED"
     value:
       token:
         text: "value"
@@ -827,6 +907,9 @@ values:
           line: 8
           col: 35
       value: "value"
+      nodeType: "INVOCATION_SIMPLE"
+    nodeType: "INVOCATION_NESTED"
+  nodeType: "BODY_EX"
 - token:
     text: "5=10and20=30"
     start:
@@ -845,6 +928,7 @@ values:
         line: 9
         col: 31
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "5=10and20=30"
@@ -856,6 +940,7 @@ values:
         col: 31
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "5 = 10 and 20 = 30"
   value:
     token:
@@ -887,6 +972,7 @@ values:
             col: 14
         type: "INTEGER"
         value: "5"
+        nodeType: "TYPE_LITERAL"
       right:
         token:
           text: "10"
@@ -898,6 +984,8 @@ values:
             col: 19
         type: "INTEGER"
         value: "10"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     right:
       token:
         text: "20=30"
@@ -919,6 +1007,7 @@ values:
             col: 26
         type: "INTEGER"
         value: "20"
+        nodeType: "TYPE_LITERAL"
       right:
         token:
           text: "30"
@@ -930,6 +1019,10 @@ values:
             col: 31
         type: "INTEGER"
         value: "30"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
+    nodeType: "EX_AND"
+  nodeType: "BODY_EX"
 - token:
     text: "x=10ory=30"
     start:
@@ -948,6 +1041,7 @@ values:
         line: 10
         col: 29
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x=10ory=30"
@@ -959,6 +1053,7 @@ values:
         col: 29
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x = 10 or y = 30"
   value:
     token:
@@ -989,6 +1084,7 @@ values:
             line: 10
             col: 14
         value: "x"
+        nodeType: "INVOCATION_SIMPLE"
       right:
         token:
           text: "10"
@@ -1000,6 +1096,8 @@ values:
             col: 19
         type: "INTEGER"
         value: "10"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     right:
       token:
         text: "y=30"
@@ -1020,6 +1118,7 @@ values:
             line: 10
             col: 24
         value: "y"
+        nodeType: "INVOCATION_SIMPLE"
       right:
         token:
           text: "30"
@@ -1031,6 +1130,10 @@ values:
             col: 29
         type: "INTEGER"
         value: "30"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
+    nodeType: "EX_OR"
+  nodeType: "BODY_EX"
 - token:
     text: "x=10orsum(y,x,z)=-30"
     start:
@@ -1049,6 +1152,7 @@ values:
         line: 11
         col: 41
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x=10orsum(y,x,z)=-30"
@@ -1060,6 +1164,7 @@ values:
         col: 41
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x = 10 or sum(y, x, z) = -30"
   value:
     token:
@@ -1090,6 +1195,7 @@ values:
             line: 11
             col: 14
         value: "x"
+        nodeType: "INVOCATION_SIMPLE"
       right:
         token:
           text: "10"
@@ -1101,6 +1207,8 @@ values:
             col: 19
         type: "INTEGER"
         value: "10"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     right:
       token:
         text: "sum(y,x,z)=-30"
@@ -1131,6 +1239,7 @@ values:
               line: 11
               col: 28
           value: "y"
+          nodeType: "INVOCATION_SIMPLE"
         - token:
             text: "x"
             start:
@@ -1140,6 +1249,7 @@ values:
               line: 11
               col: 31
           value: "x"
+          nodeType: "INVOCATION_SIMPLE"
         - token:
             text: "z"
             start:
@@ -1149,6 +1259,8 @@ values:
               line: 11
               col: 34
           value: "z"
+          nodeType: "INVOCATION_SIMPLE"
+        nodeType: "EX_INSTANCE_STATIC_METHOD"
       right:
         token:
           text: "-30"
@@ -1169,6 +1281,11 @@ values:
               col: 41
           type: "INTEGER"
           value: "30"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_UNARY_NEGATE"
+      nodeType: "EX_EQUALITY"
+    nodeType: "EX_OR"
+  nodeType: "BODY_EX"
 - token:
     text: "true=false?10:sum(20)"
     start:
@@ -1187,6 +1304,7 @@ values:
         line: 12
         col: 40
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "true=false?10:sum(20)"
@@ -1198,6 +1316,7 @@ values:
         col: 40
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "true = false ? 10 : sum(20)"
   value:
     token:
@@ -1229,6 +1348,7 @@ values:
             col: 17
         type: "BOOLEAN"
         value: "true"
+        nodeType: "TYPE_LITERAL"
       right:
         token:
           text: "false"
@@ -1240,6 +1360,8 @@ values:
             col: 25
         type: "BOOLEAN"
         value: "false"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_EQUALITY"
     left:
       token:
         text: "10"
@@ -1251,6 +1373,7 @@ values:
           col: 30
       type: "INTEGER"
       value: "10"
+      nodeType: "TYPE_LITERAL"
     right:
       token:
         text: "sum(20)"
@@ -1272,6 +1395,10 @@ values:
             col: 39
         type: "INTEGER"
         value: "20"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_INSTANCE_STATIC_METHOD"
+    nodeType: "EX_CONDITIONAL"
+  nodeType: "BODY_EX"
 - token:
     text: "-x"
     start:
@@ -1290,6 +1417,7 @@ values:
         line: 13
         col: 15
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "-x"
@@ -1301,6 +1429,7 @@ values:
         col: 15
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "-x"
   value:
     token:
@@ -1321,6 +1450,9 @@ values:
           line: 13
           col: 15
       value: "x"
+      nodeType: "INVOCATION_SIMPLE"
+    nodeType: "EX_UNARY_NEGATE"
+  nodeType: "BODY_EX"
 - token:
     text: "+x+(1-20)"
     start:
@@ -1339,6 +1471,7 @@ values:
         line: 14
         col: 24
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "+x+(1-20)"
@@ -1350,6 +1483,7 @@ values:
         col: 24
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "+x + (1-20)"
   value:
     token:
@@ -1380,6 +1514,8 @@ values:
             line: 14
             col: 15
         value: "x"
+        nodeType: "INVOCATION_SIMPLE"
+      nodeType: "EX_UNARY_NEGATE"
     right:
       token:
         text: "1-20"
@@ -1401,6 +1537,7 @@ values:
             col: 20
         type: "INTEGER"
         value: "1"
+        nodeType: "TYPE_LITERAL"
       right:
         token:
           text: "20"
@@ -1412,6 +1549,10 @@ values:
             col: 23
         type: "INTEGER"
         value: "20"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_ADDITIVE"
+    nodeType: "EX_ADDITIVE"
+  nodeType: "BODY_EX"
 - token:
     text: "(x*y/20)+1"
     start:
@@ -1430,6 +1571,7 @@ values:
         line: 15
         col: 25
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "(x*y/20)+1"
@@ -1441,6 +1583,7 @@ values:
         col: 25
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "(x*y/20) + 1"
   value:
     token:
@@ -1482,6 +1625,7 @@ values:
               line: 15
               col: 15
           value: "x"
+          nodeType: "INVOCATION_SIMPLE"
         right:
           token:
             text: "y"
@@ -1492,6 +1636,8 @@ values:
               line: 15
               col: 17
           value: "y"
+          nodeType: "INVOCATION_SIMPLE"
+        nodeType: "EX_MULTIPLICATIVE"
       right:
         token:
           text: "20"
@@ -1503,6 +1649,8 @@ values:
             col: 20
         type: "INTEGER"
         value: "20"
+        nodeType: "TYPE_LITERAL"
+      nodeType: "EX_MULTIPLICATIVE"
     right:
       token:
         text: "1"
@@ -1514,3 +1662,7 @@ values:
           col: 25
       type: "INTEGER"
       value: "1"
+      nodeType: "TYPE_LITERAL"
+    nodeType: "EX_ADDITIVE"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"

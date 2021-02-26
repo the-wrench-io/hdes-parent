@@ -11,9 +11,10 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import Avatar from '@material-ui/core/Avatar';
+import { AppTheme } from '../Themes'
 
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: AppTheme) =>
   createStyles({
     nested: {
       paddingLeft: theme.spacing(1),

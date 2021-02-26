@@ -26,6 +26,7 @@ values:
         line: 1
         col: 27
     value: ""
+    nodeType: "BODY_ID"
   headers:
     token:
       text: "x+y/z*89*(x+5)"
@@ -37,6 +38,7 @@ values:
         col: 27
     acceptDefs: []
     returnDefs: []
+    nodeType: "TYPES"
   src: "x+y/z*89*(x+5)"
   value:
     token:
@@ -58,6 +60,7 @@ values:
           line: 1
           col: 14
       value: "x"
+      nodeType: "INVOCATION_SIMPLE"
     right:
       token:
         text: "y/z*89*(x+5)"
@@ -98,6 +101,7 @@ values:
                 line: 1
                 col: 16
             value: "y"
+            nodeType: "INVOCATION_SIMPLE"
           right:
             token:
               text: "z"
@@ -108,6 +112,8 @@ values:
                 line: 1
                 col: 18
             value: "z"
+            nodeType: "INVOCATION_SIMPLE"
+          nodeType: "EX_MULTIPLICATIVE"
         right:
           token:
             text: "89"
@@ -119,6 +125,8 @@ values:
               col: 21
           type: "INTEGER"
           value: "89"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_MULTIPLICATIVE"
       right:
         token:
           text: "x+5"
@@ -139,6 +147,7 @@ values:
               line: 1
               col: 24
           value: "x"
+          nodeType: "INVOCATION_SIMPLE"
         right:
           token:
             text: "5"
@@ -150,3 +159,9 @@ values:
               col: 26
           type: "INTEGER"
           value: "5"
+          nodeType: "TYPE_LITERAL"
+        nodeType: "EX_ADDITIVE"
+      nodeType: "EX_MULTIPLICATIVE"
+    nodeType: "EX_ADDITIVE"
+  nodeType: "BODY_EX"
+nodeType: "ROOT_CONTENT"
