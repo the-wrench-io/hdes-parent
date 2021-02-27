@@ -8,7 +8,6 @@ const ShellStyles = makeStyles((theme) => ({
     display: 'flex',
   },
   toolbar: {
-    //minHeight: 72,
     paddingRight: 24, // keep right padding when drawer closed
   },
   toolbarIcon: {
@@ -19,11 +18,9 @@ const ShellStyles = makeStyles((theme) => ({
     ...theme.mixins.toolbar,
   },
   views: {
-    //paddingTop: '10px',
     height: '100%',
   },
   content: {
-    //paddingTop: '10px',
     flexGrow: 1,
     height: '100vh',
     overflow: 'auto',
@@ -35,7 +32,6 @@ const ShellStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
     backgroundColor: theme.palette.background.default,
-    //borderBottom: `1px solid ${theme.palette.primary.main}`,
   },
   appBarShift: {
     marginLeft: drawerWidth,
@@ -105,7 +101,6 @@ const ShellStyles = makeStyles((theme) => ({
   },
   inputInput: {
     padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
     paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
     transition: theme.transitions.create('width'),
     width: '100%',

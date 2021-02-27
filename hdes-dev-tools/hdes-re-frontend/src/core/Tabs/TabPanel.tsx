@@ -4,13 +4,14 @@ import { Resources } from '../Resources';
 
 interface TabPanelProps {
   plugins: {
-    id?: string;
+    id: string;
     view: React.ReactChild;
-  }[]
+  }[],
+  children: React.ReactChild;
 };
 
 
-const TabPanel: React.FC<TabPanelProps> = ({plugins}) => {
+const TabPanel: React.FC<TabPanelProps> = ({plugins, children}) => {
   const { session } = React.useContext(Resources.Context);
   const tabs = session.tabs;
 
@@ -24,7 +25,7 @@ const TabPanel: React.FC<TabPanelProps> = ({plugins}) => {
   if(plugin.length > 0) {
     return <>{plugin[0].view}</>;
   }
-  return (<>{plugin.filter(p => !p.id)[0].view}</>);
+  return (<>{children}</>);
 }
 
 export default TabPanel;

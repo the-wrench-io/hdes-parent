@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
   },
   tabLabel: {
     minHeight: 'unset',
+    textTransform: 'unset'
   },
   close: {
     marginBottom: 'unset !important',
@@ -23,6 +24,7 @@ const useStyles = makeStyles((theme) => ({
     flexGrow: 1
   },
   closeIcon: {
+    marginLeft: 5,
     "&:hover": {
       color: theme.palette.secondary.main
     }
@@ -45,18 +47,19 @@ const TabsView: React.FC<TabsViewProps> = () => {
   const handleTabChange = (_event: React.ChangeEvent<{}>, newValue: number) => {
     actions.handleTabChange(newValue);
   };
-
   const handleTabClose = (_event: React.ChangeEvent<{}>, newValue: number) => {
     actions.handleTabClose(activeTab);
   };
     
   return (<Tabs value={active} onChange={handleTabChange} variant="scrollable" scrollButtons="auto">
-      { tabs.map((tab, index) => (<Tab key={index} value={index} 
-        classes={{wrapper: classes.tab, labelIcon: classes.tabLabel}}
-        icon={(<>
+      { tabs.map((tab, index) => (
+        <Tab key={index} value={index}
+          label={tab.label} 
+          classes={{wrapper: classes.tab, labelIcon: classes.tabLabel}}
+          icon={(<>
             <CloseIcon color="disabled" className={classes.closeIcon} onClick={(e) => handleTabClose(e, index)}/>
             <span className={classes.closeSpacing}></span></>)} 
-        label={tab.label} />)) }
+        />)) }
     </Tabs>
   );
 }

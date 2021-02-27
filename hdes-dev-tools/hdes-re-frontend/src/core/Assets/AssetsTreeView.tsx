@@ -38,8 +38,6 @@ interface AssetsTreeViewProps {
 const AssetsTreeView: React.FC<AssetsTreeViewProps> = () => {
   const classes = useStyles();
   const { session } = React.useContext(Resources.Context);
-  const [open, setOpen] = React.useState(true);
-
 
   const workspace = session.workspace;
   if(!workspace) {
@@ -47,12 +45,6 @@ const AssetsTreeView: React.FC<AssetsTreeViewProps> = () => {
   }
 
   const snapshot = workspace.snapshot;
-  const handleClick = () => {
-    setOpen(!open);
-  };
-  
-  
-  
   
   return (<div className={classes.root}>
     <List dense component="nav" aria-labelledby="nested-list-subheader"

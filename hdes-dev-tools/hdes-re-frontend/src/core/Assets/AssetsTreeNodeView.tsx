@@ -43,12 +43,14 @@ interface AssetsTreeNodeViewProps {
 
 const AssetsTreeNodeView: React.FC<AssetsTreeNodeViewProps> = ({asset, snapshot}) => {
   const classes = useStyles();
-  const { session } = React.useContext(Resources.Context);
+  const { session, actions } = React.useContext(Resources.Context);
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {
     setOpen(!open);
   };
+  
+  const openAsset = (subset: string) => actions.handleTabAdd({id: asset.id, label: asset.name});
 
   return (<React.Fragment>
     <ListItem button onClick={handleClick} className={classes.root}>
@@ -58,7 +60,7 @@ const AssetsTreeNodeView: React.FC<AssetsTreeNodeViewProps> = ({asset, snapshot}
     <Collapse in={open} timeout="auto" unmountOnExit>
       <List component="div" disablePadding dense>
         {asset.ast.map((name, index) => (
-          <ListItem key={index} button className={classes.nested}>
+          <ListItem key={index} button className={classes.nested} onClick={() => openAsset(name)}>
             <ListItemText primary={name} className={new AstMapper<string>(snapshot.ast[name])
               .map("BODY_FL", () => classes.fl)
               .map("BODY_DT", () => classes.dt)

@@ -32,7 +32,7 @@ function App() {
   
   const isWorkspace = session.workspace ? true : false;
   const listProjects = () => actions.handleTabAdd({id: projectsId, label: 'Projects' });
-  
+
   const links = [
     { id: assetsId, label: 'View Assets', icon: <LibraryBooksIcon />, onClick: () => (<AssetsTreeView />), enabled: isWorkspace },
     { id: 'add-asset', label: 'Add Asset', icon: <LibraryAddIcon />, onClick: () => console.log("add resource"), enabled: isWorkspace },
@@ -50,8 +50,9 @@ function App() {
       
       <TabPanel plugins={[
         { id: projectsId, view: <ProjectsView setWorkspace={setWorkspace} /> },
-        { view: <AssetsView />}
-      ]}/>
+      ]}>
+        <AssetsView />
+      </TabPanel>
     </Shell>);
 }
 
