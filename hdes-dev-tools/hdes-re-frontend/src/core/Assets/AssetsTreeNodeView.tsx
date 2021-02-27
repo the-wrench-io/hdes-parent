@@ -34,9 +34,10 @@ const useStyles = makeStyles((theme: AppTheme) =>
 
 interface AssetsTreeNodeViewProps {
   asset: Backend.AssetBlob;
+  snapshot: Backend.SnapshotResource;
 };
 
-const AssetsTreeNodeView: React.FC<AssetsTreeNodeViewProps> = ({asset}) => {
+const AssetsTreeNodeView: React.FC<AssetsTreeNodeViewProps> = ({asset, snapshot}) => {
   const classes = useStyles();
   const { session } = React.useContext(Resources.Context);
   const [open, setOpen] = React.useState(false);
@@ -45,16 +46,8 @@ const AssetsTreeNodeView: React.FC<AssetsTreeNodeViewProps> = ({asset}) => {
     setOpen(!open);
   };
   
-
-/*
-    <ListItemIcon>
-      <InboxIcon />
-    </ListItemIcon>
-*/
-
   
-
-  console.log(asset);
+  console.log(asset, snapshot);
 
   return (<React.Fragment><ListItem button onClick={handleClick}>
     <ListItemText secondary={asset.name}/>

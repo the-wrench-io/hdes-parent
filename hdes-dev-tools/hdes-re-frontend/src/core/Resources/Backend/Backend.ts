@@ -1,3 +1,5 @@
+import Ast from './Ast';
+
 
 declare namespace Backend {
   
@@ -51,8 +53,8 @@ declare namespace Backend {
     head: Head;
     project: Project;
     blobs: Record<string, AssetBlob>;       // name - asset
-    ast: Record<string, BodyNode>;      // asset name - ast
-    errors: Record<string, ErrorNode>;  // name name - error
+    ast: Record<string, Ast.BodyNode>;      // asset name - ast
+    errors: Record<string, Ast.ErrorNode>;  // name name - error
   }
   
   interface ProjectResource {
@@ -108,17 +110,6 @@ declare namespace Backend {
   interface ServerError {
     id: string,
     messages: { code: string, value: string}[]
-  }
-
-  interface ErrorNode {
-    id: string;
-    messages: {}[];
-  }
-
-  interface AstNode {
-  }
-
-  interface BodyNode extends AstNode {
   }
 }
 export default Backend;

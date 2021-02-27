@@ -59,7 +59,8 @@ const AssetsTreeView: React.FC<AssetsTreeViewProps> = () => {
         </ListSubheader>
       }>
       
-      {Object.values(snapshot.blobs).map((blob, index) => (<AssetsTreeNodeView key={index} asset={blob}/>) )}
+      {Object.values(snapshot.blobs).map((blob, index) => (
+        <AssetsTreeNodeView key={index} asset={blob} snapshot={snapshot} />) )}
     </List>
 
   </div>);
