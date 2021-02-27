@@ -8,12 +8,10 @@ import { Palette, PaletteOptions } from '@material-ui/core/styles/createPalette'
 --turquoise: #41ead4ff;
 --white: #ffffffff;
 
-
---rich-black-fogra-39: #0c0f0aff;
---turquoise: #41ead4ff;
---shadow: #7b7263ff;
 --acid-green: #c6ca53ff;
---slate-blue: #7d53deff;
+--orchid-crayola: #fab2eaff;
+--uranian-blue: #a9def9ff;
+
 */
 interface AssetPalette {
   assets: {
@@ -49,9 +47,9 @@ const theme = createMuiTheme({
       default: '#0c0f0a',
     },
     assets: {
-      fl: '#7d53deff',
-      dt: '#c6ca53ff',
-      st: '#7b7263ff'
+      fl: '#c6ca53ff',
+      dt: '#fab2eaff',
+      st: '#a9def9ff'
     }
   },
 

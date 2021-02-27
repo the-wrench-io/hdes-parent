@@ -16,6 +16,9 @@ const useStyles = makeStyles((theme: Theme) =>
       height: '100%',
       backgroundColor: theme.palette.background.default,
     },
+    subheader: {
+      paddingLeft: theme.spacing(1),
+    },
     nested: {
       paddingLeft: theme.spacing(4),
     },
@@ -54,8 +57,8 @@ const AssetsTreeView: React.FC<AssetsTreeViewProps> = () => {
   return (<div className={classes.root}>
     <List dense component="nav" aria-labelledby="nested-list-subheader"
       subheader={
-        <ListSubheader component="div" id="nested-list-subheader">
-        {workspace.snapshot.project.name} / {workspace.snapshot.head.name}
+        <ListSubheader component="div" id="nested-list-subheader" className={classes.subheader}>
+          {workspace.snapshot.project.name} / {workspace.snapshot.head.name}
         </ListSubheader>
       }>
       
