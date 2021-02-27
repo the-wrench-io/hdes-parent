@@ -19,7 +19,7 @@ const assetsId = 'static/assets';
 
 
 function App() {
-  const { actions, session } = React.useContext(Resources.Context);
+  const { actions, session, service } = React.useContext(Resources.Context);
   
   const setWorkspace = (head: Backend.Head) => {
     const projectsTab = session.findTab(projectsId);
@@ -43,6 +43,19 @@ function App() {
     { id: 'reload',     label: 'Reload', icon: <CachedIcon />, onClick: () => console.log("Merge") },
   ];
   
+  React.useEffect(() => {
+    if(session.data.projects.length > 0 && !session.workspace) {
+      const head = session.data.projects[0].heads['main'];
+      actions.handleWorkspace(head);
+      
+      service.snapshots.query({head}).onSuccess(snapshot => {
+        const asset = Object.values(snapshot.blobs)[0];
+        actions.handleTabAdd({id: asset.id, label: asset.name});  
+      });
+      
+    }
+  }, [session, actions, service])
+  
   return (
     <Shell tabs={<Tabs />} links={links}
       search={{ onChange: actions.handleSearch }}
@@ -53,6 +66,7 @@ function App() {
       ]}>
         <AssetsView />
       </TabPanel>
+      
     </Shell>);
 }
 
