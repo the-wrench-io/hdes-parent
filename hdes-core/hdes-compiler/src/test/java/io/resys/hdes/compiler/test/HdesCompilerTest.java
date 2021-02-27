@@ -31,7 +31,20 @@ import org.junit.jupiter.api.Test;
 import io.resys.hdes.compiler.api.HdesCompiler.Resource;
 
 
-public class DtHdesCompilerTest {
+public class HdesCompilerTest {
+  
+  @Test
+  public void simpleFlow() {
+    final var file= file("SimpleFlow.hdes");
+    List<Resource> code = compiler.parser()
+      .add("SimpleFlow.hdes", file)
+      //.add("SimpleHitPolicyFirstDt.hdes", file("SimpleHitPolicyFirstDt.hdes"))
+      .build();
+    
+    
+    log(code, file);
+  }
+  
   @Test
   public void simpleHitPolicyMatrixDt() {
     final var file = file("SimpleHitPolicyMatrixDt.hdes");

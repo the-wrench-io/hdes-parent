@@ -48,14 +48,15 @@ public class TestUtil {
     StringBuilder result = new StringBuilder();
     try {
       ObjectMapper objectMapper = new ObjectMapper();
+      
       result.append(System.lineSeparator()).append("############").append(System.lineSeparator())
         .append("{").append(System.lineSeparator())
-        .append("src: ").append(objectMapper.writeValueAsString(file)).append(System.lineSeparator())
-        .append("ast: {").append(System.lineSeparator());
+        .append("\"src\": ").append(objectMapper.writeValueAsString(file)).append(System.lineSeparator())
+        .append("\"ast\": {").append(System.lineSeparator());
       
       for (Resource r : resources) {
         String ast = objectMapper.writeValueAsString(r.getAst());
-        result.append("    ").append(r.getName()).append(": ").append(ast).append(System.lineSeparator());
+        result.append("    \"").append(r.getName()).append("\": ").append(ast).append(",").append(System.lineSeparator());
       }
       result
       .append("  }").append(System.lineSeparator())
@@ -66,10 +67,10 @@ public class TestUtil {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
-  
+
   public static String file(String name) {
     try {
-      return IOUtils.toString(DtHdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
+      return IOUtils.toString(HdesCompilerTest.class.getClassLoader().getResourceAsStream(name), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
