@@ -21,6 +21,8 @@ package io.resys.hdes.object.repo.mongo;
  */
 
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import io.resys.hdes.assetdb.api.AssetClient;
 import io.resys.hdes.assetdb.api.AssetClient.Commit;
@@ -31,6 +33,7 @@ import io.resys.hdes.assetdb.mongodb.MongoDbObjectRepository;
 
 
 public class StorageServiceReadWriteTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(StorageServiceReadWriteTest.class);
   
   @Test
   public void writeAndReadCommandTest() {
@@ -49,18 +52,15 @@ public class StorageServiceReadWriteTest {
           .add("file 1", "contentxxxx")
           .add("folder1/file2", "contenty")
           .build();
-      
-      System.out.println("\r\n");
-      System.out.println("\r\n");
-      System.out.println("\r\n");
-      System.out.println("\r\n");
-      System.out.println(commit);
-      
-      
       Snapshot snapshot = client.commands().snapshot().from(commit.getId()).build();
-      System.out.println(snapshot);
       
-      
+      LOGGER.debug(new StringBuilder()
+          .append(System.lineSeparator())
+          .append("COMMIT: ").append(commit)
+          .append(System.lineSeparator())
+          .append("SNAPSHOT: ").append(snapshot)
+          .append(System.lineSeparator())
+          .toString());
     });
   }
 

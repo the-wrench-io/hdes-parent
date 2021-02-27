@@ -26,6 +26,8 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -35,8 +37,10 @@ import io.resys.hdes.executor.api.Trace.TraceEnd;
 import io.resys.hdes.interpreter.api.HdesAcceptsSupplier.HdesAcceptsMapSupplier;
 
 public class InterpreterTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(InterpreterTest.class);
   private static final ObjectMapper om = new ObjectMapper(new YAMLFactory()).registerModule(new Jdk8Module());
 
+  
   @Test
   public void matchAll() {
     TraceEnd execution = ImmutableHdesInterpreter.builder().build().executor()
@@ -51,7 +55,7 @@ public class InterpreterTest {
   
   public void assertExecution(TraceEnd execution, String yaml) {
     String actual = yaml(execution.getBody());
-    //System.out.println(yaml(execution));
+    LOGGER.debug(yaml(execution));
     String expected = file(yaml);
     Assertions.assertEquals(expected, actual);
   }

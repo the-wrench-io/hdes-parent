@@ -47,8 +47,6 @@ public class FlowWithWakeUpTest {
     Suspends suspends = output.getSuspends();
     Assertions.assertNotNull(suspends);
     Assertions.assertNotNull(suspends.getValues().size() == 1);
-    System.out.println(yaml(suspends));
-
     Await await = suspends.getValues().iterator().next();
     
     HashMap<String, Serializable> promiseData = new HashMap<>();
