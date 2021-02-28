@@ -1,4 +1,4 @@
-        decision-table DtWithFormula
+        decisiontable DtWithFormula
         ({ 
           a: INTEGER, b: INTEGER, c: DECIMAL,
           total: DECIMAL = a + b + c }):

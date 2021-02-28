@@ -40,8 +40,8 @@ FIND_ALL: F I N D A L L;
 
 // Main definition types
 FLOW: F L O W;
-DECISION_TABLE: D E C I S I O N '-' T A B L E;
-SERVICE_TASK: S E R V I C E '-' T A S K;
+DECISION_TABLE: D E C I S I O N T A B L E;
+SERVICE_TASK: S E R V I C E T A S K;
 EXPRESSION: E X P R E S S I O N;
 
 // data type options

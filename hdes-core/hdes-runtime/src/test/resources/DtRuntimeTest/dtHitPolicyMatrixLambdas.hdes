@@ -1,4 +1,4 @@
-        decision-table MatrixDT(  
+        decisiontable MatrixDT(  
         { name: STRING, lastName: STRING }):
         {
                 score: INTEGER = sum(_matched), // total score of hit columns  

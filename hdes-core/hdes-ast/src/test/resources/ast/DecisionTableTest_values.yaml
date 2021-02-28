@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decision-tablebasic({firstName:STRINGlastName:STRING}):{}{map(string)to(integer)when(_='bob',_='sam',_='viv')firstName({1,2,3})lastName({3,10,20})}<EOF>"
+  text: "decisiontablebasic({firstName:STRINGlastName:STRING}):{}{map(string)to(integer)when(_='bob',_='sam',_='viv')firstName({1,2,3})lastName({3,10,20})}<EOF>"
   start:
     line: 1
     col: 1
@@ -12,7 +12,7 @@ values:
     text: "basic({firstName:STRINGlastName:STRING}):{}{map(string)to(integer)when(_='bob',_='sam',_='viv')firstName({1,2,3})lastName({3,10,20})}"
     start:
       line: 1
-      col: 16
+      col: 15
     end:
       line: 7
       col: 2
@@ -21,10 +21,10 @@ values:
       text: "basic"
       start:
         line: 1
-        col: 16
+        col: 15
       end:
         line: 1
-        col: 21
+        col: 20
     value: "basic"
     nodeType: "BODY_ID"
   headers:
@@ -32,19 +32,19 @@ values:
       text: "({firstName:STRINGlastName:STRING}):{}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 64
+        col: 63
     acceptDefs:
     - token:
         text: "firstName:STRING"
         start:
           line: 1
-          col: 24
+          col: 23
         end:
           line: 1
-          col: 41
+          col: 40
       required: true
       name: "firstName"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "lastName:STRING"
         start:
           line: 1
-          col: 42
+          col: 41
         end:
           line: 1
-          col: 58
+          col: 57
       required: true
       name: "lastName"
       array: false
@@ -440,10 +440,10 @@ values:
       text: "({firstName:STRINGlastName:STRING}):{}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 64
+        col: 63
     required: true
     name: "constants"
     array: true
@@ -453,10 +453,10 @@ values:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
           line: 1
-          col: 21
+          col: 20
         end:
           line: 1
-          col: 64
+          col: 63
       required: true
       name: ""
       array: true
@@ -476,10 +476,10 @@ values:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
           line: 1
-          col: 21
+          col: 20
         end:
           line: 1
-          col: 64
+          col: 63
       required: true
       name: "firstName"
       array: true
@@ -499,10 +499,10 @@ values:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
           line: 1
-          col: 21
+          col: 20
         end:
           line: 1
-          col: 64
+          col: 63
       required: true
       name: "lastName"
       array: true
@@ -524,10 +524,10 @@ values:
       text: "({firstName:STRINGlastName:STRING}):{}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 64
+        col: 63
     required: true
     name: "instance"
     array: false
@@ -537,10 +537,10 @@ values:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
           line: 1
-          col: 21
+          col: 20
         end:
           line: 1
-          col: 64
+          col: 63
       required: true
       name: "instance"
       array: true
@@ -550,10 +550,10 @@ values:
           text: "({firstName:STRINGlastName:STRING}):{}"
           start:
             line: 1
-            col: 21
+            col: 20
           end:
             line: 1
-            col: 64
+            col: 63
         required: true
         name: ""
         array: true
@@ -574,10 +574,10 @@ values:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
           line: 1
-          col: 21
+          col: 20
         end:
           line: 1
-          col: 64
+          col: 63
       required: true
       name: "firstName"
       array: true
@@ -597,10 +597,10 @@ values:
         text: "({firstName:STRINGlastName:STRING}):{}"
         start:
           line: 1
-          col: 21
+          col: 20
         end:
           line: 1
-          col: 64
+          col: 63
       required: true
       name: "lastName"
       array: true

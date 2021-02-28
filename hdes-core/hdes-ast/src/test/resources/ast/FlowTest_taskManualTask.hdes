@@ -1,4 +1,4 @@
-service-task ServiceX({}):{} {
+servicetask ServiceX({}):{} {
   pkg.name.ClassName {}
 }
  

@@ -5,25 +5,25 @@
       "id": "inmem-blob-1x",
       "name": "SimpleFlowAndDt",
       "ast": ["Scoring", "SimpleFlow"],
-      "src": "\ndecision-table Scoring({ arg: INTEGER }) :{ score: INTEGER } \n{ \n  findFirst({\n    when ( _ between 1 and 30) add({ 10 })\n    when ( ? ) add({ 20 })\n  })\n}\n\n\nflow SimpleFlow ({ arg1: INTEGER, arg2: INTEGER }) : { score: INTEGER }\n{\n    \n    InitialScoring() {\n      Scoring ({ arg: arg1 }) \n      return Decision()\n    }\n    \n    Decision() {\n      if( InitialScoring.score > 10) return ExtraScoring()\n      else return { InitialScoring.score } \n    }\n  \n    ExtraScoring() {\n      Scoring({ arg: arg2 })\n      return { _score }\n    }\n\n}"
+      "src": "\ndecisiontable Scoring({ arg: INTEGER }) :{ score: INTEGER } \n{ \n  findFirst({\n    when ( _ between 1 and 30) add({ 10 })\n    when ( ? ) add({ 20 })\n  })\n}\n\n\nflow SimpleFlow ({ arg1: INTEGER, arg2: INTEGER }) : { score: INTEGER }\n{\n    \n    InitialScoring() {\n      Scoring ({ arg: arg1 }) \n      return Decision()\n    }\n    \n    Decision() {\n      if( InitialScoring.score > 10) return ExtraScoring()\n      else return { InitialScoring.score } \n    }\n  \n    ExtraScoring() {\n      Scoring({ arg: arg2 })\n      return { _score }\n    }\n\n}"
     },
     "SimpleHitPolicyAllDT": {
       "id": "inmem-blob-2x",
       "name": "SimpleHitPolicyAllDT",
       "ast": ["SimpleHitPolicyAllDT"],
-      "src": "decision-table SimpleHitPolicyAllDT ({ name: STRING, lastName: STRING }) : { value: INTEGER } \n{\n  findAll({\n    when( ?, ? ) add({ 20 })\n    when( _ = 'bob', _ = 'woman') add({ 4570 })\n    when( _ != 'bob' or _ = 'same' or _ = 'professor', _ in('woman', 'man') ) add({ 4570 })\n  })\n}"
+      "src": "decisiontable SimpleHitPolicyAllDT ({ name: STRING, lastName: STRING }) : { value: INTEGER } \n{\n  findAll({\n    when( ?, ? ) add({ 20 })\n    when( _ = 'bob', _ = 'woman') add({ 4570 })\n    when( _ != 'bob' or _ = 'same' or _ = 'professor', _ in('woman', 'man') ) add({ 4570 })\n  })\n}"
     },
     "FormulaHitPolicyFirstDt": {
       "id": "inmem-blob-3x",
       "name": "FormulaHitPolicyFirstDt",
       "ast": ["FormulaHitPolicyFirstDt"],
-      "src": "decision-table FormulaHitPolicyFirstDt ({\n    a,b, c: DECIMAL,\n    total: DECIMAL = a + b + c\n  }) : { value: INTEGER, qualifier: DECIMAL = value + 10 + total } \n\n{\n  \n  findFirst({\n    when( ?, ?, ?, ? ) add({ 20 })\n  })\n}"
+      "src": "decisiontable FormulaHitPolicyFirstDt ({\n    a,b, c: DECIMAL,\n    total: DECIMAL = a + b + c\n  }) : { value: INTEGER, qualifier: DECIMAL = value + 10 + total } \n\n{\n  \n  findFirst({\n    when( ?, ?, ?, ? ) add({ 20 })\n  })\n}"
     },
     "SimpleHitPolicyFirstDt": {
       "id": "inmem-blob-4x",
       "name": "SimpleHitPolicyFirstDt",
       "ast": ["SimpleHitPolicyFirstDt"],
-      "src": "decision-table SimpleHitPolicyFirstDt ({ name: STRING, lastName: STRING }) :{ value: INTEGER }\n{\n  findFirst({\n    when( _ = 'sam', ?           )  add({ 20 })\n    when( _ = 'bob',  _ = 'woman')  add({ 4570 })\n    when( !(_ IN('bob','same', 'professor')), !(_ IN('woman', 'man'))) add({ 4570 })\n  }) \n}"
+      "src": "decisiontable SimpleHitPolicyFirstDt ({ name: STRING, lastName: STRING }) :{ value: INTEGER }\n{\n  findFirst({\n    when( _ = 'sam', ?           )  add({ 20 })\n    when( _ = 'bob',  _ = 'woman')  add({ 4570 })\n    when( !(_ IN('bob','same', 'professor')), !(_ IN('woman', 'man'))) add({ 4570 })\n  }) \n}"
     }, 
     "SimpleHitPolicyMatrixDt": {
       "id": "inmem-blob-5x",

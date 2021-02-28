@@ -1,4 +1,4 @@
-decision-table basic({ firstName: STRING lastName: STRING }):{} {
+decisiontable basic({ firstName: STRING lastName: STRING }):{} {
   map(string) to(integer)
   when( _ = 'bob', _ = 'sam', _ = 'viv' )
   

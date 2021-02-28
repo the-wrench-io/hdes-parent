@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decision-tablebasic({value0:INTEGER,value1:INTEGER}):{value:INTEGER}{findAll({when(_>10,_<=20).add({4570})when(_>10,_<=20and_>10).add({4570})when(_=6,_!=20and_>10).add({4570})})}<EOF>"
+  text: "decisiontablebasic({value0:INTEGER,value1:INTEGER}):{value:INTEGER}{findAll({when(_>10,_<=20).add({4570})when(_>10,_<=20and_>10).add({4570})when(_=6,_!=20and_>10).add({4570})})}<EOF>"
   start:
     line: 1
     col: 1
@@ -12,7 +12,7 @@ values:
     text: "basic({value0:INTEGER,value1:INTEGER}):{value:INTEGER}{findAll({when(_>10,_<=20).add({4570})when(_>10,_<=20and_>10).add({4570})when(_=6,_!=20and_>10).add({4570})})}"
     start:
       line: 1
-      col: 16
+      col: 15
     end:
       line: 7
       col: 2
@@ -21,10 +21,10 @@ values:
       text: "basic"
       start:
         line: 1
-        col: 16
+        col: 15
       end:
         line: 1
-        col: 21
+        col: 20
     value: "basic"
     nodeType: "BODY_ID"
   headers:
@@ -32,19 +32,19 @@ values:
       text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 79
+        col: 78
     acceptDefs:
     - token:
         text: "value0:INTEGER"
         start:
           line: 1
-          col: 24
+          col: 23
         end:
           line: 1
-          col: 39
+          col: 38
       required: true
       name: "value0"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "value1:INTEGER"
         start:
           line: 1
-          col: 41
+          col: 40
         end:
           line: 1
-          col: 56
+          col: 55
       required: true
       name: "value1"
       array: false
@@ -88,10 +88,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 63
+          col: 62
         end:
           line: 1
-          col: 77
+          col: 76
       required: true
       name: "value"
       array: false
@@ -735,10 +735,10 @@ values:
       text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 79
+        col: 78
     required: true
     name: "constants"
     array: true
@@ -748,10 +748,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 63
+          col: 62
         end:
           line: 1
-          col: 77
+          col: 76
       required: true
       name: "value"
       array: false
@@ -773,10 +773,10 @@ values:
       text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 79
+        col: 78
     required: true
     name: ""
     array: true
@@ -786,10 +786,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 63
+          col: 62
         end:
           line: 1
-          col: 77
+          col: 76
       required: true
       name: "value"
       array: false

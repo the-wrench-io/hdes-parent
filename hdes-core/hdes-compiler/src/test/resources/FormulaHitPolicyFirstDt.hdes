@@ -1,4 +1,4 @@
-decision-table FormulaHitPolicyFirstDt ({
+decisiontable FormulaHitPolicyFirstDt ({
     a,b, c: DECIMAL,
     total: DECIMAL = a + b + c
   }) : { value: INTEGER, qualifier: DECIMAL = value + 10 + total } 

@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decision-tablemappingDT({}):{}{map(STRING)to(INTEGER)when()}decision-tablematchingFirstDT({}):{}{findFirst({})}decision-tablematchingFirstALL({}):{}{findAll({})}<EOF>"
+  text: "decisiontablemappingDT({}):{}{map(STRING)to(INTEGER)when()}decisiontablematchingFirstDT({}):{}{findFirst({})}decisiontablematchingFirstALL({}):{}{findAll({})}<EOF>"
   start:
     line: 1
     col: 3
@@ -12,19 +12,19 @@ values:
     text: "mappingDT({}):{}{map(STRING)to(INTEGER)when()}"
     start:
       line: 1
-      col: 18
+      col: 17
     end:
       line: 1
-      col: 76
+      col: 75
   id:
     token:
       text: "mappingDT"
       start:
         line: 1
-        col: 18
+        col: 17
       end:
         line: 1
-        col: 27
+        col: 26
     value: "mappingDT"
     nodeType: "BODY_ID"
   headers:
@@ -32,10 +32,10 @@ values:
       text: "({}):{}"
       start:
         line: 1
-        col: 27
+        col: 26
       end:
         line: 1
-        col: 34
+        col: 33
     acceptDefs: []
     returnDefs: []
     nodeType: "TYPES"
@@ -44,10 +44,10 @@ values:
       text: "map(STRING)to(INTEGER)when()"
       start:
         line: 1
-        col: 44
+        col: 43
       end:
         line: 1
-        col: 74
+        col: 73
     defFrom: "STRING"
     defTo: "INTEGER"
     when:
@@ -55,10 +55,10 @@ values:
         text: "()"
         start:
           line: 1
-          col: 72
+          col: 71
         end:
           line: 1
-          col: 74
+          col: 73
       values: []
       nodeType: "DT_RULE_WHEN"
     mapsTo: []
@@ -68,10 +68,10 @@ values:
       text: "({}):{}"
       start:
         line: 1
-        col: 27
+        col: 26
       end:
         line: 1
-        col: 34
+        col: 33
     required: true
     name: "constants"
     array: true
@@ -81,10 +81,10 @@ values:
         text: "({}):{}"
         start:
           line: 1
-          col: 27
+          col: 26
         end:
           line: 1
-          col: 34
+          col: 33
       required: true
       name: ""
       array: true
@@ -106,10 +106,10 @@ values:
       text: "({}):{}"
       start:
         line: 1
-        col: 27
+        col: 26
       end:
         line: 1
-        col: 34
+        col: 33
     required: true
     name: "instance"
     array: false
@@ -119,10 +119,10 @@ values:
         text: "({}):{}"
         start:
           line: 1
-          col: 27
+          col: 26
         end:
           line: 1
-          col: 34
+          col: 33
       required: true
       name: "instance"
       array: true
@@ -132,10 +132,10 @@ values:
           text: "({}):{}"
           start:
             line: 1
-            col: 27
+            col: 26
           end:
             line: 1
-            col: 34
+            col: 33
         required: true
         name: ""
         array: true
@@ -158,19 +158,19 @@ values:
     text: "matchingFirstDT({}):{}{findFirst({})}"
     start:
       line: 2
-      col: 18
+      col: 17
     end:
       line: 2
-      col: 59
+      col: 58
   id:
     token:
       text: "matchingFirstDT"
       start:
         line: 2
-        col: 18
+        col: 17
       end:
         line: 2
-        col: 33
+        col: 32
     value: "matchingFirstDT"
     nodeType: "BODY_ID"
   headers:
@@ -178,10 +178,10 @@ values:
       text: "({}):{}"
       start:
         line: 2
-        col: 33
+        col: 32
       end:
         line: 2
-        col: 40
+        col: 39
     acceptDefs: []
     returnDefs: []
     nodeType: "TYPES"
@@ -190,10 +190,10 @@ values:
       text: "findFirst({})"
       start:
         line: 2
-        col: 44
+        col: 43
       end:
         line: 2
-        col: 57
+        col: 56
     rows: []
     nodeType: "DT_HITPOLICY_FIRST"
   constants:
@@ -201,10 +201,10 @@ values:
       text: "({}):{}"
       start:
         line: 2
-        col: 33
+        col: 32
       end:
         line: 2
-        col: 40
+        col: 39
     required: true
     name: "constants"
     array: true
@@ -216,10 +216,10 @@ values:
       text: "({}):{}"
       start:
         line: 2
-        col: 33
+        col: 32
       end:
         line: 2
-        col: 40
+        col: 39
     required: true
     name: ""
     array: false
@@ -231,19 +231,19 @@ values:
     text: "matchingFirstALL({}):{}{findAll({})}"
     start:
       line: 3
-      col: 18
+      col: 17
     end:
       line: 3
-      col: 57
+      col: 56
   id:
     token:
       text: "matchingFirstALL"
       start:
         line: 3
-        col: 18
+        col: 17
       end:
         line: 3
-        col: 34
+        col: 33
     value: "matchingFirstALL"
     nodeType: "BODY_ID"
   headers:
@@ -251,10 +251,10 @@ values:
       text: "({}):{}"
       start:
         line: 3
-        col: 34
+        col: 33
       end:
         line: 3
-        col: 41
+        col: 40
     acceptDefs: []
     returnDefs: []
     nodeType: "TYPES"
@@ -263,10 +263,10 @@ values:
       text: "findAll({})"
       start:
         line: 3
-        col: 44
+        col: 43
       end:
         line: 3
-        col: 55
+        col: 54
     rows: []
     nodeType: "DT_HITPOLICY_ALL"
   constants:
@@ -274,10 +274,10 @@ values:
       text: "({}):{}"
       start:
         line: 3
-        col: 34
+        col: 33
       end:
         line: 3
-        col: 41
+        col: 40
     required: true
     name: "constants"
     array: true
@@ -289,10 +289,10 @@ values:
       text: "({}):{}"
       start:
         line: 3
-        col: 34
+        col: 33
       end:
         line: 3
-        col: 41
+        col: 40
     required: true
     name: ""
     array: true

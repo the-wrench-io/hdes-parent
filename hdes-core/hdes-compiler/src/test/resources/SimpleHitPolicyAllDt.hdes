@@ -1,4 +1,4 @@
-decision-table SimpleHitPolicyAllDT ({ name: STRING, lastName: STRING }) : { value: INTEGER } 
+decisiontable SimpleHitPolicyAllDT ({ name: STRING, lastName: STRING }) : { value: INTEGER } 
 {
   findAll({
     when( ?, ? ) add({ 20 })

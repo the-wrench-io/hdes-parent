@@ -1,4 +1,4 @@
-decision-table SimpleHitPolicyFirstDt ({ name: STRING, lastName: STRING }) :{ value: INTEGER }
+decisiontable SimpleHitPolicyFirstDt ({ name: STRING, lastName: STRING }) :{ value: INTEGER }
 {
   findFirst({
     when( _ = 'sam', ?           )  add({ 20 })

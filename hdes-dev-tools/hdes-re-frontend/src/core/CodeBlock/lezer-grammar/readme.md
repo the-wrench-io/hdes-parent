@@ -1,0 +1,1 @@
+based on: lezer-javascript/src/javascript.grammar

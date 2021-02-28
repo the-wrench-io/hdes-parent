@@ -1,6 +1,6 @@
 
 // first DT
-decision-table MobileScore ({ name: STRING, version: INTEGER, classifier: INTEGER = version + 10 }) : { 
+decisiontable MobileScore ({ name: STRING, version: INTEGER, classifier: INTEGER = version + 10 }) : { 
           score: INTEGER,
      classifier: INTEGER = version + 10,
     maxPossible: INTEGER = max(_constants.map(row -> max(row.score))), // sum max possible score of defined fields

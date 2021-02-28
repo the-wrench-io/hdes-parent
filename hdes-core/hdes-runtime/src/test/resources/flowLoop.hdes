@@ -1,5 +1,5 @@
 
-decision-table ScoringDT { 
+decisiontable ScoringDT { 
   accepts { arg1 INTEGER } 
   returns { score INTEGER } 
   matches FIRST {

@@ -1,4 +1,5 @@
-import { parser } from 'lezer-javascript';
+import { parser } from '../lezer-grammar';
+
 import { LezerLanguage, indentNodeProp, continuedIndent, flatIndent, delimitedIndent, foldNodeProp, LanguageSupport } from '@codemirror/next/language';
 import { styleTags, tags } from '@codemirror/next/highlight';
 import { snippetCompletion, ifNotIn, completeFromList } from '@codemirror/next/autocomplete';
@@ -71,7 +72,7 @@ const javascriptLanguage = LezerLanguage.define({
                 "get set async static": tags.modifier,
                 "for while do if else switch try catch finally return throw break continue default case": tags.controlKeyword,
                 "in of await yield void typeof delete instanceof": tags.operatorKeyword,
-                "flow service decision-table": tags.definitionKeyword,
+                "flow service decisiontable": tags.definitionKeyword,
                 "export import let var const function class extends": tags.definitionKeyword,
                 "with debugger from as new": tags.keyword,
                 TemplateString: tags.special(tags.string),

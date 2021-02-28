@@ -2,13 +2,13 @@
 /**
  * Example of a java specific service task
  */
-service-task SchoolService (
+servicetask SchoolService (
   { importId: integer }): 
   { schools: { schoolId: string, zipcode: string }[] } {
   x.y.io.MySuperService {}
 }
 
-service-task CreateFormService (
+servicetask CreateFormService (
   { schoolId: string, formName: string }):
   { confirmed: boolean } {
   
@@ -22,7 +22,7 @@ service-task CreateFormService (
  * Flow for allocating students into school
  */
 flow StudentAllocation (
-  { importId: integer }): 
+  { importId: integer, service: string }): 
   { importId: string } {
     
     GetSchools() {

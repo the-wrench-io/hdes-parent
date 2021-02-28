@@ -1,4 +1,4 @@
-        decision-table SimpleHitPolicyFirstDt({ name: STRING, lastName: STRING }): 
+        decisiontable SimpleHitPolicyFirstDt({ name: STRING, lastName: STRING }): 
         {
           value: INTEGER, 
           totalHit: INTEGER = sum(_constants.map(row -> row.value))

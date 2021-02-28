@@ -1,4 +1,3 @@
-
 import { EditorView } from '@codemirror/next/view';
 import * as Lint from '@codemirror/next/lint';
 import { Backend } from '../../Resources/Backend'
@@ -12,6 +11,7 @@ const createLinter = (service: Backend.Service) => Lint.linter((view: EditorView
   console.log("linting");
   return [];
 });
+
 
 /*
 source: fn(view: EditorView) → readonly Diagnostic[] | Promise<readonly Diagnostic[]>

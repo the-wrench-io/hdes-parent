@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decision-tablebasic({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}{findFirst({when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})})}<EOF>"
+  text: "decisiontablebasic({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}{findFirst({when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})})}<EOF>"
   start:
     line: 1
     col: 1
@@ -12,7 +12,7 @@ values:
     text: "basic({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}{findFirst({when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})})}"
     start:
       line: 1
-      col: 16
+      col: 15
     end:
       line: 7
       col: 2
@@ -21,10 +21,10 @@ values:
       text: "basic"
       start:
         line: 1
-        col: 16
+        col: 15
       end:
         line: 1
-        col: 21
+        col: 20
     value: "basic"
     nodeType: "BODY_ID"
   headers:
@@ -32,19 +32,19 @@ values:
       text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 102
+        col: 101
     acceptDefs:
     - token:
         text: "name:STRING"
         start:
           line: 1
-          col: 24
+          col: 23
         end:
           line: 1
-          col: 36
+          col: 35
       required: true
       name: "name"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "lastName:STRING"
         start:
           line: 1
-          col: 38
+          col: 37
         end:
           line: 1
-          col: 54
+          col: 53
       required: true
       name: "lastName"
       array: false
@@ -88,10 +88,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 60
+          col: 59
         end:
           line: 1
-          col: 74
+          col: 73
       required: true
       name: "value"
       array: false
@@ -111,10 +111,10 @@ values:
         text: "exp:INTEGER=value+20"
         start:
           line: 1
-          col: 76
+          col: 75
         end:
           line: 1
-          col: 101
+          col: 100
       required: false
       name: "exp"
       array: false
@@ -757,10 +757,10 @@ values:
       text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 102
+        col: 101
     required: true
     name: "constants"
     array: true
@@ -770,10 +770,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 60
+          col: 59
         end:
           line: 1
-          col: 74
+          col: 73
       required: true
       name: "value"
       array: false
@@ -795,10 +795,10 @@ values:
       text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
       start:
         line: 1
-        col: 21
+        col: 20
       end:
         line: 1
-        col: 102
+        col: 101
     required: true
     name: ""
     array: false
@@ -808,10 +808,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 60
+          col: 59
         end:
           line: 1
-          col: 74
+          col: 73
       required: true
       name: "value"
       array: false
@@ -831,10 +831,10 @@ values:
         text: "exp:INTEGER=value+20"
         start:
           line: 1
-          col: 76
+          col: 75
         end:
           line: 1
-          col: 101
+          col: 100
       required: false
       name: "exp"
       array: false

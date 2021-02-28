@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decision-tablebasic({name,lastName:STRING,value?:INTEGER}):{}{map(STRING)to(INTEGER)when()}<EOF>"
+  text: "decisiontablebasic({name,lastName:STRING,value?:INTEGER}):{}{map(STRING)to(INTEGER)when()}<EOF>"
   start:
     line: 1
     col: 3
@@ -12,7 +12,7 @@ values:
     text: "basic({name,lastName:STRING,value?:INTEGER}):{}{map(STRING)to(INTEGER)when()}"
     start:
       line: 1
-      col: 18
+      col: 17
     end:
       line: 3
       col: 4
@@ -21,10 +21,10 @@ values:
       text: "basic"
       start:
         line: 1
-        col: 18
+        col: 17
       end:
         line: 1
-        col: 23
+        col: 22
     value: "basic"
     nodeType: "BODY_ID"
   headers:
@@ -32,19 +32,19 @@ values:
       text: "({name,lastName:STRING,value?:INTEGER}):{}"
       start:
         line: 1
-        col: 23
+        col: 22
       end:
         line: 1
-        col: 74
+        col: 73
     acceptDefs:
     - token:
         text: "name,lastName:STRING"
         start:
           line: 1
-          col: 26
+          col: 25
         end:
           line: 1
-          col: 48
+          col: 47
       required: true
       name: "name"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "name,lastName:STRING"
         start:
           line: 1
-          col: 26
+          col: 25
         end:
           line: 1
-          col: 48
+          col: 47
       required: true
       name: "lastName"
       array: false
@@ -87,10 +87,10 @@ values:
         text: "value?:INTEGER"
         start:
           line: 1
-          col: 50
+          col: 49
         end:
           line: 1
-          col: 65
+          col: 64
       required: false
       name: "value"
       array: false
@@ -137,10 +137,10 @@ values:
       text: "({name,lastName:STRING,value?:INTEGER}):{}"
       start:
         line: 1
-        col: 23
+        col: 22
       end:
         line: 1
-        col: 74
+        col: 73
     required: true
     name: "constants"
     array: true
@@ -150,10 +150,10 @@ values:
         text: "({name,lastName:STRING,value?:INTEGER}):{}"
         start:
           line: 1
-          col: 23
+          col: 22
         end:
           line: 1
-          col: 74
+          col: 73
       required: true
       name: ""
       array: true
@@ -175,10 +175,10 @@ values:
       text: "({name,lastName:STRING,value?:INTEGER}):{}"
       start:
         line: 1
-        col: 23
+        col: 22
       end:
         line: 1
-        col: 74
+        col: 73
     required: true
     name: "instance"
     array: false
@@ -188,10 +188,10 @@ values:
         text: "({name,lastName:STRING,value?:INTEGER}):{}"
         start:
           line: 1
-          col: 23
+          col: 22
         end:
           line: 1
-          col: 74
+          col: 73
       required: true
       name: "instance"
       array: true
@@ -201,10 +201,10 @@ values:
           text: "({name,lastName:STRING,value?:INTEGER}):{}"
           start:
             line: 1
-            col: 23
+            col: 22
           end:
             line: 1
-            col: 74
+            col: 73
         required: true
         name: ""
         array: true

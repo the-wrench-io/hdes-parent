@@ -1,4 +1,4 @@
-        decision-table SimpleHitPolicyMatrixDt({ name: string, lastName: string }) : {}
+        decisiontable SimpleHitPolicyMatrixDt({ name: string, lastName: string }) : {}
         {
           map(string) to(integer)
           when( _ = 'BOB', _ = 'SAM', ?)
