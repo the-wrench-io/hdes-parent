@@ -73,24 +73,23 @@ const hdesDarkTheme = (theme : AppTheme) => {
 /// The highlighting style for code in the One Dark theme.
 const hdesDarkHighlightStyle = (theme : AppTheme) => {
   const colors = themeColors(theme);
-  return HighlightStyle.define({ tag: tags.keyword,
-    color: colors.violet }, { tag: [tags.name, tags.deleted, tags.character, tags.propertyName, tags.macroName],
-    color: colors.coral }, { tag: [tags.processingInstruction, tags.string, tags.inserted],
-    color: colors.sage }, { tag: [tags.function(tags.variableName), tags.labelName],
-    color: colors.malibu }, { tag: [tags.color, tags.constant(tags.name), tags.standard(tags.name)],
-    color: colors.whiskey }, { tag: [tags.definition(tags.name), tags.separator],
-    color: colors.ivory }, { tag: [tags.typeName, tags.className, tags.number, tags.changed, tags.annotation, tags.modifier, tags.self, tags.namespace],
-    color: colors.chalky }, { tag: [tags.operator, tags.operatorKeyword, tags.url, tags.escape, tags.regexp, tags.link, tags.special(tags.string)],
-    color: colors.cyan }, { tag: [tags.meta, tags.comment],
-    color: colors.stone }, { tag: tags.strong,
-    fontWeight: "bold" }, { tag: tags.emphasis,
-    fontStyle: "italic" }, { tag: tags.link,
-    color: colors.stone,
-    textDecoration: "underline" }, { tag: tags.heading,
-    fontWeight: "bold",
-    color: colors.coral }, { tag: [tags.atom, tags.bool, tags.special(tags.variableName)],
-    color: colors.whiskey }, { tag: tags.invalid,
-    color: colors.invalid })
+  return HighlightStyle.define(
+    { color: colors.violet,   tag: tags.keyword }, 
+    { color: colors.coral,    tag: [tags.name, tags.deleted, tags.character, tags.propertyName, tags.macroName] }, 
+    { color: colors.sage,     tag: [tags.processingInstruction, tags.string, tags.inserted] }, 
+    { color: colors.malibu,   tag: [tags.function(tags.variableName), tags.labelName] }, 
+    { color: colors.whiskey,  tag: [tags.color, tags.constant(tags.name), tags.standard(tags.name)] }, 
+    { color: colors.ivory,    tag: [tags.definition(tags.name), tags.separator] }, 
+    { color: colors.chalky,   tag: [tags.typeName, tags.className, tags.number, tags.changed, tags.annotation, tags.modifier, tags.self, tags.namespace] }, 
+    { color: colors.cyan,     tag: [tags.operator, tags.operatorKeyword, tags.url, tags.escape, tags.regexp, tags.link, tags.special(tags.string)]}, 
+    { color: colors.stone,    tag: [tags.meta, tags.comment] },
+    { color: colors.whiskey,  tag: [tags.atom, tags.bool, tags.special(tags.variableName)] },
+    { color: colors.stone,    tag: tags.link, textDecoration: "underline" }, 
+    { color: colors.coral,    tag: tags.heading, fontWeight: "bold" }, 
+    { color: colors.invalid,  tag: tags.invalid },
+    { fontWeight: "bold",     tag: tags.strong }, 
+    { fontStyle: "italic",    tag: tags.emphasis }, 
+  )
 };
 
 /// Extension to enable the One Dark theme (both the editor theme and
