@@ -18,7 +18,7 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
   const tabData = session.tabs[open];
   const blob = Object.values(workspace.snapshot.blobs).filter(b => b.id === tabData.id)[0];
   //{blob.src}
-  return (<div><CodeBlock src={blob.src}/></div>);
+  return (<div><CodeBlock doc={blob.src}/></div>);
 }
 
 export default AssetsView;

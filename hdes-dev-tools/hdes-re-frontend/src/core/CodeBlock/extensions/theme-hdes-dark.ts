@@ -1,23 +1,23 @@
-import { AppTheme } from '../Themes'
+import { AppTheme } from '../../Themes'
 
 import { EditorView } from '@codemirror/next/view';
 import { HighlightStyle, tags } from '@codemirror/next/highlight';
 
-
 const themeColors = (theme : AppTheme) => ({
     chalky: "#e5c07b", 
     coral: "#e06c75", 
-    cyan: "#cc0054", 
-    invalid: "#ffffff", 
+    picarm: "#cc0054",  //--pictorial carmine
     ivory: "#abb2bf", 
     stone: "#5c6370", 
     malibu: "#61afef", 
     sage: "#98c379", 
     whiskey: "#d19a66", 
     violet: "#c678dd", 
+    
+    invalid: theme.palette.error.main, 
     background: theme.palette.background.default, 
-    selection: "#405948", 
-    cursor: "#528bff"
+    selection: "#405948", //feldgraun
+    cursor: "#528bff" // united nations blue
 });
 
 /// The editor theme styles for One Dark.
@@ -33,18 +33,18 @@ const hdesDarkTheme = (theme : AppTheme) => {
     "$$focused": { outline: "unset" },
     "$$focused $cursor": { borderLeftColor: colors.cursor },
     "$$focused $selectionBackground": { backgroundColor: colors.selection },
-    $panels: { backgroundColor: colors.background, color: colors.ivory },
+    "$panels": { backgroundColor: colors.background, color: colors.ivory },
     "$panels.top": { borderBottom: "2px solid black" },
     "$panels.bottom": { borderTop: "2px solid black" },
-    $searchMatch: {
+    "$searchMatch": {
       backgroundColor: "#72a1ff59",
       outline: "1px solid #457dff"
     },
     "$searchMatch.selected": {
       backgroundColor: "#6199ff2f"
     },
-    $activeLine: { backgroundColor: "#2c313c" },
-    $selectionMatch: { backgroundColor: "#aafe661a" },
+    "$activeLine": { backgroundColor: "#2c313c" },
+    "$selectionMatch": { backgroundColor: "#aafe661a" },
     "$matchingBracket, $nonmatchingBracket": {
       backgroundColor: "#bad0f847",
       outline: "1px solid #515a6b"
@@ -55,12 +55,12 @@ const hdesDarkTheme = (theme : AppTheme) => {
       border: "none"
     },
     "$gutterElement.lineNumber": { color: "inherit" },
-    $foldPlaceholder: {
+    "$foldPlaceholder": {
       backgroundColor: "none",
       border: "none",
       color: "#ddd"
     },
-    $tooltip: {
+    "$tooltip": {
       border: "1px solid #181a1f",
       backgroundColor: "#606862"
     },
@@ -77,11 +77,11 @@ const hdesDarkHighlightStyle = (theme : AppTheme) => {
     { color: colors.violet,   tag: tags.keyword }, 
     { color: colors.coral,    tag: [tags.name, tags.deleted, tags.character, tags.propertyName, tags.macroName] }, 
     { color: colors.sage,     tag: [tags.processingInstruction, tags.string, tags.inserted] }, 
-    { color: colors.malibu,   tag: [tags.function(tags.variableName), tags.labelName] }, 
+    { color: colors.malibu,   tag: [tags.function(tags.variableName), tags.labelName, tags.variableName] }, 
     { color: colors.whiskey,  tag: [tags.color, tags.constant(tags.name), tags.standard(tags.name)] }, 
     { color: colors.ivory,    tag: [tags.definition(tags.name), tags.separator] }, 
     { color: colors.chalky,   tag: [tags.typeName, tags.className, tags.number, tags.changed, tags.annotation, tags.modifier, tags.self, tags.namespace] }, 
-    { color: colors.cyan,     tag: [tags.operator, tags.operatorKeyword, tags.url, tags.escape, tags.regexp, tags.link, tags.special(tags.string)]}, 
+    { color: colors.picarm,   tag: [tags.operator, tags.operatorKeyword, tags.url, tags.escape, tags.regexp, tags.link, tags.special(tags.string)]}, 
     { color: colors.stone,    tag: [tags.meta, tags.comment] },
     { color: colors.whiskey,  tag: [tags.atom, tags.bool, tags.special(tags.variableName)] },
     { color: colors.stone,    tag: tags.link, textDecoration: "underline" }, 
@@ -91,8 +91,5 @@ const hdesDarkHighlightStyle = (theme : AppTheme) => {
     { fontStyle: "italic",    tag: tags.emphasis }, 
   )
 };
-
-/// Extension to enable the One Dark theme (both the editor theme and
-/// the highlight style).
 const hdesDark = (theme: AppTheme) => ([hdesDarkTheme(theme), hdesDarkHighlightStyle(theme)]);
 export { hdesDark };

@@ -2,10 +2,9 @@ import React from 'react';
 
 import { makeStyles, Theme, createStyles, useTheme } from '@material-ui/core/styles';
 import { AppTheme } from '../Themes';
-import {EditorState, EditorView, basicSetup} from "@codemirror/next/basic-setup"
-
-import { javascript } from "@codemirror/next/lang-javascript"
-import { hdesDark } from "./theme-hdes-dark"
+import { EditorState, EditorView } from "@codemirror/next/basic-setup";
+import { Resources } from '../Resources'
+import createExtensions from './extensions'
 
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -17,30 +16,22 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-
 interface CodeMirrorIntegrationProps {
-  src: string
+  doc: string
 };
 
-const CodeMirrorIntegration: React.FC<CodeMirrorIntegrationProps> = ({src}) => {
+const CodeMirror: React.FC<CodeMirrorIntegrationProps> = ({doc}) => {
   const classes = useStyles();
   const ref = React.createRef<HTMLDivElement>();
+  const { service } = React.useContext(Resources.Context);
+  
   const [editor, setEditor] = React.useState<EditorView>();
   const theme: AppTheme = useTheme();
 
   React.useEffect(() => {
     if(!editor) {
-
-      
-      console.log(basicSetup)
-      const state = EditorState.create({doc: src, extensions: [
-        basicSetup,
-        javascript(),
-        hdesDark(theme),
-      //  linter(esLint(new Linter)),
-      //  StreamLanguage.define(javascript),
-      ]})
-      
+      const extensions =  createExtensions(service, theme);
+      const state = EditorState.create({ doc, extensions })
       const instance: EditorView = new EditorView({state, parent: ref.current as Element})
       setEditor(instance);
     }
@@ -49,4 +40,4 @@ const CodeMirrorIntegration: React.FC<CodeMirrorIntegrationProps> = ({src}) => {
   return (<div ref={ref} className={classes.root}></div>);
 }
 
-export default CodeMirrorIntegration;
+export default CodeMirror;

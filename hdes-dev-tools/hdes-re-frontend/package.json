@@ -21,6 +21,7 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
+    "build:parser": "",
     "start": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts start",
     "build": "REACT_APP_GIT_SHA=`git rev-parse --short HEAD` react-scripts build",
     "test": "react-scripts test",

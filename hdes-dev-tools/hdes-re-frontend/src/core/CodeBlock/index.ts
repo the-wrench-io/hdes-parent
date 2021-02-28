@@ -1,3 +1,3 @@
-import { default as CodeBlock } from './CodeMirrorIntegration';
+import { default as CodeBlock } from './CodeMirror';
 
 export { CodeBlock };
