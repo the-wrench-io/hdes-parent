@@ -114,8 +114,8 @@ const ShellStyles = makeStyles((theme) => ({
   
   appBarSpacer: theme.mixins.toolbar,
   container: {
-    //paddingTop: theme.spacing(4),
-    paddingBottom: theme.spacing(4),
+    maxWidth: '100%',
+    paddingLeft: theme.spacing(1)
   }
 }));
 

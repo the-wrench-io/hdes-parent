@@ -97,7 +97,7 @@ const Shell: React.FC<ShellProps> = ({links, tabs, search, badges, children}) =>
 
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
+        <Container className={classes.container} disableGutters>
           <>{ children }</>
         </Container>
       </main>

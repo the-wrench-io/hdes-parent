@@ -31,7 +31,7 @@ interface AppThemeOptions extends ThemeOptions {
   palette: AppPaletteOptions;
 }
 
-const theme = createMuiTheme({
+const AppThemeOptions = {
   palette: {
     type: 'dark',
     primary: {
@@ -96,7 +96,9 @@ const theme = createMuiTheme({
       }
     }
   }
-} as AppThemeOptions);
+} as AppThemeOptions
+
+const theme = createMuiTheme(AppThemeOptions);
 
 export type { AppTheme }
-export { theme };
+export { theme, AppThemeOptions };
