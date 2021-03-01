@@ -25,7 +25,7 @@ const SessionActionBuilder = {
   setData: (setData: Session.DataInit): SessionReducerAction => ({ type: SessionReducerActionType.setData, setData }),
   addTab: (addTab: Session.Tab<any>): SessionReducerAction => ({ type: SessionReducerActionType.addTab, addTab }),
   removeTab: (removeTab: string): SessionReducerAction => ({ type: SessionReducerActionType.removeTab, removeTab}),
-  changeTab: (changeTab: number): SessionReducerAction => ({ type: SessionReducerActionType.addTab, changeTab}),
+  changeTab: (changeTab: number): SessionReducerAction => ({ type: SessionReducerActionType.changeTab, changeTab}),
   
   setResourceSaved: (setResourceSaved: Backend.AnyResource): SessionReducerAction => ({ type: SessionReducerActionType.setResourceSaved, setResourceSaved }),
   setResourceDeleted: (setResourceDeleted: Backend.AnyResource): SessionReducerAction => ({ type: SessionReducerActionType.setResourceDeleted, setResourceDeleted }), 

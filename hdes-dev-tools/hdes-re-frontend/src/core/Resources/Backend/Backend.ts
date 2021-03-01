@@ -32,6 +32,7 @@ declare namespace Backend {
     query: () => ProjectQuery;    
   }
   interface HeadService {
+    create: (name: string, from: Head) => ServiceCallback<Head>;
     query: () => HeadQuery;
     delete: (value: Head) => ServiceCallback<Head>;    
   }
@@ -59,6 +60,8 @@ declare namespace Backend {
   
   interface ProjectResource {
     project: Project;
+    
+    // head name
     heads: Record<string, Head>;
     
     // head name

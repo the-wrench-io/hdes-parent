@@ -45,6 +45,7 @@ function App() {
   
   React.useEffect(() => {
     if(session.data.projects.length > 0 && !session.workspace) {
+      
       const head = session.data.projects[0].heads['main'];
       actions.handleWorkspace(head);
       

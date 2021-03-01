@@ -121,6 +121,14 @@ class InMemoryHeadService implements Backend.HeadService {
   constructor(store: Store) {
     this.store = store;
   }
+  create(name: string, from: Backend.Head) {
+    const { store } = this;
+    return {  
+      onSuccess(handle: (head: Backend.Head) => void) {
+        handle(store.createHead(name, from));
+      }
+    }
+  }
   query() {
     const { store } = this;
     return {      
@@ -146,6 +154,7 @@ interface Store {
   snapshots: Backend.SnapshotResource[];
   deleteHead(head: Backend.Head): Backend.Head;
   mergeHead(head: Backend.Head): Backend.Head;
+  createHead(name: string, from: Backend.Head): Backend.Head;
 }
 
 class InMemoryStore implements Store {
@@ -192,6 +201,19 @@ class InMemoryStore implements Store {
     this._projects = [...newProjects, project];
     this._listeners.onSave(target, "head");
     return target;  
+  }
+  createHead(name: string, from: Backend.Head) {
+    const project = this._projects
+      .filter(project =>  Object.values(project.heads).filter(h => h.id === from.id).length > 0)[0];
+    const newProjects: Backend.ProjectResource[] = this._projects.filter(p => p.project.id !== project.project.id);
+    
+    const newHead = Object.assign({}, from);
+    project.heads[name] = newHead;
+    project.states = createProjectHeadState(project.heads);
+    
+    this._projects = [...newProjects, project];
+    this._listeners.onSave(newHead, "head");
+    return newHead;
   }
   deleteHead(target: Backend.Head) {
     const newProjects: Backend.ProjectResource[] = []

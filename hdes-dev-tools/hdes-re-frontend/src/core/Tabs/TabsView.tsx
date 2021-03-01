@@ -48,6 +48,7 @@ const TabsView: React.FC<TabsViewProps> = () => {
     actions.handleTabChange(newValue);
   };
   const handleTabClose = (_event: React.ChangeEvent<{}>, newValue: number) => {
+    _event.stopPropagation();
     actions.handleTabClose(activeTab);
   };
     

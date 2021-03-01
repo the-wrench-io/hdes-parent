@@ -36,6 +36,7 @@ class GenericInstance implements Session.InstanceMutator {
   private _errors: Backend.ServerError[];
   private _workspace?: Session.Workspace;
   private _listeners: Session.SessionListeners;
+  private _updated: string;
   
   constructor(
     listeners: Session.SessionListeners,
@@ -50,6 +51,7 @@ class GenericInstance implements Session.InstanceMutator {
     errors?: Backend.ServerError[],
     workspace?: Session.Workspace) {
     
+    this._updated = new Date().toTimeString();
     this._listeners = listeners;
     this._tabs = tabs ? tabs : [];
     this._history = history ? history : { open: 0 };

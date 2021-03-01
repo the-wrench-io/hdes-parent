@@ -66,6 +66,7 @@ const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
     sessionDispatch({type: SessionReducerActionType.setListeners, setListeners: listeners});
   }, [actions, service, serviceDispatch]);
   
+  
   return (
     <ResourceContext.Provider value={{ session, actions, service }}>
       {children}

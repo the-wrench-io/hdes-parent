@@ -2,11 +2,21 @@ import { Backend } from '../Backend';
 import { Session } from '../Session';
 
 enum SessionReducerActionType {
-  addTab, removeTab, changeTab,
-  setTabData, setDialog, setLink, setSearch, setData,
+  addTab = "addTab", 
+  removeTab = "removeTab", 
+  changeTab = "changeTab",
+  
+  setTabData = "setTabData", 
+  setDialog = "setDialog", 
+  setLink = "setLink", 
+  setSearch = "setSearch", 
+  setData = "setData",
    
-  setResourceSaved, setResourceDeleted, setServerError,
-  setWorkspace, setListeners
+  setResourceSaved = "setResourceSaved", 
+  setResourceDeleted = "setResourceDeleted", 
+  setServerError = "setServerError",
+  setWorkspace = "setWorkspace", 
+  setListeners = "setListeners"
 }
 
 interface SessionReducerAction {
@@ -54,15 +64,12 @@ const SessionReducer = (state: Session.InstanceMutator, action: SessionReducerAc
       if(action.addTab) {
         return state.withTab(action.addTab); 
       }
-      if(action.changeTab !== undefined) {
-        return state.withTab(action.changeTab);  
-      }
       console.error("Action data error", action);
       return state;
     }
     
     case SessionReducerActionType.changeTab: {
-      if(!action.changeTab) {
+      if(action.changeTab === undefined) {
         console.error("Action data error", action);
         return state;
       }

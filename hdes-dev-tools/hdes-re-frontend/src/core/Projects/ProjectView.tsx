@@ -18,7 +18,7 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 
 import { Backend } from '../Resources';
 import HeadView from './HeadView'
-
+import HeadCreateView from './HeadCreateView';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,7 +67,6 @@ const ProjectView: React.FC<ProjectsViewProps> = (props) => {
     }
   }
   
-  
   return (
     <div className={classes.root}>
       <ListItem>
@@ -76,6 +75,7 @@ const ProjectView: React.FC<ProjectsViewProps> = (props) => {
         </ListItemAvatar>
         <ListItemText primary={props.project.project.name} secondary={<span>Contains {heads.length} branches: {headSummary}</span>} />
         <ListItemSecondaryAction>
+          <HeadCreateView project={props.project} setWorkspace={props.setWorkspace}/>
           <Tooltip title={"Manage branches"}>
             <IconButton edge="end" aria-label="more-or-less" onClick={() => setOpen(!open)}>
               {open ? <ExpandLessIcon /> : <ExpandMoreIcon />}
