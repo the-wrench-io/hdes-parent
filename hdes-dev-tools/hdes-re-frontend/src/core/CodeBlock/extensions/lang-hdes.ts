@@ -1,3 +1,4 @@
+/* eslint-disable no-template-curly-in-string */
 import { parser } from '../lezer-grammar';
 
 import { LezerLanguage, indentNodeProp, continuedIndent, flatIndent, delimitedIndent, foldNodeProp, LanguageSupport } from '@codemirror/next/language';

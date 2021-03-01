@@ -43,7 +43,7 @@ interface AssetsTreeNodeViewProps {
 
 const AssetsTreeNodeView: React.FC<AssetsTreeNodeViewProps> = ({asset, snapshot}) => {
   const classes = useStyles();
-  const { session, actions } = React.useContext(Resources.Context);
+  const { actions } = React.useContext(Resources.Context);
   const [open, setOpen] = React.useState(false);
 
   const handleClick = () => {

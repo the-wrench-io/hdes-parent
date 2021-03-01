@@ -7,10 +7,8 @@
   typeTernary @right,
   else @right,
   member,
-  readonly,
   newArgs,
   call,
-  taggedTemplate,
   prefix,
   postfix,
   typeof,
@@ -21,9 +19,6 @@
   loop,
   rel @left,
   equal @left,
-  bitOr @left,
-  bitXor @left,
-  bitAnd @left,
   and @left,
   or @left,
   ternary @right,
@@ -72,11 +67,7 @@ declaration {
   FunctionDeclaration |
   ClassDeclaration |
   VariableDeclaration |
-  TypeAliasDeclaration |
-  InterfaceDeclaration |
-  EnumDeclaration |
-  NamespaceDeclaration |
-  AmbientDeclaration
+  EnumDeclaration
 }
 
 FunctionDeclaration {
@@ -84,7 +75,7 @@ FunctionDeclaration {
 }
 
 ClassDeclaration {
-  !statement (kw<"flow"> | kw<"servicetask"> | kw<"decisiontable">) VariableDefinition TypeParamList?
+  !statement (kw<"flow"> | kw<"servicetask"> | kw<"decisiontable">) VariableDefinition
   ClassBody
 }
 
@@ -92,28 +83,15 @@ ClassBody {
   "{" (MethodDeclaration | PropertyDeclaration | ";")* "}"
 }
 
-privacy {
-  @extend[@name=Privacy]<word, "public" | "private" | "protected">
-}
-
-privacyArg {
-  @extend[@name=Privacy]<identifier, "public" | "private" | "protected">
-}
-
 MethodDeclaration[group=ClassItem] {
-  privacy?
-  (pkwMod<"static"> | tsPkwMod<"abstract">)?
   pkwMod<"async">?
-  (pkwMod<"get"> | pkwMod<"set"> | Star)?
+  Star?
   PropertyNameDefinition
   functionSignature
   Block
 }
 
 PropertyDeclaration[group=ClassItem] {
-  privacy?
-  (pkwMod<"static"> | tsPkwMod<"abstract">)?
-  pkwMod<"readonly">?
   PropertyNameDefinition
   (Optional | LogicOp<"!">)?
   TypeAnnotation?
@@ -125,47 +103,8 @@ VariableDeclaration {
   (kw<"let"> | kw<"var"> | kw<"const">) commaSep1<patternAssignTyped> semi
 }
 
-TypeAliasDeclaration {
-  tskw<"type"> TypeDefinition TypeParamList? "=" type semi
-}
-
-InterfaceDeclaration {
-  tskw<"interface"> TypeDefinition TypeParamList? (TSExtends type)? ObjectType
-}
-
 EnumDeclaration {
   kw<"const">? tskw<"enum"> TypeDefinition EnumBody { "{" commaSep<PropertyName ("=" expressionNoComma)?> "}" }
-}
-
-NamespaceDeclaration {
-  (tskw<"namespace"> | tskw<"module">) VariableDefinition ("." PropertyNameDefinition)* Block
-}
-
-AmbientDeclaration {
-  tskw<"declare"> (
-    VariableDeclaration |
-    TypeAliasDeclaration |
-    EnumDeclaration |
-    InterfaceDeclaration |
-    NamespaceDeclaration |
-    GlobalDeclaration { tskw<"global"> Block } |
-    ClassDeclaration {
-      tskw<"abstract">? kw<"class"> VariableDefinition TypeParamList?
-      (kw<"extends"> expression | TSExtends type)?
-      (tskw<"implements"> commaSep1<type>)?
-      ClassBody { "{" (
-        MethodDeclaration {
-          privacy? (pkwMod<"static"> | tsPkwMod<"abstract">)? pkwMod<"async">? (pkwMod<"get"> | pkwMod<"set"> | Star)?
-          PropertyNameDefinition TypeParamList? ParamList (TypeAnnotation | TypePredicate) semi
-        } |
-        PropertyDeclaration |        
-        IndexSignature
-      )* "}" }
-    } |
-    AmbientFunctionDeclaration {
-      async? kw<"function"> Star? VariableDefinition? TypeParamList? ParamList (TypeAnnotation | TypePredicate) semi
-    }
-  )
 }
 
 pattern { VariableDefinition | ArrayPattern | ObjectPattern }
@@ -187,7 +126,7 @@ patternAssignTyped {
 }
 
 ParamList {
-  "(" commaSep<"..." patternAssignTyped | privacyArg? tskw<"readonly">? patternAssignTyped> ")"
+  "(" commaSep<"..."? patternAssignTyped> ")"
 }
 
 Block {
@@ -211,7 +150,6 @@ SequenceExpression {
 expressionNoComma {
   Number |
   String |
-  TemplateString |
   VariableName |
   boolean |
   kw<"this"> |
@@ -231,12 +169,7 @@ expressionNoComma {
   ConditionalExpression { expressionNoComma !ternary questionOp expressionNoComma LogicOp<":"> expressionNoComma } |
   AssignmentExpression |
   PostfixExpression { expressionNoComma !postfix (incdec | LogicOp<"!">) } |
-  CallExpression { expressionNoComma !call TypeArgList? ArgList } |
-  TaggedTemplatExpression { expressionNoComma !taggedTemplate TemplateString } |
-  PrefixCast { tsAngleOpen type ~tsAngle ">" expressionNoComma } |
-  ArrowFunction[@dynamicPrecedence=1] {
-    TypeParamList { tsAngleOpen commaSep<typeParam> ">" } ParamList TypeAnnotation? "=>" (Block | expression)
-  }
+  CallExpression { expressionNoComma !call TypeArgList? ArgList }
 }
 
 ParenthesizedExpression { "(" expression ")" }
@@ -262,15 +195,14 @@ ClassExpression {
   kw<"class"> VariableDefinition? (kw<"extends"> expression | TSExtends type)? ClassBody
 }
 
-functionSignature { TypeParamList? ParamList (TypeAnnotation | TypePredicate)? }
+functionSignature { ParamList (TypeAnnotation | TypePredicate)? }
 
 FunctionExpression {
   async? kw<"function"> Star? VariableDefinition? functionSignature Block
 }
 
 UnaryExpression {
-  !prefix (ckw<"await"> | ckw<"yield"> | kw<"void"> | kw<"typeof"> | kw<"delete"> |
-           LogicOp<"!"> | BitOp<"~"> | incdec | incdecPrefix | ArithOp<"+" | "-">)
+  !prefix (ckw<"await"> | LogicOp<"!"> | incdec | incdecPrefix | ArithOp<"+" | "-">)
   expressionNoComma
 }
 
@@ -278,13 +210,8 @@ BinaryExpression {
   expressionNoComma !exp ArithOp<"**"> expressionNoComma |
   expressionNoComma !times (divide | ArithOp<"%"> | ArithOp<"*">) expressionNoComma |
   expressionNoComma !plus ArithOp<"+" | "-"> expressionNoComma |
-  expressionNoComma !shift BitOp<">>" ">"? | "<<"> expressionNoComma |
   expressionNoComma !rel (LessThan | CompareOp<"<=" | ">" "="?> | kw<"in"> | kw<"instanceof">) expressionNoComma |
-  expressionNoComma !rel ckw<"as"> type |
   expressionNoComma !equal CompareOp<"==" "="? | "!=" "="?> expressionNoComma |
-  expressionNoComma !bitOr BitOp { "|" } expressionNoComma |
-  expressionNoComma !bitXor BitOp<"^"> expressionNoComma |
-  expressionNoComma !bitAnd BitOp { "&" } expressionNoComma |
   expressionNoComma !and LogicOp<"&&"> expressionNoComma |
   expressionNoComma !or LogicOp<"||" | "??"> expressionNoComma
 }
@@ -311,12 +238,6 @@ TypeArgList {
   @extend[@name="<"]<LessThan, "<"> commaSep<type> ">"
 }
 
-TypeParamList {
-  "<" commaSep<typeParam> ">"
-}
-
-typeParam { TypeDefinition ~tsAngle (TSExtends type)? ("=" type)? }
-
 typeofMemberExpression[@name=MemberExpression] {
   VariableName !member (("." | "?.") PropertyName | "[" expression "]")
 }
@@ -339,7 +260,6 @@ type[@isGroup=Type] {
   IndexedType { type !typeMember ("." PropertyName | "[" (String | Number) "]")+ } |
   TupleType { "[" commaSep<(Label ":")? type | "..." type> "]" } |
   ArrayType { type "[" "]" | type "[" "]" } |
-  ReadonlyType { tskw<"readonly"> !readonly type } |
   ObjectType |
   UnionType { type !union LogicOp { "|" } type } |
   IntersectionType { type !intersection LogicOp { "&" } type } |
@@ -383,15 +303,6 @@ ParamTypeList[@name=ParamList] {
   "(" commaSep<"..."? VariableDefinition ~arrow Optional? ~arrow TypeAnnotation?> ")"
 }
 
-@skip {} {
-  TemplateString {
-    templateStart (templateContent | templateExpr)* templateEnd
-  }
-}
-
-templateExpr { templateDollarBrace expression templateClosingBrace }
-
-
 commaSep<content> {
   "" | content ("," content?)*
 }
@@ -415,8 +326,6 @@ async { @extend[@name=async]<identifier, "async"> }
 // Contextual keyword in property context
 
 pkwMod<term> { @extend[@name={term}]<word, term> }
-
-tsPkwMod<term> { @extend[@name={term}]<word, term> }
 
 semi { ";" | insertSemi }
 
@@ -453,11 +362,6 @@ questionOp[@name=LogicOp] { "?" }
  incdecPrefix[@name=ArithOp]
 }
 
-@external tokens template from "./tokens" {
-  templateContent,
-  templateDollarBrace,
-  templateEnd
-}
 
 @tokens {
   whitespace { std.whitespace+ }
@@ -502,13 +406,8 @@ questionOp[@name=LogicOp] { "?" }
     "'" (![\\\n'] | "\\" _)* "'"?
   }
 
-  templateStart { "`" }
-
-  templateClosingBrace { "}" }
-
   ArithOp<expr> { expr }
   LogicOp<expr> { expr }
-  BitOp<expr> { expr }
   CompareOp<expr> { expr }
   UpdateOp<expr> { expr }
 
@@ -523,10 +422,6 @@ questionOp[@name=LogicOp] { "?" }
   "(" ")" "[" "]" "{" "}"
 
   "?." "." "," ";" ":"
-
-  tsAngleOpen { "<" }
-
-  @precedence { tsAngleOpen }
 }
 
 @external tokens insertSemicolon from "./tokens" { insertSemi }

@@ -35,7 +35,7 @@ const CodeMirror: React.FC<CodeMirrorIntegrationProps> = ({doc}) => {
       const instance: EditorView = new EditorView({state, parent: ref.current as Element})
       setEditor(instance);
     }
-  }, [ref])
+  }, [ref, service, theme, doc, editor])
 
   return (<div ref={ref} className={classes.root}></div>);
 }
