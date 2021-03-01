@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decisiontablebasic({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}{findFirst({when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})})}<EOF>"
+  text: "decisiontablebasic(name:STRING,lastName:STRING):{value:INTEGER,exp:INTEGER=value+20}{findFirst(){when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add(4590)when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add(4590)}}<EOF>"
   start:
     line: 1
     col: 1
@@ -9,7 +9,7 @@ token:
     col: 1
 values:
 - token:
-    text: "basic({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}{findFirst({when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})})}"
+    text: "basic(name:STRING,lastName:STRING):{value:INTEGER,exp:INTEGER=value+20}{findFirst(){when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add(4590)when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add(4590)}}"
     start:
       line: 1
       col: 15
@@ -29,22 +29,22 @@ values:
     nodeType: "BODY_ID"
   headers:
     token:
-      text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
+      text: "(name:STRING,lastName:STRING):{value:INTEGER,exp:INTEGER=value+20}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 101
+        col: 97
     acceptDefs:
     - token:
         text: "name:STRING"
         start:
           line: 1
-          col: 23
+          col: 21
         end:
           line: 1
-          col: 35
+          col: 33
       required: true
       name: "name"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "lastName:STRING"
         start:
           line: 1
-          col: 37
+          col: 35
         end:
           line: 1
-          col: 53
+          col: 51
       required: true
       name: "lastName"
       array: false
@@ -88,10 +88,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 59
+          col: 55
         end:
           line: 1
-          col: 73
+          col: 69
       required: true
       name: "value"
       array: false
@@ -111,10 +111,10 @@ values:
         text: "exp:INTEGER=value+20"
         start:
           line: 1
-          col: 75
+          col: 71
         end:
           line: 1
-          col: 100
+          col: 96
       required: false
       name: "exp"
       array: false
@@ -133,22 +133,22 @@ values:
     nodeType: "TYPES"
   hitPolicy:
     token:
-      text: "findFirst({when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})})"
+      text: "findFirst(){when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add(4590)when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add(4590)}"
       start:
         line: 3
         col: 3
       end:
         line: 6
-        col: 5
+        col: 4
     rows:
     - token:
-        text: "when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add({4590})"
+        text: "when(_!='bob'or_='same'or_='professor',_='woman'or_='man').add(4590)"
         start:
           line: 4
           col: 5
         end:
           line: 4
-          col: 98
+          col: 94
       when:
         token:
           text: "(_!='bob'or_='same'or_='professor',_='woman'or_='man')"
@@ -423,37 +423,37 @@ values:
         nodeType: "DT_RULE_WHEN"
       then:
         token:
-          text: "{4590}"
+          text: "4590"
           start:
             line: 4
             col: 89
           end:
             line: 4
-            col: 97
+            col: 93
         values:
         - token:
             text: "4590"
             start:
               line: 4
-              col: 91
+              col: 89
             end:
               line: 4
-              col: 95
+              col: 93
           type: "INTEGER"
           value: "4590"
           nodeType: "TYPE_LITERAL"
         nodeType: "DT_RULE_THEN"
       text: "when(_ != 'bob'  or _ = 'same' or _ = 'professor',  _ = 'woman'  or _\
-        \ = 'man' ).add({ 4590 })"
+        \ = 'man' ).add(4590)"
       nodeType: "DT_RULE_WHEN_THEN"
     - token:
-        text: "when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add({4590})"
+        text: "when(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2').add(4590)"
         start:
           line: 5
           col: 5
         end:
           line: 5
-          col: 98
+          col: 94
       when:
         token:
           text: "(_!='bob1'or_='same'or_='professor2',_='woman2'or_='man2')"
@@ -728,39 +728,39 @@ values:
         nodeType: "DT_RULE_WHEN"
       then:
         token:
-          text: "{4590}"
+          text: "4590"
           start:
             line: 5
             col: 89
           end:
             line: 5
-            col: 97
+            col: 93
         values:
         - token:
             text: "4590"
             start:
               line: 5
-              col: 91
+              col: 89
             end:
               line: 5
-              col: 95
+              col: 93
           type: "INTEGER"
           value: "4590"
           nodeType: "TYPE_LITERAL"
         nodeType: "DT_RULE_THEN"
       text: "when(_ != 'bob1' or _ = 'same' or _ = 'professor2', _ = 'woman2' or _\
-        \ = 'man2').add({ 4590 })"
+        \ = 'man2').add(4590)"
       nodeType: "DT_RULE_WHEN_THEN"
     nodeType: "DT_HITPOLICY_FIRST"
   constants:
     token:
-      text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
+      text: "(name:STRING,lastName:STRING):{value:INTEGER,exp:INTEGER=value+20}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 101
+        col: 97
     required: true
     name: "constants"
     array: true
@@ -770,10 +770,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 59
+          col: 55
         end:
           line: 1
-          col: 73
+          col: 69
       required: true
       name: "value"
       array: false
@@ -792,13 +792,13 @@ values:
     nodeType: "TYPE_OBJECT"
   matched:
     token:
-      text: "({name:STRING,lastName:STRING}):{value:INTEGER,exp:INTEGER=value+20}"
+      text: "(name:STRING,lastName:STRING):{value:INTEGER,exp:INTEGER=value+20}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 101
+        col: 97
     required: true
     name: ""
     array: false
@@ -808,10 +808,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 59
+          col: 55
         end:
           line: 1
-          col: 73
+          col: 69
       required: true
       name: "value"
       array: false
@@ -831,10 +831,10 @@ values:
         text: "exp:INTEGER=value+20"
         start:
           line: 1
-          col: 75
+          col: 71
         end:
           line: 1
-          col: 100
+          col: 96
       required: false
       name: "exp"
       array: false

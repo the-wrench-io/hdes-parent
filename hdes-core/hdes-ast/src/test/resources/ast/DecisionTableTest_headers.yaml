@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decisiontablebasic({name,lastName:STRING,value?:INTEGER}):{}{map(STRING)to(INTEGER)when()}<EOF>"
+  text: "decisiontablebasic(name,lastName:STRING,value?:INTEGER):{}{map(STRING)to(INTEGER)when()}<EOF>"
   start:
     line: 1
     col: 3
@@ -9,7 +9,7 @@ token:
     col: 1
 values:
 - token:
-    text: "basic({name,lastName:STRING,value?:INTEGER}):{}{map(STRING)to(INTEGER)when()}"
+    text: "basic(name,lastName:STRING,value?:INTEGER):{}{map(STRING)to(INTEGER)when()}"
     start:
       line: 1
       col: 17
@@ -29,22 +29,22 @@ values:
     nodeType: "BODY_ID"
   headers:
     token:
-      text: "({name,lastName:STRING,value?:INTEGER}):{}"
+      text: "(name,lastName:STRING,value?:INTEGER):{}"
       start:
         line: 1
         col: 22
       end:
         line: 1
-        col: 73
+        col: 69
     acceptDefs:
     - token:
         text: "name,lastName:STRING"
         start:
           line: 1
-          col: 25
+          col: 23
         end:
           line: 1
-          col: 47
+          col: 45
       required: true
       name: "name"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "name,lastName:STRING"
         start:
           line: 1
-          col: 25
+          col: 23
         end:
           line: 1
-          col: 47
+          col: 45
       required: true
       name: "lastName"
       array: false
@@ -87,10 +87,10 @@ values:
         text: "value?:INTEGER"
         start:
           line: 1
-          col: 49
+          col: 47
         end:
           line: 1
-          col: 64
+          col: 62
       required: false
       name: "value"
       array: false
@@ -134,26 +134,26 @@ values:
     nodeType: "DT_HITPOLICY_MAPPING"
   constants:
     token:
-      text: "({name,lastName:STRING,value?:INTEGER}):{}"
+      text: "(name,lastName:STRING,value?:INTEGER):{}"
       start:
         line: 1
         col: 22
       end:
         line: 1
-        col: 73
+        col: 69
     required: true
     name: "constants"
     array: true
     context: "CONSTANTS"
     values:
     - token:
-        text: "({name,lastName:STRING,value?:INTEGER}):{}"
+        text: "(name,lastName:STRING,value?:INTEGER):{}"
         start:
           line: 1
           col: 22
         end:
           line: 1
-          col: 73
+          col: 69
       required: true
       name: ""
       array: true
@@ -172,39 +172,39 @@ values:
     nodeType: "TYPE_OBJECT"
   matched:
     token:
-      text: "({name,lastName:STRING,value?:INTEGER}):{}"
+      text: "(name,lastName:STRING,value?:INTEGER):{}"
       start:
         line: 1
         col: 22
       end:
         line: 1
-        col: 73
+        col: 69
     required: true
     name: "instance"
     array: false
     context: "MATCHES"
     values:
     - token:
-        text: "({name,lastName:STRING,value?:INTEGER}):{}"
+        text: "(name,lastName:STRING,value?:INTEGER):{}"
         start:
           line: 1
           col: 22
         end:
           line: 1
-          col: 73
+          col: 69
       required: true
       name: "instance"
       array: true
       context: "MATCHES"
       values:
       - token:
-          text: "({name,lastName:STRING,value?:INTEGER}):{}"
+          text: "(name,lastName:STRING,value?:INTEGER):{}"
           start:
             line: 1
             col: 22
           end:
             line: 1
-            col: 73
+            col: 69
         required: true
         name: ""
         array: true

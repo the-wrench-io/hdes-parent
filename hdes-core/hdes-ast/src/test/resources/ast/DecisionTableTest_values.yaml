@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decisiontablebasic({firstName:STRINGlastName:STRING}):{}{map(string)to(integer)when(_='bob',_='sam',_='viv')firstName({1,2,3})lastName({3,10,20})}<EOF>"
+  text: "decisiontablebasic(firstName:STRINGlastName:STRING):{}{map(string)to(integer)when(_='bob',_='sam',_='viv')firstName(1,2,3)lastName(3,10,20)}<EOF>"
   start:
     line: 1
     col: 1
@@ -9,7 +9,7 @@ token:
     col: 1
 values:
 - token:
-    text: "basic({firstName:STRINGlastName:STRING}):{}{map(string)to(integer)when(_='bob',_='sam',_='viv')firstName({1,2,3})lastName({3,10,20})}"
+    text: "basic(firstName:STRINGlastName:STRING):{}{map(string)to(integer)when(_='bob',_='sam',_='viv')firstName(1,2,3)lastName(3,10,20)}"
     start:
       line: 1
       col: 15
@@ -29,22 +29,22 @@ values:
     nodeType: "BODY_ID"
   headers:
     token:
-      text: "({firstName:STRINGlastName:STRING}):{}"
+      text: "(firstName:STRINGlastName:STRING):{}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 63
+        col: 59
     acceptDefs:
     - token:
         text: "firstName:STRING"
         start:
           line: 1
-          col: 23
+          col: 21
         end:
           line: 1
-          col: 40
+          col: 38
       required: true
       name: "firstName"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "lastName:STRING"
         start:
           line: 1
-          col: 41
+          col: 39
         end:
           line: 1
-          col: 57
+          col: 55
       required: true
       name: "lastName"
       array: false
@@ -87,13 +87,13 @@ values:
     nodeType: "TYPES"
   hitPolicy:
     token:
-      text: "map(string)to(integer)when(_='bob',_='sam',_='viv')firstName({1,2,3})lastName({3,10,20})"
+      text: "map(string)to(integer)when(_='bob',_='sam',_='viv')firstName(1,2,3)lastName(3,10,20)"
       start:
         line: 2
         col: 3
       end:
         line: 6
-        col: 25
+        col: 22
     defFrom: "STRING"
     defTo: "INTEGER"
     when:
@@ -307,13 +307,13 @@ values:
       nodeType: "DT_RULE_WHEN"
     mapsTo:
     - token:
-        text: "firstName({1,2,3})"
+        text: "firstName(1,2,3)"
         start:
           line: 5
           col: 3
         end:
           line: 5
-          col: 24
+          col: 21
       accepts:
         token:
           text: "firstName"
@@ -327,22 +327,22 @@ values:
         nodeType: "INVOCATION_SIMPLE"
       then:
         token:
-          text: "{1,2,3}"
+          text: "1,2,3"
           start:
             line: 5
             col: 13
           end:
             line: 5
-            col: 23
+            col: 20
         values:
         - token:
             text: "1"
             start:
               line: 5
-              col: 14
+              col: 13
             end:
               line: 5
-              col: 15
+              col: 14
           type: "INTEGER"
           value: "1"
           nodeType: "TYPE_LITERAL"
@@ -350,10 +350,10 @@ values:
             text: "2"
             start:
               line: 5
-              col: 17
+              col: 16
             end:
               line: 5
-              col: 18
+              col: 17
           type: "INTEGER"
           value: "2"
           nodeType: "TYPE_LITERAL"
@@ -361,23 +361,23 @@ values:
             text: "3"
             start:
               line: 5
-              col: 20
+              col: 19
             end:
               line: 5
-              col: 21
+              col: 20
           type: "INTEGER"
           value: "3"
           nodeType: "TYPE_LITERAL"
         nodeType: "DT_RULE_THEN"
       nodeType: "DT_RULE_MAPPING"
     - token:
-        text: "lastName({3,10,20})"
+        text: "lastName(3,10,20)"
         start:
           line: 6
           col: 3
         end:
           line: 6
-          col: 25
+          col: 22
       accepts:
         token:
           text: "lastName"
@@ -391,22 +391,22 @@ values:
         nodeType: "INVOCATION_SIMPLE"
       then:
         token:
-          text: "{3,10,20}"
+          text: "3,10,20"
           start:
             line: 6
             col: 12
           end:
             line: 6
-            col: 24
+            col: 21
         values:
         - token:
             text: "3"
             start:
               line: 6
-              col: 13
+              col: 12
             end:
               line: 6
-              col: 14
+              col: 13
           type: "INTEGER"
           value: "3"
           nodeType: "TYPE_LITERAL"
@@ -414,10 +414,10 @@ values:
             text: "10"
             start:
               line: 6
-              col: 16
+              col: 15
             end:
               line: 6
-              col: 18
+              col: 17
           type: "INTEGER"
           value: "10"
           nodeType: "TYPE_LITERAL"
@@ -425,10 +425,10 @@ values:
             text: "20"
             start:
               line: 6
-              col: 20
+              col: 19
             end:
               line: 6
-              col: 22
+              col: 21
           type: "INTEGER"
           value: "20"
           nodeType: "TYPE_LITERAL"
@@ -437,26 +437,26 @@ values:
     nodeType: "DT_HITPOLICY_MAPPING"
   constants:
     token:
-      text: "({firstName:STRINGlastName:STRING}):{}"
+      text: "(firstName:STRINGlastName:STRING):{}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 63
+        col: 59
     required: true
     name: "constants"
     array: true
     context: "CONSTANTS"
     values:
     - token:
-        text: "({firstName:STRINGlastName:STRING}):{}"
+        text: "(firstName:STRINGlastName:STRING):{}"
         start:
           line: 1
           col: 20
         end:
           line: 1
-          col: 63
+          col: 59
       required: true
       name: ""
       array: true
@@ -473,13 +473,13 @@ values:
       type: "INTEGER"
       nodeType: "TYPE_SCALAR"
     - token:
-        text: "({firstName:STRINGlastName:STRING}):{}"
+        text: "(firstName:STRINGlastName:STRING):{}"
         start:
           line: 1
           col: 20
         end:
           line: 1
-          col: 63
+          col: 59
       required: true
       name: "firstName"
       array: true
@@ -496,13 +496,13 @@ values:
       type: "INTEGER"
       nodeType: "TYPE_SCALAR"
     - token:
-        text: "({firstName:STRINGlastName:STRING}):{}"
+        text: "(firstName:STRINGlastName:STRING):{}"
         start:
           line: 1
           col: 20
         end:
           line: 1
-          col: 63
+          col: 59
       required: true
       name: "lastName"
       array: true
@@ -521,39 +521,39 @@ values:
     nodeType: "TYPE_OBJECT"
   matched:
     token:
-      text: "({firstName:STRINGlastName:STRING}):{}"
+      text: "(firstName:STRINGlastName:STRING):{}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 63
+        col: 59
     required: true
     name: "instance"
     array: false
     context: "MATCHES"
     values:
     - token:
-        text: "({firstName:STRINGlastName:STRING}):{}"
+        text: "(firstName:STRINGlastName:STRING):{}"
         start:
           line: 1
           col: 20
         end:
           line: 1
-          col: 63
+          col: 59
       required: true
       name: "instance"
       array: true
       context: "MATCHES"
       values:
       - token:
-          text: "({firstName:STRINGlastName:STRING}):{}"
+          text: "(firstName:STRINGlastName:STRING):{}"
           start:
             line: 1
             col: 20
           end:
             line: 1
-            col: 63
+            col: 59
         required: true
         name: ""
         array: true
@@ -571,13 +571,13 @@ values:
         nodeType: "TYPE_SCALAR"
       nodeType: "TYPE_OBJECT"
     - token:
-        text: "({firstName:STRINGlastName:STRING}):{}"
+        text: "(firstName:STRINGlastName:STRING):{}"
         start:
           line: 1
           col: 20
         end:
           line: 1
-          col: 63
+          col: 59
       required: true
       name: "firstName"
       array: true
@@ -594,13 +594,13 @@ values:
       type: "INTEGER"
       nodeType: "TYPE_SCALAR"
     - token:
-        text: "({firstName:STRINGlastName:STRING}):{}"
+        text: "(firstName:STRINGlastName:STRING):{}"
         start:
           line: 1
           col: 20
         end:
           line: 1
-          col: 63
+          col: 59
       required: true
       name: "lastName"
       array: true

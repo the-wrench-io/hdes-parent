@@ -3,13 +3,13 @@
  * Example of a java specific service task
  */
 servicetask SchoolService (
-  { importId: integer }): 
+  importId: integer ): 
   { schools: { schoolId: string, zipcode: string }[] } {
   x.y.io.MySuperService {}
 }
 
 servicetask CreateFormService (
-  { schoolId: string, formName: string }):
+  schoolId: string, formName: string):
   { confirmed: boolean } {
   
   promise { timeout: 500 }
@@ -21,8 +21,7 @@ servicetask CreateFormService (
 /**
  * Flow for allocating students into school
  */
-flow StudentAllocation (
-  { importId: integer, service: string }): 
+flow StudentAllocation ( importId: integer, service: string ): 
   { importId: string } {
     
     GetSchools() {

@@ -1,4 +1,4 @@
-flow AgeProductSelection( { age: integer, office: string } ):
+flow AgeProductSelection(age: integer, office: string):
                           { products: { name: string }[], log: string } {
   GetAgeScore() {
     if (age > 80) return NoProductAvailable()

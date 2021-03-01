@@ -1,7 +1,7 @@
-servicetask ServiceX({}):{} {
+servicetask ServiceX():{} {
   pkg.name.ClassName {}
 }
  
-flow x({ arg1: integer, arg2: integer }):{} {
+flow x(arg1: integer, arg2: integer):{} {
   firstTask() { await ServiceX({}) return {} }
 }

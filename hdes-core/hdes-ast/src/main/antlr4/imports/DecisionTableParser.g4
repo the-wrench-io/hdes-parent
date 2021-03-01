@@ -6,7 +6,7 @@ import TypeDefParser, ExpressionParser;
 decisionTableUnit: simpleTypeName headers '{' hitPolicy '}';
 hitPolicy: matchingPolicy | mappingPolicy;
 
-matchingPolicy: (FIND_FIRST | FIND_ALL) '(' '{' whenThenRules* '}' ')';
+matchingPolicy: (FIND_FIRST | FIND_ALL) '(' ')' '{' whenThenRules* '}';
 whenThenRules: WHEN whenRules '.'? ADD '(' thenRules ')';
 
 mappingPolicy: MAP '(' mappingFrom ')' '.'? TO '(' mappingTo ')' '.'? WHEN whenRules mappingRows;
@@ -16,9 +16,9 @@ mappingTo: scalarType;
 mappingRows: mappingRow*;
 mappingRow: '.'? simpleTypeName '(' thenRules ')';
 
-thenRules: '{' (ruleLiteral (',' ruleLiteral)*)? '}';
+thenRules: (ruleLiteral (',' ruleLiteral)*)?;
 whenRules: '(' (ruleExpression (',' ruleExpression)*)? ')';
 
 ruleLiteral: literal;
 ruleExpression: ruleUndefinedValue | expressionUnit;
-ruleUndefinedValue: '?';
+ruleUndefinedValue: UNDEFINED;

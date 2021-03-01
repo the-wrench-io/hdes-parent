@@ -1,17 +1,17 @@
-        servicetask FormPromise({}) : { dataId: STRING, userValue: INTEGER } {
+        servicetask FormPromise() : { dataId: STRING, userValue: INTEGER } {
           promise { timeout: 100 } 
           
           io.resys.hdes.runtime.test.CreateSessionCommand { formId: 'SuperForm' }
         }
         
-        decisiontable ScoringDT({ arg: INTEGER }) : { score: INTEGER } {
-          findFirst({
-            when( _ between 1 and 30 ) add({ 10 })
-            when( ? ) add({ 20 })
-          })
+        decisiontable ScoringDT(arg: INTEGER) : { score: INTEGER } {
+          findFirst(){
+            when( _ between 1 and 30 ) add( 10)
+            when( undefined ) add(20)
+          }
         }
 
-        flow SimpleFlow({ arg1: INTEGER, arg2: INTEGER }):{ score: INTEGER, userValue: INTEGER }
+        flow SimpleFlow(arg1: INTEGER, arg2: INTEGER):{ score: INTEGER, userValue: INTEGER }
         {
           InitialScoring() {
             ScoringDT({ arg: arg1 }) continue 

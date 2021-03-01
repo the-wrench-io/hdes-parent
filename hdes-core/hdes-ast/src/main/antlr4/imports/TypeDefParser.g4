@@ -5,7 +5,7 @@ import ExpressionParser;
 scalarType: ScalarType;
 
 headers: '(' headersAccepts ')' ':' headersReturns;
-headersAccepts: typeDefs;
+headersAccepts: (typeDef ( (',')? typeDef)*)?;
 headersReturns: typeDefs;
 
 typeDefs: '{' (typeDef ( (',')? typeDef)*)? '}';

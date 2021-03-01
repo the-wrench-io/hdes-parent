@@ -1,4 +1,4 @@
-  decisiontable basic({ name, lastName: STRING, value?: INTEGER }) : { } { 
+  decisiontable basic(name, lastName: STRING, value?: INTEGER) : { } { 
     map(STRING) to(INTEGER) when()
   }
    

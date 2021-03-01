@@ -55,6 +55,7 @@ DATE: D A T E;
 TIME: T I M E;
 STRING: S T R I N G;
 BOOLEAN: B O O L E A N;
+UNDEFINED: U N D E F I N E D;
 
 LAMBDA: '->';
 

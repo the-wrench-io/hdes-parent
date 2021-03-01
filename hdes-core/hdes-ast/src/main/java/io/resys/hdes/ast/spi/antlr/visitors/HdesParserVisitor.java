@@ -1,5 +1,7 @@
 package io.resys.hdes.ast.spi.antlr.visitors;
 
+import java.util.ArrayList;
+
 /*-
  * #%L
  * hdes-ast
@@ -226,10 +228,11 @@ public class HdesParserVisitor extends FlowParserVisitor {
   @Override
   public RedundentAccepts visitHeadersAccepts(HeadersAcceptsContext ctx) {
     Nodes nodes = nodes(ctx);
-    return ImmutableRedundentAccepts.builder()
-        .token(token(ctx))
-        .values(nodes.of(RedundentTypeDefs.class).get().getValues())
-        .build();
+    final List<TypeDef> values = new ArrayList<>();
+    for(var defs : nodes.list(RedundentTypeDefs.class)) {
+      values.addAll(defs.getValues());
+    }
+    return ImmutableRedundentAccepts.builder().token(token(ctx)).values(values).build();
   }
   
   @Override
@@ -237,7 +240,7 @@ public class HdesParserVisitor extends FlowParserVisitor {
     Nodes nodes = nodes(ctx);
     return ImmutableRedundentReturns.builder()
         .token(nodes.getToken())
-        .values(nodes.of(RedundentTypeDefs.class).get().getValues())
+        .values(nodes.of(RedundentTypeDefs.class).map(e -> e.getValues()).orElse(Collections.emptyList()))
         .build();
   }
   

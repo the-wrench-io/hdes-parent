@@ -1,13 +1,13 @@
         decisiontable DtWithFormula
-        ({ 
+        (
           a: INTEGER, b: INTEGER, c: DECIMAL,
-          total: DECIMAL = a + b + c }):
+          total: DECIMAL = a + b + c):
         {
           totalOut: DECIMAL = total,
           score: STRING } {
         
-          findFirst({ 
-            when(?, ?, ?, _ > 100)  add({'high-risk'}) 
-            when(?, ?, ?, ?)        add({'low-risk'}) 
-          })
+          findFirst(){ 
+            when(undefined, undefined, undefined, _ > 100)   add('high-risk') 
+            when(undefined, undefined, undefined, undefined) add('low-risk') 
+          }
         }

@@ -1,11 +1,11 @@
-        decisiontable Scoring ({ arg: INTEGER }) : { score: INTEGER } {
-          findFirst({
-            when ( _ between 1 and 30 ).add({ 10 })
-            when ( ? ).add({ 20 })
-          })
+        decisiontable Scoring (arg: INTEGER) : { score: INTEGER } {
+          findFirst(){
+            when ( _ between 1 and 30 ).add(10)
+            when ( undefined ).add(20)
+          }
         }
         
-        flow SimpleFlow({ arg1: INTEGER, arg2: INTEGER }) : { total: INTEGER }
+        flow SimpleFlow(arg1: INTEGER, arg2: INTEGER) : { total: INTEGER }
         {
             
           InitialScoring() {

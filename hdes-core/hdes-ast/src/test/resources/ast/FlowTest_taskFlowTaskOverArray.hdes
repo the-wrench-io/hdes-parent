@@ -1,4 +1,4 @@
-flow x({ arg1: integer, arg2: integer, x: integer[] }) : { log: string } {
+flow x(arg1: integer, arg2: integer, x: integer[]) : { log: string } {
   firstTask() {
     map(x).to({
        nestedStep() { 

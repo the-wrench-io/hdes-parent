@@ -1,6 +1,6 @@
 ---
 token:
-  text: "decisiontablebasic({value0:INTEGER,value1:INTEGER}):{value:INTEGER}{findAll({when(_>10,_<=20).add({4570})when(_>10,_<=20and_>10).add({4570})when(_=6,_!=20and_>10).add({4570})})}<EOF>"
+  text: "decisiontablebasic(value0:INTEGER,value1:INTEGER):{value:INTEGER}{findAll(){when(_>10,_<=20).add(4570)when(_>10,_<=20and_>10).add(4570)when(_=6,_!=20and_>10).add(4570)}}<EOF>"
   start:
     line: 1
     col: 1
@@ -9,7 +9,7 @@ token:
     col: 1
 values:
 - token:
-    text: "basic({value0:INTEGER,value1:INTEGER}):{value:INTEGER}{findAll({when(_>10,_<=20).add({4570})when(_>10,_<=20and_>10).add({4570})when(_=6,_!=20and_>10).add({4570})})}"
+    text: "basic(value0:INTEGER,value1:INTEGER):{value:INTEGER}{findAll(){when(_>10,_<=20).add(4570)when(_>10,_<=20and_>10).add(4570)when(_=6,_!=20and_>10).add(4570)}}"
     start:
       line: 1
       col: 15
@@ -29,22 +29,22 @@ values:
     nodeType: "BODY_ID"
   headers:
     token:
-      text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
+      text: "(value0:INTEGER,value1:INTEGER):{value:INTEGER}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 78
+        col: 74
     acceptDefs:
     - token:
         text: "value0:INTEGER"
         start:
           line: 1
-          col: 23
+          col: 21
         end:
           line: 1
-          col: 38
+          col: 36
       required: true
       name: "value0"
       array: false
@@ -64,10 +64,10 @@ values:
         text: "value1:INTEGER"
         start:
           line: 1
-          col: 40
+          col: 38
         end:
           line: 1
-          col: 55
+          col: 53
       required: true
       name: "value1"
       array: false
@@ -88,10 +88,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 62
+          col: 58
         end:
           line: 1
-          col: 76
+          col: 72
       required: true
       name: "value"
       array: false
@@ -110,22 +110,22 @@ values:
     nodeType: "TYPES"
   hitPolicy:
     token:
-      text: "findAll({when(_>10,_<=20).add({4570})when(_>10,_<=20and_>10).add({4570})when(_=6,_!=20and_>10).add({4570})})"
+      text: "findAll(){when(_>10,_<=20).add(4570)when(_>10,_<=20and_>10).add(4570)when(_=6,_!=20and_>10).add(4570)}"
       start:
         line: 2
         col: 3
       end:
         line: 6
-        col: 5
+        col: 4
     rows:
     - token:
-        text: "when(_>10,_<=20).add({4570})"
+        text: "when(_>10,_<=20).add(4570)"
         start:
           line: 3
           col: 5
         end:
           line: 3
-          col: 42
+          col: 38
       when:
         token:
           text: "(_>10,_<=20)"
@@ -271,36 +271,36 @@ values:
         nodeType: "DT_RULE_WHEN"
       then:
         token:
-          text: "{4570}"
+          text: "4570"
           start:
             line: 3
             col: 33
           end:
             line: 3
-            col: 41
+            col: 37
         values:
         - token:
             text: "4570"
             start:
               line: 3
-              col: 35
+              col: 33
             end:
               line: 3
-              col: 39
+              col: 37
           type: "INTEGER"
           value: "4570"
           nodeType: "TYPE_LITERAL"
         nodeType: "DT_RULE_THEN"
-      text: "when( _ > 10, _ <= 20 ).add({ 4570 })"
+      text: "when( _ > 10, _ <= 20 ).add(4570)"
       nodeType: "DT_RULE_WHEN_THEN"
     - token:
-        text: "when(_>10,_<=20and_>10).add({4570})"
+        text: "when(_>10,_<=20and_>10).add(4570)"
         start:
           line: 4
           col: 5
         end:
           line: 4
-          col: 53
+          col: 49
       when:
         token:
           text: "(_>10,_<=20and_>10)"
@@ -489,36 +489,36 @@ values:
         nodeType: "DT_RULE_WHEN"
       then:
         token:
-          text: "{4570}"
+          text: "4570"
           start:
             line: 4
             col: 44
           end:
             line: 4
-            col: 52
+            col: 48
         values:
         - token:
             text: "4570"
             start:
               line: 4
-              col: 46
+              col: 44
             end:
               line: 4
-              col: 50
+              col: 48
           type: "INTEGER"
           value: "4570"
           nodeType: "TYPE_LITERAL"
         nodeType: "DT_RULE_THEN"
-      text: "when( _ > 10, _ <= 20 and _ > 10 ).add({ 4570 })"
+      text: "when( _ > 10, _ <= 20 and _ > 10 ).add(4570)"
       nodeType: "DT_RULE_WHEN_THEN"
     - token:
-        text: "when(_=6,_!=20and_>10).add({4570})"
+        text: "when(_=6,_!=20and_>10).add(4570)"
         start:
           line: 5
           col: 5
         end:
           line: 5
-          col: 53
+          col: 49
       when:
         token:
           text: "(_=6,_!=20and_>10)"
@@ -707,38 +707,38 @@ values:
         nodeType: "DT_RULE_WHEN"
       then:
         token:
-          text: "{4570}"
+          text: "4570"
           start:
             line: 5
             col: 44
           end:
             line: 5
-            col: 52
+            col: 48
         values:
         - token:
             text: "4570"
             start:
               line: 5
-              col: 46
+              col: 44
             end:
               line: 5
-              col: 50
+              col: 48
           type: "INTEGER"
           value: "4570"
           nodeType: "TYPE_LITERAL"
         nodeType: "DT_RULE_THEN"
-      text: "when( _ = 6,  _ != 20 and _ > 10 ).add({ 4570 })"
+      text: "when( _ = 6,  _ != 20 and _ > 10 ).add(4570)"
       nodeType: "DT_RULE_WHEN_THEN"
     nodeType: "DT_HITPOLICY_ALL"
   constants:
     token:
-      text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
+      text: "(value0:INTEGER,value1:INTEGER):{value:INTEGER}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 78
+        col: 74
     required: true
     name: "constants"
     array: true
@@ -748,10 +748,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 62
+          col: 58
         end:
           line: 1
-          col: 76
+          col: 72
       required: true
       name: "value"
       array: false
@@ -770,13 +770,13 @@ values:
     nodeType: "TYPE_OBJECT"
   matched:
     token:
-      text: "({value0:INTEGER,value1:INTEGER}):{value:INTEGER}"
+      text: "(value0:INTEGER,value1:INTEGER):{value:INTEGER}"
       start:
         line: 1
         col: 20
       end:
         line: 1
-        col: 78
+        col: 74
     required: true
     name: ""
     array: true
@@ -786,10 +786,10 @@ values:
         text: "value:INTEGER"
         start:
           line: 1
-          col: 62
+          col: 58
         end:
           line: 1
-          col: 76
+          col: 72
       required: true
       name: "value"
       array: false
