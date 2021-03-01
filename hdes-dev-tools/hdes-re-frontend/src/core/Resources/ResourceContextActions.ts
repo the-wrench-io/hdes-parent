@@ -15,6 +15,7 @@ interface ResourceContextActions {
   handleTabAdd(newItem: Session.Tab<any>): void;
   handleTabChange(tabIndex: number): void;
   handleTabClose(tab: Session.Tab<any>): void;
+  handleTabCloseAll(): void;
   handleResourceSaved(saved: Backend.AnyResource): void;
   handleResourceDeleted(deleted: Backend.AnyResource): void;
   handleServerError(error: Backend.ServerError): void;
@@ -26,7 +27,8 @@ const SessionActionBuilder = {
   addTab: (addTab: Session.Tab<any>): SessionReducerAction => ({ type: SessionReducerActionType.addTab, addTab }),
   removeTab: (removeTab: string): SessionReducerAction => ({ type: SessionReducerActionType.removeTab, removeTab}),
   changeTab: (changeTab: number): SessionReducerAction => ({ type: SessionReducerActionType.changeTab, changeTab}),
-  
+  closeTabs: (): SessionReducerAction => ({ type: SessionReducerActionType.closeTabs }),
+    
   setResourceSaved: (setResourceSaved: Backend.AnyResource): SessionReducerAction => ({ type: SessionReducerActionType.setResourceSaved, setResourceSaved }),
   setResourceDeleted: (setResourceDeleted: Backend.AnyResource): SessionReducerAction => ({ type: SessionReducerActionType.setResourceDeleted, setResourceDeleted }), 
   setServerError: (setServerError: Backend.ServerError): SessionReducerAction => ({ type: SessionReducerActionType.setServerError, setServerError }),
@@ -71,6 +73,9 @@ class GenericResourceContextActions implements ResourceContextActions {
   }
   handleTabClose(tab: Session.Tab<any>) {
     this._sessionDispatch(SessionActionBuilder.removeTab(tab.id));
+  }
+  handleTabCloseAll() {
+    this._sessionDispatch(SessionActionBuilder.closeTabs());
   }
   handleResourceSaved(saved: Backend.AnyResource) {
     this._sessionDispatch(SessionActionBuilder.setResourceSaved(saved));

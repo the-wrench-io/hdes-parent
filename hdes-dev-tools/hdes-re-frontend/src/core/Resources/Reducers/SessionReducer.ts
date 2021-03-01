@@ -5,6 +5,7 @@ enum SessionReducerActionType {
   addTab = "addTab", 
   removeTab = "removeTab", 
   changeTab = "changeTab",
+  closeTabs = "closeTabs",
   
   setTabData = "setTabData", 
   setDialog = "setDialog", 
@@ -120,6 +121,9 @@ const SessionReducer = (state: Session.InstanceMutator, action: SessionReducerAc
     }
     case SessionReducerActionType.setLink: {
       return state.withLink(action.setLink)
+    }
+    case SessionReducerActionType.closeTabs: {
+      return state.deleteTabs();
     }
     case SessionReducerActionType.setSearch: {
       const search = action.setSearch;

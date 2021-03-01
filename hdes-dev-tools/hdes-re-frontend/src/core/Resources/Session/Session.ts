@@ -63,6 +63,7 @@ declare namespace Session {
     withLink(id?: string): InstanceMutator;
     withTabData(tabId: string, updateCommand: (oldData: any) => any): InstanceMutator;
     withTab(newTabOrTabIndex: Tab<any> | number): InstanceMutator;
+    deleteTabs(): Session.InstanceMutator;
     deleteTab(tabId: string): Session.InstanceMutator;
   }
 }

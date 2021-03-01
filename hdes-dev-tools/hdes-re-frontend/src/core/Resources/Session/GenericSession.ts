@@ -195,6 +195,11 @@ class GenericInstance implements Session.InstanceMutator {
     }
     return this.next(this.history, tabs).withTab(tabs.length - 1);
   }
+  
+  deleteTabs(): Session.InstanceMutator {
+    const tabs: Session.Tab<any>[] = [];
+    return this.next({ previous: this.history, open: 0}, tabs);
+  }
 }
 
 const createSession = () => new GenericInstance({

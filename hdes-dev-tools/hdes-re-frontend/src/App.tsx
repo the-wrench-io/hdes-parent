@@ -22,10 +22,7 @@ function App() {
   const { actions, session, service } = React.useContext(Resources.Context);
   
   const setWorkspace = (head: Backend.Head) => {
-    const projectsTab = session.findTab(projectsId);
-    if(projectsTab !== undefined) {
-      actions.handleTabClose(session.tabs[projectsTab]);
-    }
+    actions.handleTabCloseAll();
     actions.handleWorkspace(head)
     actions.handleLink(assetsId);
   }
