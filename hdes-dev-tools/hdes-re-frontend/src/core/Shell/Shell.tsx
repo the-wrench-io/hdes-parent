@@ -22,6 +22,7 @@ import ShellLinks from './ShellLinks';
 
 
 interface ShellProps {
+  header?: React.ReactNode,
   links: { 
     id: string,
     label: string, 
@@ -41,7 +42,7 @@ interface ShellProps {
   children: React.ReactNode
 };
 
-const Shell: React.FC<ShellProps> = ({links, tabs, search, badges, children}) => {
+const Shell: React.FC<ShellProps> = ({header, links, tabs, search, badges, children}) => {
   
   const classes = ShellStyles();
   const theme = useTheme();
@@ -84,10 +85,16 @@ const Shell: React.FC<ShellProps> = ({links, tabs, search, badges, children}) =>
           paper: clsx(classes.drawerPaper, !drawerOpen && classes.drawerPaperClose),
         }}>
         
-        <div className={classes.toolbarIcon}>
-          <IconButton onClick={handleDrawerClose}>
-            {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-          </IconButton>
+        <div className={classes.drawerToolbar}>
+          <div>
+            {header}
+          </div>
+          <div className={classes.toolbarIconSpacer}></div>
+          <div className={classes.toolbarIcon}>
+            <IconButton onClick={handleDrawerClose}>
+              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+            </IconButton>
+          </div>
         </div>
 
         <div className={classes.views}>

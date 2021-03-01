@@ -10,7 +10,7 @@ import CachedIcon from '@material-ui/icons/Cached';
 import { Resources, Backend } from './core/Resources';
 import { Tabs, TabPanel } from './core/Tabs';
 import { AssetsView, AssetsTreeView } from './core/Assets';
-import { ProjectsView } from './core/Projects';
+import { ProjectsView, ProjectNameView } from './core/Projects';
 import Shell from './core/Shell';
 
 
@@ -55,7 +55,7 @@ function App() {
   }, [session, actions, service])
   
   return (
-    <Shell tabs={<Tabs />} links={links}
+    <Shell header={<ProjectNameView />} tabs={<Tabs />} links={links}
       search={{ onChange: actions.handleSearch }}
       badges={[  ]}>
       

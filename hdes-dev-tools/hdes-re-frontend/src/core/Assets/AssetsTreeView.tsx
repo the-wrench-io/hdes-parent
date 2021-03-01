@@ -7,7 +7,7 @@ import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import AssetsTreeNodeView from './AssetsTreeNodeView';
-
+import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -46,19 +46,14 @@ const AssetsTreeView: React.FC<AssetsTreeViewProps> = () => {
 
   const snapshot = workspace.snapshot;
   
-  return (<div className={classes.root}>
-    <List dense component="nav" aria-labelledby="nested-list-subheader"
-      subheader={
-        <ListSubheader component="div" id="nested-list-subheader" className={classes.subheader}>
-          {workspace.snapshot.project.name} / {workspace.snapshot.head.name}
-        </ListSubheader>
-      }>
+  return (<Paper className={classes.root} elevation={3}>
+    <List dense component="nav">
       
       {Object.values(snapshot.blobs).map((blob, index) => (
         <AssetsTreeNodeView key={index} asset={blob} snapshot={snapshot} />) )}
     </List>
 
-  </div>);
+  </Paper>);
 }
 
 export default AssetsTreeView;

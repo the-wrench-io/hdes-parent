@@ -1,3 +1,4 @@
 import ProjectsView from './ProjectsView';
+import ProjectNameView from './ProjectNameView';
 
-export { ProjectsView };
+export { ProjectsView, ProjectNameView };
