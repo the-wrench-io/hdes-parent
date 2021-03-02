@@ -7,11 +7,13 @@ interface Props {
 
 const StartShape: React.FC<Props> = ({cords}) => {
   const theme = useTheme();
-  return (<ellipse 
-    cx={cords.x} cy={cords.y}
-    rx="25" ry="25"
-    fill={theme.fill} stroke={theme.stroke}
-    pointer-events="all" />);
+  return (
+      <ellipse 
+        cx={cords.x} cy={cords.y}
+        rx="25" ry="25"
+        fill={theme.fill} stroke={theme.stroke}
+        pointer-events="all" />
+    );
 
 }
 

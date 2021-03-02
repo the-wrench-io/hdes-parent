@@ -30,10 +30,13 @@ interface FlowTreeRendererProps {
 const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
   const theme = {fill: themeColors.background, stroke: themeColors.chalky };
   return (<Context.Provider theme={theme}>
-    <svg viewBox="0 0 500 500" style={{ backgroundColor: themeColors.background }}>
+    <svg viewBox="0 0 500 200" style={{ backgroundColor: themeColors.background }}>
+    <g>
       <Shapes.Start    cords={{x: 250, y: 40}}/>
       <Shapes.End      cords={{x: 250, y: 100}}/>
-      <Shapes.Decision cords={{x: 125, y: 70}}/>
+      <Shapes.Decision cords={{x: 125, y: 40}}/>
+      <Shapes.Table    cords={{x: 125, y: 100}} size={{height: 50, width: 100}}/>
+      </g>
     </svg>
   </Context.Provider>);
 
