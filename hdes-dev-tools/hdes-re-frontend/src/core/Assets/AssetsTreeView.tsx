@@ -3,7 +3,6 @@ import React from 'react';
 import { Resources } from '../Resources';
 
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
-import ListSubheader from '@material-ui/core/ListSubheader';
 import List from '@material-ui/core/List';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import AssetsTreeNodeView from './AssetsTreeNodeView';

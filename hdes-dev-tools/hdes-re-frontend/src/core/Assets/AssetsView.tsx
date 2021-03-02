@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Resources } from '../Resources';
 import { CodeBlock } from '../CodeBlock';
-
+import { FlowTreeRenderer } from '../Svg'
 
 interface AssetsViewProps {
 };
@@ -17,8 +17,13 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
   const open = session.history.open;
   const tabData = session.tabs[open];
   const blob = Object.values(workspace.snapshot.blobs).filter(b => b.id === tabData.id)[0];
-  //{blob.src}
-  return (<div><CodeBlock doc={blob.src}/></div>);
+  
+  const content = (
+    <FlowTreeRenderer /> 
+    // <CodeBlock doc={blob.src}/>
+  );
+  
+  return (<div>{content}</div>);
 }
 
 export default AssetsView;
