@@ -35,7 +35,7 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
       <Shapes.Start    cords={{x: 250, y: 40}}/>
       <Shapes.End      cords={{x: 250, y: 100}}/>
       <Shapes.Decision cords={{x: 125, y: 40}}/>
-      <Shapes.Table    cords={{x: 125, y: 100}} size={{height: 50, width: 100}}/>
+      <Shapes.Task     cords={{x: 125, y: 100}} size={{height: 50, width: 100}} clock decision service/>
       </g>
     </svg>
   </Context.Provider>);
