@@ -2,12 +2,13 @@ import React from 'react';
 import { useTheme } from '../../Context';
 
 interface Props {
-  cords: { x: number, y: number }
+  cords: { x: number, y: number },
+  size: { height: number },
 };
 
-const R = 25;
-
-const DecisionShape: React.FC<Props> = ({cords}) => {
+const DecisionShape: React.FC<Props> = ({cords, size}) => {
+  
+  const R = size.height/2;
   const theme = useTheme();
   const {x, y} = cords;
   

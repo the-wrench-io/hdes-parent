@@ -9,8 +9,6 @@ interface Props {
   service?: boolean;
 };
 
-const R = 25;
-
 const TaskShape: React.FC<Props> = ({cords, size, clock, decision, service}) => {
   const theme = useTheme();
   const {x, y} = cords;
@@ -57,7 +55,7 @@ const TaskShape: React.FC<Props> = ({cords, size, clock, decision, service}) => 
   return (<React.Fragment>
     <svg x={x - size.width/2} y={y - size.height/2} fill={theme.fill} stroke={theme.stroke}>
       <rect width={size.width} height={size.height} pointerEvents="all"/>
-      {icons}
+      {icons.map((i, index) => (<React.Fragment key={index}>{i}</React.Fragment>))}
     </svg>
   </React.Fragment>);
 }

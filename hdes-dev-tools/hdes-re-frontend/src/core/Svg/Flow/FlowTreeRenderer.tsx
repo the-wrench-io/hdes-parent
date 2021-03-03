@@ -1,6 +1,8 @@
 import React from 'react';
 import Context from '../Context';
 import Shapes from './Shapes';
+import FlowTreeBuilder from './FlowTreeBuilder';
+import FlowTreeViewBuilder from './FlowTreeViewBuilder';
 
 const themeColors = {
     chalky: "#e5c07b", 
@@ -29,14 +31,57 @@ interface FlowTreeRendererProps {
 
 const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
   const theme = {fill: themeColors.background, stroke: themeColors.chalky };
-  return (<Context.Provider theme={theme}>
-    <svg viewBox="0 0 500 200" style={{ backgroundColor: themeColors.background }}>
-    <g>
+  
+  const tree = new FlowTreeBuilder()
+    .start({id: "decide-claim"})
+    .switch({id: "decide-claim"}, [
+      {id: "collision-claim"}, 
+      {id: "vandalism-claim"}, 
+      {id: "felloffroad-claim"}])
+    .decision({id: "collision-claim"}, {id: "calculate-collision"})
+      .decision({id: "calculate-collision"}, {id: "final-calculation"})
+    .decision({id: "vandalism-claim"}, {id: "calculate-vandalism"})
+      .decision({id: "calculate-vandalism"}, {id: "final-calculation"})
+    .decision({id: "felloffroad-claim"}, {id: "calculate-felloffroad"})
+      .decision({id: "calculate-felloffroad"}, {id: "final-calculation"})
+    .service({id: "final-calculation"}, {id: "end-claim"})
+    .end({id: "end-claim"})
+    .build();
+  
+  
+/*
+
       <Shapes.Start    cords={{x: 250, y: 40}}/>
       <Shapes.End      cords={{x: 250, y: 100}}/>
       <Shapes.Decision cords={{x: 125, y: 40}}/>
       <Shapes.Task     cords={{x: 125, y: 100}} size={{height: 50, width: 100}} clock decision service/>
-      </g>
+
+*/
+  const view = new FlowTreeViewBuilder().tree(tree).start({x: 250, y: 40}).build();
+  console.log(tree);
+  console.log(view);
+  
+  const elements = tree.children.map(node => {
+    const cords = view.nodes[node.id];
+    if(!cords) {
+      console.error("skipping: ", node);
+      return null;
+    }
+    
+    switch(node.type) {
+      case "start":         return <Shapes.Start cords={cords.center} size={cords.size}/>;
+      case "end":           return <Shapes.End cords={cords.center} size={cords.size}/>;
+      case "decision-loop": return <Shapes.Task decision cords={cords.center} size={cords.size} />;
+      case "decision":      return <Shapes.Task service cords={cords.center} size={cords.size}/>;
+      case "service-loop":  return <Shapes.Task service cords={cords.center} size={cords.size}/>;
+      case "service":       return <Shapes.Task service cords={cords.center} size={cords.size}/>;
+    }
+  }).filter(e => e != null);
+  console.log(elements);
+  
+  return (<Context.Provider theme={theme}>
+    <svg viewBox="0 0 500 200" style={{ backgroundColor: themeColors.background }}>
+      <g>{elements.map((element, index) => (<React.Fragment key={index}>{element}</React.Fragment>))}</g>
     </svg>
   </Context.Provider>);
 
