@@ -4,6 +4,7 @@ import { useTheme } from '../../Context';
 interface Props {
   cords: { x: number, y: number },
   size: { height: number },
+  onClick?: () => void;
 };
 
 const EndShape: React.FC<Props> = ({cords, size}) => {

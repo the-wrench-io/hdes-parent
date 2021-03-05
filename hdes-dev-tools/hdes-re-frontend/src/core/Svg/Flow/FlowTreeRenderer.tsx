@@ -33,8 +33,8 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
   
   const tree = FlowFactory.root()
     .start({id: "decide-claim"})
-    .switch({id: "decide-claim"}, [
-      {id: "collision-claim"}, 
+    .switch({id: "decide-claim", onClick: () => console.log("clicked") }, [
+      {id: "collision-claim" },
       {id: "vandalism-claim"}, 
       {id: "felloffroad-claim"}])
     .decision({id: "collision-claim"}, {id: "calculate-collision"})
@@ -61,6 +61,7 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
   console.log(view);
   
   const elements = tree.children.map(node => {
+    
     const cords = view.nodes[node.id];
     if(!cords) {
       console.error("skipping: ", node);
@@ -68,13 +69,13 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
     }
     
     switch(node.type) {
-      case "start":         return <Shapes.Start cords={cords.center} size={cords.size}/>;
-      case "end":           return <Shapes.End cords={cords.center} size={cords.size}/>;
+      case "start":         return <Shapes.Start cords={cords.center} size={cords.size} />;
+      case "end":           return <Shapes.End cords={cords.center} size={cords.size} />;
       case "switch":        return <Shapes.Decision cords={cords.center} size={cords.size} />;
       case "decision-loop": return <Shapes.Task decision cords={cords.center} size={cords.size} />;
-      case "decision":      return <Shapes.Task service cords={cords.center} size={cords.size}/>;
-      case "service-loop":  return <Shapes.Task service cords={cords.center} size={cords.size}/>;
-      case "service":       return <Shapes.Task service cords={cords.center} size={cords.size}/>;
+      case "decision":      return <Shapes.Task service cords={cords.center} size={cords.size} />;
+      case "service-loop":  return <Shapes.Task service cords={cords.center} size={cords.size} />;
+      case "service":       return <Shapes.Task service cords={cords.center} size={cords.size} />;
     }
   }).filter(e => e != null);
   

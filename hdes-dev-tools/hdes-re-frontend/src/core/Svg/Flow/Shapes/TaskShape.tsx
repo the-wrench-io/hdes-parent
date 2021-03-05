@@ -7,6 +7,7 @@ interface Props {
   clock?: boolean;
   decision?: boolean;
   service?: boolean;
+  onClick?: () => void;
 };
 
 const TaskShape: React.FC<Props> = ({cords, size, clock, decision, service}) => {
