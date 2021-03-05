@@ -1,8 +1,7 @@
 import React from 'react';
 import Context from '../Context';
 import Shapes from './Shapes';
-import FlowTreeBuilder from './FlowTreeBuilder';
-import FlowTreeViewBuilder from './FlowTreeViewBuilder';
+import FlowFactory from './Ast';
 
 const themeColors = {
     chalky: "#e5c07b", 
@@ -32,7 +31,7 @@ interface FlowTreeRendererProps {
 const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
   const theme = {fill: themeColors.background, stroke: themeColors.chalky };
   
-  const tree = new FlowTreeBuilder()
+  const tree = FlowFactory.root()
     .start({id: "decide-claim"})
     .switch({id: "decide-claim"}, [
       {id: "collision-claim"}, 
@@ -57,7 +56,7 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
       <Shapes.Task     cords={{x: 125, y: 100}} size={{height: 50, width: 100}} clock decision service/>
 
 */
-  const view = new FlowTreeViewBuilder().tree(tree).start({x: 250, y: 40}).build();
+  const view = FlowFactory.view().tree(tree).start({x: 250, y: 40}).build();
   console.log(tree);
   console.log(view);
   
@@ -71,16 +70,19 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
     switch(node.type) {
       case "start":         return <Shapes.Start cords={cords.center} size={cords.size}/>;
       case "end":           return <Shapes.End cords={cords.center} size={cords.size}/>;
+      case "switch":        return <Shapes.Decision cords={cords.center} size={cords.size} />;
       case "decision-loop": return <Shapes.Task decision cords={cords.center} size={cords.size} />;
       case "decision":      return <Shapes.Task service cords={cords.center} size={cords.size}/>;
       case "service-loop":  return <Shapes.Task service cords={cords.center} size={cords.size}/>;
       case "service":       return <Shapes.Task service cords={cords.center} size={cords.size}/>;
     }
   }).filter(e => e != null);
-  console.log(elements);
   
   return (<Context.Provider theme={theme}>
-    <svg viewBox="0 0 500 200" style={{ backgroundColor: themeColors.background }}>
+    <svg viewBox="0 0 500 600" 
+      style={{ backgroundColor: themeColors.background }} 
+      width="100%" height="800">
+      
       <g>{elements.map((element, index) => (<React.Fragment key={index}>{element}</React.Fragment>))}</g>
     </svg>
   </Context.Provider>);

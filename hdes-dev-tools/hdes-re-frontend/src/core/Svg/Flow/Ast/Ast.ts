@@ -1,4 +1,4 @@
-declare namespace FlowTree {
+declare namespace Ast {
   
   type NodeType = "switch" | "start" | "end" | 
     "decision"  | "decision-loop" |
@@ -54,7 +54,9 @@ declare namespace FlowTree {
   
   interface RootNode {
     start: StartNode;
+    end: EndNode;
     children: readonly Node[]
+    getById: (id:string) => Node;
   }
   
   interface ChildNode {
@@ -87,4 +89,4 @@ declare namespace FlowTree {
   }
 }
 
-export type { FlowTree };
+export type { Ast };

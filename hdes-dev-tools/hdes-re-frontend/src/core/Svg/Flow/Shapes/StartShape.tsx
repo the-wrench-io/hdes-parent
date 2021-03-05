@@ -14,7 +14,7 @@ const StartShape: React.FC<Props> = ({cords, size}) => {
         cx={cords.x} cy={cords.y}
         rx={r} ry={r}
         fill={theme.fill} stroke={theme.stroke}
-        pointer-events="all" />
+        pointerEvents="all" />
     );
 
 }

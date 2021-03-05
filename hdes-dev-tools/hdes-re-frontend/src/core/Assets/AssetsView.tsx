@@ -19,7 +19,7 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
   const blob = Object.values(workspace.snapshot.blobs).filter(b => b.id === tabData.id)[0];
   
   const content = (
-    <FlowTreeRenderer /> 
+    <FlowTreeRenderer />
     // <CodeBlock doc={blob.src}/>
   );
   
