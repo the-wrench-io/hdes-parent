@@ -1,49 +1,66 @@
 declare namespace Ast {
   
-  type NodeType = "switch" | "start" | "end" | 
-    "decision"  | "decision-loop" |
-    "service"   | "service-loop";
-  
-  
   interface Cord {
     x: number;  y: number;
   }
   
-  interface NodeSize {
-    height: number, width: number
-  }
-  
-  interface NodeCord {
-    id: string; 
-    size: NodeSize;
-    center: Cord;
-    left: Cord; right: Cord;
-    top: Cord; bottom: Cord;
-  }
-  
-  interface Arrow {
+  interface Line {
     id: string;
     cords: readonly Cord[];
   }
   
-  interface View {
-    arrows: Arrow[];
-    nodes: Record<string, NodeCord>;    
+  interface Shape {
+    id: string; 
+    size: NodeSize; center: Cord;
+    left: Cord; right: Cord;
+    top: Cord; bottom: Cord;
   }
   
-  interface ViewBuilder {
-    start(cord: Cord) : ViewBuilder;
-    tree(node: RootNode) : ViewBuilder;
-    build(): View;
+  interface ShapeView {
+    lines: Line[];
+    shapes: Record<string, Shape>;
   }
+  
+  interface ShapeVisitorContext {
+    parent?: ShapeVisitorContext;
+    value: Node;
+    findNode<T extends Node>(type: NodeType): T | undefined;
+  }
+  
+  interface ShapeVisitor {
+    start(): ShapeVisitor;
+    visitRoot(root: RootNode): ShapeVisitor;
+    visitStart(node: StartNode): ShapeVisitor;
+    visitEnd(node: EndNode): ShapeVisitor;
+    visitSwitch(node: SwitchNode): ShapeVisitor;
+    visitDecision(node: DecisionNode): ShapeVisitor;
+    visitService(node: ServiceNode): ShapeVisitor;
+    vistChild(child: NodeChild): ShapeVisitor;
+    visitLoop(node: DecisionNode | ServiceNode): ShapeVisitor;
+    end(): ShapeView;
+  }
+  
+  interface ShapeBuilder {
+    start(cord: Cord): ShapeBuilder;
+    tree(node: RootNode): ShapeBuilder;
+    build(): ShapeView;
+  }
+  
   
   interface RootBuilder {
-    start(child: ChildNode): RootBuilder;
+    start(child: NodeChild): RootBuilder;
     end(node: NodeBuilder): RootBuilder;
-    switch(node: NodeBuilder, children: ChildNode[]): RootBuilder;
-    decision(node: NodeBuilder, children: ChildNode, loop?: ChildNode): RootBuilder;
-    service(node: NodeBuilder, children: ChildNode, loop?: ChildNode, async?: boolean): RootBuilder;
+    switch(node: NodeBuilder, children: NodeChild[]): RootBuilder;
+    decision(node: NodeBuilder, children: NodeChild, loop?: NodeChild): RootBuilder;
+    service(node: NodeBuilder, children: NodeChild, loop?: NodeChild, async?: boolean): RootBuilder;
     build(): RootNode;
+  }
+
+  interface RootNode {
+    start: StartNode;
+    end: EndNode;
+    children: readonly Node[]
+    getById: (id:string) => Node;
   }
 
   interface NodeBuilder {
@@ -51,17 +68,7 @@ declare namespace Ast {
     content?: string;
     onClick?: (self: Node) => void;
   }
-  
-  interface RootNode {
-    start: StartNode;
-    end: EndNode;
-    children: readonly Node[]
-    getById: (id:string) => Node;
-  }
-  
-  interface ChildNode {
-    id: string;
-  }
+
   interface Node {
     id: string;
     content: string;
@@ -71,21 +78,33 @@ declare namespace Ast {
   }
   
   interface StartNode extends Node {
-    children: ChildNode;
+    children: NodeChild;
   }
   interface EndNode extends Node {}
   
   interface SwitchNode extends Node {
-    children: readonly ChildNode[];
+    children: readonly NodeChild[];
   }
   interface DecisionNode extends Node {
-    loop?: ChildNode;
-    children: ChildNode;
+    loop?: NodeChild;
+    children: NodeChild;
   }
   interface ServiceNode extends Node {
     async?: boolean;
-    loop?: ChildNode;
-    children: ChildNode;
+    loop?: NodeChild;
+    children: NodeChild;
+  }
+  
+  interface NodeChild {
+    id: string;
+  }
+  type NodeType = "switch"        | 
+    "start"     | "end"           | 
+    "decision"  | "decision-loop" |
+    "service"   | "service-loop";
+  
+  interface NodeSize {
+    height: number, width: number
   }
 }
 

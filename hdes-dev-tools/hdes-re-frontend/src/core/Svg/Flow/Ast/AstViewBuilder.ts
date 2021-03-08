@@ -18,25 +18,25 @@ const calcTips = (size: Ast.NodeSize, cord: Ast.Cord): {
 }
 
 
-class AstViewBuilder implements Ast.ViewBuilder {
+class AstShapeBuilder implements Ast.ShapeBuilder {
   private root?: Ast.RootNode;
   private cord?: Ast.Cord;
   private sy: number = 50; // y axis spacer between nodes
   private sx: number = 30; // y axis spacer between nodes
   private calculated: string[] = [];
  
-  start(cord: Ast.Cord) : Ast.ViewBuilder {
+  start(cord: Ast.Cord) : Ast.ShapeBuilder {
     this.cord = cord;
     return this;  
   }
  
-  tree(node: Ast.RootNode): Ast.ViewBuilder {
+  tree(node: Ast.RootNode): Ast.ShapeBuilder {
     this.root = node;
     return this;
   }
 
-  children(node: Ast.Node, parent: Ast.NodeCord): Ast.NodeCord[] {
-    return new AstMapper<Ast.NodeCord[]>(node)
+  children(node: Ast.Node, parent: Ast.Shape): Ast.Shape[] {
+    return new AstMapper<Ast.Shape[]>(node)
       .decision((decision: Ast.DecisionNode) => {
         const nodeId = decision.children.id;
         if(this.calculated.includes(nodeId)) {
@@ -44,7 +44,7 @@ class AstViewBuilder implements Ast.ViewBuilder {
         }
         const node = this.root?.getById(nodeId) as Ast.Node;
         const center = {x: parent.center.x, y: parent.bottom.y + this.sy};
-        const cord: Ast.NodeCord = Object.assign({
+        const cord: Ast.Shape = Object.assign({
           id: node.id, 
           size: node.size, 
           center }, 
@@ -59,7 +59,7 @@ class AstViewBuilder implements Ast.ViewBuilder {
         }
         const node = this.root?.getById(nodeId) as Ast.Node;
         const center = {x: parent.center.x, y: parent.bottom.y + this.sy};
-        const cord: Ast.NodeCord = Object.assign({
+        const cord: Ast.Shape = Object.assign({
           id: node.id, 
           size: node.size, 
           center }, 
@@ -73,7 +73,7 @@ class AstViewBuilder implements Ast.ViewBuilder {
         let oddX = 0;
         console.log("decision at", parent)
 
-        const switchChildren: Ast.NodeCord[] = [];
+        const switchChildren: Ast.Shape[] = [];
         for(const child of decision.children) {
           const nodeId = child.id;
           if(this.calculated.includes(nodeId)) {
@@ -90,7 +90,7 @@ class AstViewBuilder implements Ast.ViewBuilder {
           }
           
           const center = {x, y: parent.bottom.y + this.sy};
-          const cord: Ast.NodeCord = Object.assign({
+          const cord: Ast.Shape = Object.assign({
             id: node.id, 
             size: node.size, 
             center }, 
@@ -119,7 +119,7 @@ class AstViewBuilder implements Ast.ViewBuilder {
         }
         const node = this.root?.getById(nodeId) as Ast.Node;
         const center = {x: parent.center.x, y: parent.center.y + this.sy};
-        const cord: Ast.NodeCord = Object.assign({
+        const cord: Ast.Shape = Object.assign({
           id: node.id, 
           size: node.size, 
           center }, 
@@ -132,7 +132,7 @@ class AstViewBuilder implements Ast.ViewBuilder {
       .map();
   }
   
-  build(): Ast.View {
+  build(): Ast.ShapeView {
     if(!this.root) {
       throw new Error("tree is not defined!");
     }
@@ -140,8 +140,8 @@ class AstViewBuilder implements Ast.ViewBuilder {
       throw new Error("start cord is not defined!");
     }
     
-    const cords: Ast.NodeCord[] = [];
-    const start: Ast.NodeCord = Object.assign({ 
+    const cords: Ast.Shape[] = [];
+    const start: Ast.Shape = Object.assign({ 
       id: this.root.start.id, 
       size: this.root.start.size,
       center: this.cord}, 
@@ -151,14 +151,14 @@ class AstViewBuilder implements Ast.ViewBuilder {
     cords.push(...this.children(this.root.start, start))
 
     // format end result
-    const nodes: Record<string, Ast.NodeCord> = {};
-    cords.forEach(cord => nodes[cord.id] = cord);
-    const arrows: Ast.Arrow[] = [];
+    const shapes: Record<string, Ast.Shape> = {};
+    cords.forEach(cord => shapes[cord.id] = cord);
+    const lines: Ast.Line[] = [];
 
-    return { arrows, nodes };
+    return { lines, shapes };
   }
 
 }
 
 
-export default AstViewBuilder;
+export default AstShapeBuilder;

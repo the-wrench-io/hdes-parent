@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Resources } from '../Resources';
 import { CodeBlock } from '../CodeBlock';
-import { FlowTreeRenderer } from '../Svg'
+import { FlowSvg } from '../Svg'
 
 interface AssetsViewProps {
 };
@@ -19,7 +19,7 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
   const blob = Object.values(workspace.snapshot.blobs).filter(b => b.id === tabData.id)[0];
   
   const content = (
-    <FlowTreeRenderer />
+    <FlowSvg />
     // <CodeBlock doc={blob.src}/>
   );
   

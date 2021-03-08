@@ -1,4 +1,4 @@
 
-import FlowTreeRenderer from './FlowTreeRenderer';
+import FlowSvg from './FlowSvg';
 
-export { FlowTreeRenderer };
+export { FlowSvg };

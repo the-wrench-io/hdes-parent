@@ -20,7 +20,7 @@ const themeColors = {
     cursor: "#528bff" // united nations blue
 };
 
-interface FlowTreeRendererProps {
+interface FlowSvgProps {
   colors?: {
     dt: string;
     st: string;
@@ -28,7 +28,7 @@ interface FlowTreeRendererProps {
   }
 };
 
-const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
+const FlowSvg: React.FC<FlowSvgProps> = ({colors}) => {
   const theme = {fill: themeColors.background, stroke: themeColors.chalky };
   
   const tree = FlowFactory.root()
@@ -62,7 +62,7 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
   
   const elements = tree.children.map(node => {
     
-    const cords = view.nodes[node.id];
+    const cords = view.shapes[node.id];
     if(!cords) {
       console.error("skipping: ", node);
       return null;
@@ -90,4 +90,4 @@ const FlowTreeRenderer: React.FC<FlowTreeRendererProps> = ({colors}) => {
 
 }
 
-export default FlowTreeRenderer;
+export default FlowSvg;
