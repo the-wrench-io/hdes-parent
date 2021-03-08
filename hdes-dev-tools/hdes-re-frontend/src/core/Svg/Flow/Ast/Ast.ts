@@ -22,9 +22,11 @@ declare namespace Ast {
   }
   
   interface ShapeVisitorContext {
-    parent?: ShapeVisitorContext;
+    parent: ShapeVisitorContext;
     value: Node;
-    findNode<T extends Node>(type: NodeType): T | undefined;
+    type: "nullNode" | "childNode";
+    addNode(node: Ast.Node): ShapeVisitorContext; 
+    getNode<T extends Node>(type: NodeType): ShapeVisitorContext;
   }
   
   interface ShapeVisitor {
