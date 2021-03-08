@@ -1,13 +1,13 @@
 import { Ast as FlowAst } from './Ast';
 import AstMapper from './AstMapper';
 import AstRootBuilder from './AstRootBuilder';
-import AstViewBuilder from './AstViewBuilder';
+import AstShapeBuilder from './AstShapeBuilder';
 
 
 const FlowFactory = {
   mapper: (resource: FlowAst.Node) => new AstMapper(resource),
-  view: () => new AstViewBuilder(),
-  root: () => new AstRootBuilder()
+  shapes: () => new AstShapeBuilder(),
+  nodes: () => new AstRootBuilder()
 }
 
 export default FlowFactory;

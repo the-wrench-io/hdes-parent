@@ -10,15 +10,15 @@ class AstBuilder implements Ast.RootBuilder {
     this.children = [];
   }
   
-  start(child: Ast.ChildNode): Ast.RootBuilder {
+  start(child: Ast.NodeChild): Ast.RootBuilder {
     if(this.startNode) {
       throw new Error("start node is already defined");
     }
-    const children: Ast.ChildNode = Object.assign({}, child);
+    const children: Ast.NodeChild = Object.assign({}, child);
     this.startNode = { 
       type: "start", id: "start", content: "start",
       children, 
-      size: {height: 25, width: 25} 
+      size: { height: 25, width: 25 } 
     }
     this.children.push(this.startNode);
     return this;
@@ -40,8 +40,8 @@ class AstBuilder implements Ast.RootBuilder {
     return this;    
   }
   
-  switch(src: Ast.NodeBuilder, srcChildren: Ast.ChildNode[]): Ast.RootBuilder {
-    const children: readonly Ast.ChildNode[] = srcChildren.map(e => ({id: e.id}));
+  switch(src: Ast.NodeBuilder, srcChildren: Ast.NodeChild[]): Ast.RootBuilder {
+    const children: readonly Ast.NodeChild[] = srcChildren.map(e => ({id: e.id}));
     const node: Ast.SwitchNode = {
       type: "switch", 
       id: src.id, 
@@ -54,7 +54,7 @@ class AstBuilder implements Ast.RootBuilder {
     return this;
   }
   
-  decision(src: Ast.NodeBuilder, srcChildren: Ast.ChildNode, loop?: Ast.ChildNode): Ast.RootBuilder {
+  decision(src: Ast.NodeBuilder, srcChildren: Ast.NodeChild, loop?: Ast.NodeChild): Ast.RootBuilder {
     const node: Ast.DecisionNode = {
       type: loop? "decision-loop" : "decision", 
       id: src.id,
@@ -68,7 +68,7 @@ class AstBuilder implements Ast.RootBuilder {
     return this;
   }
   
-  service(src: Ast.NodeBuilder, srcChildren: Ast.ChildNode, loop?: Ast.ChildNode, async?: boolean): Ast.RootBuilder {
+  service(src: Ast.NodeBuilder, srcChildren: Ast.NodeChild, loop?: Ast.NodeChild, async?: boolean): Ast.RootBuilder {
     const node: Ast.ServiceNode = {
       type: loop? "service-loop" : "service", 
       id: src.id,
@@ -91,7 +91,6 @@ class AstBuilder implements Ast.RootBuilder {
     }
     return new ImmutableRootNode(this.startNode, this.endNode, this.children);
   }
-
 }
 
 
