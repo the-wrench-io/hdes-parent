@@ -1,59 +1,32 @@
 import { Ast } from './Ast';
+import createContext from './AstShapeVisitorContext';
 
-
-class NullVisitorContext implements Ast.ShapeVisitorContext {
-  get parent(): Ast.ShapeVisitorContext {
-    throw new Error("can't get parent from null node!");    
-  }
-  get value(): Ast.Node {
-    throw new Error("can't get value from null node!");
-  }
-  get type(): "nullNode" {
-    return "nullNode";
-  }
-  addNode(): Ast.ShapeVisitorContext {
-    throw new Error("can't add to null node!");
-  }
-  getNode(): Ast.ShapeVisitorContext {
-    throw new Error("can't find from null node!");
-  }
-}
-
-class ImmutableShapeVisitorContext implements Ast.ShapeVisitorContext {
-  private _parent: Ast.ShapeVisitorContext;
-  private _node: Ast.Node;
-  
-  constructor(node: Ast.Node, parent?: Ast.ShapeVisitorContext) {
-    this._parent = parent ? parent : new NullVisitorContext(); 
-    this._node = node;
-  }
-  
-  get parent(): Ast.ShapeVisitorContext {
-    return this._parent;
-  }
-  get value(): Ast.Node {
-    return this._node;
-  }
-  get type(): "childNode" {
-    return "childNode";
-  }
-  addNode(node: Ast.Node): Ast.ShapeVisitorContext {
-    return new ImmutableShapeVisitorContext(node, this);
-  }
-  getNode(type: Ast.NodeType): Ast.ShapeVisitorContext {
-    let iterator: Ast.ShapeVisitorContext = this;
-    
-    while(iterator.type === "childNode") {
-      if(iterator.value.type === type) {
-        return iterator;
-      }
-      iterator = iterator.parent;
-    }
-    throw new Error("can't find node of type: '"+ type +"'")
-  }
-}
 
 
 class ShapeViewVisitor implements Ast.ShapeVisitor {
-  
+
+  visitRoot(root: Ast.RootNode): Ast.ShapeView {
+    
+  }
+  visitStart(node: Ast.StartNode, context: Ast.ShapeVisitorContext): Ast.Shape {
+    
+  }
+  visitEnd(node: Ast.EndNode, context: Ast.ShapeVisitorContext): Ast.Shape {
+    
+  }
+  visitSwitch(node: Ast.SwitchNode, context: Ast.ShapeVisitorContext): Ast.Shape {
+    
+  }
+  visitDecision(node: Ast.DecisionNode, context: Ast.ShapeVisitorContext): Ast.Shape {
+    
+  }
+  visitService(node: Ast.ServiceNode, context: Ast.ShapeVisitorContext): Ast.Shape {
+    
+  }
+  vistChild(child: Ast.NodeChild, context: Ast.ShapeVisitorContext): Ast.Shape {
+    
+  }
+  visitLoop(node: Ast.DecisionNode | Ast.ServiceNode, context: Ast.ShapeVisitorContext): Ast.Shape {
+    
+  }
 }

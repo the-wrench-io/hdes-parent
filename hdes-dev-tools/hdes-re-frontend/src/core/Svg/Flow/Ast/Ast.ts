@@ -24,22 +24,20 @@ declare namespace Ast {
   interface ShapeVisitorContext {
     parent: ShapeVisitorContext;
     value: Node;
-    type: "nullNode" | "childNode";
+    type: "nullNode" | NodeType;
     addNode(node: Ast.Node): ShapeVisitorContext; 
-    getNode<T extends Node>(type: NodeType): ShapeVisitorContext;
+    getNode(type: NodeType): ShapeVisitorContext;
   }
   
   interface ShapeVisitor {
-    start(): ShapeVisitor;
-    visitRoot(root: RootNode): ShapeVisitor;
-    visitStart(node: StartNode): ShapeVisitor;
-    visitEnd(node: EndNode): ShapeVisitor;
-    visitSwitch(node: SwitchNode): ShapeVisitor;
-    visitDecision(node: DecisionNode): ShapeVisitor;
-    visitService(node: ServiceNode): ShapeVisitor;
-    vistChild(child: NodeChild): ShapeVisitor;
-    visitLoop(node: DecisionNode | ServiceNode): ShapeVisitor;
-    end(): ShapeView;
+    visitRoot(root: RootNode): ShapeView;
+    visitStart(node: StartNode, context: ShapeVisitorContext): Shape;
+    visitEnd(node: EndNode, context: ShapeVisitorContext): Shape;
+    visitSwitch(node: SwitchNode, context: ShapeVisitorContext): Shape;
+    visitDecision(node: DecisionNode, context: ShapeVisitorContext): Shape;
+    visitService(node: ServiceNode, context: ShapeVisitorContext): Shape;
+    vistChild(child: NodeChild, context: ShapeVisitorContext): Shape;
+    visitLoop(node: DecisionNode | ServiceNode, context: ShapeVisitorContext): Shape;
   }
   
   interface ShapeBuilder {
@@ -58,7 +56,7 @@ declare namespace Ast {
     build(): RootNode;
   }
 
-  interface RootNode {
+  interface RootNode extends Node {
     start: StartNode;
     end: EndNode;
     children: readonly Node[]
@@ -76,7 +74,7 @@ declare namespace Ast {
     content: string;
     type: NodeType;
     size: NodeSize;
-    onClick?: (self: Node) => void;
+    onClick: () => void;
   }
   
   interface StartNode extends Node {
@@ -100,8 +98,8 @@ declare namespace Ast {
   interface NodeChild {
     id: string;
   }
-  type NodeType = "switch"        | 
-    "start"     | "end"           | 
+  type NodeType = "root" | 
+    "switch"    | "start" | "end" | 
     "decision"  | "decision-loop" |
     "service"   | "service-loop";
   
