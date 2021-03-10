@@ -52,7 +52,6 @@ const TaskShape: React.FC<Props> = ({cords, size, clock, decision, service}) => 
     icons.push(table);
   }
   
-  
   return (<React.Fragment>
     <svg x={x - size.width/2} y={y - size.height/2} fill={theme.fill} stroke={theme.stroke}>
       <rect width={size.width} height={size.height} pointerEvents="all"/>

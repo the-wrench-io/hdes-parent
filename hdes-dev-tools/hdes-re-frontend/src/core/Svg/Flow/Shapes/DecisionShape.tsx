@@ -13,7 +13,7 @@ const DecisionShape: React.FC<Props> = ({cords, size}) => {
   const theme = useTheme();
   const {x, y} = cords;
   
-  const diamond = (<path fill={theme.fill} stroke={theme.stroke} strokeMiterlimit="10" pointer-events="all" d={`
+  const diamond = (<path fill={theme.fill} stroke={theme.stroke} strokeMiterlimit="10" pointerEvents="all" d={`
       M ${x} ${y - R}
       L ${x + R} ${y}
       L ${x} ${y + R} 

@@ -1,5 +1,5 @@
 import { Ast } from './Ast';
-import createContext from './AstShapeVisitorContext';
+import createContext, { ImmutableShapeIndex } from './AstShapeVisitorContext';
 
 
 class ImmutableShapeView implements Ast.ShapeView {
@@ -83,18 +83,18 @@ class ImmutableShape implements Ast.Shape {
   private _top: Ast.Cord; 
   private _bottom: Ast.Cord;
     
-  constructor(id: string, size: Ast.NodeSize, cord: Ast.Cord) {
+  constructor(id: string, size: Ast.NodeSize, start: Ast.Cord) {
     this._id = id;
-    this._center = cord;
-    this._size = size;
-
+    
     const rx = size.width/2;
     const ry = size.height/2;
+    this._size = size;
 
-    this._left =   new ImmutableCord(cord.x-rx, cord.y);
-    this._right =  new ImmutableCord(cord.x+rx, cord.y);
-    this._top =    new ImmutableCord(cord.x,    cord.y - ry);
-    this._bottom = new ImmutableCord(cord.x,    cord.y + ry);
+    this._center = new ImmutableCord(start.x, start.y + ry);
+    this._left =   new ImmutableCord(this._center.x-rx, this._center.y);
+    this._right =  new ImmutableCord(this._center.x+rx, this._center.y);
+    this._top =    new ImmutableCord(this._center.x,    this._center.y - ry);
+    this._bottom = new ImmutableCord(this._center.x,    this._center.y + ry);
   }  
   get id() {
     return this._id;
@@ -145,7 +145,7 @@ class ShapeViewVisitor implements Ast.ShapeVisitor {
    return { shape, children };
   }
   visitEnd(node: Ast.EndNode, context: Ast.ShapeVisitorContext): Ast.VisitedShapes {
-    const center = {x: this.visitX(node, context), y: this.visitY(node, context)};
+    const center = {x: this.props.start.x, y: this.visitY(node, context)};
     const shape = new ImmutableShape(node.id, node.size, center);
     return { shape, children: [] };
   }
@@ -153,11 +153,15 @@ class ShapeViewVisitor implements Ast.ShapeVisitor {
     const center = {x: this.visitX(node, context), y: this.visitY(node, context)};
     const shape = new ImmutableShape(node.id, node.size, center);
     const children: Ast.Shape[] = [];
-    const next = context.addNode(node, shape);
+    let index = 0; 
+    const total = node.children.length
+    let visited: Ast.VisitedShapes | null = null;
     for(const child of node.children) {
-      children.push(...this.visitChildren(child, next)); 
+      const next = context.addNode(node, shape, new ImmutableShapeIndex(index++, total, visited?.shape));
+      visited = this.vistChild(child, next);
+      children.push(...visited.children);
+      children.push(visited.shape); 
     }
-    console.log("visit switch", shape);
     return { shape, children };
   }
   visitDecision(node: Ast.DecisionNode, context: Ast.ShapeVisitorContext): Ast.VisitedShapes {
@@ -193,25 +197,34 @@ class ShapeViewVisitor implements Ast.ShapeVisitor {
     return [result.shape, ...result.children];
   }
   visitX(node: Ast.Node, context: Ast.ShapeVisitorContext): number {
-    const parent = context.parent.shape;
-    return parent.center.x;
+    if(context.index.total > 1) {
+      return this.visitXN(node, context);
+    }
+    return context.shape.center.x;
   }
   visitY(node: Ast.Node, context: Ast.ShapeVisitorContext): number {
-    const parent = context.parent;
-    if(parent.type === "switch" && 
-      (parent.value as Ast.SwitchNode).children.length > 1) {
-      return this.visitYDecision(node, context);
-    }
-    
-    const parentShape = parent.shape;
-    const result = parentShape.bottom.y + this.props.sy;
-    console.log(result);
-    return result;
+    const shape = context.shape;
+    return shape.bottom.y + this.props.sy;
   }
-  visitYDecision(node: Ast.Node, context: Ast.ShapeVisitorContext): number {
-    const parent = context.parent.shape;
-
-    return parent.bottom.y + this.props.sy;
+  visitXN(node: Ast.Node, context: Ast.ShapeVisitorContext): number {
+    
+    const shape = context.shape;
+    const start = shape.bottom.x - this.props.mx*context.index.total/2;
+    const current = start + this.props.mx/2 + context.index.value*this.props.mx;
+    
+    /*
+    if(context.index.total % 2 === 0) {
+      const total = this.props.mx * context.index.value;
+      const x = total + node.size.width/2;
+      const shape = context.shape;
+      return shape.bottom.y + (x);      
+    }
+    const total = this.props.mx * context.index.value;
+    const x = total + node.size.width/2;
+    
+    return shape.bottom.y + (x);
+    */
+    return current;
   }
 }
 

@@ -22,19 +22,27 @@ declare namespace Ast {
   }
   
   interface ShapeViewProps {
-    sy: number, 
-    sx: number, 
+    sy: number; 
+    sx: number;
+    mx: number; 
     start: Cord;
+  }
+  
+  interface ShapeIndex {
+    value: number; 
+    total: number;
+    previous?: Ast.Shape;
   }
   
   interface ShapeVisitorContext {
     parent: ShapeVisitorContext;
     value: Node;
     shape: Shape;
+    index: ShapeIndex;
     type: "nullNode" | NodeType;
     shapes: readonly Shape[];
     getRoot(): Ast.RootNode;
-    addNode(node: Ast.Node, shape: Ast.Shape): ShapeVisitorContext; 
+    addNode(node: Ast.Node, shape: Ast.Shape, index?: ShapeIndex): ShapeVisitorContext; 
     getNode(type: NodeType): ShapeVisitorContext;
   }
   
@@ -47,7 +55,7 @@ declare namespace Ast {
     visitRoot(root: RootNode, props: ShapeViewProps): ShapeView;
     visitX(node: Node, context: ShapeVisitorContext): number;
     visitY(node: Node, context: ShapeVisitorContext): number;
-    visitYDecision(node: Node, context: ShapeVisitorContext): number;
+
     visitStart(node: StartNode, context: ShapeVisitorContext): VisitedShapes;
     visitEnd(node: EndNode, context: ShapeVisitorContext): VisitedShapes;
     visitSwitch(node: SwitchNode, context: ShapeVisitorContext): VisitedShapes;

@@ -23,7 +23,7 @@ class AstShapeBuilder implements Ast.ShapeBuilder {
       throw new Error("start cord is not defined!");
     }
     
-    const props = {sy: 50, sx: 30, start: this.cord };
+    const props = {sy: 50, sx: 30, mx: 120, start: this.cord };
     return new AstShapeVisitor(props).visitRoot(this.root);
   }
 

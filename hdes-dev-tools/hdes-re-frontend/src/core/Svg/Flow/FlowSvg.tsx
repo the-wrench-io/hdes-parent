@@ -31,7 +31,7 @@ interface FlowSvgProps {
 const FlowSvg: React.FC<FlowSvgProps> = ({colors}) => {
   const theme = {fill: themeColors.background, stroke: themeColors.chalky };
   
-  /*
+
   const tree = FlowFactory.nodes()
     .start({id: "decide-claim"})
     .switch({id: "decide-claim", onClick: () => console.log("clicked") }, [
@@ -47,7 +47,7 @@ const FlowSvg: React.FC<FlowSvgProps> = ({colors}) => {
     .service({id: "final-calculation"}, {id: "end-claim"})
     .end({id: "end-claim"})
     .build();
-  */
+    /*
   
 const tree = FlowFactory.nodes()
     .start({id: "decide-claim"})
@@ -56,11 +56,11 @@ const tree = FlowFactory.nodes()
     .service({id: "final-calculation"}, {id: "end-claim"})
     .end({id: "end-claim"})
     .build();
-  
+  */
   
   const view = FlowFactory.shapes().tree(tree).start({x: 250, y: 40}).build();
-  console.log(tree);
-  console.log(view);
+  //console.log(tree);
+  //console.log(view);
   
   const elements = tree.children.map(node => {
     const cords = view.shapes[node.id];
@@ -68,9 +68,6 @@ const tree = FlowFactory.nodes()
       console.error("skipping: ", node);
       return null;
     }
-    
-    console.log(cords.top.y + "- " + cords.bottom.y);
-    
     switch(node.type) {
       case "start":         return <Shapes.Start cords={cords.center} size={cords.size} />;
       case "end":           return <Shapes.End cords={cords.center} size={cords.size} />;
@@ -81,7 +78,6 @@ const tree = FlowFactory.nodes()
       case "service":       return <Shapes.Task service cords={cords.center} size={cords.size} />;
       default: return null;
     }
-    
   }).filter(e => e != null);
   
   return (<Context.Provider theme={theme}>
