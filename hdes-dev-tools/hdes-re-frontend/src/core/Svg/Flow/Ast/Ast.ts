@@ -21,23 +21,41 @@ declare namespace Ast {
     shapes: Record<string, Shape>;
   }
   
+  interface ShapeViewProps {
+    sy: number, 
+    sx: number, 
+    start: Cord;
+  }
+  
   interface ShapeVisitorContext {
     parent: ShapeVisitorContext;
     value: Node;
+    shape: Shape;
     type: "nullNode" | NodeType;
-    addNode(node: Ast.Node): ShapeVisitorContext; 
+    shapes: readonly Shape[];
+    getRoot(): Ast.RootNode;
+    addNode(node: Ast.Node, shape: Ast.Shape): ShapeVisitorContext; 
     getNode(type: NodeType): ShapeVisitorContext;
   }
   
+  interface VisitedShapes {
+    shape: Shape;
+    children: Shape[];
+  }
+  
   interface ShapeVisitor {
-    visitRoot(root: RootNode): ShapeView;
-    visitStart(node: StartNode, context: ShapeVisitorContext): Shape;
-    visitEnd(node: EndNode, context: ShapeVisitorContext): Shape;
-    visitSwitch(node: SwitchNode, context: ShapeVisitorContext): Shape;
-    visitDecision(node: DecisionNode, context: ShapeVisitorContext): Shape;
-    visitService(node: ServiceNode, context: ShapeVisitorContext): Shape;
-    vistChild(child: NodeChild, context: ShapeVisitorContext): Shape;
-    visitLoop(node: DecisionNode | ServiceNode, context: ShapeVisitorContext): Shape;
+    visitRoot(root: RootNode, props: ShapeViewProps): ShapeView;
+    visitX(node: Node, context: ShapeVisitorContext): number;
+    visitY(node: Node, context: ShapeVisitorContext): number;
+    visitYDecision(node: Node, context: ShapeVisitorContext): number;
+    visitStart(node: StartNode, context: ShapeVisitorContext): VisitedShapes;
+    visitEnd(node: EndNode, context: ShapeVisitorContext): VisitedShapes;
+    visitSwitch(node: SwitchNode, context: ShapeVisitorContext): VisitedShapes;
+    visitDecision(node: DecisionNode, context: ShapeVisitorContext): VisitedShapes;
+    visitService(node: ServiceNode, context: ShapeVisitorContext): VisitedShapes;
+    vistChild(child: NodeChild, context: ShapeVisitorContext): Ast.VisitedShapes;
+    visitChildren(child: NodeChild, context: ShapeVisitorContext): Ast.Shape[];
+    visitLoop(node: DecisionNode | ServiceNode, context: ShapeVisitorContext): VisitedShapes;
   }
   
   interface ShapeBuilder {
