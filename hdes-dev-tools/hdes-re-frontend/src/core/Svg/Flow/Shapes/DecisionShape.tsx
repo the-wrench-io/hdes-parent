@@ -13,7 +13,9 @@ const DecisionShape: React.FC<Props> = ({cords, size}) => {
   const theme = useTheme();
   const {x, y} = cords;
   
-  const diamond = (<path fill={theme.fill} stroke={theme.stroke} strokeMiterlimit="10" pointerEvents="all" d={`
+  const diamond = (<path fill={theme.fill} stroke={theme.stroke} strokeMiterlimit="10" pointerEvents="all"
+    style={{filter: "url(#dropshadow)"}} 
+    d={`
       M ${x} ${y - R}
       L ${x + R} ${y}
       L ${x} ${y + R} 
@@ -23,7 +25,7 @@ const DecisionShape: React.FC<Props> = ({cords, size}) => {
   const R2 = R*54/100;
   const R3 = R*12/100;
   const R4 = R2-R3;
-  const diamondIn = (<path fill={theme.stroke} stroke={theme.stroke} strokeMiterlimit="10" pointer-events="all" 
+  const diamondIn = (<path fill={theme.stroke} stroke={theme.stroke} strokeMiterlimit="10" pointerEvents="all" 
       d={`M ${x-R1} ${y-R2} L ${x} ${y-R3} L ${x+R1} ${y-R2} L ${x+R4} ${y-R4} L ${x+R3} ${y} L ${x+R4} ${y+R4} L ${x+R1} ${y+R2} L ${x} ${y+R3} L ${x-R1} ${y+R2} L ${x-R4} ${y+R4} L ${x-R3} ${y} L ${x-R4} ${y-R4} Z`} />);
   
   

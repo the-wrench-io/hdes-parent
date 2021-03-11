@@ -11,7 +11,7 @@ const StartShape: React.FC<Props> = ({cords, size}) => {
   const theme = useTheme();
   const r = size.height/2;
   return (
-      <ellipse 
+      <ellipse style={{filter: "url(#dropshadow)"}}
         cx={cords.x} cy={cords.y}
         rx={r} ry={r}
         fill={theme.fill} stroke={theme.stroke}
