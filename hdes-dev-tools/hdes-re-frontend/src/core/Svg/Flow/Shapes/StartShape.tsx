@@ -1,5 +1,5 @@
 import React from 'react';
-import { useTheme } from '../../Context';
+import { useTheme, useSnap } from '../../Context';
 
 interface Props {
   cords: { x: number, y: number },
@@ -9,15 +9,17 @@ interface Props {
 
 const StartShape: React.FC<Props> = ({cords, size}) => {
   const theme = useTheme();
+  const snap = useSnap();
   const r = size.height/2;
-  return (
-      <ellipse style={{filter: "url(#dropshadow)"}}
-        cx={cords.x} cy={cords.y}
-        rx={r} ry={r}
-        fill={theme.fill} stroke={theme.stroke}
-        pointerEvents="all" />
-    );
-
+    
+  snap.circle(cords.x, cords.y, r)
+    .attr({
+      pointerEvents: "all",
+      filter: "url(#dropshadow)",
+      fill: theme.fill, 
+      stroke: theme.stroke
+    });
+  return null;
 }
 
 export default StartShape;

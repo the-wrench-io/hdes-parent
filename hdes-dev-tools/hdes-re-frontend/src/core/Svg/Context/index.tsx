@@ -5,8 +5,12 @@ const useTheme = () => {
   const { theme } = React.useContext(Type);
   return theme;
 };
+const useSnap = () => {
+  const { snap } = React.useContext(Type);
+  return snap;
+};
 
-const Context = { Provider, Type, useTheme };
+const Context = { Provider, Type, useTheme, useSnap };
 
-export {useTheme};
+export {useTheme, useSnap};
 export default Context;

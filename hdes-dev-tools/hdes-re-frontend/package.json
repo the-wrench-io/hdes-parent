@@ -17,6 +17,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.1",
+    "snapsvg-cjs-ts": "^0.0.6",
     "typescript": "4.1.5",
     "web-vitals": "^0.2.4"
   },
@@ -46,6 +47,7 @@
     ]
   },
   "devDependencies": {
+    "@types/snapsvg": "^0.5.0",
     "lezer-generator": "^0.13.3"
   }
 }
