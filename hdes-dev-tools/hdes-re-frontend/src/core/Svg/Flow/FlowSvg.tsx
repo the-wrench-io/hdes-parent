@@ -71,13 +71,14 @@ const tree = FlowFactory.nodes()
       return null;
     }
     switch (node.type) {
-      case "start": return <Shapes.Start cords={cords.center} size={cords.size} />;
-      case "end": return <Shapes.End cords={cords.center} size={cords.size} />;
-      case "switch": return <Shapes.Decision cords={cords.center} size={cords.size} />;
-      case "decision-loop": return <Shapes.Task decision cords={cords.center} size={cords.size} />;
-      case "decision": return <Shapes.Task decision cords={cords.center} size={cords.size} />;
-      case "service-loop": return <Shapes.Task service cords={cords.center} size={cords.size} />;
-      case "service": return <Shapes.Task service clock cords={cords.center} size={cords.size} />;
+      
+      case "start": return <Shapes.Start cords={cords.center} node={node} size={cords.size} />;
+      case "end": return <Shapes.End cords={cords.center} node={node} size={cords.size} />;
+      case "switch": return <Shapes.Decision cords={cords.center} node={node} size={cords.size} />;
+      case "decision-loop": return <Shapes.Task decision cords={cords.center} node={node} size={cords.size} />;
+      case "decision": return <Shapes.Task decision cords={cords.center} node={node} size={cords.size} />;
+      case "service-loop": return <Shapes.Task service cords={cords.center} node={node} size={cords.size} />;
+      case "service": return <Shapes.Task service clock cords={cords.center} node={node} size={cords.size} />;
       default: return null;
     }
   }).filter(e => e != null);

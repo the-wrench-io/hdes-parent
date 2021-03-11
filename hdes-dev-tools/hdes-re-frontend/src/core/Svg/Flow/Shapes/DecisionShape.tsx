@@ -1,7 +1,9 @@
 import React from 'react';
 import { useTheme } from '../../Context';
+import { FlowAst } from '../Ast';
 
 interface Props {
+  node: FlowAst.Node;
   cords: { x: number, y: number },
   size: { height: number },
   onClick?: () => void; 

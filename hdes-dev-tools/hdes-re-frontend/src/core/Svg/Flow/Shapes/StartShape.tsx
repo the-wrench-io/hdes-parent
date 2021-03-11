@@ -1,7 +1,10 @@
 import React from 'react';
+import { FlowAst } from '../Ast';
+
 import { useTheme, useSnap } from '../../Context';
 
 interface Props {
+  node: FlowAst.Node;
   cords: { x: number, y: number },
   size: { height: number },
   onClick?: () => void;
