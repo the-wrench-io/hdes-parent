@@ -108,7 +108,7 @@ declare namespace Ast {
   }
   
   interface RendererVisitorContext {
-    visited: Record<string, Shape<Node>>;
+    visited: readonly Shape<Node>[];
     add(visited: Shape<Node>): RendererVisitorContext; 
   }
 
