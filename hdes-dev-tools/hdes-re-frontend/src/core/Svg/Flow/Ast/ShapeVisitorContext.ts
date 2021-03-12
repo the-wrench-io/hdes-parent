@@ -1,7 +1,7 @@
 import { Ast } from './Ast';
 
 
-class ImmutableShapeIndex implements Ast.ShapeIndex {
+class ImmutableShapeIndex implements Ast.ShapeVisitorIndex {
   private _total: number;
   private _value: number;
   private _previous?: Ast.Shape;
@@ -34,7 +34,7 @@ class NullVisitorContext implements Ast.ShapeVisitorContext {
   get shapes(): Ast.Shape[] {
     throw new Error("can't get shapes from null node!");
   }
-  get index(): Ast.ShapeIndex {
+  get index(): Ast.ShapeVisitorIndex {
     throw new Error("can't get shape index from null node!");
   }
   get type(): "nullNode" {
@@ -46,7 +46,7 @@ class NullVisitorContext implements Ast.ShapeVisitorContext {
   getNode(): Ast.ShapeVisitorContext {
     throw new Error("can't find from null node!");
   }
-  getRoot(): Ast.RootNode {
+  getRoot(): Ast.NodeView {
     throw new Error("can't get root from null node!");
   }
 }
@@ -71,9 +71,9 @@ class ImmutableShapeVisitorContext implements Ast.ShapeVisitorContext {
   private _node: Ast.Node;
   private _shape: Ast.Shape;
   private _shapes: AllShapes;
-  private _index: Ast.ShapeIndex;
+  private _index: Ast.ShapeVisitorIndex;
   
-  constructor(shape: Ast.Shape, index: Ast.ShapeIndex, node: Ast.Node, shapes: AllShapes, parent: Ast.ShapeVisitorContext) {
+  constructor(shape: Ast.Shape, index: Ast.ShapeVisitorIndex, node: Ast.Node, shapes: AllShapes, parent: Ast.ShapeVisitorContext) {
     this._parent = parent;
     this._shapes = shapes; 
     this._node = node;
@@ -99,10 +99,10 @@ class ImmutableShapeVisitorContext implements Ast.ShapeVisitorContext {
     return this._shapes.values;
   }
   getRoot() {
-    const root: Ast.RootNode = this.getNode("root").value as Ast.RootNode;
+    const root: Ast.NodeView = this.getNode("root").value as Ast.NodeView;
     return root;
   }
-  addNode(node: Ast.Node, shape: Ast.Shape, index?: Ast.ShapeIndex): Ast.ShapeVisitorContext {
+  addNode(node: Ast.Node, shape: Ast.Shape, index?: Ast.ShapeVisitorIndex): Ast.ShapeVisitorContext {
     return new ImmutableShapeVisitorContext(shape, index? index : new ImmutableShapeIndex(0, 1), node, this._shapes.addValue(shape), this);
   }
   getNode(type: Ast.NodeType): Ast.ShapeVisitorContext {
@@ -118,7 +118,7 @@ class ImmutableShapeVisitorContext implements Ast.ShapeVisitorContext {
   }
 }
 
-const createContext = (shape: Ast.Shape, node: Ast.RootNode) => new ImmutableShapeVisitorContext(
+const createContext = (shape: Ast.Shape, node: Ast.NodeView) => new ImmutableShapeVisitorContext(
   shape, new ImmutableShapeIndex(0, 1), node,
   new AllShapes(shape), 
   new NullVisitorContext());

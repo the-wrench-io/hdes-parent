@@ -1,16 +1,16 @@
 import { Ast } from './Ast';
-import AstShapeVisitor from './AstShapeVisitor';
+import ShapeVisitorDefault from './ShapeVisitor';
 
 
-class AstShapeBuilder implements Ast.ShapeBuilder {
-  private root?: Ast.RootNode;
-  private cord?: Ast.Cord;
+class ShapeBuilderDefault implements Ast.ShapeBuilder {
+  private root?: Ast.NodeView;
+  private cord?: Ast.ShapeCord;
  
-  start(cord: Ast.Cord) : Ast.ShapeBuilder {
+  start(cord: Ast.ShapeCord) : Ast.ShapeBuilder {
     this.cord = cord;
     return this;  
   }
-  tree(node: Ast.RootNode): Ast.ShapeBuilder {
+  tree(node: Ast.NodeView): Ast.ShapeBuilder {
     this.root = node;
     return this;
   }
@@ -24,10 +24,10 @@ class AstShapeBuilder implements Ast.ShapeBuilder {
     }
     
     const props = {sy: 50, sx: 30, mx: 120, start: this.cord };
-    return new AstShapeVisitor(props).visitRoot(this.root);
+    return new ShapeVisitorDefault(props).visitRoot(this.root);
   }
 
 }
 
 
-export default AstShapeBuilder;
+export default ShapeBuilderDefault;

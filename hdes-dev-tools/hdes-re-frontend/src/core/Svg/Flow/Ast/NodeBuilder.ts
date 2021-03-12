@@ -1,16 +1,16 @@
 import { Ast } from './Ast';
 
 
-class AstBuilder implements Ast.RootBuilder {
+class NodeBuilderDefault implements Ast.NodeBuilder {
   private children: Ast.Node[];
   private startNode?: Ast.StartNode;
   private endNode?: Ast.EndNode;
  
   constructor() {
-    this.children = [];
+    this.children = []; 
   }
   
-  start(child: Ast.NodeChild): Ast.RootBuilder {
+  start(child: Ast.NodeChild): Ast.NodeBuilder {
     if(this.startNode) {
       throw new Error("start node is already defined");
     }
@@ -24,7 +24,7 @@ class AstBuilder implements Ast.RootBuilder {
     return this;
   }
   
-  end(src: Ast.NodeBuilder): Ast.RootBuilder {
+  end(src: Ast.NodeInit): Ast.NodeBuilder {
     if(this.endNode) {
       throw new Error("end node is already defined");
     }
@@ -39,7 +39,7 @@ class AstBuilder implements Ast.RootBuilder {
     return this;    
   }
   
-  switch(src: Ast.NodeBuilder, srcChildren: Ast.NodeChild[]): Ast.RootBuilder {
+  switch(src: Ast.NodeInit, srcChildren: Ast.NodeChild[]): Ast.NodeBuilder {
     const children: Ast.NodeChild[] = srcChildren.map(e => ({id: e.id}));
     const node: Ast.SwitchNode = new ImmutableSwitchNode({
       id: src.id, 
@@ -51,7 +51,7 @@ class AstBuilder implements Ast.RootBuilder {
     return this;
   }
   
-  decision(src: Ast.NodeBuilder, srcChildren: Ast.NodeChild, loop?: Ast.NodeChild): Ast.RootBuilder {
+  decision(src: Ast.NodeInit, srcChildren: Ast.NodeChild, loop?: Ast.NodeChild): Ast.NodeBuilder {
     const node: Ast.DecisionNode = new ImmutableDecisionNode({ 
       id: src.id,
       size: {height: 50, width: 100},
@@ -63,7 +63,7 @@ class AstBuilder implements Ast.RootBuilder {
     return this;
   }
   
-  service(src: Ast.NodeBuilder, srcChildren: Ast.NodeChild, loop?: Ast.NodeChild, async?: boolean): Ast.RootBuilder {
+  service(src: Ast.NodeInit, srcChildren: Ast.NodeChild, loop?: Ast.NodeChild, async?: boolean): Ast.NodeBuilder {
     const node: Ast.ServiceNode = new ImmutableServiceNode({ 
       id: src.id,
       size: {height: 50, width: 100}, 
@@ -75,7 +75,7 @@ class AstBuilder implements Ast.RootBuilder {
     return this;
   }
   
-  build(): Ast.RootNode {
+  build(): Ast.NodeView {
     if(!this.startNode) {
       throw new Error("start node is not defined");
     }
@@ -209,7 +209,7 @@ class ImmutableServiceNode extends TemplateNode implements Ast.ServiceNode {
 }
 
 
-class ImmutableRootNode implements Ast.RootNode {
+class ImmutableRootNode implements Ast.NodeView {
   private _children: Record<string, Ast.Node> = {};
   private _start: Ast.StartNode;
   private _end: Ast.EndNode;
@@ -252,4 +252,5 @@ class ImmutableRootNode implements Ast.RootNode {
 }
 
 
-export default AstBuilder;
+export default NodeBuilderDefault;
+

@@ -1,7 +1,7 @@
 import { Ast } from './Ast';
 
 
-class AstMapper<T> {
+class NodeMapper<T> {
   private _resource?: Ast.Node; 
   private _start?: (src: Ast.StartNode) => T;
   private _end?: (src: Ast.EndNode) => T;
@@ -14,31 +14,31 @@ class AstMapper<T> {
   constructor(resource: Ast.Node) {
     this._resource = resource;
   }
-  start(mapper: (src: Ast.StartNode) => T) : AstMapper<T> {
+  start(mapper: (src: Ast.StartNode) => T) : NodeMapper<T> {
     this._start = mapper;
     return this;
   }
-  end(mapper: (src: Ast.EndNode) => T) : AstMapper<T> {
+  end(mapper: (src: Ast.EndNode) => T) : NodeMapper<T> {
     this._end = mapper;
     return this;
   }
-  switch(mapper: (src: Ast.SwitchNode) => T) : AstMapper<T> {
+  switch(mapper: (src: Ast.SwitchNode) => T) : NodeMapper<T> {
     this._switch = mapper;
     return this;
   }
-  decision(mapper: (src: Ast.DecisionNode) => T) : AstMapper<T> {
+  decision(mapper: (src: Ast.DecisionNode) => T) : NodeMapper<T> {
     this._decision = mapper;
     return this;
   }
-  decisionLoop(mapper: (src: Ast.DecisionNode) => T) : AstMapper<T> {
+  decisionLoop(mapper: (src: Ast.DecisionNode) => T) : NodeMapper<T> {
     this._decisionLoop = mapper;
     return this;
   }
-  service(mapper: (src: Ast.ServiceNode) => T) : AstMapper<T> {
+  service(mapper: (src: Ast.ServiceNode) => T) : NodeMapper<T> {
     this._service = mapper;
     return this;
   }
-  serviceLoop(mapper: (src: Ast.ServiceNode) => T) : AstMapper<T> {
+  serviceLoop(mapper: (src: Ast.ServiceNode) => T) : NodeMapper<T> {
     this._serviceLoop = mapper;
     return this;
   }
@@ -99,5 +99,5 @@ class AstMapper<T> {
 }
 
 
-export default AstMapper;
+export default NodeMapper;
 

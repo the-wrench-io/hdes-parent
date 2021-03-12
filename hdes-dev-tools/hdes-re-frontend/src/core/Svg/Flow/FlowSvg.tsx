@@ -33,8 +33,6 @@ interface FlowSvgProps {
 
 const FlowSvg: React.FC<FlowSvgProps> = ({ colors }) => {
   const theme = { fill: themeColors.background, stroke: themeColors.chalky };
-
-
   const tree = FlowFactory.nodes()
     .start({ id: "decide-claim" })
     .switch({ id: "decide-claim", onClick: () => console.log("clicked") }, [
@@ -51,6 +49,8 @@ const FlowSvg: React.FC<FlowSvgProps> = ({ colors }) => {
     .end({ id: "end-claim" })
     .build();
 /*
+  //console.log(tree);
+  //console.log(view);
 const tree = FlowFactory.nodes()
   .start({id: "decide-claim"})
   .decision({id: "decide-claim"}, {id: "calculate-collision"})
@@ -61,8 +61,6 @@ const tree = FlowFactory.nodes()
 */
 
   const view = FlowFactory.shapes().tree(tree).start({ x: 250, y: 40 }).build();
-  //console.log(tree);
-  //console.log(view);
 
   const elements = tree.children.map(node => {
     const cords = view.shapes[node.id];
@@ -82,8 +80,6 @@ const tree = FlowFactory.nodes()
       default: return null;
     }
   }).filter(e => e != null);
-
-
 
   return (<Context.Provider theme={theme} svg={{
       viewBox: "0 0 500 800",
