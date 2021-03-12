@@ -11,9 +11,9 @@ interface ShapeVisitorProps {
 
 class ImmutableShapeView implements Ast.ShapeView {
   private _lines: Ast.LineShape[];
-  private _shapes: Record<string, Ast.Shape>;
+  private _shapes: Record<string, Ast.Shape<Ast.Node>>;
   
-  constructor(lines: Ast.LineShape[], shapes: Record<string, Ast.Shape>) {
+  constructor(lines: Ast.LineShape[], shapes: Record<string, Ast.Shape<Ast.Node>>) {
     this._lines = lines;
     this._shapes = shapes;
   }
@@ -40,7 +40,7 @@ class ImmutableCord implements Ast.ShapeCord {
   }
 }
 
-class RootShape implements Ast.Shape {
+class RootShape implements Ast.Shape<Ast.NodeView> {
   private _id: string; 
   private _size: Ast.NodeSize; 
   private _center: Ast.ShapeCord;
@@ -48,9 +48,11 @@ class RootShape implements Ast.Shape {
   private _right: Ast.ShapeCord;
   private _top: Ast.ShapeCord; 
   private _bottom: Ast.ShapeCord;
+  private _node: Ast.NodeView;
     
-  constructor(start: Ast.ShapeCord) {
+  constructor(node: Ast.NodeView, start: Ast.ShapeCord) {
     this._id = "root";
+    this._node = node;
     this._center = new ImmutableCord(start.x, start.y);
     this._size = {height: 0, width: 0};
     this._left = this._center;
@@ -60,6 +62,9 @@ class RootShape implements Ast.Shape {
   }  
   get id() {
     return this._id;
+  } 
+  get node() {
+    return this._node;
   }
   get size() {
     return this._size;
@@ -81,7 +86,7 @@ class RootShape implements Ast.Shape {
   }
 }
 
-class ImmutableShape implements Ast.Shape {
+class ImmutableShape implements Ast.Shape<Ast.Node> {
   private _id: string; 
   private _size: Ast.NodeSize; 
   private _center: Ast.ShapeCord;
@@ -89,13 +94,14 @@ class ImmutableShape implements Ast.Shape {
   private _right: Ast.ShapeCord;
   private _top: Ast.ShapeCord; 
   private _bottom: Ast.ShapeCord;
+  private _node: Ast.Node;
     
-  constructor(id: string, size: Ast.NodeSize, start: Ast.ShapeCord) {
-    this._id = id;
-    
-    const rx = size.width/2;
-    const ry = size.height/2;
-    this._size = size;
+  constructor(node: Ast.Node, start: Ast.ShapeCord) {
+    this._id = node.id;
+    this._node = node;
+    this._size = node.size;
+    const rx = node.size.width/2;
+    const ry = node.size.height/2;
 
     this._center = new ImmutableCord(start.x, start.y + ry);
     this._left =   new ImmutableCord(this._center.x-rx, this._center.y);
@@ -105,6 +111,9 @@ class ImmutableShape implements Ast.Shape {
   }  
   get id() {
     return this._id;
+  }
+  get node() {
+    return this._node;
   }
   get size() {
     return this._size;
@@ -136,8 +145,8 @@ class ShapeVisitorDefault implements Ast.ShapeVisitor {
 
   visitRoot(root: Ast.NodeView): Ast.ShapeView {
     const lines: Ast.LineShape[] = [];
-    const shapes: Record<string, Ast.Shape> = {};
-    const ctx = createContext(new RootShape(this.props.start), root);
+    const shapes: Record<string, Ast.Shape<Ast.Node>> = {};
+    const ctx = createContext(new RootShape(root, this.props.start), root);
     const start = this.visitStart(root.start, ctx);
     
     for(const visited of start.children) {
@@ -147,19 +156,19 @@ class ShapeVisitorDefault implements Ast.ShapeVisitor {
     return new ImmutableShapeView(lines, shapes);
   }
   visitStart(node: Ast.StartNode, context: Ast.ShapeVisitorContext): Ast.ShapeVisitorState {
-   const shape = new ImmutableShape(node.id, node.size, this.props.start);
+   const shape = new ImmutableShape(node, this.props.start);
    const children = this.visitChildren(node.children, context.addNode(node, shape)); 
    return { shape, children };
   }
   visitEnd(node: Ast.EndNode, context: Ast.ShapeVisitorContext): Ast.ShapeVisitorState {
     const center = {x: this.props.start.x, y: this.visitY(node, context)};
-    const shape = new ImmutableShape(node.id, node.size, center);
+    const shape = new ImmutableShape(node, center);
     return { shape, children: [] };
   }
   visitSwitch(node: Ast.SwitchNode, context: Ast.ShapeVisitorContext): Ast.ShapeVisitorState {
     const center = {x: this.visitX(node, context), y: this.visitY(node, context)};
-    const shape = new ImmutableShape(node.id, node.size, center);
-    const children: Ast.Shape[] = [];
+    const shape = new ImmutableShape(node, center);
+    const children: Ast.Shape<Ast.Node>[] = [];
     let index = 0; 
     const total = node.children.length
     let visited: Ast.ShapeVisitorState | null = null;
@@ -173,13 +182,13 @@ class ShapeVisitorDefault implements Ast.ShapeVisitor {
   }
   visitDecision(node: Ast.DecisionNode, context: Ast.ShapeVisitorContext): Ast.ShapeVisitorState {
     const center = {x: this.visitX(node, context), y: this.visitY(node, context)};
-    const shape = new ImmutableShape(node.id, node.size, center);
+    const shape = new ImmutableShape(node, center);
     const children = this.visitChildren(node.children, context.addNode(node, shape));
     return { shape, children };
   }
   visitService(node: Ast.ServiceNode, context: Ast.ShapeVisitorContext): Ast.ShapeVisitorState {
     const center = {x: this.visitX(node, context), y: this.visitY(node, context)};
-    const shape = new ImmutableShape(node.id, node.size, center);
+    const shape = new ImmutableShape(node, center);
     const children = this.visitChildren(node.children, context.addNode(node, shape));
     return { shape, children };
   }
@@ -199,7 +208,7 @@ class ShapeVisitorDefault implements Ast.ShapeVisitor {
       default: throw new Error("Can't visit node of type: " + target.type + "!") 
     }
   }
-  visitChildren(child: Ast.NodeChild, context: Ast.ShapeVisitorContext): Ast.Shape[] {
+  visitChildren(child: Ast.NodeChild, context: Ast.ShapeVisitorContext): Ast.Shape<Ast.Node>[] {
     const result: Ast.ShapeVisitorState = this.vistChild(child, context);
     return [result.shape, ...result.children];
   }
