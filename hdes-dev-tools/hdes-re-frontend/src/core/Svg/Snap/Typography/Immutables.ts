@@ -38,6 +38,7 @@ class ImmutableLine implements Typography.Line {
 
   constructor(line: string, tester: Typography.TestText, space: number) {
     const words = line.split(" ");
+    
     let height = 0;
     let width = words.length > 1 ? -space : 0;
     const tested: Typography.Word[] = [];
@@ -46,8 +47,8 @@ class ImmutableLine implements Typography.Line {
       width += test.width + space;
       if (height < test.height) {
         height = test.height;
-        tested.push(new ImmutableWord(word, new ImmutableSize(test.height, test.width)));
       }
+      tested.push(new ImmutableWord(word, new ImmutableSize(test.height, test.width)));
     }
     this._words = tested;
     this._size = new ImmutableSize(height, width);
@@ -67,11 +68,19 @@ class ImmutableBox implements Typography.Box {
   constructor(text: string, size: Typography.Size, tester: Typography.TestText) {
     const space = tester(" ").width;
     const parsedLines: Typography.Line[] = [];
+    let width = 0;
+    let height = 0;
     for (const line of text.replaceAll("  ", " ").split(/\r?\n/)) {
-      parsedLines.push(new ImmutableLine(line, tester, space));
+      const parsedLine = new ImmutableLine(line, tester, space);
+      parsedLines.push(parsedLine);
+      if(parsedLine.size.height > height) {
+        height = parsedLine.size.height;
+      }
+      width += parsedLine.size.width;
+      
     }
     this._lines = parsedLines;
-    this._size = size;
+    this._size = new ImmutableSize(height, width + parsedLines.length * space);
   }
   get lines() {
     return this._lines;

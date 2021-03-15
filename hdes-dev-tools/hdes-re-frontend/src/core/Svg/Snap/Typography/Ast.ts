@@ -28,7 +28,7 @@ declare namespace Typography {
   type TestText = (text: string) => Size;
 
   interface VisitedElement {
-    content: string[];
+    values: {content: string, width: number}[]
   }
   
   interface Visitor {

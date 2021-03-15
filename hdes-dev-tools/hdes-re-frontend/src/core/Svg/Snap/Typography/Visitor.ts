@@ -18,14 +18,15 @@ class TextBoxVisitor implements Typography.Visitor {
   }
   
   visitBox(box: Typography.Box): Snap.Element {
+        console.log(box);
+    
     const result: string[] = []; 
     for(const line of box.lines) {
-      result.push(...this.visitLine(line).content);
+      result.push(...this.visitLine(line).values.map(c => c.content));
     }
-    
+
     const x = this._center.x - this._size.width / 2;
-    const y = this._center.y - this._size.height / 2;
-    
+    const y = this._center.y - box.size.height/2;
     const t = this._snap
       .text(x, y, result)
       .attr(this._attr);
@@ -39,82 +40,49 @@ class TextBoxVisitor implements Typography.Visitor {
     return t;
   }
   visitLine(line: Typography.Line): Typography.VisitedElement {
-    const content: string[] = [];
-    let filled = 0;
-    for(let index = 0; index < line.words.length; index++) {
-      const word = line.words[index];
-      const newWords  = this.visitWord(word, filled).content;
-      if(newWords.length > 1) {
-        filled = ;
+    const result: {content: string, width: number}[] = [];
+    let used = 0;
+    let index = -1;
+    let value: string = '';
+
+    
+    for(const word of line.words) {
+      const avg = word.size.width / word.value.length; 
+      const isLast = ++index === line.words.length;
+      const wordWidth = avg*word.value.length;
+      
+      // split the word
+      if(wordWidth > this._size.width) {
+        
+        
+        
+        continue; 
+      }
+      
+
+      // split
+      const willBeUsed = used + wordWidth + this._space;
+      if(willBeUsed > this._size.width) {
+        result.push({content: value, width: used});
+        
+        used = wordWidth + this._space;
+        value = word.value;
+        
+      } else {
+        used = willBeUsed;
+        value += ' ' + word.value;
       }
     }
     
-    return {content}    
+    result.push({content: value, width: used});
+    
+    return { values: result }
+        
   }
   visitWord(word: Typography.Word, filled: number): Typography.VisitedElement {
     const content: string = '';
-    return {content}    
+    return { values: [] }    
   }
 }
 
 export default TextBoxVisitor;
-
-
-/*
-
-
-
-const test = (svg: Snap.Paper, init: TypographyInit): { x: number, y: number, lines: string[] } => {
-  const x = init.center.x - init.size.width / 2;
-  const y = init.center.y - init.size.height / 2;
-
-  const content = init.txt.split("");
-  const temp = svg.text(0, 0, content);
-  temp.attr(init.attributes);
-  svg.remove();
-
-
-  // line width and height
-  const { width, height } = temp.getBBox();
-
-
-
-  ///  var letter_width = temp.getBBox().width / content.length;
-      const { x, y } = test(svg, init);
-
-      var words = init.txt.split(" ");
-      var width_so_far = 0, current_line = 0, lines = [''];
-      for (var i = 0; i < words.length; i++) {
-
-        var l = words[i].length;
-        if (width_so_far + (l * letter_width) > init.max_width) {
-          lines.push('');
-          current_line++;
-          width_so_far = 0;
-        }
-
-        width_so_far += l * letter_width;
-        lines[current_line] += words[i] + " ";
-      }
-
-      var t = this
-        .text(x, y, lines)
-        .attr(init.attributes);
-      t.selectAll("tspan:nth-child(n+2)").attr({
-        dy: "1.2em", x
-      });
-
-      return t;
-    };
-
-
-  const lines: string[] = [];
-
-  return {
-    x, y, lines
-  };
-}
-
-
-
-*/

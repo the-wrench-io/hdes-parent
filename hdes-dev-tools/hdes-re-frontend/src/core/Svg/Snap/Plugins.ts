@@ -16,20 +16,28 @@ const initPlugins = () => {
   Snap.plugin((Snap: any, Element: any, Paper: any, glob: any) => {
     Paper.prototype.typography = function(init: TypographyInit) {
       const svg = Snap();
+      
       const tester = (words: string) => {
-        const temp = svg.text(0, 0, words);
+        const temp = svg.text(10, 20, words);
         temp.attr(init.attributes);
+        
         const box = temp.getBBox();
-        svg.remove();
-        return { width: box.width, height: box.height };
+        
+        const result = { width: box.width, height: box.height };
+        return result;
       }
+      
+      
 
-      return Typography(svg, { 
+      const typography =  Typography(svg, { 
         text: init.text, 
         size: init.size, 
         center: init.center, 
         attr: init.attributes,
         tester });
+      svg.remove();
+        
+      return typography;
     }
   });
 }

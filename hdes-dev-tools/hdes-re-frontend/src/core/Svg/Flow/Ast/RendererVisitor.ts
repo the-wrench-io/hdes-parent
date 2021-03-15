@@ -134,7 +134,7 @@ class RendererVisitorDefault implements Ast.RendererVisitor {
         fill: theme.stroke, 
         stroke: theme.stroke,
       },
-      txt: shape.node.content
+      text: shape.node.content
     });
     lable.attr({
       stroke: theme.stroke    
