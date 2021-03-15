@@ -1,6 +1,5 @@
 import * as React from "react";
-import Snap from 'snapsvg-cjs-ts';
-
+import { createSnap , HdesSnap } from '../Snap'
 
 type Theme = {
   stroke: string;
@@ -10,7 +9,7 @@ type Theme = {
 
 type SvgContextType = {
   theme: Theme;
-  snap: Snap.Paper;
+  snap: HdesSnap;
 }
 
 
@@ -37,37 +36,36 @@ const SvgContext = React.createContext<SvgContextType>({
     fill: "#0000",
     background: "#0000"
   },
-  snap: {} as Snap.Paper
+  snap: {} as HdesSnap
 });
 
 type SvgProviderProps = {
   theme: Theme;
   children: React.ReactNode;
   svg: React.SVGProps<SVGSVGElement>;
-  init?: (theme: Theme, snap: Snap.Paper) => void;
+  init?: (theme: Theme, snap: HdesSnap) => void;
 };
 
 
 const SvgProvider: React.FC<SvgProviderProps> = ({ children, theme, svg, init }) => {
-  const ref = React.useRef<SVGElement>();
-  const [snap, setSnap] = React.useState<Snap.Paper>(); 
+  const ref = React.useRef<SVGSVGElement>() as React.RefObject<SVGSVGElement>;
+  const [snap, setSnap] = React.useState<HdesSnap>(); 
 
-  const svgRef: React.RefObject<SVGSVGElement> = ref as unknown as React.RefObject<SVGSVGElement>;
   React.useEffect(() => {
     if(!snap && ref.current) {
-      console.log(ref.current)
-      const newSnap = Snap(ref.current);
+      const newSnap = createSnap(ref);
       if(init !== undefined) {
         init(theme, newSnap);
       }
       setSnap(newSnap);
     }
-  }, [ref, snap, init]);
+  }, [ref, snap, init, theme]);
+  
 
-  const contextSnap = snap ? snap : {} as Snap.Paper;
+  const contextSnap = snap ? snap : {} as HdesSnap;
   return (
     <SvgContext.Provider value={{ theme, snap: contextSnap }}>
-      <svg ref={svgRef} {...svg}>
+      <svg ref={ref} {...svg}>
         <defs>
           <filter id="dropshadow" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
             {feFunc(theme.stroke)}
@@ -75,7 +73,6 @@ const SvgProvider: React.FC<SvgProviderProps> = ({ children, theme, svg, init })
             <feOffset dx="0" dy="0" result="shadow" />
             <feComposite in="SourceGraphic" in2="shadow" operator="over" />
           </filter>
-
 
           {/* '@material-ui/icons/Games'; */}
           <g id="Games" transform={`scale(0.7, 0.7)`}>

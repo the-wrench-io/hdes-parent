@@ -47,9 +47,10 @@ const FlowSvg: React.FC<FlowSvgProps> = ({ colors }) => {
     .service({ id: "final-calculation" }, { id: "end-claim" })
     .end({ id: "end-claim" })
     .build();
+
 /*
-  //console.log(tree);
-  //console.log(view);
+// console.log(tree);
+// console.log(view);
 const tree = FlowFactory.nodes()
   .start({id: "decide-claim"})
   .decision({id: "decide-claim"}, {id: "calculate-collision"})
@@ -60,16 +61,13 @@ const tree = FlowFactory.nodes()
 */
 
   const shapes = FlowFactory.shapes().tree(view).start({ x: 250, y: 40 }).build();
-
   return (<Context.Provider theme={theme} 
-    init={(snap, theme) => FlowFactory.renderer(snap, theme).visitRoot(shapes)}
+    init={(theme, snap) => FlowFactory.renderer().shapes(shapes).snap(snap).theme(theme).build() }
     svg={{
-      viewBox: "0 0 500 800",
-      width: "100%", height:"800",
+      viewBox: "0 0 500 800", width: "100%", height: "800",
       style: { backgroundColor: themeColors.background },
     }}>
   </Context.Provider>);
-
 }
 
 

@@ -1,15 +1,15 @@
 import { Ast as FlowAst } from './Ast';
 import NodeMapper from './NodeMapper';
 import NodeBuilderDefault from './NodeBuilder';
-import ShapeVisitorDefault from './ShapeBuilder';
-import RendererVisitorDefault from './RendererVisitor';
-import Snap from 'snapsvg-cjs-ts';
+import ShapeBuilderDefault from './ShapeBuilder';
+import ShapeRendererDefault from './ShapeRenderer';
+
 
 const FlowFactory = {
   mapper: (resource: FlowAst.Node) => new NodeMapper(resource),
-  shapes: () => new ShapeVisitorDefault(),
+  shapes: () => new ShapeBuilderDefault(),
   nodes: () => new NodeBuilderDefault(),
-  renderer: (theme: FlowAst.ShapeRendererTheme, snap: Snap.Paper) => new RendererVisitorDefault(snap, theme),
+  renderer: () => new ShapeRendererDefault(),
 }
 
 export default FlowFactory;

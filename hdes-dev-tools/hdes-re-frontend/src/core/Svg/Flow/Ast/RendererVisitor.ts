@@ -1,6 +1,6 @@
 import { Ast } from './Ast';
 import Snap from 'snapsvg-cjs-ts';
-
+import {HdesSnap} from '../../Snap'
 
 class DefaultContext implements Ast.RendererVisitorContext {
   private _visited: Record<string, Ast.Shape<Ast.Node>>;
@@ -20,10 +20,10 @@ class DefaultContext implements Ast.RendererVisitorContext {
 
 class RendererVisitorDefault implements Ast.RendererVisitor {
 
-  private _snap: Snap.Paper;
+  private _snap: HdesSnap;
   private _theme: Ast.ShapeRendererTheme;
 
-  constructor(snap: Snap.Paper, theme: Ast.ShapeRendererTheme) {
+  constructor(snap: HdesSnap, theme: Ast.ShapeRendererTheme) {
     this._snap = snap;
     this._theme = theme;
   }
@@ -120,9 +120,32 @@ class RendererVisitorDefault implements Ast.RendererVisitor {
   visitLoop(node: Ast.Shape<Ast.DecisionNode | Ast.ServiceNode>, context: Ast.RendererVisitorContext): Ast.RendererVisitorState {
     return this.visitTask(node, context);
   }
+  visitText(shape: Ast.Shape<Ast.Node>, context: Ast.RendererVisitorContext): Snap.Element {
+    const snap = this._snap;
+    const theme = this._theme;
+    
+    const lable = snap.typography({
+      center: shape.center,
+      size: shape.size,
+      max_width: shape.size.width,
+      attributes: {
+        fontSize: '0.9em',
+        fontWeight: 100,
+        fill: theme.stroke, 
+        stroke: theme.stroke,
+      },
+      txt: shape.node.content
+    });
+    lable.attr({
+      stroke: theme.stroke    
+    });
+    return lable;
+  }
+  
   visitTask(shape: Ast.Shape<Ast.DecisionNode | Ast.ServiceNode>, context: Ast.RendererVisitorContext): Ast.RendererVisitorState {
     const theme = this._theme;
     const snap = this._snap;
+    
     const {x, y} = shape.center;
     const {width, height} = shape.size;
     const {content} = shape.node;
@@ -137,10 +160,7 @@ class RendererVisitorDefault implements Ast.RendererVisitor {
         filter: "url(#dropshadow)"
       });
   
-    const lable = snap.text(x-width/2, y, content);
-    lable.attr({
-      stroke: theme.stroke    
-    });
+    const lable = this.visitText(shape, context)
   
     const group: Snap.Paper = snap.group(rect, lable);
     if(clock) {

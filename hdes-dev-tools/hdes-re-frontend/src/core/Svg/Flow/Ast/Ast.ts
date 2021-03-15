@@ -1,11 +1,11 @@
-import Snap from 'snapsvg-cjs-ts';
+import {HdesSnap} from '../../Snap';
 
 
 declare namespace Ast {
   
   interface ShapeRenderer {
     theme(them: ShapeRendererTheme): ShapeRenderer;
-    snap(snap: Snap.Paper): ShapeRenderer;
+    snap(snap: HdesSnap): ShapeRenderer;
     shapes(shapes: ShapeView): ShapeRenderer;
     build(): void;
   }
