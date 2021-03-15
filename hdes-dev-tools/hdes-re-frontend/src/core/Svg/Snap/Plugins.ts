@@ -27,8 +27,6 @@ const initPlugins = () => {
         return result;
       }
       
-      
-
       const typography =  Typography(svg, { 
         text: init.text, 
         size: init.size, 

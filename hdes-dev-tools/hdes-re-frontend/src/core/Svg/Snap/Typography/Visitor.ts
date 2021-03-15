@@ -51,17 +51,8 @@ class TextBoxVisitor implements Typography.Visitor {
       const isLast = ++index === line.words.length;
       const wordWidth = avg*word.value.length;
       
-      // split the word
-      if(wordWidth > this._size.width) {
-        
-        
-        
-        continue; 
-      }
-      
-
       // split
-      const willBeUsed = used + wordWidth + this._space;
+      const willBeUsed = used + wordWidth + (isLast ? 0 : this._space);
       if(willBeUsed > this._size.width) {
         result.push({content: value, width: used});
         

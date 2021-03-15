@@ -37,18 +37,26 @@ class ImmutableLine implements Typography.Line {
   private _size: Typography.Size;
 
   constructor(line: string, tester: Typography.TestText, space: number) {
-    const words = line.split(" ");
+    const wordsSplitAtSpace = line.split(" ");
     
     let height = 0;
-    let width = words.length > 1 ? -space : 0;
+    let width = wordsSplitAtSpace.length > 1 ? -space : 0;
     const tested: Typography.Word[] = [];
-    for (const word of words) {
-      const test = tester(word);
-      width += test.width + space;
-      if (height < test.height) {
-        height = test.height;
+    for (const wordAtSpace of wordsSplitAtSpace) {
+      const wordsAtDash = wordAtSpace.split("-");
+      let dashIndex = 0;
+      for(const word of wordsAtDash) {
+        const isLast = ++dashIndex === wordsAtDash.length;
+        const dash = wordsAtDash.length > 1 && !isLast ? '-' : '';
+        
+        const test = tester(word);
+        width += test.width + space;
+        if (height < test.height) {
+          height = test.height;
+        }
+        console.log(word+dash)
+        tested.push(new ImmutableWord(word+dash, new ImmutableSize(test.height, test.width)));
       }
-      tested.push(new ImmutableWord(word, new ImmutableSize(test.height, test.width)));
     }
     this._words = tested;
     this._size = new ImmutableSize(height, width);
