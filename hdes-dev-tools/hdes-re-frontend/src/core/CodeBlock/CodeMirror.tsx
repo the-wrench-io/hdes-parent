@@ -11,7 +11,7 @@ import createExtensions from './extensions'
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
+      maxWidth: '600px',
       height: '100%',
     },
   }),

@@ -92,7 +92,7 @@ class TemplateNode implements Ast.Node {
   private _content: string;
   private _type: Ast.NodeType;
   private _size: Ast.NodeSize;
-  private _onClick?: (self: Ast.Node) => void;
+  private _onClick?: (self: Ast.Node, event?: MouseEvent) => void;
   
   constructor(props: {
     id: string, content: string,
@@ -118,9 +118,9 @@ class TemplateNode implements Ast.Node {
   get size() {
     return this._size;
   }
-  onClick() {
+  onClick(event: MouseEvent) {
     if(this._onClick) {
-      this._onClick(this);
+      this._onClick(this, event);
     }
   }
 }

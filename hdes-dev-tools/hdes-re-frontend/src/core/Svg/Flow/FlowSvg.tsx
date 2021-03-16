@@ -2,7 +2,7 @@ import React from 'react';
 
 
 import Context from '../Context';
-import FlowFactory from './Ast';
+import FlowFactory, { FlowAst } from './Ast';
 
 
 const themeColors = {
@@ -27,10 +27,20 @@ interface FlowSvgProps {
     dt: string;
     st: string;
     fl: string;
+  },
+  listeners?: {
+    mousedown?: (node: FlowAst.Node, event?: MouseEvent) => void
   }
 };
 
-const FlowSvg: React.FC<FlowSvgProps> = ({ colors }) => {
+const FlowSvg: React.FC<FlowSvgProps> = (props) => {
+  
+  const mousedown = (node: FlowAst.Node, event?: MouseEvent) => {
+    if(props.listeners?.mousedown) {
+      props.listeners?.mousedown(node, event)
+    }
+  }
+  
   const theme = { fill: themeColors.background, stroke: themeColors.chalky, background: themeColors.background};
   const view = FlowFactory.nodes()
     .start({ id: "decide-claim" })
@@ -38,13 +48,13 @@ const FlowSvg: React.FC<FlowSvgProps> = ({ colors }) => {
       { id: "collision-claim" },
       { id: "vandalism-claim" },
       { id: "felloffroad-claim" }])
-    .decision({ id: "collision-claim" }, { id: "calculate-collision" })
-    .decision({ id: "calculate-collision" }, { id: "final-calculation" })
-    .decision({ id: "vandalism-claim" }, { id: "calculate-vandalism" })
-    .decision({ id: "calculate-vandalism" }, { id: "final-calculation" })
-    .decision({ id: "felloffroad-claim" }, { id: "calculate-felloffroad" })
-    .decision({ id: "calculate-felloffroad" }, { id: "final-calculation" })
-    .service({ id: "final-calculation" }, { id: "end-claim" })
+    .decision({ id: "collision-claim", onClick: mousedown}, { id: "calculate-collision" })
+    .decision({ id: "calculate-collision", onClick: mousedown }, { id: "final-calculation" })
+    .decision({ id: "vandalism-claim", onClick: mousedown }, { id: "calculate-vandalism" })
+    .decision({ id: "calculate-vandalism", onClick: mousedown }, { id: "final-calculation" })
+    .decision({ id: "felloffroad-claim", onClick: mousedown }, { id: "calculate-felloffroad" })
+    .decision({ id: "calculate-felloffroad", onClick: mousedown }, { id: "final-calculation" })
+    .service({ id: "final-calculation", onClick: mousedown }, { id: "end-claim" })
     .end({ id: "end-claim" })
     .build();
 

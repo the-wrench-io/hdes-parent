@@ -61,7 +61,7 @@ declare namespace Ast {
   interface NodeInit {
     id: string;
     content?: string;
-    onClick?: (self: Node) => void;
+    onClick?: (self: Node, event?: MouseEvent) => void;
   }
 
   interface Node {
@@ -69,7 +69,7 @@ declare namespace Ast {
     content: string;
     type: NodeType;
     size: NodeSize;
-    onClick: () => void;
+    onClick: (event: MouseEvent) => void;
   }
   
   interface StartNode extends Node {
