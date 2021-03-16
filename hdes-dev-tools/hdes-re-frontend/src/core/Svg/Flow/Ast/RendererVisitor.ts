@@ -133,6 +133,8 @@ class RendererVisitorDefault implements Ast.RendererVisitor {
         fontWeight: 100,
         fill: theme.stroke, 
         stroke: theme.stroke,
+        alignmentBaseline: "middle", 
+        textAnchor: "middle"
       },
       text: shape.node.content
     });
@@ -164,7 +166,7 @@ class RendererVisitorDefault implements Ast.RendererVisitor {
   
     const group: Snap.Paper = snap.group(rect, lable);
     if(clock) {
-      const icon = {x: x+width/2-10, y: y-8};
+      const icon = {x: x+width/2-10, y: y+15};
       const use = snap.el("use", {
         "xlink:href": "#AccessTime", 
         transform: `translate(${icon.x}, ${icon.y})`,
@@ -174,7 +176,7 @@ class RendererVisitorDefault implements Ast.RendererVisitor {
     }
     
     if(decision) {
-      const icon = {x: x-width/2, y: y+1-height/2};
+      const icon = {x: x+width/2-17, y: y-height/2};
       const use = snap.el("use", {
         "xlink:href": "#TableChart", 
         transform: `translate(${icon.x}, ${icon.y})`,
@@ -184,7 +186,7 @@ class RendererVisitorDefault implements Ast.RendererVisitor {
     }
   
     if(service) {
-      const icon = {x: x+width/2-18, y: y+1-height/2};
+      const icon = {x: x+width/2-17, y: y-height/2};
       const use = snap.el("use", {
         "xlink:href": "#SettingsApplications", 
         transform: `translate(${icon.x}, ${icon.y})`,

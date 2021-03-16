@@ -18,13 +18,15 @@ const initPlugins = () => {
       const svg = Snap();
       
       const tester = (words: string) => {
-        const temp = svg.text(10, 20, words);
+        const temp = svg.text(0, 0, words);
         temp.attr(init.attributes);
         
         const box = temp.getBBox();
-        
-        const result = { width: box.width, height: box.height };
-        return result;
+        const size = { width: box.width, height: box.height };
+        const avg = size.width/words.length;
+        return {
+          size, avg
+        };
       }
       
       const typography =  Typography(svg, { 

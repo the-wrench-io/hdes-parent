@@ -1,40 +1,44 @@
 import Snap from 'snapsvg-cjs-ts';
 
 declare namespace Typography {
-  
+
   interface Size {
     width: number, height: number;
   }
-  
+
   interface Pos {
     x: number, y: number
   }
-  
+
   interface Word {
     value: string;
     size: Size;
+    breaking: boolean;
   }
-  
+
   interface Line {
     words: readonly Word[];
     size: Size;
   }
-  
-  interface Box {
-    lines: readonly Line[];
-    size: Size;
-  }
- 
-  type TestText = (text: string) => Size;
 
-  interface VisitedElement {
-    values: {content: string, width: number}[]
+  interface TextWrapper {
+    lines: readonly Line[];
+    max: Size;
   }
-  
-  interface Visitor {
-    visitBox(box: Box): Snap.Element;
-    visitLine(line: Line): VisitedElement;
-    visitWord(line: Word, filled: number): VisitedElement;
+
+  type TestText = (text: string) => { size: Size, avg: number };
+
+  interface TextAreaBuilder {
+    break(): TextAreaBuilder;
+    lines(lines: readonly Typography.Line[]): TextAreaBuilder;
+    append(word: Typography.Word): TextAreaBuilder;
+    build(): string[];
+  }
+
+  interface TextVisitor {
+    visitText(text: string): Typography.TextWrapper;
+    visitLines(src: string): readonly Typography.Line[];
+    visitWords(src: string): Typography.Word[];
   }
 }
 
