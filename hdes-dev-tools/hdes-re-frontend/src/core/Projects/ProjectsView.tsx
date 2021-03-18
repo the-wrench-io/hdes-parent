@@ -15,7 +15,9 @@ const ProjectsView: React.FC<ProjectsViewProps> = ({setWorkspace}) => {
 
   const projects = session.data.projects.map(r => <ProjectView key={r.project.id} project={r} setWorkspace={setWorkspace}/>);
 
-  return (<div><List dense={true} disablePadding>{projects}</List></div>);
+  return (<div>
+    <List dense={true} disablePadding>{projects}</List>
+  </div>);
 }
 
 export default ProjectsView;
