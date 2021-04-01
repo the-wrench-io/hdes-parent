@@ -42,7 +42,14 @@ const ProjectView: React.FC<ProjectsViewProps> = (props) => {
   const [open, setOpen] = React.useState(false);
   
   const branches: React.ReactChild[] = [];
-  const heads = Object.values(props.project.heads);
+  const heads = Object.values(props.project.heads).sort((h1, h2) => {
+    if(h1.name === 'main') {
+      return -1;
+    } else if(h2.name === 'main') {
+      return 1;
+    }
+    return h1.name.localeCompare(h2.name);
+  });
   const headSummary: React.ReactElement[] = [];
   
   let index = 1;

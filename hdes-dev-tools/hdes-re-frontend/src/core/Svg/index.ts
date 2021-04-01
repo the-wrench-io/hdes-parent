@@ -1,2 +1,2 @@
-export * from './Flow';
-export * from './Table';
+
+export * from './SvgTree';

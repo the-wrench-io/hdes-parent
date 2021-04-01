@@ -77,7 +77,7 @@ class TextVisitorDefault implements Typography.TextVisitor {
   
   constructor(tester: Typography.TestText, bounds: Typography.Size) {
     this._tester = tester;
-    this._space = tester(" ").size.width;
+    this._space = tester(" ").dimensions.width;
     this._bounds = bounds;
   }
   
@@ -127,7 +127,7 @@ class TextVisitorDefault implements Typography.TextVisitor {
       
       const test = this._tester(word);
       // break the word
-      if(test.size.width > this._bounds.width) {
+      if(test.dimensions.width > this._bounds.width) {
         const breakAt = Math.min(Math.floor(this._bounds.width/test.avg), word.length-2, 0);
         if(breakAt === 0) {
           // unreasnoble bounds
@@ -135,14 +135,14 @@ class TextVisitorDefault implements Typography.TextVisitor {
         }
         const part1 = word.substring(0, breakAt);
         const part2 = word.substring(breakAt+1, word.length);
-        result.push(new ImmutableWord(part1, this._tester(word).size, true));
+        result.push(new ImmutableWord(part1, this._tester(word).dimensions, true));
         result.push(...this.visitWords(part2));
       } else {
         const isLast = index === words.length-1;
         const breaking = words.length > 1 && !isLast;
         const suffix = breaking ? '-' : ' ';
         const part = word+suffix;
-        result.push(new ImmutableWord(part, this._tester(part).size, breaking));
+        result.push(new ImmutableWord(part, this._tester(part).dimensions, breaking));
       }
     }
     return result;

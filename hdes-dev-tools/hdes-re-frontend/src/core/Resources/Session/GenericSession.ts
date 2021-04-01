@@ -125,8 +125,8 @@ class GenericInstance implements Session.InstanceMutator {
   }
   withData(init: Session.DataInit): Session.InstanceMutator {
     const snapshot = init.snapshot ? init.snapshot : this._data.snapshot;
-    const projects = init.projects ? init.projects : this._data.projects;
-    const heads = init.heads ? init.heads : this._data.heads;
+    const projects = init.projects ? (init.projects).sort((p1, p2) => p1.project.name.localeCompare(p2.project.name)) : this._data.projects;
+    const heads = init.heads ? (init.heads).sort((p1, p2) => p1.head.name.localeCompare(p2.head.name)) : this._data.heads;
     const newData: Session.Data = new GenericData([...projects], snapshot, [...heads]);
     return new GenericInstance(this._listeners, this._tabs, this._history, this._dialogId, this._linkId, this._search, newData, this._saved, this._deleted, this._errors, this._workspace);
   }

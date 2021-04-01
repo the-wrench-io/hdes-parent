@@ -1,5 +1,3 @@
-import Snap from 'snapsvg-cjs-ts';
-
 declare namespace Typography {
 
   interface Size {
@@ -26,7 +24,7 @@ declare namespace Typography {
     max: Size;
   }
 
-  type TestText = (text: string) => { size: Size, avg: number };
+  type TestText = (text: string) => { dimensions: Size, avg: number };
 
   interface TextAreaBuilder {
     break(): TextAreaBuilder;

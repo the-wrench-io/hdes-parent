@@ -1,6 +1,8 @@
 import { MutableRefObject } from 'react';
 import Snap from 'snapsvg-cjs-ts';
+import { Tree } from './Tree';
 import { Plugins, initPlugins } from './Plugins';
+
 
 interface HdesSnap extends Snap.Paper, Plugins {
   
@@ -19,4 +21,4 @@ const createSnap = (ref: React.RefObject<SVGSVGElement>) => {
 
 
 export { createSnap };
-export type { HdesSnap }
+export type { HdesSnap, Tree }
