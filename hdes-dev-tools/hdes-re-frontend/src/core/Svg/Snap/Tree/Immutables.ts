@@ -60,21 +60,35 @@ class ImmutableAssociations implements Tree.Associations {
 }
 
 class ImmutableTypography implements Tree.Typography {
-  private _name: string;
+  private _header?: string;
+  private _text?: string;
+  private _src?: string;
   private _desc?: string;
   private _icon?: string;
 
   constructor(props?: {
-    name: string;
+    header?: string;
     desc?: string;
+    text?: string;
+    src?: string;
     icon?: string;
   }) {
-    this._name = props?.name ? props.name : "";
+    
+    
+    this._header = props?.header;
+    this._text = props?.text;
+    this._src = props?.src;
     this._desc = props?.desc;
     this._icon = props?.icon;
   }
-  get name() {
-    return this._name;
+  get header() {
+    return this._header;
+  }
+  get src() {
+    return this._src;
+  }
+  get text() {
+    return this._text;
   }
   get desc() {
     return this._desc;
@@ -122,15 +136,32 @@ class ImmutableConnectors implements Tree.Connectors {
   private _right: Tree.Coordinates;
   private _top: Tree.Coordinates; 
   private _bottom: Tree.Coordinates;
+  private _dimensions: Tree.Dimensions;
   
-  constructor(size: Tree.Dimensions, start: Tree.Coordinates) {
+  constructor(size: Tree.Dimensions, calc: {
+    center?: Tree.Coordinates,
+    topLeft?: Tree.Coordinates,
+  }) {
     const rx = Math.round(size.width/2);
     const ry = Math.round(size.height/2);
-    this._center = new ImmutableCoordinates(start.x, start.y + ry);
-    this._left =   new ImmutableCoordinates(this._center.x-rx, this._center.y);
-    this._right =  new ImmutableCoordinates(this._center.x+rx, this._center.y);
-    this._top =    new ImmutableCoordinates(this._center.x,    this._center.y - ry);
-    this._bottom = new ImmutableCoordinates(this._center.x,    this._center.y + ry);
+    this._dimensions = size;
+    
+    if(calc.center) {
+      this._center = new ImmutableCoordinates(calc.center.x, calc.center.y + ry);
+      this._left =   new ImmutableCoordinates(this._center.x-rx, this._center.y);
+      this._right =  new ImmutableCoordinates(this._center.x+rx, this._center.y);
+      this._top =    new ImmutableCoordinates(this._center.x,    this._center.y - ry);
+      this._bottom = new ImmutableCoordinates(this._center.x,    this._center.y + ry);
+    } else if(calc.topLeft) {
+      const start = calc.topLeft;
+      this._center = new ImmutableCoordinates(start.x + rx, start.y + ry);
+      this._left =   new ImmutableCoordinates(start.x, start.y + ry);
+      this._right =  new ImmutableCoordinates(this._left.x + size.width, this._left.y);
+      this._top =    new ImmutableCoordinates(this._center.x, this._center.y - ry);
+      this._bottom = new ImmutableCoordinates(this._center.x, this._center.y + ry);
+    } else {
+      throw new Error("Define calc.center or calc.topLeft!");      
+    }
   } 
   get center() {
     return this._center;
@@ -147,32 +178,42 @@ class ImmutableConnectors implements Tree.Connectors {
   get bottom() {
     return this._bottom;
   }
+  get dimensions() {
+    return this._dimensions;
+  }
 }
 
 class ImmutableGridShapes implements Tree.GridShapes {
-  private _rows:    Record<string, Tree.Shape<Tree.GridRow>>;
-  private _headers: Record<string, Tree.Shape<Tree.GridHeader>>;
-  private _cells:   Record<string, Tree.Shape<Tree.GridCell>>;
-  private _nodes:   Record<string, Tree.Node>;
+  private _rows:      Record<string, Tree.Shape<Tree.GridRow>>;
+  private _headers:   Record<string, Tree.Shape<Tree.GridHeader>>;
+  private _cells:     Record<string, Tree.Shape<Tree.GridCell>>;
+  private _nodes:     Record<string, Tree.Node>;
+  private _headersRow: Tree.Shape<Tree.GridHeaderRow>;
   private _id: string;
   private _typography: Tree.Typography;
   private _associations: Tree.Associations;
   private _order = new ImmutableOrder(0);
-  constructor(
-    id: string,
-    rows:     Record<string, Tree.Shape<Tree.GridRow>>, 
-    headers:  Record<string, Tree.Shape<Tree.GridHeader>>, 
-    cells:    Record<string, Tree.Shape<Tree.GridCell>>,
-    nodes:    Record<string, Tree.Node>,
-    associations?: Tree.Associations) {
+  constructor(props: {
+    id:         string,
+    headersRow: Tree.Shape<Tree.GridHeaderRow>,
+    rows:       Record<string, Tree.Shape<Tree.GridRow>>, 
+    headers:    Record<string, Tree.Shape<Tree.GridHeader>>, 
+    cells:      Record<string, Tree.Shape<Tree.GridCell>>,
+    nodes:      Record<string, Tree.Node>,
+    associations?: Tree.Associations
+  }) {
     
-    this._id = id;
-    this._rows = rows;
-    this._nodes = nodes;
-    this._headers = headers;
-    this._cells = cells;
-    this._typography = new ImmutableTypography({name: id});
-    this._associations = associations ? associations : new ImmutableAssociations(); 
+    this._headersRow = props.headersRow;
+    this._id = props.id;
+    this._rows = props.rows;
+    this._nodes = props.nodes;
+    this._headers = props.headers;
+    this._cells = props.cells;
+    this._typography = new ImmutableTypography({text: props.id});
+    this._associations = props.associations ? props.associations : new ImmutableAssociations(); 
+  }
+  get headersRow() {
+    return this._headersRow;
   }
   get rows() {
     return Object.values(this._rows);
@@ -228,7 +269,7 @@ class ImmutableShapes implements Tree.Shape<Tree.Shapes> {
     this._id = "root";
     this._node = node;
     this._dimensions = {height: 0, width: 0};
-    this._connectors = connectors ? connectors : new ImmutableConnectors(this._dimensions, start);
+    this._connectors = connectors ? connectors : new ImmutableConnectors(this._dimensions, {center: start});
   }  
   get id() {
     return this._id;
@@ -321,7 +362,7 @@ class ImmutableGridCell extends TemplateNode implements Tree.GridCell {
 }
 
 class ImmutableGridRow extends TemplateNode implements Tree.GridRow {
-  private _cells: readonly Tree.GridCell[];
+  private _cells: Record<string, Tree.GridCell> = {};
   constructor(props: {
     id: string,
     order: number,
@@ -329,12 +370,32 @@ class ImmutableGridRow extends TemplateNode implements Tree.GridRow {
     cells: Tree.GridCell[]}) {
       
     super(props, "row");
+    props.cells.forEach(c => this._cells[c.headerId] = c);
+  }
+  get cells() {
+    return Object.values(this._cells);
+  }
+  getByHeader(headerId: string): Tree.GridCell {
+    return this._cells[headerId];
+  }
+}
+
+class ImmutableGridHeaderRow extends TemplateNode implements Tree.GridHeaderRow {
+  private _cells: readonly Tree.GridHeader[];
+  constructor(props: {
+    id: string,
+    order: number,
+    typography: Tree.Typography,
+    cells: Tree.GridHeader[]}) {
+      
+    super(props, "headerrow");
     this._cells = props.cells;
   }
   get cells() {
     return this._cells;
   }
 }
+
 
 class ImmutableGraphChild implements Tree.GraphChild {
   private _id: string;
@@ -465,7 +526,7 @@ class ImmutableGraphShapes implements Tree.GraphShapes {
     this._end = props.end;
     this._children = props.children;
     this._nodes = props.nodes;
-    this._typography = new ImmutableTypography({name: props.id});
+    this._typography = new ImmutableTypography({text: props.id});
     this._associations = new ImmutableAssociations();
   }
   get start() {
@@ -546,7 +607,7 @@ class ImmutableNullTypeVisitorContext implements Tree.VisitorContext {
   private _connectors: Tree.Connectors;
   constructor(all: Record<string, Tree.Node>, coords: Tree.Coordinates) {
     this._all = all;
-    this._connectors = new ImmutableConnectors({height: 0, width: 0}, coords);
+    this._connectors = new ImmutableConnectors({height: 0, width: 0}, { center: coords });
   }
   get all(): Record<string, Tree.Node> {
     return this._all;
@@ -650,7 +711,8 @@ const Immutables = {
   GridHeader: ImmutableGridHeader,
   GridCell: ImmutableGridCell,
   GridRow: ImmutableGridRow,
-  
+  GridHeaderRow: ImmutableGridHeaderRow,
+    
   GraphStart: ImmutableGraphStart,
   GraphEnd: ImmutableGraphEnd,
   GraphShapes: ImmutableGraphShapes,

@@ -1,8 +1,7 @@
 import React from 'react';
 
 import Context from './Context';
-import { Tree } from './Snap/Tree'
-import { HdesSnap } from './Snap'
+import { HdesSnap, Tree } from './Snap'
 
 
 const colors = {
@@ -23,6 +22,8 @@ const colors = {
 };
 
 interface SvgTreeProps {
+  coords: Tree.Coordinates;
+  node: { min: Tree.Dimensions, max: Tree.Dimensions };
   listeners: Tree.Listeners;
   graph?: (data: Tree.GraphBuilder) => Tree.GraphShapes;
   grid?: (data: Tree.GridBuilder) => Tree.GridShapes;
@@ -31,8 +32,11 @@ interface SvgTreeProps {
 const theme = { fill: colors.background, stroke: colors.chalky, background: colors.background };
 
 const init = (
-  theme: Tree.Theme, snap: HdesSnap,
-  listeners: Tree.Listeners, 
+  theme: Tree.Theme, 
+  snap: HdesSnap,
+  listeners: Tree.Listeners,
+  node: { min: Tree.Dimensions, max: Tree.Dimensions },
+  coords: Tree.Coordinates, 
   render: {
     graph?: (data: Tree.GraphBuilder) => Tree.GraphShapes;
     grid?: (data: Tree.GridBuilder) => Tree.GridShapes
@@ -42,30 +46,23 @@ const init = (
   }
   if(render.grid) {
     const elements = snap.grid({
-      cell: { 
-        min: {height: 40, width: 200 },
-        max: {height: 40, width: 100 } 
-      },
-      theme,
+      node, theme, coords,
       listeners: listeners,
-      typography: { attr: {} }
+      typography: { attr: {
+        fontSize: '0.9em', fontWeight: 100
+      } }
     }, render.grid);
     
-    console.log(elements);
     snap.add(elements);
   } else if(render.graph) {
     
     const elements = snap.graph({
-      cell: { 
-        min: {height: 40, width: 200 },
-        max: {height: 40, width: 100 } 
-      },
-      theme,
+      node, theme, coords,
       listeners: listeners,
-      typography: { attr: {} }
+      typography: { attr: {
+        fontSize: '0.9em', fontWeight: 100
+      } }
     }, render.graph);
-    
-    console.log(elements);
     snap.add(elements);    
   }
 }
@@ -75,7 +72,7 @@ const SvgTree: React.FC<SvgTreeProps> = (props) => {
     <Context.Provider theme={theme} init={
       (theme, snap) => (
         init(
-          theme, snap, props.listeners,
+          theme, snap, props.listeners, props.node, props.coords,
           { graph: props.graph, grid: props.grid }) 
       )}>
     </Context.Provider>);

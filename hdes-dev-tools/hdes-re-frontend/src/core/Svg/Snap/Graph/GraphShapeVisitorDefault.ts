@@ -141,8 +141,6 @@ class GraphShapeVisitorDefault implements Tree.GraphShapeVisitor<Snap.Element, V
     const decision = shape.node.type === 'decision' || shape.node.type === 'decision-loop';
     const service = shape.node.type === 'service' || shape.node.type === 'service-loop';
 
-    console.log("drawing rect: ", Math.round(x - width / 2) )
-
     const rect = snap.rect(
       Math.round(x - width / 2),
       Math.round(y - height / 2), 
@@ -202,16 +200,8 @@ class GraphShapeVisitorDefault implements Tree.GraphShapeVisitor<Snap.Element, V
     const lable = snap.typography({
       center: shape.connectors.center,
       size: shape.dimensions,
-      max_width: shape.dimensions.width,
-      attributes: {
-        fontSize: '0.9em',
-        fontWeight: 100,
-        fill: theme.stroke,
-        stroke: theme.stroke,
-        alignmentBaseline: "middle",
-        textAnchor: "middle"
-      },
-      text: shape.node.typography.name
+      text: shape.node.typography,
+      theme: theme
     });
     lable.attr({
       stroke: theme.stroke

@@ -73,7 +73,7 @@ class GraphNodeVisitorDefault implements Tree.GraphNodeVisitor<Tree.GraphShapes,
   }
   visitStart(node: Tree.GraphStart, context: Tree.VisitorContext): Visited {
     const dimensions = new Immutables.Dimensions({height: 25, width: 25});
-    const connectors = new Immutables.Connectors(dimensions, this._init.coords);
+    const connectors = new Immutables.Connectors(dimensions, {center: this._init.coords});
     this._dimensions[node.id] = dimensions;
     this._connectors[node.id] = connectors;
     this._start = node;
@@ -84,7 +84,7 @@ class GraphNodeVisitorDefault implements Tree.GraphNodeVisitor<Tree.GraphShapes,
   visitEnd(node: Tree.GraphEnd, context: Tree.VisitorContext): Visited {
     const center = {x: this._init.coords.x, y: this.visitY(node, context)};
     const dimensions = new Immutables.Dimensions({height: 25, width: 25});
-    const connectors = new Immutables.Connectors(dimensions, center);
+    const connectors = new Immutables.Connectors(dimensions, {center});
     this._dimensions[node.id] = dimensions;
     this._connectors[node.id] = connectors;
     this._end = node;
@@ -94,7 +94,7 @@ class GraphNodeVisitorDefault implements Tree.GraphNodeVisitor<Tree.GraphShapes,
   visitSwitch(node: Tree.GraphSwitch, context: Tree.VisitorContext): Visited {
     const center = {x: this.visitX(node, context), y: this.visitY(node, context)};
     const dimensions = new Immutables.Dimensions({height: 25, width: 25});
-    const connectors = new Immutables.Connectors(dimensions, center);
+    const connectors = new Immutables.Connectors(dimensions, {center});
     this._dimensions[node.id] = dimensions;
     this._connectors[node.id] = connectors;
 
@@ -114,7 +114,7 @@ class GraphNodeVisitorDefault implements Tree.GraphNodeVisitor<Tree.GraphShapes,
   visitDecision(node: Tree.GraphDecision, context: Tree.VisitorContext): Visited {
     const dimensions = new Immutables.Dimensions({height: 50, width: 100});
     const center = { x: this.visitX(node, context), y: this.visitY(node, context) };
-    const connectors = new Immutables.Connectors(dimensions, center);
+    const connectors = new Immutables.Connectors(dimensions, {center});
     
     this._dimensions[node.id] = dimensions;
     this._connectors[node.id] = connectors;
@@ -126,7 +126,7 @@ class GraphNodeVisitorDefault implements Tree.GraphNodeVisitor<Tree.GraphShapes,
   visitService(node: Tree.GraphService, context: Tree.VisitorContext): Visited {
     const dimensions = new Immutables.Dimensions({height: 50, width: 100});
     const center = { x: this.visitX(node, context), y: this.visitY(node, context) };
-    const connectors = new Immutables.Connectors(dimensions, center);
+    const connectors = new Immutables.Connectors(dimensions, {center});
     
     this._dimensions[node.id] = dimensions;
     this._connectors[node.id] = connectors;

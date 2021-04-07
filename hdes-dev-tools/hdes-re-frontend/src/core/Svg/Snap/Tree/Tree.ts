@@ -1,6 +1,14 @@
 declare namespace Tree {
   
-  type DimensionsTester = (props: {text: string, limits: { max: Dimensions, min: Dimensions }}) => { dimensions: Dimensions, avg: number };
+  type DimensionsTester = (props: {
+    text: Typography;
+    limits: { max: Dimensions, min: Dimensions };
+  }) => DimensionsTested;
+  
+  interface DimensionsTested {
+    dimensions: Dimensions; // final space to be reserved
+    avg: { width: number, height: number }
+  }
   
   interface Listeners {
     onClick: (node: Node, event: MouseEvent) => void;
@@ -21,6 +29,7 @@ declare namespace Tree {
   }
   
   interface Connectors {
+    dimensions: Dimensions;
     center: Coordinates;
     left: Coordinates; right: Coordinates;
     top: Coordinates; bottom: Coordinates;
@@ -56,11 +65,12 @@ declare namespace Tree {
     "decision"  | "decision-loop" |
     "service"   | "service-loop"  |
     "grid" | 
-    "row" | "cell" | "header";
+    "row" | "cell" | "header" | "headerrow";
   
   interface Typography {
-    name: string;
+    header?: string;
     desc?: string;
+    text?: string;
     src?: string;
     icon?: string;
   }
@@ -81,7 +91,7 @@ declare namespace Tree {
     switch    (id: string, init: InitSwitch): GraphBuilder;
     decision  (id: string, init: InitDecision): GraphBuilder;
     service   (id: string, init: InitService): GraphBuilder;
-    build(init: Coordinates): GraphShapes;
+    build(): GraphShapes;
   }
   
   interface InitStart {
@@ -109,15 +119,15 @@ declare namespace Tree {
   }
   interface InitHeader {
     typography: Typography;
-    order: Order;
+    order: number;
+    kind: GridHeaderKind;
   }  
   interface InitRow {
     typography: Typography;
-    order: Order;
+    order: number;
   }
   interface InitCell {
     typography: Typography;
-    order: Order;
     rowId: string;
     headerId: string
   }
@@ -125,21 +135,26 @@ declare namespace Tree {
   
       
   interface GridNodeVisitor<R, C> {
-    visit         (node: Record<string, Node>): R;
+    visit(props: {
+      dimensions:  Record<string, Tree.DimensionsTested>;
+      headers: Record<string, Tree.GridHeader>; 
+      cells: Record<string, Tree.GridCell>; 
+      rows: Record<string, Tree.GridRow>;
+    }): R;
     visitNode     (node: Node, context: VisitorContext): C;
     visitTypography(node: Typography, context: VisitorContext): C;
     visitHeader   (node: GridHeader, context: VisitorContext): C;
-    visitHeaders  (nodes: readonly GridHeader[], context: VisitorContext): C;
+    visitHeaders  (nodes: GridHeader[], context: VisitorContext): C;
     visitRow      (node: GridRow, context: VisitorContext): C;
-    visitRows     (nodes: readonly GridRow[], context: VisitorContext): C;
+    visitRows     (nodes: GridRow[], context: VisitorContext): C;
     visitCell     (node: GridCell, context: VisitorContext): C;
-    visitCells    (nodes: readonly GridCell[], context: VisitorContext): C;
+    visitCells    (nodes: GridCell[], context: VisitorContext): C;
   }
   interface GridShapeVisitor<R, C>{
     visitShapes   (node: GridShapes, listeners: Listeners): R;
-    visitTypography(node: Typography, context: VisitorContext): C; 
+    visitTypography(node: Tree.Shape<Tree.Node>, context: VisitorContext): C; 
     visitHeader   (node: Shape<GridHeader>, context: VisitorContext): C;
-    visitHeaders  (nodes: readonly Shape<GridHeader>[], context: VisitorContext): C;
+    visitHeaders  (nodes: Shape<GridHeaderRow>, context: VisitorContext): C;
     visitRow      (node: Shape<GridRow>, context: VisitorContext): C;
     visitRows     (nodes: readonly Shape<GridRow>[], context: VisitorContext): C;
     visitCell     (node: Shape<GridCell>, context: VisitorContext): C;
@@ -191,14 +206,19 @@ declare namespace Tree {
   
   
   interface GridShapes extends Shapes {
-    headers:  Shape<GridHeader>[];
-    rows:     Shape<GridRow>[];
-    cells:    Shape<GridCell>[];
-    getById: (id: string) => Shape<Node>;
+    headersRow: Shape<GridHeaderRow>;
+    headers:    Shape<GridHeader>[];
+    rows:       Shape<GridRow>[];
+    cells:      Shape<GridCell>[];
+    getById(id: string): Shape<Node>;
   }
   
+  interface GridHeaderRow extends Node {
+    cells: readonly GridHeader[];
+  }
   interface GridRow extends Node {
     cells: readonly GridCell[];
+    getByHeader(headerId: string): GridCell;
   }
   interface GridCell extends Node {
     headerId: string;
@@ -209,8 +229,20 @@ declare namespace Tree {
   }
   type GridHeaderKind = "IN" | "OUT";
   
-
-
+  interface GridPaths {
+    append(node: Tree.GridCell | Tree.GridHeader): GridPaths;
+    row(id: string): GridRowPath;
+    header(): GridRowPath;
+  }
+  interface GridRowPath {
+    value: GridCellPath;
+    children: readonly GridCellPath[];
+  }
+  interface GridCellPath {
+    dimensions: Tree.Dimensions;
+    coords: Tree.Coordinates;
+    path: string;
+  }
   
   interface GraphShapes extends Shapes {
     start: GraphStart;

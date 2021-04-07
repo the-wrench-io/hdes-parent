@@ -2,13 +2,23 @@ import { Tree, Immutables } from '../Tree'
 import GraphNodeVisitorDefault from './GraphNodeVisitorDefault';
 
 const typography = (id: string, init: { typography?: Tree.Typography }): Tree.Typography => {
-  return new Immutables.Typography(init.typography ? init.typography : { name: id });
+  return new Immutables.Typography(init.typography ? init.typography : { text: id });
+}
+
+interface BuilderInit {
+  coords: Tree.Coordinates;
+  node: { min: Tree.Dimensions, max: Tree.Dimensions }
 }
   
 class GraphBuilderDefault implements Tree.GraphBuilder {
+  private _init: BuilderInit;
   private _children: Record<string, Tree.Node> = {};
   private _start?: Tree.GraphStart;
   private _end?: Tree.GraphEnd;
+
+  constructor(init: BuilderInit) {
+    this._init = init;
+  }
 
   start(id: string, init: Tree.InitStart): Tree.GraphBuilder {
     if(this._start) {
@@ -63,14 +73,14 @@ class GraphBuilderDefault implements Tree.GraphBuilder {
     this._children[node.id] = node;
     return this;
   }
-  build(init: Tree.Coordinates): Tree.GraphShapes {
+  build(): Tree.GraphShapes {
     if(!this._start) {
       throw new Error("start is not defined");
     }
     if(!this._end) {
       throw new Error("end is not defined");
     }
-    const props = {sy: 50, sx: 30, mx: 120, id: "graph", coords: init};
+    const props = {sy: 50, sx: 30, mx: 120, id: "graph", coords: this._init.coords};
     return new GraphNodeVisitorDefault(props).visit(this._start.id, this._children);
   }
 }

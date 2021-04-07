@@ -1,6 +1,6 @@
-import { Typography } from './Ast';
+import { TextApi } from './TextApi';
 
-class ImmutableSize implements Typography.Size {
+class ImmutableSize implements TextApi.Size {
   private _width: number;
   private _height: number;
   constructor(height: number, width: number) {
@@ -15,12 +15,12 @@ class ImmutableSize implements Typography.Size {
   }
 }
 
-class ImmutableWord implements Typography.Word {
+class ImmutableWord implements TextApi.Word {
   private _value: string;
-  private _size: Typography.Size;
+  private _size: TextApi.Size;
   private _breaking: boolean;
 
-  constructor(value: string, size: Typography.Size, breaking: boolean) {
+  constructor(value: string, size: TextApi.Size, breaking: boolean) {
     this._value = value;
     this._size = size;
     this._breaking = breaking;
@@ -36,11 +36,11 @@ class ImmutableWord implements Typography.Word {
   }
 }
 
-class ImmutableLine implements Typography.Line {
-  private _words: readonly Typography.Word[];
-  private _size: Typography.Size;
+class ImmutableLine implements TextApi.Line {
+  private _words: readonly TextApi.Word[];
+  private _size: TextApi.Size;
 
-  constructor(words: readonly Typography.Word[], size: Typography.Size) {
+  constructor(words: readonly TextApi.Word[], size: TextApi.Size) {
     this._words = words;
     this._size = size;
   }
@@ -52,11 +52,11 @@ class ImmutableLine implements Typography.Line {
   }
 }
 
-class ImmutableTextWrapper implements Typography.TextWrapper {
-  private _lines: readonly Typography.Line[];
-  private _max: Typography.Size;
+class ImmutableTextWrapper implements TextApi.TextWrapper {
+  private _lines: readonly TextApi.Line[];
+  private _max: TextApi.Size;
   
-  constructor(lines: readonly Typography.Line[], max: Typography.Size) {
+  constructor(lines: readonly TextApi.Line[], max: TextApi.Size) {
     this._lines = lines;
     this._max = max;
   }
@@ -69,22 +69,22 @@ class ImmutableTextWrapper implements Typography.TextWrapper {
 }
 
 
-class TextVisitorDefault implements Typography.TextVisitor {
+class TextVisitorDefault implements TextApi.TextVisitor {
   
-  private _tester: Typography.TestText;
+  private _tester: TextApi.TestText;
   private _space: number;
   private _bounds: { width: number, height: number};
   
-  constructor(tester: Typography.TestText, bounds: Typography.Size) {
+  constructor(tester: TextApi.TestText, bounds: TextApi.Size) {
     this._tester = tester;
     this._space = tester(" ").dimensions.width;
     this._bounds = bounds;
   }
   
-  visitText(text: string): Typography.TextWrapper {
+  visitText(text: string): TextApi.TextWrapper {
     let width = 0;
     let height = 0;
-    const lines: Typography.Line[] = [];
+    const lines: TextApi.Line[] = [];
     
     const src = text.replaceAll("  ", " ").split(/\r?\n/);
     for (const segment of src) {
@@ -96,16 +96,16 @@ class TextVisitorDefault implements Typography.TextVisitor {
         lines.push(line)
       }   
     }
-    const max: Typography.Size = new ImmutableSize(height, width)
+    const max: TextApi.Size = new ImmutableSize(height, width)
     return new ImmutableTextWrapper(lines, max);
   }
   
-  visitLines(src: string): readonly Typography.Line[] {
-    const result: Typography.Line[] = [];
+  visitLines(src: string): readonly TextApi.Line[] {
+    const result: TextApi.Line[] = [];
     for (const line of src.split(" ")) {
       let height = 0;
       let width = 0;
-      const words: Typography.Word[] = this.visitWords(line);  
+      const words: TextApi.Word[] = this.visitWords(line);  
       
       for(const word of words) {
         width += word.size.width;
@@ -118,8 +118,8 @@ class TextVisitorDefault implements Typography.TextVisitor {
     }
     return result;
   } 
-  visitWords(src: string): Typography.Word[] {
-    const result: Typography.Word[] = [];
+  visitWords(src: string): TextApi.Word[] {
+    const result: TextApi.Word[] = [];
     const words = src.split("-");
     let index = -1;
     for(const word of words) {
@@ -128,7 +128,7 @@ class TextVisitorDefault implements Typography.TextVisitor {
       const test = this._tester(word);
       // break the word
       if(test.dimensions.width > this._bounds.width) {
-        const breakAt = Math.min(Math.floor(this._bounds.width/test.avg), word.length-2, 0);
+        const breakAt = Math.min(Math.floor(this._bounds.width/test.avg.width), word.length-2, 0);
         if(breakAt === 0) {
           // unreasnoble bounds
           continue;

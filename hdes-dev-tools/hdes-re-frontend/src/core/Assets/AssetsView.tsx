@@ -47,7 +47,17 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
     
     { 
       <SvgTree 
-        listeners={{ onClick: (node, event) => setConfig({ mode: 'code-svg' })}}
+        coords={{
+          //x: 300, y: 40
+          x: 0, y: 20
+        }}
+        node={{
+          min: { height: 40,  width: 100}, 
+          max: { height: 100, width: 200}
+        }}
+        listeners={{ onClick: (node, event) => setConfig({ mode: 'code-svg' })} }
+      
+      /*
         graph={(builder) => (builder
           .start("start", { next: "decide-claim" })
           .switch("decide-claim",             { next: [ { id: "collision-claim" }, { id: "vandalism-claim" }, { id: "felloffroad-claim" }]})
@@ -59,8 +69,36 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
           .decision("calculate-felloffroad",  { next: "final-calculation" })
           .service("final-calculation",       { next: "end-claim" })
           .end("end-claim", {})
-        .build({x: 300, y: 40 }))}
+        .build())}
+        */
+        
+        grid={(builder) => (builder
+          .header("c-1",  {kind: "IN",   order: 0, typography: {text: "level",   desc: "describes types and other things"} })
+          .header("c-2",  {kind: "IN",   order: 1, typography: {text: "risk",    desc: "describes types and other things"} })
+          .header("c-3",  {kind: "OUT",  order: 2, typography: {text: "result",  desc: "describes types and other things"} })
+          
+          .row("r-1",     {order: 0, typography: { text: "first row", desc: "describe summary" }})
+          .row("r-2",     {order: 1, typography: { text: "first row", desc: "describe summary" }})
+          .row("r-3",     {order: 2, typography: { text: "first row", desc: "describe summary" }})
+          
+          .cell("l-1",    {headerId: "c-1", rowId: "r-1", typography: {text: "rule x", desc: "rule desc"}})
+          .cell("l-2",    {headerId: "c-2", rowId: "r-1", typography: {text: "rule y", desc: "rule desc"}})
+          .cell("l-3",    {headerId: "c-3", rowId: "r-1", typography: {text: "rule z", desc: "rule desc"}})
+      
+          .cell("l-4",    {headerId: "c-1", rowId: "r-2", typography: {text: "rule x", desc: "rule desc"}})
+          .cell("l-5",    {headerId: "c-2", rowId: "r-2", typography: {text: "rule y", desc: "rule desc"}})
+          .cell("l-6",    {headerId: "c-3", rowId: "r-2", typography: {text: "rule z", desc: "rule desc"}})
+      
+          .cell("l-7",    {headerId: "c-1", rowId: "r-3", typography: {text: "rule x", desc: "rule desc"}})
+          .cell("l-8",    {headerId: "c-2", rowId: "r-3", typography: {text: "rule y", desc: "rule desc"}})
+          .cell("l-9",    {headerId: "c-3", rowId: "r-3", typography: {text: "rule z", desc: "rule desc"}})
+          .build()
+        )}
+        
       />
+      
+      
+      
       
       /*
     <FlowSvg listeners={{
