@@ -106,7 +106,7 @@ class GridShapeVisitorDefault implements Tree.GridNodeVisitor<Tree.GridShapes, V
     let next: Tree.VisitorContext = context;
     
     for(const row of nodes) {
-      const visited = this.visitRow(row, context);
+      const visited = this.visitRow(row, next);
       next = next.addNode(visited.shape.node, visited.shape.connectors, { total: nodes.length, value: index++ });
       height += visited.shape.dimensions.height;
     }
@@ -116,6 +116,7 @@ class GridShapeVisitorDefault implements Tree.GridNodeVisitor<Tree.GridShapes, V
   visitRow(node: Tree.GridRow, context: Tree.VisitorContext): Visited {
     const width: number = this.headersRow.dimensions.width;
     const outgoing: string[] = [];
+    
     const topLeft = {
       x: context.connectors.left.x,
       y: context.connectors.bottom.y
@@ -124,7 +125,7 @@ class GridShapeVisitorDefault implements Tree.GridNodeVisitor<Tree.GridShapes, V
     let height: number = 0;
     let next: Tree.VisitorContext = context
       .addNode(node, new Immutables.Connectors(
-        {height, width}, 
+        {height, width: 0}, 
         {topLeft: topLeft}));
     
     for(const headerId of this.headersRow.associations.outgoing) {
@@ -164,6 +165,7 @@ class GridShapeVisitorDefault implements Tree.GridNodeVisitor<Tree.GridShapes, V
       }),
       associations: new Immutables.Associations({outgoing: [node.rowId, node.headerId]})
     });
+    
     this.cells[shape.id] = shape;
     return { shape: shape }
   }

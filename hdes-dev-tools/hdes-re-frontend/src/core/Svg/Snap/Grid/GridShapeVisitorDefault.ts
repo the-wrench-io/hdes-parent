@@ -23,13 +23,13 @@ class GridShapeVisitorDefault implements Tree.GridShapeVisitor<Snap.Element, Vis
     })
     this._shapes = node;
     this.visitHeaders(node.headersRow, context);
+    this.visitRows(node.rows, context);
     return this._children;
   }
   visitTypography(shape: Tree.Shape<Tree.Node>, context: Tree.VisitorContext): Visited {
     const name = shape.node.typography;
     const snap = this._snap as unknown as { typography: ({}) => Snap.Element };
     const theme = this._theme;
-console.log(shape.connectors)
     const lable = snap.typography({
       center: shape.connectors.center,
       size: shape.dimensions,
@@ -67,12 +67,45 @@ console.log(shape.connectors)
     return {}
   }
   visitRow(node: Tree.Shape<Tree.GridRow>, context: Tree.VisitorContext): Visited {
+    const theme = this._theme;
+    const con = node.connectors;
+    const x = con.left.x;
+    const y = con.top.y;
+    const pathstring = `M ${x} ${y} h ${con.dimensions.width} v ${con.dimensions.height} H ${x} L ${x} ${y}`;
+    const path = this._snap
+      .path(pathstring)
+      .attr({stroke: theme.stroke});
+      
+    let next: Tree.VisitorContext = context;
+    this._children.add(path);
+    for(const cellId of node.associations.outgoing) {
+      const cell = this._shapes.getById(cellId) as Tree.Shape<Tree.GridCell>;
+      const visited = this.visitCell(cell, next);
+      next = next.addNode(cell.node, cell.connectors); 
+    }
+      
     return {}
   }
   visitRows(nodes: readonly Tree.Shape<Tree.GridRow>[], context: Tree.VisitorContext): Visited {
+    let next: Tree.VisitorContext = context; 
+    for(const row of nodes) {
+      const visited = this.visitRow(row, next);
+      next = next.addNode(row.node, row.connectors); 
+    }
     return {}
   }
   visitCell(node: Tree.Shape<Tree.GridCell>, context: Tree.VisitorContext): Visited {
+    const theme = this._theme;
+    const con = node.connectors;
+    const x = con.left.x;
+    const y = con.top.y;
+    const pathstring = `M ${x} ${y} h ${con.dimensions.width} v ${con.dimensions.height} H ${x} L ${x} ${y}`;
+    const path = this._snap
+      .path(pathstring)
+      .attr({stroke: theme.stroke});
+      
+    this._children.add(path);
+    this.visitTypography(node, context);
     return {}
   }
   visitCells(nodes: readonly Tree.Shape<Tree.GridCell>[], context: Tree.VisitorContext): Visited {
