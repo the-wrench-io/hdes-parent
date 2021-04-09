@@ -48,8 +48,8 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
     { 
       <SvgTree 
         coords={{
-          //x: 300, y: 40
-          x: 0, y: 20
+      //    x: 300, y: 40
+           x: 0, y: 20
         }}
         node={{
           min: { height: 40,  width: 100}, 
@@ -70,8 +70,8 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
           .service("final-calculation",       { next: "end-claim" })
           .end("end-claim", {})
         .build())}
-        */
         
+        /**/
         grid={(builder) => (builder
           .header("c-1",  {kind: "IN",   order: 0, typography: {text: "level",   desc: "describes types and other things"} })
           .header("c-2",  {kind: "IN",   order: 1, typography: {text: "risk",    desc: "describes types and other things"} })
@@ -108,4 +108,4 @@ const AssetsView: React.FC<AssetsViewProps> = () => {
   </Slider>);
 }
 
-export default AssetsView;
+export {AssetsView};

@@ -66,6 +66,20 @@ declare namespace Session {
     deleteTabs(): Session.InstanceMutator;
     deleteTab(tabId: string): Session.InstanceMutator;
   }
+  
+  interface Actions {
+    handleWorkspace(head: Backend.Head): void;
+    handleLink(id?: string): void;
+    handleData(data: Session.DataInit): void;
+    handleSearch(keyword: string): void;
+    handleTabAdd(newItem: Session.Tab<any>): void;
+    handleTabChange(tabIndex: number): void;
+    handleTabClose(tab: Session.Tab<any>): void;
+    handleTabCloseAll(): void;
+    handleResourceSaved(saved: Backend.AnyResource): void;
+    handleResourceDeleted(deleted: Backend.AnyResource): void;
+    handleServerError(error: Backend.ServerError): void;
+  }
 }
 
 export type { Session };

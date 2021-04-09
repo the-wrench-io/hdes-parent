@@ -2,13 +2,13 @@ import * as React from "react";
 import { Backend, InMemoryService } from './Backend';
 import { Session, createSession } from './Session';
 import { SessionReducer, ServiceReducer, SessionReducerActionType, ServiceReducerActionType } from './Reducers';
-import { ResourceContextActions, GenericResourceContextActions } from './ResourceContextActions'
+import { GenericResourceContextActions } from './ResourceContextActions'
 
 
 type ResourceContextType = {
   session: Session.Instance;
   service: Backend.Service;
-  actions: ResourceContextActions;
+  actions: Session.Actions;
 }
 
 const createService = (hdesconfig: Backend.ServerConfig | undefined) : Backend.Service => {
@@ -26,7 +26,7 @@ const init = {
 const ResourceContext = React.createContext<ResourceContextType>({
   session: init.session,
   service: init.service,
-  actions: {} as ResourceContextActions,
+  actions: {} as Session.Actions,
 });
 
 type ResourceProviderProps = {
@@ -36,7 +36,7 @@ type ResourceProviderProps = {
 const ResourceProvider: React.FC<ResourceProviderProps> = ({ children }) => {
   const [session, sessionDispatch] = React.useReducer(SessionReducer, init.session);
   const [service, serviceDispatch] = React.useReducer(ServiceReducer, init.service);
-  const actions: ResourceContextActions = React.useMemo(() => new GenericResourceContextActions(service, sessionDispatch), [service, sessionDispatch]);
+  const actions: Session.Actions = React.useMemo(() => new GenericResourceContextActions(service, sessionDispatch), [service, sessionDispatch]);
   
   React.useEffect(() => {
     console.log("init service listeners");

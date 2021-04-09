@@ -26,9 +26,12 @@ const useWorkspace = () => {
   }}; 
 }
 
+const useContext = () => {
+  const result = React.useContext(Resources.Context);
+  return result;
+}
 
-
-const Resources = { Provider, Context, useSession, useWorkspace };
+const Resources = { Provider, Context, useSession, useWorkspace, useContext };
 
 export { Resources, AstMapper, useSession };
 export type { Session, Backend, Ast };

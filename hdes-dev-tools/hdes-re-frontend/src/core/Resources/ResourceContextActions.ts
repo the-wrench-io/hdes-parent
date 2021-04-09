@@ -7,20 +7,6 @@ import { Backend } from './Backend'
 
 
 
-interface ResourceContextActions {
-  handleWorkspace(head: Backend.Head): void;
-  handleLink(id?: string): void;
-  handleData(data: Session.DataInit): void;
-  handleSearch(keyword: string): void;
-  handleTabAdd(newItem: Session.Tab<any>): void;
-  handleTabChange(tabIndex: number): void;
-  handleTabClose(tab: Session.Tab<any>): void;
-  handleTabCloseAll(): void;
-  handleResourceSaved(saved: Backend.AnyResource): void;
-  handleResourceDeleted(deleted: Backend.AnyResource): void;
-  handleServerError(error: Backend.ServerError): void;
-}
-
 const SessionActionBuilder = {
   setWorkspace: (setWorkspace: Session.Workspace): SessionReducerAction => ({ type: SessionReducerActionType.setWorkspace, setWorkspace }),
   setData: (setData: Session.DataInit): SessionReducerAction => ({ type: SessionReducerActionType.setData, setData }),
@@ -45,7 +31,7 @@ const SessionActionBuilder = {
 
 
 
-class GenericResourceContextActions implements ResourceContextActions {
+class GenericResourceContextActions implements Session.Actions {
 
   private _sessionDispatch: React.Dispatch<SessionReducerAction>;
   private _service: Backend.Service;
@@ -88,5 +74,4 @@ class GenericResourceContextActions implements ResourceContextActions {
   }
 }
 
-export type { ResourceContextActions}
 export { GenericResourceContextActions };

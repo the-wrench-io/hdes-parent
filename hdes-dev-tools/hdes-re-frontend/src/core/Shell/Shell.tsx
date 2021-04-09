@@ -18,7 +18,7 @@ import SearchIcon from '@material-ui/icons/Search';
 
 import ShellStyles from './ShellStyles' 
 import ShellBadges from './ShellBadges';
-import ShellLinks from './ShellLinks';
+import Links from './Links';
 
 
 interface ShellProps {
@@ -98,7 +98,7 @@ const Shell: React.FC<ShellProps> = ({header, links, tabs, search, badges, child
         </div>
 
         <div className={classes.views}>
-          <ShellLinks open={drawerOpen} setOpen={setDrawerOpen}>{links}</ShellLinks>
+          <Links open={drawerOpen} setOpen={setDrawerOpen}>{links}</Links>
         </div>
       </Drawer>
 

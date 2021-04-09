@@ -9,7 +9,8 @@ import CachedIcon from '@material-ui/icons/Cached';
 
 import { Resources, Backend } from './core/Resources';
 import { Tabs, TabPanel } from './core/Tabs';
-import { AssetsView, AssetsTreeView } from './core/Assets';
+import { Editor } from './core/Editor';
+import { Tree } from './core/Tree';
 import { ProjectsView, ProjectNameView } from './core/Projects';
 import Shell from './core/Shell';
 
@@ -31,13 +32,14 @@ function App() {
   const listProjects = () => actions.handleTabAdd({id: projectsId, label: 'Projects' });
 
   const links = [
-    { id: assetsId, label: 'View Assets', icon: <LibraryBooksIcon />, onClick: () => (<AssetsTreeView />), enabled: isWorkspace },
-    { id: 'add-asset', label: 'Add Asset', icon: <LibraryAddIcon />, onClick: () => console.log("add resource"), enabled: isWorkspace },
-    { id: 'branchs', label: 'Set Branch', icon: <AccountTreeIcon />, onClick: () => console.log("set branch"), enabled: isWorkspace },
-    { id: 'merge', label: 'Merge To Main', icon: <CallMergeIcon />, onClick: () => console.log("Merge"), enabled: isWorkspace },
+    {  enabled: isWorkspace, id: assetsId,     label: 'View Assets',   icon: <LibraryBooksIcon />, onClick: () => (<Tree />) },
+
+    {  enabled: isWorkspace, id: 'add-asset',  label: 'Add Asset',     icon: <LibraryAddIcon />,   onClick: () => console.log("add resource")},
+    {  enabled: isWorkspace, id: 'branchs',    label: 'Set Branch',    icon: <AccountTreeIcon />,  onClick: () => console.log("set branch") },
+    {  enabled: isWorkspace, id: 'merge',      label: 'Merge To Main', icon: <CallMergeIcon />,    onClick: () => console.log("Merge") },
     
-    { id: projectsId, label: 'Projects', icon: <ViewQuiltIcon />, onClick: listProjects },
-    { id: 'reload',     label: 'Reload', icon: <CachedIcon />, onClick: () => console.log("Merge") },
+    { id: projectsId,   label: 'Projects',  icon: <ViewQuiltIcon />,  onClick: listProjects },
+    { id: 'reload',     label: 'Reload',    icon: <CachedIcon />,     onClick: () => console.log("Merge") },
   ];
   
   React.useEffect(() => {
@@ -62,7 +64,7 @@ function App() {
       <TabPanel plugins={[
         { id: projectsId, view: <ProjectsView setWorkspace={setWorkspace} /> },
       ]}>
-        <AssetsView />
+        <Editor />
       </TabPanel>
       
     </Shell>);
