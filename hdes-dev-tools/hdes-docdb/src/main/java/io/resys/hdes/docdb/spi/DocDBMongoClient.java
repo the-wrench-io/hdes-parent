@@ -7,44 +7,61 @@ import io.resys.hdes.docdb.api.actions.CommitActions;
 import io.resys.hdes.docdb.api.actions.HistoryActions;
 import io.resys.hdes.docdb.api.actions.RepoActions;
 import io.resys.hdes.docdb.api.actions.TagActions;
+import io.resys.hdes.docdb.spi.checkout.CheckoutActionsDefault;
+import io.resys.hdes.docdb.spi.commit.CommitActionsDefault;
+import io.resys.hdes.docdb.spi.history.HistoryActionsDefault;
+import io.resys.hdes.docdb.spi.repo.RepoActionsDefault;
+import io.resys.hdes.docdb.spi.state.DocDBClientState;
+import io.resys.hdes.docdb.spi.state.DocDBContext;
+import io.resys.hdes.docdb.spi.state.ImmutableDocDBClientState;
+import io.resys.hdes.docdb.spi.tag.TagActionsDefault;
 
 public class DocDBMongoClient implements DocDB {
-  private final ReactiveMongoClient client;
-  private final DocDBContext ctx;
-  
+  private final DocDBClientState state;
+  private RepoActions repoActions;
+  private CommitActions commitActions;
+  private TagActions tagActions;
+  private CheckoutActions checkoutActions;
+  private HistoryActions historyActions;
+
   public DocDBMongoClient(ReactiveMongoClient client, DocDBContext ctx) {
     super();
-    this.client = client;
-    this.ctx = ctx;
+    this.state = ImmutableDocDBClientState.builder().context(ctx).client(client).build();
   }
-
+  
   @Override
   public RepoActions repo() {
-    // TODO Auto-generated method stub
-    return null;
+    if(repoActions == null) {
+      repoActions = new RepoActionsDefault(state); 
+    }
+    return repoActions;
   }
-
   @Override
   public CommitActions commit() {
-    // TODO Auto-generated method stub
-    return null;
+    if(commitActions == null) {
+      commitActions = new CommitActionsDefault(state); 
+    }
+    return commitActions;
   }
-
   @Override
   public TagActions tag() {
-    // TODO Auto-generated method stub
-    return null;
+    if(tagActions == null) {
+      tagActions = new TagActionsDefault(state); 
+    }
+    return tagActions;
   }
-
   @Override
   public CheckoutActions checkout() {
-    // TODO Auto-generated method stub
-    return null;
+    if(checkoutActions == null) {
+      checkoutActions = new CheckoutActionsDefault(state); 
+    }
+    return checkoutActions;
   }
-
   @Override
   public HistoryActions history() {
-    // TODO Auto-generated method stub
-    return null;
+    if(historyActions == null) {
+      historyActions = new HistoryActionsDefault(state); 
+    }
+    return historyActions;
   }
 }

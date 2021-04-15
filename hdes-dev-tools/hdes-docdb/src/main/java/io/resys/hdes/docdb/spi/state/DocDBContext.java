@@ -1,4 +1,4 @@
-package io.resys.hdes.docdb.spi;
+package io.resys.hdes.docdb.spi.state;
 
 import org.immutables.value.Value;
 

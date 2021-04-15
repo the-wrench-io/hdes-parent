@@ -2,6 +2,7 @@ package io.resys.hdes.docdb.spi;
 
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
+import io.resys.hdes.docdb.spi.state.ImmutableDocDBContext;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 
 public class DocDBFactory {
