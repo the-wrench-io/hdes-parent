@@ -34,7 +34,10 @@ public class ObjectRepositoryTest {
 
   @Test
   public void createRepository() {
-    create().commands().commit().add("file 1", "contentxxxx").author("me@me.com").comment("init").build();
+    create().commands()
+      .commit()
+      .add("file 1", "contentxxxx").author("me@me.com").comment("init")
+      .build();
   }
 
   @Test

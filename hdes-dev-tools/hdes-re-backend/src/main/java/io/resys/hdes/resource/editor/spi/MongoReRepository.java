@@ -37,33 +37,19 @@ public class MongoReRepository implements ReRepository {
     this.tx = tx;
   }
   
-
+  
   @Override
-  public BatchBuilder update() {
+  public ReUpdate update() {
     // TODO Auto-generated method stub
     return null;
   }
 
-
   @Override
-  public BatchBuilder create() {
+  public ReQuery query() {
     // TODO Auto-generated method stub
     return null;
   }
-
-
-  @Override
-  public BatchDelete delete() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-
-  @Override
-  public BatchQuery query() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+  
   
   public static Config config() {
     return new Config();
@@ -78,7 +64,6 @@ public class MongoReRepository implements ReRepository {
       this.transaction = transaction;
       return this;
     }
-
     public Config config(MongoDbConfig config) {
       this.config = config;
       return this;
