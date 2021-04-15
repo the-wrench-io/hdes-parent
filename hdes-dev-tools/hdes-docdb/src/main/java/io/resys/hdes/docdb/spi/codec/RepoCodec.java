@@ -17,9 +17,10 @@ import io.resys.hdes.docdb.spi.support.Identifiers;
 public class RepoCodec implements Codec<Repo> {
   
   public static final String ID = "_id";
+  public static final String NAME = "name";
   public static final String REV = "rev";
-  private static final String PREFIX = "prefix";
-  private static final String HEADS = "heads";
+  public static final String PREFIX = "prefix";
+  public static final String HEADS = "heads";
   
   @Override
   public void encode(BsonWriter writer, Repo command, EncoderContext encoderContext) {
@@ -27,6 +28,7 @@ public class RepoCodec implements Codec<Repo> {
     writer.writeString(ID, command.getId());
     writer.writeString(REV, command.getRev());
     writer.writeString(PREFIX, command.getPrefix());
+    writer.writeString(NAME, command.getName());
     
     writer.writeStartArray(HEADS);
     for(RepoHead head : command.getHeads()) {
@@ -44,7 +46,8 @@ public class RepoCodec implements Codec<Repo> {
     ImmutableRepo.Builder result = ImmutableRepo.builder()
       .id(repoId)
       .rev(reader.readString(REV))
-      .prefix(reader.readString(PREFIX));
+      .prefix(reader.readString(PREFIX))
+      .name(reader.readString(NAME));
 
     reader.readStartArray();
     while(reader.getCurrentBsonType() == BsonType.STRING) {

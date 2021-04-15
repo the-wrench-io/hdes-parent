@@ -2,6 +2,8 @@ package io.resys.hdes.docdb.api.actions;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.docdb.api.models.Message;
@@ -49,6 +51,7 @@ public interface RepoActions {
   
   @Value.Immutable
   interface RepoResult {
+    @Nullable
     Repo getRepo();
     RepoStatus getStatus();
     List<Message> getMessages();

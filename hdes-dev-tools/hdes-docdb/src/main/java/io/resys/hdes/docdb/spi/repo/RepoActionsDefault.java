@@ -20,8 +20,7 @@ public class RepoActionsDefault implements RepoActions {
 
   @Override
   public CreateBuilder create() {
-    // TODO Auto-generated method stub
-    return null;
+    return new RepoCreateBuilder(state);
   }
 
   @Override

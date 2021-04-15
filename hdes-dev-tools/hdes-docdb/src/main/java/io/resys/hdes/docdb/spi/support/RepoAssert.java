@@ -5,7 +5,11 @@ import java.util.function.Supplier;
 import io.resys.hdes.docdb.api.exceptions.RepoException;
 
 public class RepoAssert {
-  
+  public static void notEmpty(String object, Supplier<String> message) {
+    if (object == null || object.isBlank()) {
+      throw new RepoException(getMessage(message));
+    }
+  }
   public static void notNull(Object object, Supplier<String> message) {
     if (object == null) {
       throw new RepoException(getMessage(message));
