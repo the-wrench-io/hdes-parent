@@ -46,6 +46,7 @@ import de.flapdoodle.embed.process.runtime.Network;
 import io.quarkus.mongodb.impl.ReactiveMongoClientImpl;
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
+import io.resys.hdes.docdb.spi.DocDBCodecProvider;
 import io.resys.hdes.docdb.spi.DocDBFactory;
 
 public abstract class MongoDbConfig {
@@ -72,7 +73,7 @@ public abstract class MongoDbConfig {
       final int port = 12345;
       
       CodecRegistry codecRegistry = new ProvidersCodecRegistry(Arrays.asList(
-//          new ObjectRepositoryCodeProvider(),
+          new DocDBCodecProvider(),
           new DocumentCodecProvider(),
           new Jsr310CodecProvider(),
           new ValueCodecProvider()
