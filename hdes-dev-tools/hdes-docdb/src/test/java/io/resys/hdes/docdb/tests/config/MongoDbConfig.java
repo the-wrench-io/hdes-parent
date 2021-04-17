@@ -81,31 +81,22 @@ public abstract class MongoDbConfig {
       
       executable = starter.prepare(MongodConfig.builder()
         .version(Version.Main.PRODUCTION)
-//          .version(Versions.withFeatures(new GenericVersion("4.2.1"), 
-//              Feature.SYNC_DELAY, Feature.STORAGE_ENGINE, Feature.ONLY_64BIT, 
-//              Feature.NO_CHUNKSIZE_ARG, Feature.MONGOS_CONFIGDB_SET_STYLE, 
-//              Feature.NO_HTTP_INTERFACE_ARG, Feature.ONLY_WITH_SSL, 
-//              Feature.ONLY_WINDOWS_2008_SERVER, Feature.NO_SOLARIS_SUPPORT, Feature.NO_BIND_IP_TO_LOCALHOST))
-          .net(new Net("localhost", port, Network.localhostIsIPv6()))
-          .build());
+        .net(new Net("localhost", port, Network.localhostIsIPv6()))
+        .build());
       process = executable.start();
       
-      MongoClient client = MongoClients.create(
-          MongoClientSettings.builder()
+      MongoClient client = MongoClients.create(MongoClientSettings.builder()
           .codecRegistry(codecRegistry)
-          .applyToConnectionPoolSettings(builder -> builder
-//              .maxConnectionIdleTime(1, TimeUnit.MINUTES)
-//              .maxConnectionLifeTime(1, TimeUnit.MINUTES)
-//              .maintenanceInitialDelay(1, TimeUnit.MINUTES)
-              .build())
+          .applyToConnectionPoolSettings(builder -> builder.build())
           .applyToClusterSettings(builder -> builder
               .hosts(Arrays.asList(new ServerAddress("localhost", port)))
-              .build() )
+              .build())
           .build());
       
         this.mongo = new ReactiveMongoClientImpl(client);
         this.client = DocDBFactory.create().db("junit").client(mongo).build();
     } catch (IOException e) {
+      tearDown();
       throw new RuntimeException(e.getMessage(), e);
     }
   }

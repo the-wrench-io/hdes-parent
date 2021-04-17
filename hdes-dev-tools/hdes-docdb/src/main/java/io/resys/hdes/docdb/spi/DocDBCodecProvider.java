@@ -8,14 +8,12 @@ import com.sun.source.tree.Tree;
 
 import io.resys.hdes.docdb.api.models.Objects.Blob;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
-import io.resys.hdes.docdb.api.models.Objects.Head;
 import io.resys.hdes.docdb.api.models.Objects.Ref;
 import io.resys.hdes.docdb.api.models.Objects.Tag;
 import io.resys.hdes.docdb.api.models.Objects.TreeValue;
 import io.resys.hdes.docdb.api.models.Repo;
 import io.resys.hdes.docdb.spi.codec.BlobCodec;
 import io.resys.hdes.docdb.spi.codec.CommitCodec;
-import io.resys.hdes.docdb.spi.codec.HeadCodec;
 import io.resys.hdes.docdb.spi.codec.RefCodec;
 import io.resys.hdes.docdb.spi.codec.RepoCodec;
 import io.resys.hdes.docdb.spi.codec.TagCodec;
@@ -31,15 +29,11 @@ public class DocDBCodecProvider implements CodecProvider {
   private final TreeCodec tree = new TreeCodec(treeEntry);
   private final TagCodec tag = new TagCodec();
   private final RefCodec ref = new RefCodec();
-  private final HeadCodec head = new HeadCodec();
   private final RepoCodec repo = new RepoCodec();
   
   @SuppressWarnings("unchecked")
   @Override
   public <T> Codec<T> get(Class<T> clazz, CodecRegistry registry)  {
-    if(Head.class.isAssignableFrom(clazz)) {
-      return (Codec<T>) head;
-    }
     if(Repo.class.isAssignableFrom(clazz)) {
       return (Codec<T>) repo;
     }

@@ -33,7 +33,9 @@ public class DocDBFactory {
         .repos("repos")
         .refs("refs")
         .tags("tags")
-        .objects("objects")
+        .blobs("blobs")
+        .trees("trees")
+        .commits("commits")
         .build();
       return new DocDBMongoClient(client, ctx);
     }

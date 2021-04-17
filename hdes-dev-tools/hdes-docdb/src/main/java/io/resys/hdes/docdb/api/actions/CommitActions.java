@@ -1,8 +1,14 @@
 package io.resys.hdes.docdb.api.actions;
 
+import java.io.Serializable;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import org.immutables.value.Value;
+
 import io.resys.hdes.docdb.api.models.Message;
+import io.resys.hdes.docdb.api.models.Objects.Commit;
 import io.smallrye.mutiny.Uni;
 
 public interface CommitActions {
@@ -14,7 +20,7 @@ public interface CommitActions {
     RebaseBuilder author(String author);
     RebaseBuilder message(String message);
     RebaseBuilder id(String headGid); // head GID to what to append
-    RebaseBuilder head(String repoId, String headName); // head GID to what to append
+    RebaseBuilder head(String repoId, @Nullable String headName); // head name, if null main is set
     Uni<CommitResult> build();
   }
   
@@ -31,19 +37,22 @@ public interface CommitActions {
     HeadCommitBuilder id(String headGid); // head GID to what to append
     HeadCommitBuilder head(String repoId, String headName); // head GID to what to append
     HeadCommitBuilder append(String name, String blob);
+    HeadCommitBuilder append(String name, Serializable blob);
+    HeadCommitBuilder remove(String name);
     HeadCommitBuilder author(String author);
     HeadCommitBuilder message(String message);
     Uni<CommitResult> build();
   }
   
   enum CommitStatus {
-    OK, CONFLICT, MERGED
+    OK, ERROR, CONFLICT
   }
   
+  @Value.Immutable
   interface CommitResult {
-    String getGid(); // new head GID
-    String getNewHead();
-    String getRepo();
+    String getGid(); // repo/head
+    @Nullable
+    Commit getCommit();
     CommitStatus getStatus();
     List<Message> getMessages();
   }

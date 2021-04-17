@@ -11,15 +11,17 @@ public interface Objects {
   Map<String, Ref> getRefs();
   Map<String, Tag> getTags();
   Map<String, IsObject> getValues();
-  Optional<Head> getHead();
   
-  public static final String MAIN = "main";
   interface IsObject { String getId(); }
   interface IsName { String getName(); }
   
   @Value.Immutable
-  interface Head extends IsName {
-    String getCommit();
+  interface RefObjects {
+    String getRepoId();
+    Ref getRef();
+    Commit getCommit();
+    Tree getTree();
+    Map<String, Blob> getBlobs(); //only if loaded
   }
   
   // branch with a name

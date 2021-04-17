@@ -32,13 +32,13 @@ import io.resys.hdes.docdb.api.models.Objects.Ref;
 
 public class RefCodec implements Codec<Ref> {
   
-  public static final String ID = "_id";
+  public static final String NAME = "_id";
   public static final String COMMIT = "commit";
   
   @Override
   public void encode(BsonWriter writer, Ref command, EncoderContext encoderContext) {
     writer.writeStartDocument();
-    writer.writeString(ID, command.getName());
+    writer.writeString(NAME, command.getName());
     writer.writeString(COMMIT, command.getCommit());
     writer.writeEndDocument();
   }
@@ -47,7 +47,7 @@ public class RefCodec implements Codec<Ref> {
   public Ref decode(BsonReader reader, DecoderContext decoderContext) {
     reader.readStartDocument();
     Ref result = ImmutableRef.builder()
-      .name(reader.readString(ID))
+      .name(reader.readString(NAME))
       .commit(reader.readString(COMMIT))
       .build();
     reader.readEndDocument();

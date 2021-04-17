@@ -33,30 +33,13 @@ public class RepoCreateBuilder implements RepoActions.CreateBuilder {
     this.name = name;
     return this;
   }
-  
-  /*
-
-
-          final var newRepo = ImmutableRepo.builder()
-              .id(Identifiers.uuid())
-              .name(name)
-              .prefix(name)
-              .build();
-          
-          return collection
-              .insertOne(existing).onItem()
-              .transform((InsertOneResult insertOne) -> (RepoResult) ImmutableRepoResult.builder()
-                  .repo(newRepo)
-                  .status(RepoStatus.OK)
-                  .build());
-          
-   */
 
   @Override
   public Uni<RepoResult> build() {
-    RepoAssert.notEmpty(name, () -> "name not defined!");
-    final var collection = getCollection();
+    RepoAssert.notEmpty(name, () -> "repo name not defined!");
+    RepoAssert.isName(name, () -> "repo name has invalid charecters!");
     
+    final var collection = getCollection();
     return collection.find(Filters.eq(RepoCodec.NAME, name))
     .collectItems().first().onItem()
     .transformToUni((Repo existing) -> {

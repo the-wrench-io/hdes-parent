@@ -15,6 +15,22 @@ public class RepoException extends DocDBException {
   }
 
   public static class Builder {
+    public Message notRepoWithId(String repoId) {
+      return ImmutableMessage.builder()
+            .text(new StringBuilder()
+            .append("Repo with id: '").append(repoId).append("' does not exist!")
+            .toString())
+          .build();
+    }
+    public Message noRepoRef(String repo, String ref) {
+      return ImmutableMessage.builder()
+            .text(new StringBuilder()
+            .append("Repo with id: '").append(repo).append("',")
+            .append(" has no ref: '").append(ref).append("'")
+            .append("!")
+            .toString())
+          .build();
+    }
     public Message nameNotUnique(String name, String id) {
       return ImmutableMessage.builder()
             .text(new StringBuilder()
