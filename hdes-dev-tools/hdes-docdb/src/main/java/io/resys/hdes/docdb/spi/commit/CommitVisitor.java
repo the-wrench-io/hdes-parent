@@ -153,7 +153,9 @@ public class CommitVisitor {
       .collectItems().asList().await().indefinitely();
     
     for(RedundentHashedBlob entry : hashed) {
-      logger.append("  + ").append(entry.getName());
+      logger
+      .append(System.lineSeparator())
+      .append("  + ").append(entry.getName());
       
       if(nextTree.containsKey(entry.getName())) {
         TreeValue previous = nextTree.get(entry.getName());
@@ -174,7 +176,6 @@ public class CommitVisitor {
           .name(entry.getName())
           .blob(entry.getHash())
           .build());
-      logger.append(System.lineSeparator());      
       dataAdded = true;
     }
     
@@ -188,7 +189,7 @@ public class CommitVisitor {
       logger.append("Removing following:").append(System.lineSeparator());
     }
     for(String name : removeBlobs) {
-      logger.append("  - ").append(name);
+      logger.append(System.lineSeparator()).append("  - ").append(name);
       if(nextTree.containsKey(name)) {
         nextTree.remove(name);
         dataDeleted = true;
@@ -196,7 +197,6 @@ public class CommitVisitor {
       } else {
         logger.append(" | doesn't exist");
       }
-      logger.append(System.lineSeparator());
     }
     if(!removeBlobs.isEmpty()) {
       logger.append(System.lineSeparator());
