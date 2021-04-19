@@ -27,32 +27,32 @@ import io.smallrye.mutiny.Uni;
 
 public class RepoStateBuilderDefault implements RepoStateBuilder {
   private final DocDBClientState state;
-  private String repoId;
+  private String repoName;
 
   public RepoStateBuilderDefault(DocDBClientState state) {
     super();
     this.state = state;
   }
   @Override
-  public RepoStateBuilder repo(String repoId) {
-    this.repoId = repoId;
+  public RepoStateBuilder repo(String repoName) {
+    this.repoName = repoName;
     return this;
   }
   @Override
   public Uni<ObjectsResult<Objects>> build() {
-    RepoAssert.notEmpty(repoId, () -> "repoId not defined!");
-    final var ctx = state.getContext().toRepo(repoId);    
+    RepoAssert.notEmpty(repoName, () -> "repoName not defined!");
     
-    return getRepo(repoId, ctx).collectItems().first().onItem()
+    
+    return getRepo(repoName, state.getContext()).collectItems().first().onItem()
     .transformToUni((Repo existing) -> {
       if(existing == null) {
         return Uni.createFrom().item(ImmutableObjectsResult
             .<Objects>builder()
             .status(ObjectsStatus.ERROR)
-            .addMessages(RepoException.builder().notRepoWithId(repoId))
+            .addMessages(RepoException.builder().notRepoWithName(repoName))
             .build());
       }
-      return getState(existing, ctx);
+      return getState(existing, state.getContext().toRepo(existing));
     });
   }
   

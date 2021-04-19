@@ -100,6 +100,7 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
     
     return objectsActions.refState().repo(this.repoId).ref(headName).build().onItem()
     .transformToUni(objects -> {
+      
       if(objects.getStatus() == ObjectsStatus.ERROR) {
         return Uni.createFrom().item((CommitResult) ImmutableCommitResult.builder()
             .gid(gid)
@@ -110,7 +111,7 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
       final var toBeSaved = new CommitVisitor().visit(ImmutableCommitInput.builder()
           .commitAuthor(this.author)
           .commitMessage(this.message)
-          .repoId(repoId)
+          .repo(objects.getRepo())
           .ref(headName)
           .append(appendBlobs)
           .remove(deleteBlobs)

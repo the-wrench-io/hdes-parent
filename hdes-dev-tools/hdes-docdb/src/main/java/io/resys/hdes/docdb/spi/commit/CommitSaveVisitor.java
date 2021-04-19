@@ -44,7 +44,7 @@ public class CommitSaveVisitor {
   }
 
   public Uni<CommitOutput> visit(CommitOutput output) {
-    final var ctx = this.state.getContext().toRepo(output.getRepoId());
+    final var ctx = this.state.getContext().toRepo(output.getRepo());
     // check for consistency
     return state.getClient()
         .getDatabase(ctx.getDb())

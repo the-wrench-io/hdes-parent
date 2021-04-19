@@ -9,6 +9,7 @@ import org.immutables.value.Value;
 import io.resys.hdes.docdb.api.models.Message;
 import io.resys.hdes.docdb.api.models.Objects;
 import io.resys.hdes.docdb.api.models.Objects.RefObjects;
+import io.resys.hdes.docdb.api.models.Repo;
 import io.smallrye.mutiny.Uni;
 
 public interface ObjectsActions {
@@ -17,13 +18,13 @@ public interface ObjectsActions {
   
   // build world state
   interface RepoStateBuilder {
-    RepoStateBuilder repo(String repoId);
+    RepoStateBuilder repo(String repoName);
     Uni<ObjectsResult<Objects>> build();
   }
 
   // build REF world state, no blobs by default
   interface RefStateBuilder {
-    RefStateBuilder repo(String repoId);
+    RefStateBuilder repo(String repoName);
     RefStateBuilder ref(String ref);
     RefStateBuilder blobs();
     RefStateBuilder blobs(boolean load);
@@ -36,7 +37,8 @@ public interface ObjectsActions {
   
   @Value.Immutable
   interface ObjectsResult<T> {
-    String getRepoId();
+    @Nullable
+    Repo getRepo();    
     @Nullable
     T getObjects();
     ObjectsStatus getStatus();

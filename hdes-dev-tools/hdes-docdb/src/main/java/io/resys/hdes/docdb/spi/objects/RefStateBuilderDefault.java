@@ -30,7 +30,7 @@ import io.smallrye.mutiny.Uni;
 
 public class RefStateBuilderDefault implements RefStateBuilder {
   private final DocDBClientState state;
-  private String repoId;
+  private String repoName;
   private String ref;
   private boolean blobs;
   
@@ -39,8 +39,8 @@ public class RefStateBuilderDefault implements RefStateBuilder {
     this.state = state;
   }
   @Override
-  public RefStateBuilder repo(String repoId) {
-    this.repoId = repoId;
+  public RefStateBuilder repo(String repoName) {
+    this.repoName = repoName;
     return this;
   }
   @Override
@@ -60,21 +60,19 @@ public class RefStateBuilderDefault implements RefStateBuilder {
   }
   @Override
   public Uni<ObjectsResult<RefObjects>> build() {
-    RepoAssert.notEmpty(repoId, () -> "repoId is not defined!");
+    RepoAssert.notEmpty(repoName, () -> "repoName is not defined!");
     RepoAssert.notEmpty(ref, () -> "ref is not defined!");
-    final var ctx = state.getContext().toRepo(repoId);    
     
-    return getRepo(repoId, ctx).collectItems().first().onItem()
+    return getRepo(repoName, state.getContext()).collectItems().first().onItem()
     .transformToUni((Repo existing) -> {
       if(existing == null) {
         return Uni.createFrom().item(ImmutableObjectsResult
             .<RefObjects>builder()
-            .repoId(repoId)
             .status(ObjectsStatus.ERROR)
-            .addMessages(RepoException.builder().notRepoWithId(repoId))
+            .addMessages(RepoException.builder().notRepoWithName(repoName))
             .build());
       }
-      return getRef(existing, ref, ctx);
+      return getRef(existing, ref, state.getContext().toRepo(existing));
     });
   }
   
@@ -87,9 +85,9 @@ public class RefStateBuilderDefault implements RefStateBuilder {
           if(ref == null) {
             return Uni.createFrom().item(ImmutableObjectsResult
                 .<RefObjects>builder()
-                .repoId(repoId)
+                .repo(repo)
                 .status(ObjectsStatus.OK)
-                .addMessages(RepoException.builder().noRepoRef(repoId, refName))
+                .addMessages(RepoException.builder().noRepoRef(repo.getName(), refName))
                 .build());
           }
           return getState(repo, ref, ctx);
@@ -103,12 +101,12 @@ public class RefStateBuilderDefault implements RefStateBuilder {
       return tree.onItem().transformToUni(currentTree -> getBlobs(repo, ref, currentTree, ctx)
         .onItem().transform(blobs -> ImmutableObjectsResult.<RefObjects>builder()
           .objects(ImmutableRefObjects.builder()
-              .repoId(repo.getId())
+              .repo(repo)
               .ref(ref)
               .tree(currentTree)
               .blobs(blobs)
               .build())
-          .repoId(repoId)
+          .repo(repo)
           .status(ObjectsStatus.OK)
           .build()
         )
@@ -118,7 +116,7 @@ public class RefStateBuilderDefault implements RefStateBuilder {
     return tree.onItem().transform(currentTree -> ImmutableObjectsResult
       .<RefObjects>builder()
       .objects(ImmutableRefObjects.builder()
-          .repoId(repo.getId())
+          .repo(repo)
           .ref(ref)
           .tree(currentTree)
           .build())
@@ -148,10 +146,10 @@ public class RefStateBuilderDefault implements RefStateBuilder {
     return collection.find().collectItems().asList().onItem()
         .transform(blobs -> blobs.stream().collect(Collectors.toMap(r -> r.getId(), r -> r)));
   }
-  private Multi<Repo> getRepo(String repoId, DocDBContext ctx) {
+  private Multi<Repo> getRepo(String repoName, DocDBContext ctx) {
     final ReactiveMongoCollection<Repo> collection = state.getClient()
         .getDatabase(ctx.getDb())
         .getCollection(ctx.getRepos(), Repo.class);
-    return collection.find(Filters.eq(RepoCodec.ID, repoId));
+    return collection.find(Filters.eq(RepoCodec.NAME, repoName));
   }
 }

@@ -43,11 +43,15 @@ public class SimpleTest extends MongoDbConfig {
       .append("file1.json", "[{}]")
       .append("fileFromObject.txt", ImmutableTestContent.builder().id("10").name("sam vimes").build().toString())
       .author("same vimes")
-      .head(repo.getRepo().getId(), "main")
+      .head("project-x", "main")
       .message("first commit!")
       .build()
       .await().atMost(Duration.ofMinutes(1));
+  
+    
     LOGGER.debug("created commit {}", commit);
+    printRepo(repo.getRepo());
+    
     Assertions.assertEquals(CommitStatus.OK, commit.getStatus());
     
   }

@@ -46,9 +46,15 @@ import de.flapdoodle.embed.process.runtime.Network;
 import io.quarkus.mongodb.impl.ReactiveMongoClientImpl;
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
+import io.resys.hdes.docdb.api.models.Objects.Blob;
+import io.resys.hdes.docdb.api.models.Objects.Commit;
+import io.resys.hdes.docdb.api.models.Objects.Ref;
+import io.resys.hdes.docdb.api.models.Objects.Tree;
+import io.resys.hdes.docdb.api.models.Repo;
 import io.resys.hdes.docdb.spi.DocDBCodecProvider;
 import io.resys.hdes.docdb.spi.DocDBFactory;
 import io.resys.hdes.docdb.spi.state.DocDBClientState;
+import io.resys.hdes.docdb.spi.state.DocDBContext;
 import io.resys.hdes.docdb.spi.state.ImmutableDocDBClientState;
 import io.resys.hdes.docdb.spi.state.ImmutableDocDBContext;
 
@@ -131,6 +137,79 @@ public abstract class MongoDbConfig {
         .context(ctx)
         .client(mongo)
         .build();
+  }
+  
+  public void printRepo(Repo repo) {
+    DocDBClientState state = createState();
+    DocDBContext ctx = state.getContext().toRepo(repo);
+    
+    StringBuilder result = new StringBuilder();
+
+    result
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append("Refs").append(System.lineSeparator());
+    
+    state.getClient().getDatabase(ctx.getDb())
+    .getCollection(ctx.getRefs(), Ref.class)
+    .find().onItem()
+    .transform(item -> {
+      result.append("  ").append(item.toString()).append(System.lineSeparator());
+      return item;
+    }).collectItems().asList().await().indefinitely();
+    
+    result
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append("Commits").append(System.lineSeparator());
+    
+    state.getClient().getDatabase(ctx.getDb())
+    .getCollection(ctx.getCommits(), Commit.class)
+    .find().onItem()
+    .transform(item -> {
+      result.append("  ").append(item.toString()).append(System.lineSeparator());
+      return item;
+    }).collectItems().asList().await().indefinitely();
+    
+    
+    result
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append("Trees").append(System.lineSeparator());
+    
+    state.getClient().getDatabase(ctx.getDb())
+    .getCollection(ctx.getTrees(), Tree.class)
+    .find().onItem()
+    .transform(item -> {
+      result.append("  ").append(item.getId()).append(System.lineSeparator());
+      item.getValues().entrySet().forEach(e -> {
+        result.append("    ").append(e.getValue().getName()).append("-").append(e.getValue().getBlob()).append(System.lineSeparator());
+      });
+      
+      return item;
+    }).collectItems().asList().await().indefinitely();
+    
+    
+    
+    result
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append(System.lineSeparator())
+    .append("Blobs").append(System.lineSeparator());
+    
+    state.getClient().getDatabase(ctx.getDb())
+    .getCollection(ctx.getBlobs(), Blob.class)
+    .find().onItem()
+    .transform(item -> {
+      result.append("  ").append(item.toString()).append(System.lineSeparator());
+      return item;
+    }).collectItems().asList().await().indefinitely();
+    
+    
+    System.out.println(result.toString());
   }
   
   

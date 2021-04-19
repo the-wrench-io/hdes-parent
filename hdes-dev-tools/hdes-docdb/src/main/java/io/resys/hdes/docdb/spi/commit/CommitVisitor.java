@@ -22,6 +22,7 @@ import io.resys.hdes.docdb.api.models.Objects.Ref;
 import io.resys.hdes.docdb.api.models.Objects.RefObjects;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Objects.TreeValue;
+import io.resys.hdes.docdb.api.models.Repo;
 import io.smallrye.mutiny.Multi;
 
 public class CommitVisitor {
@@ -45,7 +46,7 @@ public class CommitVisitor {
   @Value.Immutable
   public interface CommitInput {
     Optional<RefObjects> getParent();
-    String getRepoId();
+    Repo getRepo();
     String getRef();
     String getCommitAuthor();
     String getCommitMessage();
@@ -60,7 +61,7 @@ public class CommitVisitor {
   @Value.Immutable
   public interface CommitOutput {
     CommitOutputStatus getStatus();
-    String getRepoId();
+    Repo getRepo();
     Message getLog();
     Ref getRef();
     Commit getCommit();
@@ -89,7 +90,7 @@ public class CommitVisitor {
     
     return ImmutableCommitOutput.builder()
         .log(visitLog())
-        .repoId(input.getRepoId())
+        .repo(input.getRepo())
         .ref(visitRef(commit, input))
         .status(visitEmpty())
         .tree(tree)

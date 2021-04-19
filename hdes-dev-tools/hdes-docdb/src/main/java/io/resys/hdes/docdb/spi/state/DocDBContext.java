@@ -2,6 +2,8 @@ package io.resys.hdes.docdb.spi.state;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.docdb.api.models.Repo;
+
 @Value.Immutable
 public abstract class DocDBContext {
   public abstract String getDb();
@@ -12,15 +14,16 @@ public abstract class DocDBContext {
   public abstract String getTrees();
   public abstract String getCommits();
   
-  public DocDBContext toRepo(String repoId) {
+  public DocDBContext toRepo(Repo repo) {
+    String prefix = repo.getPrefix();
     return ImmutableDocDBContext.builder()
         .db(this.getDb())
         .repos(this.getRepos())
-        .refs(    repoId + "_" + this.getRefs())
-        .tags(    repoId + "_" + this.getTags())
-        .blobs(   repoId + "_" + this.getBlobs())
-        .trees(   repoId + "_" + this.getTrees())
-        .commits( repoId + "_" + this.getCommits())
+        .refs(    prefix + "_" + this.getRefs())
+        .tags(    prefix + "_" + this.getTags())
+        .blobs(   prefix + "_" + this.getBlobs())
+        .trees(   prefix + "_" + this.getTrees())
+        .commits( prefix + "_" + this.getCommits())
         .build();
   }
 }

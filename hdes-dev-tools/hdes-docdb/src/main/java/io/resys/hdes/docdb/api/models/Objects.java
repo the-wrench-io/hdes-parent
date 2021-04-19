@@ -17,7 +17,7 @@ public interface Objects {
   
   @Value.Immutable
   interface RefObjects {
-    String getRepoId();
+    Repo getRepo();
     Ref getRef();
     Commit getCommit();
     Tree getTree();
