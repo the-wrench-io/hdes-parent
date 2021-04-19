@@ -23,7 +23,6 @@ public class DocDBFactory {
       this.client = client;
       return this;
     }
-
     public DocDB build() {
       RepoAssert.notNull(client, () -> "client must be defined!");
       RepoAssert.notNull(db, () -> "db must be defined!");

@@ -1,6 +1,5 @@
 package io.resys.hdes.docdb.spi.commit;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +16,6 @@ import io.resys.hdes.docdb.spi.state.DocDBClientState;
 import io.resys.hdes.docdb.spi.support.Identifiers;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 import io.smallrye.mutiny.Uni;
-import io.vertx.core.json.JsonObject;
 
 
 public class HeadCommitBuilderDefault implements HeadCommitBuilder {
@@ -65,11 +63,6 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
     return this;
   }
   @Override
-  public HeadCommitBuilder append(String name, Serializable blob) {
-    RepoAssert.notNull(blob, () -> "blob can't be null!");
-    return this.append(name, JsonObject.mapFrom(blob).toString());
-  }
-  @Override
   public HeadCommitBuilder remove(String name) {
     RepoAssert.isTrue(!this.appendBlobs.containsKey(name), () -> "Blob with name: '" + name + "' can't be marked for removal because it's beed appended!");
     RepoAssert.isTrue(!this.deleteBlobs.contains(name), () -> "Blob with name: '" + name + "' is already marked for removal!");
@@ -93,7 +86,7 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
   public Uni<CommitResult> build() {
     RepoAssert.notEmpty(author, () -> "author can't be empty!");
     RepoAssert.notEmpty(message, () -> "message can't be empty!");
-    RepoAssert.isTrue(!(appendBlobs.isEmpty() || deleteBlobs.isEmpty()), () -> "Nothing to commit, no content!");
+    RepoAssert.isTrue(!appendBlobs.isEmpty() || !deleteBlobs.isEmpty(), () -> "Nothing to commit, no content!");
     
     if(this.headGid != null) {
       final var id = Identifiers.fromRepoHeadGid(this.headGid);
@@ -105,7 +98,7 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
     
     final String gid = Identifiers.toRepoHeadGid(repoId, headName);
     
-    return objectsActions.refState().ref(headName).build().onItem()
+    return objectsActions.refState().repo(this.repoId).ref(headName).build().onItem()
     .transformToUni(objects -> {
       if(objects.getStatus() == ObjectsStatus.ERROR) {
         return Uni.createFrom().item((CommitResult) ImmutableCommitResult.builder()

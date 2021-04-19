@@ -1,6 +1,5 @@
 package io.resys.hdes.docdb.api.actions;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Nullable;
@@ -37,7 +36,6 @@ public interface CommitActions {
     HeadCommitBuilder id(String headGid); // head GID to what to append
     HeadCommitBuilder head(String repoId, String headName); // head GID to what to append
     HeadCommitBuilder append(String name, String blob);
-    HeadCommitBuilder append(String name, Serializable blob);
     HeadCommitBuilder remove(String name);
     HeadCommitBuilder author(String author);
     HeadCommitBuilder message(String message);

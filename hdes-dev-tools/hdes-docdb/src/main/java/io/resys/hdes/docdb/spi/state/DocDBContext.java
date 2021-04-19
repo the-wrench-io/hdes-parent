@@ -8,7 +8,6 @@ public abstract class DocDBContext {
   public abstract String getRepos();
   public abstract String getRefs();
   public abstract String getTags();
-  public abstract String getObjects();
   public abstract String getBlobs();
   public abstract String getTrees();
   public abstract String getCommits();
@@ -19,7 +18,6 @@ public abstract class DocDBContext {
         .repos(this.getRepos())
         .refs(    repoId + "_" + this.getRefs())
         .tags(    repoId + "_" + this.getTags())
-        .objects( repoId + "_" + this.getObjects())
         .blobs(   repoId + "_" + this.getBlobs())
         .trees(   repoId + "_" + this.getTrees())
         .commits( repoId + "_" + this.getCommits())

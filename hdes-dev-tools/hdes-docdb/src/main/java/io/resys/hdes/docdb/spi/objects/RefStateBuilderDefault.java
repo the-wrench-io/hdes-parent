@@ -69,6 +69,7 @@ public class RefStateBuilderDefault implements RefStateBuilder {
       if(existing == null) {
         return Uni.createFrom().item(ImmutableObjectsResult
             .<RefObjects>builder()
+            .repoId(repoId)
             .status(ObjectsStatus.ERROR)
             .addMessages(RepoException.builder().notRepoWithId(repoId))
             .build());
@@ -86,6 +87,7 @@ public class RefStateBuilderDefault implements RefStateBuilder {
           if(ref == null) {
             return Uni.createFrom().item(ImmutableObjectsResult
                 .<RefObjects>builder()
+                .repoId(repoId)
                 .status(ObjectsStatus.OK)
                 .addMessages(RepoException.builder().noRepoRef(repoId, refName))
                 .build());
@@ -106,6 +108,7 @@ public class RefStateBuilderDefault implements RefStateBuilder {
               .tree(currentTree)
               .blobs(blobs)
               .build())
+          .repoId(repoId)
           .status(ObjectsStatus.OK)
           .build()
         )

@@ -38,11 +38,13 @@ public class SimpleTest extends MongoDbConfig {
     
     // Create head and first commit
     CommitResult commit = getClient().commit().head()
+      .head("project-x", "main")
       .append("readme.md", "readme content")
       .append("file1.json", "[{}]")
-      .append("fileFromObject.json", ImmutableTestContent.builder().id("10").name("sam vimes").build())
+      .append("fileFromObject.txt", ImmutableTestContent.builder().id("10").name("sam vimes").build().toString())
       .author("same vimes")
       .head(repo.getRepo().getId(), "main")
+      .message("first commit!")
       .build()
       .await().atMost(Duration.ofMinutes(1));
     LOGGER.debug("created commit {}", commit);

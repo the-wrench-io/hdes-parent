@@ -12,11 +12,13 @@ import org.immutables.value.Value;
 import io.resys.hdes.docdb.api.models.ImmutableBlob;
 import io.resys.hdes.docdb.api.models.ImmutableCommit;
 import io.resys.hdes.docdb.api.models.ImmutableMessage;
+import io.resys.hdes.docdb.api.models.ImmutableRef;
 import io.resys.hdes.docdb.api.models.ImmutableTree;
 import io.resys.hdes.docdb.api.models.ImmutableTreeValue;
 import io.resys.hdes.docdb.api.models.Message;
 import io.resys.hdes.docdb.api.models.Objects.Blob;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
+import io.resys.hdes.docdb.api.models.Objects.Ref;
 import io.resys.hdes.docdb.api.models.Objects.RefObjects;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Objects.TreeValue;
@@ -51,13 +53,20 @@ public class CommitVisitor {
     Collection<String> getRemove();
   }
   
+  public enum CommitOutputStatus {
+    OK, EMPTY, ERROR, COMFLICT
+  }
+  
   @Value.Immutable
   public interface CommitOutput {
-    boolean isEmpty();
+    CommitOutputStatus getStatus();
+    String getRepoId();
     Message getLog();
+    Ref getRef();
     Commit getCommit();
     Tree getTree();
     Collection<Blob> getBlobs();
+    List<Message> getMessages();
   }
   
   private final Map<String, Blob> nextBlobs = new HashMap<>();
@@ -80,10 +89,18 @@ public class CommitVisitor {
     
     return ImmutableCommitOutput.builder()
         .log(visitLog())
-        .isEmpty(visitEmpty())
+        .repoId(input.getRepoId())
+        .ref(visitRef(commit, input))
+        .status(visitEmpty())
         .tree(tree)
         .blobs(blobs)
         .commit(commit)
+        .build();
+  }
+  private Ref visitRef(Commit commit, CommitInput input) {
+    return ImmutableRef.builder()
+        .commit(commit.getId())
+        .name(input.getRef())
         .build();
   }
   
@@ -118,9 +135,9 @@ public class CommitVisitor {
     return tree;
   }
   
-  // where there any changes
-  private boolean visitEmpty() {
-    return !(dataDeleted || dataAdded);
+  private CommitOutputStatus visitEmpty() {
+    boolean isEmpty = !(dataDeleted || dataAdded);
+    return isEmpty ? CommitOutputStatus.EMPTY : CommitOutputStatus.OK;
   }
   private Message visitLog() {
     return ImmutableMessage.builder().text(logger.toString()).build();

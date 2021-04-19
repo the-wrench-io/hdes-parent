@@ -33,7 +33,7 @@ import io.resys.hdes.docdb.api.models.Objects.Blob;
 public class BlobCodec implements Codec<Blob> {
   
   public static final String ID = "_id";
-  private static final String VALUE = "value";
+  public static final String VALUE = "value";
   
   @Override
   public void encode(BsonWriter writer, Blob command, EncoderContext encoderContext) {

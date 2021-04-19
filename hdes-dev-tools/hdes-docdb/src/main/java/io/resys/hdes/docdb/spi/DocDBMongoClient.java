@@ -29,7 +29,10 @@ public class DocDBMongoClient implements DocDB {
   
   public DocDBMongoClient(ReactiveMongoClient client, DocDBContext ctx) {
     super();
-    this.state = ImmutableDocDBClientState.builder().context(ctx).client(client).build();
+    this.state = ImmutableDocDBClientState.builder()
+        .client(client)
+        .context(ctx)
+        .build();
   }
   
   @Override
