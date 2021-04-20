@@ -12,6 +12,7 @@ import io.resys.hdes.docdb.api.actions.CommitActions.HeadCommitBuilder;
 import io.resys.hdes.docdb.api.actions.ImmutableCommitResult;
 import io.resys.hdes.docdb.api.actions.ObjectsActions;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.ObjectsStatus;
+import io.resys.hdes.docdb.api.models.ImmutableMessage;
 import io.resys.hdes.docdb.spi.state.DocDBClientState;
 import io.resys.hdes.docdb.spi.support.Identifiers;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
@@ -30,7 +31,7 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
   private String headName;
   private String author;
   private String message;
-
+  private String parentCommit;
 
   public HeadCommitBuilderDefault(DocDBClientState state, ObjectsActions objectsActions) {
     super();
@@ -83,6 +84,11 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
     return this;
   }
   @Override
+  public HeadCommitBuilder parent(String parentCommit) {
+    this.parentCommit = parentCommit;
+    return this;
+  }
+  @Override
   public Uni<CommitResult> build() {
     RepoAssert.notEmpty(author, () -> "author can't be empty!");
     RepoAssert.notEmpty(message, () -> "message can't be empty!");
@@ -99,25 +105,81 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
     final String gid = Identifiers.toRepoHeadGid(repoId, headName);
     
     return objectsActions.refState().repo(this.repoId).ref(headName).build().onItem()
-    .transformToUni(objects -> {
+    .transformToUni(state -> {
       
-      if(objects.getStatus() == ObjectsStatus.ERROR) {
+      if(state.getStatus() == ObjectsStatus.ERROR) {
         return Uni.createFrom().item((CommitResult) ImmutableCommitResult.builder()
             .gid(gid)
-            .addAllMessages(objects.getMessages())
+            .addAllMessages(state.getMessages())
             .status(CommitStatus.ERROR)
             .build());
       }
-      final var toBeSaved = new CommitVisitor().visit(ImmutableCommitInput.builder()
-          .commitAuthor(this.author)
-          .commitMessage(this.message)
-          .repo(objects.getRepo())
-          .ref(headName)
-          .append(appendBlobs)
-          .remove(deleteBlobs)
-          .parent(Optional.ofNullable(objects.getObjects()))
-          .build());
-      return new CommitSaveVisitor(state).visit(toBeSaved).onItem()
+      
+      
+      // Unknown parent
+      if(state.getObjects() == null && parentCommit != null) {
+        return Uni.createFrom().item((CommitResult) ImmutableCommitResult.builder()
+            .gid(gid)
+            .addMessages(ImmutableMessage.builder()
+                .text(new StringBuilder()
+                    .append("Commit to head: '").append(headName).append("'")
+                    .append(" is rejected.")
+                    .append(" Your head is: '").append(parentCommit).append("')")
+                    .append(" but remote has no head.").append("'!")
+                    .toString())
+                .build())
+            .status(CommitStatus.ERROR)
+            .build());
+        
+      }
+      
+      
+      // No parent commit defined for existing head
+      if(state.getObjects() != null && parentCommit == null) {
+        return Uni.createFrom().item((CommitResult) ImmutableCommitResult.builder()
+            .gid(gid)
+            .addMessages(ImmutableMessage.builder()
+                .text(new StringBuilder()
+                    .append("Parent commit can only be undefined for the first commit!")
+                    .append(" Parent commit for")
+                    .append(" head: '").append(headName).append("'")
+                    .append(" is: '").append(state.getObjects().getRef().getCommit()).append("'!")
+                    .toString())
+                .build())
+            .status(CommitStatus.ERROR)
+            .build());
+      }
+      
+      // Wrong parent commit
+      if(state.getObjects() != null && parentCommit != null && 
+          !parentCommit.equals(state.getObjects().getRef().getCommit())) {
+        
+        final var text = new StringBuilder()
+          .append("Commit to head: '").append(headName).append("'")
+          .append(" is rejected.")
+          .append(" Your head is: '").append(parentCommit).append("')")
+          .append(" but remote is: '").append(state.getObjects().getRef().getCommit()).append("'!")
+          .toString();
+        
+        return Uni.createFrom().item((CommitResult) ImmutableCommitResult.builder()
+            .gid(gid)
+            .addMessages(ImmutableMessage.builder().text(text).build())
+            .status(CommitStatus.ERROR)
+            .build());
+      }
+      
+      final var toBeSaved = new CommitVisitor().visit(
+          ImmutableCommitInput.builder()
+            .commitAuthor(this.author)
+            .commitMessage(this.message)
+            .ref(headName)
+            .append(appendBlobs)
+            .remove(deleteBlobs)
+            .repo(state.getRepo())
+            .parent(Optional.ofNullable(state.getObjects()))
+            .build());
+      
+      return new CommitSaveVisitor(this.state).visit(toBeSaved).onItem()
           .transform(saved -> (CommitResult) ImmutableCommitResult.builder()
               .gid(gid)
               .commit(saved.getCommit())

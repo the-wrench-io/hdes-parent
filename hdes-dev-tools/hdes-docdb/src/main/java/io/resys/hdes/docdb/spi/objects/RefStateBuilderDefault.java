@@ -90,56 +90,58 @@ public class RefStateBuilderDefault implements RefStateBuilder {
                 .addMessages(RepoException.builder().noRepoRef(repo.getName(), refName))
                 .build());
           }
+          
           return getState(repo, ref, ctx);
         });
   }
   
   private Uni<ObjectsResult<RefObjects>> getState(Repo repo, Ref ref, DocDBContext ctx) {
-    Uni<Tree> tree = getTree(repo, ref, ctx);
-    
-    if(this.blobs) {
-      return tree.onItem().transformToUni(currentTree -> getBlobs(repo, ref, currentTree, ctx)
-        .onItem().transform(blobs -> ImmutableObjectsResult.<RefObjects>builder()
-          .objects(ImmutableRefObjects.builder()
-              .repo(repo)
-              .ref(ref)
-              .tree(currentTree)
-              .blobs(blobs)
-              .build())
-          .repo(repo)
-          .status(ObjectsStatus.OK)
-          .build()
-        )
-      );
-    }
-    
-    return tree.onItem().transform(currentTree -> ImmutableObjectsResult
-      .<RefObjects>builder()
-      .objects(ImmutableRefObjects.builder()
-          .repo(repo)
-          .ref(ref)
-          .tree(currentTree)
-          .build())
-      .status(ObjectsStatus.OK)
-      .build());
+    return getCommit(ref, ctx).onItem()
+        .transformToUni(commit -> getTree(commit, ctx).onItem()
+        .transformToUni(tree -> {
+          if(this.blobs) {
+            return getBlobs(tree, ctx)
+              .onItem().transform(blobs -> ImmutableObjectsResult.<RefObjects>builder()
+                .repo(repo)
+                .objects(ImmutableRefObjects.builder()
+                    .repo(repo)
+                    .ref(ref)
+                    .tree(tree)
+                    .blobs(blobs)
+                    .commit(commit)
+                    .build())
+                .repo(repo)
+                .status(ObjectsStatus.OK)
+                .build());
+          }
+          
+          return Uni.createFrom().item(ImmutableObjectsResult.<RefObjects>builder()
+            .repo(repo)
+            .objects(ImmutableRefObjects.builder()
+                .repo(repo)
+                .ref(ref)
+                .tree(tree)
+                .commit(commit)
+                .build())
+            .status(ObjectsStatus.OK)
+            .build());
+        }));
+  
   }
-  private Uni<Tree> getTree(Repo repo, Ref ref, DocDBContext ctx) {
-    Uni<Commit> commit = getCommit(repo, ref, ctx);
-    
+  private Uni<Tree> getTree(Commit commit, DocDBContext ctx) {
     final ReactiveMongoCollection<Tree> collection = state.getClient()
         .getDatabase(ctx.getDb())
         .getCollection(ctx.getTrees(), Tree.class);
     
-    return commit.onItem().transformToUni(currentCommit -> collection
-        .find(Filters.eq(TreeCodec.ID, currentCommit.getTree())).toUni());
+    return collection.find(Filters.eq(TreeCodec.ID, commit.getTree())).toUni();
   }
-  private Uni<Commit> getCommit(Repo repo, Ref ref, DocDBContext ctx) {
+  private Uni<Commit> getCommit(Ref ref, DocDBContext ctx) {
     final ReactiveMongoCollection<Commit> collection = state.getClient()
         .getDatabase(ctx.getDb())
         .getCollection(ctx.getCommits(), Commit.class);
     return collection.find(Filters.eq(CommitCodec.ID, ref.getCommit())).toUni();
   }
-  private Uni<Map<String, Blob>> getBlobs(Repo repo, Ref ref, Tree tree, DocDBContext ctx) {
+  private Uni<Map<String, Blob>> getBlobs(Tree tree, DocDBContext ctx) {
     final ReactiveMongoCollection<Blob> collection = state.getClient()
         .getDatabase(ctx.getDb())
         .getCollection(ctx.getBlobs(), Blob.class);

@@ -27,7 +27,7 @@ public class SimpleTest extends MongoDbConfig {
   }
   
   @Test
-  public void crateRepo() {
+  public void crateRepoWithOneCommit() {
     // create project
     RepoResult repo = getClient().repo().create()
         .name("project-x")
@@ -37,7 +37,7 @@ public class SimpleTest extends MongoDbConfig {
     Assertions.assertEquals(RepoStatus.OK, repo.getStatus());
     
     // Create head and first commit
-    CommitResult commit = getClient().commit().head()
+    CommitResult commit_0 = getClient().commit().head()
       .head("project-x", "main")
       .append("readme.md", "readme content")
       .append("file1.json", "[{}]")
@@ -47,12 +47,52 @@ public class SimpleTest extends MongoDbConfig {
       .message("first commit!")
       .build()
       .await().atMost(Duration.ofMinutes(1));
+
+    LOGGER.debug("created commit {}", commit_0);
+    Assertions.assertEquals(CommitStatus.OK, commit_0.getStatus());
+  }
   
+  
+  @Test
+  public void crateRepoWithTwoCommits() {
+    // create project
+    RepoResult repo = getClient().repo().create()
+        .name("project-xy")
+        .build()
+        .await().atMost(Duration.ofMinutes(1));
+    LOGGER.debug("created repo {}", repo);
+    Assertions.assertEquals(RepoStatus.OK, repo.getStatus());
     
-    LOGGER.debug("created commit {}", commit);
-    printRepo(repo.getRepo());
+    // Create head and first commit
+    CommitResult commit_0 = getClient().commit().head()
+      .head(repo.getRepo().getName(), "main")
+      .append("readme.md", "readme content")
+      .append("file1.json", "[{}]")
+      .append("fileFromObject.txt", ImmutableTestContent.builder().id("10").name("sam vimes").build().toString())
+      .author("same vimes")
+      .message("first commit!")
+      .build()
+      .await().atMost(Duration.ofMinutes(1));
+
+    LOGGER.debug("created commit 0 {}", commit_0);
+    Assertions.assertEquals(CommitStatus.OK, commit_0.getStatus());
     
-    Assertions.assertEquals(CommitStatus.OK, commit.getStatus());
     
+    // Create head and first commit
+    CommitResult commit_1 = getClient().commit().head()
+      .head(repo.getRepo().getName(), "main")
+      .parent(commit_0.getCommit().getId())
+      .append("readme.md", "readme content")
+      .append("file1.json", "[{}, {}]")
+      .append("fileFromObject.txt", ImmutableTestContent.builder().id("10").name("sam vimes 1").build().toString())
+      .author("same vimes")
+      .message("second commit!")
+      .build()
+      .await().atMost(Duration.ofMinutes(1));
+    
+    LOGGER.debug("created commit 1 {}", commit_1);
+    Assertions.assertEquals(CommitStatus.OK, commit_1.getStatus());
+    
+    super.printRepo(repo.getRepo());
   }
 }
