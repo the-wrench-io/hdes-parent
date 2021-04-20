@@ -14,15 +14,11 @@ public class TagActionsDefault implements TagActions {
 
   @Override
   public TagBuilder create() {
-    // TODO Auto-generated method stub
-    return null;
+    return new CreateTagBuilder(state);
   }
 
   @Override
   public TagQuery query() {
-    // TODO Auto-generated method stub
-    return null;
+    return new AnyTagQuery(state);
   }
-
-
 }

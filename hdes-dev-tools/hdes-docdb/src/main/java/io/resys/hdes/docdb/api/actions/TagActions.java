@@ -1,6 +1,7 @@
 package io.resys.hdes.docdb.api.actions;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.immutables.value.Value;
 
@@ -17,23 +18,22 @@ public interface TagActions {
   interface TagQuery {
     TagQuery repo(String repoId);
     TagQuery tagName(String tagName);
+    
     Multi<Tag> find();
-    Uni<Tag> get();
-    Uni<Tag> delete();
+    Uni<Optional<Tag>> get();
+    Uni<Optional<Tag>> delete();
   }
   
   interface TagBuilder {
-    TagBuilder name(String name);
-    TagBuilder repo(String repoId, String commitId);
-    TagBuilder head(String headGid);
-    
+    TagBuilder tagName(String name);
+    TagBuilder repo(String repoIdOrName, String commitIdOrHead);
     TagBuilder author(String author);
     TagBuilder message(String message);    
     Uni<TagResult> build();
   }
 
   enum TagStatus {
-    OK, CONFLICT
+    OK, ERROR
   }
 
   @Value.Immutable

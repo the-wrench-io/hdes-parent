@@ -1,5 +1,7 @@
 package io.resys.hdes.docdb.spi.codec;
 
+import java.time.LocalDateTime;
+
 /*-
  * #%L
  * hdes-storage-mongodb
@@ -34,12 +36,18 @@ public class TagCodec implements Codec<Tag> {
   
   public static final String ID = "_id";
   public static final String COMMIT = "commit";
+  public static final String DATE_TIME = "dateTime";
+  public static final String AUTHOR = "author";
+  public static final String MESSAGE = "message";
   
   @Override
   public void encode(BsonWriter writer, Tag command, EncoderContext encoderContext) {
     writer.writeStartDocument();
     writer.writeString(ID, command.getName());
     writer.writeString(COMMIT, command.getCommit());
+    writer.writeString(DATE_TIME, command.getDateTime().toString());
+    writer.writeString(AUTHOR, command.getAuthor());
+    writer.writeString(MESSAGE, command.getMessage());
     writer.writeEndDocument();
   }
 
@@ -49,6 +57,9 @@ public class TagCodec implements Codec<Tag> {
     Tag result = ImmutableTag.builder()
       .name(reader.readString(ID))
       .commit(reader.readString(COMMIT))
+      .dateTime(LocalDateTime.parse(reader.readString(DATE_TIME)))
+      .author(reader.readString(AUTHOR))
+      .message(reader.readString(MESSAGE))
       .build();
     reader.readEndDocument();
     return result;

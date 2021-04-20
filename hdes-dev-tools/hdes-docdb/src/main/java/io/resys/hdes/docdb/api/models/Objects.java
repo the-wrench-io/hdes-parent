@@ -35,6 +35,9 @@ public interface Objects {
   interface Tag extends IsName {
     // id of a commit
     String getCommit();
+    LocalDateTime getDateTime();
+    String getAuthor();
+    String getMessage();
   }
   
   // World state 

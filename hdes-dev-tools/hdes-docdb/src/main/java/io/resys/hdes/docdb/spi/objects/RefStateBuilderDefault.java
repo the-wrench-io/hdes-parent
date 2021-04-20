@@ -20,12 +20,10 @@ import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Repo;
 import io.resys.hdes.docdb.spi.codec.CommitCodec;
 import io.resys.hdes.docdb.spi.codec.RefCodec;
-import io.resys.hdes.docdb.spi.codec.RepoCodec;
 import io.resys.hdes.docdb.spi.codec.TreeCodec;
 import io.resys.hdes.docdb.spi.state.DocDBClientState;
 import io.resys.hdes.docdb.spi.state.DocDBContext;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 
 public class RefStateBuilderDefault implements RefStateBuilder {
@@ -63,7 +61,7 @@ public class RefStateBuilderDefault implements RefStateBuilder {
     RepoAssert.notEmpty(repoName, () -> "repoName is not defined!");
     RepoAssert.notEmpty(ref, () -> "ref is not defined!");
     
-    return getRepo(repoName, state.getContext()).collectItems().first().onItem()
+    return state.getRepo(repoName).onItem()
     .transformToUni((Repo existing) -> {
       if(existing == null) {
         return Uni.createFrom().item(ImmutableObjectsResult
@@ -147,11 +145,5 @@ public class RefStateBuilderDefault implements RefStateBuilder {
         .getCollection(ctx.getBlobs(), Blob.class);
     return collection.find().collectItems().asList().onItem()
         .transform(blobs -> blobs.stream().collect(Collectors.toMap(r -> r.getId(), r -> r)));
-  }
-  private Multi<Repo> getRepo(String repoName, DocDBContext ctx) {
-    final ReactiveMongoCollection<Repo> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getRepos(), Repo.class);
-    return collection.find(Filters.eq(RepoCodec.NAME, repoName));
   }
 }
