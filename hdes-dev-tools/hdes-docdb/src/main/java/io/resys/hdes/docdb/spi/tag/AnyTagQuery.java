@@ -81,7 +81,7 @@ public class AnyTagQuery implements TagQuery {
             
             return this.state.getClient()
               .getDatabase(ctx.getDb())
-              .getCollection(ctx.getRefs(), Tag.class)
+              .getCollection(ctx.getTags(), Tag.class)
               .deleteOne(Filters.eq(TagCodec.ID, tagName))
               .onItem()
               .transform(result -> {
@@ -95,9 +95,15 @@ public class AnyTagQuery implements TagQuery {
   }
   
   private Multi<Tag> findTags(DocDBContext ctx, String tagName) {
+    if(tagName == null || tagName.isBlank()) {
+      return this.state.getClient()
+          .getDatabase(ctx.getDb())
+          .getCollection(ctx.getTags(), Tag.class)
+          .find();      
+    }
     return this.state.getClient()
         .getDatabase(ctx.getDb())
-        .getCollection(ctx.getRefs(), Tag.class)
+        .getCollection(ctx.getTags(), Tag.class)
         .find(Filters.eq(TagCodec.ID, tagName));
   }
 }

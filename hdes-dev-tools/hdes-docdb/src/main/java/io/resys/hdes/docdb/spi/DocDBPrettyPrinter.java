@@ -3,6 +3,7 @@ package io.resys.hdes.docdb.spi;
 import io.resys.hdes.docdb.api.models.Objects.Blob;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
 import io.resys.hdes.docdb.api.models.Objects.Ref;
+import io.resys.hdes.docdb.api.models.Objects.Tag;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Repo;
 import io.resys.hdes.docdb.spi.state.DocDBClientState;
@@ -40,6 +41,26 @@ public class DocDBPrettyPrinter {
       result.append("  - ")
       .append(item.getCommit()).append(": ").append(item.getName())
       .append(System.lineSeparator());
+      return item;
+    }).collectItems().asList().await().indefinitely();
+
+    
+    result
+    .append(System.lineSeparator())
+    .append("Tags").append(System.lineSeparator());
+    
+    state.getClient().getDatabase(ctx.getDb())
+    .getCollection(ctx.getTags(), Tag.class)
+    .find().onItem()
+    .transform(item -> {
+      result.append("  - id: ").append(item.getName())
+      .append(System.lineSeparator())
+      .append("    commit: ").append(item.getCommit())
+      .append(", dateTime: ").append(item.getDateTime())
+      .append(", message: ").append(item.getMessage())
+      .append(", author: ").append(item.getAuthor())
+      .append(System.lineSeparator());
+      
       return item;
     }).collectItems().asList().await().indefinitely();
     
