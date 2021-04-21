@@ -19,4 +19,10 @@ public class ObjectsActionsDefault implements ObjectsActions {
   public RefStateBuilder refState() {
     return new RefStateBuilderDefault(state);
   }
+
+  @Override
+  public CommitStateBuilder commitState() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

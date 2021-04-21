@@ -50,6 +50,7 @@ public class SimpleTest extends MongoDbConfig {
 
     LOGGER.debug("created commit {}", commit_0);
     Assertions.assertEquals(CommitStatus.OK, commit_0.getStatus());
+    super.printRepo(repo.getRepo());
   }
   
   

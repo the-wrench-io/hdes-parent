@@ -15,15 +15,6 @@ public interface Objects {
   interface IsObject { String getId(); }
   interface IsName { String getName(); }
   
-  @Value.Immutable
-  interface RefObjects {
-    Repo getRepo();
-    Ref getRef();
-    Commit getCommit();
-    Tree getTree();
-    Map<String, Blob> getBlobs(); //only if loaded
-  }
-  
   // branch with a name
   @Value.Immutable
   interface Ref extends IsName {

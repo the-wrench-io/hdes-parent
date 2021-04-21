@@ -21,6 +21,65 @@ import io.resys.hdes.docdb.tests.config.MongoDbConfig;
 public class TaggingTest extends MongoDbConfig {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TaggingTest.class);
+
+  
+  @Test
+  public void duplicateTag() {
+    // create project
+    RepoResult repo = getClient().repo().create()
+        .name("project-xyz")
+        .build()
+        .await().atMost(Duration.ofMinutes(1));
+    LOGGER.debug("created repo {}", repo);
+    Assertions.assertEquals(RepoStatus.OK, repo.getStatus());
+    
+    // Create head and first commit
+    CommitResult commit_0 = getClient().commit().head()
+      .head(repo.getRepo().getName(), "main")
+      .append("readme.md", "readme content")
+      .append("file1.json", "[{}]")
+      .author("same vimes")
+      .message("first commit!")
+      .build()
+      .await().atMost(Duration.ofMinutes(1));
+
+    LOGGER.debug("created commit 0 {}", commit_0);
+    Assertions.assertEquals(CommitStatus.OK, commit_0.getStatus());
+    
+    TagResult tag_0 = getClient().tag().create()
+        .tagName("super tag on commit 1")
+        .author("same vimes")
+        .message("first commit tag")
+        .repo(repo.getRepo().getName(), commit_0.getCommit().getId())
+        .build()
+        .await().atMost(Duration.ofMinutes(1));
+      Assertions.assertEquals(TagStatus.OK, tag_0.getStatus());
+
+    TagResult tag_1 = getClient().tag().create()
+        .tagName("super tag on commit 1")
+        .author("same vimes")
+        .message("second commit tag")
+        .repo(repo.getRepo().getName(), commit_0.getCommit().getId())
+        .build()
+        .await().atMost(Duration.ofMinutes(1));
+    Assertions.assertEquals(TagStatus.ERROR, tag_1.getStatus());
+    
+    
+    getClient().tag().query()
+    .tagName("super tag on commit 1")
+    .repo(repo.getRepo().getName())
+    .delete()
+    .await().atMost(Duration.ofMinutes(1));
+    
+    tag_1 = getClient().tag().create()
+        .tagName("super tag on commit 1")
+        .author("same vimes")
+        .message("second commit tag")
+        .repo(repo.getRepo().getName(), commit_0.getCommit().getId())
+        .build()
+        .await().atMost(Duration.ofMinutes(1));
+    Assertions.assertEquals(TagStatus.OK, tag_1.getStatus());
+  }
   
   
   @Test

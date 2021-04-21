@@ -7,15 +7,15 @@ import com.mongodb.client.model.Filters;
 
 import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
 import io.resys.hdes.docdb.api.actions.ImmutableObjectsResult;
+import io.resys.hdes.docdb.api.actions.ImmutableRefObjects;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.ObjectsResult;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.ObjectsStatus;
+import io.resys.hdes.docdb.api.actions.ObjectsActions.RefObjects;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.RefStateBuilder;
 import io.resys.hdes.docdb.api.exceptions.RepoException;
-import io.resys.hdes.docdb.api.models.ImmutableRefObjects;
 import io.resys.hdes.docdb.api.models.Objects.Blob;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
 import io.resys.hdes.docdb.api.models.Objects.Ref;
-import io.resys.hdes.docdb.api.models.Objects.RefObjects;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Repo;
 import io.resys.hdes.docdb.spi.codec.CommitCodec;
@@ -88,7 +88,6 @@ public class RefStateBuilderDefault implements RefStateBuilder {
                 .addMessages(RepoException.builder().noRepoRef(repo.getName(), refName))
                 .build());
           }
-          
           return getState(repo, ref, ctx);
         });
   }

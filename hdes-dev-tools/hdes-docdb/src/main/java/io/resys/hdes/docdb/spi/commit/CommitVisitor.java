@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.docdb.api.actions.ObjectsActions.RefObjects;
 import io.resys.hdes.docdb.api.models.ImmutableBlob;
 import io.resys.hdes.docdb.api.models.ImmutableCommit;
 import io.resys.hdes.docdb.api.models.ImmutableMessage;
@@ -19,7 +20,6 @@ import io.resys.hdes.docdb.api.models.Message;
 import io.resys.hdes.docdb.api.models.Objects.Blob;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
 import io.resys.hdes.docdb.api.models.Objects.Ref;
-import io.resys.hdes.docdb.api.models.Objects.RefObjects;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Objects.TreeValue;
 import io.resys.hdes.docdb.api.models.Repo;

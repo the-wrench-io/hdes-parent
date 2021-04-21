@@ -4,6 +4,7 @@ import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
 import io.resys.hdes.docdb.api.actions.CheckoutActions;
 import io.resys.hdes.docdb.api.actions.CommitActions;
+import io.resys.hdes.docdb.api.actions.DiffActions;
 import io.resys.hdes.docdb.api.actions.HistoryActions;
 import io.resys.hdes.docdb.api.actions.ObjectsActions;
 import io.resys.hdes.docdb.api.actions.RepoActions;
@@ -26,6 +27,7 @@ public class DocDBMongoClient implements DocDB {
   private CheckoutActions checkoutActions;
   private HistoryActions historyActions;
   private ObjectsActions objectsActions;
+  private DiffActions diffActions;
   
   public DocDBMongoClient(ReactiveMongoClient client, DocDBContext ctx) {
     super();
@@ -77,5 +79,13 @@ public class DocDBMongoClient implements DocDB {
       objectsActions = new ObjectsActionsDefault(state); 
     }
     return objectsActions;
+  }
+
+  @Override
+  public DiffActions diff() {
+    if(diffActions == null) {
+      diffActions = null; 
+    }
+    return diffActions;
   }
 }
