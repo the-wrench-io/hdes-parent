@@ -1,5 +1,6 @@
 package io.resys.hdes.docdb.spi;
 
+import io.resys.hdes.docdb.api.models.Diff;
 import io.resys.hdes.docdb.api.models.Objects.Blob;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
 import io.resys.hdes.docdb.api.models.Objects.Ref;
@@ -15,6 +16,28 @@ public class DocDBPrettyPrinter {
   public DocDBPrettyPrinter(DocDBClientState state) {
     super();
     this.state = state;
+  }
+  
+  public String print(Diff diff) {
+    final var repo = diff.getRepo();
+    
+    StringBuilder result = new StringBuilder();
+    
+    result.append(System.lineSeparator())
+      .append("Diff").append(System.lineSeparator())
+      .append("  - id: ").append(repo.getId())
+      .append(", rev: ").append(repo.getRev())
+      .append(System.lineSeparator()).append(System.lineSeparator());
+    
+    result.append("Divergences").append(System.lineSeparator());
+    for(var divergence : diff.getDivergences()) {
+      result
+        .append("  - head: ").append(divergence.getHead().getCommit().getId()).append(" alias: ").append(String.join(", ", divergence.getHead().getRefs())).append(System.lineSeparator())
+        .append("    main: ").append(divergence.getMain().getCommit().getId()).append(" alias: ").append(String.join(", ", divergence.getMain().getRefs())).append(System.lineSeparator())
+        .append("    commits in main: ").append(divergence.getMain().getCommits()).append(System.lineSeparator())
+        .append("    commits in head: ").append(divergence.getHead().getCommits()).append(System.lineSeparator());
+    }
+    return result.toString();
   }
   
   public String print(Repo repo) {

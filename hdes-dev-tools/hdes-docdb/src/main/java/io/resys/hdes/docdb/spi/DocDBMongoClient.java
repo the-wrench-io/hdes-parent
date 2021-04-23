@@ -11,6 +11,7 @@ import io.resys.hdes.docdb.api.actions.RepoActions;
 import io.resys.hdes.docdb.api.actions.TagActions;
 import io.resys.hdes.docdb.spi.checkout.CheckoutActionsDefault;
 import io.resys.hdes.docdb.spi.commit.CommitActionsDefault;
+import io.resys.hdes.docdb.spi.diff.DiffActionsDefault;
 import io.resys.hdes.docdb.spi.history.HistoryActionsDefault;
 import io.resys.hdes.docdb.spi.objects.ObjectsActionsDefault;
 import io.resys.hdes.docdb.spi.repo.RepoActionsDefault;
@@ -84,7 +85,7 @@ public class DocDBMongoClient implements DocDB {
   @Override
   public DiffActions diff() {
     if(diffActions == null) {
-      diffActions = null; 
+      diffActions = new DiffActionsDefault(state, objects()); 
     }
     return diffActions;
   }

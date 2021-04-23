@@ -46,6 +46,7 @@ import de.flapdoodle.embed.process.runtime.Network;
 import io.quarkus.mongodb.impl.ReactiveMongoClientImpl;
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
+import io.resys.hdes.docdb.api.models.Diff;
 import io.resys.hdes.docdb.api.models.Repo;
 import io.resys.hdes.docdb.spi.DocDBCodecProvider;
 import io.resys.hdes.docdb.spi.DocDBFactory;
@@ -134,7 +135,11 @@ public abstract class MongoDbConfig {
         .client(mongo)
         .build();
   }
-  
+
+  public void printDiff(Diff repo) {
+    final String result = new DocDBPrettyPrinter(createState()).print(repo);
+    System.out.println(result);
+  }
   public void printRepo(Repo repo) {
     final String result = new DocDBPrettyPrinter(createState()).print(repo);
     System.out.println(result);

@@ -6,33 +6,45 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.docdb.api.models.Objects.Blob;
+import io.resys.hdes.docdb.api.models.Objects.Commit;
 
 @Value.Immutable
 public interface Diff {
-  enum DiffAction { MODIFIED, CREATED, DELETED, RENAMED }
-  enum DiffStatusType { BEHIND, AHEAD, EQUAL }
-  
+  enum DiffActionType { MODIFIED, CREATED, DELETED, RENAMED }
+  enum DivergenceType { BEHIND, AHEAD, EQUAL, CONFLICT }
+
   Repo getRepo();
-  String getLeftCommit();
-  String getRightCommit();
-  DiffStatus getStatus();
-  List<DiffEntry> getEntries(); // only if loaded
+  List<Divergence> getDivergences();
   
   @Value.Immutable
-  interface DiffEntry {
-    String getName();
-    DiffAction getAction();
-    @Nullable
-    Blob getLeftValue();
-    @Nullable
-    Blob getRightRight();
+  interface Divergence {
+    DivergenceType getType();
+    DivergenceRef getHead(); // current head commit
+    DivergenceRef getMain(); // commit from where divergence starts
+    List<DiffAction> getActions(); // only if loaded
   }
   
   @Value.Immutable
-  interface DiffStatus {
-    DiffStatusType getLeft();
-    DiffStatusType getRight();
-    Long getCommits();
+  interface DivergenceRef {
+    List<String> getRefs();
+    List<String> getTags();
+    Integer getCommits();
+    Commit getCommit();
+  }
+  
+  @Value.Immutable
+  interface DiffAction {
+    DiffActionType getType();
+    @Nullable
+    DiffBlob getValue();
+    @Nullable
+    DiffBlob getTarget();
+  }
+  
+  @Value.Immutable
+  interface DiffBlob {
+    String getId();
+    String getName();
+    String getContent();
   }
 }

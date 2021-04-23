@@ -55,7 +55,7 @@ public class CommitVisitor {
   }
   
   public enum CommitOutputStatus {
-    OK, EMPTY, ERROR, COMFLICT
+    OK, EMPTY, ERROR, CONFLICT
   }
   
   @Value.Immutable

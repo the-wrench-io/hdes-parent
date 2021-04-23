@@ -13,6 +13,7 @@ import io.resys.hdes.docdb.api.actions.ImmutableCommitResult;
 import io.resys.hdes.docdb.api.actions.ObjectsActions;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.ObjectsStatus;
 import io.resys.hdes.docdb.api.models.ImmutableMessage;
+import io.resys.hdes.docdb.spi.commit.CommitVisitor.CommitOutputStatus;
 import io.resys.hdes.docdb.spi.state.DocDBClientState;
 import io.resys.hdes.docdb.spi.support.Identifiers;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
@@ -183,9 +184,20 @@ public class HeadCommitBuilderDefault implements HeadCommitBuilder {
           .transform(saved -> (CommitResult) ImmutableCommitResult.builder()
               .gid(gid)
               .commit(saved.getCommit())
+              .addAllMessages(saved.getMessages())
               .addMessages(saved.getLog())
-              .status(CommitStatus.OK)
+              .status(visitStatus(saved.getStatus()))
               .build());
     });
+  }
+  
+  private CommitStatus visitStatus(CommitOutputStatus src) {
+    if(src == CommitOutputStatus.OK) {
+      return CommitStatus.OK;
+    } else if(src == CommitOutputStatus.CONFLICT) {
+      return CommitStatus.CONFLICT;
+    }
+    return CommitStatus.ERROR;
+    
   }
 }

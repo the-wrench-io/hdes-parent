@@ -82,7 +82,7 @@ public class CommitSaveVisitor {
           
           return Uni.createFrom().item((CommitOutput) ImmutableCommitOutput.builder()
             .from(output)
-            .status(CommitOutputStatus.COMFLICT)
+            .status(CommitOutputStatus.CONFLICT)
             .addMessages(ImmutableMessage.builder().text(error.toString()).build())
             .build());
         });
@@ -92,7 +92,7 @@ public class CommitSaveVisitor {
     
     // save blobs
     return Multi.createFrom().items(output.getBlobs().stream())
-    .onItem().transformToUni(blob -> saveBlob(ctx, blob))
+    .onItem().transformToUni(blob -> visitBlob(ctx, blob))
     .merge().collectItems().asList()
     .onItem().transform(upserts -> {
       final var result = ImmutableCommitOutput.builder()
@@ -125,39 +125,44 @@ public class CommitSaveVisitor {
     })
     
     // save ref
-    .onItem().transformToUni(current -> {
+    .onItem().transformToUni(current -> {      
       if(current.getStatus() == CommitOutputStatus.OK) {
-        return visitRef(ctx, current.getRef(), current.getCommit())
-            .onItem().transform(upsert -> (CommitOutput) ImmutableCommitOutput.builder()
-              .from(current)
-              .status(visitStatus(upsert))
-              .addMessages(upsert.getMessage())
-              .build());
+        return visitRef(ctx, current)
+            .onItem().transform(upsert -> transformRef(upsert, current));
       }
       return Uni.createFrom().item(current);
     });
   }
   
-  private Uni<UpsertResult> visitRef(DocDBContext ctx, Ref ref, Commit commit) {
+  private CommitOutput transformRef(UpsertResult upsert, CommitOutput current) {
+    return (CommitOutput) ImmutableCommitOutput.builder()
+        .from(current)
+        .status(visitStatus(upsert))
+        .addMessages(upsert.getMessage())
+        .build();
+  }
+  
+  private Uni<UpsertResult> visitRef(DocDBContext ctx, CommitOutput output) {
     return state.getClient()
     .getDatabase(ctx.getDb())
     .getCollection(ctx.getRefs(), Ref.class)
-    .find(Filters.eq(RefCodec.NAME, ref.getName()))
+    .find(Filters.eq(RefCodec.NAME, output.getRef().getName()))
     .collectItems().first().onItem()
     .transformToUni(item -> {
       if(item == null) {
-        return createRef(ctx, ref);
+        return createRef(ctx, output.getRef());
       }
-      return updateRef(ctx, ref);
+      return updateRef(ctx, output);
     });
   }
   
-  private Uni<UpsertResult> updateRef(DocDBContext ctx, Ref ref) {
+  private Uni<UpsertResult> updateRef(DocDBContext ctx, CommitOutput output) {
     final var filters = Filters.and(
-        Filters.eq(RefCodec.NAME, ref.getName()),
-        Filters.eq(RefCodec.COMMIT, ref.getCommit())
+        Filters.eq(RefCodec.NAME, output.getRef().getName()),
+        Filters.eq(RefCodec.COMMIT, output.getCommit().getParent().get())
       );
-    final var updates = Updates.set(RefCodec.COMMIT, ref.getCommit());
+    final var updates = Updates.set(RefCodec.COMMIT, output.getRef().getCommit());
+
     return state.getClient()
         .getDatabase(ctx.getDb())
         .getCollection(ctx.getRefs(), Ref.class)
@@ -166,29 +171,29 @@ public class CommitSaveVisitor {
         .transform(updateResult -> {
           if(updateResult.getModifiedCount() == 1) {
             return (UpsertResult) ImmutableUpsertResult.builder()
-                .id(ref.getName())
+                .id(output.getRef().getName())
                 .isModified(true)
                 .status(UpsertStatus.OK)
-                .target(ref)
+                .target(output.getRef())
                 .message(ImmutableMessage.builder()
                     .text(new StringBuilder()
                         .append("Ref with id:")
-                        .append(" '").append(ref.getName()).append("'")
+                        .append(" '").append(output.getRef().getName()).append("'")
                         .append(" has been updated.")
                         .toString())
                     .build())
                 .build();
           }
           return (UpsertResult) ImmutableUpsertResult.builder()
-              .id(ref.getName())
+              .id(output.getRef().getName())
               .isModified(false)
               .status(UpsertStatus.CONFLICT)
-              .target(ref)
+              .target(output.getRef())
               .message(ImmutableMessage.builder()
                   .text(new StringBuilder()
                       .append("Ref with")
-                      .append(" id: '").append(ref.getName()).append("',")
-                      .append(" commit: '").append(ref.getCommit()).append("'")
+                      .append(" id: '").append(output.getRef().getName()).append("',")
+                      .append(" commit: '").append(output.getRef().getCommit()).append("'")
                       .append(" is behind of the head.")
                       .toString())
                   .build())
@@ -304,7 +309,7 @@ public class CommitSaveVisitor {
             .id(tree.getId())
             .isModified(false)
             .target(tree)
-            .status(UpsertStatus.DUPLICATE)
+            .status(UpsertStatus.OK)
             .message(ImmutableMessage.builder()
                 .text(new StringBuilder()
                     .append("Tree with id:")
@@ -315,7 +320,7 @@ public class CommitSaveVisitor {
             .build());
   }
   
-  private Uni<UpsertResult> saveBlob(DocDBContext ctx, Blob blob) {
+  private Uni<UpsertResult> visitBlob(DocDBContext ctx, Blob blob) {
     return state.getClient()
       .getDatabase(ctx.getDb())
       .getCollection(ctx.getBlobs(), Blob.class)
@@ -346,6 +351,7 @@ public class CommitSaveVisitor {
           .id(blob.getId())
           .isModified(false)
           .target(blob)
+          .status(UpsertStatus.OK)
           .message(ImmutableMessage.builder()
               .text(new StringBuilder()
                   .append("Blob with id:")
@@ -362,7 +368,7 @@ public class CommitSaveVisitor {
     } else if(upsert.getStatus() == UpsertStatus.DUPLICATE) {
       return CommitOutputStatus.EMPTY;
     } else if(upsert.getStatus() == UpsertStatus.CONFLICT) {
-      return CommitOutputStatus.COMFLICT;
+      return CommitOutputStatus.CONFLICT;
     }
     return CommitOutputStatus.ERROR;
     

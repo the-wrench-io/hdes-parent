@@ -22,7 +22,6 @@ public class ObjectsActionsDefault implements ObjectsActions {
 
   @Override
   public CommitStateBuilder commitState() {
-    // TODO Auto-generated method stub
-    return null;
+    return new CommitStateBuilderDefault(state);
   }
 }
