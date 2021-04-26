@@ -32,7 +32,7 @@ public class RepoStateBuilderDefault implements RepoStateBuilder {
   public Uni<ObjectsResult<Objects>> build() {
     RepoAssert.notEmpty(repoName, () -> "repoName not defined!");
     
-    return state.getRepo(repoName).onItem().transformToUni((Repo existing) -> {
+    return state.repos().getByNameOrId(repoName).onItem().transformToUni((Repo existing) -> {
           
       if(existing == null) {
         return Uni.createFrom().item(ImmutableObjectsResult

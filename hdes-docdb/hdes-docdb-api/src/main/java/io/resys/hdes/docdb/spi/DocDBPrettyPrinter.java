@@ -1,19 +1,12 @@
 package io.resys.hdes.docdb.spi;
 
 import io.resys.hdes.docdb.api.models.Diff;
-import io.resys.hdes.docdb.api.models.Objects.Blob;
-import io.resys.hdes.docdb.api.models.Objects.Commit;
-import io.resys.hdes.docdb.api.models.Objects.Ref;
-import io.resys.hdes.docdb.api.models.Objects.Tag;
-import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Repo;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
-import io.resys.hdes.docdb.spi.state.DocDBContext;
 
 public class DocDBPrettyPrinter {
-  private final DocDBClientState state;
+  private final ClientState state;
 
-  public DocDBPrettyPrinter(DocDBClientState state) {
+  public DocDBPrettyPrinter(ClientState state) {
     super();
     this.state = state;
   }
@@ -41,7 +34,7 @@ public class DocDBPrettyPrinter {
   }
   
   public String print(Repo repo) {
-   DocDBContext ctx = state.getContext().toRepo(repo);
+   final var ctx = state.withRepo(repo);
     
     StringBuilder result = new StringBuilder();
 
@@ -57,8 +50,7 @@ public class DocDBPrettyPrinter {
     .append(System.lineSeparator())
     .append("Refs").append(System.lineSeparator());
     
-    state.getClient().getDatabase(ctx.getDb())
-    .getCollection(ctx.getRefs(), Ref.class)
+    ctx.query().refs()
     .find().onItem()
     .transform(item -> {
       result.append("  - ")
@@ -72,8 +64,7 @@ public class DocDBPrettyPrinter {
     .append(System.lineSeparator())
     .append("Tags").append(System.lineSeparator());
     
-    state.getClient().getDatabase(ctx.getDb())
-    .getCollection(ctx.getTags(), Tag.class)
+    ctx.query().tags()
     .find().onItem()
     .transform(item -> {
       result.append("  - id: ").append(item.getName())
@@ -91,8 +82,7 @@ public class DocDBPrettyPrinter {
     .append(System.lineSeparator())
     .append("Commits").append(System.lineSeparator());
     
-    state.getClient().getDatabase(ctx.getDb())
-    .getCollection(ctx.getCommits(), Commit.class)
+    ctx.query().commits()
     .find().onItem()
     .transform(item -> {
       result.append("  - id: ").append(item.getId())
@@ -112,8 +102,7 @@ public class DocDBPrettyPrinter {
     .append(System.lineSeparator())
     .append("Trees").append(System.lineSeparator());
     
-    state.getClient().getDatabase(ctx.getDb())
-    .getCollection(ctx.getTrees(), Tree.class)
+    ctx.query().trees()
     .find().onItem()
     .transform(item -> {
       result.append("  - id: ").append(item.getId()).append(System.lineSeparator());
@@ -134,8 +123,7 @@ public class DocDBPrettyPrinter {
     .append(System.lineSeparator())
     .append("Blobs").append(System.lineSeparator());
     
-    state.getClient().getDatabase(ctx.getDb())
-    .getCollection(ctx.getBlobs(), Blob.class)
+    ctx.query().blobs()
     .find().onItem()
     .transform(item -> {
       result.append("  - ").append(item.getId()).append(": ").append(item.getValue()).append(System.lineSeparator());

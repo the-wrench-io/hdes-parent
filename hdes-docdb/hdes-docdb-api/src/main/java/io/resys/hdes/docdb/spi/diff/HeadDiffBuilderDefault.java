@@ -11,19 +11,19 @@ import io.resys.hdes.docdb.api.actions.ObjectsActions.CommitObjects;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.ObjectsStatus;
 import io.resys.hdes.docdb.api.models.Diff;
 import io.resys.hdes.docdb.api.models.Objects;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
+import io.resys.hdes.docdb.spi.ClientState;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 import io.smallrye.mutiny.Uni;
 
 public class HeadDiffBuilderDefault implements HeadDiffBuilder {
-  private final DocDBClientState state;
+  private final ClientState state;
   private final ObjectsActions objects;
   
   private String repoIdOrName;
   private String leftHeadOrCommitOrTag;
   private String rightHeadOrCommitOrTag;
   
-  public HeadDiffBuilderDefault(DocDBClientState state, ObjectsActions objects) {
+  public HeadDiffBuilderDefault(ClientState state, ObjectsActions objects) {
     super();
     this.state = state;
     this.objects = objects;

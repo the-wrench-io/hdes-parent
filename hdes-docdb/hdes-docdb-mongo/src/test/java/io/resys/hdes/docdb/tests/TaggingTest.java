@@ -78,7 +78,7 @@ public class TaggingTest extends MongoDbConfig {
         .repo(repo.getRepo().getName(), commit_0.getCommit().getId())
         .build()
         .await().atMost(Duration.ofMinutes(1));
-    Assertions.assertEquals(TagStatus.OK, tag_1.getStatus());
+    Assertions.assertEquals(TagStatus.ERROR, tag_1.getStatus());
   }
   
   

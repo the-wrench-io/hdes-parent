@@ -37,7 +37,7 @@ public class MongoRefQuery implements RefQuery {
     final var ctx = wrapper.getNames();
     return this.wrapper.getClient()
         .getDatabase(ctx.getDb())
-        .getCollection(ctx.getTags(), Ref.class)
+        .getCollection(ctx.getRefs(), Ref.class)
         .find();
   }
   @Override

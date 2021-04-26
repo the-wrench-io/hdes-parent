@@ -3,6 +3,8 @@ package io.resys.hdes.docdb.api.actions;
 import java.util.List;
 import java.util.Optional;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.docdb.api.models.Message;
@@ -37,7 +39,8 @@ public interface TagActions {
   }
 
   @Value.Immutable
-  interface TagResult {    
+  interface TagResult {
+    @Nullable
     Tag getTag();
     TagStatus getStatus();
     List<Message> getMessages();

@@ -48,12 +48,10 @@ import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
 import io.resys.hdes.docdb.api.models.Diff;
 import io.resys.hdes.docdb.api.models.Repo;
+import io.resys.hdes.docdb.spi.ClientState;
 import io.resys.hdes.docdb.spi.DocDBCodecProvider;
 import io.resys.hdes.docdb.spi.DocDBFactory;
 import io.resys.hdes.docdb.spi.DocDBPrettyPrinter;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
-import io.resys.hdes.docdb.spi.state.ImmutableDocDBClientState;
-import io.resys.hdes.docdb.spi.state.ImmutableDocDBContext;
 
 public abstract class MongoDbConfig {
   private static final MongodStarter starter = MongodStarter.getDefaultInstance();
@@ -119,21 +117,9 @@ public abstract class MongoDbConfig {
     }
   }
 
-  public DocDBClientState createState() {
-    final var ctx = ImmutableDocDBContext.builder()
-        .db("junit")
-        .repos("repos")
-        .refs("refs")
-        .tags("tags")
-        .blobs("blobs")
-        .trees("trees")
-        .commits("commits")
-        .build();
-    
-    return ImmutableDocDBClientState.builder()
-        .context(ctx)
-        .client(mongo)
-        .build();
+  public ClientState createState() {
+    final var ctx = DocDBFactory.names("junit");
+    return DocDBFactory.state(ctx, mongo);
   }
 
   public void printDiff(Diff repo) {

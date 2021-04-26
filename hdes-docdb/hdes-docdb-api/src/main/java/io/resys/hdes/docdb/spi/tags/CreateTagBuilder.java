@@ -58,7 +58,7 @@ public class CreateTagBuilder implements TagBuilder {
     RepoAssert.notEmpty(commitIdOrHead, () -> "commitIdOrHead can't be empty!");
     RepoAssert.notEmpty(tagName, () -> "tagName can't be empty!");
     
-    return state.getRepo(repoId).onItem()
+    return state.repos().getByNameOrId(repoId).onItem()
         .transformToUni(repo -> {
           if(repo == null) {
             return Uni.createFrom().item(ImmutableTagResult.builder()

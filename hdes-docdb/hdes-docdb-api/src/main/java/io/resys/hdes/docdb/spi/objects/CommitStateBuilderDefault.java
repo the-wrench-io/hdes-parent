@@ -56,7 +56,7 @@ public class CommitStateBuilderDefault implements CommitStateBuilder {
     RepoAssert.notEmpty(repoName, () -> "repoName is not defined!");
     RepoAssert.notEmpty(refOrCommitOrTag, () -> "refOrCommitOrTag is not defined!");
     
-    return state.getRepo(repoName).onItem()
+    return state.repos().getByNameOrId(repoName).onItem()
     .transformToUni((Repo existing) -> {
       if(existing == null) {
         return Uni.createFrom().item(ImmutableObjectsResult

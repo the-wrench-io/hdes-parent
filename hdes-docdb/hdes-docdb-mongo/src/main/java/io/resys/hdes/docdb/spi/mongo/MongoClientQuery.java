@@ -12,19 +12,26 @@ public class MongoClientQuery implements ClientQuery {
 
   @Override
   public TagQuery tags() {
-    // TODO Auto-generated method stub
-    return null;
+    return new MongoTagQuery(wrapper);
   }
 
   @Override
   public CommitQuery commits() {
-    // TODO Auto-generated method stub
-    return null;
+    return new MongoCommitQuery(wrapper);
   }
 
   @Override
   public RefQuery refs() {
-    // TODO Auto-generated method stub
-    return null;
+    return new MongoRefQuery(wrapper);
+  }
+
+  @Override
+  public TreeQuery trees() {
+    return new MongoTreeQuery(wrapper);
+  }
+
+  @Override
+  public BlobQuery blobs() {
+    return new MongoBlobQuery(wrapper);
   }
 }

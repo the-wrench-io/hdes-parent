@@ -55,7 +55,7 @@ public class RefStateBuilderDefault implements RefStateBuilder {
     RepoAssert.notEmpty(repoName, () -> "repoName is not defined!");
     RepoAssert.notEmpty(ref, () -> "ref is not defined!");
     
-    return state.getRepo(repoName).onItem()
+    return state.repos().getByNameOrId(repoName).onItem()
     .transformToUni((Repo existing) -> {
       if(existing == null) {
         return Uni.createFrom().item(ImmutableObjectsResult

@@ -1,8 +1,11 @@
 package io.resys.hdes.docdb.spi.mongo;
 
+import java.util.stream.Collectors;
+
 import com.mongodb.client.model.Filters;
 
 import io.resys.hdes.docdb.api.models.Objects.Blob;
+import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.spi.ClientQuery.BlobQuery;
 import io.resys.hdes.docdb.spi.codec.BlobCodec;
 import io.smallrye.mutiny.Multi;
@@ -31,5 +34,16 @@ public class MongoBlobQuery implements BlobQuery {
         .getDatabase(ctx.getDb())
         .getCollection(ctx.getBlobs(), Blob.class)
         .find();
+  }
+  @Override
+  public Multi<Blob> find(Tree tree) {
+    final var ctx = wrapper.getNames();
+    return this.wrapper.getClient()
+        .getDatabase(ctx.getDb())
+        .getCollection(ctx.getBlobs(), Blob.class)
+        .find(Filters.or(
+            tree.getValues().values().stream()
+            .map(e -> Filters.eq(e.getBlob()))
+            .collect(Collectors.toList())));
   }
 }

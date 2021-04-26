@@ -29,7 +29,6 @@ public interface ClientQuery {
     Multi<Blob> find();
     Multi<Blob> find(Tree tree);
   }
-  
   interface CommitQuery {
     Uni<Commit> id(String commitId);
     Multi<Commit> find();
