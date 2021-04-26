@@ -1,0 +1,572 @@
+package io.resys.hdes.projdb.spi.builders;
+
+/*-
+ * #%L
+ * hdes-pm-backend
+ * %%
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.resys.hdes.projdb.api.ImmutableConstraintViolation;
+import io.resys.hdes.projdb.api.PmException;
+import io.resys.hdes.projdb.api.PmException.ConstraintType;
+import io.resys.hdes.projdb.api.PmException.ErrorType;
+import io.resys.hdes.projdb.api.model.ImmutableAccess;
+import io.resys.hdes.projdb.api.model.ImmutableGroup;
+import io.resys.hdes.projdb.api.model.ImmutableGroupUser;
+import io.resys.hdes.projdb.api.model.ImmutableProject;
+import io.resys.hdes.projdb.api.model.ImmutableUser;
+import io.resys.hdes.projdb.api.model.Resource.Access;
+import io.resys.hdes.projdb.api.model.Resource.Group;
+import io.resys.hdes.projdb.api.model.Resource.GroupType;
+import io.resys.hdes.projdb.api.model.Resource.GroupUser;
+import io.resys.hdes.projdb.api.model.Resource.Project;
+import io.resys.hdes.projdb.api.model.Resource.User;
+import io.resys.hdes.projdb.api.model.Resource.UserStatus;
+import io.resys.hdes.projdb.spi.context.DBContext;
+import io.resys.hdes.projdb.spi.support.RepoAssert;
+
+
+public class MongoBuilderUpdate implements ObjectsBuilder {
+  private static final Logger LOGGER = LoggerFactory.getLogger(MongoBuilderUpdate.class);
+  
+  private final DBContext context;
+  private final ObjectsQuery query;
+  private final ImmutableMongoBuilderTree.Builder collect;
+  private final MongoBuilderCreate create;
+  
+  public MongoBuilderUpdate(DBContext context) {
+    this.context = context;
+    this.query = context.query();
+    this.collect = ImmutableMongoBuilderTree.builder();
+    this.create = new MongoBuilderCreate(context);
+  }
+
+  @Override
+  public MongoBuilderTree build() {
+    MongoBuilderTree tree = collect.build();
+    if(LOGGER.isDebugEnabled()) {
+      LOGGER.debug(new StringBuilder()
+          .append("Tree has been UPDATED: ").append(System.lineSeparator())
+          .append(tree.toString()).toString());
+    }
+    return tree;
+  }
+  
+  @Override
+  public ProjectVisitor visitProject() {
+    return new ProjectVisitor() {
+      private String id;
+      private String rev;
+      private String name;
+      private List<String> users;
+      private List<String> groups;
+      
+      @Override
+      public Project build() throws PmException {
+        RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);        
+        RepoAssert.notEmpty(name, () -> "name not defined!");
+        
+        final Project project = context.update(ImmutableProject
+            .builder()
+            .id(id).rev(rev).name(name)
+            .build());
+        
+        collect.putProject(project.getId(), project);
+        if(users == null && groups == null) {
+          return project;
+        }
+        
+        // Association updates
+        final var currentAccess = query.access().project(id).findAll();
+        
+        if(users != null) {
+          final var currentUsers = currentAccess.stream()
+              .filter(a -> a.getUserId().isPresent())
+              .map(a -> a.getUserId().get())
+              .collect(Collectors.toList());
+
+          // delete users
+          final var deleteUsers = currentUsers.stream()
+            .filter(a -> !users.contains(a))
+            .collect(Collectors.toList());
+          query.access().user(deleteUsers).delete();
+          
+          // create new users
+          this.users.stream()
+            .filter(userId -> !currentUsers.contains(userId))
+            .map(id -> query.user().id(id).get())
+            .forEach(user -> create.visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
+        }
+        
+        if(groups != null) {
+          final var currentGroups = currentAccess.stream()
+              .filter(a -> a.getGroupId().isPresent())
+              .map(a -> a.getGroupId().get())
+              .collect(Collectors.toList());
+        
+          // delete groups
+          final var deleteGroups = currentGroups.stream()
+            .filter(a -> !groups.contains(a))
+            .collect(Collectors.toList());
+          query.access().group(deleteGroups).delete();
+          
+          
+          // create new groups
+          this.groups.stream()
+            .filter(groupId -> !currentGroups.contains(groupId))
+            .map(id -> query.group().id(id).get())
+            .forEach(group -> create.visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
+        }
+        
+        return project;
+      }
+      @Override
+      public ProjectVisitor visit(Project project) {
+        return visitId(project.getId())
+            .visitRev(project.getRev())
+            .visitName(project.getName());
+      }
+      @Override
+      public ProjectVisitor visitUsers(List<String> users) {
+        this.users = users;
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitGroups(List<String> groups) {
+        this.groups = groups;
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitName(String name) {
+        this.name = name;
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitRev(String rev) {
+        this.rev = rev;
+        return this;
+      }
+      @Override
+      public ProjectVisitor visitId(String id) {
+        this.id = id;
+        return this;
+      }
+    };
+  }
+  @Override
+  public GroupVisitor visitGroup() {
+    return new GroupVisitor() {
+      private String id;
+      private String rev;
+      private String name;
+      private String matcher;
+      private List<String> users;
+      private List<String> projects;
+      
+      @Override
+      public Group build() {
+        RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);      
+        RepoAssert.notEmpty(name, () -> "name not defined!");
+        
+        final String matcher = this.matcher == null || this.matcher.isBlank() ? null : this.matcher;
+        if(matcher != null) {
+          try {
+            Pattern.compile(matcher);
+          } catch(PatternSyntaxException e) {
+            throw new PmException(ImmutableConstraintViolation.builder()
+                .id(id).rev(rev)
+                .constraint(ConstraintType.INVALID_DATA)
+                .type(ErrorType.GROUP)
+                .build(), () -> "entity: 'group' with name: '" + name + "' has error in the matcher: '" + matcher + "', " + e.getMessage() + "!");
+          }
+        }
+
+        Group oldValue = query.group().id(id).rev(rev).get();
+        final var group = context.update(
+            ImmutableGroup.builder()
+              .id(id).rev(rev)
+              .name(name)
+              .type(oldValue.getType())
+              .matcher(Optional.ofNullable(matcher))
+              .build());
+
+        collect.putGroups(group.getId(), group);
+        if(users == null && projects == null) {
+          return group;
+        }
+        
+        // Association updates
+        final var currentAccess = query.access().group(id).findAll();
+        
+        if(users != null) {
+          final var currentUsers = currentAccess.stream()
+              .filter(a -> a.getUserId().isPresent())
+              .map(a -> a.getUserId().get())
+              .collect(Collectors.toList());
+
+          // delete users
+          final var deleteUsers = currentUsers.stream()
+            .filter(a -> !users.contains(a))
+            .collect(Collectors.toList());
+          query.access().user(deleteUsers).delete();
+          
+          // create new users
+          this.users.stream()
+            .filter(userId -> !currentUsers.contains(userId))
+            .map(id -> query.user().id(id).get())
+            .forEach(user -> create.visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
+        }
+        if(projects != null && group.getType() == GroupType.USER) {
+          final var currentProjects = currentAccess.stream()
+              .map(a -> a.getProjectId())
+              .collect(Collectors.toList());
+
+          // delete projects
+          final var deleteProjects = currentProjects.stream()
+            .filter(a -> !projects.contains(a))
+            .collect(Collectors.toList());
+          query.access().project(deleteProjects).delete();
+          
+          
+          // create new projects
+          this.projects.stream()
+            .filter(projectId -> !currentProjects.contains(projectId))
+            .map(id -> query.project().id(id).get())
+            .forEach(project -> create.visitAccess().visitProject(project.getId()).visitGroup(group.getId()).build());
+        }
+        
+        return group;
+      }
+      @Override
+      public GroupVisitor visit(Group entity) {
+        return visitId(entity.getId())
+            .visitRev(entity.getRev())
+            .visitName(entity.getName());
+      }
+      @Override
+      public GroupVisitor visitUsers(List<String> users) {
+        this.users = users;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitProjects(List<String> projects) {
+        this.projects = projects;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitName(String name) {
+        this.name = name;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitRev(String rev) {
+        this.rev = rev;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitId(String id) {
+        this.id = id;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitMatcher(String matcher) {
+        this.matcher = matcher;
+        return this;
+      }
+      @Override
+      public GroupVisitor visitType(GroupType type) {
+        // group type can't be updated
+        return this;
+      }
+    };
+  }
+  @Override
+  public UserVisitor visitUser() {
+    return new UserVisitor() {
+      private String id;
+      private String rev;
+      private String name;
+      private String email;
+      private Optional<String> externalId;
+      private String token;
+      private UserStatus status;
+      private List<String> groups;
+      private List<String> projects;
+      
+      @Override
+      public User build() {
+        RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);    
+        
+        
+        User oldValue = query.user().id(id).rev(rev).get();
+        if(token != null && 
+            query.user().token(token).findOne()
+            .filter(u -> !u.getId().equals(oldValue.getId())).isPresent()) {
+          
+          throw new PmException(ImmutableConstraintViolation.builder()
+              .id(id)
+              .rev(rev)
+              .constraint(ConstraintType.NOT_UNIQUE)
+              .type(ErrorType.USER)
+              .build(), () -> "entity: 'user' with token: '" + token + "' already exists!");
+        }
+        
+        final User newValue = ImmutableUser.builder().from(oldValue)
+            .name(name)
+            .email(Optional.ofNullable(email))
+            .token(token == null ? oldValue.getToken() : token)
+            .externalId(externalId == null ? oldValue.getExternalId() : externalId)
+            .status(status)
+            .build();
+        
+        final User user;
+        if(oldValue.equals(newValue)) {
+          user = oldValue;
+        } else {
+          user = context.update(newValue);          
+        }
+        
+        if(groups == null && projects == null) {
+          return user;
+        }
+        
+        // Association updates
+        final var currentAccess = query.access().user(id).findAll();
+        
+        if(groups != null) {
+          final var currentGroups = query.groupUser().user(id)
+              .findAll().stream()
+              .map(a -> a.getGroupId())
+              .collect(Collectors.toList());
+
+          // delete groups
+          final var deleteGroups = currentGroups.stream()
+            .filter(a -> !groups.contains(a))
+            .collect(Collectors.toList());
+          query.access().group(deleteGroups).delete();
+          
+          // create new groups
+          this.groups.stream()
+            .filter(groupId -> !currentGroups.contains(groupId))
+            .map(id -> query.group().id(id).get())
+            .forEach(group -> create.visitGroupUser().visitGroup(group.getId()).visitUser(user.getId()).build());
+        }
+        if(projects != null) {
+          final var currentProjects = currentAccess.stream()
+              .map(a -> a.getProjectId())
+              .collect(Collectors.toList());
+
+          // delete project
+          final var deleteProjects = currentProjects.stream()
+            .filter(a -> !projects.contains(a))
+            .collect(Collectors.toList());
+          query.access().project(deleteProjects).delete();
+          
+          // create new projects
+          this.projects.stream()
+            .filter(projectId -> !currentProjects.contains(projectId))
+            .map(id -> query.project().id(id).get())
+            .forEach(project -> create.visitAccess().visitProject(project.getId()).visitUser(user.getId()).build());
+        }
+        return user;
+      }
+      @Override
+      public UserVisitor visitProjects(List<String> projects) {
+        this.projects = projects;
+        return this;
+      }
+      @Override
+      public UserVisitor visitName(String name) {
+        this.name = name;
+        return this;
+      }
+      @Override
+      public UserVisitor visitGroups(List<String> groups) {
+        this.groups = groups;
+        return this;
+      }
+      @Override
+      public UserVisitor visitEmail(String email) {
+        this.email = email;
+        return this;
+      }
+      @Override
+      public UserVisitor visitToken(String token) {
+        this.token = token;
+        return this;
+      }
+      @Override
+      public UserVisitor visitExternalId(Optional<String> externalId) {
+        this.externalId = externalId;
+        return this;
+      }
+      @Override
+      public UserVisitor visitStatus(UserStatus status) {
+        this.status = status;
+        return this;
+      }
+      @Override
+      public UserVisitor visit(User entity) {
+        return visitId(entity.getId())
+            .visitRev(entity.getRev())
+            .visitName(entity.getName())
+            .visitStatus(entity.getStatus())
+            .visitToken(entity.getToken())
+            .visitExternalId(entity.getExternalId())
+            .visitEmail(entity.getEmail().orElse(null));
+      }
+      @Override
+      public UserVisitor visitRev(String rev) {
+        this.rev = rev;
+        return this;
+      }
+      @Override
+      public UserVisitor visitId(String id) {
+        this.id = id;
+        return this;
+      }
+    };
+  }
+
+  @Override
+  public GroupUserVisitor visitGroupUser() {
+    return new GroupUserVisitor() {
+      private String id;
+      private String rev;
+      private String userId;
+      private String groupId;
+      @Override
+      public GroupUser build() {
+        RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);        
+        RepoAssert.notEmpty(userId, () -> "userId not defined!");
+        RepoAssert.notEmpty(groupId, () -> "groupId not defined!");
+        
+        GroupUser groupUser = context.update(
+            ImmutableGroupUser.builder()
+              .id(id).rev(rev).userId(userId).groupId(groupId)
+              .build());
+        collect.putGroupUsers(groupUser.getId(), groupUser);
+        return groupUser;
+      }
+      @Override
+      public GroupUserVisitor visitRev(String rev) {
+        this.rev = rev;
+        return this;
+      }
+      @Override
+      public GroupUserVisitor visitId(String id) {
+        this.id = id;
+        return this;
+      }
+      @Override
+      public GroupUserVisitor visit(GroupUser entity) {
+        return visitId(entity.getId())
+            .visitRev(entity.getRev())
+            .visitUser(entity.getUserId())
+            .visitGroup(entity.getGroupId());
+      } 
+      @Override
+      public GroupUserVisitor visitUser(String userId) {
+        this.userId = userId;
+        return this;
+      }      
+      @Override
+      public GroupUserVisitor visitGroup(String groupId) {
+        this.groupId = groupId;
+        return this;
+      }
+    };
+  }
+
+  @Override
+  public AccessVisitor visitAccess() {
+    return new AccessVisitor() {
+      private String id;
+      private String rev;
+      private String userId;
+      private String groupId;
+      private String projectId;
+      private String comment;
+      
+      @Override
+      public Access build() {
+        RepoAssert.notEmptyAll(() -> "define id and rev!", id, rev);        
+        RepoAssert.notEmptyAtLeastOne(() -> "userId or groupId not defined!", groupId, userId);
+        RepoAssert.notEmpty(projectId, () -> "projectId not defined!");
+
+        Access access = context.update(ImmutableAccess.builder()
+            .id(id).rev(rev)
+            .userId(userId)
+            .groupId(groupId)
+            .projectId(projectId)
+            .comment(comment)
+            .build());
+        
+        collect.putAccess(access.getId(), access);
+        return access;
+      }
+      @Override
+      public AccessVisitor visitUser(String userId) {
+        this.userId = userId;
+        return this;
+      }
+      @Override
+      public AccessVisitor visitProject(String projectId) {
+        this.projectId = projectId;
+        return this;
+      }
+      @Override
+      public AccessVisitor visitGroup(String groupId) {
+        this.groupId = groupId;
+        return this;
+      }
+      @Override
+      public AccessVisitor visitComment(String comment) {
+        this.comment = comment;
+        return this;
+      }
+      @Override
+      public AccessVisitor visit(Access entity) {
+        return visitId(entity.getId())
+            .visitRev(entity.getRev())
+            .visitComment(entity.getComment().orElse(null))
+            .visitGroup(entity.getGroupId().orElse(null))
+            .visitUser(entity.getUserId().orElse(null))
+            .visitProject(entity.getProjectId());
+      }
+      @Override
+      public AccessVisitor visitRev(String rev) {
+        this.rev = rev;
+        return this;
+      }
+      @Override
+      public AccessVisitor visitId(String id) {
+        this.id = id;
+        return this;
+      }
+    };
+  }
+}
