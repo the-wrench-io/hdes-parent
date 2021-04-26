@@ -11,6 +11,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>io.resys.hdes</groupId>
+      <artifactId>hdes-docdb-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-driver-reactivestreams</artifactId>
     </dependency>

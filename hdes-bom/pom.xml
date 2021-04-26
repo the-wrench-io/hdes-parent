@@ -63,13 +63,13 @@
         <artifactId>hdes-pm-frontend</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <!-- 
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-re-frontend</artifactId>
         <version>${project.version}</version>
       </dependency>
-       -->
+
+
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-projdb-api</artifactId>
@@ -78,6 +78,16 @@
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-projdb-mongo</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-docdb-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-docdb-mongo</artifactId>
         <version>${project.version}</version>
       </dependency>
       
