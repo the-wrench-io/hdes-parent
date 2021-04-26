@@ -60,52 +60,27 @@
 
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-storage</artifactId>
+        <artifactId>hdes-pm-frontend</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-object-repo</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-object-repo-mongodb</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-assetdb</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      <!-- 
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-re-frontend</artifactId>
         <version>${project.version}</version>
       </dependency>
+       -->
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-re-backend</artifactId>
+        <artifactId>hdes-projdb-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-resources-quarkus</artifactId>
+        <artifactId>hdes-projdb-mongo</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-pm-frontend</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-pm-backend</artifactId>
-        <version>${project.version}</version>
-      </dependency>
+      
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-projects-quarkus</artifactId>

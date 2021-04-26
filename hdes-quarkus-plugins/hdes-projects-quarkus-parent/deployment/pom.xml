@@ -22,7 +22,7 @@
     </dependency>
     <dependency>
       <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-pm-backend</artifactId>
+      <artifactId>hdes-projdb-mongo</artifactId>
     </dependency>
 
 		<dependency>

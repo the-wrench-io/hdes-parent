@@ -53,7 +53,9 @@
     <module>hdes-bom</module>
     <module>hdes-core</module>
     <module>hdes-quarkus-plugins</module>
-    <module>hdes-dev-tools</module>
+    <module>hdes-projdb</module>
+    <module>hdes-docdb</module>
+    <module>hdes-frontend</module>
     <module>hdes-maven</module>
   </modules>
 

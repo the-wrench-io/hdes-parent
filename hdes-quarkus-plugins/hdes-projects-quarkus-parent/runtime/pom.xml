@@ -15,9 +15,8 @@
 
     <dependency>
       <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-pm-backend</artifactId>
+      <artifactId>hdes-projdb-mongo</artifactId>
     </dependency>
-
 
     <dependency>
       <groupId>org.eclipse.microprofile.jwt</groupId>
