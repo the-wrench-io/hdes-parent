@@ -1,12 +1,12 @@
 package io.resys.hdes.docdb.spi.objects;
 
 import io.resys.hdes.docdb.api.actions.ObjectsActions;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
+import io.resys.hdes.docdb.spi.ClientState;
 
 public class ObjectsActionsDefault implements ObjectsActions {
-  private final DocDBClientState state;
+  private final ClientState state;
   
-  public ObjectsActionsDefault(DocDBClientState state) {
+  public ObjectsActionsDefault(ClientState state) {
     super();
     this.state = state;
   }

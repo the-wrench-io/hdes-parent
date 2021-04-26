@@ -1,4 +1,4 @@
-package io.resys.hdes.docdb.spi.commit;
+package io.resys.hdes.docdb.spi.commits;
 
 import java.time.LocalDateTime;
 import java.util.Collection;

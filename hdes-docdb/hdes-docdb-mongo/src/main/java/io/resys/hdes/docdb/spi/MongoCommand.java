@@ -1,4 +1,4 @@
-package io.resys.hdes.docdb.spi.support;
+package io.resys.hdes.docdb.spi;
 
 
 import java.util.function.Function;

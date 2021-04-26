@@ -1,15 +1,15 @@
-package io.resys.hdes.docdb.spi.commit;
+package io.resys.hdes.docdb.spi.commits;
 
 import io.resys.hdes.docdb.api.actions.CommitActions;
 import io.resys.hdes.docdb.api.actions.ObjectsActions;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
+import io.resys.hdes.docdb.spi.ClientState;
 
 public class CommitActionsDefault implements CommitActions {
 
-  private final DocDBClientState state;
+  private final ClientState state;
   private final ObjectsActions objectsActions;
   
-  public CommitActionsDefault(DocDBClientState state, ObjectsActions objectsActions) {
+  public CommitActionsDefault(ClientState state, ObjectsActions objectsActions) {
     super();
     this.state = state;
     this.objectsActions = objectsActions;

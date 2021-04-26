@@ -1,13 +1,13 @@
-package io.resys.hdes.docdb.spi.tag;
+package io.resys.hdes.docdb.spi.tags;
 
 import io.resys.hdes.docdb.api.actions.TagActions;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
+import io.resys.hdes.docdb.spi.ClientState;
 
 public class TagActionsDefault implements TagActions {
 
-  private final DocDBClientState state;
+  private final ClientState state;
   
-  public TagActionsDefault(DocDBClientState state) {
+  public TagActionsDefault(ClientState state) {
     super();
     this.state = state;
   }

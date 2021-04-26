@@ -2,6 +2,7 @@ package io.resys.hdes.docdb.spi;
 
 import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
+import io.resys.hdes.docdb.spi.state.ImmutableDocDBClientState;
 import io.resys.hdes.docdb.spi.state.ImmutableDocDBContext;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 
@@ -27,6 +28,11 @@ public class DocDBFactory {
       RepoAssert.notNull(client, () -> "client must be defined!");
       RepoAssert.notNull(db, () -> "db must be defined!");
       
+      this.state = ImmutableDocDBClientState.builder()
+          .client(client)
+          .context(ctx)
+          .build();
+      
       final var ctx = ImmutableDocDBContext.builder()
         .db(db)
         .repos("repos")
@@ -36,7 +42,7 @@ public class DocDBFactory {
         .trees("trees")
         .commits("commits")
         .build();
-      return new DocDBMongoClient(client, ctx);
+      return new DocDBDefault(client, ctx);
     }
   }
 }

@@ -1,6 +1,5 @@
 package io.resys.hdes.docdb.spi;
 
-import io.quarkus.mongodb.reactive.ReactiveMongoClient;
 import io.resys.hdes.docdb.api.DocDB;
 import io.resys.hdes.docdb.api.actions.CheckoutActions;
 import io.resys.hdes.docdb.api.actions.CommitActions;
@@ -10,18 +9,15 @@ import io.resys.hdes.docdb.api.actions.ObjectsActions;
 import io.resys.hdes.docdb.api.actions.RepoActions;
 import io.resys.hdes.docdb.api.actions.TagActions;
 import io.resys.hdes.docdb.spi.checkout.CheckoutActionsDefault;
-import io.resys.hdes.docdb.spi.commit.CommitActionsDefault;
+import io.resys.hdes.docdb.spi.commits.CommitActionsDefault;
 import io.resys.hdes.docdb.spi.diff.DiffActionsDefault;
 import io.resys.hdes.docdb.spi.history.HistoryActionsDefault;
 import io.resys.hdes.docdb.spi.objects.ObjectsActionsDefault;
 import io.resys.hdes.docdb.spi.repo.RepoActionsDefault;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
-import io.resys.hdes.docdb.spi.state.DocDBContext;
-import io.resys.hdes.docdb.spi.state.ImmutableDocDBClientState;
-import io.resys.hdes.docdb.spi.tag.TagActionsDefault;
+import io.resys.hdes.docdb.spi.tags.TagActionsDefault;
 
-public class DocDBMongoClient implements DocDB {
-  private final DocDBClientState state;
+public class DocDBDefault implements DocDB {
+  private final ClientState state;
   private RepoActions repoActions;
   private CommitActions commitActions;
   private TagActions tagActions;
@@ -30,12 +26,9 @@ public class DocDBMongoClient implements DocDB {
   private ObjectsActions objectsActions;
   private DiffActions diffActions;
   
-  public DocDBMongoClient(ReactiveMongoClient client, DocDBContext ctx) {
+  public DocDBDefault(ClientState state) {
     super();
-    this.state = ImmutableDocDBClientState.builder()
-        .client(client)
-        .context(ctx)
-        .build();
+    this.state = state;
   }
   
   @Override

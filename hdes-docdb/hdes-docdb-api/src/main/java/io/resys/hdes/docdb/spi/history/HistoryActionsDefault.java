@@ -1,13 +1,13 @@
 package io.resys.hdes.docdb.spi.history;
 
 import io.resys.hdes.docdb.api.actions.HistoryActions;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
+import io.resys.hdes.docdb.spi.ClientState;
 
 public class HistoryActionsDefault implements HistoryActions {
 
-  private final DocDBClientState state;
+  private final ClientState state;
   
-  public HistoryActionsDefault(DocDBClientState state) {
+  public HistoryActionsDefault(ClientState state) {
     super();
     this.state = state;
   }

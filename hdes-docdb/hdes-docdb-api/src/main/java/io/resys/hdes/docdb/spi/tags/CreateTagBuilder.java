@@ -1,10 +1,6 @@
-package io.resys.hdes.docdb.spi.tag;
+package io.resys.hdes.docdb.spi.tags;
 
 import java.time.LocalDateTime;
-
-import com.mongodb.ErrorCategory;
-import com.mongodb.MongoWriteException;
-import com.mongodb.client.model.Filters;
 
 import io.resys.hdes.docdb.api.actions.ImmutableTagResult;
 import io.resys.hdes.docdb.api.actions.TagActions.TagBuilder;
@@ -15,16 +11,13 @@ import io.resys.hdes.docdb.api.models.ImmutableTag;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
 import io.resys.hdes.docdb.api.models.Objects.Ref;
 import io.resys.hdes.docdb.api.models.Objects.Tag;
-import io.resys.hdes.docdb.spi.codec.CommitCodec;
-import io.resys.hdes.docdb.spi.codec.RefCodec;
-import io.resys.hdes.docdb.spi.codec.TagCodec;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
-import io.resys.hdes.docdb.spi.state.DocDBContext;
+import io.resys.hdes.docdb.spi.ClientState;
+import io.resys.hdes.docdb.spi.ClientState.ClientRepoState;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 import io.smallrye.mutiny.Uni;
 
 public class CreateTagBuilder implements TagBuilder {
-  private final DocDBClientState state;
+  private final ClientState state;
   
   private String repoId;
   private String commitIdOrHead;
@@ -32,7 +25,7 @@ public class CreateTagBuilder implements TagBuilder {
   private String author;
   private String message;
   
-  public CreateTagBuilder(DocDBClientState state) {
+  public CreateTagBuilder(ClientState state) {
     super();
     this.state = state;
   }
@@ -79,7 +72,7 @@ public class CreateTagBuilder implements TagBuilder {
                 .build());
           }
           
-          final var ctx = this.state.getContext().toRepo(repo);
+          final var ctx = this.state.withRepo(repo);
           return findRef(ctx, commitIdOrHead).onItem()
             .transformToUni(ref -> findCommit(ctx, ref == null ? commitIdOrHead : ref.getCommit())).onItem()
             .transformToUni(commit -> {
@@ -115,36 +108,19 @@ public class CreateTagBuilder implements TagBuilder {
         });
   }
 
-  private Uni<Tag> findTag(DocDBContext ctx, String tagName) {
-    return this.state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getRefs(), Tag.class)
-        .find(Filters.eq(TagCodec.ID, tagName))
-        .collectItems()
-        .first();
+  private Uni<Tag> findTag(ClientRepoState state, String tagName) {
+    return state.query().tags().name(tagName).get();
   }
 
-  private Uni<Ref> findRef(DocDBContext ctx, String refNameOrCommit) {
-    return this.state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getRefs(), Ref.class)
-        .find(Filters.or(
-            Filters.eq(RefCodec.NAME, refNameOrCommit),
-            Filters.eq(RefCodec.COMMIT, refNameOrCommit)
-        ))
-        .collectItems()
-        .first();
+  private Uni<Ref> findRef(ClientRepoState state, String refNameOrCommit) {
+    return state.query().refs().nameOrCommit(refNameOrCommit);
   }
   
-  private Uni<Commit> findCommit(DocDBContext ctx, String commit) {
-    return this.state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getCommits(), Commit.class)
-        .find(Filters.eq(CommitCodec.ID, commit))
-        .collectItems().first();
+  private Uni<Commit> findCommit(ClientRepoState state, String commit) {
+    return state.query().commits().id(commit);
   }
   
-  private Uni<TagResult> createTag(DocDBContext ctx, String commit) {
+  private Uni<TagResult> createTag(ClientRepoState state, String commit) {
     final var tag = ImmutableTag.builder()
         .commit(commit)
         .name(tagName)
@@ -152,28 +128,25 @@ public class CreateTagBuilder implements TagBuilder {
         .author(author)
         .dateTime(LocalDateTime.now())
         .build();
-    
-    return this.state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getTags(), Tag.class)
-        .insertOne(tag)
-        .onItem().transform(inserted -> (TagResult) ImmutableTagResult.builder()
-            .status(TagStatus.OK).tag(tag)
-            .build())
-        .onFailure(e  -> {
-          com.mongodb.MongoWriteException t = (MongoWriteException) e;
-          return t.getError().getCategory() == ErrorCategory.DUPLICATE_KEY;
-        })
-        .recoverWithItem(e -> (TagResult) ImmutableTagResult.builder()
-          .status(TagStatus.ERROR)
-          .tag(tag)
-          .addMessages(ImmutableMessage.builder()
-              .text(new StringBuilder()
-                  .append("Tag with name:")
-                  .append(" '").append(tagName).append("'")
-                  .append(" is already created.")
-                  .toString())
-              .build())
-          .build());
+    return state.insert()
+        .tag(tag)
+        .onItem().transform(inserted -> {
+          if(inserted.getDuplicate()) {
+            return (TagResult) ImmutableTagResult.builder()
+                .status(TagStatus.ERROR)
+                .tag(tag)
+                .addMessages(ImmutableMessage.builder()
+                    .text(new StringBuilder()
+                        .append("Tag with name:")
+                        .append(" '").append(tagName).append("'")
+                        .append(" is already created.")
+                        .toString())
+                    .build())
+                .build();
+          } 
+          return (TagResult) ImmutableTagResult.builder()
+              .status(TagStatus.OK).tag(tag)
+              .build();
+        });
   }
 }

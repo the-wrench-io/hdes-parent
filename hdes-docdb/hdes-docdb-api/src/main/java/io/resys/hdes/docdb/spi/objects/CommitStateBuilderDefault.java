@@ -3,9 +3,6 @@ package io.resys.hdes.docdb.spi.objects;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.mongodb.client.model.Filters;
-
-import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
 import io.resys.hdes.docdb.api.actions.ImmutableCommitObjects;
 import io.resys.hdes.docdb.api.actions.ImmutableObjectsResult;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.CommitObjects;
@@ -17,25 +14,20 @@ import io.resys.hdes.docdb.api.models.ImmutableMessage;
 import io.resys.hdes.docdb.api.models.Message;
 import io.resys.hdes.docdb.api.models.Objects.Blob;
 import io.resys.hdes.docdb.api.models.Objects.Commit;
-import io.resys.hdes.docdb.api.models.Objects.Ref;
-import io.resys.hdes.docdb.api.models.Objects.Tag;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Repo;
-import io.resys.hdes.docdb.spi.codec.CommitCodec;
-import io.resys.hdes.docdb.spi.codec.RefCodec;
-import io.resys.hdes.docdb.spi.codec.TreeCodec;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
-import io.resys.hdes.docdb.spi.state.DocDBContext;
+import io.resys.hdes.docdb.spi.ClientState;
+import io.resys.hdes.docdb.spi.ClientState.ClientRepoState;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 import io.smallrye.mutiny.Uni;
 
 public class CommitStateBuilderDefault implements CommitStateBuilder {
-  private final DocDBClientState state;
+  private final ClientState state;
   private String repoName;
   private String refOrCommitOrTag;
   private boolean blobs;
   
-  public CommitStateBuilderDefault(DocDBClientState state) {
+  public CommitStateBuilderDefault(ClientState state) {
     super();
     this.state = state;
   }
@@ -73,7 +65,7 @@ public class CommitStateBuilderDefault implements CommitStateBuilder {
             .addMessages(RepoException.builder().notRepoWithName(repoName))
             .build());
       }
-      final var ctx = state.getContext().toRepo(existing);
+      final var ctx = state.withRepo(existing);
       
       return getTagCommit(refOrCommitOrTag, ctx)
         .onItem().transformToUni(tag -> {
@@ -110,7 +102,7 @@ public class CommitStateBuilderDefault implements CommitStateBuilder {
       .build();
   }
   
-  private Uni<ObjectsResult<CommitObjects>> getState(Repo repo, Commit commit, DocDBContext ctx) {
+  private Uni<ObjectsResult<CommitObjects>> getState(Repo repo, Commit commit, ClientRepoState ctx) {
     return getTree(commit, ctx).onItem()
         .transformToUni(tree -> {
           if(this.blobs) {
@@ -140,38 +132,23 @@ public class CommitStateBuilderDefault implements CommitStateBuilder {
         });
   
   }
-  private Uni<String> getTagCommit(String tagName, DocDBContext ctx) {
-    final ReactiveMongoCollection<Tag> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getTags(), Tag.class);
-    return collection.find(Filters.eq(RefCodec.NAME, tagName)).collectItems()
-        .first().onItem().transform(tag -> tag == null ? null : tag.getCommit());
+  private Uni<String> getTagCommit(String tagName, ClientRepoState ctx) {
+    return ctx.query().tags().name(tagName).get()
+        .onItem().transform(tag -> tag == null ? null : tag.getCommit());
   }
-  private Uni<String> getRefCommit(String refName, DocDBContext ctx) {
-    final ReactiveMongoCollection<Ref> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getRefs(), Ref.class);
-    return collection.find(Filters.eq(RefCodec.NAME, refName)).collectItems()
-        .first().onItem().transform(ref -> ref == null ? null : ref.getCommit());
+  private Uni<String> getRefCommit(String refName, ClientRepoState ctx) {
+    return ctx.query().refs().name(refName)
+        .onItem().transform(ref -> ref == null ? null : ref.getCommit());
   }
-  private Uni<Tree> getTree(Commit commit, DocDBContext ctx) {
-    final ReactiveMongoCollection<Tree> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getTrees(), Tree.class);
-    
-    return collection.find(Filters.eq(TreeCodec.ID, commit.getTree())).toUni();
+  private Uni<Tree> getTree(Commit commit, ClientRepoState ctx) {
+    return ctx.query().trees().id(commit.getTree());
   }
-  private Uni<Commit> getCommit(String commit, DocDBContext ctx) {
-    final ReactiveMongoCollection<Commit> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getCommits(), Commit.class);
-    return collection.find(Filters.eq(CommitCodec.ID, commit)).toUni();
+  private Uni<Commit> getCommit(String commit, ClientRepoState ctx) {
+    return ctx.query().commits().id(commit);
   }
-  private Uni<Map<String, Blob>> getBlobs(Tree tree, DocDBContext ctx) {
-    final ReactiveMongoCollection<Blob> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getBlobs(), Blob.class);
-    return collection.find().collectItems().asList().onItem()
+  private Uni<Map<String, Blob>> getBlobs(Tree tree, ClientRepoState ctx) {
+    return ctx.query().blobs().find(tree)
+        .collectItems().asList().onItem()
         .transform(blobs -> blobs.stream().collect(Collectors.toMap(r -> r.getId(), r -> r)));
   }
 }

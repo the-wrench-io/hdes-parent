@@ -3,9 +3,6 @@ package io.resys.hdes.docdb.spi.objects;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.mongodb.client.model.Filters;
-
-import io.quarkus.mongodb.reactive.ReactiveMongoCollection;
 import io.resys.hdes.docdb.api.actions.ImmutableObjectsResult;
 import io.resys.hdes.docdb.api.actions.ImmutableRefObjects;
 import io.resys.hdes.docdb.api.actions.ObjectsActions.ObjectsResult;
@@ -18,21 +15,18 @@ import io.resys.hdes.docdb.api.models.Objects.Commit;
 import io.resys.hdes.docdb.api.models.Objects.Ref;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
 import io.resys.hdes.docdb.api.models.Repo;
-import io.resys.hdes.docdb.spi.codec.CommitCodec;
-import io.resys.hdes.docdb.spi.codec.RefCodec;
-import io.resys.hdes.docdb.spi.codec.TreeCodec;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
-import io.resys.hdes.docdb.spi.state.DocDBContext;
+import io.resys.hdes.docdb.spi.ClientState;
+import io.resys.hdes.docdb.spi.ClientState.ClientRepoState;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 import io.smallrye.mutiny.Uni;
 
 public class RefStateBuilderDefault implements RefStateBuilder {
-  private final DocDBClientState state;
+  private final ClientState state;
   private String repoName;
   private String ref;
   private boolean blobs;
   
-  public RefStateBuilderDefault(DocDBClientState state) {
+  public RefStateBuilderDefault(ClientState state) {
     super();
     this.state = state;
   }
@@ -70,15 +64,13 @@ public class RefStateBuilderDefault implements RefStateBuilder {
             .addMessages(RepoException.builder().notRepoWithName(repoName))
             .build());
       }
-      return getRef(existing, ref, state.getContext().toRepo(existing));
+      return getRef(existing, ref, state.withRepo(existing));
     });
   }
   
-  private Uni<ObjectsResult<RefObjects>> getRef(Repo repo, String refName, DocDBContext ctx) {
-    final ReactiveMongoCollection<Ref> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getRefs(), Ref.class);
-    return collection.find(Filters.eq(RefCodec.NAME, refName)).collectItems().first().onItem()
+  private Uni<ObjectsResult<RefObjects>> getRef(Repo repo, String refName, ClientRepoState ctx) {
+
+    return ctx.query().refs().name(refName).onItem()
         .transformToUni(ref -> {
           if(ref == null) {
             return Uni.createFrom().item(ImmutableObjectsResult
@@ -92,7 +84,7 @@ public class RefStateBuilderDefault implements RefStateBuilder {
         });
   }
   
-  private Uni<ObjectsResult<RefObjects>> getState(Repo repo, Ref ref, DocDBContext ctx) {
+  private Uni<ObjectsResult<RefObjects>> getState(Repo repo, Ref ref, ClientRepoState ctx) {
     return getCommit(ref, ctx).onItem()
         .transformToUni(commit -> getTree(commit, ctx).onItem()
         .transformToUni(tree -> {
@@ -125,24 +117,14 @@ public class RefStateBuilderDefault implements RefStateBuilder {
         }));
   
   }
-  private Uni<Tree> getTree(Commit commit, DocDBContext ctx) {
-    final ReactiveMongoCollection<Tree> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getTrees(), Tree.class);
-    
-    return collection.find(Filters.eq(TreeCodec.ID, commit.getTree())).toUni();
+  private Uni<Tree> getTree(Commit commit, ClientRepoState ctx) {
+    return ctx.query().trees().id(commit.getTree());
   }
-  private Uni<Commit> getCommit(Ref ref, DocDBContext ctx) {
-    final ReactiveMongoCollection<Commit> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getCommits(), Commit.class);
-    return collection.find(Filters.eq(CommitCodec.ID, ref.getCommit())).toUni();
+  private Uni<Commit> getCommit(Ref ref, ClientRepoState ctx) {
+    return ctx.query().commits().id(ref.getCommit());
   }
-  private Uni<Map<String, Blob>> getBlobs(Tree tree, DocDBContext ctx) {
-    final ReactiveMongoCollection<Blob> collection = state.getClient()
-        .getDatabase(ctx.getDb())
-        .getCollection(ctx.getBlobs(), Blob.class);
-    return collection.find().collectItems().asList().onItem()
+  private Uni<Map<String, Blob>> getBlobs(Tree tree, ClientRepoState ctx) {
+    return ctx.query().blobs().find(tree).collectItems().asList().onItem()
         .transform(blobs -> blobs.stream().collect(Collectors.toMap(r -> r.getId(), r -> r)));
   }
 }

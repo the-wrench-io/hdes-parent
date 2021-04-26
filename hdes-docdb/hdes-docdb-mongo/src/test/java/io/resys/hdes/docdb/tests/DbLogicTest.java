@@ -15,9 +15,9 @@ import io.resys.hdes.docdb.api.models.ImmutableMessage;
 import io.resys.hdes.docdb.api.models.ImmutableTree;
 import io.resys.hdes.docdb.api.models.ImmutableTreeValue;
 import io.resys.hdes.docdb.api.models.Objects.Tree;
-import io.resys.hdes.docdb.spi.commit.CommitSaveVisitor.UpsertResult;
-import io.resys.hdes.docdb.spi.commit.CommitSaveVisitor.UpsertStatus;
 import io.resys.hdes.docdb.spi.commit.ImmutableUpsertResult;
+import io.resys.hdes.docdb.spi.commits.CommitSaveVisitor.UpsertResult;
+import io.resys.hdes.docdb.spi.commits.CommitSaveVisitor.UpsertStatus;
 import io.resys.hdes.docdb.tests.config.MongoDbConfig;
 
 

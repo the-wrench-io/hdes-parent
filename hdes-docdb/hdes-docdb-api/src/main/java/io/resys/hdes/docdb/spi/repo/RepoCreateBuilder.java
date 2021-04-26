@@ -12,18 +12,18 @@ import io.resys.hdes.docdb.api.actions.RepoActions.RepoStatus;
 import io.resys.hdes.docdb.api.exceptions.RepoException;
 import io.resys.hdes.docdb.api.models.ImmutableRepo;
 import io.resys.hdes.docdb.api.models.Repo;
+import io.resys.hdes.docdb.spi.ClientState;
 import io.resys.hdes.docdb.spi.codec.RepoCodec;
-import io.resys.hdes.docdb.spi.state.DocDBClientState;
 import io.resys.hdes.docdb.spi.support.Identifiers;
 import io.resys.hdes.docdb.spi.support.RepoAssert;
 import io.smallrye.mutiny.Uni;
 
 public class RepoCreateBuilder implements RepoActions.CreateBuilder {
 
-  private final DocDBClientState state;
+  private final ClientState state;
   private String name;
   
-  public RepoCreateBuilder(DocDBClientState state) {
+  public RepoCreateBuilder(ClientState state) {
     super();
     this.state = state;
   }
