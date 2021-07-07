@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.resys.hdes</groupId>
   <artifactId>hdes</artifactId>
-  <version>999-SNAPSHOT</version>
+  <version>3.y-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>hdes</name>
 
@@ -33,7 +34,7 @@
   <scm>
     <connection>scm:git:https://github.com/the-wrench-io/hdes.git</connection>
     <developerConnection>scm:git:https://github.com/the-wrench-io/hdes.git</developerConnection>
-    <url>http://github.com/the-wrench-io/hdes/tree/master</url>
+    <url>http://github.com/the-wrench-io/hdes/tree/3.y-dev</url>
     <tag>HEAD</tag>
   </scm>
 
@@ -49,14 +50,10 @@
   </distributionManagement>
 
   <modules>
-    <module>hdes-build-parent</module>
     <module>hdes-bom</module>
+    <module>hdes-build-parent</module>
     <module>hdes-core</module>
-    <module>hdes-quarkus-plugins</module>
-    <module>hdes-projdb</module>
-    <module>hdes-docdb</module>
-    <module>hdes-frontend</module>
-    <module>hdes-maven</module>
+    <module>hdes-spring</module>
   </modules>
 
   <properties>

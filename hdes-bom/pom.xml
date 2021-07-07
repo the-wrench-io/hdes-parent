@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>3.y-SNAPSHOT</version>
   </parent>
 
   <artifactId>hdes-bom</artifactId>
@@ -18,82 +18,38 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-ast</artifactId>
+        <artifactId>hdes-datatype</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-compiler</artifactId>
+        <artifactId>hdes-dt</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-runtime</artifactId>
+        <artifactId>hdes-flow</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-runtime-test</artifactId>
+        <artifactId>hdes-script</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-executor</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-interpreter</artifactId>
+        <artifactId>hdes-services</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-maven-plugin</artifactId>
+        <artifactId>hdes-spring-bundle</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-dev-app</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-pm-frontend</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-re-frontend</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-
-
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-projdb-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-projdb-mongo</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-docdb-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-docdb-mongo</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-projects-quarkus</artifactId>
+        <artifactId>hdes-spring-bundle-editor</artifactId>
         <version>${project.version}</version>
       </dependency>
       

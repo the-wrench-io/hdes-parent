@@ -1,0 +1,66 @@
+package io.resys.wrench.assets.bundle.spi.dt.resolvers;
+
+/*-
+ * #%L
+ * wrench-assets-bundle
+ * %%
+ * Copyright (C) 2016 - 2018 Copyright 2016 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
+import io.resys.wrench.assets.bundle.spi.flow.executors.VariableResolver;
+import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
+import io.resys.wrench.assets.flow.api.model.Flow;
+import io.resys.wrench.assets.flow.api.model.Flow.FlowTaskStatus;
+import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
+
+public class FlowDtInputResolver implements Serializable, DtInputResolver {
+
+  private static final long serialVersionUID = 8818379343078413837L;
+
+  private final Map<String, Object> variables;
+  private final Map<String, Serializable> tasks;
+  private final Map<String, String> mapping;
+
+  public FlowDtInputResolver(Flow flow, FlowTaskModel node) {
+    mapping = node.getBody().getInputs();
+    variables = new HashMap<>();
+    tasks = new HashMap<>();
+
+    // Flow level variables
+    flow.getContext().getVariables().forEach((key, value) -> variables.put(key, value));
+
+    // Completed task variables
+    flow.getContext().getTasks().stream()
+    .filter(t -> t.getStatus() == FlowTaskStatus.COMPLETED)
+    .forEach(t -> tasks.put(t.getModelId(), t.getVariables().get(t.getModelId())));
+  }
+
+  @Override
+  public Object apply(DataType t) {
+    String name = mapping.get(t.getName());
+
+    // Flat mapping
+    if(variables.containsKey(name)) {
+      return variables.get(name);
+    }
+    return VariableResolver.getVariableOnPath(name, tasks);
+  }
+}

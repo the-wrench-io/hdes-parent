@@ -1,0 +1,6 @@
+attitudeToLoss:
+  type: STRING
+  min:
+  max: 
+  pattern:
+  values: 

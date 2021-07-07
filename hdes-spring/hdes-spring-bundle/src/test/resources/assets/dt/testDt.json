@@ -1,0 +1,51 @@
+[
+  {
+    "type": "ADD_HEADER_IN"
+  },
+  {
+    "id": "0",
+    "type": "SET_HEADER_NAME"
+  },
+  {
+    "id": "0",
+    "value": "inputColumn",
+    "type": "SET_HEADER_REF"
+  },
+  {
+    "id": "0",
+    "type": "SET_HEADER_SCRIPT"
+  },
+  {
+    "id": "0",
+    "value": "STRING",
+    "type": "SET_HEADER_TYPE"
+  },
+  {
+    "type": "ADD_HEADER_OUT"
+  },
+  {
+    "id": "1",
+    "type": "SET_HEADER_NAME"
+  },
+  {
+    "id": "1",
+    "value": "outputColumn",
+    "type": "SET_HEADER_REF"
+  },
+  {
+    "id": "1",
+    "type": "SET_HEADER_SCRIPT"
+  },
+  {
+    "id": "1",
+    "value": "STRING",
+    "type": "SET_HEADER_TYPE"
+  },
+  {
+    "value": "test decision table",
+    "type": "SET_NAME"
+  },
+  {
+    "type": "SET_DESCRIPTION"
+  }
+]

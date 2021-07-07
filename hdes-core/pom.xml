@@ -4,7 +4,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-build-parent</artifactId>
-    <version>999-SNAPSHOT</version>
+    <version>3.y-SNAPSHOT</version>
     <relativePath>../hdes-build-parent/pom.xml</relativePath>
   </parent>
 
@@ -12,13 +12,11 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hdes-ast</module>
-    <module>hdes-executor</module>
-    
-    <module>hdes-interpreter</module>
-    <module>hdes-runtime-test</module>
-    <module>hdes-runtime</module>
-    <module>hdes-compiler</module>
+    <module>hdes-datatype</module>
+    <module>hdes-dt</module>
+    <module>hdes-flow</module>
+    <module>hdes-script</module>
+    <module>hdes-services</module>
   </modules>
 
 </project>

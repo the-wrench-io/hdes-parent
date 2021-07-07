@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.resys.wrench.assets.bundle.spi.AssetAutoConfiguration
