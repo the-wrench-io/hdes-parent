@@ -87,7 +87,6 @@ public class AssetExceptionMapping {
   
   /**
    * Calculate unique hash for exception case
-   * @param e Exception
    * @return Unique hash for exception
    */
   protected String exceptionHash(String msg, long timestamp) {

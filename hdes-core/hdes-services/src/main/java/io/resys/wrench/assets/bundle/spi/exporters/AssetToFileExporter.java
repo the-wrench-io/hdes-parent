@@ -46,11 +46,8 @@ public class AssetToFileExporter {
   private AssetToFileExporter() {
     objectMapper = new ObjectMapper();
   }
-
-  /**
-   * @param patternForSpring "classpath:" + location
-   */
   public AssetToFileExporter resource(String location) {
+    //patternForSpring "classpath:" + location
     this.location = location;
     return this;
   }
