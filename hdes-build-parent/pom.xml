@@ -23,7 +23,8 @@
 
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.24</slf4j.version>
-    <jackson.version>2.10.2</jackson.version>
+    <jackson.version>2.10.5.1</jackson.version>
+    <jackson.format.version>2.10.5</jackson.format.version>
     <immutables.version>2.8.2</immutables.version>
     <findbugs.version>3.0.2</findbugs.version>
     <guava.version>30.0-jre</guava.version>
@@ -35,7 +36,7 @@
     <junit.version>4.12</junit.version>
     <jsonassert.version>1.5.0</jsonassert.version>
 
-    <commons-io.version>2.5</commons-io.version>
+    <commons-io.version>2.7</commons-io.version>
     <commons-csv.version>1.5</commons-csv.version>
     <commons-codec.version>1.13</commons-codec.version>
     <commons-lang.version>3.9</commons-lang.version>
@@ -220,22 +221,22 @@
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-jdk8</artifactId>
-        <version>${jackson.version}</version>
+        <version>${jackson.format.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-yaml</artifactId>
-        <version>${jackson.version}</version>
+        <version>${jackson.format.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.dataformat</groupId>
         <artifactId>jackson-dataformat-csv</artifactId>
-        <version>${jackson.version}</version>
+        <version>${jackson.format.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-guava</artifactId>
-        <version>${jackson.version}</version>
+        <version>${jackson.format.version}</version>
       </dependency>
 
       <!-- JGIT -->
