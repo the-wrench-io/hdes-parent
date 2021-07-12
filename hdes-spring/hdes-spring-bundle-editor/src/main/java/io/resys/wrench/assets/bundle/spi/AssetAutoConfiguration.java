@@ -30,7 +30,6 @@ import io.resys.wrench.assets.bundle.spi.store.git.AssetAuthorProvider;
 import io.resys.wrench.assets.context.config.GitConfigBean;
 import io.resys.wrench.assets.controllers.exception.AssetExceptionMapping;
 import io.resys.wrench.assets.git.AssetGitConfiguration;
-import io.resys.wrench.assets.git.SpringSecurityAssetAuthorProvider;
 
 @Configuration
 @ConditionalOnProperty(name = "wrench.assets.enabled", havingValue = "true", matchIfMissing = true)
@@ -43,13 +42,6 @@ public class AssetAutoConfiguration {
   @Bean
   public AssetExceptionMapping assetExceptionMapping() {
     return new AssetExceptionMapping();
-  }
-  
-  @Bean
-  @ConditionalOnMissingBean(AssetAuthorProvider.class)
-  @ConditionalOnProperty(value = "security.oauth2.enabled", havingValue = "true")
-  public AssetAuthorProvider springSecurityAssetAuthorProvider(GitConfigBean gitConfigBean) {
-    return new SpringSecurityAssetAuthorProvider(gitConfigBean);
   }
 
   @Bean
