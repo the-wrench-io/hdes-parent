@@ -52,7 +52,6 @@ public class AssetGitConfiguration {
         authorProvider = Optional.of(() -> new AssetAuthorProvider.Author("assetManager", "assetManager@resys.io"));  
       } 
     }
-    
     return new SshGitRepository(gitConfigBean.toConfig(), authorProvider.get());
   }
   @Bean
