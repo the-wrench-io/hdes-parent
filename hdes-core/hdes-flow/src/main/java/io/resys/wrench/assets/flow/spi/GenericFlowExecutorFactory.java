@@ -42,7 +42,7 @@ public class GenericFlowExecutorFactory implements FlowExecutorRepository {
   @Override
   public FlowTaskExecutor createTaskExecutor(FlowTaskType type) {
     if(!executors.containsKey(type)) {
-      throw new FlowException("No executor for flow type: " + type + "!");
+      throw new FlowDefinitionException("No executor for flow type: " + type + "!");
     }
     return executors.get(type);
   }

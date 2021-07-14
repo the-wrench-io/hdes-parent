@@ -72,7 +72,7 @@ public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTas
     } catch(Exception e) {
       String message = "Failed to evaluate expression: \"" + node.getBody().getExpression() + "\" in flow: \"" + flow.getModel().getId() + "\", id: " + flow.getId() + ", decision: \"" + node.getId() + "\"!";
       LOGGER.error(message, e);
-      throw new FlowException(message, node, e);
+      throw new FlowException(message, flow, node, e);
     }
   }
 
