@@ -21,10 +21,16 @@ package io.resys.wrench.assets.dt.spi.beans;
  */
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
+import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNodeInput;
+import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNodeOutput;
 
 public class ImmutableDecisionTableNode implements DecisionTableNode {
 
@@ -32,8 +38,9 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
 
   private final int id;
   private final int order;
-  private final Map<DataType, String> inputs;
-  private final Map<DataType, Serializable> outputs;
+  private final List<DecisionTableNodeInput> inputs;
+  private final List<DecisionTableNodeOutput> outputs;
+  @JsonIgnore
   private final DecisionTableNode previous;
   private DecisionTableNode next;
 
@@ -42,8 +49,8 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
     super();
     this.order = order;
     this.id = id;
-    this.inputs = inputs;
-    this.outputs = outputs;
+    this.inputs = inputs.entrySet().stream().map(e -> new ImmutableDecisionTableNodeInput(e.getKey(), e.getValue())).collect(Collectors.toUnmodifiableList());
+    this.outputs = outputs.entrySet().stream().map(e -> new ImmutableDecisionTableNodeOutput(e.getKey(), e.getValue())).collect(Collectors.toUnmodifiableList());
     this.previous = previous;
   }
 
@@ -53,12 +60,12 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
   }
 
   @Override
-  public Map<DataType, String> getInputs() {
+  public List<DecisionTableNodeInput> getInputs() {
     return inputs;
   }
 
   @Override
-  public Map<DataType, Serializable> getOutputs() {
+  public List<DecisionTableNodeOutput> getOutputs() {
     return outputs;
   }
 
@@ -121,5 +128,97 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
 
   public void setNext(DecisionTableNode next) {
     this.next = next;
+  }
+  
+  private static final class ImmutableDecisionTableNodeOutput implements DecisionTableNodeOutput {
+    private static final long serialVersionUID = 7364145982894215127L;
+    private final DataType key;
+    private final Serializable value;
+    public ImmutableDecisionTableNodeOutput(DataType key, Serializable value) {
+      super();
+      this.key = key;
+      this.value = value;
+    }
+    public DataType getKey() {
+      return key;
+    }
+    public Serializable getValue() {
+      return value;
+    }
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((key == null) ? 0 : key.hashCode());
+      result = prime * result + ((value == null) ? 0 : value.hashCode());
+      return result;
+    }
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      ImmutableDecisionTableNodeOutput other = (ImmutableDecisionTableNodeOutput) obj;
+      if (key == null) {
+        if (other.key != null)
+          return false;
+      } else if (!key.equals(other.key))
+        return false;
+      if (value == null) {
+        if (other.value != null)
+          return false;
+      } else if (!value.equals(other.value))
+        return false;
+      return true;
+    }
+  }
+  
+  private static final class ImmutableDecisionTableNodeInput implements DecisionTableNodeInput {
+    private static final long serialVersionUID = -6095582758590972380L;
+    private final DataType key;
+    private final String value;
+    public ImmutableDecisionTableNodeInput(DataType key, String value) {
+      super();
+      this.key = key;
+      this.value = value;
+    }
+    public DataType getKey() {
+      return key;
+    }
+    public String getValue() {
+      return value;
+    }
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((key == null) ? 0 : key.hashCode());
+      result = prime * result + ((value == null) ? 0 : value.hashCode());
+      return result;
+    }
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+      if (obj == null)
+        return false;
+      if (getClass() != obj.getClass())
+        return false;
+      ImmutableDecisionTableNodeInput other = (ImmutableDecisionTableNodeInput) obj;
+      if (key == null) {
+        if (other.key != null)
+          return false;
+      } else if (!key.equals(other.key))
+        return false;
+      if (value == null) {
+        if (other.value != null)
+          return false;
+      } else if (!value.equals(other.value))
+        return false;
+      return true;
+    }
   }
 }

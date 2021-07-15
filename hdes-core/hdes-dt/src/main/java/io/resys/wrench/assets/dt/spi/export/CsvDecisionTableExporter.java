@@ -61,8 +61,8 @@ public class CsvDecisionTableExporter extends TemplateDecisionTableExporter impl
     }
 
     Map<String, Object> entries = new HashMap<>();
-    node.getInputs().forEach((key, value) -> entries.put(key.getName(), value));
-    node.getOutputs().forEach((key, value) -> entries.put(key.getName(), value));
+    node.getInputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
+    node.getOutputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
 
     List<Object> values = new ArrayList<>();
     for(String name : headerNames) {
