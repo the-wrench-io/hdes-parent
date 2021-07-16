@@ -36,6 +36,7 @@ import io.resys.wrench.assets.dt.api.DecisionTableRepository.HitPolicyExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.NodeExpressionExecutor;
 import io.resys.wrench.assets.dt.api.model.DecisionTable;
 import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
+import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNodeInput;
 import io.resys.wrench.assets.dt.api.model.DecisionTableResult;
 import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionContext;
 import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionTableDecision;
@@ -93,7 +94,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
     List<DecisionContext> data = new ArrayList<>();
     
     Map<String, DecisionTableExpression> expressions = new HashMap<>();
-    for(Map.Entry<DataType, String> input : node.getInputs().entrySet()) {
+    for(DecisionTableNodeInput input : node.getInputs()) {
       Object contextEntity = this.context.apply(input.getKey());
       if(DecisionTableFixedValue.ALWAYS_TRUE == contextEntity) {
         DecisionTableExpression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());

@@ -1,12 +1,10 @@
 package io.resys.wrench.assets.flow.spi;
 
-import io.resys.wrench.assets.flow.api.model.Flow;
-
 /*-
  * #%L
- * wrench-assets-flow
+ * hdes-flow
  * %%
- * Copyright (C) 2016 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,39 +22,31 @@ import io.resys.wrench.assets.flow.api.model.Flow;
 
 import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
 
-public class FlowException extends RuntimeException {
+public class FlowDefinitionException extends RuntimeException {
 
-  private static final long serialVersionUID = 6659681954052672940L;
+  private static final long serialVersionUID = 2978117894572351791L;
 
   private final FlowTaskModel node;
-  private final Flow flow;
-  
-  public FlowException(String message, Flow flow, FlowTaskModel node, Throwable cause) {
+
+  public FlowDefinitionException(String message, FlowTaskModel node, Throwable cause) {
     super(message, cause);
     this.node = node;
-    this.flow = flow;
-  }
-  public FlowException(String message, Flow flow, FlowTaskModel node) {
-    super(message);
-    this.node = node;
-    this.flow = flow;
-  }
-  public FlowException(Flow flow, String message) {
-    super(message);
-    this.node = null;
-    this.flow = flow;
   }
 
-  public FlowException(Flow flow, String message, Throwable cause) {
+  public FlowDefinitionException(String message, Throwable cause) {
     super(message, cause);
     this.node = null;
-    this.flow = flow;
   }
 
+  public FlowDefinitionException(String message, FlowTaskModel node) {
+    super(message);
+    this.node = node;
+  }
+  public FlowDefinitionException(String message) {
+    super(message);
+    this.node = null;
+  }
   public FlowTaskModel getNode() {
     return node;
-  }
-  public Flow getFlow() {
-    return flow;
   }
 }

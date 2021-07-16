@@ -69,8 +69,8 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
     result.add(ImmutableCommand.builder().type(CommandType.ADD_ROW).build());
 
     Map<String, Object> entries = new HashMap<>();
-    node.getInputs().forEach((key, value) -> entries.put(key.getName(), value));
-    node.getOutputs().forEach((key, value) -> entries.put(key.getName(), value));
+    node.getInputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
+    node.getOutputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
 
     for(DecisionTableDataType header : headers) {
       Object value = entries.get(header.getValue().getName());

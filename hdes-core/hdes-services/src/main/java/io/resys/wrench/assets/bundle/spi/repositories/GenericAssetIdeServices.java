@@ -165,9 +165,10 @@ public class GenericAssetIdeServices implements AssetIdeServices {
       } else if(service.getType() == ServiceType.FLOW) {
 
         if(entity.getInput() != null) {
-          Map.Entry<Flow, ObjectNode> result = transientFlowExecutor.execute(service, objectMapper.readTree(entity.getInput()));
+          Map.Entry<Flow, ObjectNode> result = transientFlowExecutor.debug(service, objectMapper.readTree(entity.getInput()));
           Map<String, Object> output = new HashMap<>();
-          output.put("tasks", result.getKey().getContext().getTasks());
+          
+          output.put("debug", result.getKey());
           output.put("result", result.getValue());
           return objectMapper.writeValueAsString(output);
         } else if(entity.getInputCsv() != null) {

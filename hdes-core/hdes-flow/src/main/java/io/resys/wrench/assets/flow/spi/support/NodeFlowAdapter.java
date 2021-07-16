@@ -34,7 +34,7 @@ import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInput;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeTask;
 import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
-import io.resys.wrench.assets.flow.spi.FlowException;
+import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
 
 public class NodeFlowAdapter {
 
@@ -67,9 +67,10 @@ public class NodeFlowAdapter {
             .name(entry.getKey()).valueType(valueType).direction(Direction.IN).required(required)
             .values(getStringValue(entry.getValue().getDebugValue()))
             .build());
+        
       } catch (Exception e) {
-        throw new FlowException(String.format("Failed to convert data type from: %s, error: %s",
-            entry.getValue().getType().getValue(), e.getMessage()), e);
+        final String msg = String.format("Failed to convert data type from: %s, error: %s", entry.getValue().getType().getValue(), e.getMessage());
+        throw new FlowDefinitionException(msg, e);
       }
     }
     return Collections.unmodifiableCollection(result);

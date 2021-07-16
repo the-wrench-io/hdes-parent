@@ -2,9 +2,9 @@ package io.resys.wrench.assets.controllers;
 
 /*-
  * #%L
- * wrench-assets-bundle
+ * hdes-spring-bundle-editor
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,41 +20,8 @@ package io.resys.wrench.assets.controllers;
  * #L%
  */
 
-import org.apache.commons.lang3.StringUtils;
-
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
-
 public class ControllerUtil {
 
   public static final String ASSET_CONTEXT_PATH = "${wrench.assets.ide.services:/assets}";
-  
-  private static String getContextPath(String serverContextPath) {
-    String cp = "";
-    if (StringUtils.isNotBlank(serverContextPath)) {
-      if (!serverContextPath.startsWith("/")) {
-        cp = "/";
-      }
-      cp = cp + serverContextPath;
-      if (cp.endsWith("/")) {
-        cp = cp.substring(0, cp.length() - 1);
-      }
-    }
-    return cp;
-  }
 
-  private static String getUrl(String proto, String host, String serverContextPath) {
-    final String contextPath = getContextPath(serverContextPath);
-    if (StringUtils.isBlank(proto)) {
-      proto = "http";
-    }
-    if (!proto.endsWith(":")) {
-      proto = proto + ":";
-    }
-    String baseUrl = proto + "//" + host + contextPath;
-    return baseUrl;
-  }
-
-  public static String getRestUrl(String proto, String host, String apiContextPath, String serverContextPath) {
-    return FileUtils.cleanPath(getUrl(proto, host, serverContextPath)) + "/" + FileUtils.cleanPath(apiContextPath) + "/";
-  }
 }

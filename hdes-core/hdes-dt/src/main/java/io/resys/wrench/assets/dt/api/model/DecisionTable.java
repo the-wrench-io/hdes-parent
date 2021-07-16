@@ -22,7 +22,6 @@ package io.resys.wrench.assets.dt.api.model;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 
@@ -44,12 +43,25 @@ public interface DecisionTable extends Serializable {
   interface DecisionTableNode extends Serializable {
     int getId();
     int getOrder();
-    Map<DataType, String> getInputs();
-    Map<DataType, Serializable> getOutputs();
+    
+    List<DecisionTableNodeInput> getInputs();
+    List<DecisionTableNodeOutput> getOutputs();
+    
     DecisionTableNode getPrevious();
     DecisionTableNode getNext();
   }
 
+  
+  interface DecisionTableNodeInput extends Serializable {
+    DataType getKey();
+    String getValue();
+  }
+  
+  interface DecisionTableNodeOutput extends Serializable {
+    DataType getKey();
+    Serializable getValue();
+  }
+  
   enum HitPolicy {
     FIRST, ALL
   }

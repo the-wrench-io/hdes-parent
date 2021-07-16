@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -58,6 +59,40 @@ public class TransientFlowExecutor {
     this.objectMapper = objectMapper;
   }
 
+  public Map.Entry<Flow, ObjectNode> debug(Service service, JsonNode debugInput) {
+    ServiceDataModel dataModel = service.getDataModel();
+
+    // Create input
+    try {
+      Map<String, Serializable> input = createInput(dataModel.getParams(), debugInput);
+
+
+      // Required params
+      List<Message> errors = getErrors(input, dataModel);
+      if(!errors.isEmpty()) {
+        throw new DataException(new MessageList().setStatus(422).addAll(errors));
+      }
+
+      // Run service
+      ServiceResponse response = service.newExecution().insert((Serializable) input).run();
+      Flow flow = response.get();
+
+      return new AbstractMap.SimpleImmutableEntry<Flow, ObjectNode>(flow, createOutput(flow));
+    } catch(FlowException e) {
+      final Flow flow = e.getFlow();
+      final ObjectNode output = createOutput(flow);
+      final Map<String, String> errors = new HashMap<>();
+      errors.put("msg", e.getMessage());
+      errors.put("stackTrace", ExceptionUtils.getStackTrace(e));
+      output.set("_errors", objectMapper.convertValue(errors, ObjectNode.class));
+    
+      return new AbstractMap.SimpleImmutableEntry<Flow, ObjectNode>(flow, output);
+    } catch(DataTypeException e) {
+      Message error = AssetErrorCodes.FLOW_PROPERTY_INVALID.newMessage(e.getDataType().getName());
+      throw new DataException(new MessageList().setStatus(422).add(error));
+    }
+  }
+  
   public Map.Entry<Flow, ObjectNode> execute(Service service, JsonNode debugInput) {
     ServiceDataModel dataModel = service.getDataModel();
 

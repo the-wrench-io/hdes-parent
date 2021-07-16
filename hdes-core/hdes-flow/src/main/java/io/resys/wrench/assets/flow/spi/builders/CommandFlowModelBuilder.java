@@ -55,7 +55,7 @@ import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskValue;
 import io.resys.wrench.assets.flow.api.model.ImmutableFlowModel;
 import io.resys.wrench.assets.flow.api.model.ImmutableFlowTaskValue;
-import io.resys.wrench.assets.flow.spi.FlowException;
+import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
 import io.resys.wrench.assets.flow.spi.exceptions.NodeFlowException;
 import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
 import io.resys.wrench.assets.flow.spi.model.ImmutableFlowTaskModel;
@@ -244,7 +244,7 @@ public class CommandFlowModelBuilder {
         ImmutableFlowTaskModel errorModel = new ImmutableFlowTaskModel(decisionId, null, FlowTaskType.DECISION);
         String message = "Failed to evaluate expression: \"" + taskId + "\" in flow: " + flowId + ", decision: " + errorModel.getId() + "!" + System.lineSeparator() + e.getMessage();
         LOGGER.error(message, e);
-        throw new FlowException(message, errorModel, e);
+        throw new FlowDefinitionException(message, errorModel, e);
       }
     }
 
@@ -267,7 +267,7 @@ public class CommandFlowModelBuilder {
       String taskId = NodeFlowAdapter.getStringValue(task.getId());
       ImmutableFlowTaskModel errorModel = new ImmutableFlowTaskModel(taskId, null, type);
       String message = "There are no next task after: \"" + taskId + "\" in flow: " + flowId + ", decision: " + errorModel.getId() + "!";
-      throw new FlowException(message, errorModel);
+      throw new FlowDefinitionException(message, errorModel);
     }
     return NodeFlowAdapter.getStringValue(next.getId());
   }

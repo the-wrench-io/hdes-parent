@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
+import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNodeOutput;
 import io.resys.wrench.assets.dt.api.model.DecisionTableResult;
 
 public class ImmutableDecisionTableResult implements DecisionTableResult {
@@ -61,7 +61,7 @@ public class ImmutableDecisionTableResult implements DecisionTableResult {
 
   protected Map<String, Serializable> toValues(DecisionTableDecision decision) {
     Map<String, Serializable> result = new HashMap<>();
-    for(Map.Entry<DataTypeRepository.DataType, Serializable> entry : decision.getNode().getOutputs().entrySet()) {
+    for(DecisionTableNodeOutput entry : decision.getNode().getOutputs()) {
       result.put(entry.getKey().getName(), entry.getValue());
     }
     return result;

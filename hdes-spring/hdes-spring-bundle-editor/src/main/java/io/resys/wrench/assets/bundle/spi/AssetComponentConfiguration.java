@@ -75,7 +75,6 @@ import io.resys.wrench.assets.bundle.spi.store.PostProcessingServiceStore;
 import io.resys.wrench.assets.bundle.spi.tag.TagServiceBuilder;
 import io.resys.wrench.assets.context.config.AssetConfigBean;
 import io.resys.wrench.assets.context.config.GitConfigBean;
-import io.resys.wrench.assets.context.config.IdeConfigBean;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.datatype.spi.GenericDataTypeRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
@@ -123,8 +122,7 @@ import io.resys.wrench.assets.script.spi.builders.GroovyScriptParser;
 @Configuration
 @EnableConfigurationProperties({
   GitConfigBean.class,
-  AssetConfigBean.class,
-  IdeConfigBean.class })
+  AssetConfigBean.class})
 public class AssetComponentConfiguration {
   private final ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
   

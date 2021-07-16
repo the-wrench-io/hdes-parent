@@ -63,10 +63,14 @@ public class GenericFlowExecutor implements FlowExecutor {
       }
 
       run(flow, next);
-    } catch(FlowTaskExecutorException | FlowException e) {
+    } catch(FlowException e) {
       throw e;
+    } catch(FlowTaskExecutorException e) {
+      final String msg = "Flow with id: " + flow.getModel().getId() + ", failed to execute task: " + node.getId() + " because: " + e.getMessage();
+      throw new FlowException(msg, flow, node);      
     } catch(Exception e) {
-      throw new FlowException("Flow with id: " + flow.getModel().getId() + ", failed to execute task: " + node.getId() + " because: " + e.getMessage(), node);
+      final String msg = "Flow with id: " + flow.getModel().getId() + ", failed to execute task: " + node.getId() + " because: " + e.getMessage();
+      throw new FlowException(msg, flow, node);
     }
   }
 }

@@ -21,10 +21,10 @@ package io.resys.wrench.assets.git;
  */
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 
@@ -38,16 +38,21 @@ import io.resys.wrench.assets.context.config.GitConfigBean;
 
 @ConditionalOnProperty(name = "wrench.assets.git.enabled", havingValue = "true")
 public class AssetGitConfiguration {
+
   @Bean
-  @ConditionalOnProperty(name = "security.oauth2.enabled", havingValue = "false", matchIfMissing = true)
-  @ConditionalOnMissingBean(AssetAuthorProvider.class)
-  public AssetAuthorProvider gitAuthorProvider(GitConfigBean gitConfigBean) {
-    return () -> new AssetAuthorProvider.Author(gitConfigBean.getEmail().split("@")[0], gitConfigBean.getEmail());
-  }
-  @Bean
-  public GitRepository gitRepository(GitConfigBean gitConfigBean, AssetAuthorProvider gitAuthorProvider) 
+  public GitRepository gitRepository(
+      GitConfigBean gitConfigBean, 
+      Optional<AssetAuthorProvider> authorProvider) 
       throws InvalidRemoteException, IOException, GitAPIException {
-    return new SshGitRepository(gitConfigBean.toConfig(), gitAuthorProvider);
+    
+    if(authorProvider.isEmpty()) {
+      if(gitConfigBean.getEmail() != null && gitConfigBean.getEmail().contains("@")) {
+        authorProvider = Optional.of(() -> new AssetAuthorProvider.Author(gitConfigBean.getEmail().split("@")[0], gitConfigBean.getEmail()));
+      } else {
+        authorProvider = Optional.of(() -> new AssetAuthorProvider.Author("assetManager", "assetManager@resys.io"));  
+      } 
+    }
+    return new SshGitRepository(gitConfigBean.toConfig(), authorProvider.get());
   }
   @Bean
   public AssetLocation gitAsssetLocation(GitRepository gitRepository) {
