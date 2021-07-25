@@ -2,7 +2,10 @@ package io.resys.wrench.assets.covertype.spi.builders;
 
 import java.util.Optional;
 
-import io.resys.wrench.assets.covertype.api.CoverYearBuilder;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverMonthType;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverYear;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverYearBuilder;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverYearType;
 import io.resys.wrench.assets.covertype.api.ImmutableCoverYear;
 
 public class CoverYearBuilderDefault implements CoverYearBuilder {
@@ -25,8 +28,8 @@ public class CoverYearBuilderDefault implements CoverYearBuilder {
     return ImmutableCoverYear.builder()
         .daysInMonth(Optional.ofNullable(daysInMonth))
         .daysInYear(Optional.ofNullable(daysInYear))
-        .year(daysInYear == null ? YearType.NATURAL : YearType.CUSTOM)
-        .month(daysInMonth == null ? MonthType.NATURAL : MonthType.CUSTOM)
+        .year(daysInYear == null ? CoverYearType.NATURAL : CoverYearType.CUSTOM)
+        .month(daysInMonth == null ? CoverMonthType.NATURAL : CoverMonthType.CUSTOM)
         .build();
   }
 }

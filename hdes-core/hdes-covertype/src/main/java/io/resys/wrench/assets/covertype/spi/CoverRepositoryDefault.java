@@ -1,22 +1,17 @@
 package io.resys.wrench.assets.covertype.spi;
 
-import io.resys.wrench.assets.covertype.api.CoverBuilder;
-import io.resys.wrench.assets.covertype.api.CoverBuilder.Cover;
-import io.resys.wrench.assets.covertype.api.CoverPeriodBuilder;
-import io.resys.wrench.assets.covertype.api.CoverPeriodBuilder.CoverPeriod;
-import io.resys.wrench.assets.covertype.api.CoverTypeRepository;
-import io.resys.wrench.assets.covertype.api.CoverYearBuilder;
-import io.resys.wrench.assets.covertype.api.CoverYearBuilder.CoverYear;
+import io.resys.wrench.assets.covertype.api.CoverRepository;
 import io.resys.wrench.assets.covertype.spi.builders.CoverBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.builders.CoverPeriodBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.builders.CoverYearBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.util.CoverAssert;
+import io.resys.wrench.assets.covertype.spi.visitors.CoverVisitor;
 
-public class CoverTypeRepositoryDefault implements CoverTypeRepository {
+public class CoverRepositoryDefault implements CoverRepository {
 
   @Override
-  public CalculationBuilder calculation() {
-    return new CalculationBuilder() {
+  public ProjectionBuilder projection() {
+    return new ProjectionBuilder() {
       private Cover cover;
       private CoverYear coverYear;
       private CoverPeriod coverPeriod;
@@ -52,13 +47,12 @@ public class CoverTypeRepositoryDefault implements CoverTypeRepository {
       }
       
       @Override
-      public Calculation build() {
+      public Projection build() {
         CoverAssert.notNull(cover, () -> "cover needs to be added!");
         CoverAssert.notNull(coverPeriod, () -> "coverPeriod needs to be added!");
         CoverAssert.notNull(coverYear, () -> "coverYear needs to be added!");
         
-        
-        return null;
+        return new CoverVisitor(cover, coverYear, coverPeriod).visit();
       }
     };
   }
@@ -68,8 +62,8 @@ public class CoverTypeRepositoryDefault implements CoverTypeRepository {
   }
   
   public static class Builder {
-    public CoverTypeRepository build() {
-      return new CoverTypeRepositoryDefault();
+    public CoverRepository build() {
+      return new CoverRepositoryDefault();
     }
   }
 }

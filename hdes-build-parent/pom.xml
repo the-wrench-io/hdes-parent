@@ -238,6 +238,11 @@
         <artifactId>jackson-datatype-guava</artifactId>
         <version>${jackson.format.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId>
+        <version>${jackson.format.version}</version>
+      </dependency>
 
       <!-- JGIT -->
       <dependency>

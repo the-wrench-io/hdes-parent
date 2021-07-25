@@ -5,7 +5,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.resys.wrench.assets.covertype.api.CoverBuilder;
+import io.resys.wrench.assets.covertype.api.CoverRepository.Cover;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverBuilder;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverDetail;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverDetailBuilder;
 import io.resys.wrench.assets.covertype.api.ImmutableCover;
 import io.resys.wrench.assets.covertype.spi.util.CoverAssert;
 

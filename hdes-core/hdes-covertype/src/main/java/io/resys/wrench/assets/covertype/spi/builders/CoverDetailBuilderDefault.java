@@ -3,8 +3,8 @@ package io.resys.wrench.assets.covertype.spi.builders;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import io.resys.wrench.assets.covertype.api.CoverBuilder.CoverDetail;
-import io.resys.wrench.assets.covertype.api.CoverBuilder.CoverDetailBuilder;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverDetail;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverDetailBuilder;
 import io.resys.wrench.assets.covertype.api.ImmutableCoverDetail;
 import io.resys.wrench.assets.covertype.spi.util.CoverAssert;
 

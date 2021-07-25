@@ -2,7 +2,8 @@ package io.resys.wrench.assets.covertype.spi.builders;
 
 import java.time.LocalDate;
 
-import io.resys.wrench.assets.covertype.api.CoverPeriodBuilder;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverPeriod;
+import io.resys.wrench.assets.covertype.api.CoverRepository.CoverPeriodBuilder;
 import io.resys.wrench.assets.covertype.api.ImmutableCoverPeriod;
 import io.resys.wrench.assets.covertype.spi.util.CoverAssert;
 
@@ -37,7 +38,7 @@ public class CoverPeriodBuilderDefault implements CoverPeriodBuilder {
     return ImmutableCoverPeriod.builder()
         .endDate(endDate)
         .startDate(startDate)
-        .length(lengthInMonths)
+        .months(lengthInMonths)
         .build();
   }
 
