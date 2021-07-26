@@ -56,8 +56,54 @@ public class CalculationPeriodTest {
     Projection calculation = builder.build();
     var actual = TestUtils.prettyPrint(calculation.getProjectionPeriods());
     var expected = TestUtils.toString(getClass(), "coverWith2AmountsAndNaturalCalendar.json");
-    Assert.assertEquals(expected, actual);
+    Assert.assertEquals(expected, actual); 
+  }
+  
+  @Test
+  public void coverWith2AmountsAndNaturalCalendarWith1DayDetails() throws IOException {
+    ProjectionBuilder builder = repo.projection();
+  
+    builder.year().build();
     
+    builder.period().length(6)
+      .startDate(LocalDate.of(2000, 5, 1))
+      .endDate(LocalDate.of(2002, 12, 31))
+      .build();
+    
+    CoverBuilder coverBuilder = builder.cover()
+      .id("1").origin(getClass())
+      .startDate(LocalDate.of(2000, 1, 1))
+      .endDate(LocalDate.of(2000, 12, 31))
+      .type("insurance-cover");
+
+    coverBuilder.addDetail()
+      .id("").origin(getClass())
+      .startDate(LocalDate.of(2000, 1, 1))
+      .endDate(LocalDate.of(2000, 7, 4))
+      .type("insurance-amount-1")
+      .build();
+  
+    coverBuilder.addDetail()
+      .id("").origin(getClass())
+      .startDate(LocalDate.of(2000, 7, 4))
+      .endDate(LocalDate.of(2000, 7, 4))
+      .type("discount-1")
+      .build();
+
+    
+    coverBuilder.addDetail()
+      .id("").origin(getClass())
+      .startDate(LocalDate.of(2000, 7, 5))
+      .endDate(LocalDate.of(2000, 12, 31))
+      .type("cover-amount-2")
+      .build();
+    coverBuilder.build();
+
+    
+    Projection calculation = builder.build();
+    var actual = TestUtils.prettyPrint(calculation.getProjectionPeriods());
+    var expected = TestUtils.toString(getClass(), "coverWith2AmountsAndNaturalCalendarWith1DayDetails.json");
+    Assert.assertEquals(expected, actual); 
   }
 
 }

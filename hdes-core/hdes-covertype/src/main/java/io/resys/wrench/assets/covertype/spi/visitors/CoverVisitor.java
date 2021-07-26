@@ -139,7 +139,11 @@ public class CoverVisitor {
       // end date
       final var detailEnd = coverDetail.getEndDate();
       if( detailEnd.isAfter(startDate) && detailEnd.isBefore(rolledEndDate) && !distortions.contains(detailEnd)) {
-        distortions.add(detailEnd.plusDays(1));
+        if(!endDate.equals(detailEnd)) {
+          // start of next distortion
+          distortions.add(detailEnd.plusDays(1));
+        }
+        
       }
     }
     Collections.sort(distortions);

@@ -49,9 +49,5 @@
       "type" : "cover-amount-2",
       "origin" : "io.resys.wrench.assets.covertype.test.CalculationPeriodTest"
     } ]
-  }, {
-    "startDate" : [ 2001, 1, 1 ],
-    "endDate" : [ 2001, 1, 1 ],
-    "coverDetails" : [ ]
   } ]
 } ]
