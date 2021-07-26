@@ -3,12 +3,10 @@ package io.resys.wrench.assets.covertype.test;
 import java.io.IOException;
 import java.time.LocalDate;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.resys.wrench.assets.covertype.api.CoverRepository;
 import io.resys.wrench.assets.covertype.api.CoverRepository.CoverBuilder;
@@ -16,13 +14,10 @@ import io.resys.wrench.assets.covertype.api.CoverRepository.Projection;
 import io.resys.wrench.assets.covertype.api.CoverRepository.ProjectionBuilder;
 import io.resys.wrench.assets.covertype.spi.CoverRepositoryDefault;
 
+
 @RunWith(BlockJUnit4ClassRunner.class)
 public class CalculationPeriodTest {
   private static CoverRepository repo = CoverRepositoryDefault.builder().build();
-  private static ObjectMapper objectMapper = new ObjectMapper();
-  static {
-    objectMapper.registerModule(new JavaTimeModule());
-  }
   
   @Test
   public void coverWith2AmountsAndNaturalCalendar() throws IOException {
@@ -46,7 +41,8 @@ public class CalculationPeriodTest {
       .id("").origin(getClass())
       .startDate(LocalDate.of(2000, 1, 1))
       .endDate(LocalDate.of(2000, 7, 4))
-      .type("insurance-amount-1");
+      .type("insurance-amount-1")
+      .build();
   
     coverBuilder.addDetail()
       .id("").origin(getClass())
@@ -58,7 +54,9 @@ public class CalculationPeriodTest {
 
     
     Projection calculation = builder.build();
-    System.out.println(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(calculation.getProjectedYears()));
+    var actual = TestUtils.prettyPrint(calculation.getProjectionPeriods());
+    var expected = TestUtils.toString(getClass(), "coverWith2AmountsAndNaturalCalendar.json");
+    Assert.assertEquals(expected, actual);
     
   }
 

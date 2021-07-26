@@ -1,6 +1,7 @@
 package io.resys.wrench.assets.covertype.api;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -93,26 +94,29 @@ public interface CoverRepository {
     Cover getCover();
     CoverYear getCoverYear();
     CoverPeriod getCoverPeriod();
-    List<ProjectionYear> getProjectedYears();
+    List<ProjectionPeriod> getProjectionPeriods();
   }
   @Value.Immutable
-  interface ProjectionYear {
+  interface ProjectionPeriod {
     LocalDate getStartDate();
     LocalDate getEndDate();
-    List<ProjectionDetail> getMonths();
+    ProjectionPeriodMonths getProjectionMonths();
+    List<ProjectionDetail> getProjectionDetails();
   }
+  
+  @Value.Immutable
+  interface ProjectionPeriodMonths {
+    int getDays();
+    int getMonths();
+    long getTotalDays();
+    Optional<BigDecimal> getStartPerc(); // how many days from start as percentage
+    Optional<BigDecimal> getEndPerc(); // how many days from end as percentage
+  }
+  
   @Value.Immutable
   interface ProjectionDetail {
     LocalDate getStartDate();
     LocalDate getEndDate();
-    int getMonths();
-    List<ProjectionParam> getParams();
-  }
-  
-  @Value.Immutable
-  interface ProjectionParam {
-    LocalDate getStartDate();
-    LocalDate getEndDate();
-    CoverDetail getCoverDetail();
+    List<CoverDetail> getCoverDetails();
   }
 }
