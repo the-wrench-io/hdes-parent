@@ -92,7 +92,7 @@ public class CoverVisitor {
 
     Optional<BigDecimal> startPerc = Optional.empty();
     if(startDate.getDayOfMonth() != 1) {
-      startPerc = Optional.of(visitPercOfMonth(endDate));
+      startPerc = Optional.of(visitPercOfMonth(startDate));
     }
     
     Optional<BigDecimal> endPerc = Optional.empty();
@@ -112,9 +112,8 @@ public class CoverVisitor {
   private BigDecimal visitPercOfMonth(LocalDate target) {
     final var dayOfMonth = target.getDayOfMonth();
     final var lengthOfMonth = target.lengthOfMonth();
-    final var diff = lengthOfMonth - dayOfMonth + 1;
     
-    final var result = BigDecimal.valueOf(diff)
+    final var result = BigDecimal.valueOf(dayOfMonth)
         .multiply(BigDecimal.valueOf(100))
         .divide(BigDecimal.valueOf(lengthOfMonth), RoundingMode.HALF_EVEN)
         .setScale(2, RoundingMode.HALF_EVEN);
