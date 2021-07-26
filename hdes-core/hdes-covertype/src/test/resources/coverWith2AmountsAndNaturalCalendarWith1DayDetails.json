@@ -1,0 +1,69 @@
+[ {
+  "startDate" : [ 2000, 5, 1 ],
+  "endDate" : [ 2000, 10, 31 ],
+  "projectionMonths" : {
+    "days" : 0,
+    "months" : 6,
+    "totalDays" : 184,
+    "startPerc" : null,
+    "endPerc" : null
+  },
+  "projectionDetails" : [ {
+    "startDate" : [ 2000, 5, 1 ],
+    "endDate" : [ 2000, 7, 3 ],
+    "coverDetails" : [ {
+      "id" : "",
+      "startDate" : [ 2000, 1, 1 ],
+      "endDate" : [ 2000, 7, 4 ],
+      "type" : "insurance-amount-1",
+      "origin" : "io.resys.wrench.assets.covertype.test.CalculationPeriodTest"
+    } ]
+  }, {
+    "startDate" : [ 2000, 7, 4 ],
+    "endDate" : [ 2000, 7, 4 ],
+    "coverDetails" : [ {
+      "id" : "",
+      "startDate" : [ 2000, 1, 1 ],
+      "endDate" : [ 2000, 7, 4 ],
+      "type" : "insurance-amount-1",
+      "origin" : "io.resys.wrench.assets.covertype.test.CalculationPeriodTest"
+    }, {
+      "id" : "",
+      "startDate" : [ 2000, 7, 4 ],
+      "endDate" : [ 2000, 7, 4 ],
+      "type" : "discount-1",
+      "origin" : "io.resys.wrench.assets.covertype.test.CalculationPeriodTest"
+    } ]
+  }, {
+    "startDate" : [ 2000, 7, 5 ],
+    "endDate" : [ 2000, 10, 31 ],
+    "coverDetails" : [ {
+      "id" : "",
+      "startDate" : [ 2000, 7, 5 ],
+      "endDate" : [ 2000, 12, 31 ],
+      "type" : "cover-amount-2",
+      "origin" : "io.resys.wrench.assets.covertype.test.CalculationPeriodTest"
+    } ]
+  } ]
+}, {
+  "startDate" : [ 2000, 11, 1 ],
+  "endDate" : [ 2000, 12, 31 ],
+  "projectionMonths" : {
+    "days" : 0,
+    "months" : 2,
+    "totalDays" : 61,
+    "startPerc" : null,
+    "endPerc" : null
+  },
+  "projectionDetails" : [ {
+    "startDate" : [ 2000, 11, 1 ],
+    "endDate" : [ 2000, 12, 31 ],
+    "coverDetails" : [ {
+      "id" : "",
+      "startDate" : [ 2000, 7, 5 ],
+      "endDate" : [ 2000, 12, 31 ],
+      "type" : "cover-amount-2",
+      "origin" : "io.resys.wrench.assets.covertype.test.CalculationPeriodTest"
+    } ]
+  } ]
+} ]
