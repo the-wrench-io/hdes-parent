@@ -13,6 +13,7 @@
 
   <modules>
     <module>hdes-datatype</module>
+    <module>hdes-covertype</module>
     <module>hdes-dt</module>
     <module>hdes-flow</module>
     <module>hdes-script</module>
