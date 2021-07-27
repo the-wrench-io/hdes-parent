@@ -111,6 +111,7 @@ public interface AssetIdeServices {
   @JsonDeserialize(as = ImmutableAssetCommand.class)
   interface AssetCommand {
     JsonNode getInput();
+    @Nullable
     Integer getRev();
     ServiceType getType();
   }
