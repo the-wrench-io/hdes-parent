@@ -69,10 +69,8 @@ public class ListAssetLoader {
         return;
       }
     } catch (Exception e1) {
-      throw new RuntimeException("Failed to load asset content from: " + resource.getFilename() + "!" + e.getMessage(), e1);
+      LOGGER.error("Failed to load asset content from: " + resource.getFilename() + "!" + e.getMessage(), e1);
     }
-    
-    throw new RuntimeException("Failed to load asset content from: " + resource.getFilename() + "!" + e.getMessage(), e);
   }
 
   public void load() {
