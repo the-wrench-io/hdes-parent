@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>io.resys.hdes</groupId>
   <artifactId>hdes</artifactId>
-  <version>3.y-SNAPSHOT</version>
+  <version>3.0.8</version>
   <packaging>pom</packaging>
   <name>hdes</name>
 
