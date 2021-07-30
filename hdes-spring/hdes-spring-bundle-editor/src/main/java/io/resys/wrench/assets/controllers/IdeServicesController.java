@@ -45,8 +45,10 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetCopy
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetDebug;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetResource;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetSummary;
+import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.CreateAssetResource;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
+import io.resys.wrench.assets.bundle.api.repositories.ImmutableAssetResource;
 
 @RestController
 @RequestMapping(ControllerUtil.ASSET_CONTEXT_PATH)
@@ -79,8 +81,12 @@ public class IdeServicesController {
   }
 
   @PostMapping(path = "/resources", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public AssetResource create(@RequestBody AssetResource entity) {
-    return assetIdeServices.persist(entity);
+  public AssetResource create(@RequestBody CreateAssetResource entity) {
+    return assetIdeServices.persist(ImmutableAssetResource.builder()
+        .type(entity.getType())
+        .name(entity.getName())
+        .content("")
+        .build());
   }
 
   @PutMapping(path = "/resources/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

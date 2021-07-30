@@ -99,6 +99,15 @@ public interface AssetIdeServices {
   }
   
   @Value.Immutable
+  @JsonSerialize(as = ImmutableCreateAssetResource.class)
+  @JsonDeserialize(as = ImmutableCreateAssetResource.class)
+  interface CreateAssetResource {
+    String getName();
+    ServiceType getType();
+  }
+  
+  
+  @Value.Immutable
   @JsonSerialize(as = ImmutableAssetSummary.class)
   @JsonDeserialize(as = ImmutableAssetSummary.class)
   interface AssetSummary {
