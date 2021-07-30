@@ -106,6 +106,13 @@ public interface AssetIdeServices {
     ServiceType getType();
   }
   
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableUpdateAssetResource.class)
+  @JsonDeserialize(as = ImmutableUpdateAssetResource.class)
+  interface UpdateAssetResource {
+    String getContent();
+    ServiceType getType();
+  }
   
   @Value.Immutable
   @JsonSerialize(as = ImmutableAssetSummary.class)

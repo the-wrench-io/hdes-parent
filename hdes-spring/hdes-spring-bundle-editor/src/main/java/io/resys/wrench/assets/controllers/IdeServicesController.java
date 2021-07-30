@@ -46,6 +46,7 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetDebu
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetResource;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetSummary;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.CreateAssetResource;
+import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.UpdateAssetResource;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableAssetResource;
@@ -90,8 +91,13 @@ public class IdeServicesController {
   }
 
   @PutMapping(path = "/resources/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public AssetResource update(@PathVariable String id, @RequestBody AssetResource entity) {
-    return assetIdeServices.persist(entity);
+  public AssetResource update(@PathVariable String id, @RequestBody UpdateAssetResource entity) {
+    return assetIdeServices.persist(ImmutableAssetResource.builder()
+        .id(id)
+        .name("")
+        .type(entity.getType())
+        .content(entity.getContent())
+        .build());
   }
   
   @DeleteMapping(path = "/resources/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
