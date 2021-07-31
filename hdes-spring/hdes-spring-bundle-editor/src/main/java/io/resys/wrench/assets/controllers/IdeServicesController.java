@@ -94,7 +94,6 @@ public class IdeServicesController {
   public AssetResource update(@PathVariable String id, @RequestBody UpdateAssetResource entity) {
     return assetIdeServices.persist(ImmutableAssetResource.builder()
         .id(id)
-        .name("")
         .type(entity.getType())
         .content(entity.getContent())
         .build());
