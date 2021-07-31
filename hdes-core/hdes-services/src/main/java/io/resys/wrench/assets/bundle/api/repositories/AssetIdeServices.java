@@ -92,6 +92,7 @@ public interface AssetIdeServices {
   interface AssetResource {
     @Nullable
     String getId();
+    @Nullable
     String getName();
     ServiceType getType();
     String getContent();
