@@ -26,10 +26,15 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class VariableResolver {
+  
+  public VariableResolver(ObjectMapper objectMapper) {
+    super();
+    this.objectMapper = objectMapper;
+  }
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private final ObjectMapper objectMapper;
 
-  public static Serializable getVariableOnPath(String name, Map<String, Serializable> tasks) {
+  public Serializable getVariableOnPath(String name, Map<String, Serializable> tasks) {
     String[] path = name.split("\\.");
     if(path.length > 0) {
       return getVariableOnPath(path, tasks);
@@ -37,7 +42,7 @@ public class VariableResolver {
     return null;
   }
 
-  private static Serializable getVariableOnPath(String[] paths, Object src) {
+  private Serializable getVariableOnPath(String[] paths, Object src) {
     Object target = src;
     StringBuilder fullName = new StringBuilder();
     for(String path : paths) {
@@ -55,12 +60,12 @@ public class VariableResolver {
   }
 
   @SuppressWarnings("rawtypes")
-  private static Object getVariable(String fullName, String name, Object src) {
+  private Object getVariable(String fullName, String name, Object src) {
     if(src instanceof Map) {
       return ((Map) src).get(name);
     }
     try {
-      return OBJECT_MAPPER.convertValue(src, Map.class).get(name);
+      return objectMapper.convertValue(src, Map.class).get(name);
     } catch(Exception e) {
       throw new IllegalArgumentException("Don't know how to convert variable: " + fullName + " of type: " + src.getClass().getCanonicalName() + "!");
     }

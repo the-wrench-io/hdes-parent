@@ -34,15 +34,16 @@ import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
 public class FlowDtInputResolver implements Serializable, DtInputResolver {
 
   private static final long serialVersionUID = 8818379343078413837L;
-
+  private final VariableResolver variableResolver;
   private final Map<String, Object> variables;
   private final Map<String, Serializable> tasks;
   private final Map<String, String> mapping;
 
-  public FlowDtInputResolver(Flow flow, FlowTaskModel node) {
+  public FlowDtInputResolver(Flow flow, FlowTaskModel node, VariableResolver variableResolver) {
     mapping = node.getBody().getInputs();
     variables = new HashMap<>();
     tasks = new HashMap<>();
+    this.variableResolver = variableResolver;
 
     // Flow level variables
     flow.getContext().getVariables().forEach((key, value) -> variables.put(key, value));
@@ -61,6 +62,6 @@ public class FlowDtInputResolver implements Serializable, DtInputResolver {
     if(variables.containsKey(name)) {
       return variables.get(name);
     }
-    return VariableResolver.getVariableOnPath(name, tasks);
+    return variableResolver.getVariableOnPath(name, tasks);
   }
 }

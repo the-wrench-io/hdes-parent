@@ -25,6 +25,8 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
 
 
@@ -58,7 +60,10 @@ public interface Flow extends Serializable {
     FlowContext addTask(FlowTask task);
 
     FlowContext putVariable(String name, Serializable value);
-    Map<String, Serializable> getVariables();
+    Map<String, Serializable> getVariables();    
+    
+    @Nullable
+    <T> T getTaskOutput(String taskName);
   }
 
   interface FlowHistory extends Serializable {

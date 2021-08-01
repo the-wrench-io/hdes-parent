@@ -44,11 +44,13 @@ import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskValue;
 
 public class GenericFlowDtExecutor implements FlowTaskExecutor  {
 
+  private final VariableResolver variableResolver;
   private final Supplier<ServiceQuery> query;
 
-  public GenericFlowDtExecutor(Supplier<ServiceQuery> query) {
+  public GenericFlowDtExecutor(Supplier<ServiceQuery> query, VariableResolver variableResolver) {
     super();
     this.query = query;
+    this.variableResolver = variableResolver;
   }
 
   @SuppressWarnings("unchecked")
@@ -60,7 +62,7 @@ public class GenericFlowDtExecutor implements FlowTaskExecutor  {
     Service service = query.get().dt(taskValue.getRef());
 
     Map<String, Serializable> inputs = new HashMap<>();
-    ServiceResponse response = service.newExecution().insert(new LoggingFlowDtInputResolver(inputs, new FlowDtInputResolver(flow, node))).run();
+    ServiceResponse response = service.newExecution().insert(new LoggingFlowDtInputResolver(inputs, new FlowDtInputResolver(flow, node, variableResolver))).run();
     List<DecisionTableOutput> outputs = (List<DecisionTableOutput>) response.list();
     task
     .putInputs(inputs)
