@@ -121,4 +121,15 @@ public class FlowContextBean implements FlowContext {
     this.variables.put(name, value);
     return this;
   }
+  
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> T getTaskOutput(String taskName) {
+    Collection<FlowTask> tasks = this.getTasks(taskName);
+    if(tasks.isEmpty()) {
+      return null;
+    }
+    FlowTask task = tasks.iterator().next();
+    return (T) task.getVariables().get(taskName);
+  }
 }

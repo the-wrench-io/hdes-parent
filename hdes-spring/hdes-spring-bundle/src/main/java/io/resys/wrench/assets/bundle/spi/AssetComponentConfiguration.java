@@ -58,6 +58,7 @@ import io.resys.wrench.assets.bundle.spi.flow.FlowServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.flow.FlowServiceDataModelValidator;
 import io.resys.wrench.assets.bundle.spi.flow.executors.GenericFlowDtExecutor;
 import io.resys.wrench.assets.bundle.spi.flow.executors.GenericFlowServiceExecutor;
+import io.resys.wrench.assets.bundle.spi.flow.executors.VariableResolver;
 import io.resys.wrench.assets.bundle.spi.flow.hints.PartialTaskInputsAutocomplete;
 import io.resys.wrench.assets.bundle.spi.flow.hints.TaskInputMappingAutocomplete;
 import io.resys.wrench.assets.bundle.spi.flow.hints.TaskInputsAutocomplete;
@@ -219,12 +220,14 @@ public class AssetComponentConfiguration {
         new FlowServiceDataModelValidator(serviceStore, dataTypeRepository)
         );
     
+    VariableResolver variableResolver = new VariableResolver(objectMapper);
+    
     Map<FlowTaskType, FlowTaskExecutor> executors = new HashMap<>();
     executors.put(FlowTaskType.END, new EndFlowTaskExecutor());
     executors.put(FlowTaskType.EXCLUSIVE, new ExclusiveFlowTaskExecutor());
     executors.put(FlowTaskType.MERGE, new MergeFlowTaskExecutor());
-    executors.put(FlowTaskType.SERVICE, new GenericFlowServiceExecutor(serviceStore));
-    executors.put(FlowTaskType.DT, new GenericFlowDtExecutor(() -> new GenericServiceQuery(serviceStore)));
+    executors.put(FlowTaskType.SERVICE, new GenericFlowServiceExecutor(serviceStore, variableResolver));
+    executors.put(FlowTaskType.DT, new GenericFlowDtExecutor(() -> new GenericServiceQuery(serviceStore), variableResolver));
     executors.put(FlowTaskType.EMPTY, new EmptyFlowTaskExecutor());
 
     FlowExecutorRepository executorRepository = new GenericFlowExecutorFactory(executors);  

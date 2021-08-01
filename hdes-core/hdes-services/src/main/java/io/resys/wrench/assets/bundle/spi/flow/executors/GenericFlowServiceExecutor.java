@@ -47,11 +47,13 @@ public class GenericFlowServiceExecutor extends ServiceFlowTaskExecutor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GenericFlowServiceExecutor.class);
 
+  private final VariableResolver variableResolver;
   private final ServiceStore serviceStore;
 
-  public GenericFlowServiceExecutor(ServiceStore serviceStore) {
+  public GenericFlowServiceExecutor(ServiceStore serviceStore, VariableResolver variableResolver) {
     super();
     this.serviceStore = serviceStore;
+    this.variableResolver = variableResolver;
   }
 
   @Override
@@ -78,7 +80,7 @@ public class GenericFlowServiceExecutor extends ServiceFlowTaskExecutor {
         if(flow.getContext().getVariables().containsKey(ref)) {
           value = flow.getContext().getVariables().get(ref);
         } else {
-          value = VariableResolver.getVariableOnPath(ref, tasks);
+          value = variableResolver.getVariableOnPath(ref, tasks);
         }
         serviceInput.put(input.getKey(), value);
       }
