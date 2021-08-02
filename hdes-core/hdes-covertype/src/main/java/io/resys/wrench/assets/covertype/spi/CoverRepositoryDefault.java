@@ -1,5 +1,9 @@
 package io.resys.wrench.assets.covertype.spi;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /*-
  * #%L
  * hdes-covertype
@@ -24,6 +28,7 @@ import io.resys.wrench.assets.covertype.api.CoverRepository;
 import io.resys.wrench.assets.covertype.spi.builders.CoverBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.builders.CoverPeriodBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.builders.CoverYearBuilderDefault;
+import io.resys.wrench.assets.covertype.spi.builders.InvoiceBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.util.CoverAssert;
 import io.resys.wrench.assets.covertype.spi.visitors.CoverVisitor;
 
@@ -77,6 +82,29 @@ public class CoverRepositoryDefault implements CoverRepository {
     };
   }
 
+  
+  @Override
+  public InvoicesBuilder invoices() {
+    return new InvoicesBuilder() {
+      private final List<Invoice> result = new ArrayList<>();
+      @Override
+      public InvoiceBuilder addInvoice() {
+        return new InvoiceBuilderDefault() {
+          @Override
+          public Invoice build() {
+            Invoice invoice = super.build();
+            result.add(invoice);
+            return invoice;
+          }
+        };
+      }
+      @Override
+      public List<Invoice> build() {
+        return Collections.unmodifiableList(result);
+      }
+    };
+  }
+  
   public static Builder builder() {
     return new Builder();
   }
