@@ -35,12 +35,12 @@ fi
 
 
 # Current and next version
-LAST_RELEASE_VERSION=$(cat release.version)
+LAST_RELEASE_VERSION=$(cat hdes-build-parent/release.version)
 [[ $LAST_RELEASE_VERSION =~ ([^\\.]*)$ ]]
 MINOR_VERSION=`expr ${BASH_REMATCH[1]} + 1`
 MAJOR_VERSION=${LAST_RELEASE_VERSION:0:`expr ${#LAST_RELEASE_VERSION} - ${#MINOR_VERSION}`}
 RELEASE_VERSION=${MAJOR_VERSION}${MINOR_VERSION}
-echo ${RELEASE_VERSION} > release.version
+echo ${RELEASE_VERSION} > hdes-build-parent/release.version
 
 
 PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
