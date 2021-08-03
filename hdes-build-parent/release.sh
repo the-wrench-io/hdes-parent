@@ -32,10 +32,22 @@ if [[ "${refname}" = "refs/heads/3.y" ]]; then
 else
      readonly local branch=${refname#refs/remotes/origin/}
 fi
+
+
+# Current and next version
+LAST_RELEASE_VERSION=$(cat release.version)
+[[ $LAST_RELEASE_VERSION =~ ([^\\.]*)$ ]]
+MINOR_VERSION=`expr ${BASH_REMATCH[1]} + 1`
+MAJOR_VERSION=${LAST_RELEASE_VERSION:0:`expr ${#LAST_RELEASE_VERSION} - ${#MINOR_VERSION}`}
+RELEASE_VERSION=${MAJOR_VERSION}${MINOR_VERSION}
+echo ${RELEASE_VERSION} > release.version
+
+
 PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
 
 echo "Git checkout refname: '${refname}' branch: '${branch}' commit: '${GITHUB_SHA}'"
 echo "Dev version: '${PROJECT_VERSION}' release version: '${RELEASE_VERSION}'"
+echo "Releasing: '${RELEASE_VERSION}', previous: '${LAST_RELEASE_VERSION}'"
 mvn -version
 
 git checkout ${branch}
