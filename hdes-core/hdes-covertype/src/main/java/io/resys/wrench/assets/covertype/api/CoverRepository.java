@@ -29,6 +29,9 @@ import java.util.Optional;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 public interface CoverRepository {
 
   ProjectionBuilder projection();
@@ -135,7 +138,8 @@ public interface CoverRepository {
     CUSTOM // months have fixed number of days in them
   }
 
-  
+  @JsonSerialize(as = ImmutableProjection.class)
+  @JsonDeserialize(as = ImmutableProjection.class)  
   @Value.Immutable
   interface Projection {
     Cover getCover();
@@ -143,6 +147,8 @@ public interface CoverRepository {
     CoverPeriod getCoverPeriod();
     List<ProjectionPeriod> getProjectionPeriods();
   }
+  @JsonSerialize(as = ImmutableProjectionPeriod.class)
+  @JsonDeserialize(as = ImmutableProjectionPeriod.class)
   @Value.Immutable
   interface ProjectionPeriod {
     LocalDate getStartDate();
@@ -150,6 +156,8 @@ public interface CoverRepository {
     ProjectionPeriodMonths getProjectionMonths();
     List<ProjectionDetail> getProjectionDetails();
   }
+  @JsonSerialize(as = ImmutableProjectionPeriodMonths.class)
+  @JsonDeserialize(as = ImmutableProjectionPeriodMonths.class)
   @Value.Immutable
   interface ProjectionPeriodMonths {
     int getDays();
@@ -158,6 +166,9 @@ public interface CoverRepository {
     Optional<BigDecimal> getStartPerc(); // how many days from start as percentage
     Optional<BigDecimal> getEndPerc(); // how many days from end as percentage
   }
+ 
+  @JsonSerialize(as = ImmutableProjectionDetail.class)
+  @JsonDeserialize(as = ImmutableProjectionDetail.class)
   @Value.Immutable
   interface ProjectionDetail {
     LocalDate getStartDate();
@@ -166,6 +177,8 @@ public interface CoverRepository {
   }
   
   
+  @JsonSerialize(as = ImmutableInvoice.class)
+  @JsonDeserialize(as = ImmutableInvoice.class)
   @Value.Immutable
   interface Invoice {
     String getId();
@@ -173,12 +186,16 @@ public interface CoverRepository {
     LocalDate getEndDate();
     List<InvoiceDetail> getInvoiceDetails();
   }
+  @JsonSerialize(as = ImmutableInvoiceDetail.class)
+  @JsonDeserialize(as = ImmutableInvoiceDetail.class)
   @Value.Immutable
   interface InvoiceDetail {
     String getCoverType();
     ProjectionPeriodMonths getProjectionPeriodMonths();
     List<InvoiceCalculation> getInvoiceCalculations();
   }
+  @JsonSerialize(as = ImmutableInvoiceCalculation.class)
+  @JsonDeserialize(as = ImmutableInvoiceCalculation.class)
   @Value.Immutable
   interface InvoiceCalculation {
     String getCoverType();
