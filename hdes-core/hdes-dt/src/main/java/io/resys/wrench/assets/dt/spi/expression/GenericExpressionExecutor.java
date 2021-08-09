@@ -48,7 +48,7 @@ public class GenericExpressionExecutor implements NodeExpressionExecutor {
       return false;
     }
     Assert.notNull(entity, () -> "Type: \"" + type + "\" expression: \"" + value + "\" entity can't be null!");
-    if(value == null) {
+    if(value == null || value.isEmpty()) {
       return true;
     }
     DecisionTableExpression expression = getExpression(value, type);
