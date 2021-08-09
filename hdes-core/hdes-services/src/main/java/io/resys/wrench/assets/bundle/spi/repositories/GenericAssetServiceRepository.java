@@ -1,5 +1,9 @@
 package io.resys.wrench.assets.bundle.spi.repositories;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+
 /*-
  * #%L
  * wrench-component-assets
@@ -21,16 +25,24 @@ package io.resys.wrench.assets.bundle.spi.repositories;
  */
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.springframework.util.Assert;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
+import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
+import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
+import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
+import io.resys.wrench.assets.flow.api.model.Flow;
+import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 
 public class GenericAssetServiceRepository implements AssetServiceRepository {
@@ -40,8 +52,10 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   private final FlowRepository flowRepository;
   private final ScriptRepository scriptRepository;
   private final ServiceStore serviceStore;
+  private final ObjectMapper objectMapper;
 
   public GenericAssetServiceRepository(
+      ObjectMapper objectMapper,
       DecisionTableRepository decisionTableRepository,
       FlowRepository flowRepository,
       ScriptRepository scriptRepository,
@@ -50,6 +64,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
       ServiceStore serviceStore) {
     
     super();
+    this.objectMapper = objectMapper;
     this.decisionTableRepository = decisionTableRepository;
     this.flowRepository = flowRepository;
     this.scriptRepository = scriptRepository;
@@ -98,5 +113,56 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   @Override
   public FlowRepository getFlRepo() {
     return flowRepository;
+  }
+
+  @Override
+  public ServiceExecutor executor() {
+    return new ServiceExecutor() {
+      @Override
+      public FlowServiceExecutor flow(String name) {
+        Assert.notNull(name, "Define flow name!");
+        Optional<Service> service = createQuery().type(ServiceType.FLOW).name(name).get();
+        if(service.isEmpty()) {
+          throw new DataException(422, new Message("E002", "No flow with id: " + name + "!"));
+        }
+        
+        return new FlowServiceExecutor() {
+          private final Map<String, Object> inputs = new HashMap<>();
+          @Override
+          public FlowServiceExecutor withMap(Map<String, Object> input) {
+            this.inputs.putAll(input);
+            return this;
+          }
+          @SuppressWarnings("unchecked")
+          @Override
+          public FlowServiceExecutor withEntity(Object inputObject) {
+            this.inputs.putAll(objectMapper.convertValue(inputObject, Map.class));
+            return this;
+          }
+          
+          @Override
+          public Object andGetTask(String taskName) {
+            validateFlowInput(service.get(), inputs);
+            Flow flow = service.get().newExecution().insert((Serializable) inputs).run().get();
+            
+            Collection<FlowTask> tasks = flow.getContext().getTasks(taskName);
+            if(tasks.isEmpty()) {
+              throw new DataException(422, new Message("E002", "Flow with id: " + flow.getModel().getId() + " does not have task with id: " + taskName + "!"));
+            }
+
+            FlowTask task = tasks.iterator().next();
+            Serializable delegate = task.getVariables().get(taskName);
+            return delegate;
+          }
+          private void validateFlowInput(Service service, Map<String, Object> input) {
+            for(DataType dataType : service.getDataModel().getParams()) {
+              if(dataType.isRequired() && input.get(dataType.getName()) == null) {
+                throw new DataException(422, new Message("E003", "Flow with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
+              }
+            }
+          }
+        };
+      }
+    };
   }
 }

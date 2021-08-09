@@ -147,7 +147,7 @@ public class AssetComponentConfiguration {
     final ServicePostProcessorSupplier servicePostProcessorSupplier = new GenericServicePostProcessorSupplier(postProcessors);
     final ServiceStore serviceStore = new PostProcessingServiceStore(origServiceStore, servicePostProcessorSupplier); 
     
-    return new GenericAssetServiceRepository(
+    return new GenericAssetServiceRepository(objectMapper,
         decisionTableRepository, flowRepository, scriptRepository, 
         builders, serviceStore);
   }

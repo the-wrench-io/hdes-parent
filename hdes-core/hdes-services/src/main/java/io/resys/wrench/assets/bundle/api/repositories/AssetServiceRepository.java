@@ -25,6 +25,7 @@ import java.util.Collection;
  */
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -37,6 +38,7 @@ import io.resys.wrench.assets.script.api.ScriptRepository;
 
 public interface AssetServiceRepository {
 
+  ServiceExecutor executor();
   ServiceBuilder createBuilder(ServiceType type);
   ServiceQuery createQuery();
   ExportBuilder createExport();
@@ -46,6 +48,17 @@ public interface AssetServiceRepository {
   DecisionTableRepository getDtRepo();
   ScriptRepository getStRepo();
   FlowRepository getFlRepo();
+  
+  
+  interface ServiceExecutor {
+    FlowServiceExecutor flow(String name);
+  }
+  
+  interface FlowServiceExecutor {
+    FlowServiceExecutor withMap(Map<String, Object> input);
+    FlowServiceExecutor withEntity(Object inputObject);
+    Object andGetTask(String task);
+  }
   
   interface ExportBuilder {
     ExportBuilder type(ExportType type);
