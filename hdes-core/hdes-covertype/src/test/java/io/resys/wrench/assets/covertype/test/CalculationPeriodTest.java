@@ -43,12 +43,11 @@ public class CalculationPeriodTest {
   public void coverWith2AmountsAndNaturalCalendar() throws IOException {
     ProjectionBuilder builder = repo.projection();
   
-    builder.year().build();
-    
     builder.period()
       .length(6)
       .startDate(LocalDate.of(2000, 5, 1))
       .endDate(LocalDate.of(2002, 12, 31))
+      .dueDate(LocalDate.of(2000, 5, 1))
       .build();
     
     CoverBuilder coverBuilder = builder.cover()
@@ -83,10 +82,9 @@ public class CalculationPeriodTest {
   public void coverWith2AmountsAndNaturalCalendarWith1DayDetails() throws IOException {
     ProjectionBuilder builder = repo.projection();
   
-    builder.year().build();
-    
     builder.period().length(6)
       .startDate(LocalDate.of(2000, 5, 1))
+      .dueDate(LocalDate.of(2000, 5, 20))
       .endDate(LocalDate.of(2002, 12, 31))
       .build();
     
@@ -131,11 +129,10 @@ public class CalculationPeriodTest {
   public void coverWith2AmountsAndNaturalCalendarWith1DayDetailsAndFragments() throws IOException {
     ProjectionBuilder builder = repo.projection();
   
-    builder.year().build();
-    
     builder.period().length(6)
       .startDate(LocalDate.of(2000, 5, 20))
       .endDate(LocalDate.of(2002, 12, 9))
+      .dueDate(LocalDate.of(2002, 12, 19))
       .build();
     
     CoverBuilder coverBuilder = builder.cover()

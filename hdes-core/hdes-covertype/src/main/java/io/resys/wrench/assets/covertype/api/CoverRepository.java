@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public interface CoverRepository {
-
+  
   ProjectionBuilder projection();
   InvoicesBuilder invoices();
   
@@ -84,16 +84,11 @@ public interface CoverRepository {
   interface CoverPeriodBuilder {
     CoverPeriodBuilder startDate(LocalDate startDate);
     CoverPeriodBuilder endDate(LocalDate endDate);
+    CoverPeriodBuilder dueDate(LocalDate dueDate);
     CoverPeriodBuilder length(int lengthInMonths); // 1-12
     CoverPeriod build();
   }
-  interface CoverYearBuilder {
-    CoverYearBuilder daysInMonth(int daysInMonth);
-    CoverYearBuilder daysInYear(int daysInYear);
-    CoverYear build();
-  }
   interface ProjectionBuilder {
-    CoverYearBuilder year();
     CoverPeriodBuilder period();
     CoverBuilder cover();
     Projection build();
@@ -120,30 +115,14 @@ public interface CoverRepository {
   interface CoverPeriod {
     LocalDate getStartDate();
     LocalDate getEndDate();
+    LocalDate getDueDate();
     int getMonths();
   }
-  @Value.Immutable
-  interface CoverYear {
-    CoverMonthType getMonth();
-    CoverYearType getYear();
-    Optional<Integer> getDaysInMonth();
-    Optional<Integer> getDaysInYear();
-  }
-  enum CoverYearType {
-    NATURAL, // includes leap year 365/366
-    CUSTOM // year has fixed number of days
-  }
-  enum CoverMonthType {
-    NATURAL, // however many days there are in month
-    CUSTOM // months have fixed number of days in them
-  }
-
   @JsonSerialize(as = ImmutableProjection.class)
   @JsonDeserialize(as = ImmutableProjection.class)  
   @Value.Immutable
   interface Projection {
     Cover getCover();
-    CoverYear getCoverYear();
     CoverPeriod getCoverPeriod();
     List<ProjectionPeriod> getProjectionPeriods();
   }

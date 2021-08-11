@@ -1,12 +1,12 @@
 [ {
   "startDate" : [ 2000, 5, 1 ],
-  "endDate" : [ 2000, 10, 31 ],
+  "endDate" : [ 2000, 11, 1 ],
   "projectionMonths" : {
-    "days" : 0,
+    "days" : 1,
     "months" : 6,
-    "totalDays" : 184,
+    "totalDays" : 185,
     "startPerc" : null,
-    "endPerc" : null
+    "endPerc" : 3.00
   },
   "projectionDetails" : [ {
     "startDate" : [ 2000, 5, 1 ],
@@ -20,7 +20,7 @@
     } ]
   }, {
     "startDate" : [ 2000, 7, 5 ],
-    "endDate" : [ 2000, 10, 31 ],
+    "endDate" : [ 2000, 11, 1 ],
     "coverDetails" : [ {
       "id" : "",
       "startDate" : [ 2000, 7, 5 ],
@@ -30,18 +30,18 @@
     } ]
   } ]
 }, {
-  "startDate" : [ 2000, 11, 1 ],
-  "endDate" : [ 2000, 12, 31 ],
+  "startDate" : [ 2000, 11, 2 ],
+  "endDate" : [ 2000, 12, 1 ],
   "projectionMonths" : {
     "days" : 0,
-    "months" : 2,
-    "totalDays" : 61,
-    "startPerc" : null,
-    "endPerc" : null
+    "months" : 1,
+    "totalDays" : 30,
+    "startPerc" : 7.00,
+    "endPerc" : 3.00
   },
   "projectionDetails" : [ {
-    "startDate" : [ 2000, 11, 1 ],
-    "endDate" : [ 2000, 12, 31 ],
+    "startDate" : [ 2000, 11, 2 ],
+    "endDate" : [ 2000, 12, 1 ],
     "coverDetails" : [ {
       "id" : "",
       "startDate" : [ 2000, 7, 5 ],

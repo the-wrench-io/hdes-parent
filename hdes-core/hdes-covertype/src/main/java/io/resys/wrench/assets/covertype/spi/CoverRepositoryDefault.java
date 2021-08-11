@@ -27,7 +27,6 @@ import java.util.List;
 import io.resys.wrench.assets.covertype.api.CoverRepository;
 import io.resys.wrench.assets.covertype.spi.builders.CoverBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.builders.CoverPeriodBuilderDefault;
-import io.resys.wrench.assets.covertype.spi.builders.CoverYearBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.builders.InvoiceBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.util.CoverAssert;
 import io.resys.wrench.assets.covertype.spi.visitors.CoverVisitor;
@@ -38,18 +37,7 @@ public class CoverRepositoryDefault implements CoverRepository {
   public ProjectionBuilder projection() {
     return new ProjectionBuilder() {
       private Cover cover;
-      private CoverYear coverYear;
       private CoverPeriod coverPeriod;
-      @Override
-      public CoverYearBuilder year() {
-        return new CoverYearBuilderDefault() {
-          @Override
-          public CoverYear build() {
-            coverYear = super.build();
-            return coverYear;
-          }
-        };
-      }
       @Override
       public CoverPeriodBuilder period() {
         return new CoverPeriodBuilderDefault() {
@@ -75,9 +63,8 @@ public class CoverRepositoryDefault implements CoverRepository {
       public Projection build() {
         CoverAssert.notNull(cover, () -> "cover needs to be added!");
         CoverAssert.notNull(coverPeriod, () -> "coverPeriod needs to be added!");
-        CoverAssert.notNull(coverYear, () -> "coverYear needs to be added!");
         
-        return new CoverVisitor(cover, coverYear, coverPeriod).visit();
+        return new CoverVisitor(cover, coverPeriod).visit();
       }
     };
   }

@@ -47,17 +47,17 @@
   } ]
 }, {
   "startDate" : [ 2000, 11, 20 ],
-  "endDate" : [ 2000, 12, 31 ],
+  "endDate" : [ 2000, 12, 19 ],
   "projectionMonths" : {
-    "days" : 12,
+    "days" : 0,
     "months" : 1,
-    "totalDays" : 42,
+    "totalDays" : 30,
     "startPerc" : 67.00,
-    "endPerc" : null
+    "endPerc" : 61.00
   },
   "projectionDetails" : [ {
     "startDate" : [ 2000, 11, 20 ],
-    "endDate" : [ 2000, 12, 31 ],
+    "endDate" : [ 2000, 12, 19 ],
     "coverDetails" : [ {
       "id" : "",
       "startDate" : [ 2000, 7, 5 ],

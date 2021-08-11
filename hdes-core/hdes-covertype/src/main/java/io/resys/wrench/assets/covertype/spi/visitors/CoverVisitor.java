@@ -34,7 +34,6 @@ import java.util.Optional;
 import io.resys.wrench.assets.covertype.api.CoverRepository.Cover;
 import io.resys.wrench.assets.covertype.api.CoverRepository.CoverDetail;
 import io.resys.wrench.assets.covertype.api.CoverRepository.CoverPeriod;
-import io.resys.wrench.assets.covertype.api.CoverRepository.CoverYear;
 import io.resys.wrench.assets.covertype.api.CoverRepository.Projection;
 import io.resys.wrench.assets.covertype.api.CoverRepository.ProjectionDetail;
 import io.resys.wrench.assets.covertype.api.CoverRepository.ProjectionPeriod;
@@ -48,13 +47,11 @@ import io.resys.wrench.assets.covertype.api.ImmutableProjectionPeriodMonths;
 public class CoverVisitor {
 
   private final Cover cover;
-  private final CoverYear coverYear;
   private final CoverPeriod coverPeriod;
   
-  public CoverVisitor(Cover cover, CoverYear coverYear, CoverPeriod coverPeriod) {
+  public CoverVisitor(Cover cover, CoverPeriod coverPeriod) {
     super();
     this.cover = cover;
-    this.coverYear = coverYear;
     this.coverPeriod = coverPeriod;
   }
   
@@ -62,7 +59,6 @@ public class CoverVisitor {
     return ImmutableProjection.builder()
         .cover(cover)
         .coverPeriod(coverPeriod)
-        .coverYear(coverYear)
         .projectionPeriods(visitProjectionPeriods(coverPeriod))
         .build();
   }
@@ -73,7 +69,7 @@ public class CoverVisitor {
       return Collections.emptyList();
     }
     
-    final var endDate = visitProjectionEndDate(coverPeriod);
+    final var endDate = visitProjectionEndDate(coverPeriod).withDayOfMonth(coverPeriod.getDueDate().getDayOfMonth());
     final List<ProjectionPeriod> result = new ArrayList<>();
     
     var startDate = coverPeriod.getStartDate();
@@ -91,7 +87,7 @@ public class CoverVisitor {
   }
   
   private ProjectionPeriod visitProjectionPeriod(LocalDate startDate, LocalDate limitEndDate, int months) {
-    var endDate = startDate.plusMonths(months).minusDays(1);
+    var endDate = startDate.plusMonths(months).withDayOfMonth(limitEndDate.getDayOfMonth());
     if(endDate.isAfter(limitEndDate)) {
       endDate = limitEndDate;
     }

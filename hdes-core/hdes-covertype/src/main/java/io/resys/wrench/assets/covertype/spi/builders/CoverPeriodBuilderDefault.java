@@ -31,6 +31,7 @@ public class CoverPeriodBuilderDefault implements CoverPeriodBuilder {
 
   private LocalDate startDate;
   private LocalDate endDate;
+  private LocalDate dueDate;
   private int lengthInMonths;
   
   @Override
@@ -49,15 +50,22 @@ public class CoverPeriodBuilderDefault implements CoverPeriodBuilder {
     return this;
   }
   @Override
+  public CoverPeriodBuilder dueDate(LocalDate dueDate) {
+    this.dueDate = dueDate;
+    return this;
+  }
+  @Override
   public CoverPeriod build() {
     CoverAssert.notNull(startDate, () -> "startDate needs to be set!");
     CoverAssert.notNull(endDate, () -> "endDate needs to be set!");
+    CoverAssert.notNull(dueDate, () -> "dueDate needs to be set!");
     CoverAssert.isTrue(startDate.isBefore(endDate), () -> "startDate needs to be before endDate!");
     CoverAssert.isTrue(lengthInMonths > 0 && lengthInMonths < 13, () -> "lengthInMonths needs to be between 1-12 but was: " + lengthInMonths + "!");
     
     return ImmutableCoverPeriod.builder()
         .endDate(endDate)
         .startDate(startDate)
+        .dueDate(dueDate)
         .months(lengthInMonths)
         .build();
   }
