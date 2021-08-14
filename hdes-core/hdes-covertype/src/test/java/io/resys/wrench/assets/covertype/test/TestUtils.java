@@ -41,7 +41,7 @@ public class TestUtils {
     objectMapper.registerModule(new JavaTimeModule());
     objectMapper.registerModule(new Jdk8Module());
   }
-
+  
   public static String prettyPrint(Object value) {
     try {
       return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(value);

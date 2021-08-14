@@ -38,6 +38,7 @@ import io.resys.wrench.assets.covertype.api.CoverRepository.Projection;
 import io.resys.wrench.assets.covertype.api.CoverRepository.ProjectionDetail;
 import io.resys.wrench.assets.covertype.api.CoverRepository.ProjectionPeriod;
 import io.resys.wrench.assets.covertype.api.CoverRepository.ProjectionPeriodMonths;
+import io.resys.wrench.assets.covertype.api.ImmutableCoverPeriod;
 import io.resys.wrench.assets.covertype.api.ImmutableProjection;
 import io.resys.wrench.assets.covertype.api.ImmutableProjectionDetail;
 import io.resys.wrench.assets.covertype.api.ImmutableProjectionPeriod;
@@ -47,59 +48,108 @@ import io.resys.wrench.assets.covertype.api.ImmutableProjectionPeriodMonths;
 public class CoverVisitor {
 
   private final Cover cover;
-  private final CoverPeriod coverPeriod;
+  private final LocalDate markerDate;
   
-  public CoverVisitor(Cover cover, CoverPeriod coverPeriod) {
+  public CoverVisitor(Cover cover, LocalDate markerDate) {
     super();
     this.cover = cover;
-    this.coverPeriod = coverPeriod;
+    this.markerDate = markerDate;
   }
   
   public Projection visit() {
     return ImmutableProjection.builder()
         .cover(cover)
-        .coverPeriod(coverPeriod)
-        .projectionPeriods(visitProjectionPeriods(coverPeriod))
+        .projectionPeriods(visitCoverPeriods(cover.getPeriods()))
         .build();
   }
   
-  
-  private List<ProjectionPeriod> visitProjectionPeriods(CoverPeriod coverPeriod) {
-    if(coverPeriod.getStartDate().isAfter(cover.getEndDate())) {
-      return Collections.emptyList();
+  private List<ProjectionPeriod> visitCoverPeriods(List<CoverPeriod> periods) {
+    final var result = new ArrayList<ProjectionPeriod>();
+    final var year = markerDate.getYear();
+    final var yearNext = year + 1;
+
+    
+    CoverPeriod previous = null;
+    for(final var current : periods) {
+      final var startDate = visitStartDate(previous, current); 
+      final var endDate = visitEndDate(current);
+ 
+      final var inYear = startDate.getYear() <= year;
+      final var inNextYear = startDate.getYear() <= yearNext;      
+      
+      LocalDate failsafeEnd = endDate;
+      if(failsafeEnd.isAfter(cover.getEndDate())) {
+        failsafeEnd = cover.getEndDate();
+      }
+
+
+      if(inYear || inNextYear) {
+        result.addAll(visitCoverPeriod(
+            ImmutableCoverPeriod.builder()
+            .startDate(startDate)
+            .endDate(failsafeEnd)
+            .dueDate(current.getDueDate())
+            .months(current.getMonths())
+            .build()));
+      }
+      
+      if(startDate.getYear() > yearNext) {
+        break;
+      }
+      previous = current;
+    }
+    return result;
+  }
+
+  private LocalDate visitStartDate(CoverPeriod previous, CoverPeriod current) {
+    // no history, get start date is null
+    if(previous == null) {
+      return current.getStartDate();
     }
     
-    final var endDate = visitProjectionEndDate(coverPeriod).withDayOfMonth(coverPeriod.getDueDate().getDayOfMonth());
+    return CoverDates.toDueDate(previous.getDueDate(), 
+        previous.getEndDate().withDayOfMonth(1).plusMonths(previous.getMonths()))
+        .plusDays(1);
+  }
+  
+  private LocalDate visitEndDate(CoverPeriod current) {
+    if(current.getDueDate().getDayOfMonth() == current.getEndDate().getDayOfMonth()) {
+      return current.getEndDate();
+    }
+    return CoverDates.toDueDate(current.getDueDate(), 
+        current.getEndDate().withDayOfMonth(1).plusMonths(current.getMonths()));
+  }
+
+  private List<ProjectionPeriod> visitCoverPeriod(CoverPeriod coverPeriod) {
     final List<ProjectionPeriod> result = new ArrayList<>();
-    
-    var startDate = coverPeriod.getStartDate();
-    while(!startDate.isAfter(endDate)) {
-      ProjectionPeriod period = visitProjectionPeriod(startDate, endDate, coverPeriod.getMonths());
+    ProjectionPeriod period = null;
+    while(period == null || period.getEndDate().compareTo(coverPeriod.getEndDate()) < 0) {
+
+      final LocalDate dueDateDelta;
+      if(period == null && coverPeriod.getStartDate().equals(coverPeriod.getDueDate())) {
+        dueDateDelta = coverPeriod.getStartDate().withDayOfMonth(1).plusMonths(coverPeriod.getMonths());
+      } else {
+        dueDateDelta = period == null ? coverPeriod.getStartDate() : period.getEndDate().plusMonths(coverPeriod.getMonths());
+      }
+      
+      
+      final var dueDate = CoverDates.toDueDate(coverPeriod.getDueDate(), dueDateDelta);
+      final var startDate = period == null ? coverPeriod.getStartDate() : period.getEndDate().plusDays(1);
+      
+      period = ImmutableProjectionPeriod.builder()
+          .startDate(startDate)
+          .endDate(dueDate)
+          .projectionMonths(visitProjectionPeriodMonths(startDate, dueDate))
+          .projectionDetails(visitProjectionDetails(startDate, dueDate))
+          .build();
+      
       result.add(period);
-      startDate = period.getEndDate().plusDays(1);
     }
     
     return result;
   }
   
-  private LocalDate visitProjectionEndDate(CoverPeriod coverPeriod) {
-    return coverPeriod.getEndDate().isBefore(cover.getEndDate()) ? coverPeriod.getEndDate() : cover.getEndDate();
-  }
-  
-  private ProjectionPeriod visitProjectionPeriod(LocalDate startDate, LocalDate limitEndDate, int months) {
-    var endDate = startDate.plusMonths(months).withDayOfMonth(limitEndDate.getDayOfMonth());
-    if(endDate.isAfter(limitEndDate)) {
-      endDate = limitEndDate;
-    }
     
-    return ImmutableProjectionPeriod.builder()
-        .startDate(startDate)
-        .endDate(endDate)
-        .projectionMonths(visitProjectionPeriodMonths(startDate, endDate))
-        .projectionDetails(visitProjectionDetails(startDate, endDate))
-        .build();
-  }
-  
   private ProjectionPeriodMonths visitProjectionPeriodMonths(LocalDate startDate, LocalDate endDate) {
     final var rolledEndDate = endDate.plusDays(1);
     final var period = Period.between(startDate, rolledEndDate);
@@ -177,7 +227,7 @@ public class CoverVisitor {
       for(final var coverDetail : cover.getDetails()) {
         
         // has start logn before or on the distortion date AND has not ended
-        if(in(coverDetail, detailStartDate, detailEndDate)) {
+        if(CoverDates.in(coverDetail, detailStartDate, detailEndDate)) {
           details.add(coverDetail);
         }
       }
@@ -187,27 +237,5 @@ public class CoverVisitor {
     }
     
     return result;
-  }
-  
-
-  
-  private boolean in(CoverDetail detail, LocalDate startDate, LocalDate endDate) {
-    // ended details
-    if(detail.getStartDate().isAfter(endDate)) {
-      return false;
-    }
-    if(detail.getEndDate().isBefore(startDate)) {
-      return false;
-    }
-
-    if(detail.getStartDate().isBefore(startDate)) {
-      return true;
-    }
-    
-    if(detail.getStartDate().isEqual(startDate)) {
-      return true;
-    }
-    
-    return false;
   }
 }

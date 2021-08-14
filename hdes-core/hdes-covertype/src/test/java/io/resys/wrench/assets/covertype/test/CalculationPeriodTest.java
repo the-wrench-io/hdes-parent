@@ -42,13 +42,6 @@ public class CalculationPeriodTest {
   @Test
   public void coverWith2AmountsAndNaturalCalendar() throws IOException {
     ProjectionBuilder builder = repo.projection();
-  
-    builder.period()
-      .length(6)
-      .startDate(LocalDate.of(2000, 5, 1))
-      .endDate(LocalDate.of(2002, 12, 31))
-      .dueDate(LocalDate.of(2000, 5, 1))
-      .build();
     
     CoverBuilder coverBuilder = builder.cover()
       .id("1").origin(getClass())
@@ -56,6 +49,13 @@ public class CalculationPeriodTest {
       .endDate(LocalDate.of(2000, 12, 31))
       .type("insurance-cover");
 
+    coverBuilder.addPeriod()
+      .length(6)
+      .startDate(LocalDate.of(2000, 5, 1))
+      .endDate(LocalDate.of(2002, 12, 31))
+      .dueDate(LocalDate.of(2000, 5, 1))
+      .build();
+    
     coverBuilder.addDetail()
       .id("").origin(getClass())
       .startDate(LocalDate.of(2000, 1, 1))
@@ -81,12 +81,6 @@ public class CalculationPeriodTest {
   @Test
   public void coverWith2AmountsAndNaturalCalendarWith1DayDetails() throws IOException {
     ProjectionBuilder builder = repo.projection();
-  
-    builder.period().length(6)
-      .startDate(LocalDate.of(2000, 5, 1))
-      .dueDate(LocalDate.of(2000, 5, 20))
-      .endDate(LocalDate.of(2002, 12, 31))
-      .build();
     
     CoverBuilder coverBuilder = builder.cover()
       .id("1").origin(getClass())
@@ -94,6 +88,12 @@ public class CalculationPeriodTest {
       .endDate(LocalDate.of(2000, 12, 31))
       .type("insurance-cover");
 
+    coverBuilder.addPeriod().length(6)
+    .startDate(LocalDate.of(2000, 5, 1))
+    .dueDate(LocalDate.of(2000, 5, 20))
+    .endDate(LocalDate.of(2002, 12, 31))
+    .build();
+    
     coverBuilder.addDetail()
       .id("").origin(getClass())
       .startDate(LocalDate.of(2000, 1, 1))
@@ -129,11 +129,6 @@ public class CalculationPeriodTest {
   public void coverWith2AmountsAndNaturalCalendarWith1DayDetailsAndFragments() throws IOException {
     ProjectionBuilder builder = repo.projection();
   
-    builder.period().length(6)
-      .startDate(LocalDate.of(2000, 5, 20))
-      .endDate(LocalDate.of(2002, 12, 9))
-      .dueDate(LocalDate.of(2002, 12, 19))
-      .build();
     
     CoverBuilder coverBuilder = builder.cover()
       .id("1").origin(getClass())
@@ -141,6 +136,12 @@ public class CalculationPeriodTest {
       .endDate(LocalDate.of(2000, 12, 31))
       .type("insurance-cover");
 
+    coverBuilder.addPeriod().length(6)
+    .startDate(LocalDate.of(2000, 5, 20))
+    .endDate(LocalDate.of(2002, 12, 9))
+    .dueDate(LocalDate.of(2002, 12, 19))
+    .build();
+  
     coverBuilder.addDetail()
       .id("").origin(getClass())
       .startDate(LocalDate.of(2000, 1, 1))

@@ -1,5 +1,6 @@
 package io.resys.wrench.assets.covertype.spi;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,7 +27,6 @@ import java.util.List;
 
 import io.resys.wrench.assets.covertype.api.CoverRepository;
 import io.resys.wrench.assets.covertype.spi.builders.CoverBuilderDefault;
-import io.resys.wrench.assets.covertype.spi.builders.CoverPeriodBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.builders.InvoiceBuilderDefault;
 import io.resys.wrench.assets.covertype.spi.util.CoverAssert;
 import io.resys.wrench.assets.covertype.spi.visitors.CoverVisitor;
@@ -37,17 +37,7 @@ public class CoverRepositoryDefault implements CoverRepository {
   public ProjectionBuilder projection() {
     return new ProjectionBuilder() {
       private Cover cover;
-      private CoverPeriod coverPeriod;
-      @Override
-      public CoverPeriodBuilder period() {
-        return new CoverPeriodBuilderDefault() {
-          @Override
-          public CoverPeriod build() {
-            coverPeriod = super.build();
-            return coverPeriod;
-          }
-        };
-      }
+      private LocalDate markerDate;
       @Override
       public CoverBuilder cover() {
         return new CoverBuilderDefault() {
@@ -58,13 +48,16 @@ public class CoverRepositoryDefault implements CoverRepository {
           }
         };
       }
-      
+      @Override
+      public ProjectionBuilder markerDate(LocalDate markerDate) {
+        this.markerDate = markerDate;
+        return this;
+      }
       @Override
       public Projection build() {
         CoverAssert.notNull(cover, () -> "cover needs to be added!");
-        CoverAssert.notNull(coverPeriod, () -> "coverPeriod needs to be added!");
-        
-        return new CoverVisitor(cover, coverPeriod).visit();
+        CoverAssert.notNull(markerDate, () -> "markerDate needs to be added!");
+        return new CoverVisitor(cover, markerDate).visit();
       }
     };
   }

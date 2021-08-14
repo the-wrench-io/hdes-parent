@@ -71,6 +71,7 @@ public interface CoverRepository {
     CoverBuilder type(String type);
     CoverBuilder origin(Serializable origin);
     CoverDetailBuilder addDetail();
+    CoverPeriodBuilder addPeriod();
     Cover build();    
   }
   interface CoverDetailBuilder {
@@ -89,7 +90,7 @@ public interface CoverRepository {
     CoverPeriod build();
   }
   interface ProjectionBuilder {
-    CoverPeriodBuilder period();
+    ProjectionBuilder markerDate(LocalDate marker);
     CoverBuilder cover();
     Projection build();
   }
@@ -101,6 +102,7 @@ public interface CoverRepository {
     LocalDate getEndDate();
     String getType();
     Serializable getOrigin();
+    List<CoverPeriod> getPeriods();
     List<CoverDetail> getDetails();
   }
   @Value.Immutable
@@ -123,7 +125,6 @@ public interface CoverRepository {
   @Value.Immutable
   interface Projection {
     Cover getCover();
-    CoverPeriod getCoverPeriod();
     List<ProjectionPeriod> getProjectionPeriods();
   }
   @JsonSerialize(as = ImmutableProjectionPeriod.class)
