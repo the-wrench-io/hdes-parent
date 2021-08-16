@@ -90,7 +90,7 @@ public interface CoverRepository {
     CoverPeriod build();
   }
   interface ProjectionBuilder {
-    ProjectionBuilder markerDate(LocalDate marker);
+    ProjectionBuilder lastDueDate(LocalDate marker);
     CoverBuilder cover();
     Projection build();
   }

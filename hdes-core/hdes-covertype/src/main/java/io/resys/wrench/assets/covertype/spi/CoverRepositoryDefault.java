@@ -37,7 +37,7 @@ public class CoverRepositoryDefault implements CoverRepository {
   public ProjectionBuilder projection() {
     return new ProjectionBuilder() {
       private Cover cover;
-      private LocalDate markerDate;
+      private LocalDate lastDueDate;
       @Override
       public CoverBuilder cover() {
         return new CoverBuilderDefault() {
@@ -49,15 +49,15 @@ public class CoverRepositoryDefault implements CoverRepository {
         };
       }
       @Override
-      public ProjectionBuilder markerDate(LocalDate markerDate) {
-        this.markerDate = markerDate;
+      public ProjectionBuilder lastDueDate(LocalDate markerDate) {
+        this.lastDueDate = markerDate;
         return this;
       }
       @Override
       public Projection build() {
         CoverAssert.notNull(cover, () -> "cover needs to be added!");
-        CoverAssert.notNull(markerDate, () -> "markerDate needs to be added!");
-        return new CoverVisitor(cover, markerDate).visit();
+        CoverAssert.notNull(lastDueDate, () -> "lastDueDate needs to be added!");
+        return new CoverVisitor(cover, lastDueDate).visit();
       }
     };
   }

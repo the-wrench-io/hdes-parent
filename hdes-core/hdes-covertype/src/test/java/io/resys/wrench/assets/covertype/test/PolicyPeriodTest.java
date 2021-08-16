@@ -69,7 +69,7 @@ public class PolicyPeriodTest {
     coverBuilder.build();
 
     
-    Projection calculation = builder.markerDate(LocalDate.of(2000, 1, 1)).build();
+    Projection calculation = builder.lastDueDate(LocalDate.of(1999, 12, 31)).build();
     var actual = prettyPrint(calculation);
     var expected = TestUtils.toString(getClass(), "policy-period.txt");
     Assert.assertEquals(expected, actual); 
@@ -95,7 +95,6 @@ public class PolicyPeriodTest {
         .append(period.getStartDate()).append(" - ").append(period.getEndDate())
         .append(System.lineSeparator());
     }
-    
     return result.toString();
   }
   

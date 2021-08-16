@@ -48,12 +48,12 @@ import io.resys.wrench.assets.covertype.api.ImmutableProjectionPeriodMonths;
 public class CoverVisitor {
 
   private final Cover cover;
-  private final LocalDate markerDate;
+  private final LocalDate lastDueDate;
   
-  public CoverVisitor(Cover cover, LocalDate markerDate) {
+  public CoverVisitor(Cover cover, LocalDate lastDueDate) {
     super();
     this.cover = cover;
-    this.markerDate = markerDate;
+    this.lastDueDate = lastDueDate;
   }
   
   public Projection visit() {
@@ -65,12 +65,16 @@ public class CoverVisitor {
   
   private List<ProjectionPeriod> visitCoverPeriods(List<CoverPeriod> periods) {
     final var result = new ArrayList<ProjectionPeriod>();
-    final var year = markerDate.getYear();
+    final var year = lastDueDate.plusDays(1).getYear();
     final var yearNext = year + 1;
 
     
     CoverPeriod previous = null;
     for(final var current : periods) {
+      if(current.getEndDate().compareTo(lastDueDate) < 0) {
+        continue;
+      }
+      
       final var startDate = visitStartDate(previous, current); 
       final var endDate = visitEndDate(current);
  
@@ -104,7 +108,7 @@ public class CoverVisitor {
   private LocalDate visitStartDate(CoverPeriod previous, CoverPeriod current) {
     // no history, get start date is null
     if(previous == null) {
-      return current.getStartDate();
+      return lastDueDate.plusDays(1);
     }
     
     return CoverDates.toDueDate(previous.getDueDate(), 

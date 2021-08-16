@@ -22,6 +22,8 @@ package io.resys.wrench.assets.covertype.test;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -72,9 +74,9 @@ public class CalculationPeriodTest {
     coverBuilder.build();
 
     
-    Projection calculation = builder.build();
-    var actual = TestUtils.prettyPrint(calculation.getProjectionPeriods());
-    var expected = TestUtils.toString(getClass(), "coverWith2AmountsAndNaturalCalendar.json");
+    Projection calculation = builder.lastDueDate(LocalDate.of(1999, 12, 31)).build();
+    var actual = prettyPrint(calculation);
+    var expected = TestUtils.toString(getClass(), "policy-period-with-2-amounts.txt");
     Assert.assertEquals(expected, actual); 
   }
   
@@ -118,9 +120,9 @@ public class CalculationPeriodTest {
     coverBuilder.build();
 
     
-    Projection calculation = builder.build();
-    var actual = TestUtils.prettyPrint(calculation.getProjectionPeriods());
-    var expected = TestUtils.toString(getClass(), "coverWith2AmountsAndNaturalCalendarWith1DayDetails.json");
+    Projection calculation = builder.lastDueDate(LocalDate.of(1999, 12, 31)).build();
+    var actual = prettyPrint(calculation);
+    var expected = TestUtils.toString(getClass(), "policy-period-with-splits.txt");
     Assert.assertEquals(expected, actual); 
   }
 
@@ -166,9 +168,38 @@ public class CalculationPeriodTest {
     coverBuilder.build();
 
     
-    Projection calculation = builder.build();
-    var actual = TestUtils.prettyPrint(calculation.getProjectionPeriods());
-    var expected = TestUtils.toString(getClass(), "coverWith2AmountsAndNaturalCalendarWith1DayDetailsAndFragments.json");
+    Projection calculation = builder.lastDueDate(LocalDate.of(1999, 12, 31)).build();
+    var actual = prettyPrint(calculation);
+    var expected = TestUtils.toString(getClass(), "policy-period-with-2-amounts-and-1-day-details.txt");
     Assert.assertEquals(expected, actual); 
+  }
+  
+  private static String prettyPrint(Projection calculation) {
+    StringBuilder result = new StringBuilder();
+    final var periods = new ArrayList<>(calculation.getProjectionPeriods());
+    Collections.sort(periods, (a, b) -> a.getStartDate().compareTo(b.getStartDate()));
+    
+    int index = 0;
+    for(final var period : periods) {
+      if(index != period.getStartDate().getYear()) {
+        index = period.getStartDate().getYear();
+        result.append("  - ").append(index)
+        .append(System.lineSeparator());
+        
+      }
+      result
+        .append("    ")
+        .append(period.getStartDate().getMonthValue()).append(": ")
+        .append(period.getStartDate()).append(" - ").append(period.getEndDate())
+        .append(System.lineSeparator());
+        
+      for(final var detail : period.getProjectionDetails()) {
+        result
+        .append("       - ")
+        .append(detail.getStartDate()).append(" - ").append(detail.getEndDate())
+        .append(System.lineSeparator());
+      }
+    }
+    return result.toString();
   }
 }
