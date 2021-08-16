@@ -106,6 +106,12 @@ public class InvoiceBuilderDefault implements InvoiceBuilder {
             }
             return this;
           }
+
+          @Override
+          public InvoiceCalculationBuilder addParams(Map<String, Serializable> values) {
+            this.params.putAll(values);
+            return this;
+          }
           @Override
           public InvoiceCalculation build() {
             CoverAssert.notNull(id, () -> "id needs to be set!");

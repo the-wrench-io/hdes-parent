@@ -60,6 +60,7 @@ public interface CoverRepository {
     InvoiceCalculationBuilder startDate(LocalDate startDate);
     InvoiceCalculationBuilder endDate(LocalDate endDate);
     InvoiceCalculationBuilder addParam(String name, Serializable value);
+    InvoiceCalculationBuilder addParams(Map<String, Serializable> values);
     InvoiceCalculation build();
   }
   
