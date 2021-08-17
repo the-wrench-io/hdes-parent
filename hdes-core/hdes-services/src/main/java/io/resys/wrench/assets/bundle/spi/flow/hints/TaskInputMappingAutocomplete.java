@@ -108,12 +108,16 @@ public class TaskInputMappingAutocomplete extends TemplateAutocomplete implement
   }
 
   private Map<String, String> getInputs(NodeFlow flow) {
-    Map<String, String> result = new HashMap<>(
-        flow.getInputs().entrySet().stream()
+    Map<String, String> result = new HashMap<>();
 
-        .collect(Collectors.toMap(e -> e.getKey(),
-            e -> NodeFlowAdapter.getStringValue(e.getValue().getType()))));
-
+    for(final var e : flow.getInputs().entrySet()) {
+      final var key = e.getKey();
+      final var value = NodeFlowAdapter.getStringValue(e.getValue().getType());
+      if(value != null) {
+        result.put(key, value);
+      }
+    }
+    
     for(NodeTask taskModel : flow.getTasks().values()) {
       if(taskModel.getRef() == null) {
         continue;

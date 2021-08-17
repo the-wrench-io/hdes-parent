@@ -91,7 +91,7 @@ public class GenericFlowCommandModelBuilder implements FlowNodeBuilder {
 
     NodeFlow flow = nodeBuilder.build();
     try {
-      visitors.parallelStream().forEach(v -> v.visit(flow, result));
+      visitors.stream().forEach(v -> v.visit(flow, result));
     } catch(Exception e) {
       LOGGER.error(e.getMessage(), e);
       result.addMessages(
