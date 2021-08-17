@@ -58,7 +58,12 @@
         <artifactId>hdes-spring-bundle-editor</artifactId>
         <version>${project.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-spring-ide</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      
     </dependencies>
   </dependencyManagement>
 </project>
