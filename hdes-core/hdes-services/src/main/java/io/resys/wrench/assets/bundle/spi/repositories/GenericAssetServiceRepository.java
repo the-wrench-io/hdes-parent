@@ -3,6 +3,7 @@ package io.resys.wrench.assets.bundle.spi.repositories;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 /*-
  * #%L
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.util.Assert;
 
@@ -35,11 +37,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
+import io.resys.wrench.assets.bundle.spi.dt.resolvers.MatchingDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
+import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionTableOutput;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.model.Flow;
 import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
@@ -160,6 +164,52 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
                 throw new DataException(422, new Message("E003", "Flow with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
               }
             }
+          }
+        };
+      }
+
+      @Override
+      public DtServiceExecutor dt(String name) {
+        Assert.notNull(name, "Define dt name!");
+        Optional<Service> service = createQuery().type(ServiceType.DT).name(name).get();
+        if(service.isEmpty()) {
+          throw new DataException(422, new Message("E002", "No dt with id: " + name + "!"));
+        }
+        
+        return new DtServiceExecutor() {
+          private final Map<String, Object> inputs = new HashMap<>();
+          @Override
+          public DtServiceExecutor withMap(Map<String, Object> input) {
+            this.inputs.putAll(input);
+            return this;
+          }
+          @SuppressWarnings("unchecked")
+          @Override
+          public DtServiceExecutor withEntity(Object inputObject) {
+            this.inputs.putAll(objectMapper.convertValue(inputObject, Map.class));
+            return this;
+          }
+          private void validateDtInput(Service service, Map<String, Object> input) {
+            for(DataType dataType : service.getDataModel().getParams()) {
+              if(dataType.isRequired() && input.get(dataType.getName()) == null) {
+                throw new DataException(422, new Message("E003", "DT with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
+              }
+            }
+          }
+          @Override
+          public Map<String, Serializable> andGet() {
+            validateDtInput(service.get(), inputs);
+            final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
+            final DecisionTableOutput output = dt.get();
+            return output.getValues();
+          }
+          
+          @Override
+          public List<Map<String, Serializable>> andFind() {
+            validateDtInput(service.get(), inputs);
+            final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
+            final List<DecisionTableOutput> output = (List<DecisionTableOutput>) dt.list();
+            return output.stream().map(e -> e.getValues()).collect(Collectors.toList());
           }
         };
       }

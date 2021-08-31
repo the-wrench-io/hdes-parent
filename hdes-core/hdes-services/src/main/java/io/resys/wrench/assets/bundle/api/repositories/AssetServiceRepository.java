@@ -52,12 +52,20 @@ public interface AssetServiceRepository {
   
   interface ServiceExecutor {
     FlowServiceExecutor flow(String name);
+    DtServiceExecutor dt(String name);
   }
   
   interface FlowServiceExecutor {
     FlowServiceExecutor withMap(Map<String, Object> input);
     FlowServiceExecutor withEntity(Object inputObject);
     Object andGetTask(String task);
+  }
+
+  interface DtServiceExecutor {
+    DtServiceExecutor withMap(Map<String, Object> input);
+    DtServiceExecutor withEntity(Object inputObject);
+    Map<String, Serializable> andGet();
+    List<Map<String, Serializable>> andFind();
   }
   
   interface ExportBuilder {
