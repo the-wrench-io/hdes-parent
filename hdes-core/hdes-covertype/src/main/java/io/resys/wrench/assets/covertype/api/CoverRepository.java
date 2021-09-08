@@ -87,7 +87,7 @@ public interface CoverRepository {
     CoverPeriodBuilder startDate(LocalDate startDate);
     CoverPeriodBuilder endDate(LocalDate endDate);
     CoverPeriodBuilder dueDate(LocalDate dueDate);
-    CoverPeriodBuilder length(int lengthInMonths); // 1-12
+    CoverPeriodBuilder lengthInMonths(Integer lengthInMonths); // 1-12
     CoverPeriod build();
   }
   interface ProjectionBuilder {

@@ -56,14 +56,14 @@ public class PolicyPeriodTest {
       .startDate(LocalDate.of(2000, 1, 1))
       .endDate(LocalDate.of(2000, 12, 31))
       .dueDate(LocalDate.of(2000, 1, 1))
-      .length(1)
+      .lengthInMonths(1)
       .build();
 
     coverBuilder.addPeriod()
       .startDate(LocalDate.of(2001, 1, 1))
       .endDate(LocalDate.of(2001, 12, 31))
       .dueDate(LocalDate.of(2001, 5, 31))
-      .length(1)
+      .lengthInMonths(1)
       .build();
     
     coverBuilder.build();

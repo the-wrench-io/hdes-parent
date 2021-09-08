@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,11 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
+import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
+import io.resys.wrench.assets.bundle.spi.exceptions.Message;
+import io.resys.wrench.assets.bundle.spi.exceptions.MessageList;
 import io.resys.wrench.assets.bundle.spi.flowtask.FlowTaskInput;
+import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
 import io.resys.wrench.assets.flow.api.model.Flow;
 import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
 import io.resys.wrench.assets.flow.api.model.Flow.FlowTaskStatus;
@@ -89,6 +94,23 @@ public class GenericFlowServiceExecutor extends ServiceFlowTaskExecutor {
         task
           .putInputs(serviceInput)
           .putVariables(createVariables(flow, task, node.getBody(), response.get()));
+      } catch(FlowTaskExecutorException e) {
+        LOGGER.error(e.getMessage(), e);
+        final var rootCause = ExceptionUtils.getRootCause(e);
+        final var rootMsg = ExceptionUtils.getRootCauseStackTrace(rootCause);
+        List<Message> messages = new ArrayList<>(); 
+        for(final var trace : rootMsg) {
+          if(trace.contains("resys")) {
+            var msg = new Message("trace", trace);
+            messages.add(msg);
+          }
+          
+        }
+        
+        final var result = new MessageList().setStatus(422)
+            .addAll(messages)
+            .add(new Message(flow.getModel().getId()+ "/" + task.getModelId(), rootCause.getMessage()));
+        throw new DataException(result);
       } catch(RuntimeException e) {
         LOGGER.error(e.getMessage(), e);
         throw e;

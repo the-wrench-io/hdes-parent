@@ -52,7 +52,7 @@ public class CalculationPeriodTest {
       .type("insurance-cover");
 
     coverBuilder.addPeriod()
-      .length(6)
+      .lengthInMonths(6)
       .startDate(LocalDate.of(2000, 5, 1))
       .endDate(LocalDate.of(2002, 12, 31))
       .dueDate(LocalDate.of(2000, 5, 1))
@@ -90,7 +90,7 @@ public class CalculationPeriodTest {
       .endDate(LocalDate.of(2000, 12, 31))
       .type("insurance-cover");
 
-    coverBuilder.addPeriod().length(6)
+    coverBuilder.addPeriod().lengthInMonths(6)
     .startDate(LocalDate.of(2000, 5, 1))
     .dueDate(LocalDate.of(2000, 5, 20))
     .endDate(LocalDate.of(2002, 12, 31))
@@ -138,7 +138,7 @@ public class CalculationPeriodTest {
       .endDate(LocalDate.of(2000, 12, 31))
       .type("insurance-cover");
 
-    coverBuilder.addPeriod().length(6)
+    coverBuilder.addPeriod().lengthInMonths(6)
     .startDate(LocalDate.of(2000, 5, 20))
     .endDate(LocalDate.of(2002, 12, 9))
     .dueDate(LocalDate.of(2002, 12, 19))
