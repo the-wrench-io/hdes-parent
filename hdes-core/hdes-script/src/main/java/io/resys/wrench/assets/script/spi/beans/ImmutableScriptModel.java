@@ -2,7 +2,7 @@ package io.resys.wrench.assets.script.spi.beans;
 
 import java.util.List;
 
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommand;
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 
 /*-
  * #%L
@@ -32,11 +32,11 @@ public class ImmutableScriptModel implements ScriptModel {
   private final String id;
   private final String src;
   private final int rev;
-  private final List<ScriptCommand> commands;
+  private final List<AstCommandType> commands;
   private final Class<?> type;
   private final ScriptMethodModel method;
 
-  public ImmutableScriptModel(String id, int rev, String src, List<ScriptCommand> commands, Class<?> type, ScriptMethodModel method) {
+  public ImmutableScriptModel(String id, int rev, String src, List<AstCommandType> commands, Class<?> type, ScriptMethodModel method) {
     this.id = id;
     this.rev = rev;
     this.src = src;
@@ -53,7 +53,7 @@ public class ImmutableScriptModel implements ScriptModel {
     return src;
   }
   @Override
-  public List<ScriptCommand> getCommands() {
+  public List<AstCommandType> getCommands() {
     return commands;
   }
   @Override

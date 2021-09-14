@@ -69,15 +69,6 @@ public interface DecisionTableAst extends AstType, Serializable {
     String getValue();
   }
 
-  @Value.Immutable  
-  interface Command extends Serializable {
-    @Nullable
-    String getId();
-    @Nullable
-    String getValue();
-    CommandType getType();
-  }
-
   enum CommandType {
     SET_NAME,
     SET_DESCRIPTION,

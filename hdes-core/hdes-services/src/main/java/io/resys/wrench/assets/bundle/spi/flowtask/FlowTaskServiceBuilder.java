@@ -2,6 +2,8 @@ package io.resys.wrench.assets.bundle.spi.flowtask;
 
 import javax.lang.model.SourceVersion;
 
+import org.apache.commons.lang3.StringUtils;
+
 /*-
  * #%L
  * wrench-component-assets
@@ -22,7 +24,7 @@ import javax.lang.model.SourceVersion;
  * #L%
  */
 
-import org.springframework.util.StringUtils;
+
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

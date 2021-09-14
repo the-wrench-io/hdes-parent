@@ -49,6 +49,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
@@ -458,6 +459,10 @@ public class GenericAssetIdeServices implements AssetIdeServices {
           .stream().map(error -> ImmutableAssetError.builder().id(error.getId()).message(error.getMessage()).build())
           .collect(Collectors.toList()))
       .build();
+  }
+  @Override
+  public Migration migrate() {
+    return assetServiceRepository.createMigration().build();
   }
 
 }

@@ -41,6 +41,7 @@ import io.resys.wrench.assets.bundle.spi.dt.resolvers.MatchingDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
+import io.resys.wrench.assets.bundle.spi.migration.GenericServiceExporter;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionTableOutput;
@@ -214,5 +215,28 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
         };
       }
     };
+  }
+
+  @Override
+  public MigrationBuilder createMigration() {
+    return new GenericServiceExporter(this, objectMapper);
+  }
+
+  @Override
+  public Migration readMigration(String json) {
+    try {
+      return objectMapper.readValue(json, Migration.class);
+    } catch(Exception e) {
+      throw new RuntimeException("Failed to parse migration json, msg: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public String toSrc(MigrationValue migration) {
+    try {
+      return objectMapper.writeValueAsString(migration.getCommands());
+    } catch(Exception e) {
+      throw new RuntimeException("Failed to parse migration json for: '" + migration.getName() + "', msg: " + e.getMessage(), e);
+    }
   }
 }

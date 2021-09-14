@@ -30,6 +30,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.immutables.value.Value;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
@@ -44,11 +50,35 @@ public interface AssetServiceRepository {
   ExportBuilder createExport();
   ServiceStore createStore();
   String getHash();
+  MigrationBuilder createMigration();
+  Migration readMigration(String json);
+  String toSrc(MigrationValue migration);
   
   DecisionTableRepository getDtRepo();
   ScriptRepository getStRepo();
   FlowRepository getFlRepo();
   
+  interface MigrationBuilder {
+    Migration build();
+  }
+
+  @JsonSerialize(as = ImmutableMigration.class)
+  @JsonDeserialize(as = ImmutableMigration.class)
+  @Value.Immutable
+  interface Migration {
+    String getId();
+    List<MigrationValue> getValue();
+  }
+  
+  @JsonSerialize(as = ImmutableMigrationValue.class)
+  @JsonDeserialize(as = ImmutableMigrationValue.class)
+  @Value.Immutable
+  interface MigrationValue {
+    String getId();
+    ServiceType getType();
+    String getName();
+    List<AstCommandType> getCommands();
+  }
   
   interface ServiceExecutor {
     FlowServiceExecutor flow(String name);

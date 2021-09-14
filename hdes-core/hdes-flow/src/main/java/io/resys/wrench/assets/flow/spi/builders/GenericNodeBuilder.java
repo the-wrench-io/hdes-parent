@@ -36,13 +36,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.collect.Range;
 
+import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeBuilder;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInputType;
 import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessage;
 import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessageType;
 import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandType;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommand;
 import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommandMessage;
 import io.resys.wrench.assets.flow.spi.exceptions.NodeFlowException;
 import io.resys.wrench.assets.flow.spi.model.NodeBean;
@@ -70,7 +70,7 @@ public class GenericNodeBuilder implements NodeBuilder {
   @Override
   public GenericNodeBuilder add(int line, String value) {
     sourcesAdded.stream().filter(s -> s.getLine() >= line).forEach(s -> s.setLine(s.getLine() + 1));
-    sourcesAdded.add(new NodeSourceBean(line, ImmutableFlowCommand.builder().id(line).value(value).type(FlowCommandType.ADD).build()));
+    sourcesAdded.add(new NodeSourceBean(line, ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(FlowCommandType.ADD.name()).build()));
     return this;
   }
 
@@ -78,7 +78,7 @@ public class GenericNodeBuilder implements NodeBuilder {
   public GenericNodeBuilder set(int line, String value) {
     Optional<NodeSourceBean> source = sourcesAdded.stream().filter(s -> s.getLine() == line).findFirst();
     Assert.isTrue(source.isPresent(), () -> String.format("Can't change value of non existing line: %s!", line));
-    source.get().add(ImmutableFlowCommand.builder().id(line).value(value).type(FlowCommandType.SET).build());
+    source.get().add(ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(FlowCommandType.SET.name()).build());
     return this;
   }
 

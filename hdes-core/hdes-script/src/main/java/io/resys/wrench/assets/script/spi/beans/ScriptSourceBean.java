@@ -26,17 +26,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
+
 
 public class ScriptSourceBean implements Comparable<ScriptSourceBean>, Serializable {
   private static final long serialVersionUID = 7861465598795670509L;
   private int line;
-  private List<ScriptSourceCommandBean> commands = new ArrayList<>();
+  private List<AstCommandType> commands = new ArrayList<>();
 
   public ScriptSourceBean(int line) {
     super();
     this.line = line;
   }
-  public ScriptSourceBean(int line, ScriptSourceCommandBean command) {
+  public ScriptSourceBean(int line, AstCommandType command) {
     super();
     this.line = line;
     this.commands.add(command);
@@ -44,10 +46,10 @@ public class ScriptSourceBean implements Comparable<ScriptSourceBean>, Serializa
   public int getLine() {
     return line;
   }
-  public List<ScriptSourceCommandBean> getCommands() {
+  public List<AstCommandType> getCommands() {
     return Collections.unmodifiableList(commands);
   }
-  public ScriptSourceBean add(ScriptSourceCommandBean command) {
+  public ScriptSourceBean add(AstCommandType command) {
     commands.add(command);
     return this;
   }

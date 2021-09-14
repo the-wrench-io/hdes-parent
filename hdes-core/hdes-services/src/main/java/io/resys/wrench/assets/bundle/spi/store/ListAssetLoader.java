@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
@@ -35,6 +36,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.MigrationValue;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableService;
@@ -50,7 +52,7 @@ public class ListAssetLoader {
   private final AssetServiceRepository assetRepository;
   private final AssetLocation location;
   private final ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-
+  
   public ListAssetLoader(AssetServiceRepository assetRepository, AssetLocation location) {
     super();
     this.assetRepository = assetRepository;
@@ -74,6 +76,51 @@ public class ListAssetLoader {
   }
 
   public void load() {
+    // migration
+    
+    StringBuilder migLog = new StringBuilder();
+    list(location.getMigrationRegex()).stream().forEach(r -> {
+      Map<ServiceType, Integer> order = Map.of(
+          ServiceType.DT, 1,
+          ServiceType.FLOW_TASK, 2,
+          ServiceType.FLOW, 3);
+      
+      migLog
+        .append("Loading assets from: " + r.getFilename()).append(System.lineSeparator())
+        .append(" Migrations hash: " + r.getFilename()).append(System.lineSeparator());
+      
+      final var assets = new ArrayList<>(assetRepository.readMigration(getContent(r)).getValue());
+      assets.sort((MigrationValue o1, MigrationValue o2) -> 
+        Integer.compare(order.get(o1.getType()), order.get(o2.getType()))
+      );
+      
+      for(final var asset : assets) {
+        migLog.append("  - ")
+          .append(asset.getId()).append("/").append(asset.getType()).append("/").append(asset.getName())
+          .append(System.lineSeparator());
+        
+        Service s = null;
+        try {
+          s = assetRepository.createBuilder(asset.getType())
+              .id(asset.getId() + "/" + asset.getName())
+              .src(assetRepository.toSrc(asset))
+              .pointer(asset.getId())
+              .build();
+          assetRepository.createStore().load(s);
+          
+          
+        } catch (DataException e) {
+          createDuplicateErrorService(r, s, e);
+        } catch (Exception e) {
+          throw new RuntimeException("Failed to load asset content from: " + r.getFilename() + "!" + e.getMessage(), e);
+        }
+      }
+      
+    });
+    
+    LOGGER.debug(migLog.toString());
+
+    
     // Decision tables
     list(location.getDtRegex()).stream().forEach(r -> {
       Service s = null;

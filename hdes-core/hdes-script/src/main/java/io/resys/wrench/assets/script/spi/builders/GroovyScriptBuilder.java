@@ -47,6 +47,7 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import groovy.lang.GroovyClassLoader;
 import io.resys.wrench.assets.context.stereotypes.WrenchFlowParameter;
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeBuilder;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
@@ -54,7 +55,6 @@ import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommand;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptConstructor;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptMethodModel;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModel;
@@ -121,7 +121,7 @@ public class GroovyScriptBuilder implements ScriptBuilder {
   public Script build() {
     Assert.isTrue(src != null || jsonNode != null, () -> "src can't be null!");
 
-    final Map.Entry<String, List<ScriptCommand>> src = getSrc(this.src, this.jsonNode);
+    final Map.Entry<String, List<AstCommandType>> src = getSrc(this.src, this.jsonNode);
     final int rev = this.rev != null ? this.rev : src.getValue().size();
     final GroovyClassLoader gcl = new GroovyClassLoader();
 
@@ -154,7 +154,7 @@ public class GroovyScriptBuilder implements ScriptBuilder {
     }
   }
 
-  private Map.Entry<String, List<ScriptCommand>> getSrc(String src, JsonNode jsonNode) {
+  private Map.Entry<String, List<AstCommandType>> getSrc(String src, JsonNode jsonNode) {
     if(this.jsonNode != null) {
       return scriptParsers.parse(this.jsonNode, this.rev);
     }

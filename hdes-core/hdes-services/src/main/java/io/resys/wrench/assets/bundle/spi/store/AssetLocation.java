@@ -67,6 +67,9 @@ public class AssetLocation implements Serializable {
   public String getDtRegex() {
     return withRegex("**/dt/**/*.json");
   }
+  public String getMigrationRegex() {
+    return withRegex("**/migration/**/*.json");
+  }
 
   protected String withRegex(String exp) {
     return value + assetFolder + exp;

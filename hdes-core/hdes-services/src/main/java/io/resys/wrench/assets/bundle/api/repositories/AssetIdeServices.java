@@ -32,6 +32,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 
@@ -46,6 +48,8 @@ public interface AssetIdeServices {
   AssetResource copyAs(AssetCopyAs copyAs);
   String debug(AssetDebug debug);
   JsonNode commands(AssetCommand input);
+  
+  Migration migrate();
   
   interface AssetResourceQuery {
     AssetResourceQuery id(String id);

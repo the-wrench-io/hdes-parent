@@ -24,20 +24,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeSource;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommand;
 
 
 public class NodeSourceBean implements Comparable<NodeSourceBean>, NodeSource {
   private static final long serialVersionUID = 7861465598795670509L;
   private int line;
-  private List<FlowCommand> commands = new ArrayList<>();
+  private List<AstCommandType> commands = new ArrayList<>();
 
   public NodeSourceBean(int line) {
     super();
     this.line = line;
   }
-  public NodeSourceBean(int line, FlowCommand command) {
+  public NodeSourceBean(int line, AstCommandType command) {
     super();
     this.line = line;
     this.commands.add(command);
@@ -47,10 +47,10 @@ public class NodeSourceBean implements Comparable<NodeSourceBean>, NodeSource {
     return line;
   }
   @Override
-  public List<FlowCommand> getCommands() {
+  public List<AstCommandType> getCommands() {
     return Collections.unmodifiableList(commands);
   }
-  public NodeSourceBean add(FlowCommand command) {
+  public NodeSourceBean add(AstCommandType command) {
     commands.add(command);
     return this;
   }

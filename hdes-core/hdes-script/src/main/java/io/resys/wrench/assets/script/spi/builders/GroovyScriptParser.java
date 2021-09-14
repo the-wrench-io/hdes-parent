@@ -31,9 +31,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommand;
+import io.resys.wrench.assets.datatype.api.AstCommandType;
+import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommandType;
-import io.resys.wrench.assets.script.spi.beans.ScriptSourceCommandBean;
 
 public class GroovyScriptParser {
 
@@ -44,10 +44,10 @@ public class GroovyScriptParser {
     this.objectMapper = objectMapper;
   }
 
-  public Map.Entry<String, List<ScriptCommand>> parse(JsonNode node, Integer rev) {
+  public Map.Entry<String, List<AstCommandType>> parse(JsonNode node, Integer rev) {
     try {
       GrooovyCommandBuilder commandBuilder = new GrooovyCommandBuilder();
-      List<ScriptCommand> commands = new ArrayList<>();
+      List<AstCommandType> commands = new ArrayList<>();
       ArrayNode sourceCommands = (ArrayNode)  (node.isArray() ? node : node.get("commands"));
 
       if(rev != null) {
@@ -64,13 +64,13 @@ public class GroovyScriptParser {
       }
 
       String src = commandBuilder.build();
-      return new AbstractMap.SimpleImmutableEntry<String, List<ScriptCommand>>(src, commands);
+      return new AbstractMap.SimpleImmutableEntry<String, List<AstCommandType>>(src, commands);
     } catch(Exception e) {
       throw new RuntimeException("Incorrect script format, for format conversions use: new FlowTaskFlatToCommandExporter().build(\"src/main/resources\")!" + System.lineSeparator() + e.getMessage(), e);
     }
   }
 
-  public Map.Entry<String, List<ScriptCommand>> parse(String input, Integer rev) {
+  public Map.Entry<String, List<AstCommandType>> parse(String input, Integer rev) {
     try {
 
 
@@ -82,12 +82,12 @@ public class GroovyScriptParser {
     }
   }
 
-  private void create(List<ScriptCommand> commands, ObjectNode src, GrooovyCommandBuilder builder) {
+  private void create(List<AstCommandType> commands, ObjectNode src, GrooovyCommandBuilder builder) {
     int line = src.get("id").asInt();
     ScriptCommandType type = ScriptCommandType.valueOf(src.get("type").asText());
     JsonNode valueNode = src.hasNonNull("value") ? src.get("value") : null;
     String value = valueNode == null ? null : valueNode.asText();
-    ScriptSourceCommandBean command = new ScriptSourceCommandBean(line, value, type);
+    AstCommandType command = ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(type.name()).build();
     builder.add(command);
     commands.add(command);
   }

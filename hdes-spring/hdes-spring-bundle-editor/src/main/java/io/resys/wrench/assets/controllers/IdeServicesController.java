@@ -47,6 +47,7 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetReso
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.AssetSummary;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.CreateAssetResource;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices.UpdateAssetResource;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableAssetResource;
@@ -71,6 +72,11 @@ public class IdeServicesController {
     return assetIdeServices.models();
   }
 
+  @GetMapping(value="/exports", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Migration exports() {
+    return assetIdeServices.migrate();
+  }
+  
   @PostMapping(path = "/commands", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public JsonNode commands(@RequestBody AssetCommand command) {
     return assetIdeServices.commands(command);

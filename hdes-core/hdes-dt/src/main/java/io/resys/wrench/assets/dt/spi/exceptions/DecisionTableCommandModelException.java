@@ -2,9 +2,9 @@ package io.resys.wrench.assets.dt.spi.exceptions;
 
 /*-
  * #%L
- * wrench-assets-dt
+ * hdes-dt
  * %%
- * Copyright (C) 2016 - 2018 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,15 @@ package io.resys.wrench.assets.dt.spi.exceptions;
  * #L%
  */
 
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Command;
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 
 public class DecisionTableCommandModelException extends RuntimeException {
 
   private static final long serialVersionUID = -7154685569622201632L;
 
-  private final Command command;
+  private final AstCommandType command;
 
-  public DecisionTableCommandModelException(Command command, String message, Throwable cause) {
+  public DecisionTableCommandModelException(AstCommandType command, String message, Throwable cause) {
     super(message, cause);
     this.command = command;
   }
@@ -38,12 +38,12 @@ public class DecisionTableCommandModelException extends RuntimeException {
     this.command = null;
   }
 
-  public DecisionTableCommandModelException(Command command, String message) {
+  public DecisionTableCommandModelException(AstCommandType command, String message) {
     super(message);
     this.command = command;
   }
 
-  public Command getCommand() {
+  public AstCommandType getCommand() {
     return command;
   }
 

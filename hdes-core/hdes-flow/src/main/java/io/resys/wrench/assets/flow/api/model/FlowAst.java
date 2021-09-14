@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.api.AstType;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
@@ -35,7 +36,7 @@ import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
 @Value.Immutable
 public interface FlowAst extends AstType, Serializable {
   Node getSrc();
-  List<FlowCommand> getCommands();
+  List<AstCommandType> getCommands();
   List<FlowCommandMessage> getMessages();
   List<FlowAutocomplete> getAutocomplete();
 
@@ -63,15 +64,6 @@ public interface FlowAst extends AstType, Serializable {
     Integer getColumn();
     @Nullable
     Boolean getInsert();
-  }
-
-  @Value.Immutable
-  interface FlowCommand extends Serializable {
-    int getId();
-    @Nullable
-    String getValue();
-    FlowCommandType getType();
-
   }
 
   enum FlowCommandMessageType { ERROR, WARNING }

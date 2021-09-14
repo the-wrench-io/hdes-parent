@@ -28,13 +28,13 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
+import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableDataType;
 import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Command;
 import io.resys.wrench.assets.dt.api.model.DecisionTableAst.CommandType;
-import io.resys.wrench.assets.dt.api.model.ImmutableCommand;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 
 public class CommandModelDecisionTableExporter extends TemplateDecisionTableExporter implements DecisionTableExporter {
@@ -48,25 +48,28 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
 
   @Override
   public String build() {
-    List<DecisionTableDataType> headers = dt.getTypes();
-    List<Command> result = createHeaderCommands(headers);
-    createRow(headers, 1, dt.getNode(), result);
-    result.add(ImmutableCommand.builder().value(dt.getId()).type(CommandType.SET_NAME).build());
-    result.add(ImmutableCommand.builder().value(dt.getDescription()).type(CommandType.SET_DESCRIPTION).build());
-
     try {
-      return objectMapper.writeValueAsString(result);
+      return objectMapper.writeValueAsString(buildCommands());
     } catch(IOException e) {
       throw new DecisionTableException(e.getMessage(), e);
     }
   }
+  
+  public List<AstCommandType> buildCommands() {
+    List<DecisionTableDataType> headers = dt.getTypes();
+    List<AstCommandType> result = createHeaderCommands(headers);
+    createRow(headers, 1, dt.getNode(), result);
+    result.add(ImmutableAstCommandType.builder().value(dt.getId()).type(CommandType.SET_NAME.name()).build());
+    result.add(ImmutableAstCommandType.builder().value(dt.getDescription()).type(CommandType.SET_DESCRIPTION.name()).build());
+    return result;
+  }
 
-  private void createRow(List<DecisionTableDataType> headers, int rows, DecisionTableNode node, List<Command> result) {
+  private void createRow(List<DecisionTableDataType> headers, int rows, DecisionTableNode node, List<AstCommandType> result) {
     if(node == null) {
       return;
     }
     int nextId = headers.size() * rows + rows;
-    result.add(ImmutableCommand.builder().type(CommandType.ADD_ROW).build());
+    result.add(ImmutableAstCommandType.builder().type(CommandType.ADD_ROW.name()).build());
 
     Map<String, Object> entries = new HashMap<>();
     node.getInputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
@@ -74,24 +77,24 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
 
     for(DecisionTableDataType header : headers) {
       Object value = entries.get(header.getValue().getName());
-      result.add(ImmutableCommand.builder()
+      result.add(ImmutableAstCommandType.builder()
           .id(String.valueOf(nextId++))
           .value(value == null ? null : header.getValue().getSerializer().serialize(header.getValue(), value))
-          .type(CommandType.SET_CELL_VALUE)
+          .type(CommandType.SET_CELL_VALUE.name())
           .build());
     }
     createRow(headers, ++rows, node.getNext(), result);
   }
 
-  private List<Command> createHeaderCommands(List<DecisionTableDataType> headers) {
-    List<Command> result = new ArrayList<>();
+  private List<AstCommandType> createHeaderCommands(List<DecisionTableDataType> headers) {
+    List<AstCommandType> result = new ArrayList<>();
     int index = 0;
     for(DecisionTableDataType dataType : headers) {
       String id = String.valueOf(index);
-      result.add(ImmutableCommand.builder().type(dataType.getValue().getDirection() == Direction.IN ? CommandType.ADD_HEADER_IN : CommandType.ADD_HEADER_OUT).build());
-      result.add(ImmutableCommand.builder().id(id).value(dataType.getValue().getName()).type(CommandType.SET_HEADER_REF).build());
-      result.add(ImmutableCommand.builder().id(id).value(dataType.getScript()).type(CommandType.SET_HEADER_SCRIPT).build());
-      result.add(ImmutableCommand.builder().id(id).value(dataType.getValue().getValueType() == null ? null : dataType.getValue().getValueType().name()).type(CommandType.SET_HEADER_TYPE).build());
+      result.add(ImmutableAstCommandType.builder().type(dataType.getValue().getDirection() == Direction.IN ? CommandType.ADD_HEADER_IN.name() : CommandType.ADD_HEADER_OUT.name()).build());
+      result.add(ImmutableAstCommandType.builder().id(id).value(dataType.getValue().getName()).type(CommandType.SET_HEADER_REF.name()).build());
+      result.add(ImmutableAstCommandType.builder().id(id).value(dataType.getScript()).type(CommandType.SET_HEADER_SCRIPT.name()).build());
+      result.add(ImmutableAstCommandType.builder().id(id).value(dataType.getValue().getValueType() == null ? null : dataType.getValue().getValueType().name()).type(CommandType.SET_HEADER_TYPE.name()).build());
       index++;
     }
     return result;

@@ -37,8 +37,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableCommandModelBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
@@ -46,9 +48,7 @@ import io.resys.wrench.assets.dt.api.DecisionTableRepository.DynamicValueExpress
 import io.resys.wrench.assets.dt.api.model.DecisionTable.HitPolicy;
 import io.resys.wrench.assets.dt.api.model.DecisionTableAst;
 import io.resys.wrench.assets.dt.api.model.DecisionTableAst.ColumnExpressionType;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Command;
 import io.resys.wrench.assets.dt.api.model.DecisionTableAst.CommandType;
-import io.resys.wrench.assets.dt.api.model.ImmutableCommand;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableCommandModelException;
 
 public class GenericDecisionTableCommandModelBuilder implements DecisionTableCommandModelBuilder {
@@ -58,7 +58,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
   private final Supplier<DecisionTableExpressionBuilder> expressionBuilder;
   private final Map<ValueType, List<String>> headerExpressions;
   private final Supplier<DynamicValueExpressionExecutor> dynamicValueExpressionExecutor;
-  private List<Command> src;
+  private List<AstCommandType> src;
   private Integer rev;
 
   public GenericDecisionTableCommandModelBuilder(
@@ -74,7 +74,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
   }
 
   @Override
-  public DecisionTableCommandModelBuilder src(List<Command> src) {
+  public DecisionTableCommandModelBuilder src(List<AstCommandType> src) {
     this.src = src;
     return this;
   }
@@ -89,7 +89,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
     for(JsonNode node : src) {
       final String type = getString(node, "type");
       if(knownCommandTypes.contains(type)) {
-        this.src.add(ImmutableCommand.builder().id(getString(node, "id")).value(getString(node, "value")).type(CommandType.valueOf(type)).build());
+        this.src.add(ImmutableAstCommandType.builder().id(getString(node, "id")).value(getString(node, "value")).type(type).build());
       }
     }
     return this;
@@ -103,7 +103,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
 
   @Override
   public DecisionTableAst build() {
-    List<Command> src = CollectionUtils.isEmpty(this.src) ? Collections.emptyList() : this.src;
+    List<AstCommandType> src = CollectionUtils.isEmpty(this.src) ? Collections.emptyList() : this.src;
     CommandMapper.Builder builder = CommandMapper.builder()
         .headerTypes(headerTypes.get())
         .headerExpressions(headerExpressions)
@@ -113,7 +113,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
     if(this.rev != null) {
       int limit = this.rev;
       int runningVersion = 0;
-      for(Command command : src) {
+      for(AstCommandType command : src) {
         if(runningVersion++ > limit) {
           break;
         }
@@ -128,9 +128,10 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
     return builder.build();
   }
 
-  protected CommandMapper.Builder execute(CommandMapper.Builder builder, Command command) {
+  protected CommandMapper.Builder execute(CommandMapper.Builder builder, AstCommandType command) {
     try {
-      switch(command.getType()) {
+      final var type = CommandType.valueOf(command.getType());
+      switch(type) {
       case SET_NAME:
         return builder.name(command.getValue());
       case SET_DESCRIPTION:

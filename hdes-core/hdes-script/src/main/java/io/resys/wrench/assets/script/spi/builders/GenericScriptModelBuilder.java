@@ -22,8 +22,8 @@ package io.resys.wrench.assets.script.spi.builders;
 
 import java.util.List;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommand;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptMethodModel;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModel;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModelBuilder;
@@ -33,7 +33,7 @@ public class GenericScriptModelBuilder implements ScriptModelBuilder {
 
   private String src;
   private int rev;
-  private List<ScriptCommand> commands;
+  private List<AstCommandType> commands;
   private Class<?> type;
   private ScriptMethodModel method;
 
@@ -43,7 +43,7 @@ public class GenericScriptModelBuilder implements ScriptModelBuilder {
     return this;
   }
   @Override
-  public ScriptModelBuilder commands(List<ScriptCommand> commands) {
+  public ScriptModelBuilder commands(List<AstCommandType> commands) {
     this.commands = commands;
     return this;
   }

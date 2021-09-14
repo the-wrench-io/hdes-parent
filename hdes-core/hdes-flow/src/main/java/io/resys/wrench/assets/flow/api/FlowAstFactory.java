@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommand;
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessage;
 
 public interface FlowAstFactory {
@@ -99,6 +99,6 @@ public interface FlowAstFactory {
   interface NodeSource extends Serializable {
     int getLine();
     String getValue();
-    Collection<FlowCommand> getCommands();
+    Collection<AstCommandType> getCommands();
   }
 }

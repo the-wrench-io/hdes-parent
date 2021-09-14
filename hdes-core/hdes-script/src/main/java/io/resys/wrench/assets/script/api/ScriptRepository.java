@@ -26,6 +26,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.api.AstType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 
@@ -43,22 +44,16 @@ public interface ScriptRepository {
 
   interface ScriptModelBuilder {
     ScriptModelBuilder src(String src);
-    ScriptModelBuilder commands(List<ScriptCommand> commands);
+    ScriptModelBuilder commands(List<AstCommandType> commands);
     ScriptModelBuilder rev(int rev);
     ScriptModelBuilder type(Class<?> type);
     ScriptModelBuilder method(ScriptMethodModel method);
     ScriptModel build();
   }
 
-  interface ScriptCommand extends Serializable {
-    int getId();
-    String getValue();
-    ScriptCommandType getType();
-  }
-
   interface ScriptModel extends AstType, Serializable {
     String getSrc();
-    List<ScriptCommand> getCommands();
+    List<AstCommandType> getCommands();
     ScriptMethodModel getMethod();
     Class<?> getType();
   }

@@ -28,11 +28,11 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.resys.wrench.assets.datatype.api.AstCommandType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
 import io.resys.wrench.assets.dt.api.model.DecisionTable;
 import io.resys.wrench.assets.dt.api.model.DecisionTableAst;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Command;
 import io.resys.wrench.assets.dt.api.model.DecisionTableResult;
 import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionTableDecision;
 
@@ -51,7 +51,7 @@ public interface DecisionTableRepository {
   }
 
   interface DecisionTableCommandModelBuilder {
-    DecisionTableCommandModelBuilder src(List<Command> src);
+    DecisionTableCommandModelBuilder src(List<AstCommandType> src);
     DecisionTableCommandModelBuilder src(JsonNode src);
     DecisionTableCommandModelBuilder rev(Integer version);
     DecisionTableAst build();

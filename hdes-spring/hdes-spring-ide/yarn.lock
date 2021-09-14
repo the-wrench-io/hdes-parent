@@ -1933,10 +1933,10 @@
     "@svgr/plugin-svgo" "^5.4.0"
     loader-utils "^2.0.0"
 
-"@the-wrench-io/hdes-ide@^0.2.6":
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.6.tgz#b53e84e1a8e4546c9cd90b279d024188035b9b9c"
-  integrity sha512-IY5ryX550YN88zDjnjWudG4GdqRJKhM7ZVz/HZf48UZIiJHnbgvxsUXLHX9MjaYsG9SDSvMrw5XtWqRXfyJnDg==
+"@the-wrench-io/hdes-ide@^0.2.8":
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.8.tgz#afb1615b4a8cd48dc25acd77b44bc688f49fc019"
+  integrity sha512-BNc6UeoNRWBc1MAKvgPvtBR4Z+/4cN8Ci2xae1IGZg6OOL0lllYc7w/k9O4WefhEv39JkMxnL+YPUm8BNf570w==
   dependencies:
     "@types/codemirror" "^5.60.0"
     "@types/react-virtualized" "^9.21.11"
@@ -2547,6 +2547,11 @@ acorn@^8.2.4:
   version "8.4.1"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.4.1.tgz#56c36251fc7cabc7096adc18f05afe814321a28c"
   integrity sha512-asabaBSkEKosYKMITunzX177CXxQ4Q8BSSzMTKD+FefUhipQC70gfW5SiUDhYQ3vk8G+81HqQk7Fv9OXwwn9KA==
+
+add@^2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/add/-/add-2.0.6.tgz#248f0a9f6e5a528ef2295dbeec30532130ae2235"
+  integrity sha1-JI8Kn25aUo7yKV2+7DBTITCuIjU=
 
 address@1.1.2, address@^1.0.1:
   version "1.1.2"
@@ -11955,6 +11960,11 @@ yargs@^15.4.1:
     which-module "^2.0.0"
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
+
+yarn@^1.22.11:
+  version "1.22.11"
+  resolved "https://registry.yarnpkg.com/yarn/-/yarn-1.22.11.tgz#d0104043e7349046e0e2aec977c24be106925ed6"
+  integrity sha512-AWje4bzqO9RUn3sdnM5N8n4ZJ0BqCc/kqFJvpOI5/EVkINXui0yuvU7NDCEF//+WaxHuNay2uOHxA4+tq1P3cg==
 
 yn@3.1.1:
   version "3.1.1"

@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
@@ -40,7 +41,6 @@ import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessageType;
 import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandType;
 import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
 import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommand;
 import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommandMessage;
 
 public class GenericFlowCommandModelBuilder implements FlowNodeBuilder {
@@ -123,7 +123,7 @@ public class GenericFlowCommandModelBuilder implements FlowNodeBuilder {
     } else {
       builder.set(line, text);
     }
-    modelBuilder.addCommands(ImmutableFlowCommand.builder().id(line).value(text).type(type).build());
+    modelBuilder.addCommands(ImmutableAstCommandType.builder().id(String.valueOf(line)).value(text).type(type.name()).build());
   }
 
   private String getText(ObjectNode command) {
