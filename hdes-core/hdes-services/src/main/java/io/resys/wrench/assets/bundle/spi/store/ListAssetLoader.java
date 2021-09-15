@@ -102,7 +102,7 @@ public class ListAssetLoader {
         Service s = null;
         try {
           s = assetRepository.createBuilder(asset.getType())
-              .id(asset.getId() + "/" + asset.getName())
+              .id(asset.getId())
               .src(assetRepository.toSrc(asset))
               .pointer(asset.getId())
               .build();
