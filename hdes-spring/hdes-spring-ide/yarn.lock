@@ -1933,10 +1933,10 @@
     "@svgr/plugin-svgo" "^5.4.0"
     loader-utils "^2.0.0"
 
-"@the-wrench-io/hdes-ide@^0.2.8":
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.8.tgz#afb1615b4a8cd48dc25acd77b44bc688f49fc019"
-  integrity sha512-BNc6UeoNRWBc1MAKvgPvtBR4Z+/4cN8Ci2xae1IGZg6OOL0lllYc7w/k9O4WefhEv39JkMxnL+YPUm8BNf570w==
+"@the-wrench-io/hdes-ide@^0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.9.tgz#43eaf6bb539dc735367cf0c9cd74cc8ea469218c"
+  integrity sha512-GqTAq9AGkEqJs21JWb6dDI8iyT4TqKD4B+7Xosz3q5uaqcaPPtmQRvO8utL0FkyAgeowef72GazNdSqcFkeVZA==
   dependencies:
     "@types/codemirror" "^5.60.0"
     "@types/react-virtualized" "^9.21.11"
