@@ -61,6 +61,7 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
     createRow(headers, 1, dt.getNode(), result);
     result.add(ImmutableAstCommandType.builder().value(dt.getId()).type(CommandType.SET_NAME.name()).build());
     result.add(ImmutableAstCommandType.builder().value(dt.getDescription()).type(CommandType.SET_DESCRIPTION.name()).build());
+    result.add(ImmutableAstCommandType.builder().value(dt.getHitPolicy().name()).type(CommandType.SET_HIT_POLICY.name()).build());
     return result;
   }
 
