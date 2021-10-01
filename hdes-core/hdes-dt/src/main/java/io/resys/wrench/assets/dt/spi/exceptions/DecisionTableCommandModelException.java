@@ -20,7 +20,7 @@ package io.resys.wrench.assets.dt.spi.exceptions;
  * #L%
  */
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 
 public class DecisionTableCommandModelException extends RuntimeException {
 

@@ -25,12 +25,12 @@ import java.util.function.Function;
 
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowExecutor;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowStatus;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowStatus;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.spi.FlowException;
 
 public class GenericFlowExecutor implements FlowExecutor {

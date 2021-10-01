@@ -24,15 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.DataType.DataTypeConstraint;
+import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
+import io.resys.hdes.client.api.model.DataType.DataTypeSerializer;
+import io.resys.hdes.client.api.model.DataType.ValueTypeResolver;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeBuilder;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeConstraint;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeConstraintBuilder;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeDeserializer;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeSerializer;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueTypeResolver;
 import io.resys.wrench.assets.datatype.spi.beans.ImmutableDataType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 

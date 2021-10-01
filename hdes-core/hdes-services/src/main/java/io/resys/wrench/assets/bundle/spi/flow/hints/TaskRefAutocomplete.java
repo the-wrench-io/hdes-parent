@@ -25,15 +25,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeRef;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeRef;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeTask;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandRange;
-import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
 import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
 import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
@@ -44,7 +44,7 @@ public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlo
   }
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAst.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
     Map<String, NodeTask> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;

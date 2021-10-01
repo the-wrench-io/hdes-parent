@@ -1,8 +1,8 @@
-package io.resys.wrench.assets.datatype.api;
+package io.resys.hdes.client.api.model;
 
 /*-
  * #%L
- * hdes-datatype
+ * hdes-client-api
  * %%
  * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
@@ -22,20 +22,6 @@ package io.resys.wrench.assets.datatype.api;
 
 import java.io.Serializable;
 
-import javax.annotation.Nullable;
+public interface Model extends Serializable {
 
-import org.immutables.value.Value;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-@JsonSerialize(as = ImmutableAstCommandType.class)
-@JsonDeserialize(as = ImmutableAstCommandType.class)
-@Value.Immutable
-public interface AstCommandType extends Serializable{
-  @Nullable
-  String getId();
-  @Nullable
-  String getValue();
-  String getType();
 }

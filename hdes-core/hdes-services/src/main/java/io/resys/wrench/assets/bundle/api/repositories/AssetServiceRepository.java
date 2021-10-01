@@ -35,9 +35,9 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.script.api.ScriptRepository;

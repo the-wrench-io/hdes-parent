@@ -1,5 +1,7 @@
 package io.resys.wrench.assets.bundle.spi.beans;
 
+import io.resys.hdes.client.api.ast.AstType.Direction;
+
 /*-
  * #%L
  * wrench-assets-bundle
@@ -23,7 +25,6 @@ package io.resys.wrench.assets.bundle.spi.beans;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociationType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
 
 public class ImmutableServiceAssociation implements ServiceAssociation {
 

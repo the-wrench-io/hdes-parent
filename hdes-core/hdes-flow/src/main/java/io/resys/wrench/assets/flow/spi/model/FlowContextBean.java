@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.resys.hdes.client.api.execution.Flow.FlowContext;
+import io.resys.hdes.client.api.execution.Flow.FlowHistory;
+import io.resys.hdes.client.api.execution.Flow.FlowStatus;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowContext;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowHistory;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowStatus;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
 
 public class FlowContextBean implements FlowContext {
 

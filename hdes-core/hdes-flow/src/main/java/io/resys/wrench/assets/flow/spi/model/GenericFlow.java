@@ -25,10 +25,10 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.FlowModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
 import io.resys.wrench.assets.flow.spi.log.FlowLogger;
 
 public class GenericFlow implements Flow {

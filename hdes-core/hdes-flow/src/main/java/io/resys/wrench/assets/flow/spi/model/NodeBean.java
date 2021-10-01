@@ -26,7 +26,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
 
 @JsonIgnoreProperties({"parent"})
 public class NodeBean implements Node {

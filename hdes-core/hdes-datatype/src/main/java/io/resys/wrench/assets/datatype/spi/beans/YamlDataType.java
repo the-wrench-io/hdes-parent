@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
 
 public class YamlDataType {
 

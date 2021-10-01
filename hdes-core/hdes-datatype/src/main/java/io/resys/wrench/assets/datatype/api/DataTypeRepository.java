@@ -2,9 +2,9 @@ package io.resys.wrench.assets.datatype.api;
 
 /*-
  * #%L
- * wrench-assets-datatype
+ * hdes-datatype
  * %%
- * Copyright (C) 2016 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,13 @@ package io.resys.wrench.assets.datatype.api;
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.Collection;
+
 import java.util.List;
 
-import javax.annotation.Nullable;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.DataType.DataTypeConstraint;
 
 public interface DataTypeRepository {
   DataTypeBuilder createBuilder();
@@ -48,62 +50,5 @@ public interface DataTypeRepository {
   interface DataTypeConstraintBuilder {
     DataTypeConstraintBuilder values(List<String> values);
     DataTypeConstraint build();
-  }
-
-  interface DataType {
-    String getName();
-    String getRef();
-    String getDescription();
-    Direction getDirection();
-    ValueType getValueType();
-    Class<?> getBeanType();
-    boolean isRequired();
-
-    @Nullable
-    String getValues();
-    Collection<DataTypeConstraint> getConstraints();
-    Collection<DataType> getProperties();
-
-    Serializable toValue(Object value);
-    Serializable toString(Object value);
-    DataTypeDeserializer getDeserializer();
-    DataTypeSerializer getSerializer();
-  }
-
-  interface DataTypeDeserializer {
-    Serializable deserialize(DataType dataType, Object value);
-  }
-
-  interface DataTypeSerializer {
-    String serialize(DataType dataType, Object value);
-  }
-
-  @FunctionalInterface
-  interface ValueTypeResolver {
-    ValueType get(Class<?> src);
-  }
-
-  interface DataTypeConstraint {
-    ConstraintType getType();
-  }
-
-  enum AssociationType {
-    ONE_TO_ONE, ONE_TO_MANY
-  }
-
-  enum ConstraintType {
-    RANGE, VALUES, PATTERN
-  }
-
-  public enum Direction {
-    IN, OUT
-  }
-
-  enum ValueType {
-    TIME, DATE, DATE_TIME, INSTANT,
-    STRING,
-    INTEGER, LONG, DECIMAL,
-    BOOLEAN, PERIOD, DURATION, PERCENT,
-    OBJECT, ARRAY;
   }
 }

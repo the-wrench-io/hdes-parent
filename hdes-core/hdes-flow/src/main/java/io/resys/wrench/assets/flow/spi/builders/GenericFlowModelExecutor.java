@@ -28,11 +28,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowStatus;
+import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowModelExecutor;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowStatus;
-import io.resys.wrench.assets.flow.api.model.FlowModel;
 import io.resys.wrench.assets.flow.spi.model.FlowContextBean;
 import io.resys.wrench.assets.flow.spi.model.GenericFlow;
 

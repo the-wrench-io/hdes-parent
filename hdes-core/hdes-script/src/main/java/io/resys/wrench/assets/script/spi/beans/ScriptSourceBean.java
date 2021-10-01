@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 
 
 public class ScriptSourceBean implements Comparable<ScriptSourceBean>, Serializable {

@@ -29,10 +29,10 @@ import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableDataType;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableDataType;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
 
 public class CsvDecisionTableExporter extends TemplateDecisionTableExporter implements DecisionTableExporter {
 

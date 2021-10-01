@@ -23,8 +23,8 @@ package io.resys.wrench.assets.dt.spi.beans;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpression;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionTableOutput;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutput;
 
 public class ImmutableDecisionTableOutput implements DecisionTableOutput {
 

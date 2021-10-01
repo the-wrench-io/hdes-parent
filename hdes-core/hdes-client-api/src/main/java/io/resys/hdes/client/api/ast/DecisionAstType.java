@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.dt.api.model;
+package io.resys.hdes.client.api.ast;
 
 /*-
  * #%L
@@ -28,13 +28,8 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.wrench.assets.datatype.api.AstType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.HitPolicy;
-
 @Value.Immutable
-public interface DecisionTableAst extends AstType, Serializable {
+public interface DecisionAstType extends AstType, Serializable {
   
   HitPolicy getHitPolicy();
   List<String> getHeaderTypes();
@@ -69,35 +64,6 @@ public interface DecisionTableAst extends AstType, Serializable {
     String getValue();
   }
 
-  enum CommandType {
-    SET_NAME,
-    SET_DESCRIPTION,
-    IMPORT_CSV,    
-    IMPORT_ORDERED_CSV,
-
-    MOVE_ROW,
-    MOVE_HEADER,
-    INSERT_ROW,
-    COPY_ROW,
-    
-    SET_HEADER_TYPE,
-    SET_HEADER_REF,
-    
-    SET_HEADER_SCRIPT,
-    SET_HEADER_DIRECTION,
-    SET_HEADER_EXPRESSION,
-    SET_HIT_POLICY,
-    SET_CELL_VALUE,
-
-    DELETE_CELL,
-    DELETE_HEADER,
-    DELETE_ROW,
-
-    ADD_LOG,
-    ADD_HEADER_IN,
-    ADD_HEADER_OUT,
-    ADD_ROW,
-  }
-
+  enum HitPolicy { FIRST, ALL }
   enum ColumnExpressionType { IN, EQUALS }
 }

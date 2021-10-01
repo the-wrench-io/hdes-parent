@@ -23,7 +23,7 @@ package io.resys.wrench.assets.datatype.spi.builders;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeConstraint;
+import io.resys.hdes.client.api.model.DataType.DataTypeConstraint;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeConstraintBuilder;
 import io.resys.wrench.assets.datatype.spi.beans.ValuesDataTypeConstraint;
 import io.resys.wrench.assets.datatype.spi.util.Assert;

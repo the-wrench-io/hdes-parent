@@ -2,9 +2,9 @@ package io.resys.wrench.assets.script.spi.beans;
 
 /*-
  * #%L
- * wrench-assets-script
+ * hdes-script
  * %%
- * Copyright (C) 2016 - 2018 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ package io.resys.wrench.assets.script.spi.beans;
  * #L%
  */
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterContextType;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterContextType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
+import io.resys.hdes.client.api.model.DataType;
 
 public class ImmutableScriptParameterModel implements ScriptParameterModel {
 

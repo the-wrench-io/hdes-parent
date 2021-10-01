@@ -22,9 +22,9 @@ package io.resys.wrench.assets.script.spi.beans;
 
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptMethodModel;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterModel;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
 
 public class ImmutableScriptMethodModel implements ScriptMethodModel {
   private static final long serialVersionUID = 8451288360934228389L;

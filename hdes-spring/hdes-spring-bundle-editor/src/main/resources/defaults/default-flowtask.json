@@ -1,1 +1,134 @@
-[{"id":0,"type":"ADD","value":"package io.resys.wrench.assets.bundle.groovy;","origin":"SOURCE"},{"id":1,"type":"ADD","value":"","origin":"SOURCE"},{"id":2,"type":"ADD","value":"import java.io.Serializable;","origin":"SOURCE"},{"id":3,"type":"ADD","value":"","origin":"SOURCE"},{"id":4,"type":"ADD","value":"import io.resys.wrench.assets.context.stereotypes.WrenchFlowParameter;","origin":"SOURCE"},{"id":5,"type":"ADD","value":"","origin":"SOURCE"},{"id":6,"type":"ADD","value":"public class {{id}} {","origin":"SOURCE"},{"id":7,"type":"ADD","value":"","origin":"SOURCE"},{"id":8,"type":"ADD","value":"  public Output execute(Input input) {","origin":"SOURCE"},{"id":9,"type":"ADD","value":"    return new Output();","origin":"SOURCE"},{"id":10,"type":"ADD","value":"  }","origin":"SOURCE"},{"id":11,"type":"ADD","value":"","origin":"SOURCE"},{"id":12,"type":"ADD","value":"  @WrenchFlowParameter","origin":"SOURCE"},{"id":13,"type":"ADD","value":"  public static class Input implements Serializable {","origin":"SOURCE"},{"id":14,"type":"ADD","value":"    ","origin":"SOURCE"},{"id":15,"type":"ADD","value":"  }","origin":"SOURCE"},{"id":16,"type":"ADD","value":"  ","origin":"SOURCE"},{"id":17,"type":"ADD","value":"  @WrenchFlowParameter","origin":"SOURCE"},{"id":18,"type":"ADD","value":"  public static class Output implements Serializable {","origin":"SOURCE"},{"id":19,"type":"ADD","value":"  ","origin":"SOURCE"},{"id":20,"type":"ADD","value":"  }","origin":"SOURCE"},{"id":21,"type":"ADD","value":"}","origin":"SOURCE"}]
+[
+  {
+    "id": 0,
+    "type": "ADD",
+    "value": "package io.resys.wrench.assets.bundle.groovy;",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 1,
+    "type": "ADD",
+    "value": "",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 2,
+    "type": "ADD",
+    "value": "import java.io.Serializable;",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 3,
+    "type": "ADD",
+    "value": "",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 4,
+    "type": "ADD",
+    "value": "import io.resys.hdes.client.api.execution.ServiceData;",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 5,
+    "type": "ADD",
+    "value": "",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 6,
+    "type": "ADD",
+    "value": "public class {{id}} {",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 7,
+    "type": "ADD",
+    "value": "",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 8,
+    "type": "ADD",
+    "value": "  public Output execute(Input input) {",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 9,
+    "type": "ADD",
+    "value": "    return new Output();",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 10,
+    "type": "ADD",
+    "value": "  }",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 11,
+    "type": "ADD",
+    "value": "",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 12,
+    "type": "ADD",
+    "value": "  @ServiceData",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 13,
+    "type": "ADD",
+    "value": "  public static class Input implements Serializable {",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 14,
+    "type": "ADD",
+    "value": "    ",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 15,
+    "type": "ADD",
+    "value": "  }",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 16,
+    "type": "ADD",
+    "value": "  ",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 17,
+    "type": "ADD",
+    "value": "  @ServiceData",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 18,
+    "type": "ADD",
+    "value": "  public static class Output implements Serializable {",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 19,
+    "type": "ADD",
+    "value": "  ",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 20,
+    "type": "ADD",
+    "value": "  }",
+    "origin": "SOURCE"
+  },
+  {
+    "id": 21,
+    "type": "ADD",
+    "value": "}",
+    "origin": "SOURCE"
+  }
+]

@@ -26,13 +26,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInput;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInputType;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeRef;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeSwitch;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeTask;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeInput;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeInputType;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeRef;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeSwitch;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
 import io.resys.wrench.assets.flow.spi.exceptions.NodeFlowException;
 
 public class NodeFlowBean extends NodeBean implements NodeFlow {

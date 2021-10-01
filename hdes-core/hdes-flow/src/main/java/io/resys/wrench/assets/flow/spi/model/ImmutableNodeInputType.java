@@ -2,9 +2,9 @@ package io.resys.wrench.assets.flow.spi.model;
 
 /*-
  * #%L
- * wrench-assets-flow
+ * hdes-flow
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ package io.resys.wrench.assets.flow.spi.model;
  * #L%
  */
 
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInputType;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeInputType;
 
 public class ImmutableNodeInputType implements NodeInputType {
 

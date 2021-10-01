@@ -24,13 +24,13 @@ import java.util.function.Supplier;
 
 import org.springframework.util.Assert;
 
+import io.resys.hdes.client.api.model.DecisionTable;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.api.model.DecisionTable;
 
 public class GenericExportBuilder implements ExportBuilder {
 

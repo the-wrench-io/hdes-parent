@@ -30,9 +30,10 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessage;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeInputType;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessage;
 import io.resys.wrench.assets.flow.spi.builders.GenericNodeBuilder;
 import io.resys.wrench.assets.flow.spi.model.ImmutableNodeInputType;
 

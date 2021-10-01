@@ -1,1 +1,14 @@
-[{"id":0,"type":"ADD","value":"id: {{id}}","origin":"ADD"}, {"id":1,"type":"ADD","value":"","origin":"ADD"}]
+[
+  {
+    "id": 0,
+    "type": "ADD",
+    "value": "id: {{id}}",
+    "origin": "ADD"
+  },
+  {
+    "id": 1,
+    "type": "ADD",
+    "value": "",
+    "origin": "ADD"
+  }
+]

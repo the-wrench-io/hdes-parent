@@ -25,6 +25,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterContextType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
@@ -32,18 +36,14 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.script.api.ScriptRepository.Script;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModel;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterContextType;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterModel;
 
 public class FlowTaskServiceDataModelBuilder {
 
   public ServiceDataModel build(String id, String name, Script script, ServiceStore serviceStore) {
     List<ServiceAssociation> associations = new ArrayList<>();
     List<ServiceError> errors = new ArrayList<>();
-    ScriptModel model = script.getModel();
+    ServiceAstType model = script.getModel();
 
     List<DataType> params = getScriptParameterModels(model);
 
@@ -57,7 +57,7 @@ public class FlowTaskServiceDataModelBuilder {
             Collections.unmodifiableList(associations));
   }
 
-  protected List<DataType> getScriptParameterModels(ScriptModel model) {
+  protected List<DataType> getScriptParameterModels(ServiceAstType model) {
     List<ScriptParameterModel> externals = model.getMethod().getParameters().stream()
         .filter(p -> p.getContextType() == ScriptParameterContextType.EXTERNAL)
         .collect(Collectors.toList());

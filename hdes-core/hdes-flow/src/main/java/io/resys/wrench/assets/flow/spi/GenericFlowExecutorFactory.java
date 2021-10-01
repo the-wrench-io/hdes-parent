@@ -22,8 +22,8 @@ package io.resys.wrench.assets.flow.spi;
 
 import java.util.Map;
 
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.spi.executors.GenericFlowExecutor;
 
 public class GenericFlowExecutorFactory implements FlowExecutorRepository {

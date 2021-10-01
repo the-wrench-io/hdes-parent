@@ -28,8 +28,8 @@ import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskExpression;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskExpressionContext;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskExpression;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskExpressionContext;
 
 public class SpelFlowTaskExpression implements FlowTaskExpression {
 

@@ -35,6 +35,10 @@ import org.apache.commons.codec.digest.DigestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.FlowAstType;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.model.DecisionTable;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.MigrationBuilder;
@@ -43,14 +47,9 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigration;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigrationValue;
-import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.api.model.DecisionTable;
 import io.resys.wrench.assets.dt.spi.export.CommandModelDecisionTableExporter;
-import io.resys.wrench.assets.flow.api.model.FlowAst;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandType;
 import io.resys.wrench.assets.script.api.ScriptRepository.Script;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommandType;
 
 
 
@@ -101,7 +100,7 @@ public class GenericServiceExporter implements MigrationBuilder {
       int index = 0;
       while ((line = br.readLine()) != null) {
         final var command = ImmutableAstCommandType.builder().id(String.valueOf(index++)).value(line)
-            .type(ScriptCommandType.ADD.name()).build();
+            .type(AstCommandValue.ADD).build();
         builder.addCommands(command);
       }
     } finally {
@@ -113,7 +112,7 @@ public class GenericServiceExporter implements MigrationBuilder {
   private MigrationValue visitFl(Service service) throws IOException {
     final var builder = ImmutableMigrationValue.builder().name(service.getName()).id(md5(service.getSrc())).type(ServiceType.FLOW);
     
-    FlowAst commandModel  = serviceRepository.getFlRepo().createNode()
+    FlowAstType commandModel  = serviceRepository.getFlRepo().createNode()
         .src((ArrayNode) objectMapper.readTree(service.getSrc()))
         .build();
     BufferedReader br = new BufferedReader(new StringReader(commandModel.getSrc().getValue()));
@@ -122,7 +121,7 @@ public class GenericServiceExporter implements MigrationBuilder {
       int index = 0;
       while ((line = br.readLine()) != null) {
         final var command = ImmutableAstCommandType.builder().id(String.valueOf(index++)).value(line)
-            .type(FlowCommandType.ADD.name()).build();
+            .type(AstCommandValue.ADD).build();
         builder.addCommands(command);
       }
     } finally {

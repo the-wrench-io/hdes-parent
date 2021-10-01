@@ -32,21 +32,21 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.DecisionAstType;
+import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
+import io.resys.hdes.client.api.ast.DecisionAstType.Header;
+import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
+import io.resys.hdes.client.api.ast.DecisionAstType.Row;
+import io.resys.hdes.client.api.ast.ImmutableCell;
+import io.resys.hdes.client.api.ast.ImmutableDecisionAstType;
+import io.resys.hdes.client.api.ast.ImmutableHeader;
+import io.resys.hdes.client.api.ast.ImmutableRow;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpression;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DynamicValueExpressionExecutor;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.HitPolicy;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.ColumnExpressionType;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Header;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Row;
-import io.resys.wrench.assets.dt.api.model.ImmutableCell;
-import io.resys.wrench.assets.dt.api.model.ImmutableDecisionTableAst;
-import io.resys.wrench.assets.dt.api.model.ImmutableHeader;
-import io.resys.wrench.assets.dt.api.model.ImmutableRow;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 
 public class CommandMapper {
@@ -367,7 +367,7 @@ public class CommandMapper {
       }
     }
 
-    public DecisionTableAst build() {
+    public DecisionAstType build() {
       DynamicValueExpressionExecutor dynamicValueExpressionExecutor = this.dynamicValueExpressionExecutor.get();
       this.headers.values().stream()
       .filter(h -> !StringUtils.isEmpty(h.getScript()))
@@ -401,7 +401,7 @@ public class CommandMapper {
           .collect(Collectors.toList());
 
       HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
-      return ImmutableDecisionTableAst.builder()
+      return ImmutableDecisionAstType.builder()
           .name(name)
           .description(description)
           .rev(version)

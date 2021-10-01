@@ -29,8 +29,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessage;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessage;
 import io.resys.wrench.assets.flow.spi.config.TestFlowConfig;
 
 @RunWith(BlockJUnit4ClassRunner.class)
@@ -41,7 +42,7 @@ public class FlowCommandModelTest {
   @Test
   public void indentNormal() throws IOException {
     List<FlowCommandMessage> messages = new ArrayList<>();
-    FlowAstFactory.Node node = nodeRepository.create(m -> messages.add(m))
+    Node node = nodeRepository.create(m -> messages.add(m))
         .add(1, "id: uber flow")
         .add(2, "description: uber description")
         .add(3, "tasks:")
@@ -70,7 +71,7 @@ public class FlowCommandModelTest {
   @Test
   public void deleteId() throws IOException {
     List<FlowCommandMessage> messages = new ArrayList<>();
-    FlowAstFactory.Node node = nodeRepository.create(m -> messages.add(m))
+    Node node = nodeRepository.create(m -> messages.add(m))
         .add(1, "id: uber flow")
         .add(2, "description: uber description")
         .add(3, "tasks:")
@@ -89,7 +90,7 @@ public class FlowCommandModelTest {
   @Test
   public void deleteAndSetId() throws IOException {
     List<FlowCommandMessage> messages = new ArrayList<>();
-    FlowAstFactory.Node node = nodeRepository.create(m -> messages.add(m))
+    Node node = nodeRepository.create(m -> messages.add(m))
         .add(1, "id: uber flow")
         .add(2, "description: uber description")
         .add(3, "tasks:")

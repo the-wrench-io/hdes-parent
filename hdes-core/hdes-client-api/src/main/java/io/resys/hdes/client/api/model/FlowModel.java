@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.flow.api.model;
+package io.resys.hdes.client.api.model;
 
 /*-
  * #%L
@@ -30,10 +30,8 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-
 @Value.Immutable
-public interface FlowModel extends Serializable {
+public interface FlowModel extends Model {
   String getId();
   int getRev();
   @Nullable

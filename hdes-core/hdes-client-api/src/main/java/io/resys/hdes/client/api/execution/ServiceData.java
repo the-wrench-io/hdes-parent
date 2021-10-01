@@ -1,10 +1,10 @@
-package io.resys.wrench.assets.datatype.api;
+package io.resys.hdes.client.api.execution;
 
 /*-
  * #%L
- * wrench-assets-datatype
+ * hdes-client-api
  * %%
- * Copyright (C) 2016 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,14 @@ package io.resys.wrench.assets.datatype.api;
  * #L%
  */
 
-import javax.annotation.Nullable;
 
-public interface AstType {
-  String getName();
-  int getRev();
-  @Nullable
-  String getDescription();
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ServiceData {
+  String value() default "";
 }

@@ -32,7 +32,7 @@ import org.springframework.expression.spel.ast.PropertyOrFieldReference;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowTaskValue;
+import io.resys.hdes.client.api.model.ImmutableFlowTaskValue;
 
 public class SpelExpressionFactory implements ExpressionFactory {
 

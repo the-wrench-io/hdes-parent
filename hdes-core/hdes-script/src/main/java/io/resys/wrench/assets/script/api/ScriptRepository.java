@@ -21,14 +21,13 @@ package io.resys.wrench.assets.script.api;
  */
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
-import io.resys.wrench.assets.datatype.api.AstType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
 
 public interface ScriptRepository {
 
@@ -48,31 +47,11 @@ public interface ScriptRepository {
     ScriptModelBuilder rev(int rev);
     ScriptModelBuilder type(Class<?> type);
     ScriptModelBuilder method(ScriptMethodModel method);
-    ScriptModel build();
-  }
-
-  interface ScriptModel extends AstType, Serializable {
-    String getSrc();
-    List<AstCommandType> getCommands();
-    ScriptMethodModel getMethod();
-    Class<?> getType();
-  }
-
-
-  interface ScriptMethodModel extends Serializable {
-    String getId();
-    String getName();
-    boolean isReturnType();
-    List<ScriptParameterModel> getParameters();
-  }
-
-  interface ScriptParameterModel extends Serializable {
-    DataType getType();
-    ScriptParameterContextType getContextType();
+    ServiceAstType build();
   }
 
   interface Script {
-    ScriptModel getModel();
+    ServiceAstType getModel();
     Object execute(List<Object> context);
   }
 
@@ -82,14 +61,5 @@ public interface ScriptRepository {
   
   interface ScriptContext {
     <T> T get(Class<T> type);
-  }
-
-
-  enum ScriptCommandType {
-    SET, ADD, DELETE
-  }
-
-  enum ScriptParameterContextType {
-    INTERNAL, EXTERNAL
   }
 }

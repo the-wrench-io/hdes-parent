@@ -32,9 +32,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.wrench.assets.datatype.spi.util.FileUtils;
 import io.resys.wrench.assets.flow.api.FlowRepository;
-import io.resys.wrench.assets.flow.api.model.FlowAst;
 import io.resys.wrench.assets.flow.spi.config.TestFlowConfig;
 
 
@@ -50,7 +50,7 @@ public class TestFlowReader {
     String content = objectMapper.readValue(stream, ObjectNode.class).get("content").asText();
 
     ArrayNode commands = objectMapper.readValue(content, ArrayNode.class);
-    FlowAst flowCommandModel = repository.createNode().src(commands).build();
+    FlowAstType flowCommandModel = repository.createNode().src(commands).build();
 
     String expected = FileUtils.toString(getClass(), "trafficMain.out.yaml");
     Assert.assertEquals(expected, flowCommandModel.getSrc().getValue());

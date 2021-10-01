@@ -2,9 +2,9 @@ package io.resys.wrench.assets.dt.spi.beans;
 
 /*-
  * #%L
- * wrench-assets-dt
+ * hdes-dt
  * %%
- * Copyright (C) 2016 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ package io.resys.wrench.assets.dt.spi.beans;
  * #L%
  */
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionContext;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
+import io.resys.hdes.client.api.model.DataType;
 
 public class ImmutableDecisionContext implements DecisionContext {
 

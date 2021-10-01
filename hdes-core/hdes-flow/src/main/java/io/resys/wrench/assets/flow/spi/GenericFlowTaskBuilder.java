@@ -24,11 +24,11 @@ package io.resys.wrench.assets.flow.spi;
 import java.io.Serializable;
 import java.util.Map;
 
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowTaskBuilder;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
 
 public class GenericFlowTaskBuilder implements FlowRepository.FlowTaskBuilder {
 

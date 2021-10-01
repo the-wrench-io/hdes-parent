@@ -1,5 +1,9 @@
 package io.resys.wrench.assets.flow.spi.executors;
 
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+
 /*-
  * #%L
  * wrench-assets-flow
@@ -21,9 +25,6 @@ package io.resys.wrench.assets.flow.spi.executors;
  */
 
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
 
 public class ServiceFlowTaskExecutor implements FlowExecutorRepository.FlowTaskExecutor {
 

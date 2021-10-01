@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTaskStatus;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
 
 public class FlowTaskBean implements FlowTask {
 

@@ -24,18 +24,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandRange;
-import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
 import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class TaskAutocomplete implements NodeFlowVisitor {
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAst.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
     Node tasks = flow.get(NodeFlowBean.KEY_TASKS);
     if(tasks == null) {
       return;

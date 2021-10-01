@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeSource;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeSource;
 
 
 public class NodeSourceBean implements Comparable<NodeSourceBean>, NodeSource {

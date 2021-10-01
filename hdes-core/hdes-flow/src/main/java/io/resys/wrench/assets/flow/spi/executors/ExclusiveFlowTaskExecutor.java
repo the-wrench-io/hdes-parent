@@ -27,12 +27,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTaskStatus;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
 import io.resys.wrench.assets.flow.spi.FlowException;
 
 public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTaskExecutor {

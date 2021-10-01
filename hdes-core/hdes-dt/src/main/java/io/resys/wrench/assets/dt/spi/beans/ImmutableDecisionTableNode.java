@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNodeInput;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNodeOutput;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNodeInput;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNodeOutput;
 
 public class ImmutableDecisionTableNode implements DecisionTableNode {
 

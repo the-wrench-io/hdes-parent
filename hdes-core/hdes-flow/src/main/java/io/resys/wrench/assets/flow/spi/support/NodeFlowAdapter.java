@@ -25,15 +25,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeInput;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInput;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeTask;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
 
 public class NodeFlowAdapter {

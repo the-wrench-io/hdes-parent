@@ -38,7 +38,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DynamicValueExpressionExecutor;
 
 public class SpringDynamicValueExpressionExecutor implements DynamicValueExpressionExecutor {

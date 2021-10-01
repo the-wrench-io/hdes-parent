@@ -29,9 +29,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpression;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableExpression;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;

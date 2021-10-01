@@ -25,6 +25,7 @@ import java.util.Optional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.model.DecisionTable;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -34,7 +35,6 @@ import io.resys.wrench.assets.bundle.spi.builders.TemplateServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.api.model.DecisionTable;
 
 public class DtServiceBuilder extends TemplateServiceBuilder {
 

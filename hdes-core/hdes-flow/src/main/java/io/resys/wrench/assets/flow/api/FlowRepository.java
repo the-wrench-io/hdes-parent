@@ -27,10 +27,10 @@ import java.util.Optional;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
-import io.resys.wrench.assets.flow.api.model.FlowAst;
-import io.resys.wrench.assets.flow.api.model.FlowModel;
+import io.resys.hdes.client.api.ast.FlowAstType;
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.model.FlowModel;
 
 public interface FlowRepository {
   
@@ -53,7 +53,7 @@ public interface FlowRepository {
   interface FlowNodeBuilder {
     FlowNodeBuilder src(ArrayNode src);
     FlowNodeBuilder rev(Integer version);
-    FlowAst build();
+    FlowAstType build();
   }
 
   interface FlowModelExporter {

@@ -40,21 +40,21 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeSwitch;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
+import io.resys.hdes.client.api.model.ImmutableFlowModel;
+import io.resys.hdes.client.api.model.ImmutableFlowTaskValue;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeBuilder;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeSwitch;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeTask;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessageType;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandType;
-import io.resys.wrench.assets.flow.api.model.FlowModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskValue;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowModel;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowTaskValue;
 import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
 import io.resys.wrench.assets.flow.spi.exceptions.NodeFlowException;
 import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
@@ -126,7 +126,7 @@ public class CommandFlowModelBuilder {
         
         ObjectNode renameNode = objectMapper.createObjectNode();
         renameNode.set("id", IntNode.valueOf(idNode.getStart()));
-        renameNode.set("type", TextNode.valueOf(FlowCommandType.SET.name()));
+        renameNode.set("type", TextNode.valueOf(AstCommandValue.SET.name()));
         renameNode.set("value", TextNode.valueOf("id: " + rename.get()));
         original.add(renameNode);
         
@@ -296,12 +296,12 @@ public class CommandFlowModelBuilder {
 
   private void create(ObjectNode command, NodeBuilder builder) {
     int line = command.get("id").asInt();
-    FlowCommandType type = FlowCommandType.valueOf(command.get("type").asText());
+    AstCommandValue type = AstCommandValue.valueOf(command.get("type").asText());
 
 
-    if(type == FlowCommandType.DELETE) {
+    if(type == AstCommandValue.DELETE) {
       builder.delete(line, command.get("value").asInt());
-    } else if(type == FlowCommandType.ADD) {
+    } else if(type == AstCommandValue.ADD) {
       builder.add(line, getText(command));
     } else {
       builder.set(line, getText(command));

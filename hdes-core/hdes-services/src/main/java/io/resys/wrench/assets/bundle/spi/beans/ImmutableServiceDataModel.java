@@ -26,12 +26,12 @@ import java.util.Collections;
 
 import java.util.List;
 
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 
 public class ImmutableServiceDataModel implements ServiceDataModel {
 

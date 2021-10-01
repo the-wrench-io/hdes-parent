@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.flow.api.model;
+package io.resys.hdes.client.api.execution;
 
 /*-
  * #%L
@@ -27,7 +27,8 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 
 
 

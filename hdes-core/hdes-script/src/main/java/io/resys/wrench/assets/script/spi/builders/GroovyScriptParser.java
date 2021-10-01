@@ -31,9 +31,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
-import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 
 public class GroovyScriptParser {
 
@@ -84,10 +84,10 @@ public class GroovyScriptParser {
 
   private void create(List<AstCommandType> commands, ObjectNode src, GrooovyCommandBuilder builder) {
     int line = src.get("id").asInt();
-    ScriptCommandType type = ScriptCommandType.valueOf(src.get("type").asText());
+    AstCommandValue type = AstCommandValue.valueOf(src.get("type").asText());
     JsonNode valueNode = src.hasNonNull("value") ? src.get("value") : null;
     String value = valueNode == null ? null : valueNode.asText();
-    AstCommandType command = ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(type.name()).build();
+    AstCommandType command = ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(type).build();
     builder.add(command);
     commands.add(command);
   }

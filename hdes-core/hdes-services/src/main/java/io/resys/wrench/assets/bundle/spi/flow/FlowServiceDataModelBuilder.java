@@ -32,6 +32,12 @@ import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociationType;
@@ -45,12 +51,6 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceAssociation;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceError;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.flow.api.model.FlowModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
 
 public class FlowServiceDataModelBuilder {
 

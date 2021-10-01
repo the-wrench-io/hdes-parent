@@ -43,23 +43,23 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.DecisionAstType;
+import io.resys.hdes.client.api.ast.DecisionAstType.Cell;
+import io.resys.hdes.client.api.ast.DecisionAstType.Header;
+import io.resys.hdes.client.api.ast.DecisionAstType.Row;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.DecisionTable;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableDataType;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableCommandModelBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DynamicValueExpressionExecutor;
-import io.resys.wrench.assets.dt.api.model.DecisionTable;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableDataType;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Cell;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.CommandType;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Header;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.Row;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTable;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableDataType;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableNode;
@@ -99,7 +99,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
         ArrayNode array = (ArrayNode) objectMapper.readTree(this.src);
         ObjectNode renameNode = objectMapper.createObjectNode();
         renameNode.set("value", TextNode.valueOf(rename.get()));
-        renameNode.set("type", TextNode.valueOf(CommandType.SET_NAME.name()));
+        renameNode.set("type", TextNode.valueOf(AstCommandValue.SET_NAME.name()));
         array.add(renameNode);
         
         src = objectMapper.writeValueAsString(array);
@@ -107,7 +107,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
         src = this.src;
       }
       
-      DecisionTableAst commandModel = commandBuilder.get()
+      DecisionAstType commandModel = commandBuilder.get()
           .src(objectMapper.readTree(src))
           .build();
 
@@ -146,7 +146,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     }
   }
 
-  protected List<DecisionTableDataType> createTypes(DecisionTableAst data) {
+  protected List<DecisionTableDataType> createTypes(DecisionAstType data) {
     List<DecisionTableDataType> result = new ArrayList<>();
     int index = 0;
     for(Header header : data.getHeaders()) {

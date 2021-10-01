@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.dt.api.model;
+package io.resys.hdes.client.api.model;
 
 /*-
  * #%L
@@ -23,9 +23,9 @@ package io.resys.wrench.assets.dt.api.model;
 import java.io.Serializable;
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
+import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
 
-public interface DecisionTable extends Serializable {
+public interface DecisionTable extends Model {
   String getId();
   String getDescription();
   String getRev();
@@ -62,7 +62,5 @@ public interface DecisionTable extends Serializable {
     Serializable getValue();
   }
   
-  enum HitPolicy {
-    FIRST, ALL
-  }
+  
 }

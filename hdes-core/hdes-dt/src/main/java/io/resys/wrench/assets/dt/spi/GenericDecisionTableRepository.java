@@ -30,10 +30,10 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.ColumnExpressionType;
 import io.resys.wrench.assets.dt.spi.builders.CommandDecisionTableBuilder;
 import io.resys.wrench.assets.dt.spi.builders.GenericDecisionTableCommandModelBuilder;
 import io.resys.wrench.assets.dt.spi.builders.GenericDecisionTableExecutor;

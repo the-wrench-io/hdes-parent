@@ -25,7 +25,7 @@ import java.util.function.Consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
 
 public class NumberOperation {
 

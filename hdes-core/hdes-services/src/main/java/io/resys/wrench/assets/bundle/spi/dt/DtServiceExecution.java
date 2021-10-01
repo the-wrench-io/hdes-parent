@@ -28,11 +28,11 @@ import java.util.function.Consumer;
 
 import org.springframework.util.Assert;
 
+import io.resys.hdes.client.api.execution.DecisionTableResult;
+import io.resys.hdes.client.api.model.DecisionTable;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.api.model.DecisionTable;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult;
 
 public class DtServiceExecution implements ServiceExecution {
 

@@ -25,12 +25,9 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeConstraint;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeDeserializer;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeSerializer;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.model.DataType;
 
 public class ImmutableDataType implements DataType {
 

@@ -24,12 +24,12 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
 import io.resys.wrench.assets.bundle.spi.flow.executors.VariableResolver;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTaskStatus;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
 
 public class FlowDtInputResolver implements Serializable, DtInputResolver {
 

@@ -22,8 +22,8 @@ package io.resys.wrench.assets.dt.spi.beans;
 
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpression;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
 import io.resys.wrench.assets.dt.spi.expression.Operation;
 
 

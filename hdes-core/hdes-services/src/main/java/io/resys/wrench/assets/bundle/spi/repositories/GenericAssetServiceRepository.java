@@ -34,6 +34,10 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutput;
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
@@ -42,12 +46,8 @@ import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
 import io.resys.wrench.assets.bundle.spi.migration.GenericServiceExporter;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionTableOutput;
 import io.resys.wrench.assets.flow.api.FlowRepository;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 
 public class GenericAssetServiceRepository implements AssetServiceRepository {

@@ -27,7 +27,7 @@ class ${name} extends ScriptTemplate {
 
   private final ${beanSimpleName} bean;
 
-  public ${name}(${beanSimpleName} bean, ScriptModel model) {
+  public ${name}(${beanSimpleName} bean, ServiceAstType model) {
     super(model);
     this.bean = bean;
   }

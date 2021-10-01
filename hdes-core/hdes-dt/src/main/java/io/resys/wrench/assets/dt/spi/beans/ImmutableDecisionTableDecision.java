@@ -24,10 +24,10 @@ import java.util.List;
 
 import java.util.Map;
 
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpression;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionContext;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult.DecisionTableDecision;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
 
 public class ImmutableDecisionTableDecision implements DecisionTableDecision {
 

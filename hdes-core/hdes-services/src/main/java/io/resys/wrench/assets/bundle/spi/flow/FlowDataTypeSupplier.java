@@ -26,13 +26,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeInputType;
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder.DataTypeRef;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInputType;
 import io.resys.wrench.assets.flow.spi.model.ImmutableNodeInputType;
 
 public class FlowDataTypeSupplier implements Supplier<Collection<NodeInputType>> {

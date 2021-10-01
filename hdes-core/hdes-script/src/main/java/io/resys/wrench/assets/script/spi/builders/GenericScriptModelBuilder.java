@@ -22,10 +22,10 @@ package io.resys.wrench.assets.script.spi.builders;
 
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptMethodModel;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModel;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModelBuilder;
 import io.resys.wrench.assets.script.spi.beans.ImmutableScriptModel;
 
@@ -63,7 +63,7 @@ public class GenericScriptModelBuilder implements ScriptModelBuilder {
     return this;
   }
   @Override
-  public ScriptModel build() {
+  public ServiceAstType build() {
     Assert.isTrue(src != null, () -> "src can't be null!");
     Assert.isTrue(type != null, () -> "type can't be null!");
     Assert.isTrue(method != null, () -> "method can't be null!");

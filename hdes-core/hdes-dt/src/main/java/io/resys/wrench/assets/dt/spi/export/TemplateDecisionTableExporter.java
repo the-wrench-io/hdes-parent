@@ -1,5 +1,7 @@
 package io.resys.wrench.assets.dt.spi.export;
 
+import io.resys.hdes.client.api.model.DecisionTable;
+
 /*-
  * #%L
  * wrench-assets-dt
@@ -22,7 +24,6 @@ package io.resys.wrench.assets.dt.spi.export;
 
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.api.model.DecisionTable;
 
 public abstract class TemplateDecisionTableExporter implements DecisionTableExporter {
   protected DecisionTable dt;

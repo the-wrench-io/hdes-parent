@@ -2,11 +2,11 @@ package io.resys.wrench.assets.flow.spi.validators;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessageType;
-import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommandMessage;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
+import io.resys.hdes.client.api.ast.ImmutableFlowCommandMessage;
 import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 /*-
@@ -32,7 +32,7 @@ import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 public class IdValidator implements NodeFlowVisitor {
 
   @Override
-  public void visit(NodeFlow node, ImmutableFlowAst.Builder modelBuilder) {
+  public void visit(NodeFlow node, ImmutableFlowAstType.Builder modelBuilder) {
     if(node.getId() == null) {
       modelBuilder.addMessages(
           ImmutableFlowCommandMessage.builder()

@@ -25,9 +25,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskValue;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
 
 @JsonIgnoreProperties("previous")
 public class ImmutableFlowTaskModel implements FlowTaskModel {

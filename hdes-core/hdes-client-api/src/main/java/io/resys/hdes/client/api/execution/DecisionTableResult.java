@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.dt.api.model;
+package io.resys.hdes.client.api.execution;
 
 /*-
  * #%L
@@ -24,9 +24,9 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpression;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNode;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
 
 public interface DecisionTableResult extends Serializable {
   List<DecisionTableDecision> getRejections();
@@ -50,5 +50,12 @@ public interface DecisionTableResult extends Serializable {
     int getOrder();
     Map<String, DecisionTableExpression> getExpressions();
     Map<String, Serializable> getValues();
+  }
+  
+  interface DecisionTableExpression {
+    String getSrc();
+    ValueType getType();
+    List<String> getConstants();
+    Object getValue(Object entity);
   }
 }

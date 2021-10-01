@@ -22,8 +22,8 @@ package io.resys.wrench.assets.datatype.spi.beans;
 
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ConstraintType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeConstraint;
+import io.resys.hdes.client.api.model.DataType.ConstraintType;
+import io.resys.hdes.client.api.model.DataType.DataTypeConstraint;
 
 public class ValuesDataTypeConstraint implements DataTypeConstraint {
 

@@ -1,5 +1,7 @@
 package io.resys.wrench.assets.bundle.spi.flow.hints;
 
+import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+
 /*-
  * #%L
  * wrench-assets-bundle
@@ -24,7 +26,6 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeTask;
 
 public class TemplateAutocomplete {
 

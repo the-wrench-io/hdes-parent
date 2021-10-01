@@ -30,6 +30,19 @@ import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessage;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeInput;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
+import io.resys.hdes.client.api.ast.ImmutableFlowCommandMessage;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
@@ -37,19 +50,6 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeInput;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeTask;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessage;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessageType;
-import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommandMessage;
 import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
@@ -64,7 +64,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
   }
 
   @Override
-  public void visit(NodeFlow node, ImmutableFlowAst.Builder modelBuilder) {
+  public void visit(NodeFlow node, ImmutableFlowAstType.Builder modelBuilder) {
 
     List<DataType> params = new ArrayList<>(NodeFlowAdapter.getInputs(node, dataTypeRepository));
     Map<String, NodeInput> unusedInputs = new HashMap<>(node.getInputs());
@@ -179,7 +179,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
 
 
   protected Map<String, TaskInput> getTaskServiceInput(
-      ImmutableFlowAst.Builder modelBuilder,
+      ImmutableFlowAstType.Builder modelBuilder,
       NodeTask taskModel,
       Map<String, DataType> allParams,
       Service refService) {

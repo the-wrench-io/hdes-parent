@@ -29,19 +29,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.FlowAstType;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
+import io.resys.hdes.client.api.ast.ImmutableFlowCommandMessage;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeBuilder;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowNodeBuilder;
-import io.resys.wrench.assets.flow.api.model.FlowAst;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandMessageType;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandType;
-import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommandMessage;
 
 public class GenericFlowCommandModelBuilder implements FlowNodeBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(GenericFlowCommandModelBuilder.class);
@@ -70,10 +70,10 @@ public class GenericFlowCommandModelBuilder implements FlowNodeBuilder {
   }
 
   @Override
-  public FlowAst build() {
+  public FlowAstType build() {
     Assert.notNull(src, () -> "src can't ne null!");
 
-    ImmutableFlowAst.Builder result = ImmutableFlowAst.builder();
+    ImmutableFlowAstType.Builder result = ImmutableFlowAstType.builder();
     NodeBuilder nodeBuilder = nodeRepository.create((message) -> result.addMessages(message));
 
     if(rev != null) {
@@ -111,19 +111,19 @@ public class GenericFlowCommandModelBuilder implements FlowNodeBuilder {
         .build();
   }
 
-  private void create(ObjectNode command, NodeBuilder builder, ImmutableFlowAst.Builder modelBuilder) {
+  private void create(ObjectNode command, NodeBuilder builder, ImmutableFlowAstType.Builder modelBuilder) {
     int line = command.get("id").asInt();
-    FlowCommandType type = FlowCommandType.valueOf(command.get("type").asText());
+    AstCommandValue type = AstCommandValue.valueOf(command.get("type").asText());
 
     String text = getText(command);
-    if(type == FlowCommandType.DELETE) {
+    if(type == AstCommandValue.DELETE) {
       builder.delete(line, command.get("value").asInt());
-    } else if(type == FlowCommandType.ADD) {
+    } else if(type == AstCommandValue.ADD) {
       builder.add(line, text);
     } else {
       builder.set(line, text);
     }
-    modelBuilder.addCommands(ImmutableAstCommandType.builder().id(String.valueOf(line)).value(text).type(type.name()).build());
+    modelBuilder.addCommands(ImmutableAstCommandType.builder().id(String.valueOf(line)).value(text).type(type).build());
   }
 
   private String getText(ObjectNode command) {

@@ -46,21 +46,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import groovy.lang.GroovyClassLoader;
-import io.resys.wrench.assets.context.stereotypes.WrenchFlowParameter;
-import io.resys.wrench.assets.datatype.api.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterContextType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
+import io.resys.hdes.client.api.execution.ServiceData;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeBuilder;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptConstructor;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptMethodModel;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModel;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModelBuilder;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterContextType;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterModel;
 import io.resys.wrench.assets.script.spi.ScriptTemplate;
 import io.resys.wrench.assets.script.spi.beans.ImmutableScriptMethodModel;
 import io.resys.wrench.assets.script.spi.beans.ImmutableScriptModel;
@@ -129,13 +129,13 @@ public class GroovyScriptBuilder implements ScriptBuilder {
       final Class<?> beanType = generateBeanType(gcl, src.getKey());
       final ImmutableScriptMethodModel method = getMethods(beanType);
       final Class<Script> executorType = generateExecutorType(gcl, method, beanType);
-      final ScriptModel model = modelBuilder.get().src(src.getKey()).commands(src.getValue()).rev(rev).type(beanType).method(method).build();
+      final ServiceAstType model = modelBuilder.get().src(src.getKey()).commands(src.getValue()).rev(rev).type(beanType).method(method).build();
       final Object bean = constructor.get(beanType);
-      return executorType.getConstructor(beanType, ScriptModel.class).newInstance(bean, model);
+      return executorType.getConstructor(beanType, ServiceAstType.class).newInstance(bean, model);
 
     } catch (Exception e) {
       if(this.rev != null) {
-        ScriptModel model = new ImmutableScriptModel("historic", rev, src.getKey(), src.getValue(), null, null);
+        ServiceAstType model = new ImmutableScriptModel("historic", rev, src.getKey(), src.getValue(), null, null);
         return new ScriptTemplate(model) {
           @Override
           public Object execute(List<Object> facts) {
@@ -171,7 +171,7 @@ public class GroovyScriptBuilder implements ScriptBuilder {
     imports.add(beanType.getCanonicalName());
     imports.add(ScriptMethodModel.class.getCanonicalName());
     imports.add(ScriptTemplate.class.getCanonicalName());
-    imports.add(ScriptModel.class.getCanonicalName());
+    imports.add(ServiceAstType.class.getCanonicalName());
 
     for(ScriptParameterModel arg : method.getParameters()) {
       imports.add(arg.getType().getBeanType().getCanonicalName());
@@ -240,7 +240,7 @@ public class GroovyScriptBuilder implements ScriptBuilder {
     Class<?> returnType = method.getReturnType();
     ScriptParameterContextType contextType = getContextType(returnType);
     if(contextType == ScriptParameterContextType.INTERNAL) {
-      Assert.isTrue(returnType == void.class, () -> "'execute' must be void or return type must define: " + WrenchFlowParameter.class.getCanonicalName() + "!");
+      Assert.isTrue(returnType == void.class, () -> "'execute' must be void or return type must define: " + ServiceData.class.getCanonicalName() + "!");
     } else {
       DataTypeBuilder dataTypeBuilder = dataTypeRepository.createBuilder().
           name(returnType.getSimpleName()).
@@ -274,6 +274,6 @@ public class GroovyScriptBuilder implements ScriptBuilder {
   }
 
   protected ScriptParameterContextType getContextType(Class<?> type) {
-    return type.isAnnotationPresent(WrenchFlowParameter.class) ? ScriptParameterContextType.EXTERNAL : ScriptParameterContextType.INTERNAL;
+    return type.isAnnotationPresent(ServiceData.class) ? ScriptParameterContextType.EXTERNAL : ScriptParameterContextType.INTERNAL;
   }
 }

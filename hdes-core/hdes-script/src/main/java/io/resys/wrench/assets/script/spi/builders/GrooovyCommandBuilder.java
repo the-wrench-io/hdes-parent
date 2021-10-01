@@ -30,10 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Range;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
-import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptCommandType;
 import io.resys.wrench.assets.script.spi.beans.ScriptSourceBean;
 
 public class GrooovyCommandBuilder {
@@ -44,9 +44,9 @@ public class GrooovyCommandBuilder {
 
   public GrooovyCommandBuilder add(AstCommandType command) {
     int line = Integer.parseInt(command.getId());
-    if(command.getType().equals(ScriptCommandType.DELETE.name())) {
+    if(command.getType().equals(AstCommandValue.DELETE)) {
       delete(line, Integer.parseInt(command.getValue()));
-    } else if(command.getType().equals(ScriptCommandType.ADD.name())) {
+    } else if(command.getType().equals(AstCommandValue.ADD)) {
       add(line, command.getValue());
     } else {
       set(line, command.getValue());
@@ -57,14 +57,14 @@ public class GrooovyCommandBuilder {
   private GrooovyCommandBuilder add(int line, String value) {
     sourcesAdded.stream().filter(s -> s.getLine() >= line).forEach(s -> s.setLine(s.getLine() + 1));
     sourcesAdded.add(new ScriptSourceBean(line, 
-        ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(ScriptCommandType.ADD.name()).build()));
+        ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(AstCommandValue.ADD).build()));
     return this;
   }
 
   private GrooovyCommandBuilder set(int line, String value) {
     Optional<ScriptSourceBean> source = sourcesAdded.stream().filter(s -> s.getLine() == line).findFirst();
     Assert.isTrue(source.isPresent(), () -> String.format("Can't change value of non existing line: %s!", line));
-    source.get().add(ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(ScriptCommandType.SET.name()).build());
+    source.get().add(ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(AstCommandValue.SET).build());
     return this;
   }
 

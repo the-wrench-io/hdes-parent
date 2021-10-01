@@ -30,12 +30,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
+import io.resys.hdes.client.api.execution.DecisionTableResult;
+import io.resys.hdes.client.api.model.DecisionTable;
 import io.resys.wrench.assets.datatype.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFixedValue;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.api.model.DecisionTable;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult;
 import io.resys.wrench.assets.dt.spi.config.TestDtConfig;
 
 @RunWith(BlockJUnit4ClassRunner.class)

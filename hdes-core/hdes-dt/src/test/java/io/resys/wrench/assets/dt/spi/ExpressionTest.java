@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpression;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
 import io.resys.wrench.assets.dt.spi.config.TestDtConfig;
 import io.resys.wrench.assets.dt.spi.expression.GenericDecisionTableExpressionBuilder;

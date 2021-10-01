@@ -60,6 +60,7 @@ public class ListAssetLoader {
   }
 
   public void createDuplicateErrorService(Resource resource, Service s1, DataException e) {
+    LOGGER.error("Failed to load asset content from: " + resource.getFilename() + "!" + e.getMessage(), e);
     try {
       Optional<Message> duplicate = e.getError(AssetErrorCodes.SERVICE_NAME_NOT_UNIQUE.getCode());
       if (location.isGit() && duplicate.isPresent() && s1 != null) {

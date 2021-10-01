@@ -22,16 +22,17 @@ package io.resys.wrench.assets.script.spi;
 
 import java.util.List;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
 import io.resys.wrench.assets.script.api.ScriptRepository;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptMethodModel;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModel;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterModel;
+
 
 public abstract class ScriptTemplate implements ScriptRepository.Script {
-  private final ScriptModel model;
+  private final ServiceAstType model;
 
-  public ScriptTemplate(ScriptModel model) {
+  public ScriptTemplate(ServiceAstType model) {
     this.model = model;
   }
 
@@ -72,7 +73,7 @@ public abstract class ScriptTemplate implements ScriptRepository.Script {
     return false;
   }
   @Override
-  public ScriptModel getModel() {
+  public ServiceAstType getModel() {
     return model;
   }
 }

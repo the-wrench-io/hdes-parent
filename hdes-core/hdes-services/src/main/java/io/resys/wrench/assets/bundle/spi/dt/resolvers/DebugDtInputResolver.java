@@ -23,8 +23,8 @@ package io.resys.wrench.assets.bundle.spi.dt.resolvers;
 import java.io.Serializable;
 import java.util.Map;
 
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 
 public class DebugDtInputResolver implements Serializable, DtInputResolver {
 

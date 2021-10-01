@@ -20,7 +20,7 @@ package io.resys.wrench.assets.flow.spi;
  * #L%
  */
 
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 
 public class FlowDefinitionException extends RuntimeException {
 

@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.wrench.assets.dt.api.model.DecisionTable.DecisionTableNodeOutput;
-import io.resys.wrench.assets.dt.api.model.DecisionTableResult;
+import io.resys.hdes.client.api.execution.DecisionTableResult;
+import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNodeOutput;
 
 public class ImmutableDecisionTableResult implements DecisionTableResult {
 

@@ -25,7 +25,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
 
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskExpressionContext;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskExpressionContext;
 
 public class FlowTaskExpressionContextPropertyAccessor implements PropertyAccessor {
 

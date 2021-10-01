@@ -1,22 +1,17 @@
 package io.resys.wrench.assets.flow.spi.hints.input;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 /*-
  * #%L
- * wrench-assets-flow
+ * hdes-flow
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,18 +20,23 @@ import java.util.List;
  * #L%
  */
 
-import io.resys.wrench.assets.flow.api.FlowAstFactory.Node;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandRange;
-import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
 import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class InputAutocomplete implements NodeFlowVisitor {
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAst.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
     Node node = flow.get(NodeFlowBean.KEY_INPUTS);
     if(node == null) {
       return;

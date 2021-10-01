@@ -26,13 +26,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterContextType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
 import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
 import io.resys.wrench.assets.script.api.ScriptRepository.Script;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterContextType;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptParameterModel;
 
 public class FlowTaskServiceExecution implements ServiceExecution {
 

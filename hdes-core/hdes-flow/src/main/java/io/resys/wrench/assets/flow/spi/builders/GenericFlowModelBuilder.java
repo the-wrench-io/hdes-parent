@@ -30,11 +30,11 @@ import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowModelBuilder;
-import io.resys.wrench.assets.flow.api.model.FlowModel;
 import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
 
 public class GenericFlowModelBuilder implements FlowRepository.FlowModelBuilder {

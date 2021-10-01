@@ -47,6 +47,14 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
+import io.resys.hdes.client.api.ast.DecisionAstType;
+import io.resys.hdes.client.api.ast.FlowAstType;
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.Flow.FlowContext;
+import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
@@ -61,14 +69,6 @@ import io.resys.wrench.assets.bundle.spi.dt.resolvers.DebugDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.flow.executors.TransientFlowExecutor;
 import io.resys.wrench.assets.bundle.spi.flowtask.FlowTaskInput;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst;
-import io.resys.wrench.assets.flow.api.model.Flow;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowContext;
-import io.resys.wrench.assets.flow.api.model.Flow.FlowTask;
-import io.resys.wrench.assets.flow.api.model.FlowAst;
-import io.resys.wrench.assets.flow.api.model.FlowModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 
 public class GenericAssetIdeServices implements AssetIdeServices {
@@ -376,7 +376,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createDtCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    DecisionTableAst commandModel  = assetServiceRepository.getDtRepo().createCommandModelBuilder()
+    DecisionAstType commandModel  = assetServiceRepository.getDtRepo().createCommandModelBuilder()
         .src(command.getInput())
         .rev(command.getRev())
         .build();
@@ -388,7 +388,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    FlowAst commandModel  = assetServiceRepository.getFlRepo().createNode()
+    FlowAstType commandModel  = assetServiceRepository.getFlRepo().createNode()
         .src((ArrayNode) command.getInput())
         .rev(command.getRev())
         .build();

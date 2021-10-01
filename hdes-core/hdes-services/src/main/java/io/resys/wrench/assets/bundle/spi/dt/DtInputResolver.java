@@ -22,7 +22,7 @@ package io.resys.wrench.assets.bundle.spi.dt;
 
 import java.util.function.Function;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
+import io.resys.hdes.client.api.model.DataType;
 
 public interface DtInputResolver extends Function<DataType, Object> {
 

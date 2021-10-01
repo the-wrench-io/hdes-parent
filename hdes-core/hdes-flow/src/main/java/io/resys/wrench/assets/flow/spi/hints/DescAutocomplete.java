@@ -24,9 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeFlow;
-import io.resys.wrench.assets.flow.api.model.FlowAst.NodeFlowVisitor;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAst;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
 import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
@@ -37,7 +37,7 @@ public class DescAutocomplete implements NodeFlowVisitor {
       NodeFlowBean.KEY_TASKS);
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAst.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
     if(flow.getDescription() != null || flow.getId() == null) {
       return;
     }

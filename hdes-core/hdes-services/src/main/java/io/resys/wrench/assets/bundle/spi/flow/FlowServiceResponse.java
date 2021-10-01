@@ -25,8 +25,8 @@ import java.util.List;
 
 import java.util.function.Consumer;
 
+import io.resys.hdes.client.api.execution.Flow;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
-import io.resys.wrench.assets.flow.api.model.Flow;
 
 public class FlowServiceResponse implements ServiceResponse {
 

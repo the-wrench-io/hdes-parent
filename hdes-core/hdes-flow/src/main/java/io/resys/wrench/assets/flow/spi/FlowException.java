@@ -1,12 +1,10 @@
 package io.resys.wrench.assets.flow.spi;
 
-import io.resys.wrench.assets.flow.api.model.Flow;
-
 /*-
  * #%L
- * wrench-assets-flow
+ * hdes-flow
  * %%
- * Copyright (C) 2016 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +20,8 @@ import io.resys.wrench.assets.flow.api.model.Flow;
  * #L%
  */
 
-import io.resys.wrench.assets.flow.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 
 public class FlowException extends RuntimeException {
 

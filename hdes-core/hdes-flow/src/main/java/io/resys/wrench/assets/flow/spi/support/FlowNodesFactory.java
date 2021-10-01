@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowAutocomplete;
-import io.resys.wrench.assets.flow.api.model.FlowAst.FlowCommandRange;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowAutocomplete;
-import io.resys.wrench.assets.flow.api.model.ImmutableFlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAutocomplete;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.ImmutableFlowAutocomplete;
+import io.resys.hdes.client.api.ast.ImmutableFlowCommandRange;
 
 public class FlowNodesFactory {
 

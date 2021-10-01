@@ -22,8 +22,8 @@ package io.resys.wrench.assets.datatype.spi.serializers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeSerializer;
+import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.model.DataType.DataTypeSerializer;
 
 public class GenericDataTypeSerializer implements DataTypeSerializer {
 

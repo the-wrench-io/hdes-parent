@@ -24,8 +24,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 
 public class MatchingDtInputResolver implements Serializable, DtInputResolver {

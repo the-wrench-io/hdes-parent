@@ -37,23 +37,23 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.resys.wrench.assets.datatype.api.AstCommandType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.Direction;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.ValueType;
-import io.resys.wrench.assets.datatype.api.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.DecisionAstType;
+import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
+import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableCommandModelBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DynamicValueExpressionExecutor;
-import io.resys.wrench.assets.dt.api.model.DecisionTable.HitPolicy;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.ColumnExpressionType;
-import io.resys.wrench.assets.dt.api.model.DecisionTableAst.CommandType;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableCommandModelException;
 
 public class GenericDecisionTableCommandModelBuilder implements DecisionTableCommandModelBuilder {
 
-  private final static List<String> knownCommandTypes = Arrays.asList(CommandType.values()).stream().map(c -> c.name()).collect(Collectors.toList());
+  private final static List<String> knownCommandTypes = Arrays.asList(AstCommandValue.values()).stream().map(c -> c.name()).collect(Collectors.toList());
   private final Supplier<List<String>> headerTypes;
   private final Supplier<DecisionTableExpressionBuilder> expressionBuilder;
   private final Map<ValueType, List<String>> headerExpressions;
@@ -89,7 +89,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
     for(JsonNode node : src) {
       final String type = getString(node, "type");
       if(knownCommandTypes.contains(type)) {
-        this.src.add(ImmutableAstCommandType.builder().id(getString(node, "id")).value(getString(node, "value")).type(type).build());
+        this.src.add(ImmutableAstCommandType.builder().id(getString(node, "id")).value(getString(node, "value")).type(AstCommandValue.valueOf(type)).build());
       }
     }
     return this;
@@ -102,7 +102,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
   }
 
   @Override
-  public DecisionTableAst build() {
+  public DecisionAstType build() {
     List<AstCommandType> src = CollectionUtils.isEmpty(this.src) ? Collections.emptyList() : this.src;
     CommandMapper.Builder builder = CommandMapper.builder()
         .headerTypes(headerTypes.get())
@@ -130,7 +130,7 @@ public class GenericDecisionTableCommandModelBuilder implements DecisionTableCom
 
   protected CommandMapper.Builder execute(CommandMapper.Builder builder, AstCommandType command) {
     try {
-      final var type = CommandType.valueOf(command.getType());
+      final var type = command.getType();
       switch(type) {
       case SET_NAME:
         return builder.name(command.getValue());
