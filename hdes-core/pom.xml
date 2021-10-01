@@ -12,13 +12,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hdes-client-api</module>
-    
-    <!-- 
+    <module>hdes-client-api</module> 
     <module>hdes-client</module>
-    
-     -->
-    
     <module>hdes-datatype</module>
     <module>hdes-covertype</module>
     <module>hdes-dt</module>

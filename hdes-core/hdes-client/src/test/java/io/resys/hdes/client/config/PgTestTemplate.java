@@ -28,6 +28,7 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import io.resys.hdes.client.HdesClientImpl;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoResult;
@@ -91,7 +92,7 @@ public class PgTestTemplate {
         .await().atMost(Duration.ofMinutes(1));
     final AtomicInteger gid = new AtomicInteger(0);
     
-    throw new RuntimeException("Need to implemented the client");
+    return new HdesClientImpl();
   }
   
 }
