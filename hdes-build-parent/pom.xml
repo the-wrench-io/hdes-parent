@@ -39,7 +39,6 @@
     <findbugs.version>3.0.2</findbugs.version>
     <guava.version>30.0-jre</guava.version>
     <groovy.version>2.4.20</groovy.version>
-    <freemarker.version>2.3.30</freemarker.version>
     <gitplugin.version>2.2.4</gitplugin.version>
     <jgit.version>5.9.0.202009080501-r</jgit.version>
 
@@ -203,11 +202,6 @@
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.freemarker</groupId>
-        <artifactId>freemarker</artifactId>
-        <version>${freemarker.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.groovy</groupId>

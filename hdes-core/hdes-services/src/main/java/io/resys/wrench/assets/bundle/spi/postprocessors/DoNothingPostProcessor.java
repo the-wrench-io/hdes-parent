@@ -20,17 +20,17 @@ package io.resys.wrench.assets.bundle.spi.postprocessors;
  * #L%
  */
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServicePostProcessor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 
 public class DoNothingPostProcessor implements ServicePostProcessor {
 
   @Override
-  public void process(ServiceStore store, Service oldState, Service newState) {
+  public void process(ServiceStore store, AssetService oldState, AssetService newState) {
   }
 
   @Override
-  public void delete(ServiceStore store, Service state) {
+  public void delete(ServiceStore store, AssetService state) {
   }
 }

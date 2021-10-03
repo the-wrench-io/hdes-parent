@@ -30,16 +30,16 @@ import java.util.stream.Collectors;
 
 import org.springframework.util.Assert;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
 
 
 public class InMemoryAssetStore implements ServiceStore {
-  private final Map<String, Service> cachedAssets = new ConcurrentHashMap<>();
+  private final Map<String, AssetService> cachedAssets = new ConcurrentHashMap<>();
 
   @Override
-  public Service save(Service newState) {
+  public AssetService save(AssetService newState) {
 
     List<String> duplicate = cachedAssets.values().stream()
         .filter(a -> !a.getId().equals(newState.getId()))
@@ -54,11 +54,11 @@ public class InMemoryAssetStore implements ServiceStore {
     return newState;
   }
   @Override
-  public Service get(Service service, String commit) {
+  public AssetService get(AssetService service, String commit) {
     return service;
   }
   @Override
-  public Service load(Service service) {
+  public AssetService load(AssetService service) {
     return save(service);
   }
   @Override
@@ -66,12 +66,12 @@ public class InMemoryAssetStore implements ServiceStore {
     cachedAssets.remove(id);
   }
   @Override
-  public Service get(String id) {
+  public AssetService get(String id) {
     Assert.isTrue(cachedAssets.containsKey(id), "No asset with id: " + id + "!");
     return cachedAssets.get(id);
   }
   @Override
-  public Collection<Service> list() {
+  public Collection<AssetService> list() {
     return Collections.unmodifiableCollection(cachedAssets.values());
   }
   @Override

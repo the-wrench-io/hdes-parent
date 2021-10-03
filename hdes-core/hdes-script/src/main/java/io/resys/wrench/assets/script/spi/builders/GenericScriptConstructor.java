@@ -2,9 +2,9 @@ package io.resys.wrench.assets.script.spi.builders;
 
 /*-
  * #%L
- * wrench-assets-script
+ * hdes-script
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ package io.resys.wrench.assets.script.spi.builders;
  * #L%
  */
 
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptConstructor;
+import io.resys.hdes.client.api.execution.Service.ServiceInit;
 
-public class GenericScriptConstructor implements ScriptConstructor {
+public class GenericScriptConstructor implements ServiceInit {
 
   @Override
   public <T> T get(Class<T> type) {

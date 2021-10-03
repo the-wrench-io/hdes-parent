@@ -23,18 +23,18 @@ package io.resys.wrench.assets.script.spi.beans;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
 
-public class ImmutableScriptMethodModel implements ScriptMethodModel {
+public class ImmutableScriptMethodModel implements ServiceDataModel {
   private static final long serialVersionUID = 8451288360934228389L;
 
-  private final String id;
+  private final int id;
   private final String name;
   private final boolean returnType;
-  private final List<ScriptParameterModel> params;
+  private final List<ServiceDataParamModel> params;
 
-  public ImmutableScriptMethodModel(String id, String name, List<ScriptParameterModel> params) {
+  public ImmutableScriptMethodModel(int id, String name, List<ServiceDataParamModel> params) {
     super();
     this.id = id;
     this.name = name;
@@ -42,7 +42,7 @@ public class ImmutableScriptMethodModel implements ScriptMethodModel {
     this.returnType = params.stream().filter(p -> p.getType().getDirection() == Direction.OUT).findFirst().isPresent();
   }
   @Override
-  public String getId() {
+  public int getOrder() {
     return id;
   }
   @Override
@@ -50,7 +50,7 @@ public class ImmutableScriptMethodModel implements ScriptMethodModel {
     return name;
   }
   @Override
-  public List<ScriptParameterModel> getParameters() {
+  public List<ServiceDataParamModel> getParameters() {
     return params;
   }
   @Override

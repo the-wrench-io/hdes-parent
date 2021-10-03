@@ -29,12 +29,12 @@ import java.util.Vector;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 
 public class HashBuilder {
   private final Vector<InputStream> streams = new Vector<>();
 
-  public HashBuilder add(Service service) {
+  public HashBuilder add(AssetService service) {
     streams.add(new ByteArrayInputStream(service.getSrc().getBytes(StandardCharsets.UTF_8)));
     return this;
   }

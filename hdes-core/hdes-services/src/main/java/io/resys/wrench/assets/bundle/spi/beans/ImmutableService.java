@@ -25,13 +25,13 @@ import java.util.List;
 
 import java.util.function.Supplier;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 
-public class ImmutableService implements Service {
+public class ImmutableService implements AssetService {
 
   private final String id;
   private final String rev;
@@ -61,7 +61,7 @@ public class ImmutableService implements Service {
     this.execution = execution;
   }
 
-  public static ImmutableService of(Service service) {
+  public static ImmutableService of(AssetService service) {
     return new ImmutableService(
         service.getId(),
         service.getPointer(),
@@ -75,7 +75,7 @@ public class ImmutableService implements Service {
         service.getExecution());
   }
 
-  public static ImmutableService of(Service service, String newName, List<ServiceError> errors) {
+  public static ImmutableService of(AssetService service, String newName, List<ServiceError> errors) {
     return new ImmutableService(
         service.getId(),
         service.getPointer(),
@@ -89,7 +89,7 @@ public class ImmutableService implements Service {
         service.getExecution());
   }
   
-  public static ImmutableService of(Service service, Timestamp created, Timestamp modified) {
+  public static ImmutableService of(AssetService service, Timestamp created, Timestamp modified) {
     return new ImmutableService(
         service.getId(),
         service.getPointer(),

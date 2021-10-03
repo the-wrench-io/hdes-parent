@@ -38,7 +38,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableService;
@@ -52,7 +52,7 @@ import io.resys.wrench.assets.bundle.spi.store.git.GitRepository.ContentTimestam
 public class GitAssetStore implements ServiceStore {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GitAssetStore.class);
-  private final Map<String, Service> cachedAssets = new ConcurrentHashMap<>();
+  private final Map<String, AssetService> cachedAssets = new ConcurrentHashMap<>();
 
   private final GitRepository gitRepository;
   private final AssetLocation location;
@@ -67,9 +67,9 @@ public class GitAssetStore implements ServiceStore {
   }
 
   @Override
-  public Service save(Service service) {
+  public AssetService save(AssetService service) {
     try {
-      Optional<Service> duplicate = cachedAssets.values().stream()
+      Optional<AssetService> duplicate = cachedAssets.values().stream()
           .filter(a -> !a.getId().equals(service.getId()))
           .filter(a -> a.getType() == service.getType())
           .filter(a -> a.getName().equalsIgnoreCase(service.getName()))
@@ -107,8 +107,8 @@ public class GitAssetStore implements ServiceStore {
         gitRepository.push();        
       }
       
-      final Service oldService = cachedAssets.get(service.getId());
-      final Service result;
+      final AssetService oldService = cachedAssets.get(service.getId());
+      final AssetService result;
       if(oldService == null) {
         result = ImmutableService.of(service);
       } else {
@@ -126,9 +126,9 @@ public class GitAssetStore implements ServiceStore {
   }
 
   @Override
-  public Service load(Service service) {
+  public AssetService load(AssetService service) {
     try {
-      Optional<Service> duplicate = cachedAssets.values().stream()
+      Optional<AssetService> duplicate = cachedAssets.values().stream()
           .filter(a -> !a.getId().equals(service.getId()))
           .filter(a -> a.getType() == service.getType())
           .filter(a -> a.getName().equalsIgnoreCase(service.getName()))
@@ -142,7 +142,7 @@ public class GitAssetStore implements ServiceStore {
       final boolean isTag = service.getType() == ServiceType.TAG;
       final String resourceName = isTag ? service.getPointer() : location.getResourceFullName(service.getType(), service.getPointer());
       final ContentTimestamps timestamps = this.gitRepository.getTimestamps(isTag ? service.getName() : resourceName, isTag);
-      Service result = ImmutableService.of(service, timestamps.getCreated(), timestamps.getModified());
+      AssetService result = ImmutableService.of(service, timestamps.getCreated(), timestamps.getModified());
       cachedAssets.put(service.getId(), result);
 
       return result;
@@ -155,7 +155,7 @@ public class GitAssetStore implements ServiceStore {
   }
 
   @Override
-  public Service get(Service service, String commit) {
+  public AssetService get(AssetService service, String commit) {
     String resourceName = location.getResourceName(service.getType(), service.getPointer());
     String src = gitRepository.getContent(commit, resourceName);
     return ImmutableServiceBuilder.from(service).setSrc(src).build();
@@ -163,7 +163,7 @@ public class GitAssetStore implements ServiceStore {
 
   @Override
   public void remove(String id) {
-    Service service = null;
+    AssetService service = null;
     try {
       
       service = cachedAssets.get(id);
@@ -203,13 +203,13 @@ public class GitAssetStore implements ServiceStore {
   }
   
   @Override
-  public Service get(String id) {
+  public AssetService get(String id) {
     Assert.isTrue(cachedAssets.containsKey(id), "No asset with id: " + id + "!");
     return cachedAssets.get(id);
   }
 
   @Override
-  public Collection<Service> list() {
+  public Collection<AssetService> list() {
     return Collections.unmodifiableCollection(cachedAssets.values());
   }
 

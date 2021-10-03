@@ -27,7 +27,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataModel;
+import io.resys.hdes.client.api.execution.Service;
 
 public interface ScriptRepository {
 
@@ -38,7 +39,7 @@ public interface ScriptRepository {
     ScriptBuilder src(JsonNode src);
     ScriptBuilder src(String src);
     ScriptBuilder rev(Integer rev);
-    Script build();
+    Service build();
   }
 
   interface ScriptModelBuilder {
@@ -46,17 +47,8 @@ public interface ScriptRepository {
     ScriptModelBuilder commands(List<AstCommandType> commands);
     ScriptModelBuilder rev(int rev);
     ScriptModelBuilder type(Class<?> type);
-    ScriptModelBuilder method(ScriptMethodModel method);
+    ScriptModelBuilder method(ServiceDataModel method);
     ServiceAstType build();
-  }
-
-  interface Script {
-    ServiceAstType getModel();
-    Object execute(List<Object> context);
-  }
-
-  interface ScriptConstructor {
-    <T> T get(Class<T> type);
   }
   
   interface ScriptContext {

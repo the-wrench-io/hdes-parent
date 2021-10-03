@@ -31,7 +31,7 @@ import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeRef;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
@@ -51,7 +51,7 @@ public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlo
     }
 
     Map<ServiceType, List<String>> services = new HashMap<>();
-    for(Service service : createQuery().list()) {
+    for(AssetService service : createQuery().list()) {
       List<String> serviceNames = services.get(service.getType());
       if(serviceNames == null) {
         serviceNames = new ArrayList<>();

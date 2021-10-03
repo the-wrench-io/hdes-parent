@@ -100,17 +100,17 @@ public interface AssetServiceRepository {
   
   interface ExportBuilder {
     ExportBuilder type(ExportType type);
-    ExportBuilder service(Service service);
+    ExportBuilder service(AssetService service);
     String build();
   }
 
   interface ServiceStore {
-    Service get(Service service, String rev);
-    Collection<Service> list();
-    Service get(String id);
+    AssetService get(AssetService service, String rev);
+    Collection<AssetService> list();
+    AssetService get(String id);
     boolean contains(String id);
-    Service save(Service service);
-    Service load(Service service);
+    AssetService save(AssetService service);
+    AssetService load(AssetService service);
     List<String> getTags();
     void remove(String id);
   }
@@ -120,18 +120,18 @@ public interface AssetServiceRepository {
   }
   
   interface ServiceQuery {
-    Service tag(String name);
-    Service flowTask(String name);
-    Service dt(String name);
-    Service flow(String name);
-    Service dataType(String name);
+    AssetService tag(String name);
+    AssetService flowTask(String name);
+    AssetService dt(String name);
+    AssetService flow(String name);
+    AssetService dataType(String name);
 
     ServiceQuery id(String id);
     ServiceQuery rev(String rev);
     ServiceQuery name(String name);
     ServiceQuery type(ServiceType type);
-    List<Service> list();
-    Optional<Service> get();
+    List<AssetService> list();
+    Optional<AssetService> get();
   }
 
   interface ServiceBuilder {
@@ -143,10 +143,10 @@ public interface AssetServiceRepository {
     ServiceBuilder lastModified(Timestamp lastModified);
     ServiceBuilder rename();
     ServiceBuilder ignoreErrors();
-    Service build();
+    AssetService build();
   }
 
-  interface Service {
+  interface AssetService {
     String getId();
     ServiceType getType();
     ServiceDataModel getDataModel();
@@ -178,8 +178,8 @@ public interface AssetServiceRepository {
   }
 
   interface ServicePostProcessor {
-    void process(ServiceStore store, Service oldState, Service newState);
-    void delete(ServiceStore store, Service state);
+    void process(ServiceStore store, AssetService oldState, AssetService newState);
+    void delete(ServiceStore store, AssetService state);
   }
 
   enum ServiceType {

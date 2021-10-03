@@ -24,7 +24,7 @@ import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptMethodModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataModel;
 import io.resys.wrench.assets.datatype.spi.util.Assert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModelBuilder;
 import io.resys.wrench.assets.script.spi.beans.ImmutableScriptModel;
@@ -35,7 +35,7 @@ public class GenericScriptModelBuilder implements ScriptModelBuilder {
   private int rev;
   private List<AstCommandType> commands;
   private Class<?> type;
-  private ScriptMethodModel method;
+  private ServiceDataModel method;
 
   @Override
   public ScriptModelBuilder src(String src) {
@@ -53,7 +53,7 @@ public class GenericScriptModelBuilder implements ScriptModelBuilder {
     return this;
   }
   @Override
-  public ScriptModelBuilder method(ScriptMethodModel method) {
+  public ScriptModelBuilder method(ServiceDataModel method) {
     this.method = method;
     return this;
   }

@@ -38,18 +38,18 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.api.model.DecisionTable;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.MigrationBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.MigrationValue;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigration;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigrationValue;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
 import io.resys.wrench.assets.dt.spi.export.CommandModelDecisionTableExporter;
-import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 
 
 
@@ -80,7 +80,7 @@ public class GenericServiceExporter implements MigrationBuilder {
     }
   }
 
-  private MigrationValue visitDt(Service service) {
+  private MigrationValue visitDt(AssetService service) {
     DecisionTable dt = serviceRepository.getDtRepo().createBuilder().format(DecisionTableFormat.JSON)
         .src(service.getSrc()).build();
     final var exporter = (CommandModelDecisionTableExporter) new CommandModelDecisionTableExporter(objectMapper)
@@ -91,9 +91,9 @@ public class GenericServiceExporter implements MigrationBuilder {
         .addAllCommands(exporter.buildCommands()).build();
   }
 
-  private MigrationValue visitSt(Service service) throws IOException {
+  private MigrationValue visitSt(AssetService service) throws IOException {
     final var builder = ImmutableMigrationValue.builder().id(md5(service.getSrc())).name(service.getName()).type(ServiceType.FLOW_TASK);
-    Script commandModel  = serviceRepository.getStRepo().createBuilder().src(service.getSrc()).build();
+    Service commandModel  = serviceRepository.getStRepo().createBuilder().src(service.getSrc()).build();
     BufferedReader br = new BufferedReader(new StringReader(commandModel.getModel().getSrc()));
     try {
       String line;
@@ -109,7 +109,7 @@ public class GenericServiceExporter implements MigrationBuilder {
     return builder.build();
   }
 
-  private MigrationValue visitFl(Service service) throws IOException {
+  private MigrationValue visitFl(AssetService service) throws IOException {
     final var builder = ImmutableMigrationValue.builder().name(service.getName()).id(md5(service.getSrc())).type(ServiceType.FLOW);
     
     FlowAstType commandModel  = serviceRepository.getFlRepo().createNode()

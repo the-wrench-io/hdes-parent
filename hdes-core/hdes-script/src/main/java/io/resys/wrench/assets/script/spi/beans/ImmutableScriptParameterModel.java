@@ -1,5 +1,7 @@
 package io.resys.wrench.assets.script.spi.beans;
 
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
+
 /*-
  * #%L
  * hdes-script
@@ -20,21 +22,26 @@ package io.resys.wrench.assets.script.spi.beans;
  * #L%
  */
 
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterContextType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
 import io.resys.hdes.client.api.model.DataType;
 
-public class ImmutableScriptParameterModel implements ScriptParameterModel {
+public class ImmutableScriptParameterModel implements ServiceDataParamModel {
 
   private static final long serialVersionUID = -3494498278287692703L;
 
-  private final ScriptParameterContextType contextType;
+  private final ServiceParamType contextType;
   private final DataType type;
+  private final int order;
 
-  public ImmutableScriptParameterModel(DataType type, ScriptParameterContextType contextType) {
+  public ImmutableScriptParameterModel(int order, DataType type, ServiceParamType contextType) {
     super();
     this.type = type;
     this.contextType = contextType;
+    this.order = order;
+  }
+  @Override
+  public int getOrder() {
+    return order;
   }
 
   @Override
@@ -42,7 +49,7 @@ public class ImmutableScriptParameterModel implements ScriptParameterModel {
     return type;
   }
   @Override
-  public ScriptParameterContextType getContextType() {
+  public ServiceParamType getContextType() {
     return contextType;
   }
 }

@@ -72,9 +72,6 @@ public class GroovyScriptParser {
 
   public Map.Entry<String, List<AstCommandType>> parse(String input, Integer rev) {
     try {
-
-
-
       JsonNode node = objectMapper.readTree(input);
       return parse(node, rev);
     } catch(IOException e) {

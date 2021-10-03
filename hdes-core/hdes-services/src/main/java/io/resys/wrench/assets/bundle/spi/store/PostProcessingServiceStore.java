@@ -26,7 +26,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServicePostProcessorSupplier;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 
@@ -42,24 +42,24 @@ public class PostProcessingServiceStore implements ServiceStore {
   }
 
   @Override
-  public Service get(Service service, String rev) {
+  public AssetService get(AssetService service, String rev) {
     return delegate.get(service, rev);
   }
 
   @Override
-  public Collection<Service> list() {
+  public Collection<AssetService> list() {
     return delegate.list();
   }
 
   @Override
-  public Service get(String id) {
+  public AssetService get(String id) {
     return delegate.get(id);
   }
   
   @Override
-  public Service save(Service newState) {
-    final Service oldState = delegate.contains(newState.getId()) ? delegate.get(newState.getId()) : null;
-    final Service result = delegate.save(newState);
+  public AssetService save(AssetService newState) {
+    final AssetService oldState = delegate.contains(newState.getId()) ? delegate.get(newState.getId()) : null;
+    final AssetService result = delegate.save(newState);
     
     try {
       postProcessors.get(newState.getType()).process(delegate, oldState, result);
@@ -70,8 +70,8 @@ public class PostProcessingServiceStore implements ServiceStore {
   }
 
   @Override
-  public Service load(Service service) {
-    final Service result = delegate.load(service);
+  public AssetService load(AssetService service) {
+    final AssetService result = delegate.load(service);
     
     try {
       postProcessors.get(service.getType()).process(delegate, null, result);
@@ -84,7 +84,7 @@ public class PostProcessingServiceStore implements ServiceStore {
 
   @Override
   public void remove(String id) {
-    final Service service = delegate.get(id);
+    final AssetService service = delegate.get(id);
     delegate.remove(id);
     
     try {

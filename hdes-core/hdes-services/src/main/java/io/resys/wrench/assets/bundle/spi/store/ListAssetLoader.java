@@ -37,7 +37,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.MigrationValue;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableService;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceError;
@@ -59,14 +59,14 @@ public class ListAssetLoader {
     this.location = location;
   }
 
-  public void createDuplicateErrorService(Resource resource, Service s1, DataException e) {
+  public void createDuplicateErrorService(Resource resource, AssetService s1, DataException e) {
     LOGGER.error("Failed to load asset content from: " + resource.getFilename() + "!" + e.getMessage(), e);
     try {
       Optional<Message> duplicate = e.getError(AssetErrorCodes.SERVICE_NAME_NOT_UNIQUE.getCode());
       if (location.isGit() && duplicate.isPresent() && s1 != null) {
         String tempName = s1.getName() + "-" + System.currentTimeMillis();
         ImmutableServiceError error = new ImmutableServiceError(duplicate.get().getCode(), duplicate.get().getValue());
-        Service s2 = ImmutableService.of(s1, tempName, Arrays.asList(error));
+        AssetService s2 = ImmutableService.of(s1, tempName, Arrays.asList(error));
         assetRepository.createStore().load(s2);
         LOGGER.error("Failed to load asset content from: " + resource.getFilename() + "!" + e.getMessage(), e);
         return;
@@ -100,7 +100,7 @@ public class ListAssetLoader {
           .append(asset.getId()).append("/").append(asset.getType()).append("/").append(asset.getName())
           .append(System.lineSeparator());
         
-        Service s = null;
+        AssetService s = null;
         try {
           s = assetRepository.createBuilder(asset.getType())
               .id(asset.getId())
@@ -124,7 +124,7 @@ public class ListAssetLoader {
     
     // Decision tables
     list(location.getDtRegex()).stream().forEach(r -> {
-      Service s = null;
+      AssetService s = null;
       try {
         s = assetRepository.createBuilder(ServiceType.DT)
             .id(location.getResourceId(ServiceType.DT, r.getFilename())).src(getContent(r)).pointer(r.getFilename())
@@ -140,7 +140,7 @@ public class ListAssetLoader {
 
     // Flow tasks
     list(location.getFlowTaskRegex()).stream().forEach(r -> {
-      Service s = null;
+      AssetService s = null;
       try {
         s = assetRepository.createBuilder(ServiceType.FLOW_TASK)
             .id(location.getResourceId(ServiceType.FLOW_TASK, r.getFilename())).src(getContent(r))
@@ -155,7 +155,7 @@ public class ListAssetLoader {
 
     // Flow
     list(location.getFlowRegex()).stream().forEach(r -> {
-      Service s = null;
+      AssetService s = null;
       try {
         s = assetRepository.createBuilder(ServiceType.FLOW)
             .id(location.getResourceId(ServiceType.FLOW, r.getFilename())).src(getContent(r)).pointer(r.getFilename())
@@ -174,7 +174,7 @@ public class ListAssetLoader {
     // Tags
     assetRepository.createStore().getTags().forEach(tagName -> {
       try {
-        Service service = assetRepository.createBuilder(ServiceType.TAG).name(tagName).src("").ignoreErrors().build();
+        AssetService service = assetRepository.createBuilder(ServiceType.TAG).name(tagName).src("").ignoreErrors().build();
         assetRepository.createStore().load(service);
 
       } catch (DataException e) {

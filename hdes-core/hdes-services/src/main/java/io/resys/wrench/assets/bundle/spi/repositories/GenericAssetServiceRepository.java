@@ -126,7 +126,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
       @Override
       public FlowServiceExecutor flow(String name) {
         Assert.notNull(name, "Define flow name!");
-        Optional<Service> service = createQuery().type(ServiceType.FLOW).name(name).get();
+        Optional<AssetService> service = createQuery().type(ServiceType.FLOW).name(name).get();
         if(service.isEmpty()) {
           throw new DataException(422, new Message("E002", "No flow with id: " + name + "!"));
         }
@@ -159,7 +159,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             Serializable delegate = task.getVariables().get(taskName);
             return delegate;
           }
-          private void validateFlowInput(Service service, Map<String, Object> input) {
+          private void validateFlowInput(AssetService service, Map<String, Object> input) {
             for(DataType dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "Flow with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
@@ -172,7 +172,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
       @Override
       public DtServiceExecutor dt(String name) {
         Assert.notNull(name, "Define dt name!");
-        Optional<Service> service = createQuery().type(ServiceType.DT).name(name).get();
+        Optional<AssetService> service = createQuery().type(ServiceType.DT).name(name).get();
         if(service.isEmpty()) {
           throw new DataException(422, new Message("E002", "No dt with id: " + name + "!"));
         }
@@ -190,7 +190,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             this.inputs.putAll(objectMapper.convertValue(inputObject, Map.class));
             return this;
           }
-          private void validateDtInput(Service service, Map<String, Object> input) {
+          private void validateDtInput(AssetService service, Map<String, Object> input) {
             for(DataType dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "DT with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));

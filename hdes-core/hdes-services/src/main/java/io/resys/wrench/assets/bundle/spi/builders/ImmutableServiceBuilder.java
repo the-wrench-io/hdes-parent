@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 import org.springframework.util.Assert;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
@@ -48,7 +48,7 @@ public class ImmutableServiceBuilder {
     this.type = type;
   }
 
-  public Service build() {
+  public AssetService build() {
     Assert.notNull(type, "type can't be null!");
     Assert.notNull(name, "name can't be null!");
     Assert.notNull(src, "src can't be null!");
@@ -96,7 +96,7 @@ public class ImmutableServiceBuilder {
     this.metadata = metadata;
     return this;
   }
-  public static ImmutableServiceBuilder from(Service service) {
+  public static ImmutableServiceBuilder from(AssetService service) {
     return new ImmutableServiceBuilder(service.getType())
         .setId(service.getId())
         .setRev(service.getRev())

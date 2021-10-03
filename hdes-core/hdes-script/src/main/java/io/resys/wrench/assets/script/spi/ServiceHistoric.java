@@ -1,8 +1,8 @@
-package io.resys.hdes.client.api.ast;
+package io.resys.wrench.assets.script.spi;
 
 /*-
  * #%L
- * hdes-client-api
+ * hdes-script
  * %%
  * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
@@ -20,29 +20,29 @@ package io.resys.hdes.client.api.ast;
  * #L%
  */
 
-import java.io.Serializable;
 import java.util.List;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.execution.Service;
 
-public interface ServiceAstType extends AstType, Serializable {
-  String getSrc();
-  ServiceDataModel getMethod();
-  Class<?> getType();
+
+public class ServiceHistoric implements Service {
+  private final ServiceAstType model;
   
-  interface ServiceDataModel extends Serializable {
-    int getOrder();
-    String getName();
-    boolean isReturnType();
-    List<ServiceDataParamModel> getParameters();
+  public ServiceHistoric(ServiceAstType model) {
+    this.model = model;
+  }
+  @Override
+  public ServiceAstType getModel() {
+    return model;
   }
 
-  interface ServiceDataParamModel extends Serializable {
-    int getOrder();
-    DataType getType();
-    ServiceParamType getContextType();
+  @Override
+  public Object execute(List<Object> context, ServiceInit init) {    
+    return null;
   }
 
-
-  enum ServiceParamType { INTERNAL, EXTERNAL }
+  @Override
+  public void stop() {
+  }
 }

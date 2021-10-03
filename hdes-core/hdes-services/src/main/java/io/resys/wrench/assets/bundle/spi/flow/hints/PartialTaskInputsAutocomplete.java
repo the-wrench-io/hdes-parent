@@ -32,7 +32,7 @@ import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
@@ -66,7 +66,7 @@ public class PartialTaskInputsAutocomplete extends TemplateAutocomplete implemen
       if(serviceType == null || StringUtils.isEmpty(taskServiceName)) {
         continue;
       }
-      Service service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
+      AssetService service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
       if(service == null) {
         continue;
       }

@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServicePostProcessor;
@@ -47,7 +47,7 @@ public class FlowDependencyServicePostProcessor implements ServicePostProcessor 
   }
 
   @Override
-  public void process(ServiceStore store, Service oldState, Service newState) {
+  public void process(ServiceStore store, AssetService oldState, AssetService newState) {
     Assert.isTrue(newState.getType() != ServiceType.FLOW, "Only flows can rebuild from dependencies, not vica versa!");
 
     new GenericServiceQuery(store).type(ServiceType.FLOW).list().stream()
@@ -56,7 +56,7 @@ public class FlowDependencyServicePostProcessor implements ServicePostProcessor 
   }
 
   @Override
-  public void delete(ServiceStore store, Service state) {
+  public void delete(ServiceStore store, AssetService state) {
     Assert.isTrue(state.getType() != ServiceType.FLOW, "Only flows can rebuild from dependencies, not vica versa!");
 
     new GenericServiceQuery(store).type(ServiceType.FLOW).list().stream()
@@ -64,11 +64,11 @@ public class FlowDependencyServicePostProcessor implements ServicePostProcessor 
     .forEach(f -> buildFlow(f, store));
   }
 
-  protected void buildFlow(Service flow, ServiceStore store) {
+  protected void buildFlow(AssetService flow, ServiceStore store) {
     Assert.isTrue(flow.getType() == ServiceType.FLOW, "Only flows can rebuild from dependencies!");
 
     try {
-      Service newFlowState = builders.get(flow.getType()).apply(store)
+      AssetService newFlowState = builders.get(flow.getType()).apply(store)
       .id(flow.getId())
       .src(flow.getSrc())
       .name(flow.getName())
@@ -79,7 +79,7 @@ public class FlowDependencyServicePostProcessor implements ServicePostProcessor 
     }
   }
 
-  protected boolean isDependency(Service flow, Service dependency) {
+  protected boolean isDependency(AssetService flow, AssetService dependency) {
     if(dependency == null) {
       return false;
     }
@@ -88,7 +88,7 @@ public class FlowDependencyServicePostProcessor implements ServicePostProcessor 
         .findFirst().isPresent();
   }
 
-  protected boolean isDependency(ServiceAssociation assoc, Service dependency) {
+  protected boolean isDependency(ServiceAssociation assoc, AssetService dependency) {
     if(assoc.getServiceType() != dependency.getType()) {
       return false;
     }

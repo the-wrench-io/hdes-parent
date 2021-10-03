@@ -34,7 +34,7 @@ import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutpu
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.bundle.spi.dt.resolvers.FlowDtInputResolver;
@@ -59,7 +59,7 @@ public class GenericFlowDtExecutor implements FlowTaskExecutor  {
     FlowTaskModel node = flow.getModel().getTask().get(task.getModelId());
 
     FlowTaskValue taskValue = node.getBody();
-    Service service = query.get().dt(taskValue.getRef());
+    AssetService service = query.get().dt(taskValue.getRef());
 
     Map<String, Serializable> inputs = new HashMap<>();
     ServiceResponse response = service.newExecution().insert(new LoggingFlowDtInputResolver(inputs, new FlowDtInputResolver(flow, node, variableResolver))).run();

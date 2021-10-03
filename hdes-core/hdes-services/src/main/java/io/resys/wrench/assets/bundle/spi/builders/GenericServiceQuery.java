@@ -28,7 +28,7 @@ import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
@@ -48,23 +48,23 @@ public class GenericServiceQuery implements ServiceQuery {
   }
 
   @Override
-  public Service tag(String name) {
+  public AssetService tag(String name) {
     return name(name).type(ServiceType.TAG).get().get();
   }
   @Override
-  public Service flowTask(String name) {
+  public AssetService flowTask(String name) {
     return name(name).type(ServiceType.FLOW_TASK).get().get();
   }
   @Override
-  public Service dt(String name) {
+  public AssetService dt(String name) {
     return name(name).type(ServiceType.DT).get().get();
   }
   @Override
-  public Service flow(String name) {
+  public AssetService flow(String name) {
     return name(name).type(ServiceType.FLOW).get().get();
   }
   @Override
-  public Service dataType(String name) {
+  public AssetService dataType(String name) {
     return name(name).type(ServiceType.DATA_TYPE).get().get();
   }
   @Override
@@ -88,8 +88,8 @@ public class GenericServiceQuery implements ServiceQuery {
     return this;
   }
   @Override
-  public List<Service> list() {
-    Stream<Service> result = assetStore.list().stream();
+  public List<AssetService> list() {
+    Stream<AssetService> result = assetStore.list().stream();
 
     if(id != null) {
       result = result.filter(s -> s.getId().equals(id));
@@ -106,8 +106,8 @@ public class GenericServiceQuery implements ServiceQuery {
     return result.collect(Collectors.toList());
   }
   @Override
-  public Optional<Service> get() {
-    List<Service> services = list();
+  public Optional<AssetService> get() {
+    List<AssetService> services = list();
     if(services.isEmpty()) {
       return Optional.empty();
     }

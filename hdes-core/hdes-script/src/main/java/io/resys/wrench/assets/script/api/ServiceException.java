@@ -1,8 +1,8 @@
-package io.resys.hdes.client.api.ast;
+package io.resys.wrench.assets.script.api;
 
 /*-
  * #%L
- * hdes-client-api
+ * hdes-script
  * %%
  * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
@@ -20,29 +20,22 @@ package io.resys.hdes.client.api.ast;
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.List;
+import io.resys.hdes.client.api.ast.ServiceAstType;
 
-import io.resys.hdes.client.api.model.DataType;
+public class ServiceException extends RuntimeException {
 
-public interface ServiceAstType extends AstType, Serializable {
-  String getSrc();
-  ServiceDataModel getMethod();
-  Class<?> getType();
+  private static final long serialVersionUID = 4696840189119749118L;
+
+  public ServiceException(ServiceAstType type, String message, Throwable cause) {
+    super(formatMessage(type, message), cause);
+  }
+
+  public ServiceException(ServiceAstType type, String message) {
+    super(formatMessage(type, message));
+  }
+
   
-  interface ServiceDataModel extends Serializable {
-    int getOrder();
-    String getName();
-    boolean isReturnType();
-    List<ServiceDataParamModel> getParameters();
+  private static String formatMessage(ServiceAstType type, String msg) {
+    return "Exception on service: '" + type.getName() + "'" + System.lineSeparator() + msg;
   }
-
-  interface ServiceDataParamModel extends Serializable {
-    int getOrder();
-    DataType getType();
-    ServiceParamType getContextType();
-  }
-
-
-  enum ServiceParamType { INTERNAL, EXTERNAL }
 }

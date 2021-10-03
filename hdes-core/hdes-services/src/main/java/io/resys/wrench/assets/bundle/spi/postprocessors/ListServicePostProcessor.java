@@ -23,7 +23,7 @@ package io.resys.wrench.assets.bundle.spi.postprocessors;
 import java.util.Arrays;
 import java.util.List;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServicePostProcessor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 
@@ -40,12 +40,12 @@ public class ListServicePostProcessor implements ServicePostProcessor {
   }
 
   @Override
-  public void process(ServiceStore store, Service oldState, Service newState) {
+  public void process(ServiceStore store, AssetService oldState, AssetService newState) {
     processors.forEach(p -> p.process(store, oldState, newState));
   }
 
   @Override
-  public void delete(ServiceStore store, Service state) {
+  public void delete(ServiceStore store, AssetService state) {
     processors.forEach(p -> p.delete(store, state));
   }
 }

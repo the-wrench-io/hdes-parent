@@ -26,8 +26,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterContextType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
+import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -36,11 +37,10 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
-import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 
 public class FlowTaskServiceDataModelBuilder {
 
-  public ServiceDataModel build(String id, String name, Script script, ServiceStore serviceStore) {
+  public ServiceDataModel build(String id, String name, Service script, ServiceStore serviceStore) {
     List<ServiceAssociation> associations = new ArrayList<>();
     List<ServiceError> errors = new ArrayList<>();
     ServiceAstType model = script.getModel();
@@ -58,8 +58,8 @@ public class FlowTaskServiceDataModelBuilder {
   }
 
   protected List<DataType> getScriptParameterModels(ServiceAstType model) {
-    List<ScriptParameterModel> externals = model.getMethod().getParameters().stream()
-        .filter(p -> p.getContextType() == ScriptParameterContextType.EXTERNAL)
+    List<ServiceDataParamModel> externals = model.getMethod().getParameters().stream()
+        .filter(p -> p.getContextType() == ServiceParamType.EXTERNAL)
         .collect(Collectors.toList());
 
     // drop dummy layer

@@ -140,13 +140,13 @@
   {
     "id": 23,
     "type": "ADD",
-    "value": "public class RuleGroup2 {",
+    "value": "public class RuleGroup2 { @io.resys.hdes.client.api.execution.ServiceData public static class Output  extends Serializable {};",
     "origin": "SOURCE"
   },
   {
     "id": 24,
     "type": "ADD",
-    "value": "  public void execute() {",
+    "value": "  public Output execute() {",
     "origin": "SOURCE"
   },
   {

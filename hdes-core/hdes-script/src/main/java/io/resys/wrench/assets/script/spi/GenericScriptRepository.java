@@ -2,9 +2,9 @@ package io.resys.wrench.assets.script.spi;
 
 /*-
  * #%L
- * wrench-assets-script
+ * hdes-script
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ package io.resys.wrench.assets.script.spi;
  * #L%
  */
 
-import freemarker.template.Configuration;
 import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 import io.resys.wrench.assets.script.spi.builders.GenericScriptModelBuilder;
@@ -29,24 +28,18 @@ import io.resys.wrench.assets.script.spi.builders.GroovyScriptParser;
 
 public class GenericScriptRepository implements ScriptRepository {
   private final DataTypeRepository dataTypeRepository;
-  private final Configuration cfg;
   private final GroovyScriptParser scriptParsers;
-  private final ScriptConstructor scriptConstructor;
 
   public GenericScriptRepository(
-      ScriptConstructor scriptConstructor,
       GroovyScriptParser scriptParsers, 
-      Configuration cfg, 
       DataTypeRepository dataTypeRepository) {
     super();
-    this.scriptConstructor = scriptConstructor;
     this.dataTypeRepository = dataTypeRepository;
-    this.cfg = cfg;
     this.scriptParsers = scriptParsers;
   }
 
   @Override
   public ScriptBuilder createBuilder() {
-    return new GroovyScriptBuilder(scriptConstructor, scriptParsers, dataTypeRepository, cfg, () -> new GenericScriptModelBuilder());
+    return new GroovyScriptBuilder(scriptParsers, dataTypeRepository, () -> new GenericScriptModelBuilder());
   }
 }

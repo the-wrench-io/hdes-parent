@@ -36,7 +36,7 @@ import io.resys.hdes.client.api.execution.Flow.FlowTask;
 import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
@@ -67,7 +67,7 @@ public class GenericFlowServiceExecutor extends ServiceFlowTaskExecutor {
       FlowTaskModel node = flow.getModel().getTask().get(task.getModelId());
       String flowTaskId = node.getBody().getRef();
 
-      Service service = new GenericServiceQuery(serviceStore).flowTask(flowTaskId);
+      AssetService service = new GenericServiceQuery(serviceStore).flowTask(flowTaskId);
 
       Map<String, Serializable> tasks = new HashMap<>();
       flow.getContext().getTasks().stream()

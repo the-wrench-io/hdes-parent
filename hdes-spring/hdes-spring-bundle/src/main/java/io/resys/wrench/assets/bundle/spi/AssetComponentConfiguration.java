@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.execution.Service.ServiceInit;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
@@ -112,7 +113,6 @@ import io.resys.wrench.assets.flow.spi.hints.task.TasksAutocomplete;
 import io.resys.wrench.assets.flow.spi.validators.DescriptionValidator;
 import io.resys.wrench.assets.flow.spi.validators.IdValidator;
 import io.resys.wrench.assets.script.api.ScriptRepository;
-import io.resys.wrench.assets.script.api.ScriptRepository.ScriptConstructor;
 import io.resys.wrench.assets.script.spi.GenericScriptRepository;
 import io.resys.wrench.assets.script.spi.builders.GroovyScriptParser;
 
@@ -126,6 +126,13 @@ public class AssetComponentConfiguration {
       ApplicationContext context, ObjectMapper objectMapper, 
       ServiceStore origServiceStore) {
     
+    final ServiceInit init = new ServiceInit() {
+      @Override
+      public <T> T get(Class<T> type) {
+        return context.getAutowireCapableBeanFactory().createBean(type);
+      }
+    };
+    
     final ClockRepository clockRepository = new SystemClockRepository();
     final DataTypeRepository dataTypeRepository = new GenericDataTypeRepository(objectMapper);
     final DecisionTableRepository decisionTableRepository = decisionTableRepository(dataTypeRepository, objectMapper, origServiceStore);
@@ -136,7 +143,7 @@ public class AssetComponentConfiguration {
     final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders = new HashMap<>();
     builders.put(ServiceType.DT, (store) -> new DtServiceBuilder(idGen, decisionTableRepository, clockRepository, getDefaultContent(ServiceType.DT)));
     builders.put(ServiceType.FLOW, (store) -> new FlowServiceBuilder(idGen, store, flowRepository, flowRepository, clockRepository, getDefaultContent(ServiceType.FLOW)));
-    builders.put(ServiceType.FLOW_TASK, (store) -> new FlowTaskServiceBuilder(idGen, store, scriptRepository, clockRepository, objectMapper, getDefaultContent(ServiceType.FLOW_TASK)));
+    builders.put(ServiceType.FLOW_TASK, (store) -> new FlowTaskServiceBuilder(idGen, store, init, scriptRepository, objectMapper, getDefaultContent(ServiceType.FLOW_TASK)));
     builders.put(ServiceType.TAG, (store) -> new TagServiceBuilder("", idGen, getDefaultContent(ServiceType.TAG)));
     
     final Map<ServiceType, ServicePostProcessor> postProcessors = new HashMap<>();
@@ -237,15 +244,7 @@ public class AssetComponentConfiguration {
 
 
   private ScriptRepository scriptRepository(ObjectMapper objectMapper, DataTypeRepository dataTypeRepository, ApplicationContext context) {
-    freemarker.template.Configuration cfg = new freemarker.template.Configuration(freemarker.template.Configuration.VERSION_2_3_22);
-    cfg.setClassForTemplateLoading(this.getClass(), "/");
-    ScriptConstructor scriptConstructor = new ScriptConstructor() {
-      @Override
-      public <T> T get(Class<T> type) {
-        return context.getAutowireCapableBeanFactory().createBean(type);
-      }
-    };
-    return new GenericScriptRepository(scriptConstructor, new GroovyScriptParser(objectMapper), cfg, dataTypeRepository);
+    return new GenericScriptRepository(new GroovyScriptParser(objectMapper), dataTypeRepository);
   }
 
   protected String getDefaultContent(ServiceType type) {

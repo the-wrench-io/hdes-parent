@@ -29,7 +29,7 @@ import java.util.function.Supplier;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeInputType;
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder.DataTypeRef;
@@ -57,7 +57,7 @@ public class FlowDataTypeSupplier implements Supplier<Collection<NodeInputType>>
     }
 
     // Reference type
-    for(Service service : serviceStore.list()) {
+    for(AssetService service : serviceStore.list()) {
       List<DataType> types = service.getDataModel().getParams();
       for(DataType type : types) {
         if(supportedTypes.contains(type.getValueType())) {

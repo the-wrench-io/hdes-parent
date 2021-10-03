@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.ast;
+package io.resys.hdes.client.api.execution;
 
 /*-
  * #%L
@@ -20,29 +20,27 @@ package io.resys.hdes.client.api.ast;
  * #L%
  */
 
-import java.io.Serializable;
 import java.util.List;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.ServiceAstType;
 
-public interface ServiceAstType extends AstType, Serializable {
-  String getSrc();
-  ServiceDataModel getMethod();
-  Class<?> getType();
+public interface Service {
+  ServiceAstType getModel();
+  Object execute(List<Object> context, ServiceInit init);
+  void stop();  
   
-  interface ServiceDataModel extends Serializable {
-    int getOrder();
-    String getName();
-    boolean isReturnType();
-    List<ServiceDataParamModel> getParameters();
+  @FunctionalInterface
+  interface ServiceInit {
+    <T> T get(Class<T> type);
+  }
+  interface ServiceExecutorType0<O> {
+    O execute();
+  }  
+  interface ServiceExecutorType1<I, O> {
+    O execute(I input1);
   }
 
-  interface ServiceDataParamModel extends Serializable {
-    int getOrder();
-    DataType getType();
-    ServiceParamType getContextType();
+  interface ServiceExecutorType2<I, I2, O> {
+    public O execute(I input1, I2 input2);
   }
-
-
-  enum ServiceParamType { INTERNAL, EXTERNAL }
 }

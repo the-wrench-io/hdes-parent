@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -53,7 +53,7 @@ public class TagServiceBuilder extends TemplateServiceBuilder {
   }
 
   @Override
-  public Service build() {
+  public AssetService build() {
     String serviceId = id == null ? idGen.nextId() : id;
     if(!ignoreErrors && pattern.isPresent() && !pattern.get().matcher(name).matches()) {
       throw new DataException(new MessageList().setStatus(422).add(new Message()

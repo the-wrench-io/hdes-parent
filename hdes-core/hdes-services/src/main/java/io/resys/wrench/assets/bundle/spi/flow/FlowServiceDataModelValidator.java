@@ -43,7 +43,7 @@ import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.hdes.client.api.ast.ImmutableFlowCommandMessage;
 import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
@@ -99,7 +99,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
       }
 
       // unknown service
-      Service service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
+      AssetService service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
       if(service == null) {
         modelBuilder.addMessages(
             error(
@@ -182,7 +182,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
       ImmutableFlowAstType.Builder modelBuilder,
       NodeTask taskModel,
       Map<String, DataType> allParams,
-      Service refService) {
+      AssetService refService) {
 
     Map<String, DataType> serviceTypes = refService.getDataModel().getParams().stream()
         .filter(p -> p.getDirection() == Direction.IN)
@@ -251,7 +251,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
       if(serviceType == null || StringUtils.isEmpty(taskServiceName)) {
         continue;
       }
-      Service service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
+      AssetService service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
       if(service == null) {
         continue;
       }

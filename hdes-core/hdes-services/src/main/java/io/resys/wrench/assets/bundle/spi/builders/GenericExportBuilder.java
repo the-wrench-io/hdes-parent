@@ -27,7 +27,7 @@ import org.springframework.util.Assert;
 import io.resys.hdes.client.api.model.DecisionTable;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportType;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
@@ -36,7 +36,7 @@ public class GenericExportBuilder implements ExportBuilder {
 
   private final Supplier<DecisionTableExporter> exporter;
   private ExportType type;
-  private Service service;
+  private AssetService service;
 
   public GenericExportBuilder(Supplier<DecisionTableExporter> exporter) {
     super();
@@ -44,7 +44,7 @@ public class GenericExportBuilder implements ExportBuilder {
   }
 
   @Override
-  public ExportBuilder service(Service service) {
+  public ExportBuilder service(AssetService service) {
     this.service = service;
     return this;
   }

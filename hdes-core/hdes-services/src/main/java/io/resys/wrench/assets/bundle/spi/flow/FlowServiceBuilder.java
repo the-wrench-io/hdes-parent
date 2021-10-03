@@ -26,7 +26,7 @@ import java.util.Optional;
 import org.springframework.util.StringUtils;
 
 import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -62,7 +62,7 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
   }
 
   @Override
-  public Service build() {
+  public AssetService build() {
     boolean isDefault = StringUtils.isEmpty(src);
     String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
 

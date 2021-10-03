@@ -38,7 +38,7 @@ import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociationType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -78,7 +78,7 @@ public class FlowServiceDataModelBuilder {
           continue;
         }
 
-        Service service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
+        AssetService service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
         if(service == null) {
           errors.add(new ImmutableServiceError("flowTaskRefMissing", "Task: " + taskModel.getId() + ", refers to non existing " + serviceType + ": " + taskServiceName + "!"));
           continue;
@@ -132,7 +132,7 @@ public class FlowServiceDataModelBuilder {
 
   protected Map<String, DataType> getTaskServiceInput(
       FlowTaskModel taskModel, Map<String, DataType> allParams,
-      Service refService) {
+      AssetService refService) {
 
     Map<String, DataType> serviceTypes = refService.getDataModel().getParams().stream()
     .filter(p -> p.getDirection() == Direction.IN)
@@ -164,7 +164,7 @@ public class FlowServiceDataModelBuilder {
         errors.add(new ImmutableServiceError("flowTaskRefUndefined", "Task: " + taskModel.getId() + ", has no ref!"));
         continue;
       }
-      Service service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
+      AssetService service = createQuery().type(serviceType).name(taskServiceName).get().orElse(null);
       if(service == null) {
         errors.add(new ImmutableServiceError("flowTaskRefUndefined", "Task: " + taskModel.getId() + ", ref: '" + taskServiceName + "' does not exist!"));
         continue;

@@ -27,26 +27,29 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterContextType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ScriptParameterModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
+import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.execution.Service.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
-import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 
 public class FlowTaskServiceExecution implements ServiceExecution {
 
-  private final Script script;
+  private final Service script;
+  private final ServiceInit init;
   private final List<Object> facts = new ArrayList<>();
-  private final ScriptParameterModel taskInputModel;
+  private final ServiceDataParamModel taskInputModel;
   private FlowTaskInput taskInput;
 
-  public FlowTaskServiceExecution(Script script) {
+  public FlowTaskServiceExecution(Service script, ServiceInit init) {
     super();
     this.script = script;
+    this.init = init;
     this.taskInputModel = script.getModel().getMethod().getParameters().stream()
         .filter(p -> p.getType().getDirection() == Direction.IN)
-        .filter(p -> p.getContextType() == ScriptParameterContextType.EXTERNAL)
+        .filter(p -> p.getContextType() == ServiceParamType.EXTERNAL)
         .findFirst()
         .orElse(null);
   }
@@ -69,7 +72,7 @@ public class FlowTaskServiceExecution implements ServiceExecution {
     }
 
     try {
-      Object result = script.execute(facts);
+      Object result = script.execute(facts, init);
       facts.clear();
       return new ServiceResponse() {
         @Override

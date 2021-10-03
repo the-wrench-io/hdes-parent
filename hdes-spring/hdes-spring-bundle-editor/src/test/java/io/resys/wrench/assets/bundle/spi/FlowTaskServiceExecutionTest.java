@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.spi.flow.executors.TransientFlowExecutor;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -67,7 +67,7 @@ public class FlowTaskServiceExecutionTest {
    */
   @Test
   public void flowExecution() throws IOException {
-    Service flow = assetServiceRepository.createQuery().flow("sumFlow");
+    AssetService flow = assetServiceRepository.createQuery().flow("sumFlow");
 
     ObjectNode input = objectMapper.createObjectNode();
     input.put("val1", new BigDecimal("10"));

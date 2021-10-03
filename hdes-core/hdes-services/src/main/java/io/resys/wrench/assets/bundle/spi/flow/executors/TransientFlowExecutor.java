@@ -41,7 +41,7 @@ import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
 import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
@@ -59,7 +59,7 @@ public class TransientFlowExecutor {
     this.objectMapper = objectMapper;
   }
 
-  public Map.Entry<Flow, ObjectNode> debug(Service service, JsonNode debugInput) {
+  public Map.Entry<Flow, ObjectNode> debug(AssetService service, JsonNode debugInput) {
     ServiceDataModel dataModel = service.getDataModel();
 
     // Create input
@@ -93,7 +93,7 @@ public class TransientFlowExecutor {
     }
   }
   
-  public Map.Entry<Flow, ObjectNode> execute(Service service, JsonNode debugInput) {
+  public Map.Entry<Flow, ObjectNode> execute(AssetService service, JsonNode debugInput) {
     ServiceDataModel dataModel = service.getDataModel();
 
     // Create input

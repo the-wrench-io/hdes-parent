@@ -26,7 +26,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import io.resys.hdes.client.api.model.DecisionTable;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -57,7 +57,7 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
   }
 
   @Override
-  public Service build() {
+  public AssetService build() {
     if(StringUtils.isEmpty(src) ) {
       Assert.isTrue(!StringUtils.isEmpty(name), "Decision table name must be defined!");
     }

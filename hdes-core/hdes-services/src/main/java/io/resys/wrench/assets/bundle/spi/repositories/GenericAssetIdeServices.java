@@ -52,13 +52,14 @@ import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowContext;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
@@ -69,7 +70,6 @@ import io.resys.wrench.assets.bundle.spi.dt.resolvers.DebugDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.flow.executors.TransientFlowExecutor;
 import io.resys.wrench.assets.bundle.spi.flowtask.FlowTaskInput;
-import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 
 public class GenericAssetIdeServices implements AssetIdeServices {
   private final ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
@@ -134,7 +134,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   public String debug(AssetDebug entity) {
     Assert.isTrue(entity.getType() != null, () -> "AssetResource type can't be null!");
     
-    final Service service;
+    final AssetService service;
     if(entity.getContent() == null) {
       service = assetServiceRepository.createQuery().id(entity.getId()).get().get();
     } else {
@@ -304,7 +304,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
     return false;
   }
   
-  private Flow executeCsvRecord(Map<Integer, String> headers, CSVRecord row, Service service) throws JsonProcessingException {
+  private Flow executeCsvRecord(Map<Integer, String> headers, CSVRecord row, AssetService service) throws JsonProcessingException {
     ObjectNode inputEntity = objectMapper.createObjectNode();
     int columnIndex = 0;
     for(String columnValue : row) {
@@ -400,7 +400,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowTaskCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    Script commandModel  = assetServiceRepository.getStRepo().createBuilder()
+    Service commandModel  = assetServiceRepository.getStRepo().createBuilder()
         .src(command.getInput())
         .rev(command.getRev())
         .build();
@@ -412,7 +412,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   @Override
   public synchronized AssetResource persist(AssetResource asset) {
     // Create
-    Service service = assetServiceRepository.createStore().save(assetServiceRepository.createBuilder(asset.getType())
+    AssetService service = assetServiceRepository.createStore().save(assetServiceRepository.createBuilder(asset.getType())
         .id(asset.getId())
         .src(asset.getContent())
         .name(asset.getName())
@@ -439,11 +439,11 @@ public class GenericAssetIdeServices implements AssetIdeServices {
 
   @Override
   public AssetResource copyAs(AssetCopyAs copyAs) {
-    final Service original = assetServiceRepository.createStore().get(copyAs.getId());
+    final AssetService original = assetServiceRepository.createStore().get(copyAs.getId());
     
     
     // Create
-    Service service = assetServiceRepository.createStore().save(assetServiceRepository.createBuilder(original.getType())
+    AssetService service = assetServiceRepository.createStore().save(assetServiceRepository.createBuilder(original.getType())
         .src(original.getSrc())
         .name(copyAs.getName())
         .rename()

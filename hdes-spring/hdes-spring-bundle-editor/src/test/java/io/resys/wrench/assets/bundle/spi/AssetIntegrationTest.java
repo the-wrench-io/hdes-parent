@@ -41,7 +41,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 
 
@@ -66,13 +66,13 @@ public class AssetIntegrationTest {
 
   @Test
   public void services() {
-    List<Service> services = assetServiceRepository.createQuery().list();
+    List<AssetService> services = assetServiceRepository.createQuery().list();
     Assert.assertEquals(6, services.size());
   }
 
   @Test
   public void dt() throws IOException {
-    Service dt = assetServiceRepository.createQuery().dt("test decision table");
+    AssetService dt = assetServiceRepository.createQuery().dt("test decision table");
     Assert.assertEquals(getContent("assets/dt/testDt.json"), dt.getSrc());
     Assert.assertEquals("testDt.json", dt.getPointer());
     Assert.assertEquals("test decision table", dt.getName());
@@ -81,7 +81,7 @@ public class AssetIntegrationTest {
 
   @Test
   public void flow() throws IOException {
-    Service flow = assetServiceRepository.createQuery().flow("evaluateRating");
+    AssetService flow = assetServiceRepository.createQuery().flow("evaluateRating");
     Assert.assertEquals(getContent("assets/flow/evaluateRating.json"), flow.getSrc());
     Assert.assertEquals("evaluateRating.json", flow.getPointer());
     Assert.assertEquals("evaluateRating", flow.getName());
@@ -92,7 +92,7 @@ public class AssetIntegrationTest {
   @Test
   public void flowTasks() {
 
-    Service task = assetServiceRepository.createQuery().flowTask("RuleGroup1");
+    AssetService task = assetServiceRepository.createQuery().flowTask("RuleGroup1");
     Assert.assertNotNull(task.getSrc());
     Assert.assertEquals("ruleGroup1.json", task.getPointer());
     Assert.assertEquals("RuleGroup1", task.getName());

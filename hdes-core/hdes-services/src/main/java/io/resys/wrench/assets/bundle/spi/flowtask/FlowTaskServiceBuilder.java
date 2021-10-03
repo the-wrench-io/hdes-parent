@@ -28,45 +28,45 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Service;
+import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.execution.Service.ServiceInit;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.ImmutableServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.TemplateServiceBuilder;
-import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
 import io.resys.wrench.assets.script.api.ScriptRepository;
-import io.resys.wrench.assets.script.api.ScriptRepository.Script;
 
 public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
 
   private final ServiceIdGen idGen;
   private final ServiceStore serviceStore;  
   private final ScriptRepository scriptRepository;
-  private final ClockRepository clockRepository;
   private final ObjectMapper objectMapper;
   private final String defaultContent;
+  private final ServiceInit init;
   private boolean rename;
   
   public FlowTaskServiceBuilder(
       ServiceIdGen idGen,
       ServiceStore serviceStore,
-      ScriptRepository scriptRepository,
-      ClockRepository clockRepository, 
+      ServiceInit init, 
+      ScriptRepository scriptRepository, 
       ObjectMapper objectMapper, String defaultContent) {
     super();
     this.idGen = idGen;
+    this.init = init;
     this.serviceStore = serviceStore;
     this.scriptRepository = scriptRepository;
-    this.clockRepository = clockRepository;
     this.defaultContent = defaultContent;
     this.objectMapper = objectMapper;
   }
 
   @Override
-  public Service build() {
+  public AssetService build() {
     if(name != null && (!SourceVersion.isName(name) || !Character.isUpperCase(name.charAt(0)))) {
       throw AssetErrorCodes.FLOW_TASK_NAME_INVALID.newException("Flow task name must be valid UpperCamel groovy class name!");
     }
@@ -76,10 +76,10 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
     final String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
     
     try {
-      final Script script;
+      final Service script;
       
       if(rename) {
-        final Script originalScript = scriptRepository.createBuilder().src(content).build();
+        final Service originalScript = scriptRepository.createBuilder().src(content).build();
         final String originalName = originalScript.getModel().getName();
         final String newContent = content.replaceAll(originalName, name);
         
@@ -100,12 +100,14 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
           .setSrc(objectMapper.writeValueAsString(script.getModel().getCommands()))
           .setPointer(pointer)
           .setModel(dataModel)
-          .setExecution(() -> new FlowTaskServiceExecution(script))
+          .setExecution(() -> new FlowTaskServiceExecution(script, init))
           .build();
 
     } catch (Exception e) {
       String name = this.pointer == null ? this.name : this.pointer;
-      throw AssetErrorCodes.FLOW_TASK_ERROR.newException("AssetResource error in: " + name + System.lineSeparator() + e.getMessage());
+      throw AssetErrorCodes.FLOW_TASK_ERROR.newException(
+          "AssetResource error in: " + name + System.lineSeparator() + 
+          e.getMessage());
     }
   }
 
