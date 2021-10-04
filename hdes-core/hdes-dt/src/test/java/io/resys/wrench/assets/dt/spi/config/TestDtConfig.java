@@ -38,8 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.spi.GenericDataTypeRepository;
+import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.spi.HdesTypesImpl;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.NodeExpressionExecutor;
@@ -81,7 +81,7 @@ public class TestDtConfig {
       SpringDynamicValueExpressionExecutor springDynamicValueExpressionExecutor = new SpringDynamicValueExpressionExecutor();
       Supplier<DecisionTableExpressionBuilder> springExpressionBuilder = () -> new GenericDecisionTableExpressionBuilder(objectMapper());
       NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(springExpressionBuilder);
-      DataTypeRepository dataTypeRepository = new GenericDataTypeRepository(objectMapper());
+      HdesTypes dataTypeRepository = new HdesTypesImpl(objectMapper());
       decisionTableRepository = new GenericDecisionTableRepository(objectMapper(), dataTypeRepository,
           expressionExecutor,
           () -> springDynamicValueExpressionExecutor, springExpressionBuilder);

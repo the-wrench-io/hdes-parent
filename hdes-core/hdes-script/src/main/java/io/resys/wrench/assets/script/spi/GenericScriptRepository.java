@@ -20,19 +20,19 @@ package io.resys.wrench.assets.script.spi;
  * #L%
  */
 
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 import io.resys.wrench.assets.script.spi.builders.GenericScriptModelBuilder;
 import io.resys.wrench.assets.script.spi.builders.GroovyScriptBuilder;
 import io.resys.wrench.assets.script.spi.builders.GroovyScriptParser;
 
 public class GenericScriptRepository implements ScriptRepository {
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
   private final GroovyScriptParser scriptParsers;
 
   public GenericScriptRepository(
       GroovyScriptParser scriptParsers, 
-      DataTypeRepository dataTypeRepository) {
+      HdesTypes dataTypeRepository) {
     super();
     this.dataTypeRepository = dataTypeRepository;
     this.scriptParsers = scriptParsers;

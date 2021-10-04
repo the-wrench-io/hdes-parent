@@ -27,8 +27,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import io.resys.hdes.client.api.model.DecisionTable;
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
+import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
 import io.resys.wrench.assets.dt.spi.config.TestDtConfig;
@@ -42,7 +42,7 @@ public class DtImportCommandTest {
   @Test
   public void commandFormatExport() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "dt-import.json");
-    DecisionTable decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
   }
 

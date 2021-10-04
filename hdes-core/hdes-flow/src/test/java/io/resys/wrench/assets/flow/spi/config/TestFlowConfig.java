@@ -28,13 +28,13 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.spi.GenericDataTypeRepository;
+import io.resys.hdes.client.spi.HdesTypesImpl;
+import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.wrench.assets.flow.api.FlowRepository;
-import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.spi.GenericFlowExecutorFactory;
 import io.resys.wrench.assets.flow.spi.GenericFlowRepository;
 import io.resys.wrench.assets.flow.spi.GenericNodeRepository;
@@ -63,7 +63,7 @@ public class TestFlowConfig {
   public static FlowRepository flowRepository() {
     if (flowRepository == null) {
       SpelExpressionFactory parser = new SpelExpressionFactory();
-      DataTypeRepository dataTypeRepository = new GenericDataTypeRepository(objectMapper);
+      HdesTypes dataTypeRepository = new HdesTypesImpl(objectMapper);
       flowRepository = new GenericFlowRepository(dataTypeRepository, 
           flowExecutorFactory(), 
           parser, nodeRepository, objectMapper, Arrays.asList(), 

@@ -30,9 +30,9 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.spi.builders.CommandDecisionTableBuilder;
 import io.resys.wrench.assets.dt.spi.builders.GenericDecisionTableCommandModelBuilder;
@@ -41,7 +41,7 @@ import io.resys.wrench.assets.dt.spi.export.DelegateDecisionTableExporter;
 
 public class GenericDecisionTableRepository implements DecisionTableRepository {
 
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
   private final ObjectMapper objectMapper;
   private final NodeExpressionExecutor expressionExecutor;
   private final Supplier<DynamicValueExpressionExecutor> executor;
@@ -51,7 +51,7 @@ public class GenericDecisionTableRepository implements DecisionTableRepository {
 
   public GenericDecisionTableRepository(
       ObjectMapper objectMapper,
-      DataTypeRepository dataTypeRepository,
+      HdesTypes dataTypeRepository,
       NodeExpressionExecutor expressionExecutor,
       Supplier<DynamicValueExpressionExecutor> executor,
       Supplier<DecisionTableExpressionBuilder> expressionBuilder) {

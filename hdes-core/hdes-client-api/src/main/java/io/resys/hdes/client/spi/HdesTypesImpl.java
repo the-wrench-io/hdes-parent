@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi;
+package io.resys.hdes.client.spi;
 
 /*-
  * #%L
@@ -26,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Period;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -33,26 +34,29 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
 import io.resys.hdes.client.api.model.DataType.DataTypeSerializer;
 import io.resys.hdes.client.api.model.DataType.ValueTypeResolver;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.spi.builders.GenericDataTypeBuilder;
-import io.resys.wrench.assets.datatype.spi.deserializers.DateDataTypeDeserializer;
-import io.resys.wrench.assets.datatype.spi.deserializers.DateTimeDataTypeDeserializer;
-import io.resys.wrench.assets.datatype.spi.deserializers.GenericDataTypeDeserializer;
-import io.resys.wrench.assets.datatype.spi.deserializers.JsonObjectDataTypeDeserializer;
-import io.resys.wrench.assets.datatype.spi.deserializers.TimeDataTypeDeserializer;
-import io.resys.wrench.assets.datatype.spi.serializers.GenericDataTypeSerializer;
+import io.resys.hdes.client.api.model.ImmutableDataType;
+import io.resys.hdes.client.spi.serializers.DateDataTypeDeserializer;
+import io.resys.hdes.client.spi.serializers.DateTimeDataTypeDeserializer;
+import io.resys.hdes.client.spi.serializers.GenericDataTypeDeserializer;
+import io.resys.hdes.client.spi.serializers.GenericDataTypeSerializer;
+import io.resys.hdes.client.spi.serializers.JsonObjectDataTypeDeserializer;
+import io.resys.hdes.client.spi.serializers.TimeDataTypeDeserializer;
+import io.resys.hdes.client.spi.util.Assert;
 
-public class GenericDataTypeRepository implements DataTypeRepository {
+public class HdesTypesImpl implements HdesTypes {
 
   private final Map<ValueType, DataTypeDeserializer> deserializers;
   private final Map<ValueType, DataTypeSerializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
 
-  public GenericDataTypeRepository(
+  public HdesTypesImpl(
       ObjectMapper objectMapper,
       Map<ValueType, DataTypeDeserializer> deserializers,
       Map<ValueType, DataTypeSerializer> serializers,
@@ -63,7 +67,7 @@ public class GenericDataTypeRepository implements DataTypeRepository {
     this.valueTypeResolver = valueTypeResolver;
   }
 
-  public GenericDataTypeRepository(ObjectMapper objectMapper) {
+  public HdesTypesImpl(ObjectMapper objectMapper) {
 
     Map<ValueType, DataTypeDeserializer> deserializers = new HashMap<>();
     this.deserializers = Collections.unmodifiableMap(deserializers);
@@ -117,7 +121,122 @@ public class GenericDataTypeRepository implements DataTypeRepository {
 
   }
   @Override
-  public DataTypeBuilder createBuilder() {
-    return new GenericDataTypeBuilder(deserializers, serializers, valueTypeResolver);
+  public DataTypeBuilder create() {
+    return new GenericDataTypeBuilder();
+  }
+  
+  public class GenericDataTypeBuilder implements DataTypeBuilder {
+    private Boolean required;
+    private String name;
+    private ValueType valueType;
+    private Direction direction;
+    private Class<?> beanType;
+    private String description;
+    private String values;
+    private List<DataType> properties = new ArrayList<>();
+    private String ref;
+    private DataType dataType;
+
+    @Override
+    public DataTypeBuilder required(boolean required) {
+      this.required = required;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder name(String name) {
+      this.name = name;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder valueType(ValueType valueType) {
+      this.valueType = valueType;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder direction(Direction direction) {
+      this.direction = direction;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder beanType(Class<?> beanType) {
+      this.beanType = beanType;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder description(String description) {
+      this.description = description;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder values(String values) {
+      this.values = values;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder ref(String ref, DataType dataType) {
+      Assert.isTrue(ref != null, () -> "ref can't be null!");
+      Assert.isTrue(dataType != null, () -> "dataType can't be null for ref: " + ref + "!");
+      this.dataType = dataType;
+      return this;
+    }
+    @Override
+    public DataTypeBuilder property() {
+      return new GenericDataTypeBuilder() {
+        @Override
+        public DataType build() {
+          DataType property = super.build();
+          properties.add(property);
+          return property;
+        }
+      };
+    }
+    @Override
+    public DataType build() {
+      Assert.notNull(name, () -> "name can't be null!");
+
+      if(dataType != null) {
+        valueType = dataType.getValueType();
+        properties.addAll(dataType.getProperties());
+
+        DataTypeDeserializer deserializer = dataType.getDeserializer();
+        DataTypeSerializer serializer = dataType.getSerializer();
+        return ImmutableDataType.builder()
+            .name(name)
+            .ref(ref)
+            .description(description)
+            .direction(direction)
+            .valueType(valueType)
+            .beanType(beanType)
+            .isRequired(Boolean.TRUE.equals(required))
+            .values(values)
+            .properties(properties)
+            .deserializer(deserializer)
+            .serializer(serializer)
+            .build();
+      }
+
+      if(valueType == null) {
+        Assert.notNull(beanType, () -> "beanType can't be null!");
+        valueType = valueTypeResolver.get(beanType);
+      }
+
+      DataTypeDeserializer deserializer = deserializers.get(valueType);
+      DataTypeSerializer serializer = serializers.get(valueType);
+
+      Assert.notNull(valueType, () -> "valueType can't be null!");
+      return ImmutableDataType.builder()
+          .name(name)
+          .ref(ref)
+          .description(description)
+          .direction(direction)
+          .valueType(valueType)
+          .beanType(beanType)
+          .isRequired(Boolean.TRUE.equals(required))
+          .values(values)
+          .properties(properties)
+          .deserializer(deserializer)
+          .serializer(serializer)
+          .build();
+    }
   }
 }

@@ -33,7 +33,7 @@ import io.resys.hdes.client.api.execution.Flow.FlowContext;
 import io.resys.hdes.client.api.execution.Flow.FlowHistory;
 import io.resys.hdes.client.api.execution.Flow.FlowStatus;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 
 public class FlowContextBean implements FlowContext {
 

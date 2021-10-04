@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.deserializers;
+package io.resys.hdes.client.spi.serializers;
 
 /*-
  * #%L
@@ -9,9 +9,9 @@ package io.resys.wrench.assets.datatype.spi.deserializers;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,33 +20,28 @@ package io.resys.wrench.assets.datatype.spi.deserializers;
  * #L%
  */
 
-import java.io.Serializable;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
+import io.resys.hdes.client.api.model.DataType.DataTypeSerializer;
 
-public class GenericDataTypeDeserializer implements DataTypeDeserializer {
+public class GenericDataTypeSerializer implements DataTypeSerializer {
 
   private final ObjectMapper objectMapper;
-  private final Class<?> type;
 
-  public GenericDataTypeDeserializer(ObjectMapper objectMapper, Class<?> type) {
+  public GenericDataTypeSerializer(ObjectMapper objectMapper) {
     super();
     this.objectMapper = objectMapper;
-    this.type = type;
   }
 
   @Override
-  public Serializable deserialize(DataType dataType, Object value) {
+  public String serialize(DataType dataType, Object value) {
     if(value == null) {
       return null;
     }
-    try {
-      return (Serializable) objectMapper.convertValue(value, type);
-    } catch(Exception e) {
-      throw new DataTypeException(dataType, value, e);
+    if(value.getClass().equals(String.class)) {
+      return (String) value;
     }
+    return objectMapper.convertValue(value, String.class);
   }
 }

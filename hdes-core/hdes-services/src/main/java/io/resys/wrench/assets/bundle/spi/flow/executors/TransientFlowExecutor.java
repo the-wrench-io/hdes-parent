@@ -37,6 +37,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.exceptions.DataTypeException;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
 import io.resys.hdes.client.api.model.DataType;
@@ -48,7 +49,6 @@ import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.exceptions.MessageList;
-import io.resys.wrench.assets.datatype.spi.deserializers.DataTypeException;
 import io.resys.wrench.assets.flow.spi.FlowException;
 
 public class TransientFlowExecutor {

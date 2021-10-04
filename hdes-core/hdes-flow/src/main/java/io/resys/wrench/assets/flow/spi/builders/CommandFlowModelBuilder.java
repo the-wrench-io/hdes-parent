@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
 import io.resys.hdes.client.api.ast.FlowAstType.Node;
@@ -52,7 +53,6 @@ import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
 import io.resys.hdes.client.api.model.ImmutableFlowModel;
 import io.resys.hdes.client.api.model.ImmutableFlowTaskValue;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeBuilder;
 import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
@@ -68,7 +68,7 @@ public class CommandFlowModelBuilder {
 
   private final FlowAstFactory nodeRepository;
   private final ObjectMapper objectMapper;
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
   private final ExpressionFactory parser;
   private final String input;
 
@@ -83,7 +83,7 @@ public class CommandFlowModelBuilder {
   public CommandFlowModelBuilder(
       FlowAstFactory nodeRepository,
       ObjectMapper objectMapper,
-      DataTypeRepository dataTypeRepository,
+      HdesTypes dataTypeRepository,
       ExpressionFactory parser,
       String input, Optional<String> rename) {
     super();

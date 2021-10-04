@@ -21,7 +21,7 @@ package io.resys.wrench.assets.dt.spi.beans;
  */
 
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableDataType;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
 
 public class ImmutableDecisionTableDataType implements DecisionTableDataType {
 

@@ -43,14 +43,14 @@ import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.api.HdesTypes.DataTypeBuilder;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.api.execution.ServiceData;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeBuilder;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModelBuilder;
 import io.resys.wrench.assets.script.spi.ServiceHistoric;
@@ -63,7 +63,7 @@ import io.resys.wrench.assets.script.spi.beans.ImmutableScriptParameterModel;
 public class GroovyScriptBuilder implements ScriptBuilder {
   private static final Charset UTF_8 = Charset.forName("utf-8");
 
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
   private final Supplier<ScriptModelBuilder> modelBuilder;
   private final GroovyScriptParser scriptParsers;
   private static final CompilerConfiguration config;
@@ -80,7 +80,7 @@ public class GroovyScriptBuilder implements ScriptBuilder {
 
   public GroovyScriptBuilder(
       GroovyScriptParser scriptParsers,
-      DataTypeRepository dataTypeRepository,
+      HdesTypes dataTypeRepository,
       Supplier<ScriptModelBuilder> modelBuilder) {
     super();
     this.dataTypeRepository = dataTypeRepository;
@@ -174,7 +174,7 @@ public class GroovyScriptBuilder implements ScriptBuilder {
     int index = 0;
     for(Parameter parameter : method.getParameters()) {
       ServiceParamType contextType = getContextType(parameter.getType());
-      DataTypeBuilder dataTypeBuilder = dataTypeRepository.createBuilder().
+      DataTypeBuilder dataTypeBuilder = dataTypeRepository.create().
           name(parameter.getName()).
           direction(Direction.IN).
           beanType(parameter.getType()).
@@ -189,7 +189,7 @@ public class GroovyScriptBuilder implements ScriptBuilder {
     if(contextType == ServiceParamType.INTERNAL) {
       Assert.isTrue(returnType == void.class, () -> "'execute' must be void or return type must define: " + ServiceData.class.getCanonicalName() + "!");
     } else {
-      DataTypeBuilder dataTypeBuilder = dataTypeRepository.createBuilder().
+      DataTypeBuilder dataTypeBuilder = dataTypeRepository.create().
           name(returnType.getSimpleName()).
           direction(Direction.OUT).
           beanType(returnType).

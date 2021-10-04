@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.util;
+package io.resys.hdes.client.spi.util;
 
 /*-
  * #%L

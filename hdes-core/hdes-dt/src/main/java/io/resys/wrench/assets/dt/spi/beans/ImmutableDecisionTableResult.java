@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNodeOutput;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeOutput;
 
 public class ImmutableDecisionTableResult implements DecisionTableResult {
 

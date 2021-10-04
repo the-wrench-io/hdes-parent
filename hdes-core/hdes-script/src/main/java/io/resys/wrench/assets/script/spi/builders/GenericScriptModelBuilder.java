@@ -25,7 +25,7 @@ import java.util.List;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataModel;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptModelBuilder;
 import io.resys.wrench.assets.script.spi.beans.ImmutableScriptModel;
 

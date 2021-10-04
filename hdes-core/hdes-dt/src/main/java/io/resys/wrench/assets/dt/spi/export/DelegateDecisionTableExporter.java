@@ -22,7 +22,7 @@ package io.resys.wrench.assets.dt.spi.export;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 

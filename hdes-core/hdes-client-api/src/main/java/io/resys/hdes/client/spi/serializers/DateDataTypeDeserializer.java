@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.deserializers;
+package io.resys.hdes.client.spi.serializers;
 
 /*-
  * #%L
@@ -21,18 +21,18 @@ package io.resys.wrench.assets.datatype.spi.deserializers;
  */
 
 import java.io.Serializable;
-import java.time.LocalTime;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
 
-public class TimeDataTypeDeserializer implements DataTypeDeserializer {
+public class DateDataTypeDeserializer implements DataTypeDeserializer {
 
   private final ObjectMapper objectMapper;
 
-  public TimeDataTypeDeserializer(ObjectMapper objectMapper) {
+  public DateDataTypeDeserializer(ObjectMapper objectMapper) {
     super();
     this.objectMapper = objectMapper;
   }
@@ -42,16 +42,22 @@ public class TimeDataTypeDeserializer implements DataTypeDeserializer {
     if(value == null) {
       return null;
     }
+    if(value.getClass() == LocalDate.class) {
+      return (Serializable) value;
+    }
 
-    String result = objectMapper.convertValue(value, String.class);
-    return parseLocalDateTime(result);
+    Serializable result = objectMapper.convertValue(value, String.class);
+    return parseLocalDate((String) result);
   }
 
-  public static LocalTime parseLocalDateTime(String time) {
+  public static LocalDate parseLocalDate(String date) {
     try {
-      return LocalTime.parse(time);
+      if(date.length() > 10) {
+        return LocalDate.parse(date.substring(0, 10));
+      }
+      return LocalDate.parse(date);
     } catch(Exception e) {
-      throw new IllegalArgumentException("Incorrect time: '" + time + "', correct format: hh:mm:ss, example: 00:00:00!");
+      throw new IllegalArgumentException("Incorrect date: '" + date + "', correct format: YYYY-MM-DD, example: 2017-07-03!");
     }
   }
 }

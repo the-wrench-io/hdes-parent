@@ -27,7 +27,7 @@ import java.util.Map;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 
 public class ImmutableDecisionTableDecision implements DecisionTableDecision {
 

@@ -25,44 +25,58 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
+import org.immutables.value.Value;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
 
-public interface DataType extends Model {
 
-  String getName();
-  String getRef();
-  String getDescription();
-  Direction getDirection();
-  ValueType getValueType();
-  Class<?> getBeanType();
-  boolean isRequired();
-  @Nullable
-  String getValues();
-
-  Collection<DataTypeConstraint> getConstraints();
-  Collection<DataType> getProperties();
-  Serializable toValue(Object value);
-  Serializable toString(Object value);
-  DataTypeDeserializer getDeserializer();
-  DataTypeSerializer getSerializer();
+@Value.Immutable
+public abstract class DataType implements Model {
+  private static final long serialVersionUID = -1945170579949676929L;
   
-  interface DataTypeDeserializer {
+  public abstract String getName();
+  public abstract Direction getDirection();
+  public abstract ValueType getValueType();
+  public abstract boolean isRequired();
+  public abstract Collection<DataType> getProperties();
+
+  @Nullable
+  public abstract Class<?> getBeanType();
+  @Nullable
+  public abstract String getDescription();
+  @Nullable
+  public abstract String getValues();
+  @Nullable
+  public abstract String getRef();
+  
+  @JsonIgnore
+  public abstract DataTypeDeserializer getDeserializer();
+  @JsonIgnore
+  public abstract DataTypeSerializer getSerializer();
+  @JsonIgnore
+  public Serializable toValue(Object value) {
+    return getDeserializer().deserialize(this, value);
+  }
+  @JsonIgnore
+  public String toString(Object value) {
+    return getSerializer().serialize(this, value);
+  }
+    
+  public interface DataTypeDeserializer {
     Serializable deserialize(DataType dataType, Object value);
   }
 
-  interface DataTypeSerializer {
+  public interface DataTypeSerializer {
     String serialize(DataType dataType, Object value);
-  }
-  interface DataTypeConstraint {
-    ConstraintType getType();
   }
 
   @FunctionalInterface
-  interface ValueTypeResolver {
+  public interface ValueTypeResolver {
     ValueType get(Class<?> src);
   }
 
-  enum AssociationType { ONE_TO_ONE, ONE_TO_MANY }
-  enum ConstraintType { RANGE, VALUES, PATTERN }
+  public enum AssociationType { ONE_TO_ONE, ONE_TO_MANY }
 }

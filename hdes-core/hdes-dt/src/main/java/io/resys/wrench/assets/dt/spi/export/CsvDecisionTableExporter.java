@@ -30,8 +30,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableDataType;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 
 public class CsvDecisionTableExporter extends TemplateDecisionTableExporter implements DecisionTableExporter {

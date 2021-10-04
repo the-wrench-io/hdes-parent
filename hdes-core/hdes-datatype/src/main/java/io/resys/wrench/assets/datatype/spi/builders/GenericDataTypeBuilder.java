@@ -24,17 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.resys.hdes.client.api.HdesTypes.DataTypeBuilder;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DataType.DataTypeConstraint;
 import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
 import io.resys.hdes.client.api.model.DataType.DataTypeSerializer;
 import io.resys.hdes.client.api.model.DataType.ValueTypeResolver;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeBuilder;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository.DataTypeConstraintBuilder;
-import io.resys.wrench.assets.datatype.spi.beans.ImmutableDataType;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.model.ImmutableDataType;
 
 public class GenericDataTypeBuilder implements DataTypeBuilder {
 
@@ -50,7 +48,6 @@ public class GenericDataTypeBuilder implements DataTypeBuilder {
   private String description;
   private String values;
   private List<DataType> properties = new ArrayList<>();
-  private List<DataTypeConstraint> constraints = new ArrayList<>();
   private String ref;
   private DataType dataType;
 
@@ -99,17 +96,6 @@ public class GenericDataTypeBuilder implements DataTypeBuilder {
     return this;
   }
   @Override
-  public DataTypeConstraintBuilder constraint() {
-    return new GenericDataTypeConstraintBuilder() {
-      @Override
-      public DataTypeConstraint build() {
-        DataTypeConstraint result = super.build();
-        constraints.add(result);
-        return result;
-      }
-    };
-  }
-  @Override
   public DataTypeBuilder ref(String ref, DataType dataType) {
     Assert.isTrue(ref != null, () -> "ref can't be null!");
     Assert.isTrue(dataType != null, () -> "dataType can't be null for ref: " + ref + "!");
@@ -133,17 +119,23 @@ public class GenericDataTypeBuilder implements DataTypeBuilder {
 
     if(dataType != null) {
       valueType = dataType.getValueType();
-      constraints.addAll(dataType.getConstraints());
       properties.addAll(dataType.getProperties());
 
       DataTypeDeserializer deserializer = dataType.getDeserializer();
       DataTypeSerializer serializer = dataType.getSerializer();
-
-      return new ImmutableDataType(
-          name, ref, description,
-          direction, valueType, beanType,
-          Boolean.TRUE.equals(required), values,
-          constraints, properties, deserializer, serializer);
+      return ImmutableDataType.builder()
+          .name(name)
+          .ref(ref)
+          .description(description)
+          .direction(direction)
+          .valueType(valueType)
+          .beanType(beanType)
+          .isRequired(Boolean.TRUE.equals(required))
+          .values(values)
+          .properties(properties)
+          .deserializer(deserializer)
+          .serializer(serializer)
+          .build();
     }
 
     if(valueType == null) {
@@ -155,11 +147,18 @@ public class GenericDataTypeBuilder implements DataTypeBuilder {
     DataTypeSerializer serializer = serializers.get(valueType);
 
     Assert.notNull(valueType, () -> "valueType can't be null!");
-    return new ImmutableDataType(
-        name, ref, description,
-        direction, valueType, beanType,
-        Boolean.TRUE.equals(required),
-        values,
-        constraints, properties, deserializer, serializer);
+    return ImmutableDataType.builder()
+        .name(name)
+        .ref(ref)
+        .description(description)
+        .direction(direction)
+        .valueType(valueType)
+        .beanType(beanType)
+        .isRequired(Boolean.TRUE.equals(required))
+        .values(values)
+        .properties(properties)
+        .deserializer(deserializer)
+        .serializer(serializer)
+        .build();
   }
 }

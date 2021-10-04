@@ -31,8 +31,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTable;
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
+import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFixedValue;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
@@ -48,7 +48,7 @@ public class HitPolicyTest {
   public void firstHitPolicy() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "firstHitPolicy.json");
 
-    DecisionTable decisionTable = decisionTableRepository.createBuilder()
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder()
         .format(DecisionTableFormat.JSON)
         .src(stream)
         .build();
@@ -71,7 +71,7 @@ public class HitPolicyTest {
   public void all() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "allHitPolicy.json");
 
-    DecisionTable decisionTable = decisionTableRepository.createBuilder()
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder()
         .format(DecisionTableFormat.JSON)
         .src(stream)
         .build();
@@ -86,7 +86,7 @@ public class HitPolicyTest {
   public void allWithFixedOverrideEvaluation() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "allHitPolicy.json");
 
-    DecisionTable decisionTable = decisionTableRepository.createBuilder()
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder()
         .format(DecisionTableFormat.JSON)
         .src(stream)
         .build();
@@ -98,7 +98,7 @@ public class HitPolicyTest {
   }
 
   
-  public DecisionTableResult execute(DecisionTable decisionTable, Map<String, Object> values) {
+  public DecisionTableResult execute(DecisionTableModel decisionTable, Map<String, Object> values) {
     return decisionTableRepository.createExecutor().
         decisionTable(decisionTable).
         context((type) -> values.get(type.getName())).

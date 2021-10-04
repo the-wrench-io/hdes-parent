@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.model.DecisionTable;
+import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
@@ -63,7 +63,7 @@ public class GenericExportBuilder implements ExportBuilder {
 
     service.newExecution().run(e -> stringBuilder.append(exporter.get()
         .format(DecisionTableFormat.valueOf(type.name()))
-        .src((DecisionTable) e)
+        .src((DecisionTableModel) e)
         .build()));
 
     return stringBuilder.toString();

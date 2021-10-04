@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.deserializers;
+package io.resys.hdes.client.spi.serializers;
 
 /*-
  * #%L
@@ -24,16 +24,19 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.exceptions.DataTypeException;
 import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
 
-public class JsonObjectDataTypeDeserializer implements DataTypeDeserializer {
+public class GenericDataTypeDeserializer implements DataTypeDeserializer {
 
   private final ObjectMapper objectMapper;
+  private final Class<?> type;
 
-  public JsonObjectDataTypeDeserializer(ObjectMapper objectMapper) {
+  public GenericDataTypeDeserializer(ObjectMapper objectMapper, Class<?> type) {
     super();
     this.objectMapper = objectMapper;
+    this.type = type;
   }
 
   @Override
@@ -41,6 +44,10 @@ public class JsonObjectDataTypeDeserializer implements DataTypeDeserializer {
     if(value == null) {
       return null;
     }
-    return (Serializable) objectMapper.convertValue(value, dataType.getBeanType());
+    try {
+      return (Serializable) objectMapper.convertValue(value, type);
+    } catch(Exception e) {
+      throw new DataTypeException(dataType, value, e);
+    }
   }
 }

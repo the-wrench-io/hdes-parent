@@ -30,8 +30,8 @@ import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowModelBuilder;
@@ -40,7 +40,7 @@ import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
 public class GenericFlowModelBuilder implements FlowRepository.FlowModelBuilder {
 
   private final ExpressionFactory parser;
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
   private final FlowAstFactory nodeRepository;
   private final ObjectMapper objectMapper;
 
@@ -51,7 +51,7 @@ public class GenericFlowModelBuilder implements FlowRepository.FlowModelBuilder 
   
   public GenericFlowModelBuilder(
       ExpressionFactory parser,
-      DataTypeRepository dataTypeRepository,
+      HdesTypes dataTypeRepository,
       FlowAstFactory nodeRepository,
       ObjectMapper objectMapper) {
     this.dataTypeRepository = dataTypeRepository;

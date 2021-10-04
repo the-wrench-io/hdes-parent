@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.model.DecisionTable;
+import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -62,7 +62,7 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
       Assert.isTrue(!StringUtils.isEmpty(name), "Decision table name must be defined!");
     }
     String content = StringUtils.isEmpty(src) ? defaultContent.replace("{{name}}", name) : src;
-    DecisionTable decisionTable = decisionTableRepository.createBuilder()
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder()
         .format(DecisionTableFormat.JSON)
         .src(content)
         .rename(rename ? Optional.of(name) : Optional.empty())

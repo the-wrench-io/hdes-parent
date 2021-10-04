@@ -34,8 +34,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
 
 public class AssetToFileExporter {
   private final ObjectMapper objectMapper;

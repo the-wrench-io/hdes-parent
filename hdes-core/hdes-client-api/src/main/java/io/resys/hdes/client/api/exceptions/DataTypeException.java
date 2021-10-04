@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.deserializers;
+package io.resys.hdes.client.api.exceptions;
 
 /*-
  * #%L

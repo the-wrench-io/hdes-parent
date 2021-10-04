@@ -26,7 +26,7 @@ import java.util.function.Supplier;
 
 import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.NodeExpressionExecutor;
 

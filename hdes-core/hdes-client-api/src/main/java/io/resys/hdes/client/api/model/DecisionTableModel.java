@@ -25,7 +25,7 @@ import java.util.List;
 
 import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
 
-public interface DecisionTable extends Model {
+public interface DecisionTableModel extends Model {
   String getId();
   String getDescription();
   String getRev();

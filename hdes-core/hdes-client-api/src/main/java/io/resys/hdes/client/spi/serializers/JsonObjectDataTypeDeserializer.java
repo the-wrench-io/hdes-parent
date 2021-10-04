@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.deserializers;
+package io.resys.hdes.client.spi.serializers;
 
 /*-
  * #%L
@@ -9,9 +9,9 @@ package io.resys.wrench.assets.datatype.spi.deserializers;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,19 +21,17 @@ package io.resys.wrench.assets.datatype.spi.deserializers;
  */
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
 
-public class DateTimeDataTypeDeserializer implements DataTypeDeserializer {
+public class JsonObjectDataTypeDeserializer implements DataTypeDeserializer {
 
   private final ObjectMapper objectMapper;
 
-  public DateTimeDataTypeDeserializer(ObjectMapper objectMapper) {
+  public JsonObjectDataTypeDeserializer(ObjectMapper objectMapper) {
     super();
     this.objectMapper = objectMapper;
   }
@@ -43,16 +41,6 @@ public class DateTimeDataTypeDeserializer implements DataTypeDeserializer {
     if(value == null) {
       return null;
     }
-
-    String result = objectMapper.convertValue(value, String.class);
-    return parseLocalDateTime(result);
-  }
-
-  public static LocalDateTime parseLocalDateTime(String date) {
-    try {
-      return ZonedDateTime.parse(date).toLocalDateTime();
-    } catch(Exception e) {
-      throw new IllegalArgumentException("Incorrect date time: '" + date + "', correct format: YYYY-MM-DDThh:mm:ssTZD, example: 2017-07-03T00:00:00Z!");
-    }
+    return (Serializable) objectMapper.convertValue(value, dataType.getBeanType());
   }
 }

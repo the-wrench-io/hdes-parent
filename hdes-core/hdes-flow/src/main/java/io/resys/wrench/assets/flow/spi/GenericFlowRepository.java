@@ -5,8 +5,8 @@ import java.util.Collection;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 
@@ -43,11 +43,11 @@ public class GenericFlowRepository implements FlowRepository {
   private final ExpressionFactory parser;
   private final Clock clock;
   private final FlowExecutorRepository executorRepository;
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
   private final ObjectMapper objectMapper;
 
   public GenericFlowRepository(
-      DataTypeRepository dataTypeRepository,
+      HdesTypes dataTypeRepository,
       FlowExecutorRepository executorRepository,
       ExpressionFactory parser,
       FlowAstFactory nodeRepository,

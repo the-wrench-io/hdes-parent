@@ -32,7 +32,7 @@ import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 import io.resys.hdes.client.api.execution.DecisionTableResult;
 import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.model.DecisionTable;
+import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.hdes.client.api.model.FlowModel;
 
 public interface HdesClient {
@@ -65,7 +65,7 @@ public interface HdesClient {
 
     // From model or by Id
     DecisionExecutor decision(String modelId);
-    DecisionExecutor decision(DecisionTable model);
+    DecisionExecutor decision(DecisionTableModel model);
     
     // From model or by Id
     ServiceExecutor service(String modelId);
@@ -74,7 +74,7 @@ public interface HdesClient {
   
   interface ModelBuilder {
     FlowModel ast(FlowAstType ast);
-    DecisionTable ast(DecisionAstType ast);
+    DecisionTableModel ast(DecisionAstType ast);
     ServiceAstType ast(ServiceAstType ast);
   }
 

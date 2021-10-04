@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.serializers;
+package io.resys.hdes.client.spi.serializers;
 
 /*-
  * #%L
@@ -20,28 +20,38 @@ package io.resys.wrench.assets.datatype.spi.serializers;
  * #L%
  */
 
+import java.io.Serializable;
+import java.time.LocalTime;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DataType.DataTypeSerializer;
+import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
 
-public class GenericDataTypeSerializer implements DataTypeSerializer {
+public class TimeDataTypeDeserializer implements DataTypeDeserializer {
 
   private final ObjectMapper objectMapper;
 
-  public GenericDataTypeSerializer(ObjectMapper objectMapper) {
+  public TimeDataTypeDeserializer(ObjectMapper objectMapper) {
     super();
     this.objectMapper = objectMapper;
   }
 
   @Override
-  public String serialize(DataType dataType, Object value) {
+  public Serializable deserialize(DataType dataType, Object value) {
     if(value == null) {
       return null;
     }
-    if(value.getClass().equals(String.class)) {
-      return (String) value;
+
+    String result = objectMapper.convertValue(value, String.class);
+    return parseLocalDateTime(result);
+  }
+
+  public static LocalTime parseLocalDateTime(String time) {
+    try {
+      return LocalTime.parse(time);
+    } catch(Exception e) {
+      throw new IllegalArgumentException("Incorrect time: '" + time + "', correct format: hh:mm:ss, example: 00:00:00!");
     }
-    return objectMapper.convertValue(value, String.class);
   }
 }

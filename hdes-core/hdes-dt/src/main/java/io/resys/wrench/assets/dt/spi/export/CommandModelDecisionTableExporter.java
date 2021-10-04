@@ -32,8 +32,8 @@ import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableDataType;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 

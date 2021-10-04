@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DecisionTable;
+import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
@@ -36,7 +36,7 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 
 public class DtServiceDataModelBuilder {
 
-  public ServiceDataModel build(String id, DecisionTable dt) {
+  public ServiceDataModel build(String id, DecisionTableModel dt) {
     List<DataType> params = dt.getTypes().stream().map(h -> h.getValue()).collect(Collectors.toList());
     List<ServiceError> errors = new ArrayList<>();
 

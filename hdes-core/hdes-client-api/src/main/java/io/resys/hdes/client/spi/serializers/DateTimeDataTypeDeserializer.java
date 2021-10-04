@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.deserializers;
+package io.resys.hdes.client.spi.serializers;
 
 /*-
  * #%L
@@ -21,18 +21,19 @@ package io.resys.wrench.assets.datatype.spi.deserializers;
  */
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
 
-public class DateDataTypeDeserializer implements DataTypeDeserializer {
+public class DateTimeDataTypeDeserializer implements DataTypeDeserializer {
 
   private final ObjectMapper objectMapper;
 
-  public DateDataTypeDeserializer(ObjectMapper objectMapper) {
+  public DateTimeDataTypeDeserializer(ObjectMapper objectMapper) {
     super();
     this.objectMapper = objectMapper;
   }
@@ -42,22 +43,16 @@ public class DateDataTypeDeserializer implements DataTypeDeserializer {
     if(value == null) {
       return null;
     }
-    if(value.getClass() == LocalDate.class) {
-      return (Serializable) value;
-    }
 
-    Serializable result = objectMapper.convertValue(value, String.class);
-    return parseLocalDate((String) result);
+    String result = objectMapper.convertValue(value, String.class);
+    return parseLocalDateTime(result);
   }
 
-  public static LocalDate parseLocalDate(String date) {
+  public static LocalDateTime parseLocalDateTime(String date) {
     try {
-      if(date.length() > 10) {
-        return LocalDate.parse(date.substring(0, 10));
-      }
-      return LocalDate.parse(date);
+      return ZonedDateTime.parse(date).toLocalDateTime();
     } catch(Exception e) {
-      throw new IllegalArgumentException("Incorrect date: '" + date + "', correct format: YYYY-MM-DD, example: 2017-07-03!");
+      throw new IllegalArgumentException("Incorrect date time: '" + date + "', correct format: YYYY-MM-DDThh:mm:ssTZD, example: 2017-07-03T00:00:00Z!");
     }
   }
 }

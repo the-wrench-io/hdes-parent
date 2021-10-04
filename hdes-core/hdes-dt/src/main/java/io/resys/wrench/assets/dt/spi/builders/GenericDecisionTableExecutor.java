@@ -32,10 +32,10 @@ import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DecisionTable;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNodeInput;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeInput;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFixedValue;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.HitPolicyExecutor;
@@ -48,7 +48,7 @@ import io.resys.wrench.assets.dt.spi.hitpolicy.DelegateHitPolicyExecutor;
 public class GenericDecisionTableExecutor implements DecisionTableExecutor {
 
   private final NodeExpressionExecutor expressionExecutor;
-  private DecisionTable decisionTable;
+  private DecisionTableModel decisionTable;
   private Function<DataType, Object> context;
 
   public GenericDecisionTableExecutor(NodeExpressionExecutor expressionExecutor) {
@@ -57,7 +57,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
   }
 
   @Override
-  public DecisionTableExecutor decisionTable(DecisionTable decisionTable) {
+  public DecisionTableExecutor decisionTable(DecisionTableModel decisionTable) {
     this.decisionTable = decisionTable;
     return this;
   }

@@ -33,7 +33,7 @@ import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowStatus;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
 import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
+import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.spi.config.TestFlowConfig;
 import io.resys.wrench.assets.flow.spi.support.FlowFlatToCommandBuilder;

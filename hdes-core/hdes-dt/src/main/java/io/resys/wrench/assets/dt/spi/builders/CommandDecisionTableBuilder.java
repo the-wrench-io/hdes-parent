@@ -46,16 +46,16 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.ast.DecisionAstType;
 import io.resys.hdes.client.api.ast.DecisionAstType.Cell;
 import io.resys.hdes.client.api.ast.DecisionAstType.Header;
 import io.resys.hdes.client.api.ast.DecisionAstType.Row;
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DecisionTable;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableDataType;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableCommandModelBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
@@ -71,7 +71,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   private final ObjectMapper objectMapper;
   private final Supplier<DecisionTableCommandModelBuilder> commandBuilder;
   private final List<String> errors = new ArrayList<>();
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
   private final DynamicValueExpressionExecutor executor;
 
   protected String src;
@@ -82,7 +82,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   public CommandDecisionTableBuilder(
       ObjectMapper objectMapper,
       DynamicValueExpressionExecutor executor,
-      DataTypeRepository dataTypeRepository,
+      HdesTypes dataTypeRepository,
       Supplier<DecisionTableCommandModelBuilder> commandBuilder) {
     this.dataTypeRepository = dataTypeRepository;
     this.executor = executor;
@@ -91,7 +91,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   }
 
   @Override
-  public DecisionTable build() {
+  public DecisionTableModel build() {
     try {
       
       final String src;
@@ -228,7 +228,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     return this;
   }
   protected DataType resolveType(ValueType valueType, String name, Direction direction) {
-    return dataTypeRepository.createBuilder().
+    return dataTypeRepository.create().
         name(name).
         valueType(valueType).
         direction(direction).

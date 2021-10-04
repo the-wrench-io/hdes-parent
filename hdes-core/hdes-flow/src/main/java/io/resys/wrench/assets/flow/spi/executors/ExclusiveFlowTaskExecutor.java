@@ -31,7 +31,7 @@ import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
 import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.spi.FlowException;
 

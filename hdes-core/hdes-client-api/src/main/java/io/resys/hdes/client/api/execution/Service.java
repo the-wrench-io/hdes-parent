@@ -41,6 +41,6 @@ public interface Service {
   }
 
   interface ServiceExecutorType2<I, I2, O> {
-    public O execute(I input1, I2 input2);
+    O execute(I input1, I2 input2);
   }
 }

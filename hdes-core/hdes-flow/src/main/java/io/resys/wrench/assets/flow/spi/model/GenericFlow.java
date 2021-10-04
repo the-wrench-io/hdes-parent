@@ -28,7 +28,7 @@ import java.util.Optional;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.flow.spi.log.FlowLogger;
 
 public class GenericFlow implements Flow {

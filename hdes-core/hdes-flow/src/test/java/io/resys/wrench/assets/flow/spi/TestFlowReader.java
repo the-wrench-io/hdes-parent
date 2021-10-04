@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
+import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.spi.config.TestFlowConfig;
 

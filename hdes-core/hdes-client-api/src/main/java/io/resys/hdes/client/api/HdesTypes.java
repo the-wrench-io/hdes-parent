@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.api;
+package io.resys.hdes.client.api;
 
 /*-
  * #%L
@@ -20,16 +20,12 @@ package io.resys.wrench.assets.datatype.api;
  * #L%
  */
 
-
-import java.util.List;
-
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DataType.DataTypeConstraint;
 
-public interface DataTypeRepository {
-  DataTypeBuilder createBuilder();
+public interface HdesTypes {
+  DataTypeBuilder create();
 
   interface DataTypeBuilder {
     DataTypeBuilder ref(String ref, DataType dataType);
@@ -41,14 +37,7 @@ public interface DataTypeRepository {
     DataTypeBuilder beanType(Class<?> beanType);
     DataTypeBuilder description(String description);
     DataTypeBuilder values(String values);
-
-    DataTypeConstraintBuilder constraint();
     DataTypeBuilder property();
     DataType build();
-  }
-
-  interface DataTypeConstraintBuilder {
-    DataTypeConstraintBuilder values(List<String> values);
-    DataTypeConstraint build();
   }
 }

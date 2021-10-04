@@ -31,9 +31,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTable;
-import io.resys.hdes.client.api.model.DecisionTable.DecisionTableNode;
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
+import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
+import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
 import io.resys.wrench.assets.dt.spi.config.TestDtConfig;
@@ -47,7 +47,7 @@ public class DtTest {
   public void readerNodeOrderTest() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "dt.json");
 
-    DecisionTable decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
     DecisionTableNode node = decisionTable.getNode();
     Assert.assertEquals(0, node.getId());
@@ -68,7 +68,7 @@ public class DtTest {
   public void executionTest() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "dt.json");
 
-    DecisionTable decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
     Map<String, Object> values = new HashMap<>();
     values.put("sriBoolean", false);
@@ -127,7 +127,7 @@ public class DtTest {
   public void nullEqualsNull() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "nullEqualsNull.json");
 
-    DecisionTable decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
+    DecisionTableModel decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
     Map<String, Object> values = new HashMap<>();
     values.put("risk", null);

@@ -80,9 +80,9 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
 import io.resys.wrench.assets.bundle.spi.store.git.AssetAuthorProvider.Author;
-import io.resys.wrench.assets.datatype.spi.util.FileUtils;
 
 public class SshGitRepository implements GitRepository {
   private static final Logger LOGGER = LoggerFactory.getLogger(SshGitRepository.class);

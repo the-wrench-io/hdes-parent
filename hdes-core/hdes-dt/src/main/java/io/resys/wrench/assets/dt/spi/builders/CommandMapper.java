@@ -44,7 +44,7 @@ import io.resys.hdes.client.api.ast.ImmutableDecisionAstType;
 import io.resys.hdes.client.api.ast.ImmutableHeader;
 import io.resys.hdes.client.api.ast.ImmutableRow;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
-import io.resys.wrench.assets.datatype.spi.util.Assert;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DynamicValueExpressionExecutor;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;

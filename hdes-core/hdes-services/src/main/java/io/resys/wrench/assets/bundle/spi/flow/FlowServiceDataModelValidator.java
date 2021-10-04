@@ -39,6 +39,7 @@ import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeInput;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.hdes.client.api.ast.ImmutableFlowCommandMessage;
 import io.resys.hdes.client.api.model.DataType;
@@ -49,16 +50,15 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
-import io.resys.wrench.assets.datatype.api.DataTypeRepository;
 import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class FlowServiceDataModelValidator implements NodeFlowVisitor {
 
   private final ServiceStore serviceStore;
-  private final DataTypeRepository dataTypeRepository;
+  private final HdesTypes dataTypeRepository;
 
-  public FlowServiceDataModelValidator(ServiceStore serviceStore, DataTypeRepository dataTypeRepository) {
+  public FlowServiceDataModelValidator(ServiceStore serviceStore, HdesTypes dataTypeRepository) {
     this.serviceStore = serviceStore;
     this.dataTypeRepository = dataTypeRepository;
   }

@@ -35,7 +35,7 @@ import io.resys.hdes.client.api.execution.DecisionTableResult;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
 import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DecisionTable;
+import io.resys.hdes.client.api.model.DecisionTableModel;
 
 public interface DecisionTableRepository {
 
@@ -59,13 +59,13 @@ public interface DecisionTableRepository {
   }
 
   interface DecisionTableExporter {
-    DecisionTableExporter src(DecisionTable dt);
+    DecisionTableExporter src(DecisionTableModel dt);
     DecisionTableExporter format(DecisionTableFormat format);
     String build();
   }
 
   interface DecisionTableExecutor {
-    DecisionTableExecutor decisionTable(DecisionTable decisionTable);
+    DecisionTableExecutor decisionTable(DecisionTableModel decisionTable);
     DecisionTableExecutor context(Function<DataType, Object> context);
     DecisionTableResult execute();
   }
@@ -77,7 +77,7 @@ public interface DecisionTableRepository {
     DecisionTableBuilder src(String input);
     DecisionTableBuilder src(InputStream inputStream);
     DecisionTableBuilder src(JsonNode src);
-    DecisionTable build();
+    DecisionTableModel build();
   }
 
   interface NodeExpressionExecutor {

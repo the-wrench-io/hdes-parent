@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.datatype.spi.util;
+package io.resys.hdes.client.spi.util;
 
 /*-
  * #%L
@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class FileUtils {
 
@@ -57,7 +56,7 @@ public class FileUtils {
 
   public static List<String> splitPath(String path) {
     String cleanPath = cleanPath(path);
-    if(!StringUtils.isEmpty(cleanPath)) {
+    if(cleanPath != null && !cleanPath.isEmpty()) {
       return Arrays.asList(cleanPath.split(PATH_SEP));
     }
     return Collections.emptyList();

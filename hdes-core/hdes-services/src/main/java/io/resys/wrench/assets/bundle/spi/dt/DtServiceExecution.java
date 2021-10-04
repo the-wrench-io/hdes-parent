@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 import org.springframework.util.Assert;
 
 import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTable;
+import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
@@ -37,11 +37,11 @@ import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 public class DtServiceExecution implements ServiceExecution {
 
   private final DecisionTableRepository decisionTableRepository;
-  private final DecisionTable decisionTable;
+  private final DecisionTableModel decisionTable;
   private final List<Object> inputs = new ArrayList<>();
   private DtInputResolver dtInputResolver;
 
-  public DtServiceExecution(DecisionTableRepository decisionTableRepository, DecisionTable decisionTable) {
+  public DtServiceExecution(DecisionTableRepository decisionTableRepository, DecisionTableModel decisionTable) {
     super();
     this.decisionTableRepository = decisionTableRepository;
     this.decisionTable = decisionTable;
