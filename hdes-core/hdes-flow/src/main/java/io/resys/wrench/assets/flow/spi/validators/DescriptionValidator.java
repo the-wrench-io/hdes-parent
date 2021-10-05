@@ -5,9 +5,9 @@ import org.apache.commons.lang3.StringUtils;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.hdes.client.api.ast.ImmutableFlowCommandMessage;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 
 /*-
  * #%L
@@ -38,7 +38,7 @@ public class DescriptionValidator implements NodeFlowVisitor {
     }
     if(StringUtils.isEmpty(node.getDescription().getValue())) {
       modelBuilder.addMessages(
-          ImmutableFlowCommandMessage.builder()
+          ImmutableFlowAstCommandMessage.builder()
           .line(node.getDescription().getStart())
           .value("flow description must have a value")
           .range(FlowNodesFactory.range().build(0, node.getDescription().getSource().getValue().length()))

@@ -1,6 +1,6 @@
 package io.resys.wrench.assets.bundle.spi.flow.hints;
 
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
 
 /*-
  * #%L
@@ -36,7 +36,7 @@ public class TemplateAutocomplete {
     this.serviceStore = serviceStore;
   }
 
-  protected ServiceType getServiceType(NodeTask taskModel) {
+  protected ServiceType getServiceType(FlowAstTask taskModel) {
     if(taskModel.getDecisionTable() != null) {
       return ServiceType.DT;
     } else if(taskModel.getService() != null) {

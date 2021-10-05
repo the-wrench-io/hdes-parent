@@ -12,7 +12,7 @@
   <dependencies>
     <dependency>
       <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-datatype</artifactId>
+      <artifactId>hdes-client-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

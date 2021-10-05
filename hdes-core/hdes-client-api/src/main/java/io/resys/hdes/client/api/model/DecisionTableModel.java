@@ -23,6 +23,7 @@ package io.resys.hdes.client.api.model;
 import java.io.Serializable;
 import java.util.List;
 
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
 
 public interface DecisionTableModel extends Model {
@@ -37,7 +38,7 @@ public interface DecisionTableModel extends Model {
   interface DecisionTableDataType extends Serializable, Comparable<DecisionTableDataType> {
     int getOrder();
     String getScript();
-    DataType getValue();
+    AstDataType getValue();
   }
 
   interface DecisionTableNode extends Serializable {
@@ -53,12 +54,12 @@ public interface DecisionTableModel extends Model {
 
   
   interface DecisionTableNodeInput extends Serializable {
-    DataType getKey();
+    AstDataType getKey();
     String getValue();
   }
   
   interface DecisionTableNodeOutput extends Serializable {
-    DataType getKey();
+    AstDataType getKey();
     Serializable getValue();
   }
   

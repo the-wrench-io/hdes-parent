@@ -24,9 +24,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
 import io.resys.wrench.assets.bundle.spi.flow.executors.VariableResolver;
@@ -55,7 +55,7 @@ public class FlowDtInputResolver implements Serializable, DtInputResolver {
   }
 
   @Override
-  public Object apply(DataType t) {
+  public Object apply(AstDataType t) {
     String name = mapping.get(t.getName());
 
     // Flat mapping

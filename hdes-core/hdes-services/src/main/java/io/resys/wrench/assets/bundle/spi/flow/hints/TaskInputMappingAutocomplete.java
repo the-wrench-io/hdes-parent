@@ -29,18 +29,18 @@ import java.util.stream.Collectors;
 import org.springframework.util.StringUtils;
 
 import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeRef;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstRef;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class TaskInputMappingAutocomplete extends TemplateAutocomplete implements NodeFlowVisitor {
@@ -52,14 +52,14 @@ public class TaskInputMappingAutocomplete extends TemplateAutocomplete implement
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Map<String, NodeTask> tasks = flow.getTasks();
+    Map<String, FlowAstTask> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;
     }
 
     Map<String, String> inputsByNameAndType = getInputs(flow);
-    for(NodeTask task : tasks.values()) {
-      NodeRef ref = task.getDecisionTable() != null ? task.getDecisionTable() : task.getService();
+    for(FlowAstTask task : tasks.values()) {
+      FlowAstRef ref = task.getDecisionTable() != null ? task.getDecisionTable() : task.getService();
       if(ref == null) {
         continue;
       }
@@ -83,7 +83,7 @@ public class TaskInputMappingAutocomplete extends TemplateAutocomplete implement
           .filter(param -> param.getDirection() == Direction.IN)
           .collect(Collectors.toMap(p -> p.getName(), p -> p.getValueType().name()));
 
-      for(Map.Entry<String, Node> entry : ref.getInputsNode().getChildren().entrySet()) {
+      for(Map.Entry<String, FlowAstNode> entry : ref.getInputsNode().getChildren().entrySet()) {
         String type = serviceParamByNameAndType.get(entry.getKey());
         if(type == null) {
           continue;
@@ -118,7 +118,7 @@ public class TaskInputMappingAutocomplete extends TemplateAutocomplete implement
       }
     }
     
-    for(NodeTask taskModel : flow.getTasks().values()) {
+    for(FlowAstTask taskModel : flow.getTasks().values()) {
       if(taskModel.getRef() == null) {
         continue;
       }
@@ -131,7 +131,7 @@ public class TaskInputMappingAutocomplete extends TemplateAutocomplete implement
       if(service == null) {
         continue;
       }
-      for(DataType param : service.getDataModel().getParams()) {
+      for(AstDataType param : service.getDataModel().getParams()) {
         if(param.getDirection() == Direction.OUT) {
           String name = NodeFlowAdapter.getStringValue(taskModel.getId()) + "." + param.getName();
           result.put(name, param.getValueType().name());

@@ -25,11 +25,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
 import io.resys.hdes.client.api.execution.Service;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
@@ -45,7 +45,7 @@ public class FlowTaskServiceDataModelBuilder {
     List<ServiceError> errors = new ArrayList<>();
     ServiceAstType model = script.getModel();
 
-    List<DataType> params = getScriptParameterModels(model);
+    List<AstDataType> params = getScriptParameterModels(model);
 
     return new ImmutableServiceDataModel(
         id, name, null,
@@ -57,13 +57,13 @@ public class FlowTaskServiceDataModelBuilder {
             Collections.unmodifiableList(associations));
   }
 
-  protected List<DataType> getScriptParameterModels(ServiceAstType model) {
+  protected List<AstDataType> getScriptParameterModels(ServiceAstType model) {
     List<ServiceDataParamModel> externals = model.getMethod().getParameters().stream()
         .filter(p -> p.getContextType() == ServiceParamType.EXTERNAL)
         .collect(Collectors.toList());
 
     // drop dummy layer
-    List<DataType> result = new ArrayList<>();
+    List<AstDataType> result = new ArrayList<>();
     externals.forEach(e -> result.addAll(e.getType().getProperties()));
     return result;
   }

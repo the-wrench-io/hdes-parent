@@ -32,28 +32,28 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 public interface FlowAstType extends AstType, Serializable {
-  Node getSrc();
-  List<FlowCommandMessage> getMessages();
-  List<FlowAutocomplete> getAutocomplete();
+  NodeFlow getSrc();
+  List<FlowAstCommandMessage> getMessages();
+  List<FlowAstAutocomplete> getAutocomplete();
 
   @Value.Immutable
-  interface FlowAutocomplete extends Serializable {
+  interface FlowAstAutocomplete extends Serializable {
     String getId();
-    List<FlowCommandRange> getRange();
+    List<FlowAstCommandRange> getRange();
     List<String> getValue();
   }
 
   @Value.Immutable
-  interface FlowCommandMessage extends Serializable {
+  interface FlowAstCommandMessage extends Serializable {
     int getLine();
     String getValue();
     FlowCommandMessageType getType();
     @Nullable
-    FlowCommandRange getRange();
+    FlowAstCommandRange getRange();
   }
 
   @Value.Immutable
-  interface FlowCommandRange extends Serializable {
+  interface FlowAstCommandRange extends Serializable {
     int getStart();
     int getEnd();
     @Nullable
@@ -64,66 +64,65 @@ public interface FlowAstType extends AstType, Serializable {
 
   enum FlowCommandMessageType { ERROR, WARNING }
   
-  interface NodeInputType extends Serializable {
+  //v.name(), null, v.name()
+  //public ImmutableNodeInputType(String name, String ref, String value) {
+  
+  @Value.Immutable
+  interface FlowAstInputType extends Serializable {
     String getName();
+    String getValue();
+    @Nullable
     String getRef();
-    String getValue();
   }
 
-  interface NodeFlow extends Node {
-    Node getId();
-    Node getDescription();
-    Collection<NodeInputType> getTypes();
-    Map<String, NodeInput> getInputs();
-    Map<String, NodeTask> getTasks();
+  interface NodeFlow extends FlowAstNode {
+    FlowAstNode getId();
+    FlowAstNode getDescription();
+    Collection<FlowAstInputType> getTypes();
+    Map<String, FlowAstInput> getInputs();
+    Map<String, FlowAstTask> getTasks();
   }
 
-  interface NodeTask extends Node {
-    Node getId();
+  interface FlowAstTask extends FlowAstNode {
+    FlowAstNode getId();
     int getOrder();
-    Node getThen();
-    NodeRef getRef();
-    NodeRef getUserTask();
-    NodeRef getDecisionTable();
-    NodeRef getService();
-    Map<String, NodeSwitch> getSwitch();
+    FlowAstNode getThen();
+    FlowAstRef getRef();
+    FlowAstRef getUserTask();
+    FlowAstRef getDecisionTable();
+    FlowAstRef getService();
+    Map<String, FlowAstSwitch> getSwitch();
   }
 
-  interface NodeRef extends Node {
-    Node getRef();
-    Node getCollection();
-    Node getInputsNode();
-    Map<String, Node> getInputs();
+  interface FlowAstRef extends FlowAstNode {
+    FlowAstNode getRef();
+    FlowAstNode getCollection();
+    FlowAstNode getInputsNode();
+    Map<String, FlowAstNode> getInputs();
   }
 
-  interface NodeSwitch extends Node {
+  interface FlowAstSwitch extends FlowAstNode {
     int getOrder();
-    Node getWhen();
-    Node getThen();
+    FlowAstNode getWhen();
+    FlowAstNode getThen();
   }
 
-  interface NodeInput extends Node {
-    Node getRequired();
-    Node getType();
-    Node getDebugValue();
+  interface FlowAstInput extends FlowAstNode {
+    FlowAstNode getRequired();
+    FlowAstNode getType();
+    FlowAstNode getDebugValue();
   }
 
-  interface Node extends Serializable, Comparable<Node> {
-    Node getParent();
+  interface FlowAstNode extends Serializable, Comparable<FlowAstNode> {
+    FlowAstNode getParent();
     String getKeyword();
-    Map<String, Node> getChildren();
-    Node get(String name);
+    Map<String, FlowAstNode> getChildren();
+    FlowAstNode get(String name);
     String getValue();
-    NodeSource getSource();
+    AstChangeset getSource();
     boolean hasNonNull(String name);
     int getStart();
     int getEnd();
-  }
-
-  interface NodeSource extends Serializable {
-    int getLine();
-    String getValue();
-    Collection<AstCommandType> getCommands();
   }
   
   interface NodeFlowVisitor {

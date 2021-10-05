@@ -24,13 +24,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.wrench.assets.flow.spi.hints.input.InputsAutocomplete;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class TasksAutocomplete implements NodeFlowVisitor {
 
@@ -41,7 +41,7 @@ public class TasksAutocomplete implements NodeFlowVisitor {
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Node node = flow.get(NodeFlowBean.KEY_TASKS);
+    FlowAstNode node = flow.get(NodeFlowBean.KEY_TASKS);
     if(node != null) {
       return;
     }

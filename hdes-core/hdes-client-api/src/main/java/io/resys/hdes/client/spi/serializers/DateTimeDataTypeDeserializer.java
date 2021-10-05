@@ -26,8 +26,8 @@ import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.model.DataType;
-import io.resys.hdes.client.api.model.DataType.DataTypeDeserializer;
+import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.AstDataType.DataTypeDeserializer;
 
 public class DateTimeDataTypeDeserializer implements DataTypeDeserializer {
 
@@ -39,7 +39,7 @@ public class DateTimeDataTypeDeserializer implements DataTypeDeserializer {
   }
 
   @Override
-  public Serializable deserialize(DataType dataType, Object value) {
+  public Serializable deserialize(AstDataType dataType, Object value) {
     if(value == null) {
       return null;
     }

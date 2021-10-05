@@ -19,11 +19,6 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-datatype</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-dt</artifactId>
         <version>${project.version}</version>
       </dependency>

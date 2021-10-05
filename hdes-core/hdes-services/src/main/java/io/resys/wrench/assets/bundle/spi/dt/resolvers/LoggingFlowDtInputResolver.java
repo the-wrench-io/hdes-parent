@@ -23,7 +23,7 @@ package io.resys.wrench.assets.bundle.spi.dt.resolvers;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
 
 public class LoggingFlowDtInputResolver implements Serializable, DtInputResolver {
@@ -38,7 +38,7 @@ public class LoggingFlowDtInputResolver implements Serializable, DtInputResolver
   }
 
   @Override
-  public Object apply(DataType t) {
+  public Object apply(AstDataType t) {
     Object result = delegate.apply(t);
     if(result == null || result instanceof Serializable) {
       log.put(t.getName(), (Serializable) result);

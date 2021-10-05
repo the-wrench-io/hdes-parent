@@ -24,13 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class TaskThenAutocomplete implements NodeFlowVisitor {
@@ -38,7 +38,7 @@ public class TaskThenAutocomplete implements NodeFlowVisitor {
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Map<String, NodeTask> tasks = flow.getTasks();
+    Map<String, FlowAstTask> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;
     }
@@ -47,10 +47,10 @@ public class TaskThenAutocomplete implements NodeFlowVisitor {
         .filter(t -> t != null).collect(Collectors.toList());
     ref.add(NodeFlowBean.VALUE_END);
 
-    for(NodeTask task : tasks.values()) {
+    for(FlowAstTask task : tasks.values()) {
 
       String taskId = NodeFlowAdapter.getStringValue(task.getId());
-      final FlowCommandRange range;
+      final FlowAstCommandRange range;
 
       if(task.getThen() == null) {
         int start = task.getId() == null ? task.getStart() : task.getId().getEnd();

@@ -25,7 +25,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.function.Supplier;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -38,15 +37,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import io.resys.hdes.client.api.HdesTypes;
-import io.resys.hdes.client.spi.HdesTypesImpl;
+import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
+import io.resys.hdes.client.spi.HdesAstTypesImpl;
+import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
+import io.resys.hdes.client.spi.decision.SpringDynamicValueExpressionExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.NodeExpressionExecutor;
 import io.resys.wrench.assets.dt.spi.GenericDecisionTableRepository;
-import io.resys.wrench.assets.dt.spi.expression.GenericDecisionTableExpressionBuilder;
-import io.resys.wrench.assets.dt.spi.expression.GenericExpressionExecutor;
-import io.resys.wrench.assets.dt.spi.expression.SpringDynamicValueExpressionExecutor;
 
 public class TestDtConfig {
   private static ObjectMapper objectMapper;
@@ -79,12 +76,12 @@ public class TestDtConfig {
   public static DecisionTableRepository decisionTableRepository() {
     if(decisionTableRepository == null) {
       SpringDynamicValueExpressionExecutor springDynamicValueExpressionExecutor = new SpringDynamicValueExpressionExecutor();
-      Supplier<DecisionTableExpressionBuilder> springExpressionBuilder = () -> new GenericDecisionTableExpressionBuilder(objectMapper());
-      NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(springExpressionBuilder);
-      HdesTypes dataTypeRepository = new HdesTypesImpl(objectMapper());
-      decisionTableRepository = new GenericDecisionTableRepository(objectMapper(), dataTypeRepository,
-          expressionExecutor,
-          () -> springDynamicValueExpressionExecutor, springExpressionBuilder);
+      NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper);
+      HdesAstTypes dataTypeRepository = new HdesAstTypesImpl(objectMapper());
+      
+      decisionTableRepository = new GenericDecisionTableRepository(
+          objectMapper(), dataTypeRepository, expressionExecutor,
+          () -> springDynamicValueExpressionExecutor);
     }
     return decisionTableRepository;
   }

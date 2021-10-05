@@ -376,7 +376,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createDtCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    DecisionAstType commandModel  = assetServiceRepository.getDtRepo().createCommandModelBuilder()
+    DecisionAstType commandModel  = assetServiceRepository.getTypes().decision()
         .src(command.getInput())
         .rev(command.getRev())
         .build();
@@ -388,7 +388,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    FlowAstType commandModel  = assetServiceRepository.getFlRepo().createNode()
+    FlowAstType commandModel  = assetServiceRepository.getTypes().flow()
         .src((ArrayNode) command.getInput())
         .rev(command.getRev())
         .build();

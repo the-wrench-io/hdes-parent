@@ -27,14 +27,14 @@ import org.springframework.util.StringUtils;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class TaskInputsAutocomplete extends TemplateAutocomplete implements NodeFlowVisitor {
@@ -45,12 +45,12 @@ public class TaskInputsAutocomplete extends TemplateAutocomplete implements Node
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Map<String, NodeTask> tasks = flow.getTasks();
+    Map<String, FlowAstTask> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;
     }
 
-    for(NodeTask taskModel : flow.getTasks().values()) {
+    for(FlowAstTask taskModel : flow.getTasks().values()) {
       if(taskModel.getRef() == null) {
         continue;
       }
@@ -70,7 +70,7 @@ public class TaskInputsAutocomplete extends TemplateAutocomplete implements Node
       }
 
       FlowNodesFactory.AcBuilder builder = FlowNodesFactory.ac().addField(8, "inputs");
-      for(DataType param : service.getDataModel().getParams()) {
+      for(AstDataType param : service.getDataModel().getParams()) {
         if(param.getDirection() == Direction.IN) {
           builder.addField(10, param.getName());
         }

@@ -24,24 +24,24 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class SwitchBodyAutocomplete implements NodeFlowVisitor {
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Collection<NodeTask> tasks = flow.getTasks().values();
+    Collection<FlowAstTask> tasks = flow.getTasks().values();
     if(tasks.isEmpty()) {
       return;
     }
 
-    List<FlowCommandRange> ranges = new ArrayList<>();
-    for(NodeTask child : tasks) {
+    List<FlowAstCommandRange> ranges = new ArrayList<>();
+    for(FlowAstTask child : tasks) {
       if(child.getDecisionTable() == null && child.getService() == null) {
         ranges.add(FlowNodesFactory.range().build(child.getStart(), child.getEnd(), true));
       }

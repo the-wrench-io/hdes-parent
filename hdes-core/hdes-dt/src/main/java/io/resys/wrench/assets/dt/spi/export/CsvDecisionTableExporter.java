@@ -29,7 +29,7 @@ import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
@@ -39,7 +39,7 @@ public class CsvDecisionTableExporter extends TemplateDecisionTableExporter impl
   @Override
   public String build() {
     StringBuilder stringBuilder = new StringBuilder();
-    List<DataType> headers = new ArrayList<>();
+    List<AstDataType> headers = new ArrayList<>();
     List<String> headerNames = new ArrayList<>();
     for(DecisionTableDataType dataType : dt.getTypes()) {
       headers.add(dataType.getValue());

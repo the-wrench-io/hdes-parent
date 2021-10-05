@@ -21,20 +21,13 @@ package io.resys.wrench.assets.dt.api;
  */
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.ast.DecisionAstType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.DecisionTableModel;
 
 public interface DecisionTableRepository {
@@ -42,21 +35,7 @@ public interface DecisionTableRepository {
   DecisionTableBuilder createBuilder();
   DecisionTableExecutor createExecutor();
   DecisionTableExporter createExporter();
-  DecisionTableExpressionBuilder createExpression();
-  DecisionTableCommandModelBuilder createCommandModelBuilder();
 
-  interface DecisionTableExpressionBuilder {
-    DecisionTableExpressionBuilder src(String src);
-    DecisionTableExpressionBuilder valueType(ValueType valueType);
-    DecisionTableExpression build();
-  }
-
-  interface DecisionTableCommandModelBuilder {
-    DecisionTableCommandModelBuilder src(List<AstCommandType> src);
-    DecisionTableCommandModelBuilder src(JsonNode src);
-    DecisionTableCommandModelBuilder rev(Integer version);
-    DecisionAstType build();
-  }
 
   interface DecisionTableExporter {
     DecisionTableExporter src(DecisionTableModel dt);
@@ -66,7 +45,7 @@ public interface DecisionTableRepository {
 
   interface DecisionTableExecutor {
     DecisionTableExecutor decisionTable(DecisionTableModel decisionTable);
-    DecisionTableExecutor context(Function<DataType, Object> context);
+    DecisionTableExecutor context(Function<AstDataType, Object> context);
     DecisionTableResult execute();
   }
 
@@ -78,22 +57,6 @@ public interface DecisionTableRepository {
     DecisionTableBuilder src(InputStream inputStream);
     DecisionTableBuilder src(JsonNode src);
     DecisionTableModel build();
-  }
-
-  interface NodeExpressionExecutor {
-    DecisionTableExpression getExpression(String src, ValueType type);
-    boolean execute(String expression, ValueType type, Object entity);
-  }
-
-
-
-  interface DynamicValueExpressionExecutor {
-    Object parseVariable(String expression, ValueType type);
-    String execute(String expression, Map<String, Object> context);
-  }
-
-  interface HitPolicyExecutor {
-    boolean execute(DecisionTableDecision decision);
   }
 
   enum DecisionTableFormat {

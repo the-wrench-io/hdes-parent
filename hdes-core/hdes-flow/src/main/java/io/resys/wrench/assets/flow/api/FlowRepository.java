@@ -25,9 +25,6 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
-import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
 import io.resys.hdes.client.api.model.FlowModel;
@@ -36,7 +33,6 @@ public interface FlowRepository {
   
   FlowModelBuilder createModel();
   FlowModelExporter createExporter();
-  FlowNodeBuilder createNode();
   FlowModelExecutor createExecutor();
   FlowTaskBuilder createTaskBuilder();
   
@@ -48,12 +44,6 @@ public interface FlowRepository {
   interface FlowModelExecutor {
     FlowModelExecutor insert(String name, Serializable value);
     Flow run(FlowModel model);
-  }
-  
-  interface FlowNodeBuilder {
-    FlowNodeBuilder src(ArrayNode src);
-    FlowNodeBuilder rev(Integer version);
-    FlowAstType build();
   }
 
   interface FlowModelExporter {

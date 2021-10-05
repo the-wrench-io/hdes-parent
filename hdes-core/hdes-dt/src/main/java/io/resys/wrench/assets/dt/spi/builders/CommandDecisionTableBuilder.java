@@ -43,23 +43,22 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
+import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.HdesTypes;
 import io.resys.hdes.client.api.ast.DecisionAstType;
 import io.resys.hdes.client.api.ast.DecisionAstType.Cell;
 import io.resys.hdes.client.api.ast.DecisionAstType.Header;
 import io.resys.hdes.client.api.ast.DecisionAstType.Row;
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DynamicValueExpressionExecutor;
 import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableBuilder;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableCommandModelBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DynamicValueExpressionExecutor;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTable;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableDataType;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableNode;
@@ -69,9 +68,9 @@ import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(CommandDecisionTableBuilder.class);
   private final ObjectMapper objectMapper;
-  private final Supplier<DecisionTableCommandModelBuilder> commandBuilder;
+  private final Supplier<HdesAstTypes> commandBuilder;
   private final List<String> errors = new ArrayList<>();
-  private final HdesTypes dataTypeRepository;
+  private final HdesAstTypes dataTypeRepository;
   private final DynamicValueExpressionExecutor executor;
 
   protected String src;
@@ -82,8 +81,8 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   public CommandDecisionTableBuilder(
       ObjectMapper objectMapper,
       DynamicValueExpressionExecutor executor,
-      HdesTypes dataTypeRepository,
-      Supplier<DecisionTableCommandModelBuilder> commandBuilder) {
+      HdesAstTypes dataTypeRepository,
+      Supplier<HdesAstTypes> commandBuilder) {
     this.dataTypeRepository = dataTypeRepository;
     this.executor = executor;
     this.objectMapper = objectMapper;
@@ -107,12 +106,12 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
         src = this.src;
       }
       
-      DecisionAstType commandModel = commandBuilder.get()
+      DecisionAstType commandModel = commandBuilder.get().decision()
           .src(objectMapper.readTree(src))
           .build();
 
       List<DecisionTableDataType> types = createTypes(commandModel);
-      Map<Integer, DataType> typesById = types.stream().collect(Collectors.toMap(t -> t.getOrder(), t -> t.getValue()));
+      Map<Integer, AstDataType> typesById = types.stream().collect(Collectors.toMap(t -> t.getOrder(), t -> t.getValue()));
 
       DecisionTableNode first = null;
       ImmutableDecisionTableNode previous = null;
@@ -161,11 +160,11 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     return Collections.unmodifiableList(result);
   }
 
-  protected Map<DataType, String> getInputs(Map<Integer, DataType> typesById, Row entry) {
-    Map<DataType, String> result = new HashMap<>();
+  protected Map<AstDataType, String> getInputs(Map<Integer, AstDataType> typesById, Row entry) {
+    Map<AstDataType, String> result = new HashMap<>();
     int index = 0;
     for(Cell value : entry.getCells()) {
-      DataType type = typesById.get(index++);
+      AstDataType type = typesById.get(index++);
       if(type.getDirection() == Direction.IN) {
         result.put(type, value.getValue());
       }
@@ -174,11 +173,11 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     return Collections.unmodifiableMap(result);
   }
 
-  protected Map<DataType, Serializable> getOutputs(Map<Integer, DataType> typesById, Row entry) {
-    Map<DataType, Serializable> result = new HashMap<>();
+  protected Map<AstDataType, Serializable> getOutputs(Map<Integer, AstDataType> typesById, Row entry) {
+    Map<AstDataType, Serializable> result = new HashMap<>();
     int index = 0;
     for(Cell value : entry.getCells()) {
-      DataType type = typesById.get(index++);
+      AstDataType type = typesById.get(index++);
       if(type.getDirection() == Direction.OUT) {
         try {
           result.put(type, type.toValue(value.getValue()));
@@ -227,8 +226,8 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     this.rename = rename;
     return this;
   }
-  protected DataType resolveType(ValueType valueType, String name, Direction direction) {
-    return dataTypeRepository.create().
+  protected AstDataType resolveType(ValueType valueType, String name, Direction direction) {
+    return dataTypeRepository.dataType().
         name(name).
         valueType(valueType).
         direction(direction).
