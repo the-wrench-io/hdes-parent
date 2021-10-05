@@ -76,7 +76,7 @@ public class TestDtConfig {
   public static DecisionTableRepository decisionTableRepository() {
     if(decisionTableRepository == null) {
       SpringDynamicValueExpressionExecutor springDynamicValueExpressionExecutor = new SpringDynamicValueExpressionExecutor();
-      NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper);
+      NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper());
       HdesAstTypes dataTypeRepository = new HdesAstTypesImpl(objectMapper());
       
       decisionTableRepository = new GenericDecisionTableRepository(
