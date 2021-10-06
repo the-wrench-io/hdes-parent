@@ -27,19 +27,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.execution.DecisionTableResult;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.execution.DecisionTableResult.Expression;
+import io.resys.hdes.client.api.execution.DecisionTableResult.HitPolicyExecutor;
+import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
 import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeInput;
 import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFixedValue;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.HitPolicyExecutor;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.NodeExpressionExecutor;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionContext;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableDecision;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableResult;
@@ -49,7 +49,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
 
   private final NodeExpressionExecutor expressionExecutor;
   private DecisionTableModel decisionTable;
-  private Function<DataType, Object> context;
+  private Function<AstDataType, Object> context;
 
   public GenericDecisionTableExecutor(NodeExpressionExecutor expressionExecutor) {
     super();
@@ -63,7 +63,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
   }
 
   @Override
-  public DecisionTableExecutor context(Function<DataType, Object> context) {
+  public DecisionTableExecutor context(Function<AstDataType, Object> context) {
     this.context = context;
     return this;
   }
@@ -93,11 +93,11 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
     
     List<DecisionContext> data = new ArrayList<>();
     
-    Map<String, DecisionTableExpression> expressions = new HashMap<>();
+    Map<String, Expression> expressions = new HashMap<>();
     for(DecisionTableNodeInput input : node.getInputs()) {
       Object contextEntity = this.context.apply(input.getKey());
       if(DecisionTableFixedValue.ALWAYS_TRUE == contextEntity) {
-        DecisionTableExpression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
+        Expression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
         expressions.put(input.getKey().getName(), expression);
         
         if(!Boolean.FALSE.equals(match)) {
@@ -113,7 +113,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
         continue;
       }
       match = expressionExecutor.execute(input.getValue(), input.getKey().getValueType(), entity);
-      DecisionTableExpression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
+      Expression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
       expressions.put(input.getKey().getName(), expression);
       
     }

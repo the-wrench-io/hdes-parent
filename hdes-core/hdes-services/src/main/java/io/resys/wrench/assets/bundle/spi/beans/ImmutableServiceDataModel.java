@@ -26,7 +26,7 @@ import java.util.Collections;
 
 import java.util.List;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
@@ -44,12 +44,12 @@ public class ImmutableServiceDataModel implements ServiceDataModel {
   private final ServiceType type;
   private final ServiceStatus status;
   private final List<ServiceError> errors;
-  private final List<DataType> params;
+  private final List<AstDataType> params;
   private final List<ServiceAssociation> associations;
 
   public ImmutableServiceDataModel(
       String id, String name, String description, ServiceType type, Class<?> beanType,
-      ServiceStatus status, List<ServiceError> errors, List<DataType> params, List<ServiceAssociation> associations) {
+      ServiceStatus status, List<ServiceError> errors, List<AstDataType> params, List<ServiceAssociation> associations) {
     this.id = id;
     this.name = name;
     this.description = description;
@@ -64,7 +64,7 @@ public class ImmutableServiceDataModel implements ServiceDataModel {
   }
   public ImmutableServiceDataModel(
       String id, String name, String description, ServiceType type, Class<?> beanType,
-      ServiceStatus status, List<ServiceError> errors, List<DataType> params, List<ServiceAssociation> associations, 
+      ServiceStatus status, List<ServiceError> errors, List<AstDataType> params, List<ServiceAssociation> associations, 
       Timestamp created, Timestamp modified) {
     this.id = id;
     this.name = name;
@@ -107,7 +107,7 @@ public class ImmutableServiceDataModel implements ServiceDataModel {
     return errors;
   }
   @Override
-  public List<DataType> getParams() {
+  public List<AstDataType> getParams() {
     return params;
   }
   @Override

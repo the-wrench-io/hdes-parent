@@ -112,7 +112,7 @@ public class GenericServiceExporter implements MigrationBuilder {
   private MigrationValue visitFl(AssetService service) throws IOException {
     final var builder = ImmutableMigrationValue.builder().name(service.getName()).id(md5(service.getSrc())).type(ServiceType.FLOW);
     
-    FlowAstType commandModel  = serviceRepository.getFlRepo().createNode()
+    FlowAstType commandModel  = serviceRepository.getTypes().flow()
         .src((ArrayNode) objectMapper.readTree(service.getSrc()))
         .build();
     BufferedReader br = new BufferedReader(new StringReader(commandModel.getSrc().getValue()));

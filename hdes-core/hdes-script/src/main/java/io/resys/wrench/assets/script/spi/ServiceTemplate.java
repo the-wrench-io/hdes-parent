@@ -1,7 +1,5 @@
 package io.resys.wrench.assets.script.spi;
 
-import java.io.IOException;
-
 /*-
  * #%L
  * wrench-component-script
@@ -25,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
@@ -35,7 +32,6 @@ import io.resys.wrench.assets.script.api.ServiceException;
 public class ServiceTemplate implements Service {
   private final ServiceAstType model;
   private final Class<?> beanType;
-  private final GroovyClassLoader gcl;
   private final List<ServiceDataParamModel> inputs;
   private boolean created;
   @SuppressWarnings("rawtypes")
@@ -46,11 +42,9 @@ public class ServiceTemplate implements Service {
   private ServiceExecutorType2 type2;
   
   public ServiceTemplate(
-      ServiceAstType model, Class<?> beanType, 
-      GroovyClassLoader gcl) {
+      ServiceAstType model, Class<?> beanType) {
     this.beanType = beanType;
     this.model = model;
-    this.gcl = gcl;
     this.inputs = model.getMethod().getParameters().stream()
         .filter(p -> p.getType().getDirection() == Direction.IN)
         .sorted((p1, p2) -> Integer.compare(p1.getOrder(), p2.getOrder()))
@@ -119,12 +113,6 @@ public class ServiceTemplate implements Service {
 
   @Override
   public void stop() {
-    try {
-      // TODO This do not work with groovy 2.5+. GroovyClassLoader may not be closed
-      // until script becomes unused.
-      gcl.close();
-    } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+
   }
 }

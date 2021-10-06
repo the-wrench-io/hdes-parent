@@ -26,7 +26,7 @@ import java.util.Map;
 
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableExpression;
+import io.resys.hdes.client.api.execution.DecisionTableResult.Expression;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 
 public class ImmutableDecisionTableDecision implements DecisionTableDecision {
@@ -35,10 +35,10 @@ public class ImmutableDecisionTableDecision implements DecisionTableDecision {
 
   private final List<DecisionContext> context;
   private final DecisionTableNode node;
-  private final Map<String, DecisionTableExpression> expressions;
+  private final Map<String, Expression> expressions;
   private final boolean match;
 
-  public ImmutableDecisionTableDecision(List<DecisionContext> data, DecisionTableNode node, boolean match, Map<String, DecisionTableExpression> expressions) {
+  public ImmutableDecisionTableDecision(List<DecisionContext> data, DecisionTableNode node, boolean match, Map<String, Expression> expressions) {
     super();
     this.context = data;
     this.node = node;
@@ -56,7 +56,7 @@ public class ImmutableDecisionTableDecision implements DecisionTableDecision {
     return context;
   }
   @Override
-  public Map<String, DecisionTableExpression> getExpressions() {
+  public Map<String, Expression> getExpressions() {
     return expressions;
   }
   @Override

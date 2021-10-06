@@ -22,8 +22,8 @@ package io.resys.wrench.assets.bundle.spi.dt;
 
 import java.util.function.Function;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 
-public interface DtInputResolver extends Function<DataType, Object> {
+public interface DtInputResolver extends Function<AstDataType, Object> {
 
 }

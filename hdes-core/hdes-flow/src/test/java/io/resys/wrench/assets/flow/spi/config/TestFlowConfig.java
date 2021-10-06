@@ -21,23 +21,19 @@ package io.resys.wrench.assets.flow.spi.config;
  */
 
 import java.time.Clock;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
-import io.resys.hdes.client.spi.HdesTypesImpl;
-import io.resys.wrench.assets.flow.api.FlowAstFactory;
+import io.resys.hdes.client.spi.HdesAstTypesImpl;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.spi.GenericFlowExecutorFactory;
 import io.resys.wrench.assets.flow.spi.GenericFlowRepository;
-import io.resys.wrench.assets.flow.spi.GenericNodeRepository;
 import io.resys.wrench.assets.flow.spi.executors.EmptyFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.EndFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.ExclusiveFlowTaskExecutor;
@@ -48,7 +44,7 @@ import io.resys.wrench.assets.flow.spi.expressions.SpelExpressionFactory;
 
 public class TestFlowConfig {
   private static ObjectMapper objectMapper = new ObjectMapper();
-  private static FlowAstFactory nodeRepository = new GenericNodeRepository(new ObjectMapper(new YAMLFactory()), null);
+  private static HdesAstTypes nodeRepository = new HdesAstTypesImpl(objectMapper);
   private static FlowExecutorRepository flowExecutorFactory;
   private static FlowRepository flowRepository;
 
@@ -56,17 +52,17 @@ public class TestFlowConfig {
     return objectMapper;
   }
   
-  public static FlowAstFactory nodeRepository() {
+  public static HdesAstTypes nodeRepository() {
     return nodeRepository;
   }
 
   public static FlowRepository flowRepository() {
     if (flowRepository == null) {
       SpelExpressionFactory parser = new SpelExpressionFactory();
-      HdesTypes dataTypeRepository = new HdesTypesImpl(objectMapper);
-      flowRepository = new GenericFlowRepository(dataTypeRepository, 
+
+      flowRepository = new GenericFlowRepository(nodeRepository, 
           flowExecutorFactory(), 
-          parser, nodeRepository, objectMapper, Arrays.asList(), 
+          parser, objectMapper, 
           Clock.systemUTC());
     }
     return flowRepository;

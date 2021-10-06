@@ -25,45 +25,45 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
-import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeInput;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
 
 public class NodeFlowAdapter {
 
-  public static String getStringValue(Node node) {
+  public static String getStringValue(FlowAstNode node) {
     if (node == null || node.getValue() == null) {
       return null;
     }
     return node.getValue();
   }
 
-  public static boolean getBooleanValue(Node node) {
+  public static boolean getBooleanValue(FlowAstNode node) {
     if (node == null || node.getValue() == null) {
       return false;
     }
     return Boolean.parseBoolean(node.getValue());
   }
 
-  public static Collection<DataType> getInputs(NodeFlow data, HdesTypes dataTypeRepository) {
-    Map<String, NodeInput> inputs = data.getInputs();
+  public static Collection<AstDataType> getInputs(NodeFlow data, HdesAstTypes dataTypeRepository) {
+    Map<String, FlowAstInput> inputs = data.getInputs();
 
-    Collection<DataType> result = new ArrayList<>();
-    for (Map.Entry<String, NodeInput> entry : inputs.entrySet()) {
+    Collection<AstDataType> result = new ArrayList<>();
+    for (Map.Entry<String, FlowAstInput> entry : inputs.entrySet()) {
       if (entry.getValue().getType() == null) {
         continue;
       }
       try {
         ValueType valueType = ValueType.valueOf(entry.getValue().getType().getValue());
         boolean required = getBooleanValue(entry.getValue().getRequired());
-        result.add(dataTypeRepository.create()
+        result.add(dataTypeRepository.dataType()
             .name(entry.getKey()).valueType(valueType).direction(Direction.IN).required(required)
             .values(getStringValue(entry.getValue().getDebugValue()))
             .build());
@@ -76,7 +76,7 @@ public class NodeFlowAdapter {
     return Collections.unmodifiableCollection(result);
   }
 
-  public static FlowTaskType getTaskType(NodeTask task) {
+  public static FlowTaskType getTaskType(FlowAstTask task) {
     if (task.getUserTask() != null) {
       return FlowTaskType.USER_TASK;
     } else if (task.getDecisionTable() != null) {

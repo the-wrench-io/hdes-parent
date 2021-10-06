@@ -40,54 +40,49 @@ import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstSwitch;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.FlowAstType.Node;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeSwitch;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.exceptions.FlowAstException;
 import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
 import io.resys.hdes.client.api.model.ImmutableFlowModel;
 import io.resys.hdes.client.api.model.ImmutableFlowTaskValue;
-import io.resys.wrench.assets.flow.api.FlowAstFactory;
-import io.resys.wrench.assets.flow.api.FlowAstFactory.NodeBuilder;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
-import io.resys.wrench.assets.flow.spi.exceptions.NodeFlowException;
 import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
 import io.resys.wrench.assets.flow.spi.model.ImmutableFlowTaskModel;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class CommandFlowModelBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(CommandFlowModelBuilder.class);
   private static final ImmutableFlowTaskModel EMPTY = new ImmutableFlowTaskModel("empty", null, FlowTaskType.END);
 
-  private final FlowAstFactory nodeRepository;
+  private final HdesAstTypes nodeRepository;
   private final ObjectMapper objectMapper;
-  private final HdesTypes dataTypeRepository;
   private final ExpressionFactory parser;
   private final String input;
 
   private final ImmutableFlowTaskModel endNode = new ImmutableFlowTaskModel("end", null, FlowTaskType.END);
   private final Map<String, ImmutableFlowTaskModel> taskModels = new HashMap<>();
 
-  private List<NodeTask> tasksByOrder;
-  private Map<String, NodeTask> tasksById;
+  private List<FlowAstTask> tasksByOrder;
+  private Map<String, FlowAstTask> tasksById;
   private String flowId;
   private Optional<String> rename;
 
   public CommandFlowModelBuilder(
-      FlowAstFactory nodeRepository,
+      HdesAstTypes nodeRepository,
       ObjectMapper objectMapper,
-      HdesTypes dataTypeRepository,
       ExpressionFactory parser,
       String input, Optional<String> rename) {
     super();
-    this.dataTypeRepository = dataTypeRepository;
     this.nodeRepository = nodeRepository;
     this.parser = parser;
     this.objectMapper = objectMapper;
@@ -96,21 +91,16 @@ public class CommandFlowModelBuilder {
   }
 
   private NodeFlow parseModel(ArrayNode src) throws IOException {
+    final var ast = nodeRepository.flow().src(src).build();
+    List<String> messages = ast.getMessages().stream()
+        .filter(t -> t.getType() == FlowCommandMessageType.ERROR)
+        .map(t -> t.getValue())
+        .collect(Collectors.toList());
     
-    List<String> messages = new ArrayList<>();
-    NodeBuilder nodeBuilder = nodeRepository.create(message -> {
-      if(message.getType() == FlowCommandMessageType.ERROR) {
-        messages.add(message.getValue());
-      }
-    });
-    src.forEach(command -> create((ObjectNode) command, nodeBuilder));
-    NodeFlow data = nodeBuilder.build();
-
     if(!messages.isEmpty()) {
-      throw new NodeFlowException(messages.toString(), data.getValue());
+      throw new FlowAstException(messages.toString(), ast.getSrc().getValue());
     }
-    
-    return data;
+    return ast.getSrc();
   } 
   
   public Map.Entry<String, FlowModel> build() {
@@ -122,7 +112,7 @@ public class CommandFlowModelBuilder {
         
         ArrayNode original = (ArrayNode) objectMapper.readTree(this.input);
         NodeFlow originalModel = parseModel(original);
-        Node idNode = originalModel.getId();
+        FlowAstNode idNode = originalModel.getId();
         
         ObjectNode renameNode = objectMapper.createObjectNode();
         renameNode.set("id", IntNode.valueOf(idNode.getStart()));
@@ -145,7 +135,7 @@ public class CommandFlowModelBuilder {
       Collections.sort(tasksByOrder);
       flowId = NodeFlowAdapter.getStringValue(data.getId());
 
-      NodeTask firstTask = data.getTasks().values().stream()
+      FlowAstTask firstTask = data.getTasks().values().stream()
           .filter(task -> task.getOrder() == 0)
           .findFirst().orElse(null);
 
@@ -157,7 +147,7 @@ public class CommandFlowModelBuilder {
           .description(NodeFlowAdapter.getStringValue(data.getDescription()))
           .task(task)
           .tasks(getTasks(task))
-          .inputs(NodeFlowAdapter.getInputs(data, dataTypeRepository))
+          .inputs(NodeFlowAdapter.getInputs(data, nodeRepository))
           .build();
       
       return new AbstractMap.SimpleEntry<String, FlowModel>(input, model);
@@ -179,7 +169,7 @@ public class CommandFlowModelBuilder {
     node.getNext().forEach(n -> getServices(visited, n));
   }
 
-  protected ImmutableFlowTaskModel createNode(NodeTask task) {
+  protected ImmutableFlowTaskModel createNode(FlowAstTask task) {
     String taskId = NodeFlowAdapter.getStringValue(task.getId());
     if(taskModels.containsKey(taskId)) {
       return taskModels.get(taskId);
@@ -220,10 +210,10 @@ public class CommandFlowModelBuilder {
     ImmutableFlowTaskModel exclusive = new ImmutableFlowTaskModel(taskId + "-" + FlowTaskType.EXCLUSIVE, null, FlowTaskType.EXCLUSIVE);
     intermediate.addNext(exclusive);
 
-    List<NodeSwitch> decisions = new ArrayList<>(task.getSwitch().values());
+    List<FlowAstSwitch> decisions = new ArrayList<>(task.getSwitch().values());
     Collections.sort(decisions, (o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
 
-    for(NodeSwitch decision : decisions) {
+    for(FlowAstSwitch decision : decisions) {
       String decisionId = decision.getKeyword();
 
       try {
@@ -251,13 +241,13 @@ public class CommandFlowModelBuilder {
     return result;
   }
 
-  private String getThenTaskId(NodeTask task, String then, FlowTaskType type) {
+  private String getThenTaskId(FlowAstTask task, String then, FlowTaskType type) {
     if(!NodeFlowBean.VALUE_NEXT.equalsIgnoreCase(then)) {
       return then;
     }
 
-    NodeTask next = null;
-    for(NodeTask node : tasksByOrder) {
+    FlowAstTask next = null;
+    for(FlowAstTask node : tasksByOrder) {
       if(node.getStart() > task.getStart()) {
         next = node;
       }
@@ -272,13 +262,13 @@ public class CommandFlowModelBuilder {
     return NodeFlowAdapter.getStringValue(next.getId());
   }
 
-  public FlowTaskValue createFlowTaskValue(NodeTask task, FlowTaskType type) {
+  public FlowTaskValue createFlowTaskValue(FlowAstTask task, FlowTaskType type) {
     if(type == FlowTaskType.SERVICE || type == FlowTaskType.DT || type == FlowTaskType.USER_TASK) {
 
       boolean collection = NodeFlowAdapter.getBooleanValue(task.getRef().getCollection());
       String ref = NodeFlowAdapter.getStringValue(task.getRef().getRef());
       Map<String, String> inputs = new HashMap<>();
-      for(Map.Entry<String, Node> entry : task.getRef().getInputs().entrySet()) {
+      for(Map.Entry<String, FlowAstNode> entry : task.getRef().getInputs().entrySet()) {
         inputs.put(entry.getKey(), NodeFlowAdapter.getStringValue(entry.getValue()));
       }
       return ImmutableFlowTaskValue.builder()
@@ -291,24 +281,5 @@ public class CommandFlowModelBuilder {
     }
 
     throw new IllegalArgumentException("Can't create task value from type: " + type + "!");
-  }
-
-
-  private void create(ObjectNode command, NodeBuilder builder) {
-    int line = command.get("id").asInt();
-    AstCommandValue type = AstCommandValue.valueOf(command.get("type").asText());
-
-
-    if(type == AstCommandValue.DELETE) {
-      builder.delete(line, command.get("value").asInt());
-    } else if(type == AstCommandValue.ADD) {
-      builder.add(line, getText(command));
-    } else {
-      builder.set(line, getText(command));
-    }
-  }
-
-  private String getText(ObjectNode command) {
-    return command.hasNonNull("value") ? command.get("value").asText() : null;
   }
 }

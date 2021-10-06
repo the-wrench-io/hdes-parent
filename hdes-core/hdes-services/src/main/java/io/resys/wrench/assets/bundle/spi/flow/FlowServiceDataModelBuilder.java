@@ -32,9 +32,9 @@ import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
@@ -62,8 +62,8 @@ public class FlowServiceDataModelBuilder {
   }
 
   public ServiceDataModel build(String id, FlowModel flowModel, Timestamp modified) {
-    List<DataType> params = new ArrayList<>(flowModel.getInputs());
-    Map<String, DataType> allParams = createModelParameterMap(flowModel, params);
+    List<AstDataType> params = new ArrayList<>(flowModel.getInputs());
+    Map<String, AstDataType> allParams = createModelParameterMap(flowModel, params);
 
     List<ServiceError> errors = new ArrayList<>();
     List<ServiceAssociation> assocs = new ArrayList<>();
@@ -84,8 +84,8 @@ public class FlowServiceDataModelBuilder {
           continue;
         }
 
-        Map<String, DataType> taskInputs = getTaskServiceInput(taskModel, allParams, service);
-        for(DataType input : service.getDataModel().getParams()) {
+        Map<String, AstDataType> taskInputs = getTaskServiceInput(taskModel, allParams, service);
+        for(AstDataType input : service.getDataModel().getParams()) {
           if(input.getDirection() == Direction.OUT) {
             continue;
           }
@@ -100,7 +100,7 @@ public class FlowServiceDataModelBuilder {
           }
         }
 
-        for(DataType input : taskInputs.values()) {
+        for(AstDataType input : taskInputs.values()) {
           errors.add(new ImmutableServiceError("flowTaskParamUnused", "Task: " + taskModel.getId() + ", has unused input: '" + input.getName() + "'!"));
         }
 
@@ -130,15 +130,15 @@ public class FlowServiceDataModelBuilder {
 
 
 
-  protected Map<String, DataType> getTaskServiceInput(
-      FlowTaskModel taskModel, Map<String, DataType> allParams,
+  protected Map<String, AstDataType> getTaskServiceInput(
+      FlowTaskModel taskModel, Map<String, AstDataType> allParams,
       AssetService refService) {
 
-    Map<String, DataType> serviceTypes = refService.getDataModel().getParams().stream()
+    Map<String, AstDataType> serviceTypes = refService.getDataModel().getParams().stream()
     .filter(p -> p.getDirection() == Direction.IN)
     .collect(Collectors.toMap(p -> p.getName(), p -> p));
 
-    Map<String, DataType> result = new HashMap<>();
+    Map<String, AstDataType> result = new HashMap<>();
     for(Map.Entry<String, String> entry : taskModel.getBody().getInputs().entrySet()) {
       if(!serviceTypes.containsKey(entry.getKey())) {
         errors.add(new ImmutableServiceError("flowTaskParamUnknown", "Task: " + taskModel.getId() + ", has unknown input: '" + entry.getKey() + "'!"));
@@ -150,8 +150,8 @@ public class FlowServiceDataModelBuilder {
   }
 
 
-  protected Map<String, DataType> createModelParameterMap(FlowModel flowModel, List<DataType> params) {
-    Map<String, DataType> result = new HashMap<>();
+  protected Map<String, AstDataType> createModelParameterMap(FlowModel flowModel, List<AstDataType> params) {
+    Map<String, AstDataType> result = new HashMap<>();
     params.forEach(p -> result.put(p.getName(), p));
 
     for(FlowTaskModel taskModel : flowModel.getTasks()) {
@@ -169,7 +169,7 @@ public class FlowServiceDataModelBuilder {
         errors.add(new ImmutableServiceError("flowTaskRefUndefined", "Task: " + taskModel.getId() + ", ref: '" + taskServiceName + "' does not exist!"));
         continue;
       }
-      for(DataType param : service.getDataModel().getParams()) {
+      for(AstDataType param : service.getDataModel().getParams()) {
         if(param.getDirection() == Direction.OUT) {
           String name = taskModel.getId() + "." + param.getName();
           Assert.isTrue(!result.containsKey(name), "Can't have duplicate param: " + name + "!");

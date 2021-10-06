@@ -24,27 +24,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeInput;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class InputRequiredAutocomplete implements NodeFlowVisitor {
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Map<String, NodeInput> inputs = flow.getInputs();
+    Map<String, FlowAstInput> inputs = flow.getInputs();
 
     if(inputs.isEmpty()) {
       return;
     }
 
-    List<FlowCommandRange> ranges = new ArrayList<>();
-    for(NodeInput input : inputs.values()) {
-      FlowCommandRange range;
+    List<FlowAstCommandRange> ranges = new ArrayList<>();
+    for(FlowAstInput input : inputs.values()) {
+      FlowAstCommandRange range;
       if(input.getRequired() != null) {
         range = FlowNodesFactory.range().build(input.getRequired().getStart());
       } else {

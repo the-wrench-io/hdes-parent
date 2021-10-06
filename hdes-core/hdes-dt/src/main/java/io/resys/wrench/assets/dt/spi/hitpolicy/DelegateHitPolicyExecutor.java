@@ -1,14 +1,10 @@
 package io.resys.wrench.assets.dt.spi.hitpolicy;
 
-import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
-import io.resys.hdes.client.api.model.DecisionTableModel;
-
 /*-
  * #%L
- * wrench-assets-dt
+ * hdes-dt
  * %%
- * Copyright (C) 2016 - 2018 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +20,10 @@ import io.resys.hdes.client.api.model.DecisionTableModel;
  * #L%
  */
 
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.HitPolicyExecutor;
+import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
+import io.resys.hdes.client.api.execution.DecisionTableResult.HitPolicyExecutor;
+import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 
 public class DelegateHitPolicyExecutor implements HitPolicyExecutor {

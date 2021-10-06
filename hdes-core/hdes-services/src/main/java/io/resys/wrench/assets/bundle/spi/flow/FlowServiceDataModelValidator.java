@@ -30,35 +30,35 @@ import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessage;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandMessage;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.FlowAstType.Node;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeInput;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
-import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.hdes.client.api.ast.ImmutableFlowCommandMessage;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class FlowServiceDataModelValidator implements NodeFlowVisitor {
 
   private final ServiceStore serviceStore;
-  private final HdesTypes dataTypeRepository;
+  private final HdesAstTypes dataTypeRepository;
 
-  public FlowServiceDataModelValidator(ServiceStore serviceStore, HdesTypes dataTypeRepository) {
+  public FlowServiceDataModelValidator(ServiceStore serviceStore, HdesAstTypes dataTypeRepository) {
     this.serviceStore = serviceStore;
     this.dataTypeRepository = dataTypeRepository;
   }
@@ -66,11 +66,11 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
   @Override
   public void visit(NodeFlow node, ImmutableFlowAstType.Builder modelBuilder) {
 
-    List<DataType> params = new ArrayList<>(NodeFlowAdapter.getInputs(node, dataTypeRepository));
-    Map<String, NodeInput> unusedInputs = new HashMap<>(node.getInputs());
-    Map<String, DataType> allParams = createModelParameterMap(node, params);
+    List<AstDataType> params = new ArrayList<>(NodeFlowAdapter.getInputs(node, dataTypeRepository));
+    Map<String, FlowAstInput> unusedInputs = new HashMap<>(node.getInputs());
+    Map<String, AstDataType> allParams = createModelParameterMap(node, params);
 
-    for(NodeTask taskModel : node.getTasks().values()) {
+    for(FlowAstTask taskModel : node.getTasks().values()) {
 
       ServiceType serviceType = getServiceType(taskModel);
       if(serviceType == null) {
@@ -111,7 +111,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
 
       // Validate inputs
       Map<String, TaskInput> taskInputs = getTaskServiceInput(modelBuilder, taskModel, allParams, service);
-      for(DataType input : service.getDataModel().getParams()) {
+      for(AstDataType input : service.getDataModel().getParams()) {
         if(input.getDirection() == Direction.OUT) {
           continue;
         }
@@ -167,7 +167,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
     }
 
     // Unused inputs on task
-    for(NodeInput input : unusedInputs.values()) {
+    for(FlowAstInput input : unusedInputs.values()) {
       modelBuilder.addMessages(
           warning(
               input.getStart(),
@@ -180,18 +180,18 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
 
   protected Map<String, TaskInput> getTaskServiceInput(
       ImmutableFlowAstType.Builder modelBuilder,
-      NodeTask taskModel,
-      Map<String, DataType> allParams,
+      FlowAstTask taskModel,
+      Map<String, AstDataType> allParams,
       AssetService refService) {
 
-    Map<String, DataType> serviceTypes = refService.getDataModel().getParams().stream()
+    Map<String, AstDataType> serviceTypes = refService.getDataModel().getParams().stream()
         .filter(p -> p.getDirection() == Direction.IN)
         .collect(Collectors.toMap(p -> p.getName(), p -> p));
 
     Map<String, TaskInput> result = new HashMap<>();
-    for(Map.Entry<String, Node> entry : taskModel.getRef().getInputs().entrySet()) {
+    for(Map.Entry<String, FlowAstNode> entry : taskModel.getRef().getInputs().entrySet()) {
 
-      Node node = entry.getValue();
+      FlowAstNode node = entry.getValue();
       String mappingName = NodeFlowAdapter.getStringValue(node);
       if(StringUtils.isEmpty(mappingName)) {
         modelBuilder.addMessages(
@@ -220,8 +220,8 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
     return result;
   }
   
-  private FlowCommandMessage error(int start, int range, String value) {
-    return ImmutableFlowCommandMessage.builder()
+  private FlowAstCommandMessage error(int start, int range, String value) {
+    return ImmutableFlowAstCommandMessage.builder()
         .line(start)
         .range(FlowNodesFactory.range().build(0, range))
         .type(FlowCommandMessageType.ERROR)
@@ -229,8 +229,8 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
         .build();
   }
 
-  private FlowCommandMessage warning(int start, int range, String value) {
-    return ImmutableFlowCommandMessage.builder()
+  private FlowAstCommandMessage warning(int start, int range, String value) {
+    return ImmutableFlowAstCommandMessage.builder()
         .line(start)
         .range(FlowNodesFactory.range().build(0, range))
         .type(FlowCommandMessageType.WARNING)
@@ -238,11 +238,11 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
         .build();
   }
 
-  protected Map<String, DataType> createModelParameterMap(NodeFlow node, List<DataType> params) {
-    Map<String, DataType> result = new HashMap<>();
+  protected Map<String, AstDataType> createModelParameterMap(NodeFlow node, List<AstDataType> params) {
+    Map<String, AstDataType> result = new HashMap<>();
     params.forEach(p -> result.put(p.getName(), p));
 
-    for(NodeTask taskModel : node.getTasks().values()) {
+    for(FlowAstTask taskModel : node.getTasks().values()) {
       if(taskModel.getRef() == null) {
         continue;
       }
@@ -255,7 +255,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
       if(service == null) {
         continue;
       }
-      for(DataType param : service.getDataModel().getParams()) {
+      for(AstDataType param : service.getDataModel().getParams()) {
         if(param.getDirection() == Direction.OUT) {
           String name = NodeFlowAdapter.getStringValue(taskModel.getId()) + "." + param.getName();
           Assert.isTrue(!result.containsKey(name), "Can't have duplicate param: " + name + "!");
@@ -274,7 +274,7 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
   protected boolean isTaskServiceCollection(FlowTaskModel taskModel) {
     return taskModel.getBody() != null ? taskModel.getBody().isCollection() : false;
   }
-  protected ServiceType getServiceType(NodeTask taskModel) {
+  protected ServiceType getServiceType(FlowAstTask taskModel) {
     if(taskModel.getDecisionTable() != null) {
       return ServiceType.DT;
     } else if(taskModel.getService() != null) {
@@ -285,17 +285,17 @@ public class FlowServiceDataModelValidator implements NodeFlowVisitor {
   }
 
   private static class TaskInput {
-    private final Node node;
-    private final DataType dataType;
-    public TaskInput(Node node, DataType dataType) {
+    private final FlowAstNode node;
+    private final AstDataType dataType;
+    public TaskInput(FlowAstNode node, AstDataType dataType) {
       super();
       this.node = node;
       this.dataType = dataType;
     }
-    public Node getNode() {
+    public FlowAstNode getNode() {
       return node;
     }
-    public DataType getDataType() {
+    public AstDataType getDataType() {
       return dataType;
     }
   }

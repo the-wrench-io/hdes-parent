@@ -25,17 +25,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeRef;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeTask;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstRef;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlowVisitor {
 
@@ -45,7 +45,7 @@ public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlo
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Map<String, NodeTask> tasks = flow.getTasks();
+    Map<String, FlowAstTask> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;
     }
@@ -61,8 +61,8 @@ public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlo
     }
 
 
-    for(NodeTask task : tasks.values()) {
-      NodeRef ref = task.getRef();
+    for(FlowAstTask task : tasks.values()) {
+      FlowAstRef ref = task.getRef();
       if(ref == null) {
         continue;
       }
@@ -75,7 +75,7 @@ public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlo
         continue;
       }
 
-      FlowCommandRange range;
+      FlowAstCommandRange range;
       if(ref.getRef() == null) {
         range = FlowNodesFactory.range().build(ref.getStart(), ref.getEnd(), true);
       } else {

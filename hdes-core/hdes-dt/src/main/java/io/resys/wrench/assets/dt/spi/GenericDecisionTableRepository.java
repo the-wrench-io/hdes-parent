@@ -2,9 +2,9 @@ package io.resys.wrench.assets.dt.spi;
 
 /*-
  * #%L
- * wrench-assets-dt
+ * hdes-dt
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,62 +20,43 @@ package io.resys.wrench.assets.dt.spi;
  * #L%
  */
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesTypes;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
+import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.execution.DecisionTableResult.DynamicValueExpressionExecutor;
+import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
+import io.resys.hdes.client.spi.HdesAstTypesImpl;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.spi.builders.CommandDecisionTableBuilder;
-import io.resys.wrench.assets.dt.spi.builders.GenericDecisionTableCommandModelBuilder;
 import io.resys.wrench.assets.dt.spi.builders.GenericDecisionTableExecutor;
 import io.resys.wrench.assets.dt.spi.export.DelegateDecisionTableExporter;
 
 public class GenericDecisionTableRepository implements DecisionTableRepository {
 
-  private final HdesTypes dataTypeRepository;
+  private final HdesAstTypes dataTypeRepository;
   private final ObjectMapper objectMapper;
   private final NodeExpressionExecutor expressionExecutor;
   private final Supplier<DynamicValueExpressionExecutor> executor;
-  private final Supplier<List<String>> headerTypes;
-  private final Supplier<DecisionTableExpressionBuilder> expressionBuilder;
-  private final Map<ValueType, List<String>> headerExpressions;
-
+  private final HdesAstTypes ast;
   public GenericDecisionTableRepository(
       ObjectMapper objectMapper,
-      HdesTypes dataTypeRepository,
+      HdesAstTypes dataTypeRepository,
       NodeExpressionExecutor expressionExecutor,
-      Supplier<DynamicValueExpressionExecutor> executor,
-      Supplier<DecisionTableExpressionBuilder> expressionBuilder) {
+      Supplier<DynamicValueExpressionExecutor> executor) {
     super();
     this.objectMapper = objectMapper;
     this.dataTypeRepository = dataTypeRepository;
     this.expressionExecutor = expressionExecutor;
-    this.expressionBuilder = expressionBuilder;
     this.executor = executor;
-    this.headerTypes = () -> Collections.unmodifiableList(
-        Arrays.asList(ValueType.STRING,  ValueType.BOOLEAN, ValueType.INTEGER, ValueType.LONG, ValueType.DECIMAL, ValueType.DATE, ValueType.DATE_TIME).stream()
-        .map(v -> v.name())
-        .collect(Collectors.toList()));
+    this.ast = new HdesAstTypesImpl(objectMapper);
 
-    Map<ValueType, List<String>> headerExpressions = new HashMap<>();
-    headerExpressions.put(ValueType.INTEGER, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.EQUALS.name())));
-    headerExpressions.put(ValueType.DECIMAL, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.EQUALS.name())));
-    headerExpressions.put(ValueType.STRING, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.IN.name())));
-    this.headerExpressions = Collections.unmodifiableMap(headerExpressions);
   }
 
   @Override
   public DecisionTableBuilder createBuilder() {
-    return new CommandDecisionTableBuilder(objectMapper, executor.get(), dataTypeRepository, () -> createCommandModelBuilder());
+    return new CommandDecisionTableBuilder(objectMapper, executor.get(), dataTypeRepository, () -> ast);
   }
   @Override
   public DecisionTableExecutor createExecutor() {
@@ -84,13 +65,5 @@ public class GenericDecisionTableRepository implements DecisionTableRepository {
   @Override
   public DecisionTableExporter createExporter() {
     return new DelegateDecisionTableExporter(objectMapper);
-  }
-  @Override
-  public DecisionTableCommandModelBuilder createCommandModelBuilder() {
-    return new GenericDecisionTableCommandModelBuilder(headerTypes, expressionBuilder, headerExpressions, executor);
-  }
-  @Override
-  public DecisionTableExpressionBuilder createExpression() {
-    return expressionBuilder.get();
   }
 }

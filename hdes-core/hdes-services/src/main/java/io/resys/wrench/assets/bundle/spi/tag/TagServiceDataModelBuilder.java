@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
@@ -35,7 +35,7 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 public class TagServiceDataModelBuilder {
 
   public ServiceDataModel build(String id, String name) {
-    List<DataType> params = Collections.emptyList();
+    List<AstDataType> params = Collections.emptyList();
     List<ServiceError> errors = new ArrayList<>();
     List<ServiceAssociation> assocs = new ArrayList<>();
 

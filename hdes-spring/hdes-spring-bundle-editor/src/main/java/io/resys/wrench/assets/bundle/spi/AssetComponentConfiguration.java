@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -43,11 +42,14 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import io.resys.hdes.client.api.HdesTypes;
+import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
 import io.resys.hdes.client.api.execution.Service.ServiceInit;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
-import io.resys.hdes.client.spi.HdesTypesImpl;
+import io.resys.hdes.client.spi.HdesAstTypesImpl;
+import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
+import io.resys.hdes.client.spi.decision.SpringDynamicValueExpressionExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -59,7 +61,6 @@ import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
 import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 import io.resys.wrench.assets.bundle.spi.clock.SystemClockRepository;
 import io.resys.wrench.assets.bundle.spi.dt.DtServiceBuilder;
-import io.resys.wrench.assets.bundle.spi.flow.FlowDataTypeSupplier;
 import io.resys.wrench.assets.bundle.spi.flow.FlowServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.flow.FlowServiceDataModelValidator;
 import io.resys.wrench.assets.bundle.spi.flow.executors.GenericFlowDtExecutor;
@@ -82,19 +83,12 @@ import io.resys.wrench.assets.bundle.spi.tag.TagServiceBuilder;
 import io.resys.wrench.assets.context.config.AssetConfigBean;
 import io.resys.wrench.assets.context.config.GitConfigBean;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExpressionBuilder;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.NodeExpressionExecutor;
 import io.resys.wrench.assets.dt.spi.GenericDecisionTableRepository;
-import io.resys.wrench.assets.dt.spi.expression.GenericDecisionTableExpressionBuilder;
-import io.resys.wrench.assets.dt.spi.expression.GenericExpressionExecutor;
-import io.resys.wrench.assets.dt.spi.expression.SpringDynamicValueExpressionExecutor;
-import io.resys.wrench.assets.flow.api.FlowAstFactory;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.spi.GenericFlowExecutorFactory;
 import io.resys.wrench.assets.flow.spi.GenericFlowRepository;
-import io.resys.wrench.assets.flow.spi.GenericNodeRepository;
 import io.resys.wrench.assets.flow.spi.executors.EmptyFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.EndFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.ExclusiveFlowTaskExecutor;
@@ -117,7 +111,6 @@ import io.resys.wrench.assets.flow.spi.validators.DescriptionValidator;
 import io.resys.wrench.assets.flow.spi.validators.IdValidator;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 import io.resys.wrench.assets.script.spi.GenericScriptRepository;
-import io.resys.wrench.assets.script.spi.builders.GroovyScriptParser;
 
 
 @Configuration
@@ -133,7 +126,7 @@ public class AssetComponentConfiguration {
       AssetConfigBean assetConfigBean, ServiceStore origServiceStore) {
     
     final ClockRepository clockRepository = new SystemClockRepository();
-    final HdesTypes dataTypeRepository = new HdesTypesImpl(objectMapper);
+    final HdesAstTypes dataTypeRepository = new HdesAstTypesImpl(objectMapper);
     final DecisionTableRepository decisionTableRepository = decisionTableRepository(dataTypeRepository, objectMapper, origServiceStore);
     final FlowRepository flowRepository = flowRepository(dataTypeRepository, clockRepository, origServiceStore, objectMapper);
     final ScriptRepository scriptRepository = scriptRepository(objectMapper, dataTypeRepository, context);
@@ -160,7 +153,7 @@ public class AssetComponentConfiguration {
     final ServicePostProcessorSupplier servicePostProcessorSupplier = new GenericServicePostProcessorSupplier(postProcessors);
     final ServiceStore serviceStore = new PostProcessingServiceStore(origServiceStore, servicePostProcessorSupplier); 
     
-    return new GenericAssetServiceRepository(objectMapper,
+    return new GenericAssetServiceRepository(dataTypeRepository, objectMapper,
         decisionTableRepository, flowRepository, scriptRepository, 
         builders, serviceStore);
   }
@@ -188,20 +181,18 @@ public class AssetComponentConfiguration {
   }
   
   
-  private DecisionTableRepository decisionTableRepository(HdesTypes dataTypeRepository, ObjectMapper objectMapper, ServiceStore serviceStore) {
-    Supplier<DecisionTableExpressionBuilder> springExpressionBuilder = () -> new GenericDecisionTableExpressionBuilder(objectMapper);
-    NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(springExpressionBuilder);
+  private DecisionTableRepository decisionTableRepository(HdesAstTypes dataTypeRepository, ObjectMapper objectMapper, ServiceStore serviceStore) {
+    NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper);
     return new GenericDecisionTableRepository(
         objectMapper,
         dataTypeRepository,
         expressionExecutor,
-        () -> new SpringDynamicValueExpressionExecutor(),
-        springExpressionBuilder);
+        () -> new SpringDynamicValueExpressionExecutor());
   }
 
 
   private FlowRepository flowRepository(
-      HdesTypes dataTypeRepository,
+      HdesAstTypes dataTypeRepository,
       ClockRepository clockRepository,
       ServiceStore serviceStore, 
       ObjectMapper objectMapper) {
@@ -244,13 +235,13 @@ public class AssetComponentConfiguration {
     executors.put(FlowTaskType.EMPTY, new EmptyFlowTaskExecutor());
 
     FlowExecutorRepository executorRepository = new GenericFlowExecutorFactory(executors);  
-    FlowAstFactory nodeRepository = new GenericNodeRepository(mapper, new FlowDataTypeSupplier(serviceStore));
-    return new GenericFlowRepository(dataTypeRepository, executorRepository, parser, nodeRepository, objectMapper, visitors, clockRepository.get());
+    //FlowAstFactory nodeRepository = new GenericNodeRepository(mapper, new FlowDataTypeSupplier(serviceStore));
+    return new GenericFlowRepository(dataTypeRepository, executorRepository, parser, objectMapper, clockRepository.get());
   }
 
 
-  private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesTypes dataTypeRepository, ApplicationContext context) {
-    return new GenericScriptRepository(new GroovyScriptParser(objectMapper), dataTypeRepository);
+  private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesAstTypes dataTypeRepository, ApplicationContext context) {
+    return new GenericScriptRepository(dataTypeRepository);
   }
 
   protected String getDefaultContent(ServiceType type) {

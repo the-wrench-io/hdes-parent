@@ -34,10 +34,11 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutput;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
@@ -58,8 +59,10 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   private final ScriptRepository scriptRepository;
   private final ServiceStore serviceStore;
   private final ObjectMapper objectMapper;
+  private final HdesAstTypes types;
 
   public GenericAssetServiceRepository(
+      HdesAstTypes types,
       ObjectMapper objectMapper,
       DecisionTableRepository decisionTableRepository,
       FlowRepository flowRepository,
@@ -69,6 +72,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
       ServiceStore serviceStore) {
     
     super();
+    this.types = types;
     this.objectMapper = objectMapper;
     this.decisionTableRepository = decisionTableRepository;
     this.flowRepository = flowRepository;
@@ -160,7 +164,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             return delegate;
           }
           private void validateFlowInput(AssetService service, Map<String, Object> input) {
-            for(DataType dataType : service.getDataModel().getParams()) {
+            for(AstDataType dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "Flow with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
               }
@@ -191,7 +195,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             return this;
           }
           private void validateDtInput(AssetService service, Map<String, Object> input) {
-            for(DataType dataType : service.getDataModel().getParams()) {
+            for(AstDataType dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "DT with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
               }
@@ -238,5 +242,10 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     } catch(Exception e) {
       throw new RuntimeException("Failed to parse migration json for: '" + migration.getName() + "', msg: " + e.getMessage(), e);
     }
+  }
+
+  @Override
+  public HdesAstTypes getTypes() {
+    return types;
   }
 }

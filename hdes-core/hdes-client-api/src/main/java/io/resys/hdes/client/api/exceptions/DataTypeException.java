@@ -2,7 +2,7 @@ package io.resys.hdes.client.api.exceptions;
 
 /*-
  * #%L
- * hdes-datatype
+ * hdes-client-api
  * %%
  * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
@@ -20,20 +20,20 @@ package io.resys.hdes.client.api.exceptions;
  * #L%
  */
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 
 public class DataTypeException extends RuntimeException {
   private static final long serialVersionUID = 1479713119727436525L;
-  private final DataType dataType;
+  private final AstDataType dataType;
   private final Object value;
 
-  public DataTypeException(DataType dataType, Object value, Exception e) {
+  public DataTypeException(AstDataType dataType, Object value, Exception e) {
     super(e.getMessage(), e);
     this.dataType = dataType;
     this.value = value;
   }
 
-  public DataType getDataType() {
+  public AstDataType getDataType() {
     return dataType;
   }
 

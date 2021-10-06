@@ -35,9 +35,10 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstType.AstCommandType;
 import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.model.DataType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.script.api.ScriptRepository;
@@ -54,6 +55,7 @@ public interface AssetServiceRepository {
   Migration readMigration(String json);
   String toSrc(MigrationValue migration);
   
+  HdesAstTypes getTypes();
   DecisionTableRepository getDtRepo();
   ScriptRepository getStRepo();
   FlowRepository getFlRepo();
@@ -200,7 +202,7 @@ public interface AssetServiceRepository {
     ServiceType getType();
     ServiceStatus getStatus();
     List<ServiceError> getErrors();
-    List<DataType> getParams();
+    List<AstDataType> getParams();
     List<ServiceAssociation> getAssociations();
     ServiceDataModel withErrors(List<ServiceError> errors);
     ServiceDataModel withTimestamps(Timestamp created, Timestamp modified);

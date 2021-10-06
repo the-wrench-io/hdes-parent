@@ -25,29 +25,29 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandRange;
-import io.resys.hdes.client.api.ast.FlowAstType.Node;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class InputAutocomplete implements NodeFlowVisitor {
 
   @Override
   public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Node node = flow.get(NodeFlowBean.KEY_INPUTS);
+    FlowAstNode node = flow.get(NodeFlowBean.KEY_INPUTS);
     if(node == null) {
       return;
     }
 
-    List<Node> allInputs = new ArrayList<>(node.getChildren().values());
+    List<FlowAstNode> allInputs = new ArrayList<>(node.getChildren().values());
     int previous = node.getStart();
     Collections.sort(allInputs);
 
-    Collection<FlowCommandRange> range = new ArrayList<>();
-    for(Node input : allInputs) {
+    Collection<FlowAstCommandRange> range = new ArrayList<>();
+    for(FlowAstNode input : allInputs) {
       if(input.getStart() - previous > 1) {
         range.add(FlowNodesFactory.range().build(previous + 1, input.getStart() - 1));
       }

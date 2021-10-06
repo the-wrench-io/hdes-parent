@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeInput;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeOutput;
@@ -45,7 +45,7 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
   private DecisionTableNode next;
 
   public ImmutableDecisionTableNode(
-      int id, int order, Map<DataType, String> inputs, Map<DataType, Serializable> outputs, DecisionTableNode previous) {
+      int id, int order, Map<AstDataType, String> inputs, Map<AstDataType, Serializable> outputs, DecisionTableNode previous) {
     super();
     this.order = order;
     this.id = id;
@@ -132,14 +132,14 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
   
   private static final class ImmutableDecisionTableNodeOutput implements DecisionTableNodeOutput {
     private static final long serialVersionUID = 7364145982894215127L;
-    private final DataType key;
+    private final AstDataType key;
     private final Serializable value;
-    public ImmutableDecisionTableNodeOutput(DataType key, Serializable value) {
+    public ImmutableDecisionTableNodeOutput(AstDataType key, Serializable value) {
       super();
       this.key = key;
       this.value = value;
     }
-    public DataType getKey() {
+    public AstDataType getKey() {
       return key;
     }
     public Serializable getValue() {
@@ -178,14 +178,14 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
   
   private static final class ImmutableDecisionTableNodeInput implements DecisionTableNodeInput {
     private static final long serialVersionUID = -6095582758590972380L;
-    private final DataType key;
+    private final AstDataType key;
     private final String value;
-    public ImmutableDecisionTableNodeInput(DataType key, String value) {
+    public ImmutableDecisionTableNodeInput(AstDataType key, String value) {
       super();
       this.key = key;
       this.value = value;
     }
-    public DataType getKey() {
+    public AstDataType getKey() {
       return key;
     }
     public String getValue() {

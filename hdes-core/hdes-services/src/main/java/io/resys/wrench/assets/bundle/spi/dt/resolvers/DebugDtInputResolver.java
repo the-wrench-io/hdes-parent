@@ -23,7 +23,7 @@ package io.resys.wrench.assets.bundle.spi.dt.resolvers;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.hdes.client.api.model.DataType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
 
 public class DebugDtInputResolver implements Serializable, DtInputResolver {
@@ -37,7 +37,7 @@ public class DebugDtInputResolver implements Serializable, DtInputResolver {
   }
 
   @Override
-  public Object apply(DataType t) {
+  public Object apply(AstDataType t) {
     String name = t.getName();
 
     // Flat mapping

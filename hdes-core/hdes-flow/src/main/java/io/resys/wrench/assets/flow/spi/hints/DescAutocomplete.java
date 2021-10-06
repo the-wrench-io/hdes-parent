@@ -26,9 +26,9 @@ import java.util.Optional;
 
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.wrench.assets.flow.spi.model.NodeFlowBean;
-import io.resys.wrench.assets.flow.spi.support.FlowNodesFactory;
 
 public class DescAutocomplete implements NodeFlowVisitor {
 
