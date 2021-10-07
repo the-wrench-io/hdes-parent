@@ -26,12 +26,12 @@ import java.util.Set;
 
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
@@ -46,7 +46,7 @@ public class PartialTaskInputsAutocomplete extends TemplateAutocomplete implemen
   }
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
     Map<String, FlowAstTask> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;
@@ -72,14 +72,14 @@ public class PartialTaskInputsAutocomplete extends TemplateAutocomplete implemen
       }
 
       Set<String> inputs = taskModel.getRef().getInputs().keySet();
-      List<AstDataType> params = service.getDataModel().getParams();
+      List<TypeDef> params = service.getDataModel().getParams();
       if(params.isEmpty()) {
         continue;
       }
 
       boolean addHint = false;
       FlowNodesFactory.AcBuilder builder = FlowNodesFactory.ac();
-      for(AstDataType param : params) {
+      for(TypeDef param : params) {
         if(param.getDirection() == Direction.IN && !inputs.contains(param.getName())) {
           addHint = true;
           builder.addField(10, param.getName());

@@ -25,5 +25,5 @@ import java.util.List;
 public interface AstChangeset {
   int getLine();
   String getValue();
-  List<AstCommandType> getCommands();
+  List<AstCommand> getCommands();
 }

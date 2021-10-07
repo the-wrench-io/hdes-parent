@@ -27,23 +27,23 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 
-public interface AstType extends Serializable {
+public interface AstBody extends Serializable {
   
   String getName();
   @Nullable
   String getDescription();
   int getRev();
   
-  List<AstCommandType> getCommands();
-  AstHeaders getHeaders();
+  List<AstCommand> getCommands();
+  Headers getHeaders();
   
   
   @Value.Immutable
-  interface AstHeaders extends Serializable {
-    List<AstDataType> getInputs();
-    List<AstDataType> getOutputs();
+  interface Headers extends Serializable {
+    List<TypeDef> getAcceptDefs();
+    List<TypeDef> getReturnDefs();
   }
   
   interface AstExpression {

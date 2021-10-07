@@ -36,18 +36,18 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.AstType.AstExpression;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
-import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
-import io.resys.hdes.client.api.ast.DecisionAstType.Row;
-import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
+import io.resys.hdes.client.api.ast.AstBody.AstExpression;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstDecision.ColumnExpressionType;
+import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
+import io.resys.hdes.client.api.ast.AstDecision.Row;
+import io.resys.hdes.client.api.ast.ImmutableAstDecision;
 import io.resys.hdes.client.api.ast.ImmutableCell;
-import io.resys.hdes.client.api.ast.ImmutableDecisionAstType;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.ast.ImmutableRow;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.spi.HdesDataTypeFactory;
 import io.resys.hdes.client.spi.util.Assert;
@@ -386,13 +386,13 @@ public class CommandMapper {
       }
     }
 
-    public DecisionAstType build() {
+    public AstDecision build() {
       this.headers.values().stream()
       .filter(h -> !StringUtils.isEmpty(h.getScript()))
       .forEach(h -> h.getCells().forEach(c -> c.setValue(resolveScriptValue(h, c))));
       
-      List<AstDataType> headers = this.headers.values().stream().sorted()
-          .map(h -> (AstDataType) dataTypeFactory.dataType()
+      List<TypeDef> headers = this.headers.values().stream().sorted()
+          .map(h -> (TypeDef) dataTypeFactory.dataType()
               .direction(h.getDirection())
               .name(h.getName())
               .valueType(h.getValue())
@@ -418,16 +418,16 @@ public class CommandMapper {
           .collect(Collectors.toList());
 
       HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
-      return ImmutableDecisionAstType.builder()
+      return ImmutableAstDecision.builder()
           .name(name)
           .description(description)
           .rev(version)
           .hitPolicy(hitPolicy)
           .headerTypes(headerTypes)
           .headerExpressions(headerExpressions)
-          .headers(ImmutableAstHeaders.builder()
-              .inputs(headers.stream().filter(p -> p.getDirection() == Direction.IN).collect(Collectors.toList()))
-              .outputs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
+          .headers(ImmutableHeaders.builder()
+              .acceptDefs(headers.stream().filter(p -> p.getDirection() == Direction.IN).collect(Collectors.toList()))
+              .returnDefs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
               .build())
           .rows(rows)
           .build();

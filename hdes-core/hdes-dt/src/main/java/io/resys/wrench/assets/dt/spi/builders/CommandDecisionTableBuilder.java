@@ -44,12 +44,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.DecisionAstType.Cell;
-import io.resys.hdes.client.api.ast.DecisionAstType.Row;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstDecision.Cell;
+import io.resys.hdes.client.api.ast.AstDecision.Row;
 import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
@@ -97,12 +97,12 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
         src = this.src;
       }
       
-      DecisionAstType commandModel = commandBuilder.get().decision()
+      AstDecision commandModel = commandBuilder.get().decision()
           .src(objectMapper.readTree(src))
           .build();
 
       List<DecisionTableDataType> types = createTypes(commandModel);
-      Map<Integer, AstDataType> typesById = types.stream().collect(Collectors.toMap(t -> t.getOrder(), t -> t.getValue()));
+      Map<Integer, TypeDef> typesById = types.stream().collect(Collectors.toMap(t -> t.getOrder(), t -> t.getValue()));
 
       DecisionTableNode first = null;
       ImmutableDecisionTableNode previous = null;
@@ -136,15 +136,15 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     }
   }
 
-  protected List<DecisionTableDataType> createTypes(DecisionAstType data) {
+  protected List<DecisionTableDataType> createTypes(AstDecision data) {
     List<DecisionTableDataType> result = new ArrayList<>();
     int index = 0;
     
-    List<AstDataType> allHeaders = new ArrayList<>();
-    allHeaders.addAll(data.getHeaders().getInputs());
-    allHeaders.addAll(data.getHeaders().getOutputs());
+    List<TypeDef> allHeaders = new ArrayList<>();
+    allHeaders.addAll(data.getHeaders().getAcceptDefs());
+    allHeaders.addAll(data.getHeaders().getReturnDefs());
     
-    for(AstDataType header : allHeaders) {
+    for(TypeDef header : allHeaders) {
       result.add(new ImmutableDecisionTableDataType(
           index++, header.getScript(), header));
     }
@@ -152,11 +152,11 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     return Collections.unmodifiableList(result);
   }
 
-  protected Map<AstDataType, String> getInputs(Map<Integer, AstDataType> typesById, Row entry) {
-    Map<AstDataType, String> result = new HashMap<>();
+  protected Map<TypeDef, String> getInputs(Map<Integer, TypeDef> typesById, Row entry) {
+    Map<TypeDef, String> result = new HashMap<>();
     int index = 0;
     for(Cell value : entry.getCells()) {
-      AstDataType type = typesById.get(index++);
+      TypeDef type = typesById.get(index++);
       if(type.getDirection() == Direction.IN) {
         result.put(type, value.getValue());
       }
@@ -165,11 +165,11 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     return Collections.unmodifiableMap(result);
   }
 
-  protected Map<AstDataType, Serializable> getOutputs(Map<Integer, AstDataType> typesById, Row entry) {
-    Map<AstDataType, Serializable> result = new HashMap<>();
+  protected Map<TypeDef, Serializable> getOutputs(Map<Integer, TypeDef> typesById, Row entry) {
+    Map<TypeDef, Serializable> result = new HashMap<>();
     int index = 0;
     for(Cell value : entry.getCells()) {
-      AstDataType type = typesById.get(index++);
+      TypeDef type = typesById.get(index++);
       if(type.getDirection() == Direction.OUT) {
         try {
           result.put(type, type.toValue(value.getValue()));

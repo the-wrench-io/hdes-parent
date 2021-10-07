@@ -35,14 +35,14 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.DataTypeDeserializer;
-import io.resys.hdes.client.api.ast.AstDataType.DataTypeSerializer;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.AstDataType.ValueTypeResolver;
-import io.resys.hdes.client.api.ast.AstType.AstExpression;
-import io.resys.hdes.client.api.ast.ImmutableAstDataType;
+import io.resys.hdes.client.api.ast.AstBody.AstExpression;
+import io.resys.hdes.client.api.ast.ImmutableTypeDef;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.DataTypeDeserializer;
+import io.resys.hdes.client.api.ast.TypeDef.DataTypeSerializer;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.ast.TypeDef.ValueTypeResolver;
 import io.resys.hdes.client.spi.expression.OperationFactory;
 import io.resys.hdes.client.spi.serializers.DateDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.DateTimeDataTypeDeserializer;
@@ -146,9 +146,9 @@ public class HdesDataTypeFactory {
     private Class<?> beanType;
     private String description;
     private String values;
-    private List<AstDataType> properties = new ArrayList<>();
+    private List<TypeDef> properties = new ArrayList<>();
     private String ref;
-    private AstDataType dataType;
+    private TypeDef dataType;
     private Integer order;
     private String script;
     private String id;
@@ -210,7 +210,7 @@ public class HdesDataTypeFactory {
       return this;
     }
     @Override
-    public DataTypeAstBuilder ref(String ref, AstDataType dataType) {
+    public DataTypeAstBuilder ref(String ref, TypeDef dataType) {
       Assert.isTrue(ref != null, () -> "ref can't be null!");
       Assert.isTrue(dataType != null, () -> "dataType can't be null for ref: " + ref + "!");
       this.dataType = dataType;
@@ -220,15 +220,15 @@ public class HdesDataTypeFactory {
     public DataTypeAstBuilder property() {
       return new GenericDataTypeBuilder() {
         @Override
-        public AstDataType build() {
-          AstDataType property = super.build();
+        public TypeDef build() {
+          TypeDef property = super.build();
           properties.add(property);
           return property;
         }
       };
     }
     @Override
-    public AstDataType build() {
+    public TypeDef build() {
       Assert.notNull(name, () -> "name can't be null!");
 
       if(dataType != null) {
@@ -237,7 +237,7 @@ public class HdesDataTypeFactory {
 
         DataTypeDeserializer deserializer = dataType.getDeserializer();
         DataTypeSerializer serializer = dataType.getSerializer();
-        return ImmutableAstDataType.builder()
+        return ImmutableTypeDef.builder()
             .id(id).script(script).order(order)
             .name(name).ref(ref).description(description)
             .direction(direction)
@@ -260,7 +260,7 @@ public class HdesDataTypeFactory {
       DataTypeSerializer serializer = serializers.get(valueType);
 
       Assert.notNull(valueType, () -> "valueType can't be null!");
-      return ImmutableAstDataType.builder()
+      return ImmutableTypeDef.builder()
           .id(id).script(script).order(order)
           .name(name)
           .ref(ref)

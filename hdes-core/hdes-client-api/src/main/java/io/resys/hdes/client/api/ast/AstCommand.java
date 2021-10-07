@@ -29,10 +29,10 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-@JsonSerialize(as = ImmutableAstCommandType.class)
-@JsonDeserialize(as = ImmutableAstCommandType.class)
+@JsonSerialize(as = ImmutableAstCommand.class)
+@JsonDeserialize(as = ImmutableAstCommand.class)
 @Value.Immutable
-public interface AstCommandType extends Serializable {
+public interface AstCommand extends Serializable {
   @Nullable
   String getId();
   @Nullable

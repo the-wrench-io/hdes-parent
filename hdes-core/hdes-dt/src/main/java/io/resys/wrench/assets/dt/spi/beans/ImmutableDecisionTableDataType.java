@@ -20,7 +20,7 @@ package io.resys.wrench.assets.dt.spi.beans;
  * #L%
  */
 
-import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
 
 public class ImmutableDecisionTableDataType implements DecisionTableDataType {
@@ -29,9 +29,9 @@ public class ImmutableDecisionTableDataType implements DecisionTableDataType {
 
   private final int order;
   private final String script;
-  private final AstDataType value;
+  private final TypeDef value;
 
-  public ImmutableDecisionTableDataType(int order, String script, AstDataType value) {
+  public ImmutableDecisionTableDataType(int order, String script, TypeDef value) {
     super();
     this.order = order;
     this.script = script;
@@ -49,7 +49,7 @@ public class ImmutableDecisionTableDataType implements DecisionTableDataType {
   }
 
   @Override
-  public AstDataType getValue() {
+  public TypeDef getValue() {
     return value;
   }
 

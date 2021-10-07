@@ -41,20 +41,20 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes.FlowAstBuilder;
 import io.resys.hdes.client.api.ast.AstChangeset;
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandMessage;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInputType;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
-import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstInputType;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
+import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstInputType;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
 import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
@@ -76,7 +76,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
   private final NodeFlowBean result = new NodeFlowBean(inputTypes);
   private final ObjectMapper yamlMapper;
   private final List<FlowAstCommandMessage> messages = new ArrayList<>();
-  private List<AstCommandType> src = new ArrayList<>();
+  private List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   
   public FlowAstBuilderImpl(ObjectMapper yamlMapper) {
@@ -91,13 +91,13 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
     }
     for(JsonNode node : src) {
       final String type = getString(node, "type");
-      this.src.add(ImmutableAstCommandType.builder().id(getString(node, "id")).value(getString(node, "value")).type(AstCommandValue.valueOf(type)).build());
+      this.src.add(ImmutableAstCommand.builder().id(getString(node, "id")).value(getString(node, "value")).type(AstCommandValue.valueOf(type)).build());
     }
     return this;
   }
   
   @Override
-  public FlowAstBuilder src(List<AstCommandType> src) {
+  public FlowAstBuilder src(List<AstCommand> src) {
     if(src == null) {
       return this;
     }
@@ -107,13 +107,13 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
 
   @Override
   public FlowAstBuilder srcAdd(int line, String value) {
-    this.src.add(ImmutableAstCommandType.builder().id(line + "").value(value).type(AstCommandValue.ADD).build());
+    this.src.add(ImmutableAstCommand.builder().id(line + "").value(value).type(AstCommandValue.ADD).build());
     return this;
   }
 
   @Override
   public FlowAstBuilder srcDel(int line) {
-    this.src.add(ImmutableAstCommandType.builder().id(line + "").value(line + "").type(AstCommandValue.DELETE).build());
+    this.src.add(ImmutableAstCommand.builder().id(line + "").value(line + "").type(AstCommandValue.DELETE).build());
     return this;
   }
   @Override
@@ -123,12 +123,12 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
   }
 
   @Override
-  public FlowAstType build() {
+  public AstFlow build() {
     Assert.notNull(src, () -> "src can't ne null!");
 
     final var changes = AstChangesetFactory.src(src, rev);
     final var flow = visitFlow(changes.getSrc());
-    final var ast = ImmutableFlowAstType.builder();
+    final var ast = ImmutableAstFlow.builder();
     
     try {
       visitors.stream().forEach(v -> v.visit(flow, ast));
@@ -150,7 +150,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         .rev(this.rev == null ? src.size() : this.rev)
         .src(flow)
         // TODO::: HEADERS
-        .headers(ImmutableAstHeaders.builder().build())
+        .headers(ImmutableHeaders.builder().build())
         .build();
   }
   @Override

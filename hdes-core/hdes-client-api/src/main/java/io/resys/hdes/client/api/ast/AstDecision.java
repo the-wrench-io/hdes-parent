@@ -28,10 +28,10 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 
 @Value.Immutable
-public interface DecisionAstType extends AstType, Serializable {
+public interface AstDecision extends AstBody, Serializable {
   
   HitPolicy getHitPolicy();
   List<String> getHeaderTypes();

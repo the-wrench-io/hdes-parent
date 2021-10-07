@@ -27,7 +27,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
 
 @JsonIgnoreProperties({"parent"})
 public class NodeBean implements FlowAstNode {

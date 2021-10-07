@@ -31,9 +31,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
-import io.resys.hdes.client.api.ast.ImmutableServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.ImmutableAstService;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
@@ -102,12 +102,12 @@ public class GenericScriptBuilder implements ScriptBuilder {
       return new ServiceTemplate(ast, beanType);
     } catch (Exception e) {
       if (this.rev != null) {
-        ServiceAstType model = ImmutableServiceAstType.builder()
+        AstService model = ImmutableAstService.builder()
             .name("historic")
             .src(ast.getSrc())
             .commands(ast.getCommands())
             .rev(ast.getCommands().size())
-            .headers(ImmutableAstHeaders.builder().build())
+            .headers(ImmutableHeaders.builder().build())
             .build();
         return new ServiceHistoric(model);
       }

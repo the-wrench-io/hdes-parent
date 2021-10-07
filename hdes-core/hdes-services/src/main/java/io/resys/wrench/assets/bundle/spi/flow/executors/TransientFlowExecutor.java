@@ -35,9 +35,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DataTypeException;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
@@ -123,7 +123,7 @@ public class TransientFlowExecutor {
 
   protected List<Message> getErrors(Map<String, Serializable> input, ServiceDataModel dataModel) {
     List<Message> errors = new ArrayList<>();
-    for(AstDataType param : dataModel.getParams()) {
+    for(TypeDef param : dataModel.getParams()) {
       if(param.getDirection() != Direction.IN || !param.isRequired()) {
         continue;
       }
@@ -151,7 +151,7 @@ public class TransientFlowExecutor {
     return output;
   }
 
-  protected Map<String, Serializable> createInput(List<AstDataType> params, JsonNode input) {
+  protected Map<String, Serializable> createInput(List<TypeDef> params, JsonNode input) {
     Map<String, Serializable> result = new HashMap<>();
 
     if(input.isNull() || input == null) {
@@ -159,7 +159,7 @@ public class TransientFlowExecutor {
     }
     Assert.isTrue(input.isObject(), "input can only be object node!");
 
-    for(AstDataType param : params) {
+    for(TypeDef param : params) {
       if(param.getDirection() != Direction.IN) {
         continue;
       }

@@ -30,7 +30,7 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
 public interface FlowModel extends Model {
@@ -39,7 +39,7 @@ public interface FlowModel extends Model {
   @Nullable
   String getDescription();
   String getSrc();
-  Collection<AstDataType> getInputs();
+  Collection<TypeDef> getInputs();
   FlowTaskModel getTask();
   Collection<FlowTaskModel> getTasks();
 

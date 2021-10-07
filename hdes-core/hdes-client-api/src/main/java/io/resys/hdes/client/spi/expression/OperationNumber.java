@@ -23,7 +23,7 @@ package io.resys.hdes.client.spi.expression;
 import java.math.BigDecimal;
 import java.util.function.Consumer;
 
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 
 public class OperationNumber {
 

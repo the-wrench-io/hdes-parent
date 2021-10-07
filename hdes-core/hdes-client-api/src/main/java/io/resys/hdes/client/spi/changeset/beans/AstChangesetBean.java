@@ -25,19 +25,19 @@ import java.util.Collections;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
-import io.resys.hdes.client.api.ast.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommand;
 
 
 public class AstChangesetBean implements Comparable<AstChangesetBean>, AstChangeset {
   
   private int line;
-  private List<AstCommandType> commands = new ArrayList<>();
+  private List<AstCommand> commands = new ArrayList<>();
 
   public AstChangesetBean(int line) {
     super();
     this.line = line;
   }
-  public AstChangesetBean(int line, AstCommandType command) {
+  public AstChangesetBean(int line, AstCommand command) {
     super();
     this.line = line;
     this.commands.add(command);
@@ -47,10 +47,10 @@ public class AstChangesetBean implements Comparable<AstChangesetBean>, AstChange
     return line;
   }
   @Override
-  public List<AstCommandType> getCommands() {
+  public List<AstCommand> getCommands() {
     return Collections.unmodifiableList(commands);
   }
-  public AstChangesetBean add(AstCommandType command) {
+  public AstChangesetBean add(AstCommand command) {
     commands.add(command);
     return this;
   }

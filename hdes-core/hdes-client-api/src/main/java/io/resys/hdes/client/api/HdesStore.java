@@ -29,11 +29,11 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstType;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstBody;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
 import io.smallrye.mutiny.Uni;
 
 public interface HdesStore {
@@ -43,23 +43,23 @@ public interface HdesStore {
   UpdateBuilder update();
   
   interface DeleteBuilder {
-    Uni<Entity<AstType>> build(DeleteAstType deleteType);
+    Uni<Entity<AstBody>> build(DeleteAstType deleteType);
   }
   
   interface UpdateBuilder {
-    Uni<Entity<AstType>> build(UpdateAstType updateType); 
+    Uni<Entity<AstBody>> build(UpdateAstType updateType); 
   }
   
   interface QueryBuilder {
     Uni<StoreState> get();
-    Uni<Entity<AstType>> get(String id);
+    Uni<Entity<AstBody>> get(String id);
   }
   
   interface CreateBuilder {
-    Uni<Entity<FlowAstType>> flow(String name);
-    Uni<Entity<DecisionAstType>> decision(String name);
-    Uni<Entity<ServiceAstType>> service(String name);
-    Uni<Entity<AstType>> build(CreateAstType newType);
+    Uni<Entity<AstFlow>> flow(String name);
+    Uni<Entity<AstDecision>> decision(String name);
+    Uni<Entity<AstService>> service(String name);
+    Uni<Entity<AstBody>> build(CreateAstType newType);
   }
 
   @JsonSerialize(as = ImmutableDeleteAstType.class)
@@ -75,7 +75,7 @@ public interface HdesStore {
   interface UpdateAstType extends Serializable {
     String getId();
     EntityType getType();
-    List<AstCommandType> getBody();
+    List<AstCommand> getBody();
   }
   
   @JsonSerialize(as = ImmutableCreateAstType.class)
@@ -90,14 +90,14 @@ public interface HdesStore {
   @JsonDeserialize(as = ImmutableStoreState.class)
   @Value.Immutable
   interface StoreState {
-    Map<String, Entity<FlowAstType>> getFlows();
-    Map<String, Entity<FlowAstType>> getServices();
-    Map<String, Entity<FlowAstType>> getDecisions();
+    Map<String, Entity<AstFlow>> getFlows();
+    Map<String, Entity<AstFlow>> getServices();
+    Map<String, Entity<AstFlow>> getDecisions();
   }
   
   @JsonSerialize(as = ImmutableEntity.class)
   @Value.Immutable
-  interface Entity<T extends AstType> {
+  interface Entity<T extends AstBody> {
     String getId();
     String getValue();
     EntityType getType();

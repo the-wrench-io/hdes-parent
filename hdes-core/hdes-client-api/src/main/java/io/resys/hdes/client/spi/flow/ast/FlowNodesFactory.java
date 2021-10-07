@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstAutocomplete;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstAutocomplete;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstAutocomplete;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandRange;
 

@@ -26,10 +26,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.execution.DecisionTableResult;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.model.DecisionTableModel;
@@ -70,22 +70,22 @@ public interface HdesClient {
     
     // From model or by Id
     ServiceExecutor service(String modelId);
-    ServiceExecutor service(ServiceAstType model);
+    ServiceExecutor service(AstService model);
   }
   
   interface ModelBuilder {
-    FlowModel ast(FlowAstType ast);
-    DecisionTableModel ast(DecisionAstType ast);
-    ServiceAstType ast(ServiceAstType ast);
+    FlowModel ast(AstFlow ast);
+    DecisionTableModel ast(AstDecision ast);
+    AstService ast(AstService ast);
   }
 
   interface AstBuilder {
     AstBuilder commands(ArrayNode src, Integer version);
-    AstBuilder commands(List<AstCommandType> src, Integer version);
+    AstBuilder commands(List<AstCommand> src, Integer version);
     AstBuilder syntax(String src);
 
-    FlowAstType flow();
-    DecisionAstType decision();
-    ServiceAstType service();
+    AstFlow flow();
+    AstDecision decision();
+    AstService service();
   }
 }

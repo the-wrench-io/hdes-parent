@@ -1,6 +1,6 @@
 package io.resys.wrench.assets.bundle.spi.flow.hints;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
 
 /*-
  * #%L

@@ -36,14 +36,14 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.HdesAstTypes.DecisionAstBuilder;
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
-import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
-import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstDecision.ColumnExpressionType;
+import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.spi.HdesDataTypeFactory;
 import io.resys.hdes.client.spi.decision.ast.CommandMapper;
@@ -54,7 +54,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
   private final static List<String> knownCommandTypes = Arrays.asList(AstCommandValue.values()).stream().map(c -> c.name()).collect(Collectors.toList());
 
   private final HdesDataTypeFactory dataTypeFactory;
-  private List<AstCommandType> src;
+  private List<AstCommand> src;
   private Integer rev;
 
   public DecisionAstBuilderImpl(HdesDataTypeFactory dataTypeFactory) {
@@ -63,7 +63,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
   }
 
   @Override
-  public DecisionAstBuilderImpl src(List<AstCommandType> src) {
+  public DecisionAstBuilderImpl src(List<AstCommand> src) {
     this.src = src;
     return this;
   }
@@ -78,7 +78,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
     for(JsonNode node : src) {
       final String type = getString(node, "type");
       if(knownCommandTypes.contains(type)) {
-        this.src.add(ImmutableAstCommandType.builder().id(getString(node, "id")).value(getString(node, "value")).type(AstCommandValue.valueOf(type)).build());
+        this.src.add(ImmutableAstCommand.builder().id(getString(node, "id")).value(getString(node, "value")).type(AstCommandValue.valueOf(type)).build());
       }
     }
     return this;
@@ -91,14 +91,14 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
   }
 
   @Override
-  public DecisionAstType build() {
-    List<AstCommandType> src = CollectionUtils.isEmpty(this.src) ? Collections.emptyList() : this.src;
+  public AstDecision build() {
+    List<AstCommand> src = CollectionUtils.isEmpty(this.src) ? Collections.emptyList() : this.src;
     CommandMapper.Builder builder = CommandMapper.builder(dataTypeFactory);
 
     if(this.rev != null) {
       int limit = this.rev;
       int runningVersion = 0;
-      for(AstCommandType command : src) {
+      for(AstCommand command : src) {
         if(runningVersion++ > limit) {
           break;
         }
@@ -113,7 +113,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
     return builder.build();
   }
 
-  protected CommandMapper.Builder execute(CommandMapper.Builder builder, AstCommandType command) {
+  protected CommandMapper.Builder execute(CommandMapper.Builder builder, AstCommand command) {
     try {
       final var type = command.getType();
       switch(type) {

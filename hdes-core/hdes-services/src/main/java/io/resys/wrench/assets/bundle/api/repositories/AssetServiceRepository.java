@@ -36,9 +36,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.script.api.ScriptRepository;
@@ -79,7 +79,7 @@ public interface AssetServiceRepository {
     String getId();
     ServiceType getType();
     String getName();
-    List<AstCommandType> getCommands();
+    List<AstCommand> getCommands();
   }
   
   interface ServiceExecutor {
@@ -202,7 +202,7 @@ public interface AssetServiceRepository {
     ServiceType getType();
     ServiceStatus getStatus();
     List<ServiceError> getErrors();
-    List<AstDataType> getParams();
+    List<TypeDef> getParams();
     List<ServiceAssociation> getAssociations();
     ServiceDataModel withErrors(List<ServiceError> errors);
     ServiceDataModel withTimestamps(Timestamp created, Timestamp modified);

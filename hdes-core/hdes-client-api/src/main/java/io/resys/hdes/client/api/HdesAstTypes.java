@@ -25,14 +25,14 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstService;
 
 public interface HdesAstTypes {
 
@@ -47,7 +47,7 @@ public interface HdesAstTypes {
     DataTypeAstBuilder order(Integer order);
     DataTypeAstBuilder valueType(ValueType valueType);
     
-    DataTypeAstBuilder ref(String ref, AstDataType dataType);
+    DataTypeAstBuilder ref(String ref, TypeDef dataType);
     DataTypeAstBuilder required(boolean required);
     DataTypeAstBuilder data(boolean data);
     DataTypeAstBuilder name(String name);
@@ -58,31 +58,31 @@ public interface HdesAstTypes {
     DataTypeAstBuilder beanType(Class<?> beanType);
     DataTypeAstBuilder values(String values);
     DataTypeAstBuilder property();
-    AstDataType build();
+    TypeDef build();
   }
   
   interface DecisionAstBuilder {
-    DecisionAstBuilder src(List<AstCommandType> src);
+    DecisionAstBuilder src(List<AstCommand> src);
     DecisionAstBuilder src(JsonNode src);
     DecisionAstBuilder rev(Integer version);
-    DecisionAstType build();
+    AstDecision build();
   }
   
   interface FlowAstBuilder {
-    FlowAstBuilder src(List<AstCommandType> src);
+    FlowAstBuilder src(List<AstCommand> src);
     FlowAstBuilder src(ArrayNode src);
     FlowAstBuilder srcAdd(int line, String value);
     FlowAstBuilder srcDel(int line);
     FlowAstBuilder rev(Integer version);
     FlowAstBuilder autocomplete(boolean autocomplete);
     FlowAstBuilder visitors(NodeFlowVisitor ... visitors);
-    FlowAstType build();
+    AstFlow build();
   }
 
   interface ServiceAstBuilder {
-    ServiceAstBuilder src(List<AstCommandType> src);
+    ServiceAstBuilder src(List<AstCommand> src);
     ServiceAstBuilder src(ArrayNode src);
     ServiceAstBuilder rev(Integer version);
-    ServiceAstType build();
+    AstService build();
   }
 }

@@ -28,9 +28,9 @@ import io.resys.hdes.client.api.HdesStore.Entity;
 import io.resys.hdes.client.api.HdesStore.EntityType;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
 import io.resys.hdes.client.api.ImmutableUpdateAstType;
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.config.PgTestTemplate;
 import io.resys.hdes.client.config.RepositoryToStaticData;
 
@@ -43,7 +43,7 @@ public class PersistencePgTest extends PgTestTemplate {
   public void starter() {
     final var repo = getHdes("test1");
     
-    Entity<FlowAstType> article1 = repo.store().create().flow("first-flow")
+    Entity<AstFlow> article1 = repo.store().create().flow("first-flow")
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
 
@@ -56,7 +56,7 @@ public class PersistencePgTest extends PgTestTemplate {
       .build(ImmutableUpdateAstType.builder()
           .id(article1.getId())
           .type(EntityType.FLOW)
-          .addBody(ImmutableAstCommandType.builder()
+          .addBody(ImmutableAstCommand.builder()
               .type(AstCommandValue.SET_BODY)
               .value("id: change flow symbolic id")
               .build())

@@ -26,7 +26,7 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.execution.DecisionTableResult;
 import io.resys.hdes.client.api.model.DecisionTableModel;
 
@@ -45,7 +45,7 @@ public interface DecisionTableRepository {
 
   interface DecisionTableExecutor {
     DecisionTableExecutor decisionTable(DecisionTableModel decisionTable);
-    DecisionTableExecutor context(Function<AstDataType, Object> context);
+    DecisionTableExecutor context(Function<TypeDef, Object> context);
     DecisionTableResult execute();
   }
 

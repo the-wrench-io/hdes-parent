@@ -22,10 +22,10 @@ package io.resys.hdes.client.api.execution;
 
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.AstService;
 
 public interface Service {
-  ServiceAstType getModel();
+  AstService getModel();
   Object execute(List<Object> context, ServiceInit init);
   void stop();  
   

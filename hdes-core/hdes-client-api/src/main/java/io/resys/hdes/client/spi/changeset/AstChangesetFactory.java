@@ -31,9 +31,9 @@ import org.immutables.value.Value;
 import com.google.common.collect.Range;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.spi.changeset.beans.AstChangesetBean;
 import io.resys.hdes.client.spi.util.Assert;
 
@@ -41,7 +41,7 @@ public class AstChangesetFactory {
 
   @Value.Immutable
   public interface CommandsAndChanges {
-    List<AstCommandType> getCommands();
+    List<AstCommand> getCommands();
     List<AstChangeset> getSrc();
   } 
   
@@ -49,17 +49,17 @@ public class AstChangesetFactory {
     return new SourceBuilder();
   }
 
-  public static CommandsAndChanges src(List<AstCommandType> src, Integer rev) {
+  public static CommandsAndChanges src(List<AstCommand> src, Integer rev) {
     return new SourceBuilderFromCommands(src, rev).build();
   }
 
   private static class SourceBuilderFromCommands {
-    private final List<AstCommandType> src; 
+    private final List<AstCommand> src; 
     private final Integer rev;
-    private final List<AstCommandType> commands = new ArrayList<>();
+    private final List<AstCommand> commands = new ArrayList<>();
     private final SourceBuilder sourceBuilder = new SourceBuilder();
     
-    public SourceBuilderFromCommands(List<AstCommandType> src, Integer rev) {
+    public SourceBuilderFromCommands(List<AstCommand> src, Integer rev) {
       this.src = src;
       this.rev = rev;
     }
@@ -68,7 +68,7 @@ public class AstChangesetFactory {
       if (rev != null) {
         int limit = rev;
         int runningVersion = 0;
-        for (AstCommandType command : src) {
+        for (AstCommand command : src) {
           if (runningVersion++ > limit) {
             break;
           }
@@ -80,7 +80,7 @@ public class AstChangesetFactory {
       return ImmutableCommandsAndChanges.builder().commands(commands).src(sourceBuilder.build()).build();
     }
     
-    private void visitCommand(AstCommandType command) {
+    private void visitCommand(AstCommand command) {
       int line = Integer.parseInt(command.getId());
       AstCommandValue type = command.getType();
 
@@ -103,7 +103,7 @@ public class AstChangesetFactory {
     public SourceBuilder add(int line, String value) {
       sourcesAdded.stream().filter(s -> s.getLine() >= line).forEach(s -> s.setLine(s.getLine() + 1));
       sourcesAdded.add(new AstChangesetBean(line,
-          ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(AstCommandValue.ADD).build()));
+          ImmutableAstCommand.builder().id(String.valueOf(line)).value(value).type(AstCommandValue.ADD).build()));
       return this;
     }
 
@@ -111,7 +111,7 @@ public class AstChangesetFactory {
       Optional<AstChangesetBean> source = sourcesAdded.stream().filter(s -> s.getLine() == line).findFirst();
       Assert.isTrue(source.isPresent(), () -> String.format("Can't change value of non existing line: %s!", line));
       source.get().add(
-          ImmutableAstCommandType.builder().id(String.valueOf(line)).value(value).type(AstCommandValue.SET).build());
+          ImmutableAstCommand.builder().id(String.valueOf(line)).value(value).type(AstCommandValue.SET).build());
       return this;
     }
 

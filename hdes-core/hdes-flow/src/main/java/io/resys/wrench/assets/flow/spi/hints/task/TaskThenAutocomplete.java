@@ -24,20 +24,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class TaskThenAutocomplete implements NodeFlowVisitor {
 
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
     Map<String, FlowAstTask> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;

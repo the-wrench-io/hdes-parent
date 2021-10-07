@@ -27,12 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstInput;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 
@@ -48,7 +48,7 @@ public class InputDataTypeAutocomplete implements NodeFlowVisitor {
       .collect(Collectors.toList());
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
     Map<String, FlowAstInput> inputs = flow.getInputs();
 
     if(inputs.isEmpty()) {

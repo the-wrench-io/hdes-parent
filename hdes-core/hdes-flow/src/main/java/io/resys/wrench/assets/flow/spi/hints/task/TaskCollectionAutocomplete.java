@@ -24,19 +24,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstRef;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstRef;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 
 public class TaskCollectionAutocomplete implements NodeFlowVisitor {
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
     Map<String, FlowAstTask> tasks = flow.getTasks();
 
     if(tasks.isEmpty()) {

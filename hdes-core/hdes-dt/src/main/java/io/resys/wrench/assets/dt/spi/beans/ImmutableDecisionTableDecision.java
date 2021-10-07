@@ -24,7 +24,7 @@ import java.util.List;
 
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstType.AstExpression;
+import io.resys.hdes.client.api.ast.AstBody.AstExpression;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;

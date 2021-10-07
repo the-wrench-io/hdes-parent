@@ -31,7 +31,7 @@ import org.immutables.value.Value;
 
 
 @Value.Immutable
-public interface FlowAstType extends AstType, Serializable {
+public interface AstFlow extends AstBody, Serializable {
   NodeFlow getSrc();
   List<FlowAstCommandMessage> getMessages();
   List<FlowAstAutocomplete> getAutocomplete();
@@ -126,7 +126,7 @@ public interface FlowAstType extends AstType, Serializable {
   }
   
   interface NodeFlowVisitor {
-    void visit(NodeFlow node, ImmutableFlowAstType.Builder nodesBuilder);
+    void visit(NodeFlow node, ImmutableAstFlow.Builder nodesBuilder);
   }
 
 }

@@ -27,13 +27,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInputType;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstRef;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstSwitch;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstInput;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstInputType;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstRef;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstSwitch;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
 
 public class NodeFlowBean extends NodeBean implements NodeFlow {

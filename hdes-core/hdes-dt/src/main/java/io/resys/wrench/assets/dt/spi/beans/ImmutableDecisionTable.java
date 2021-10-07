@@ -22,7 +22,7 @@ package io.resys.wrench.assets.dt.spi.beans;
 
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
+import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.model.DecisionTableModel;
 
 public class ImmutableDecisionTable implements DecisionTableModel {

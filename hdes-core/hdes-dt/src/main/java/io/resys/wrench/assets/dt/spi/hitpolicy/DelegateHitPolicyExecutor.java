@@ -20,7 +20,7 @@ package io.resys.wrench.assets.dt.spi.hitpolicy;
  * #L%
  */
 
-import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
+import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
 import io.resys.hdes.client.api.execution.DecisionTableResult.HitPolicyExecutor;
 import io.resys.hdes.client.api.model.DecisionTableModel;

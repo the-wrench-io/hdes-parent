@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutput;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
@@ -164,7 +164,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             return delegate;
           }
           private void validateFlowInput(AssetService service, Map<String, Object> input) {
-            for(AstDataType dataType : service.getDataModel().getParams()) {
+            for(TypeDef dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "Flow with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
               }
@@ -195,7 +195,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             return this;
           }
           private void validateDtInput(AssetService service, Map<String, Object> input) {
-            for(AstDataType dataType : service.getDataModel().getParams()) {
+            for(TypeDef dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "DT with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
               }

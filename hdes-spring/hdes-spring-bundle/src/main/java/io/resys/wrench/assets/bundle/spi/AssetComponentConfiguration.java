@@ -42,7 +42,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
 import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
 import io.resys.hdes.client.api.execution.Service.ServiceInit;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;

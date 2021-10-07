@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.AstExpression;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.AstBody.AstExpression;
 import io.resys.hdes.client.api.execution.DecisionTableResult;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
@@ -49,7 +49,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
 
   private final NodeExpressionExecutor expressionExecutor;
   private DecisionTableModel decisionTable;
-  private Function<AstDataType, Object> context;
+  private Function<TypeDef, Object> context;
 
   public GenericDecisionTableExecutor(NodeExpressionExecutor expressionExecutor) {
     super();
@@ -63,7 +63,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
   }
 
   @Override
-  public DecisionTableExecutor context(Function<AstDataType, Object> context) {
+  public DecisionTableExecutor context(Function<TypeDef, Object> context) {
     this.context = context;
     return this;
   }

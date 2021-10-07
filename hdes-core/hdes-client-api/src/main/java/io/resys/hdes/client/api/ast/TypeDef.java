@@ -29,11 +29,9 @@ import org.immutables.value.Value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.resys.hdes.client.api.model.Model;
-
 
 @Value.Immutable
-public abstract class AstDataType implements Model {
+public abstract class TypeDef implements Serializable {
   private static final long serialVersionUID = -1945170579949676929L;
   
   public abstract String getId(); // GID
@@ -44,7 +42,7 @@ public abstract class AstDataType implements Model {
   public abstract Direction getDirection();
   public abstract ValueType getValueType();
   public abstract boolean isRequired();
-  public abstract Collection<AstDataType> getProperties();
+  public abstract Collection<TypeDef> getProperties();
 
   @Nullable
   public abstract String getScript();
@@ -71,11 +69,11 @@ public abstract class AstDataType implements Model {
   }
     
   public interface DataTypeDeserializer {
-    Serializable deserialize(AstDataType dataType, Object value);
+    Serializable deserialize(TypeDef dataType, Object value);
   }
 
   public interface DataTypeSerializer {
-    String serialize(AstDataType dataType, Object value);
+    String serialize(TypeDef dataType, Object value);
   }
 
   @FunctionalInterface

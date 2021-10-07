@@ -1,6 +1,6 @@
 package io.resys.wrench.assets.dt.spi.beans;
 
-import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.TypeDef;
 
 /*-
  * #%L
@@ -26,15 +26,15 @@ import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 
 public class ImmutableDecisionContext implements DecisionContext {
 
-  private final AstDataType key;
+  private final TypeDef key;
   private final Object value;
-  public ImmutableDecisionContext(AstDataType key, Object value) {
+  public ImmutableDecisionContext(TypeDef key, Object value) {
     super();
     this.key = key;
     this.value = value;
   }
   @Override
-  public AstDataType getKey() {
+  public TypeDef getKey() {
     return key;
   }
   @Override

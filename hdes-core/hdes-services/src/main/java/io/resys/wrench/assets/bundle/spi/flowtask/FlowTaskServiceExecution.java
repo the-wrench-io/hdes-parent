@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.api.execution.Service.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
@@ -38,14 +38,14 @@ public class FlowTaskServiceExecution implements ServiceExecution {
   private final Service script;
   private final ServiceInit init;
   private final List<Object> facts = new ArrayList<>();
-  private final AstDataType taskInputModel;
+  private final TypeDef taskInputModel;
   private FlowTaskInput taskInput;
 
   public FlowTaskServiceExecution(Service script, ServiceInit init) {
     super();
     this.script = script;
     this.init = init;
-    this.taskInputModel = script.getModel().getHeaders().getInputs().stream()
+    this.taskInputModel = script.getModel().getHeaders().getAcceptDefs().stream()
         .filter(p -> p.getData())
         .findFirst()
         .orElse(null);

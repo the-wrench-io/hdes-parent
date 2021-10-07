@@ -24,12 +24,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 
 public class IdAutocomplete implements NodeFlowVisitor {
 
@@ -39,7 +39,7 @@ public class IdAutocomplete implements NodeFlowVisitor {
       NodeFlowBean.KEY_TASKS);
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
+  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
     FlowAstNode node = flow.getId();
     if(node != null) {
       return;

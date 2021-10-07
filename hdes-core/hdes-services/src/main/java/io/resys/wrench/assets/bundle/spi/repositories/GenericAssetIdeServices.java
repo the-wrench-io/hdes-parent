@@ -47,8 +47,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.FlowAstType;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowContext;
 import io.resys.hdes.client.api.execution.Flow.FlowTask;
@@ -376,7 +376,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createDtCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    DecisionAstType commandModel  = assetServiceRepository.getTypes().decision()
+    AstDecision commandModel  = assetServiceRepository.getTypes().decision()
         .src(command.getInput())
         .rev(command.getRev())
         .build();
@@ -388,7 +388,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    FlowAstType commandModel  = assetServiceRepository.getTypes().flow()
+    AstFlow commandModel  = assetServiceRepository.getTypes().flow()
         .src((ArrayNode) command.getInput())
         .rev(command.getRev())
         .build();

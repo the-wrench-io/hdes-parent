@@ -24,7 +24,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 
@@ -39,7 +39,7 @@ public class MatchingDtInputResolver implements Serializable, DtInputResolver {
   }
 
   @Override
-  public Object apply(AstDataType t) {
+  public Object apply(TypeDef t) {
     String name = t.getName();
 
     // Flat mapping

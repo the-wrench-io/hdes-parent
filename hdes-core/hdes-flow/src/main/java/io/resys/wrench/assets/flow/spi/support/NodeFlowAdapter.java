@@ -26,13 +26,13 @@ import java.util.Collections;
 import java.util.Map;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstInput;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
 
@@ -52,11 +52,11 @@ public class NodeFlowAdapter {
     return Boolean.parseBoolean(node.getValue());
   }
 
-  public static Collection<AstDataType> getInputs(NodeFlow data, HdesAstTypes dataTypeRepository) {
+  public static Collection<TypeDef> getInputs(NodeFlow data, HdesAstTypes dataTypeRepository) {
     Map<String, FlowAstInput> inputs = data.getInputs();
 
     int index = 0;
-    Collection<AstDataType> result = new ArrayList<>();
+    Collection<TypeDef> result = new ArrayList<>();
     for (Map.Entry<String, FlowAstInput> entry : inputs.entrySet()) {
       if (entry.getValue().getType() == null) {
         continue;

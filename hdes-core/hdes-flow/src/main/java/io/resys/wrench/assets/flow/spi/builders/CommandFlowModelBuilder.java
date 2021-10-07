@@ -41,12 +41,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstSwitch;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstSwitch;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
+import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
 import io.resys.hdes.client.api.model.FlowModel;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
