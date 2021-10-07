@@ -51,6 +51,7 @@ import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowCommandMessageType;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstInputType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
@@ -148,6 +149,8 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         .name(id == null ? "": id.getValue())
         .rev(this.rev == null ? src.size() : this.rev)
         .src(flow)
+        // TODO::: HEADERS
+        .headers(ImmutableAstHeaders.builder().build())
         .build();
   }
   @Override

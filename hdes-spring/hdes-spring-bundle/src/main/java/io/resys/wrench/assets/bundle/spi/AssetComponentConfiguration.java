@@ -47,8 +47,7 @@ import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExec
 import io.resys.hdes.client.api.execution.Service.ServiceInit;
 import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
 import io.resys.hdes.client.spi.HdesAstTypesImpl;
-import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
-import io.resys.hdes.client.spi.decision.SpringDynamicValueExpressionExecutor;
+import io.resys.hdes.client.spi.expression.GenericExpressionExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -180,11 +179,7 @@ public class AssetComponentConfiguration {
   
   private DecisionTableRepository decisionTableRepository(HdesAstTypes dataTypeRepository, ObjectMapper objectMapper, ServiceStore serviceStore) {
     NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper);
-    return new GenericDecisionTableRepository(
-        objectMapper,
-        dataTypeRepository,
-        expressionExecutor,
-        () -> new SpringDynamicValueExpressionExecutor());
+    return new GenericDecisionTableRepository(objectMapper, dataTypeRepository, expressionExecutor);
   }
 
 

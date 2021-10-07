@@ -23,11 +23,9 @@ package io.resys.wrench.assets.bundle.spi.flowtask;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeader;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -57,13 +55,16 @@ public class FlowTaskServiceDataModelBuilder {
   }
 
   protected List<AstDataType> getScriptParameterModels(ServiceAstType model) {
-    List<ServiceHeader> externals = model.getHeaders().getValues().stream()
-        .filter(p -> p.getData())
-        .collect(Collectors.toList());
-
     // drop dummy layer
     List<AstDataType> result = new ArrayList<>();
-    externals.forEach(e -> result.addAll(e.getType().getProperties()));
+    
+    model.getHeaders().getInputs().stream()
+      .filter(p -> p.getData())
+      .forEach(p -> result.addAll(p.getProperties()));
+    
+    model.getHeaders().getOutputs().stream()
+      .forEach(p -> result.addAll(p.getProperties()));
+    
     return result;
   }
 }

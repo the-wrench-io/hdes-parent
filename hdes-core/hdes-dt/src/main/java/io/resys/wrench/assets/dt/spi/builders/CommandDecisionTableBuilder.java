@@ -47,12 +47,9 @@ import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.ast.DecisionAstType;
 import io.resys.hdes.client.api.ast.DecisionAstType.Cell;
-import io.resys.hdes.client.api.ast.DecisionAstType.Header;
 import io.resys.hdes.client.api.ast.DecisionAstType.Row;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DynamicValueExpressionExecutor;
 import io.resys.hdes.client.api.model.DecisionTableModel;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
@@ -70,8 +67,6 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   private final ObjectMapper objectMapper;
   private final Supplier<HdesAstTypes> commandBuilder;
   private final List<String> errors = new ArrayList<>();
-  private final HdesAstTypes dataTypeRepository;
-  private final DynamicValueExpressionExecutor executor;
 
   protected String src;
   protected Optional<String> rename = Optional.empty();
@@ -80,11 +75,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   
   public CommandDecisionTableBuilder(
       ObjectMapper objectMapper,
-      DynamicValueExpressionExecutor executor,
-      HdesAstTypes dataTypeRepository,
       Supplier<HdesAstTypes> commandBuilder) {
-    this.dataTypeRepository = dataTypeRepository;
-    this.executor = executor;
     this.objectMapper = objectMapper;
     this.commandBuilder = commandBuilder;
   }
@@ -148,13 +139,14 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   protected List<DecisionTableDataType> createTypes(DecisionAstType data) {
     List<DecisionTableDataType> result = new ArrayList<>();
     int index = 0;
-    for(Header header : data.getHeaders()) {
+    
+    List<AstDataType> allHeaders = new ArrayList<>();
+    allHeaders.addAll(data.getHeaders().getInputs());
+    allHeaders.addAll(data.getHeaders().getOutputs());
+    
+    for(AstDataType header : allHeaders) {
       result.add(new ImmutableDecisionTableDataType(
-          index++, header.getScript(),
-          resolveType(
-              header.getValue(),
-              header.getName(),
-              header.getDirection())));
+          index++, header.getScript(), header));
     }
     Collections.sort(result);
     return Collections.unmodifiableList(result);
@@ -225,15 +217,5 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
     Assert.notNull(rename, () -> "rename can't be null!");
     this.rename = rename;
     return this;
-  }
-  protected AstDataType resolveType(ValueType valueType, String name, Direction direction) {
-    return dataTypeRepository.dataType().
-        name(name).
-        valueType(valueType).
-        direction(direction).
-        build();
-  }
-  protected DynamicValueExpressionExecutor getExecutor() {
-    return executor;
   }
 }

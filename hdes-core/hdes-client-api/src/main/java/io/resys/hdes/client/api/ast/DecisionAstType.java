@@ -28,7 +28,6 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
 import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 
 @Value.Immutable
@@ -37,20 +36,8 @@ public interface DecisionAstType extends AstType, Serializable {
   HitPolicy getHitPolicy();
   List<String> getHeaderTypes();
   Map<ValueType, List<String>> getHeaderExpressions();
-  List<Header> getHeaders();
   List<Row> getRows();
 
-  @Value.Immutable
-  interface Header extends Serializable {
-    String getId();
-    Integer getOrder();
-    String getName();
-    ValueType getValue();
-    Direction getDirection();
-    
-    @Nullable
-    String getScript();
-  }
 
   @Value.Immutable
   interface Row extends Serializable {

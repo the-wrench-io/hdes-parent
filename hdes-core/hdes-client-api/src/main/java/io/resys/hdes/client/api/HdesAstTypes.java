@@ -43,14 +43,19 @@ public interface HdesAstTypes {
 
   
   interface DataTypeAstBuilder {
+    DataTypeAstBuilder id(String id);
+    DataTypeAstBuilder order(Integer order);
+    DataTypeAstBuilder valueType(ValueType valueType);
+    
     DataTypeAstBuilder ref(String ref, AstDataType dataType);
     DataTypeAstBuilder required(boolean required);
+    DataTypeAstBuilder data(boolean data);
     DataTypeAstBuilder name(String name);
-
-    DataTypeAstBuilder valueType(ValueType valueType);
+    DataTypeAstBuilder script(String script);
     DataTypeAstBuilder direction(Direction direction);
-    DataTypeAstBuilder beanType(Class<?> beanType);
     DataTypeAstBuilder description(String description);
+    
+    DataTypeAstBuilder beanType(Class<?> beanType);
     DataTypeAstBuilder values(String values);
     DataTypeAstBuilder property();
     AstDataType build();

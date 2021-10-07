@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.decision.execution;
+package io.resys.hdes.client.spi.expression;
 
 /*-
  * #%L
@@ -30,8 +30,8 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.AstType.AstExpression;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
-import io.resys.hdes.client.api.execution.DecisionTableResult.Expression;
 import io.resys.hdes.client.spi.util.Assert;
 
 
@@ -61,7 +61,7 @@ public class OperationFactory {
       return this;
     }
 
-    public Expression build() {
+    public AstExpression build() {
       Assert.notNull(src, () -> "src can't be null!");
       Assert.notNull(valueType, () -> "valueType can't be null!");
 
@@ -75,6 +75,10 @@ public class OperationFactory {
 
         Operation operation = null;
         switch (valueType) {
+        case MAP: 
+          Assert.notNull(objectMapper, () -> "objectMapper can't be null!");
+          operation = OperationMap.builder().build(src, constantsConsumer);
+          break;
         case STRING:
           Assert.notNull(objectMapper, () -> "objectMapper can't be null!");
           operation = OperationString.builder(objectMapper).build(src, constantsConsumer);
@@ -102,7 +106,7 @@ public class OperationFactory {
     }
   }
 
-  private static class ImmutableExpression implements Expression {
+  private static class ImmutableExpression implements AstExpression {
     private final transient Operation expression;
     private final String src;
     private final ValueType type;

@@ -36,12 +36,18 @@ import io.resys.hdes.client.api.model.Model;
 public abstract class AstDataType implements Model {
   private static final long serialVersionUID = -1945170579949676929L;
   
+  public abstract String getId(); // GID
   public abstract String getName();
+  public abstract Integer getOrder();
+  public abstract Boolean getData();
+  
   public abstract Direction getDirection();
   public abstract ValueType getValueType();
   public abstract boolean isRequired();
   public abstract Collection<AstDataType> getProperties();
 
+  @Nullable
+  public abstract String getScript();
   @Nullable
   public abstract Class<?> getBeanType();
   @Nullable
@@ -80,6 +86,6 @@ public abstract class AstDataType implements Model {
   public enum AssociationType { ONE_TO_ONE, ONE_TO_MANY }
   public enum Direction { IN, OUT }
   public enum ValueType {
-    TIME, DATE, DATE_TIME, INSTANT, STRING, INTEGER, LONG, DECIMAL, BOOLEAN, PERIOD, DURATION, PERCENT, OBJECT, ARRAY;
+    TIME, DATE, DATE_TIME, INSTANT, STRING, INTEGER, LONG, DECIMAL, BOOLEAN, PERIOD, DURATION, PERCENT, OBJECT, ARRAY, MAP;
   }
 }

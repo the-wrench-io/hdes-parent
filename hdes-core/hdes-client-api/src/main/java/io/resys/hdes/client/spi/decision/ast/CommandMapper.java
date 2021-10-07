@@ -1,5 +1,7 @@
 package io.resys.hdes.client.spi.decision.ast;
 
+import java.math.BigDecimal;
+
 /*-
  * #%L
  * hdes-client-api
@@ -29,55 +31,72 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstDataType.Direction;
 import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.AstType.AstExpression;
 import io.resys.hdes.client.api.ast.DecisionAstType;
 import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
-import io.resys.hdes.client.api.ast.DecisionAstType.Header;
 import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
 import io.resys.hdes.client.api.ast.DecisionAstType.Row;
+import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
 import io.resys.hdes.client.api.ast.ImmutableCell;
 import io.resys.hdes.client.api.ast.ImmutableDecisionAstType;
-import io.resys.hdes.client.api.ast.ImmutableHeader;
 import io.resys.hdes.client.api.ast.ImmutableRow;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DynamicValueExpressionExecutor;
-import io.resys.hdes.client.api.execution.DecisionTableResult.Expression;
-import io.resys.hdes.client.spi.decision.SpringDynamicValueExpressionExecutor;
-import io.resys.hdes.client.spi.decision.execution.OperationFactory;
+import io.resys.hdes.client.spi.HdesDataTypeFactory;
 import io.resys.hdes.client.spi.util.Assert;
 
 
 
 public class CommandMapper {
-  private final static List<String> headerTypes;
-  private final static Map<ValueType, List<String>> headerExpressions;
+  private final static List<String> headerTypes = Collections.unmodifiableList(
+      Arrays.asList(ValueType.STRING,  ValueType.BOOLEAN, ValueType.INTEGER, ValueType.LONG, ValueType.DECIMAL, ValueType.DATE, ValueType.DATE_TIME).stream()
+      .map(v -> v.name()).collect(Collectors.toList()));
   
-  static {
-    headerExpressions = Collections.unmodifiableMap(Map.of(
-        ValueType.INTEGER, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.EQUALS.name())),
-        ValueType.DECIMAL, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.EQUALS.name())),
-        ValueType.STRING, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.IN.name()))    
-    ));
-    headerTypes = Collections.unmodifiableList(
-        Arrays.asList(ValueType.STRING,  ValueType.BOOLEAN, ValueType.INTEGER, ValueType.LONG, ValueType.DECIMAL, ValueType.DATE, ValueType.DATE_TIME).stream()
-        .map(v -> v.name()).collect(Collectors.toList()));
+  private final static Map<ValueType, List<String>> headerExpressions = Collections.unmodifiableMap(Map.of(
+      ValueType.INTEGER, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.EQUALS.name())),
+      ValueType.DECIMAL, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.EQUALS.name())),
+      ValueType.STRING, Collections.unmodifiableList(Arrays.asList(ColumnExpressionType.IN.name()))    
+  ));
+  private final static List<String> dynamocValueExpressions = Collections.unmodifiableList(Arrays.asList("<=", "<",">=", ">", "="));
+
+  private static Object parseVariable(String expression, ValueType type) {
+    Optional<String> comparison = dynamocValueExpressions.stream().filter(v -> expression.startsWith(v)).findFirst();
+    if(!comparison.isPresent()) {
+      switch(type) {
+      case DECIMAL:
+        return BigDecimal.ZERO;
+      case LONG:
+        return 0;
+      case INTEGER:
+        return 0;
+      default: return null;
+      }
+    }
+    String value = expression.substring(comparison.get().length()).trim();
+    switch(type) {
+    case DECIMAL:
+      return new BigDecimal(value);
+    case LONG:
+      return Long.parseLong(value);
+    case INTEGER:
+      return Integer.parseInt(value);
+    default: return null;
+    }
   }
   
-  
-  public static Builder builder(ObjectMapper objectMapper) {
-    return new Builder(objectMapper);
+  public static Builder builder(HdesDataTypeFactory dataTypeFactory) {
+    return new Builder(dataTypeFactory);
   }
 
   public static class Builder {
-    private final ObjectMapper objectMapper;
-    private final SpringDynamicValueExpressionExecutor dynamicValueExpressionExecutor = new SpringDynamicValueExpressionExecutor(); 
+    private final HdesDataTypeFactory dataTypeFactory; 
     private long idGen = 0;
     private String name;
     private String description;
@@ -88,9 +107,9 @@ public class CommandMapper {
     private final Map<String, MutableCell> cells = new HashMap<>();
     private final Map<String, MutableRow> rows = new HashMap<>();
 
-    public Builder(ObjectMapper objectMapper) {
+    public Builder(HdesDataTypeFactory dataTypeFactory) {
       super();
-      this.objectMapper = objectMapper;
+      this.dataTypeFactory = dataTypeFactory;
     }
     
     private String nextId() {
@@ -168,11 +187,7 @@ public class CommandMapper {
         .forEach(cell -> {
 
           try {
-            Expression expression = OperationFactory.builder()
-                .objectMapper(objectMapper)
-                .valueType(valueType)
-                .src(cell.getValue()).build();
-
+            AstExpression expression = dataTypeFactory.expression(valueType, cell.getValue());
             if(expression.getConstants().size() == 1) {
               cell.setValue(expression.getConstants().get(0));
             }
@@ -188,10 +203,7 @@ public class CommandMapper {
     private String getExpression(ValueType valueType, ColumnExpressionType value, String columnValue) {
       String constant;
       try {
-        Expression expression = OperationFactory.builder()
-            .objectMapper(objectMapper)
-            .valueType(valueType)
-            .src(columnValue).build();
+        AstExpression expression = dataTypeFactory.expression(valueType, columnValue);
         if(expression.getConstants().size() != 1) {
           return null;
         }
@@ -354,24 +366,21 @@ public class CommandMapper {
       return this;
     }
 
-    private String resolveScriptValue(
-        MutableHeader header, MutableCell cell,
-        DynamicValueExpressionExecutor dynamicValueExpressionExecutor) {
-
-
+    private String resolveScriptValue(MutableHeader header, MutableCell cell) {
       Map<String, Object> context = new HashMap<>();
       for(MutableHeader h : headers.values()) {
         MutableCell value = h.getCells().stream()
             .filter(c -> c.getRow().equals(cell.getRow()))
             .findFirst().get();
         try {
-          Object variable = dynamicValueExpressionExecutor.parseVariable(value.getValue(), h.getValue());
+          Object variable = parseVariable(value.getValue(), h.getValue());
           context.put(h.getName(), variable);
         } catch(Exception e) {
         }
       }
+      
       try {
-        return dynamicValueExpressionExecutor.execute(header.getScript(), context);
+        return dataTypeFactory.expression(ValueType.MAP, header.getScript()).getValue(context) + "";
       } catch(Exception e) {
         return null;
       }
@@ -380,19 +389,18 @@ public class CommandMapper {
     public DecisionAstType build() {
       this.headers.values().stream()
       .filter(h -> !StringUtils.isEmpty(h.getScript()))
-      .forEach(h -> h.getCells().forEach(c -> c.setValue(resolveScriptValue(h, c, dynamicValueExpressionExecutor))));
-
-      //Direction direction, String name, String ref, String value, String id, String script, List<String> constraints
-      List<Header> headers = this.headers.values().stream().sorted()
-          .map(h ->  ImmutableHeader.builder()
-          .direction(h.getDirection())
-          .name(h.getName())
-          .value(h.getValue())
-          .id(h.getId())
-          .order(h.getOrder())
-          .script(h.getScript())
-          .build())
-        .collect(Collectors.toList());
+      .forEach(h -> h.getCells().forEach(c -> c.setValue(resolveScriptValue(h, c))));
+      
+      List<AstDataType> headers = this.headers.values().stream().sorted()
+          .map(h -> (AstDataType) dataTypeFactory.dataType()
+              .direction(h.getDirection())
+              .name(h.getName())
+              .valueType(h.getValue())
+              .id(h.getId())
+              .order(h.getOrder())
+              .script(h.getScript())
+              .build())
+          .collect(Collectors.toList());
 
       
       List<Row> rows = this.rows.values().stream().sorted()
@@ -417,7 +425,10 @@ public class CommandMapper {
           .hitPolicy(hitPolicy)
           .headerTypes(headerTypes)
           .headerExpressions(headerExpressions)
-          .headers(headers)
+          .headers(ImmutableAstHeaders.builder()
+              .inputs(headers.stream().filter(p -> p.getDirection() == Direction.IN).collect(Collectors.toList()))
+              .outputs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
+              .build())
           .rows(rows)
           .build();
     }

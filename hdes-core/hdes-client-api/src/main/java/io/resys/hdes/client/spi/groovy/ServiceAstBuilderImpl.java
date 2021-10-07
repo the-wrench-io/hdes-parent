@@ -40,13 +40,11 @@ import io.resys.hdes.client.api.ast.AstCommandType;
 import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDataType.Direction;
 import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.AstType.AstHeaders;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
 import io.resys.hdes.client.api.ast.ImmutableServiceAstType;
-import io.resys.hdes.client.api.ast.ImmutableServiceHeader;
-import io.resys.hdes.client.api.ast.ImmutableServiceHeaders;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeader;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeaders;
 import io.resys.hdes.client.api.exceptions.ServiceAstException;
 import io.resys.hdes.client.api.execution.ServiceData;
 import io.resys.hdes.client.spi.HdesDataTypeFactory;
@@ -116,7 +114,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     
     try {
       final Class<?> beanType = gcl.parseClass(source);
-      final ServiceHeaders method = getHeaders(beanType);
+      final AstHeaders method = getHeaders(beanType);
       
       return ImmutableServiceAstType.builder()
           .name(beanType.getSimpleName())
@@ -131,15 +129,15 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
   }
   
-  protected ServiceHeaders getHeaders(Class<?> beanType) {
-    List<ServiceHeaders> result = new ArrayList<>();
+  protected AstHeaders getHeaders(Class<?> beanType) {
+    List<AstHeaders> result = new ArrayList<>();
     for (Method method : beanType.getDeclaredMethods()) {
       if (method.getName().equals("execute") && Modifier.isPublic(method.getModifiers())
           && !Modifier.isVolatile(method.getModifiers())) {
 
-        List<ServiceHeader> params = getParams(method);
+        AstHeaders params = getParams(method);
         Assert.isTrue(result.isEmpty(), () -> "Only one 'execute' method allowed!");
-        result.add(ImmutableServiceHeaders.builder().values(params).build());
+        result.add(params);
       }
     }
     Assert.isTrue(result.size() == 1, () -> "There must be one 'execute' method!");
@@ -147,20 +145,23 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
   }
   
 
-  protected List<ServiceHeader> getParams(Method method) {
-    List<ServiceHeader> result = new ArrayList<>();
+  protected AstHeaders getParams(Method method) {
+    final var result = ImmutableAstHeaders.builder();
     int index = 0;
     for(Parameter parameter : method.getParameters()) {
       Class<?> type = parameter.getType();
       boolean isData = type.isAnnotationPresent(ServiceData.class);
       
-      DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.create().
+      DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().
+          id("intput-" + index).
+          order(index++).
+          data(isData).
           name(parameter.getName()).
           direction(Direction.IN).
           beanType(parameter.getType()).
           valueType(ValueType.OBJECT);
       getWrenchFlowParameter(dataTypeBuilder, parameter.getType(), isData, Direction.IN);
-      result.add(ImmutableServiceHeader.builder().order(index++).type(dataTypeBuilder.build()).data(isData).build());
+      result.addInputs(dataTypeBuilder.build());
     }
 
     index = 0;
@@ -168,16 +169,19 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     if(!returnType.isAnnotationPresent(ServiceData.class)) {
       throw new ServiceAstException("'execute' must be void or return type must define: " + ServiceData.class.getCanonicalName() + "!");
     } else {
-      DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.create().
+      DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().
+          id("output").
           name(returnType.getSimpleName()).
+          data(true).
+          order(index++).
           direction(Direction.OUT).
           beanType(returnType).
           valueType(ValueType.OBJECT);
       getWrenchFlowParameter(dataTypeBuilder, returnType, true, Direction.OUT);
-      result.add(ImmutableServiceHeader.builder().order(index++).type(dataTypeBuilder.build()).data(true).build());
+      result.addOutputs(dataTypeBuilder.build());
     }
 
-    return result;
+    return result.build();
   }
 
 
@@ -185,6 +189,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     if(!isServiceData) {
       return;
     }
+    int index = 0;
 
     Assert.isTrue(Serializable.class.isAssignableFrom(type), () -> "Flow types must implement Serializable!");
     for(Field field : type.getDeclaredFields()) {
@@ -196,7 +201,10 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
           field.getName().startsWith("_")) {
         continue;
       }
-      parentDataTypeBuilder.property().name(field.getName()).direction(direction).beanType(field.getType()).build();
+      parentDataTypeBuilder.property()
+        .id(field.getName())
+        .order(index++)
+        .name(field.getName()).direction(direction).beanType(field.getType()).build();
     }
   }
 

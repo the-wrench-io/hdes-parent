@@ -1,5 +1,6 @@
 package io.resys.hdes.client.api.ast;
 
+import java.io.Serializable;
 import java.util.List;
 
 /*-
@@ -24,11 +25,31 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-public interface AstType {
+import org.immutables.value.Value;
+
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+
+public interface AstType extends Serializable {
   
   String getName();
   @Nullable
   String getDescription();
   int getRev();
+  
   List<AstCommandType> getCommands();
+  AstHeaders getHeaders();
+  
+  
+  @Value.Immutable
+  interface AstHeaders extends Serializable {
+    List<AstDataType> getInputs();
+    List<AstDataType> getOutputs();
+  }
+  
+  interface AstExpression {
+    String getSrc();
+    ValueType getType();
+    List<String> getConstants();
+    Object getValue(Object entity);
+  }
 }
