@@ -37,9 +37,10 @@ import io.resys.hdes.client.api.model.FlowModel;
 
 public interface HdesClient {
   AstBuilder ast();
+  HdesStore store();
   ModelBuilder model();
   ExecutorBuilder executor();
-  HdesStore store();
+
   
   interface FlowExecutor {
     Object andGetTask(String task);

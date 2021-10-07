@@ -26,7 +26,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,14 +42,15 @@ import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.hdes.client.api.ast.ImmutableServiceAstType;
+import io.resys.hdes.client.api.ast.ImmutableServiceHeader;
+import io.resys.hdes.client.api.ast.ImmutableServiceHeaders;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeader;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeaders;
+import io.resys.hdes.client.api.exceptions.ServiceAstException;
 import io.resys.hdes.client.api.execution.ServiceData;
 import io.resys.hdes.client.spi.HdesDataTypeFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
-import io.resys.hdes.client.spi.groovy.beans.ImmutableServiceDataModel;
-import io.resys.hdes.client.spi.groovy.beans.ImmutableServiceDataParamModel;
 import io.resys.hdes.client.spi.util.Assert;
 
 public class ServiceAstBuilderImpl implements ServiceAstBuilder {
@@ -116,11 +116,11 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     
     try {
       final Class<?> beanType = gcl.parseClass(source);
-      final ImmutableServiceDataModel method = getMethods(beanType);
+      final ServiceHeaders method = getHeaders(beanType);
       
       return ImmutableServiceAstType.builder()
           .name(beanType.getSimpleName())
-          .method(method)
+          .headers(method)
           .src(source)
           .rev(changes.getCommands().size())
           .commands(changes.getCommands())
@@ -131,16 +131,15 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
   }
   
-  protected ImmutableServiceDataModel getMethods(Class<?> beanType) {
-    int index = 0;
-    List<ImmutableServiceDataModel> result = new ArrayList<>();
+  protected ServiceHeaders getHeaders(Class<?> beanType) {
+    List<ServiceHeaders> result = new ArrayList<>();
     for (Method method : beanType.getDeclaredMethods()) {
       if (method.getName().equals("execute") && Modifier.isPublic(method.getModifiers())
           && !Modifier.isVolatile(method.getModifiers())) {
 
-        List<ServiceDataParamModel> params = getParams(method);
+        List<ServiceHeader> params = getParams(method);
         Assert.isTrue(result.isEmpty(), () -> "Only one 'execute' method allowed!");
-        result.add(new ImmutableServiceDataModel(index++, method.getName(), Collections.unmodifiableList(params)));
+        result.add(ImmutableServiceHeaders.builder().values(params).build());
       }
     }
     Assert.isTrue(result.size() == 1, () -> "There must be one 'execute' method!");
@@ -148,41 +147,42 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
   }
   
 
-  protected List<ServiceDataParamModel> getParams(Method method) {
-    List<ServiceDataParamModel> result = new ArrayList<>();
+  protected List<ServiceHeader> getParams(Method method) {
+    List<ServiceHeader> result = new ArrayList<>();
     int index = 0;
     for(Parameter parameter : method.getParameters()) {
-      ServiceParamType contextType = getContextType(parameter.getType());
+      Class<?> type = parameter.getType();
+      boolean isData = type.isAnnotationPresent(ServiceData.class);
+      
       DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.create().
           name(parameter.getName()).
           direction(Direction.IN).
           beanType(parameter.getType()).
           valueType(ValueType.OBJECT);
-      getWrenchFlowParameter(dataTypeBuilder, parameter.getType(), contextType, Direction.IN);
-      result.add(new ImmutableServiceDataParamModel(index++, dataTypeBuilder.build(), contextType));
+      getWrenchFlowParameter(dataTypeBuilder, parameter.getType(), isData, Direction.IN);
+      result.add(ImmutableServiceHeader.builder().order(index++).type(dataTypeBuilder.build()).data(isData).build());
     }
 
     index = 0;
     Class<?> returnType = method.getReturnType();
-    ServiceParamType contextType = getContextType(returnType);
-    if(contextType == ServiceParamType.INTERNAL) {
-      Assert.isTrue(returnType == void.class, () -> "'execute' must be void or return type must define: " + ServiceData.class.getCanonicalName() + "!");
+    if(!returnType.isAnnotationPresent(ServiceData.class)) {
+      throw new ServiceAstException("'execute' must be void or return type must define: " + ServiceData.class.getCanonicalName() + "!");
     } else {
       DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.create().
           name(returnType.getSimpleName()).
           direction(Direction.OUT).
           beanType(returnType).
           valueType(ValueType.OBJECT);
-      getWrenchFlowParameter(dataTypeBuilder, returnType, contextType, Direction.OUT);
-      result.add(new ImmutableServiceDataParamModel(index++, dataTypeBuilder.build(), contextType));
+      getWrenchFlowParameter(dataTypeBuilder, returnType, true, Direction.OUT);
+      result.add(ImmutableServiceHeader.builder().order(index++).type(dataTypeBuilder.build()).data(true).build());
     }
 
     return result;
   }
 
 
-  protected void getWrenchFlowParameter(DataTypeAstBuilder parentDataTypeBuilder, Class<?> type, ServiceParamType contextType, Direction direction) {
-    if(contextType == ServiceParamType.INTERNAL) {
+  protected void getWrenchFlowParameter(DataTypeAstBuilder parentDataTypeBuilder, Class<?> type, boolean isServiceData, Direction direction) {
+    if(!isServiceData) {
       return;
     }
 
@@ -200,9 +200,6 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
   }
 
-  protected ServiceParamType getContextType(Class<?> type) {
-    return type.isAnnotationPresent(ServiceData.class) ? ServiceParamType.EXTERNAL : ServiceParamType.INTERNAL;
-  }
   private String buildSource(StringBuilder value) {
     String result = value.toString();
     if (result.endsWith(System.lineSeparator())) {

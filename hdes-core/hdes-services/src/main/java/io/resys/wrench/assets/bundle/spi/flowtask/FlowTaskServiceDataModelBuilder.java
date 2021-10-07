@@ -27,8 +27,7 @@ import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeader;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -58,8 +57,8 @@ public class FlowTaskServiceDataModelBuilder {
   }
 
   protected List<AstDataType> getScriptParameterModels(ServiceAstType model) {
-    List<ServiceDataParamModel> externals = model.getMethod().getParameters().stream()
-        .filter(p -> p.getContextType() == ServiceParamType.EXTERNAL)
+    List<ServiceHeader> externals = model.getHeaders().getValues().stream()
+        .filter(p -> p.getData())
         .collect(Collectors.toList());
 
     // drop dummy layer

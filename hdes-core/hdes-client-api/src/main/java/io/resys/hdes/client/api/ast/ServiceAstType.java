@@ -29,22 +29,19 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface ServiceAstType extends AstType, Serializable {
   String getSrc();
-  ServiceDataModel getMethod();
+  ServiceHeaders getHeaders();
   Class<?> getType();
   
-  interface ServiceDataModel extends Serializable {
-    int getOrder();
-    String getName();
-    boolean isReturnType();
-    List<ServiceDataParamModel> getParameters();
+  // input and output parameters
+  @Value.Immutable
+  interface ServiceHeaders extends Serializable {
+    List<ServiceHeader> getValues();
   }
 
-  interface ServiceDataParamModel extends Serializable {
+  @Value.Immutable
+  interface ServiceHeader extends Serializable {
     int getOrder();
+    Boolean getData();
     AstDataType getType();
-    ServiceParamType getContextType();
   }
-
-
-  enum ServiceParamType { INTERNAL, EXTERNAL }
 }

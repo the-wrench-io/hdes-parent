@@ -31,11 +31,14 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public interface AstType {
+  
   String getName();
-  int getRev();
   @Nullable
   String getDescription();
+  int getRev();
   List<AstCommandType> getCommands();
+  
+  
   
   enum Direction { IN, OUT }
   enum ValueType {

@@ -25,14 +25,14 @@ import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.AstType.Direction;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
+import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeader;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.wrench.assets.script.api.ServiceException;
 
 public class ServiceTemplate implements Service {
   private final ServiceAstType model;
   private final Class<?> beanType;
-  private final List<ServiceDataParamModel> inputs;
+  private final List<ServiceHeader> inputs;
   private boolean created;
   @SuppressWarnings("rawtypes")
   private ServiceExecutorType0 type0;
@@ -45,7 +45,7 @@ public class ServiceTemplate implements Service {
       ServiceAstType model, Class<?> beanType) {
     this.beanType = beanType;
     this.model = model;
-    this.inputs = model.getMethod().getParameters().stream()
+    this.inputs = model.getHeaders().getValues().stream()
         .filter(p -> p.getType().getDirection() == Direction.IN)
         .sorted((p1, p2) -> Integer.compare(p1.getOrder(), p2.getOrder()))
         .collect(Collectors.toList());

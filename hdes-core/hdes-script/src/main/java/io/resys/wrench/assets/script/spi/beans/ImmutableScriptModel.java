@@ -31,9 +31,9 @@ public class ImmutableScriptModel implements ServiceAstType {
   private final int rev;
   private final List<AstCommandType> commands;
   private final Class<?> type;
-  private final ServiceDataModel method;
+  private final ServiceHeaders method;
 
-  public ImmutableScriptModel(String id, int rev, String src, List<AstCommandType> commands, Class<?> type, ServiceDataModel method) {
+  public ImmutableScriptModel(String id, int rev, String src, List<AstCommandType> commands, Class<?> type, ServiceHeaders method) {
     this.id = id;
     this.rev = rev;
     this.src = src;
@@ -58,7 +58,7 @@ public class ImmutableScriptModel implements ServiceAstType {
     return type;
   }
   @Override
-  public ServiceDataModel getMethod() {
+  public ServiceHeaders getHeaders() {
     return method;
   }
   @Override
