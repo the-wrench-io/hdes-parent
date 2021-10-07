@@ -22,6 +22,7 @@ package io.resys.wrench.assets.script.spi.beans;
 
 import java.util.List;
 
+import io.resys.hdes.client.api.ast.AstCommandType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 
 public class ImmutableScriptModel implements ServiceAstType {

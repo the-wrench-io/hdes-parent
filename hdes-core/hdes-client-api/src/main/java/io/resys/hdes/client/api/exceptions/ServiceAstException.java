@@ -2,7 +2,7 @@ package io.resys.hdes.client.api.exceptions;
 
 /*-
  * #%L
- * hdes-dt
+ * hdes-client-api
  * %%
  * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
@@ -20,7 +20,7 @@ package io.resys.hdes.client.api.exceptions;
  * #L%
  */
 
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommandType;
 
 public class ServiceAstException extends RuntimeException {
 

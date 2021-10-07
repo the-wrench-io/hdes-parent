@@ -31,8 +31,8 @@ import org.immutables.value.Value;
 import com.google.common.collect.Range;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.hdes.client.spi.changeset.beans.AstChangesetBean;
 import io.resys.hdes.client.spi.util.Assert;

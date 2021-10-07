@@ -29,7 +29,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.execution.DecisionTableResult.Expression;
 import io.resys.hdes.client.spi.decision.execution.OperationFactory;
 import io.resys.wrench.assets.dt.spi.config.TestDtConfig;

@@ -28,9 +28,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;

@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 
 public interface DecisionTableResult extends Serializable {

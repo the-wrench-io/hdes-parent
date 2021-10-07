@@ -29,8 +29,6 @@ import org.immutables.value.Value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
 import io.resys.hdes.client.api.model.Model;
 
 
@@ -80,4 +78,8 @@ public abstract class AstDataType implements Model {
   }
 
   public enum AssociationType { ONE_TO_ONE, ONE_TO_MANY }
+  public enum Direction { IN, OUT }
+  public enum ValueType {
+    TIME, DATE, DATE_TIME, INSTANT, STRING, INTEGER, LONG, DECIMAL, BOOLEAN, PERIOD, DURATION, PERCENT, OBJECT, ARRAY;
+  }
 }

@@ -27,8 +27,8 @@ import java.util.Map;
 
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;

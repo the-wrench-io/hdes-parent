@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeader;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.api.execution.Service.ServiceInit;

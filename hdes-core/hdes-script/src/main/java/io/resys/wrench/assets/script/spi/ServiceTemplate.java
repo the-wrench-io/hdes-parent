@@ -23,7 +23,7 @@ package io.resys.wrench.assets.script.spi;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType.ServiceHeader;
 import io.resys.hdes.client.api.execution.Service;

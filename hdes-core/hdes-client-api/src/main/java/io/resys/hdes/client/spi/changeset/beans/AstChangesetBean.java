@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommandType;
 
 
 public class AstChangesetBean implements Comparable<AstChangesetBean>, AstChangeset {

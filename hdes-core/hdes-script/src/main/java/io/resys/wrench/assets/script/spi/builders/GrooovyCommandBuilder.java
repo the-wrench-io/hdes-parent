@@ -30,10 +30,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.collect.Range;
 
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.ast.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.script.spi.beans.ScriptSourceBean;
 
 public class GrooovyCommandBuilder {

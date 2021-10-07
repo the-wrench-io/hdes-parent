@@ -1,6 +1,5 @@
 package io.resys.hdes.client.api.ast;
 
-import java.io.Serializable;
 import java.util.List;
 
 /*-
@@ -25,11 +24,6 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.immutables.value.Value;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 public interface AstType {
   
   String getName();
@@ -37,58 +31,4 @@ public interface AstType {
   String getDescription();
   int getRev();
   List<AstCommandType> getCommands();
-  
-  
-  
-  enum Direction { IN, OUT }
-  enum ValueType {
-    TIME, DATE, DATE_TIME, INSTANT, STRING, INTEGER, LONG, DECIMAL, BOOLEAN, PERIOD, DURATION, PERCENT, OBJECT, ARRAY;
-  }
-  
-  @JsonSerialize(as = ImmutableAstCommandType.class)
-  @JsonDeserialize(as = ImmutableAstCommandType.class)
-  @Value.Immutable
-  public interface AstCommandType extends Serializable {
-    @Nullable
-    String getId();
-    @Nullable
-    String getValue();
-    AstCommandValue getType();
-    
-    enum AstCommandValue {
-      // flow and service related
-      SET, ADD, DELETE, SET_BODY,
-      
-      
-      // DT related
-      SET_NAME,
-      SET_DESCRIPTION,
-      IMPORT_CSV,    
-      IMPORT_ORDERED_CSV,
-
-      MOVE_ROW,
-      MOVE_HEADER,
-      INSERT_ROW,
-      COPY_ROW,
-      
-      SET_HEADER_TYPE,
-      SET_HEADER_REF,
-      
-      SET_HEADER_SCRIPT,
-      SET_HEADER_DIRECTION,
-      SET_HEADER_EXPRESSION,
-      SET_HIT_POLICY,
-      SET_CELL_VALUE,
-
-      DELETE_CELL,
-      DELETE_HEADER,
-      DELETE_ROW,
-
-      ADD_LOG,
-      ADD_HEADER_IN,
-      ADD_HEADER_OUT,
-      ADD_ROW,
-    }
-  }
-
 }

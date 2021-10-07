@@ -28,6 +28,9 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+
 @Value.Immutable
 public interface DecisionAstType extends AstType, Serializable {
   

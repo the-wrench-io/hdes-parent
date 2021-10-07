@@ -1,6 +1,6 @@
 package io.resys.wrench.assets.bundle.spi.beans;
 
-import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
 
 /*-
  * #%L
