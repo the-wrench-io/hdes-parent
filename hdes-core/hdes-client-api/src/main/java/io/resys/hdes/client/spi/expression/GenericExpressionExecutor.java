@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.decision;
+package io.resys.hdes.client.spi.expression;
 
 /*-
  * #%L
@@ -25,16 +25,16 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.execution.DecisionTableResult.Expression;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.AstType.AstExpression;
 import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
-import io.resys.hdes.client.spi.decision.execution.OperationFactory;
 import io.resys.hdes.client.spi.util.Assert;
 
 public class GenericExpressionExecutor implements NodeExpressionExecutor {
 
+
   private final ObjectMapper objectMapper;
-  private final Map<String, Expression> cache = new ConcurrentHashMap<>();
+  private final Map<String, AstExpression> cache = new ConcurrentHashMap<>();
 
   public GenericExpressionExecutor(ObjectMapper objectMapper) {
     super();
@@ -52,12 +52,12 @@ public class GenericExpressionExecutor implements NodeExpressionExecutor {
     if(value == null || value.isEmpty()) {
       return true;
     }
-    Expression expression = getExpression(value, type);
+    AstExpression expression = getExpression(value, type);
     return (boolean) expression.getValue(entity);
   }
 
   @Override
-  public Expression getExpression(String src, ValueType type) {
+  public AstExpression getExpression(String src, ValueType type) {
     if(src == null) {
       return null;
     }
@@ -65,7 +65,7 @@ public class GenericExpressionExecutor implements NodeExpressionExecutor {
     if(cache.containsKey(cacheKey)) {
       return cache.get(cacheKey);
     }
-    Expression exp = OperationFactory.builder().objectMapper(objectMapper).src(src).valueType(type).build();
+    AstExpression exp = OperationFactory.builder().objectMapper(objectMapper).src(src).valueType(type).build();
     cache.put(cacheKey, exp);
     return exp;
   }

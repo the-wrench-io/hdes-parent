@@ -38,6 +38,11 @@ public class DataException extends RuntimeException {
     this.messagesList = new MessageList();
   }
 
+  public DataException(Exception e, int status, Message message) {
+    super(message.toString(), e);
+    this.messagesList = new MessageList().setStatus(status).add(message);
+  }
+  
   public DataException(int status, Message message) {
     super(message.toString());
     this.messagesList = new MessageList().setStatus(status).add(message);

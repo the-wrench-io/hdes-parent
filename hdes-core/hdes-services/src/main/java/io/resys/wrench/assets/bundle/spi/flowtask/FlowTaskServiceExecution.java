@@ -26,9 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceParamType;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.api.execution.Service.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
@@ -40,16 +38,15 @@ public class FlowTaskServiceExecution implements ServiceExecution {
   private final Service script;
   private final ServiceInit init;
   private final List<Object> facts = new ArrayList<>();
-  private final ServiceDataParamModel taskInputModel;
+  private final AstDataType taskInputModel;
   private FlowTaskInput taskInput;
 
   public FlowTaskServiceExecution(Service script, ServiceInit init) {
     super();
     this.script = script;
     this.init = init;
-    this.taskInputModel = script.getModel().getMethod().getParameters().stream()
-        .filter(p -> p.getType().getDirection() == Direction.IN)
-        .filter(p -> p.getContextType() == ServiceParamType.EXTERNAL)
+    this.taskInputModel = script.getModel().getHeaders().getInputs().stream()
+        .filter(p -> p.getData())
         .findFirst()
         .orElse(null);
   }
@@ -67,7 +64,7 @@ public class FlowTaskServiceExecution implements ServiceExecution {
   public ServiceResponse run() {
 
     if(taskInputModel != null && taskInput != null) {
-      Object flowTaskInput = taskInputModel.getType().toValue(taskInput.getValue());
+      Object flowTaskInput = taskInputModel.toValue(taskInput.getValue());
       facts.add(flowTaskInput);
     }
 

@@ -34,18 +34,18 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesAstTypes.DecisionAstBuilder;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.ast.DecisionAstType;
 import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
 import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
+import io.resys.hdes.client.spi.HdesDataTypeFactory;
 import io.resys.hdes.client.spi.decision.ast.CommandMapper;
 import io.resys.hdes.client.spi.util.Assert;
 
@@ -53,13 +53,13 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
 
   private final static List<String> knownCommandTypes = Arrays.asList(AstCommandValue.values()).stream().map(c -> c.name()).collect(Collectors.toList());
 
-  private final ObjectMapper objectMapper;
+  private final HdesDataTypeFactory dataTypeFactory;
   private List<AstCommandType> src;
   private Integer rev;
 
-  public DecisionAstBuilderImpl(ObjectMapper objectMapper) {
+  public DecisionAstBuilderImpl(HdesDataTypeFactory dataTypeFactory) {
     super();
-    this.objectMapper = objectMapper;
+    this.dataTypeFactory = dataTypeFactory;
   }
 
   @Override
@@ -93,7 +93,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
   @Override
   public DecisionAstType build() {
     List<AstCommandType> src = CollectionUtils.isEmpty(this.src) ? Collections.emptyList() : this.src;
-    CommandMapper.Builder builder = CommandMapper.builder(objectMapper);
+    CommandMapper.Builder builder = CommandMapper.builder(dataTypeFactory);
 
     if(this.rev != null) {
       int limit = this.rev;

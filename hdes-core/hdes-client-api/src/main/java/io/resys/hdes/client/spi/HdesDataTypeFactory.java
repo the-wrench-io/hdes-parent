@@ -38,10 +38,12 @@ import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.AstDataType.DataTypeDeserializer;
 import io.resys.hdes.client.api.ast.AstDataType.DataTypeSerializer;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.ast.AstDataType.ValueTypeResolver;
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstType.AstExpression;
 import io.resys.hdes.client.api.ast.ImmutableAstDataType;
+import io.resys.hdes.client.spi.expression.OperationFactory;
 import io.resys.hdes.client.spi.serializers.DateDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.DateTimeDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.GenericDataTypeDeserializer;
@@ -55,7 +57,8 @@ public class HdesDataTypeFactory {
   private final Map<ValueType, DataTypeDeserializer> deserializers;
   private final Map<ValueType, DataTypeSerializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
-
+  private final ObjectMapper objectMapper; 
+  
   public HdesDataTypeFactory(
       ObjectMapper objectMapper,
       Map<ValueType, DataTypeDeserializer> deserializers,
@@ -65,10 +68,12 @@ public class HdesDataTypeFactory {
     this.deserializers = deserializers;
     this.serializers = serializers;
     this.valueTypeResolver = valueTypeResolver;
+    this.objectMapper = objectMapper;
   }
 
   public HdesDataTypeFactory(ObjectMapper objectMapper) {
-
+    this.objectMapper = objectMapper;
+    
     Map<ValueType, DataTypeDeserializer> deserializers = new HashMap<>();
     this.deserializers = Collections.unmodifiableMap(deserializers);
 
@@ -121,8 +126,16 @@ public class HdesDataTypeFactory {
 
   }
 
-  public DataTypeAstBuilder create() {
+  public DataTypeAstBuilder dataType() {
     return new GenericDataTypeBuilder();
+  }
+  
+  public AstExpression expression(ValueType valueType, String src) {
+    AstExpression expression = OperationFactory.builder()
+        .objectMapper(objectMapper)
+        .valueType(valueType)
+        .src(src).build();
+    return expression;
   }
   
   public class GenericDataTypeBuilder implements DataTypeAstBuilder {
@@ -136,6 +149,10 @@ public class HdesDataTypeFactory {
     private List<AstDataType> properties = new ArrayList<>();
     private String ref;
     private AstDataType dataType;
+    private Integer order;
+    private String script;
+    private String id;
+    private boolean data = true;
 
     @Override
     public DataTypeAstBuilder required(boolean required) {
@@ -143,8 +160,28 @@ public class HdesDataTypeFactory {
       return this;
     }
     @Override
+    public DataTypeAstBuilder data(boolean data) {
+      this.data = data;
+      return this;
+    }
+    @Override
     public DataTypeAstBuilder name(String name) {
       this.name = name;
+      return this;
+    }
+    @Override
+    public DataTypeAstBuilder order(Integer order) {
+      this.order = order;
+      return this;
+    }
+    @Override
+    public DataTypeAstBuilder script(String script) {
+      this.script = script;
+      return this;
+    }
+    @Override
+    public DataTypeAstBuilder id(String id) {
+      this.id = id;
       return this;
     }
     @Override
@@ -201,9 +238,8 @@ public class HdesDataTypeFactory {
         DataTypeDeserializer deserializer = dataType.getDeserializer();
         DataTypeSerializer serializer = dataType.getSerializer();
         return ImmutableAstDataType.builder()
-            .name(name)
-            .ref(ref)
-            .description(description)
+            .id(id).script(script).order(order)
+            .name(name).ref(ref).description(description)
             .direction(direction)
             .valueType(valueType)
             .beanType(beanType)
@@ -225,8 +261,10 @@ public class HdesDataTypeFactory {
 
       Assert.notNull(valueType, () -> "valueType can't be null!");
       return ImmutableAstDataType.builder()
+          .id(id).script(script).order(order)
           .name(name)
           .ref(ref)
+          .data(data)
           .description(description)
           .direction(direction)
           .valueType(valueType)

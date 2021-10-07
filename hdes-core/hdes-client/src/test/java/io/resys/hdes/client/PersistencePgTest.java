@@ -28,7 +28,7 @@ import io.resys.hdes.client.api.HdesStore.Entity;
 import io.resys.hdes.client.api.HdesStore.EntityType;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
 import io.resys.hdes.client.api.ImmutableUpdateAstType;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.hdes.client.config.PgTestTemplate;

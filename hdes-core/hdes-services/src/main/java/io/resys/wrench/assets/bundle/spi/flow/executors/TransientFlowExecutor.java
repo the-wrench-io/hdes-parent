@@ -36,8 +36,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.exceptions.DataTypeException;
 import io.resys.hdes.client.api.execution.Flow;
 import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;

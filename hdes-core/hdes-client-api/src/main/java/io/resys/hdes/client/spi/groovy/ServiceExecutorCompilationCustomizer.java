@@ -45,9 +45,6 @@ public class ServiceExecutorCompilationCustomizer extends CompilationCustomizer 
   
   @Override
   public void call(SourceUnit source, GeneratorContext context, ClassNode classNode) throws CompilationFailedException {
-    
-    
-    
     int length = 0;
     ClassNode inputType1 = null;
     ClassNode inputType2 = null;

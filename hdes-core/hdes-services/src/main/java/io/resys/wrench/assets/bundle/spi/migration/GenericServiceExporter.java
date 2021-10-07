@@ -35,7 +35,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
 import io.resys.hdes.client.api.execution.Service;

@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.decision.execution;
+package io.resys.hdes.client.spi.expression;
 
 /*-
  * #%L
@@ -26,7 +26,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.function.Consumer;
 
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 
 public class OperationDate {
   private final static String AFTER = "after";

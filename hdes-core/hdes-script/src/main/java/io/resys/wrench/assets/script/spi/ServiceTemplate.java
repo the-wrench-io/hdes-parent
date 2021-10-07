@@ -23,16 +23,15 @@ package io.resys.wrench.assets.script.spi;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.AstType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType.ServiceDataParamModel;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.wrench.assets.script.api.ServiceException;
 
 public class ServiceTemplate implements Service {
   private final ServiceAstType model;
   private final Class<?> beanType;
-  private final List<ServiceDataParamModel> inputs;
+  private final List<AstDataType> inputs;
   private boolean created;
   @SuppressWarnings("rawtypes")
   private ServiceExecutorType0 type0;
@@ -45,14 +44,13 @@ public class ServiceTemplate implements Service {
       ServiceAstType model, Class<?> beanType) {
     this.beanType = beanType;
     this.model = model;
-    this.inputs = model.getMethod().getParameters().stream()
-        .filter(p -> p.getType().getDirection() == Direction.IN)
+    this.inputs = model.getHeaders().getInputs().stream()
         .sorted((p1, p2) -> Integer.compare(p1.getOrder(), p2.getOrder()))
         .collect(Collectors.toList());
   }
   
   private Object getInput(List<Object> context, int index) {
-    Class<?> clazz = inputs.get(0).getType().getBeanType();
+    Class<?> clazz = inputs.get(0).getBeanType();
     for (Object fact : context) {
       if (clazz.isAssignableFrom(fact.getClass())) {
         return fact;

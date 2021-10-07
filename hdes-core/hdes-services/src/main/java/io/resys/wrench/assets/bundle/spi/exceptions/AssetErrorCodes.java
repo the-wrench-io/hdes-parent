@@ -45,10 +45,14 @@ public enum AssetErrorCodes implements MessageCode {
   public Message newMessage(Object ... args) {
     return new Message(getCode(), getValue(), args);
   }
-
   @Override
   public DataException newException(Object ... args) {
     return new DataException(getStatus(), newMessage(args));
+  }
+
+  @Override
+  public DataException newException(Exception e, Object ... args) {
+    return new DataException(e, getStatus(), newMessage(args));
   }
 
   @Override

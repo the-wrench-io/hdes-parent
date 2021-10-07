@@ -27,8 +27,8 @@ import java.util.Map;
 
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;
@@ -55,6 +55,7 @@ public class NodeFlowAdapter {
   public static Collection<AstDataType> getInputs(NodeFlow data, HdesAstTypes dataTypeRepository) {
     Map<String, FlowAstInput> inputs = data.getInputs();
 
+    int index = 0;
     Collection<AstDataType> result = new ArrayList<>();
     for (Map.Entry<String, FlowAstInput> entry : inputs.entrySet()) {
       if (entry.getValue().getType() == null) {
@@ -64,6 +65,8 @@ public class NodeFlowAdapter {
         ValueType valueType = ValueType.valueOf(entry.getValue().getType().getValue());
         boolean required = getBooleanValue(entry.getValue().getRequired());
         result.add(dataTypeRepository.dataType()
+            .id(entry.getValue().getStart() + "")
+            .order(index++)
             .name(entry.getKey()).valueType(valueType).direction(Direction.IN).required(required)
             .values(getStringValue(entry.getValue().getDebugValue()))
             .build());

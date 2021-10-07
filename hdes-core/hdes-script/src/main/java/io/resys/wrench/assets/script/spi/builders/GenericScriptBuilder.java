@@ -27,30 +27,33 @@ import java.nio.charset.Charset;
 import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
+import io.resys.hdes.client.api.ast.ImmutableServiceAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
 import io.resys.hdes.client.api.execution.Service;
 import io.resys.hdes.client.spi.util.Assert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
 import io.resys.wrench.assets.script.spi.ServiceHistoric;
 import io.resys.wrench.assets.script.spi.ServiceTemplate;
-import io.resys.wrench.assets.script.spi.beans.ImmutableScriptModel;
-
 
 public class GenericScriptBuilder implements ScriptBuilder {
   private static final Charset UTF_8 = Charset.forName("utf-8");
 
   private final HdesAstTypes dataTypeRepository;
-  
+  private final ObjectMapper objectMapper;
+
   private String src;
   private Integer rev;
   private JsonNode jsonNode;
 
-  public GenericScriptBuilder(HdesAstTypes dataTypeRepository) {
+  public GenericScriptBuilder(HdesAstTypes dataTypeRepository, ObjectMapper objectMapper) {
     super();
     this.dataTypeRepository = dataTypeRepository;
+    this.objectMapper = objectMapper;
   }
 
   @Override
@@ -58,37 +61,54 @@ public class GenericScriptBuilder implements ScriptBuilder {
     this.src = src;
     return this;
   }
+
   @Override
   public ScriptBuilder src(InputStream src) {
     try {
       this.src = IOUtils.toString(src, UTF_8);
-    } catch(IOException e) {
+    } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
     return this;
   }
+
   @Override
   public ScriptBuilder src(JsonNode jsonNode) {
     this.jsonNode = jsonNode;
     return this;
   }
+
   @Override
   public ScriptBuilder rev(Integer rev) {
     this.rev = rev;
     return this;
   }
+
   @Override
   public Service build() {
     Assert.isTrue(src != null || jsonNode != null, () -> "src can't be null!");
-    final ArrayNode sourceCommands = (ArrayNode)  (jsonNode.isArray() ? jsonNode : jsonNode.get("commands"));
+    if (src != null) {
+      try {
+        jsonNode = objectMapper.readTree(src);
+      } catch (IOException e) {
+        throw new RuntimeException(e.getMessage(), e);
+      }
+    }
+
+    final ArrayNode sourceCommands = (ArrayNode) (jsonNode.isArray() ? jsonNode : jsonNode.get("commands"));
     final var ast = dataTypeRepository.service().src(sourceCommands).build();
-    
     try {
       final Class<?> beanType = ast.getType();
       return new ServiceTemplate(ast, beanType);
     } catch (Exception e) {
-      if(this.rev != null) {
-        ServiceAstType model = new ImmutableScriptModel("historic", rev, ast.getSrc(), ast.getCommands(), null, null);
+      if (this.rev != null) {
+        ServiceAstType model = ImmutableServiceAstType.builder()
+            .name("historic")
+            .src(ast.getSrc())
+            .commands(ast.getCommands())
+            .rev(ast.getCommands().size())
+            .headers(ImmutableAstHeaders.builder().build())
+            .build();
         return new ServiceHistoric(model);
       }
       throw new RuntimeException(e.getMessage(), e);

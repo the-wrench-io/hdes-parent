@@ -28,10 +28,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.resys.hdes.client.api.ast.AstDataType;
+import io.resys.hdes.client.api.ast.AstType.AstExpression;
 import io.resys.hdes.client.api.execution.DecisionTableResult;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableDecision;
-import io.resys.hdes.client.api.execution.DecisionTableResult.Expression;
 import io.resys.hdes.client.api.execution.DecisionTableResult.HitPolicyExecutor;
 import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
 import io.resys.hdes.client.api.model.DecisionTableModel;
@@ -93,11 +93,11 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
     
     List<DecisionContext> data = new ArrayList<>();
     
-    Map<String, Expression> expressions = new HashMap<>();
+    Map<String, AstExpression> expressions = new HashMap<>();
     for(DecisionTableNodeInput input : node.getInputs()) {
       Object contextEntity = this.context.apply(input.getKey());
       if(DecisionTableFixedValue.ALWAYS_TRUE == contextEntity) {
-        Expression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
+        AstExpression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
         expressions.put(input.getKey().getName(), expression);
         
         if(!Boolean.FALSE.equals(match)) {
@@ -113,7 +113,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
         continue;
       }
       match = expressionExecutor.execute(input.getValue(), input.getKey().getValueType(), entity);
-      Expression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
+      AstExpression expression = expressionExecutor.getExpression(input.getValue(), input.getKey().getValueType());
       expressions.put(input.getKey().getName(), expression);
       
     }

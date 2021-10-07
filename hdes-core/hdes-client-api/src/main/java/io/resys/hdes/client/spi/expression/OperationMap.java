@@ -1,20 +1,17 @@
-package io.resys.hdes.client.spi.decision;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
+package io.resys.hdes.client.spi.expression;
 
 /*-
  * #%L
- * wrench-component-dt
+ * hdes-client-api
  * %%
- * Copyright (C) 2016 - 2017 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,10 +20,8 @@ import java.util.Arrays;
  * #L%
  */
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.function.Consumer;
 
 import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
@@ -38,52 +33,25 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.ast.AstType.ValueType;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DynamicValueExpressionExecutor;
-
-public class SpringDynamicValueExpressionExecutor implements DynamicValueExpressionExecutor {
-
+public class OperationMap {
   private final static ExpressionParser PARSER = new SpelExpressionParser();
-  private final Map<String, Expression> cache = new HashMap<>();
-  private final List<String> validExpressions = Arrays.asList("<=", "<",">=", ">", "=");
 
-  @Override
-  public Object parseVariable(String expression, ValueType type) {
-    Optional<String> comparison = validExpressions.stream().filter(v -> expression.startsWith(v)).findFirst();
-    if(!comparison.isPresent()) {
-      switch(type) {
-      case DECIMAL:
-        return BigDecimal.ZERO;
-      case LONG:
-        return 0;
-      case INTEGER:
-        return 0;
-      default: return null;
-      }
-    }
-    String value = expression.substring(comparison.get().length()).trim();
-    switch(type) {
-    case DECIMAL:
-      return new BigDecimal(value);
-    case LONG:
-      return Long.parseLong(value);
-    case INTEGER:
-      return Integer.parseInt(value);
-    default: return null;
+  public static Builder builder() {
+    return new Builder();
+  }
+  
+  public static class Builder {
+    public Operation<?> build(String src, Consumer<String> constants) {
+      Assert.notNull(src, "expression can't be null!");
+      Expression exp = PARSER.parseExpression(src);
+      return (Map<String, Object> input) -> {
+        StandardEvaluationContext context = createContext(input);
+        return exp.getValue(context);
+      };
     }
   }
 
-  @Override
-  public String execute(String expression, Map<String, Object> contextExpression) {
-    Assert.notNull(expression, "expression can't be null!");
-    Assert.notNull(contextExpression, "context can't be null!");
-
-    StandardEvaluationContext context = createContext(contextExpression);
-    Expression exp = getExpression(expression);
-    return exp.getValue(context) + "";
-  }
-
-  protected StandardEvaluationContext createContext(Map<String, Object> contextExpression) {
+  private static StandardEvaluationContext createContext(Map<String, Object> contextExpression) {
     StandardEvaluationContext context = new StandardEvaluationContext();
     context.setVariables(contextExpression);
     context.addPropertyAccessor(new PropertyAccessor() {
@@ -91,7 +59,6 @@ public class SpringDynamicValueExpressionExecutor implements DynamicValueExpress
       @Override
       public void write(EvaluationContext context, Object target, String name, Object newValue) throws AccessException {
         // TODO Auto-generated method stub
-
       }
 
       @Override
@@ -119,14 +86,5 @@ public class SpringDynamicValueExpressionExecutor implements DynamicValueExpress
 
     //contextExpression.forEach((key, value) -> context.setVariable(key, value));
     return context;
-  }
-
-  protected Expression getExpression(String value) {
-    if(cache.containsKey(value)) {
-      return cache.get(value);
-    }
-    Expression exp = PARSER.parseExpression(value);
-    cache.put(value, exp);
-    return exp;
   }
 }

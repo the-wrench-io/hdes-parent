@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
+import io.resys.hdes.client.api.ast.AstType.AstExpression;
 import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
 
 public interface DecisionTableResult extends Serializable {
@@ -37,7 +38,7 @@ public interface DecisionTableResult extends Serializable {
     List<DecisionContext> getContext();
     DecisionTableNode getNode();
     boolean isMatch();
-    Map<String, Expression> getExpressions();
+    Map<String, AstExpression> getExpressions();
   }
   
   interface DecisionContext {
@@ -48,25 +49,13 @@ public interface DecisionTableResult extends Serializable {
   interface DecisionTableOutput extends Serializable {
     int getId();
     int getOrder();
-    Map<String, Expression> getExpressions();
+    Map<String, AstExpression> getExpressions();
     Map<String, Serializable> getValues();
   }
-
-  interface Expression {
-    String getSrc();
-    ValueType getType();
-    List<String> getConstants();
-    Object getValue(Object entity);
-  }
-  
   
   interface NodeExpressionExecutor {
-    Expression getExpression(String src, ValueType type);
+    AstExpression getExpression(String src, ValueType type);
     boolean execute(String expression, ValueType type, Object entity);
-  }
-  interface DynamicValueExpressionExecutor {
-    Object parseVariable(String expression, ValueType type);
-    String execute(String expression, Map<String, Object> context);
   }
   interface HitPolicyExecutor {
     boolean execute(DecisionTableDecision decision);

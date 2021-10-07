@@ -26,7 +26,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommandType;
 import io.resys.hdes.client.api.ast.DecisionAstType;
 import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.ast.ServiceAstType;
@@ -37,9 +37,10 @@ import io.resys.hdes.client.api.model.FlowModel;
 
 public interface HdesClient {
   AstBuilder ast();
+  HdesStore store();
   ModelBuilder model();
   ExecutorBuilder executor();
-  HdesStore store();
+
   
   interface FlowExecutor {
     Object andGetTask(String task);

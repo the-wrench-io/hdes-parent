@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInputType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstInputType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;

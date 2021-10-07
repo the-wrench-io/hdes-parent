@@ -25,10 +25,10 @@ import java.util.List;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import io.resys.hdes.client.api.ast.AstCommandType;
 import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType;
-import io.resys.hdes.client.api.ast.AstType.Direction;
-import io.resys.hdes.client.api.ast.AstType.ValueType;
+import io.resys.hdes.client.api.ast.AstDataType.Direction;
+import io.resys.hdes.client.api.ast.AstDataType.ValueType;
 import io.resys.hdes.client.api.ast.DecisionAstType;
 import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
@@ -43,14 +43,19 @@ public interface HdesAstTypes {
 
   
   interface DataTypeAstBuilder {
+    DataTypeAstBuilder id(String id);
+    DataTypeAstBuilder order(Integer order);
+    DataTypeAstBuilder valueType(ValueType valueType);
+    
     DataTypeAstBuilder ref(String ref, AstDataType dataType);
     DataTypeAstBuilder required(boolean required);
+    DataTypeAstBuilder data(boolean data);
     DataTypeAstBuilder name(String name);
-
-    DataTypeAstBuilder valueType(ValueType valueType);
+    DataTypeAstBuilder script(String script);
     DataTypeAstBuilder direction(Direction direction);
-    DataTypeAstBuilder beanType(Class<?> beanType);
     DataTypeAstBuilder description(String description);
+    
+    DataTypeAstBuilder beanType(Class<?> beanType);
     DataTypeAstBuilder values(String values);
     DataTypeAstBuilder property();
     AstDataType build();

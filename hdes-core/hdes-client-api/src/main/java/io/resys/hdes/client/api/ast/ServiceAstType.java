@@ -21,7 +21,6 @@ package io.resys.hdes.client.api.ast;
  */
 
 import java.io.Serializable;
-import java.util.List;
 
 import org.immutables.value.Value;
 
@@ -29,22 +28,5 @@ import org.immutables.value.Value;
 @Value.Immutable
 public interface ServiceAstType extends AstType, Serializable {
   String getSrc();
-  ServiceDataModel getMethod();
   Class<?> getType();
-  
-  interface ServiceDataModel extends Serializable {
-    int getOrder();
-    String getName();
-    boolean isReturnType();
-    List<ServiceDataParamModel> getParameters();
-  }
-
-  interface ServiceDataParamModel extends Serializable {
-    int getOrder();
-    AstDataType getType();
-    ServiceParamType getContextType();
-  }
-
-
-  enum ServiceParamType { INTERNAL, EXTERNAL }
 }

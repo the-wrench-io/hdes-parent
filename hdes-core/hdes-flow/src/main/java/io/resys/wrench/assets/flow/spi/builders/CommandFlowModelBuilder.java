@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstType.AstCommandType.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstSwitch;
 import io.resys.hdes.client.api.ast.FlowAstType.FlowAstTask;

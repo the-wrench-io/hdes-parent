@@ -22,27 +22,27 @@ package io.resys.hdes.client.api.exceptions;
 
 import io.resys.hdes.client.api.ast.AstCommandType;
 
-public class DecisionAstException extends RuntimeException {
+public class ServiceAstException extends RuntimeException {
 
   private static final long serialVersionUID = -7154685569622201632L;
 
   private final AstCommandType command;
 
-  public DecisionAstException(AstCommandType command, String message, Throwable cause) {
+  public ServiceAstException(AstCommandType command, String message, Throwable cause) {
     super(message, cause);
     this.command = command;
   }
 
-  public DecisionAstException(String message) {
+  public ServiceAstException(String message) {
     super(message);
     this.command = null;
   }
-  public DecisionAstException(String message, Throwable cause) {
+  public ServiceAstException(String message, Throwable cause) {
     super(message, cause);
     this.command = null;
   }
 
-  public DecisionAstException(AstCommandType command, String message) {
+  public ServiceAstException(AstCommandType command, String message) {
     super(message);
     this.command = command;
   }
