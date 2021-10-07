@@ -241,7 +241,7 @@ public class AssetComponentConfiguration {
 
 
   private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesAstTypes dataTypeRepository, ApplicationContext context) {
-    return new GenericScriptRepository(dataTypeRepository);
+    return new GenericScriptRepository(dataTypeRepository, objectMapper);
   }
 
   protected String getDefaultContent(ServiceType type) {

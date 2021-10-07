@@ -29,7 +29,7 @@ import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.spi.decision.DecisionAstBuilderImpl;
 import io.resys.hdes.client.spi.flow.FlowAstBuilderImpl;
-import io.resys.hdes.client.spi.groovy.ServiceAstBuilderImpl2;
+import io.resys.hdes.client.spi.groovy.ServiceAstBuilderImpl;
 import io.resys.hdes.client.spi.groovy.ServiceExecutorCompilationCustomizer;
 
 public class HdesAstTypesImpl implements HdesAstTypes {
@@ -61,7 +61,7 @@ public class HdesAstTypesImpl implements HdesAstTypes {
   }
   @Override
   public ServiceAstBuilder service() {
-    return new ServiceAstBuilderImpl2(dataType, gcl);
+    return new ServiceAstBuilderImpl(dataType, gcl);
   }
   @Override
   public DataTypeAstBuilder dataType() {

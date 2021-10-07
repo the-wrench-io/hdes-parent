@@ -53,7 +53,7 @@ import io.resys.hdes.client.spi.groovy.beans.ImmutableServiceDataModel;
 import io.resys.hdes.client.spi.groovy.beans.ImmutableServiceDataParamModel;
 import io.resys.hdes.client.spi.util.Assert;
 
-public class ServiceAstBuilderImpl2 implements ServiceAstBuilder {
+public class ServiceAstBuilderImpl implements ServiceAstBuilder {
 
   
   private final HdesDataTypeFactory dataTypeRepository;
@@ -61,14 +61,14 @@ public class ServiceAstBuilderImpl2 implements ServiceAstBuilder {
   private Integer rev;
   private final GroovyClassLoader gcl;
 
-  public ServiceAstBuilderImpl2(HdesDataTypeFactory dataTypeRepository, GroovyClassLoader gcl) {
+  public ServiceAstBuilderImpl(HdesDataTypeFactory dataTypeRepository, GroovyClassLoader gcl) {
     super();
     this.dataTypeRepository = dataTypeRepository;
     this.gcl = gcl;
   }
 
   @Override
-  public ServiceAstBuilderImpl2 src(ArrayNode src) {
+  public ServiceAstBuilderImpl src(ArrayNode src) {
     if (src == null) {
       return this;
     }
@@ -81,7 +81,7 @@ public class ServiceAstBuilderImpl2 implements ServiceAstBuilder {
   }
 
   @Override
-  public ServiceAstBuilderImpl2 src(List<AstCommandType> src) {
+  public ServiceAstBuilderImpl src(List<AstCommandType> src) {
     if (src == null) {
       return this;
     }
@@ -90,7 +90,7 @@ public class ServiceAstBuilderImpl2 implements ServiceAstBuilder {
   }
 
   @Override
-  public ServiceAstBuilderImpl2 rev(Integer rev) {
+  public ServiceAstBuilderImpl rev(Integer rev) {
     this.rev = rev;
     return this;
   }
@@ -119,9 +119,10 @@ public class ServiceAstBuilderImpl2 implements ServiceAstBuilder {
       final ImmutableServiceDataModel method = getMethods(beanType);
       
       return ImmutableServiceAstType.builder()
+          .name(beanType.getSimpleName())
           .method(method)
           .src(source)
-          .rev(rev)
+          .rev(changes.getCommands().size())
           .commands(changes.getCommands())
           .type(beanType)
           .build();

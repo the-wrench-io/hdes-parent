@@ -26,4 +26,5 @@ public interface MessageCode {
   int getStatus();
   Message newMessage(Object ... args);
   DataException newException(Object ... args);
+  DataException newException(Exception e, Object ... args);
 }

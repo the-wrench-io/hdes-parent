@@ -106,6 +106,7 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
     } catch (Exception e) {
       String name = this.pointer == null ? this.name : this.pointer;
       throw AssetErrorCodes.FLOW_TASK_ERROR.newException(
+          e, 
           "AssetResource error in: " + name + System.lineSeparator() + 
           e.getMessage());
     }
