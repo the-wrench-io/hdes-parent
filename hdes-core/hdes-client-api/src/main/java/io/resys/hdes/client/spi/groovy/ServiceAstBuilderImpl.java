@@ -47,19 +47,19 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.ServiceAstException;
 import io.resys.hdes.client.api.execution.ServiceData;
-import io.resys.hdes.client.spi.HdesDataTypeFactory;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
 import io.resys.hdes.client.spi.util.Assert;
 
 public class ServiceAstBuilderImpl implements ServiceAstBuilder {
 
   
-  private final HdesDataTypeFactory dataTypeRepository;
+  private final HdesTypeDefsFactory dataTypeRepository;
   private final List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   private final GroovyClassLoader gcl;
 
-  public ServiceAstBuilderImpl(HdesDataTypeFactory dataTypeRepository, GroovyClassLoader gcl) {
+  public ServiceAstBuilderImpl(HdesTypeDefsFactory dataTypeRepository, GroovyClassLoader gcl) {
     super();
     this.dataTypeRepository = dataTypeRepository;
     this.gcl = gcl;

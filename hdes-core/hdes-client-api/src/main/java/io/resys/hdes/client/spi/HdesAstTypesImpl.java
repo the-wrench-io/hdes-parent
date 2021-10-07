@@ -35,7 +35,7 @@ import io.resys.hdes.client.spi.groovy.ServiceExecutorCompilationCustomizer;
 public class HdesAstTypesImpl implements HdesAstTypes {
   private final ObjectMapper yaml = new ObjectMapper(new YAMLFactory());
   private final GroovyClassLoader gcl;
-  private final HdesDataTypeFactory dataType;
+  private final HdesTypeDefsFactory dataType;
   
   public HdesAstTypesImpl(ObjectMapper objectMapper) {
     super();
@@ -44,7 +44,7 @@ public class HdesAstTypesImpl implements HdesAstTypes {
     config.addCompilationCustomizers(new ServiceExecutorCompilationCustomizer());
     
     this.gcl = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), config);
-    this.dataType = new HdesDataTypeFactory(objectMapper);
+    this.dataType = new HdesTypeDefsFactory(objectMapper);
   }
 
   @Override

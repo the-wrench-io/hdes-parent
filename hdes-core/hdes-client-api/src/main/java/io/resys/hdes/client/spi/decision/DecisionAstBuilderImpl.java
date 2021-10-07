@@ -45,7 +45,7 @@ import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
-import io.resys.hdes.client.spi.HdesDataTypeFactory;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.decision.ast.CommandMapper;
 import io.resys.hdes.client.spi.util.Assert;
 
@@ -53,11 +53,11 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
 
   private final static List<String> knownCommandTypes = Arrays.asList(AstCommandValue.values()).stream().map(c -> c.name()).collect(Collectors.toList());
 
-  private final HdesDataTypeFactory dataTypeFactory;
+  private final HdesTypeDefsFactory dataTypeFactory;
   private List<AstCommand> src;
   private Integer rev;
 
-  public DecisionAstBuilderImpl(HdesDataTypeFactory dataTypeFactory) {
+  public DecisionAstBuilderImpl(HdesTypeDefsFactory dataTypeFactory) {
     super();
     this.dataTypeFactory = dataTypeFactory;
   }

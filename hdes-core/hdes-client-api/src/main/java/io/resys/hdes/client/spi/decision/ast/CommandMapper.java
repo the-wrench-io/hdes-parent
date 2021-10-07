@@ -49,7 +49,7 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
-import io.resys.hdes.client.spi.HdesDataTypeFactory;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.util.Assert;
 
 
@@ -91,12 +91,12 @@ public class CommandMapper {
     }
   }
   
-  public static Builder builder(HdesDataTypeFactory dataTypeFactory) {
+  public static Builder builder(HdesTypeDefsFactory dataTypeFactory) {
     return new Builder(dataTypeFactory);
   }
 
   public static class Builder {
-    private final HdesDataTypeFactory dataTypeFactory; 
+    private final HdesTypeDefsFactory dataTypeFactory; 
     private long idGen = 0;
     private String name;
     private String description;
@@ -107,7 +107,7 @@ public class CommandMapper {
     private final Map<String, MutableCell> cells = new HashMap<>();
     private final Map<String, MutableRow> rows = new HashMap<>();
 
-    public Builder(HdesDataTypeFactory dataTypeFactory) {
+    public Builder(HdesTypeDefsFactory dataTypeFactory) {
       super();
       this.dataTypeFactory = dataTypeFactory;
     }

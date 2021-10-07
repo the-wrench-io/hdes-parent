@@ -52,14 +52,14 @@ import io.resys.hdes.client.spi.serializers.JsonObjectDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.TimeDataTypeDeserializer;
 import io.resys.hdes.client.spi.util.Assert;
 
-public class HdesDataTypeFactory {
+public class HdesTypeDefsFactory {
 
   private final Map<ValueType, DataTypeDeserializer> deserializers;
   private final Map<ValueType, DataTypeSerializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
   private final ObjectMapper objectMapper; 
   
-  public HdesDataTypeFactory(
+  public HdesTypeDefsFactory(
       ObjectMapper objectMapper,
       Map<ValueType, DataTypeDeserializer> deserializers,
       Map<ValueType, DataTypeSerializer> serializers,
@@ -71,7 +71,7 @@ public class HdesDataTypeFactory {
     this.objectMapper = objectMapper;
   }
 
-  public HdesDataTypeFactory(ObjectMapper objectMapper) {
+  public HdesTypeDefsFactory(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
     
     Map<ValueType, DataTypeDeserializer> deserializers = new HashMap<>();
