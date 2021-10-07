@@ -23,9 +23,9 @@ package io.resys.hdes.client.spi.serializers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.DataTypeSerializer;
+import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 
-public class GenericDataTypeSerializer implements DataTypeSerializer {
+public class GenericDataTypeSerializer implements Serializer {
 
   private final ObjectMapper objectMapper;
 

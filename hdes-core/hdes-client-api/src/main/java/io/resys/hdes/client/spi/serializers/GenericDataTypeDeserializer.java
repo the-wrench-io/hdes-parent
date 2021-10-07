@@ -25,10 +25,10 @@ import java.io.Serializable;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.DataTypeDeserializer;
+import io.resys.hdes.client.api.ast.TypeDef.Deserializer;
 import io.resys.hdes.client.api.exceptions.DataTypeException;
 
-public class GenericDataTypeDeserializer implements DataTypeDeserializer {
+public class GenericDataTypeDeserializer implements Deserializer {
 
   private final ObjectMapper objectMapper;
   private final Class<?> type;

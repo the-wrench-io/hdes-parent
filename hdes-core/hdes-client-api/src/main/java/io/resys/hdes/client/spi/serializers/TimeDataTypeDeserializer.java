@@ -26,9 +26,9 @@ import java.time.LocalTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.DataTypeDeserializer;
+import io.resys.hdes.client.api.ast.TypeDef.Deserializer;
 
-public class TimeDataTypeDeserializer implements DataTypeDeserializer {
+public class TimeDataTypeDeserializer implements Deserializer {
 
   private final ObjectMapper objectMapper;
 

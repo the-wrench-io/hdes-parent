@@ -27,9 +27,9 @@ import java.time.ZonedDateTime;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.DataTypeDeserializer;
+import io.resys.hdes.client.api.ast.TypeDef.Deserializer;
 
-public class DateTimeDataTypeDeserializer implements DataTypeDeserializer {
+public class DateTimeDataTypeDeserializer implements Deserializer {
 
   private final ObjectMapper objectMapper;
 

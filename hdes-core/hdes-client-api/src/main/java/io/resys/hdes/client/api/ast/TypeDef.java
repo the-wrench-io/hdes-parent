@@ -56,9 +56,9 @@ public abstract class TypeDef implements Serializable {
   public abstract String getRef();
   
   @JsonIgnore
-  public abstract DataTypeDeserializer getDeserializer();
+  public abstract Deserializer getDeserializer();
   @JsonIgnore
-  public abstract DataTypeSerializer getSerializer();
+  public abstract Serializer getSerializer();
   @JsonIgnore
   public Serializable toValue(Object value) {
     return getDeserializer().deserialize(this, value);
@@ -68,11 +68,11 @@ public abstract class TypeDef implements Serializable {
     return getSerializer().serialize(this, value);
   }
     
-  public interface DataTypeDeserializer {
+  public interface Deserializer {
     Serializable deserialize(TypeDef dataType, Object value);
   }
 
-  public interface DataTypeSerializer {
+  public interface Serializer {
     String serialize(TypeDef dataType, Object value);
   }
 

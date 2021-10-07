@@ -38,8 +38,8 @@ import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.ast.AstBody.AstExpression;
 import io.resys.hdes.client.api.ast.ImmutableTypeDef;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.DataTypeDeserializer;
-import io.resys.hdes.client.api.ast.TypeDef.DataTypeSerializer;
+import io.resys.hdes.client.api.ast.TypeDef.Deserializer;
+import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.ast.TypeDef.ValueTypeResolver;
@@ -54,15 +54,15 @@ import io.resys.hdes.client.spi.util.Assert;
 
 public class HdesTypeDefsFactory {
 
-  private final Map<ValueType, DataTypeDeserializer> deserializers;
-  private final Map<ValueType, DataTypeSerializer> serializers;
+  private final Map<ValueType, Deserializer> deserializers;
+  private final Map<ValueType, Serializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
   private final ObjectMapper objectMapper; 
   
   public HdesTypeDefsFactory(
       ObjectMapper objectMapper,
-      Map<ValueType, DataTypeDeserializer> deserializers,
-      Map<ValueType, DataTypeSerializer> serializers,
+      Map<ValueType, Deserializer> deserializers,
+      Map<ValueType, Serializer> serializers,
       ValueTypeResolver valueTypeResolver) {
     super();
     this.deserializers = deserializers;
@@ -74,7 +74,7 @@ public class HdesTypeDefsFactory {
   public HdesTypeDefsFactory(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
     
-    Map<ValueType, DataTypeDeserializer> deserializers = new HashMap<>();
+    Map<ValueType, Deserializer> deserializers = new HashMap<>();
     this.deserializers = Collections.unmodifiableMap(deserializers);
 
     deserializers.put(ValueType.ARRAY, new GenericDataTypeDeserializer(objectMapper, List.class));
@@ -92,10 +92,10 @@ public class HdesTypeDefsFactory {
     deserializers.put(ValueType.DATE, new DateDataTypeDeserializer(objectMapper));
     deserializers.put(ValueType.DATE_TIME, new DateTimeDataTypeDeserializer(objectMapper));
 
-    Map<ValueType, DataTypeSerializer> serializers = new HashMap<>();
+    Map<ValueType, Serializer> serializers = new HashMap<>();
     this.serializers = Collections.unmodifiableMap(serializers);
 
-    DataTypeSerializer dataTypeSerializer = new GenericDataTypeSerializer(objectMapper);
+    Serializer dataTypeSerializer = new GenericDataTypeSerializer(objectMapper);
     serializers.put(ValueType.ARRAY, dataTypeSerializer);
     serializers.put(ValueType.OBJECT, dataTypeSerializer);
     serializers.put(ValueType.DURATION, dataTypeSerializer);
@@ -235,8 +235,8 @@ public class HdesTypeDefsFactory {
         valueType = dataType.getValueType();
         properties.addAll(dataType.getProperties());
 
-        DataTypeDeserializer deserializer = dataType.getDeserializer();
-        DataTypeSerializer serializer = dataType.getSerializer();
+        Deserializer deserializer = dataType.getDeserializer();
+        Serializer serializer = dataType.getSerializer();
         return ImmutableTypeDef.builder()
             .id(id).script(script).order(order)
             .name(name).ref(ref).description(description)
@@ -256,8 +256,8 @@ public class HdesTypeDefsFactory {
         valueType = valueTypeResolver.get(beanType);
       }
 
-      DataTypeDeserializer deserializer = deserializers.get(valueType);
-      DataTypeSerializer serializer = serializers.get(valueType);
+      Deserializer deserializer = deserializers.get(valueType);
+      Serializer serializer = serializers.get(valueType);
 
       Assert.notNull(valueType, () -> "valueType can't be null!");
       return ImmutableTypeDef.builder()
