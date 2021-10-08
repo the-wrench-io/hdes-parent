@@ -34,7 +34,10 @@
       <groupId>io.smallrye.reactive</groupId>
       <artifactId>mutiny</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>io.resys.hdes</groupId>
+      <artifactId>thena-docdb-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>

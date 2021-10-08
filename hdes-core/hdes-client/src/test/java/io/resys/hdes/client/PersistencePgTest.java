@@ -23,7 +23,11 @@ package io.resys.hdes.client;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.test.junit.TestProfile;
 import io.resys.hdes.client.api.HdesStore.Entity;
 import io.resys.hdes.client.api.HdesStore.EntityType;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
@@ -31,15 +35,16 @@ import io.resys.hdes.client.api.ImmutableUpdateAstType;
 import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
 import io.resys.hdes.client.api.ast.FlowAstType;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
+import io.resys.hdes.client.config.PgProfile;
 import io.resys.hdes.client.config.PgTestTemplate;
 import io.resys.hdes.client.config.RepositoryToStaticData;
 
-//@QuarkusTest
-//@TestProfile(PgProfile.class)
+@QuarkusTest
+@TestProfile(PgProfile.class)
 public class PersistencePgTest extends PgTestTemplate {
 
   //@Disabled
-  //@Test
+  @Test
   public void starter() {
     final var repo = getHdes("test1");
     

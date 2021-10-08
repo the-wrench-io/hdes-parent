@@ -1,5 +1,6 @@
 package io.resys.hdes.client.config;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,8 +29,16 @@ import javax.inject.Inject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import io.resys.hdes.client.HdesClientImpl;
 import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.spi.serializers.ZoeDeserializer;
+import io.resys.hdes.client.spi.store.ImmutablePersistenceConfig;
+import io.resys.hdes.client.spi.store.PersistenceConfig;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoResult;
 import io.resys.thena.docdb.api.models.Repo;
@@ -42,7 +51,12 @@ public class PgTestTemplate {
   private DocDB client;
   @Inject
   io.vertx.mutiny.pgclient.PgPool pgPool;
-  
+  public static ObjectMapper objectMapper = new ObjectMapper();
+  static {
+    objectMapper.registerModule(new GuavaModule());
+    objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.registerModule(new Jdk8Module());
+  }
   @BeforeEach
   public void setUp() {
     this.client = DocDBFactory.create()
@@ -92,7 +106,22 @@ public class PgTestTemplate {
         .await().atMost(Duration.ofMinutes(1));
     final AtomicInteger gid = new AtomicInteger(0);
     
-    return new HdesClientImpl();
+    PersistenceConfig config = ImmutablePersistenceConfig.builder()
+        .client(client).repoName(repoId).headName("main")
+        .gidProvider(type -> {
+            return type + "-" + gid.incrementAndGet();
+         })
+        .serializer((entity) -> {
+          try {
+            return objectMapper.writeValueAsString(entity);
+          } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+          }
+        })
+        .deserializer(new ZoeDeserializer(objectMapper))
+        .authorProvider(()-> "test author")
+        .build();
+    return new HdesClientImpl(config);
   }
   
 }
