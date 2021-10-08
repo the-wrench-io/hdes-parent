@@ -30,7 +30,7 @@ import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstAutocomplete;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandRange;
 
-public class FlowNodesFactory {
+public class AstFlowNodesFactory {
 
   public static AcBuilder ac() {
     return new AcBuilder();
@@ -71,7 +71,7 @@ public class FlowNodesFactory {
     }
 
     public AcBuilder addRange(int start, int end) {
-      range.add(FlowNodesFactory.range().build(start, end));
+      range.add(AstFlowNodesFactory.range().build(start, end));
       return this;
     }
     public AcBuilder addRange(FlowAstCommandRange range) {

@@ -3,11 +3,11 @@ package io.resys.wrench.assets.flow.spi.validators;
 import org.apache.commons.lang3.StringUtils;
 
 import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 
 /*-
  * #%L
@@ -29,16 +29,16 @@ import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
  * #L%
  */
 
-public class IdValidator implements NodeFlowVisitor {
+public class IdValidator implements AstFlowNodeVisitor {
 
   @Override
-  public void visit(NodeFlow node, ImmutableAstFlow.Builder modelBuilder) {
+  public void visit(AstFlowRoot node, ImmutableAstFlow.Builder modelBuilder) {
     if(node.getId() == null) {
       modelBuilder.addMessages(
           ImmutableFlowAstCommandMessage.builder()
           .line(0)
           .value("flow must have id")
-          .range(FlowNodesFactory.range().build(0, 0))
+          .range(AstFlowNodesFactory.range().build(0, 0))
           .type(FlowCommandMessageType.ERROR)
           .build());
       return;
@@ -48,7 +48,7 @@ public class IdValidator implements NodeFlowVisitor {
           ImmutableFlowAstCommandMessage.builder()
           .line(node.getId().getStart())
           .value("flow id must have a value")
-          .range(FlowNodesFactory.range().build(0, node.getId().getSource().getValue().length()))
+          .range(AstFlowNodesFactory.range().build(0, node.getId().getSource().getValue().length()))
           .type(FlowCommandMessageType.ERROR)
           .build());
     }

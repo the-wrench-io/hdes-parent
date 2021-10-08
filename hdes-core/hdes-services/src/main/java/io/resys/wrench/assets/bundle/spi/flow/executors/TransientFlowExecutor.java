@@ -39,9 +39,9 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DataTypeException;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTaskStatus;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
@@ -59,7 +59,7 @@ public class TransientFlowExecutor {
     this.objectMapper = objectMapper;
   }
 
-  public Map.Entry<Flow, ObjectNode> debug(AssetService service, JsonNode debugInput) {
+  public Map.Entry<FlowResult, ObjectNode> debug(AssetService service, JsonNode debugInput) {
     ServiceDataModel dataModel = service.getDataModel();
 
     // Create input
@@ -75,25 +75,25 @@ public class TransientFlowExecutor {
 
       // Run service
       ServiceResponse response = service.newExecution().insert((Serializable) input).run();
-      Flow flow = response.get();
+      FlowResult flow = response.get();
 
-      return new AbstractMap.SimpleImmutableEntry<Flow, ObjectNode>(flow, createOutput(flow));
+      return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, createOutput(flow));
     } catch(FlowException e) {
-      final Flow flow = e.getFlow();
+      final FlowResult flow = e.getFlow();
       final ObjectNode output = createOutput(flow);
       final Map<String, String> errors = new HashMap<>();
       errors.put("msg", e.getMessage());
       errors.put("stackTrace", ExceptionUtils.getStackTrace(e));
       output.set("_errors", objectMapper.convertValue(errors, ObjectNode.class));
     
-      return new AbstractMap.SimpleImmutableEntry<Flow, ObjectNode>(flow, output);
+      return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, output);
     } catch(DataTypeException e) {
       Message error = AssetErrorCodes.FLOW_PROPERTY_INVALID.newMessage(e.getDataType().getName());
       throw new DataException(new MessageList().setStatus(422).add(error));
     }
   }
   
-  public Map.Entry<Flow, ObjectNode> execute(AssetService service, JsonNode debugInput) {
+  public Map.Entry<FlowResult, ObjectNode> execute(AssetService service, JsonNode debugInput) {
     ServiceDataModel dataModel = service.getDataModel();
 
     // Create input
@@ -109,9 +109,9 @@ public class TransientFlowExecutor {
 
       // Run service
       ServiceResponse response = service.newExecution().insert((Serializable) input).run();
-      Flow flow = response.get();
+      FlowResult flow = response.get();
 
-      return new AbstractMap.SimpleImmutableEntry<Flow, ObjectNode>(flow, createOutput(flow));
+      return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, createOutput(flow));
     } catch(FlowException e) {
       Message error = AssetErrorCodes.FLOW_EXEC_ERROR.newMessage(e.getMessage());
       throw new DataException(new MessageList().setStatus(422).add(error));
@@ -135,13 +135,13 @@ public class TransientFlowExecutor {
     return errors;
   }
 
-  protected ObjectNode createOutput(Flow flow) {
+  protected ObjectNode createOutput(FlowResult flow) {
     ObjectNode output = objectMapper.createObjectNode();
     flow.getContext().getTasks().stream()
     .filter(t -> t.getStatus() == FlowTaskStatus.COMPLETED)
     .forEach(t -> {
 
-      FlowTaskModel taskModel = flow.getModel().getTask().get(t.getModelId());
+      Step taskModel = flow.getModel().getStep().get(t.getModelId());
       if(taskModel.getBody() != null) {
         JsonNode node = objectMapper.valueToTree(t.getVariables().get(t.getModelId()));
         output.set(taskModel.getId(), node);

@@ -44,32 +44,32 @@ import io.resys.hdes.client.api.ast.AstChangeset;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstInputType;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
 import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.api.ast.ImmutableAstFlowInputType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstInputType;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeBean;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class FlowAstBuilderImpl implements FlowAstBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(FlowAstBuilderImpl.class);
-  private final Collection<NodeFlowVisitor> visitors = new ArrayList<>();
+  private final Collection<AstFlowNodeVisitor> visitors = new ArrayList<>();
 
   private final static String LINE_SEPARATOR = System.lineSeparator();
-  private final static Collection<FlowAstInputType> inputTypes = Collections.unmodifiableList(    
+  private final static Collection<AstFlowInputType> inputTypes = Collections.unmodifiableList(    
       Arrays.asList(ValueType.STRING,  ValueType.BOOLEAN, ValueType.INTEGER, ValueType.LONG, ValueType.DECIMAL, ValueType.DATE, ValueType.DATE_TIME).stream()
-      .map(v -> ImmutableFlowAstInputType.builder().name(v.name()).value(v.name()).build())
+      .map(v -> ImmutableAstFlowInputType.builder().name(v.name()).value(v.name()).build())
       .collect(Collectors.toList())
   );
 
@@ -124,7 +124,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
 
   @Override
   public AstFlow build() {
-    Assert.notNull(src, () -> "src can't ne null!");
+    HdesAssert.notNull(src, () -> "src can't ne null!");
 
     final var changes = AstChangesetFactory.src(src, rev);
     final var flow = visitFlow(changes.getSrc());
@@ -142,7 +142,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
           .build());
     }
     
-    FlowAstNode id = flow.getId();
+    AstFlowNode id = flow.getId();
     
     return ast
         .messages(messages)
@@ -154,7 +154,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         .build();
   }
   @Override
-  public FlowAstBuilder visitors(NodeFlowVisitor... visitors) {
+  public FlowAstBuilder visitors(AstFlowNodeVisitor... visitors) {
     // TODO Auto-generated method stub
     return null;
   }
@@ -223,7 +223,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         int end = lineContent.length();
         messages.add(ImmutableFlowAstCommandMessage.builder()
             .line(lineNumber)
-            .range(FlowNodesFactory.range().build(start, end))
+            .range(AstFlowNodesFactory.range().build(start, end))
             .value("space has no meaning")
             .type(FlowCommandMessageType.WARNING)
             .build());

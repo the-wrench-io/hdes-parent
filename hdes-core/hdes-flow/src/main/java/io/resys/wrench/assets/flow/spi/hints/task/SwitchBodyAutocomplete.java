@@ -25,30 +25,30 @@ import java.util.Collection;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 
-public class SwitchBodyAutocomplete implements NodeFlowVisitor {
+public class SwitchBodyAutocomplete implements AstFlowNodeVisitor {
 
   @Override
-  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
-    Collection<FlowAstTask> tasks = flow.getTasks().values();
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    Collection<AstFlowTaskNode> tasks = flow.getTasks().values();
     if(tasks.isEmpty()) {
       return;
     }
 
     List<FlowAstCommandRange> ranges = new ArrayList<>();
-    for(FlowAstTask child : tasks) {
+    for(AstFlowTaskNode child : tasks) {
       if(child.getDecisionTable() == null && child.getService() == null) {
-        ranges.add(FlowNodesFactory.range().build(child.getStart(), child.getEnd(), true));
+        ranges.add(AstFlowNodesFactory.range().build(child.getStart(), child.getEnd(), true));
       }
     }
 
     modelBuilder.addAutocomplete(
-        FlowNodesFactory.ac()
+        AstFlowNodesFactory.ac()
         .id(SwitchBodyAutocomplete.class.getSimpleName())
         .addField(6, "switch")
         .addField(8, "- {caseName}")

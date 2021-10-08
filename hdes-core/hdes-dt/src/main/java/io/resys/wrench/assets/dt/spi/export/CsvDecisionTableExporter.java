@@ -30,8 +30,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
+import io.resys.hdes.client.api.execution.DecisionProgram.DecisionTableDataType;
+import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 
 public class CsvDecisionTableExporter extends TemplateDecisionTableExporter implements DecisionTableExporter {
@@ -42,27 +42,27 @@ public class CsvDecisionTableExporter extends TemplateDecisionTableExporter impl
     List<TypeDef> headers = new ArrayList<>();
     List<String> headerNames = new ArrayList<>();
     for(DecisionTableDataType dataType : dt.getTypes()) {
-      headers.add(dataType.getValue());
-      headerNames.add(dataType.getValue().getName());
+      headers.add(dataType.getExpression());
+      headerNames.add(dataType.getExpression().getName());
     }
 
     try {
       CSVPrinter csvPrinter = new CSVPrinter(stringBuilder, CSVFormat.DEFAULT.withDelimiter(';').withHeader(headerNames.toArray(new String[] {})));
-      print(csvPrinter, dt.getNode(), headerNames);
+      print(csvPrinter, dt.getRows(), headerNames);
       return stringBuilder.toString();
     } catch(IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
-  protected void print(CSVPrinter csvPrinter, DecisionTableNode node, List<String> headerNames) throws IOException {
+  protected void print(CSVPrinter csvPrinter, Row node, List<String> headerNames) throws IOException {
     if(node == null) {
       return;
     }
 
     Map<String, Object> entries = new HashMap<>();
-    node.getInputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
-    node.getOutputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
+    node.getAccepts().forEach(e -> entries.put(e.getKey().getName(), e.getExpression()));
+    node.getReturns().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
 
     List<Object> values = new ArrayList<>();
     for(String name : headerNames) {

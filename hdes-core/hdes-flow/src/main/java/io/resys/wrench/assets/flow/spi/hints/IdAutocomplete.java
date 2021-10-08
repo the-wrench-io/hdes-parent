@@ -24,14 +24,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 
-public class IdAutocomplete implements NodeFlowVisitor {
+public class IdAutocomplete implements AstFlowNodeVisitor {
 
   private final static List<String> BEFORE = Arrays.asList(
       NodeFlowBean.KEY_DESC,
@@ -39,8 +39,8 @@ public class IdAutocomplete implements NodeFlowVisitor {
       NodeFlowBean.KEY_TASKS);
 
   @Override
-  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
-    FlowAstNode node = flow.getId();
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    AstFlowNode node = flow.getId();
     if(node != null) {
       return;
     }
@@ -52,7 +52,7 @@ public class IdAutocomplete implements NodeFlowVisitor {
     int end = before.orElse(flow.getEnd());
 
     modelBuilder.addAutocomplete(
-        FlowNodesFactory.ac()
+        AstFlowNodesFactory.ac()
         .id(IdAutocomplete.class.getSimpleName())
         .addField(NodeFlowBean.KEY_ID)
         .addRange(0, end)

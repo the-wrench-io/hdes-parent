@@ -21,7 +21,7 @@ package io.resys.wrench.assets.dt.spi.beans;
  */
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
+import io.resys.hdes.client.api.execution.DecisionProgram.DecisionTableDataType;
 
 public class ImmutableDecisionTableDataType implements DecisionTableDataType {
 
@@ -49,7 +49,7 @@ public class ImmutableDecisionTableDataType implements DecisionTableDataType {
   }
 
   @Override
-  public TypeDef getValue() {
+  public TypeDef getExpression() {
     return value;
   }
 

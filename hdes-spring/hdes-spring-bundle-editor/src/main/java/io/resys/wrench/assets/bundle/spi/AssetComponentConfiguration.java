@@ -43,12 +43,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
-import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
-import io.resys.hdes.client.api.execution.Service.ServiceInit;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
+import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.execution.ServiceProgram.ServiceInit;
 import io.resys.hdes.client.spi.HdesAstTypesImpl;
-import io.resys.hdes.client.spi.expression.GenericExpressionExecutor;
+import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -195,7 +195,7 @@ public class AssetComponentConfiguration {
     SpelExpressionFactory parser = new SpelExpressionFactory();
     ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
-    List<NodeFlowVisitor> visitors = Arrays.asList(
+    List<AstFlowNodeVisitor> visitors = Arrays.asList(
         new IdAutocomplete(),
         new DescAutocomplete(),
         new InputsAutocomplete(),

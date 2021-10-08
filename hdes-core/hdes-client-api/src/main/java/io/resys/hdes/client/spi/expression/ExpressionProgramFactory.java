@@ -30,12 +30,14 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.ast.AstBody.AstExpression;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.execution.ExpressionProgram;
+import io.resys.hdes.client.api.execution.ExpressionResult;
+import io.resys.hdes.client.api.execution.ImmutableExpressionResult;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 
-public class OperationFactory {
+public class ExpressionProgramFactory {
 
   public static Builder builder() {
     return new Builder();
@@ -61,9 +63,9 @@ public class OperationFactory {
       return this;
     }
 
-    public AstExpression build() {
-      Assert.notNull(src, () -> "src can't be null!");
-      Assert.notNull(valueType, () -> "valueType can't be null!");
+    public ExpressionProgram build() {
+      HdesAssert.notNull(src, () -> "src can't be null!");
+      HdesAssert.notNull(valueType, () -> "valueType can't be null!");
 
       try {
         final List<String> constants = new ArrayList<>();
@@ -76,11 +78,15 @@ public class OperationFactory {
         Operation operation = null;
         switch (valueType) {
         case MAP: 
-          Assert.notNull(objectMapper, () -> "objectMapper can't be null!");
+          HdesAssert.notNull(objectMapper, () -> "objectMapper can't be null!");
           operation = OperationMap.builder().build(src, constantsConsumer);
           break;
+        case FLOW_CONTEXT: 
+          HdesAssert.notNull(objectMapper, () -> "objectMapper can't be null!");
+          operation = OperationFlowContext.builder().build(src, constantsConsumer);
+          break;
         case STRING:
-          Assert.notNull(objectMapper, () -> "objectMapper can't be null!");
+          HdesAssert.notNull(objectMapper, () -> "objectMapper can't be null!");
           operation = OperationString.builder(objectMapper).build(src, constantsConsumer);
           break;
         case BOOLEAN:
@@ -99,32 +105,24 @@ public class OperationFactory {
           throw new DecisionAstException("Unknown type: " + valueType + "!");
         }
 
-        return new ImmutableExpression(operation, src, valueType, Collections.unmodifiableList(constants));
+        return new ImmutableExpressionProgram(operation, valueType, Collections.unmodifiableList(constants));
       } catch (Exception e) {
         throw new DecisionAstException(e.getMessage(), e);
       }
     }
   }
 
-  private static class ImmutableExpression implements AstExpression {
-    private final transient Operation expression;
-    private final String src;
+  private static class ImmutableExpressionProgram implements ExpressionProgram {
+    private final Operation expression;
     private final ValueType type;
     private final List<String> constants;
 
-    public ImmutableExpression(Operation expression, String src, ValueType type, List<String> constants) {
+    public ImmutableExpressionProgram(Operation expression, ValueType type, List<String> constants) {
       super();
       this.expression = expression;
-      this.src = src;
       this.type = type;
       this.constants = constants;
     }
-
-    @Override
-    public String getSrc() {
-      return src;
-    }
-
     @Override
     public ValueType getType() {
       return type;
@@ -137,8 +135,11 @@ public class OperationFactory {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Object getValue(Object entity) {
-      return expression.apply(entity);
+    public ExpressionResult run(Object entity) {
+      return ImmutableExpressionResult.builder()
+          .constants(constants)
+          .value(expression.apply(entity))
+          .build();
     }
   }
 }

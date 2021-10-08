@@ -24,33 +24,33 @@ import java.util.Map;
 
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.NodeFlowAdapter;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
-import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
-public class TaskInputsAutocomplete extends TemplateAutocomplete implements NodeFlowVisitor {
+public class TaskInputsAutocomplete extends TemplateAutocomplete implements AstFlowNodeVisitor {
 
   public TaskInputsAutocomplete(ServiceStore serviceStore) {
     super(serviceStore);
   }
 
   @Override
-  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
-    Map<String, FlowAstTask> tasks = flow.getTasks();
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    Map<String, AstFlowTaskNode> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;
     }
 
-    for(FlowAstTask taskModel : flow.getTasks().values()) {
+    for(AstFlowTaskNode taskModel : flow.getTasks().values()) {
       if(taskModel.getRef() == null) {
         continue;
       }
@@ -69,7 +69,7 @@ public class TaskInputsAutocomplete extends TemplateAutocomplete implements Node
         continue;
       }
 
-      FlowNodesFactory.AcBuilder builder = FlowNodesFactory.ac().addField(8, "inputs");
+      AstFlowNodesFactory.AcBuilder builder = AstFlowNodesFactory.ac().addField(8, "inputs");
       for(TypeDef param : service.getDataModel().getParams()) {
         if(param.getDirection() == Direction.IN) {
           builder.addField(10, param.getName());
@@ -78,7 +78,7 @@ public class TaskInputsAutocomplete extends TemplateAutocomplete implements Node
 
       modelBuilder.addAutocomplete(builder
           .id(TaskInputsAutocomplete.class.getSimpleName())
-          .addRange(FlowNodesFactory.range().build(taskModel.getRef().getStart(), taskModel.getRef().getEnd(), true))
+          .addRange(AstFlowNodesFactory.range().build(taskModel.getRef().getStart(), taskModel.getRef().getEnd(), true))
           .build());
     }
   }

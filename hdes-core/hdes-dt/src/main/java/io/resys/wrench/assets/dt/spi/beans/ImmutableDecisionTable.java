@@ -23,9 +23,9 @@ package io.resys.wrench.assets.dt.spi.beans;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
-import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.execution.DecisionProgram;
 
-public class ImmutableDecisionTable implements DecisionTableModel {
+public class ImmutableDecisionTable implements DecisionProgram {
 
   private static final long serialVersionUID = -8964213143541619331L;
 
@@ -35,12 +35,12 @@ public class ImmutableDecisionTable implements DecisionTableModel {
   private final String description;
   private final HitPolicy hitPolicy;
   private final List<DecisionTableDataType> types;
-  private final DecisionTableNode node;
+  private final Row node;
 
   public ImmutableDecisionTable(
       String id, String rev, String src, String description, HitPolicy hitPolicy,
       List<DecisionTableDataType> types,
-      DecisionTableNode node) {
+      Row node) {
     super();
     this.id = id;
     this.rev = rev;
@@ -60,7 +60,7 @@ public class ImmutableDecisionTable implements DecisionTableModel {
     return types;
   }
   @Override
-  public DecisionTableNode getNode() {
+  public Row getRows() {
     return node;
   }
   @Override

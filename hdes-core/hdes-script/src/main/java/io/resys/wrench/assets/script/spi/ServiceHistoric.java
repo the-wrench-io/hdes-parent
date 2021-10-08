@@ -23,10 +23,10 @@ package io.resys.wrench.assets.script.spi;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstService;
-import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.execution.ServiceProgram;
 
 
-public class ServiceHistoric implements Service {
+public class ServiceHistoric implements ServiceProgram {
   private final AstService model;
   
   public ServiceHistoric(AstService model) {

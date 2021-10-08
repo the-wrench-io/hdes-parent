@@ -1,6 +1,6 @@
 package io.resys.wrench.assets.dt.spi.export;
 
-import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.execution.DecisionProgram;
 
 /*-
  * #%L
@@ -26,11 +26,11 @@ import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExport
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
 
 public abstract class TemplateDecisionTableExporter implements DecisionTableExporter {
-  protected DecisionTableModel dt;
+  protected DecisionProgram dt;
   protected DecisionTableFormat format;
 
   @Override
-  public DecisionTableExporter src(DecisionTableModel dt) {
+  public DecisionTableExporter src(DecisionProgram dt) {
     this.dt = dt;
     return this;
   }

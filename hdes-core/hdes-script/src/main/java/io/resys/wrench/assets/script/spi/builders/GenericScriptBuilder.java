@@ -34,8 +34,8 @@ import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.ImmutableAstService;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
-import io.resys.hdes.client.api.execution.Service;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.execution.ServiceProgram;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
 import io.resys.wrench.assets.script.spi.ServiceHistoric;
 import io.resys.wrench.assets.script.spi.ServiceTemplate;
@@ -85,8 +85,8 @@ public class GenericScriptBuilder implements ScriptBuilder {
   }
 
   @Override
-  public Service build() {
-    Assert.isTrue(src != null || jsonNode != null, () -> "src can't be null!");
+  public ServiceProgram build() {
+    HdesAssert.isTrue(src != null || jsonNode != null, () -> "src can't be null!");
     if (src != null) {
       try {
         jsonNode = objectMapper.readTree(src);

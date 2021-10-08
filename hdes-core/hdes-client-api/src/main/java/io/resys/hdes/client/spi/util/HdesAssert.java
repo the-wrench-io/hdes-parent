@@ -22,7 +22,7 @@ package io.resys.hdes.client.spi.util;
 
 import java.util.function.Supplier;
 
-public class Assert {
+public class HdesAssert {
   
   public static void notNull(Object object, Supplier<String> message) {
     if (object == null) {

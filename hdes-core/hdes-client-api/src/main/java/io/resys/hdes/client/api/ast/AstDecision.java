@@ -38,7 +38,6 @@ public interface AstDecision extends AstBody, Serializable {
   Map<ValueType, List<String>> getHeaderExpressions();
   List<Row> getRows();
 
-
   @Value.Immutable
   interface Row extends Serializable {
     String getId();

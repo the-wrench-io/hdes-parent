@@ -35,22 +35,22 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
-import io.resys.hdes.client.api.ast.AstBody.AstExpression;
 import io.resys.hdes.client.api.ast.ImmutableTypeDef;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Deserializer;
-import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.ast.TypeDef.ValueTypeResolver;
-import io.resys.hdes.client.spi.expression.OperationFactory;
+import io.resys.hdes.client.api.execution.ExpressionProgram;
+import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
 import io.resys.hdes.client.spi.serializers.DateDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.DateTimeDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.GenericDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.GenericDataTypeSerializer;
 import io.resys.hdes.client.spi.serializers.JsonObjectDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.TimeDataTypeDeserializer;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesTypeDefsFactory {
 
@@ -130,8 +130,8 @@ public class HdesTypeDefsFactory {
     return new GenericDataTypeBuilder();
   }
   
-  public AstExpression expression(ValueType valueType, String src) {
-    AstExpression expression = OperationFactory.builder()
+  public ExpressionProgram expression(ValueType valueType, String src) {
+    ExpressionProgram expression = ExpressionProgramFactory.builder()
         .objectMapper(objectMapper)
         .valueType(valueType)
         .src(src).build();
@@ -211,8 +211,8 @@ public class HdesTypeDefsFactory {
     }
     @Override
     public DataTypeAstBuilder ref(String ref, TypeDef dataType) {
-      Assert.isTrue(ref != null, () -> "ref can't be null!");
-      Assert.isTrue(dataType != null, () -> "dataType can't be null for ref: " + ref + "!");
+      HdesAssert.isTrue(ref != null, () -> "ref can't be null!");
+      HdesAssert.isTrue(dataType != null, () -> "dataType can't be null for ref: " + ref + "!");
       this.dataType = dataType;
       return this;
     }
@@ -229,7 +229,7 @@ public class HdesTypeDefsFactory {
     }
     @Override
     public TypeDef build() {
-      Assert.notNull(name, () -> "name can't be null!");
+      HdesAssert.notNull(name, () -> "name can't be null!");
 
       if(dataType != null) {
         valueType = dataType.getValueType();
@@ -252,14 +252,14 @@ public class HdesTypeDefsFactory {
       }
 
       if(valueType == null) {
-        Assert.notNull(beanType, () -> "beanType can't be null!");
+        HdesAssert.notNull(beanType, () -> "beanType can't be null!");
         valueType = valueTypeResolver.get(beanType);
       }
 
       Deserializer deserializer = deserializers.get(valueType);
       Serializer serializer = serializers.get(valueType);
 
-      Assert.notNull(valueType, () -> "valueType can't be null!");
+      HdesAssert.notNull(valueType, () -> "valueType can't be null!");
       return ImmutableTypeDef.builder()
           .id(id).script(script).order(order)
           .name(name)

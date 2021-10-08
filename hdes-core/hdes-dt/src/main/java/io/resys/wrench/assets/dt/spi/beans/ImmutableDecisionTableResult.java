@@ -28,27 +28,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeOutput;
+import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.api.execution.DecisionProgram.RowReturns;
 
-public class ImmutableDecisionTableResult implements DecisionTableResult {
+public class ImmutableDecisionTableResult implements DecisionResult {
 
   private static final long serialVersionUID = -2615335425678830306L;
 
-  private final List<DecisionTableDecision> decisions;
+  private final List<DecisionExpression> decisions;
 
-  public ImmutableDecisionTableResult(List<DecisionTableDecision> decisions) {
+  public ImmutableDecisionTableResult(List<DecisionExpression> decisions) {
     super();
     this.decisions = decisions;
   }
 
   @Override
-  public List<DecisionTableDecision> getRejections() {
+  public List<DecisionExpression> getRejections() {
     return decisions.stream().filter(d -> !d.isMatch()).collect(Collectors.toList());
   }
 
   @Override
-  public List<DecisionTableDecision> getMatches() {
+  public List<DecisionExpression> getMatches() {
     return decisions.stream().filter(d -> d.isMatch()).collect(Collectors.toList());
   }
 
@@ -59,9 +59,9 @@ public class ImmutableDecisionTableResult implements DecisionTableResult {
         .collect(Collectors.toList());
   }
 
-  protected Map<String, Serializable> toValues(DecisionTableDecision decision) {
+  protected Map<String, Serializable> toValues(DecisionExpression decision) {
     Map<String, Serializable> result = new HashMap<>();
-    for(DecisionTableNodeOutput entry : decision.getNode().getOutputs()) {
+    for(RowReturns entry : decision.getNode().getReturns()) {
       result.put(entry.getKey().getName(), entry.getValue());
     }
     return result;

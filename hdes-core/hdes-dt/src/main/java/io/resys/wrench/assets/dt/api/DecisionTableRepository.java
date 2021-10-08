@@ -27,8 +27,8 @@ import java.util.function.Function;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.execution.DecisionResult;
 
 public interface DecisionTableRepository {
 
@@ -38,15 +38,15 @@ public interface DecisionTableRepository {
 
 
   interface DecisionTableExporter {
-    DecisionTableExporter src(DecisionTableModel dt);
+    DecisionTableExporter src(DecisionProgram dt);
     DecisionTableExporter format(DecisionTableFormat format);
     String build();
   }
 
   interface DecisionTableExecutor {
-    DecisionTableExecutor decisionTable(DecisionTableModel decisionTable);
+    DecisionTableExecutor decisionTable(DecisionProgram decisionTable);
     DecisionTableExecutor context(Function<TypeDef, Object> context);
-    DecisionTableResult execute();
+    DecisionResult execute();
   }
 
   interface DecisionTableBuilder {
@@ -56,7 +56,7 @@ public interface DecisionTableRepository {
     DecisionTableBuilder src(String input);
     DecisionTableBuilder src(InputStream inputStream);
     DecisionTableBuilder src(JsonNode src);
-    DecisionTableModel build();
+    DecisionProgram build();
   }
 
   enum DecisionTableFormat {

@@ -20,10 +20,10 @@ package io.resys.wrench.assets.flow.api;
  * #L%
  */
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
 
 public interface FlowExecutorRepository {
 
@@ -31,10 +31,10 @@ public interface FlowExecutorRepository {
   FlowTaskExecutor createTaskExecutor(FlowTaskType type);
 
   interface FlowExecutor {
-    void execute(Flow flow);
+    void execute(FlowResult flow);
   }
 
   interface FlowTaskExecutor {
-    FlowTaskModel execute(Flow flow, FlowTask task);
+    Step execute(FlowResult flow, FlowTask task);
   }
 }

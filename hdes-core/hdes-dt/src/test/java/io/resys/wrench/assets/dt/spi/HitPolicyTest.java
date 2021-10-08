@@ -30,8 +30,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.execution.DecisionResult;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFixedValue;
@@ -48,14 +48,14 @@ public class HitPolicyTest {
   public void firstHitPolicy() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "firstHitPolicy.json");
 
-    DecisionTableModel decisionTable = decisionTableRepository.createBuilder()
+    DecisionProgram decisionTable = decisionTableRepository.createBuilder()
         .format(DecisionTableFormat.JSON)
         .src(stream)
         .build();
 
     Map<String, Object> values = new HashMap<>();
     values.put("regionName", "FIN");
-    DecisionTableResult result = execute(decisionTable, values);
+    DecisionResult result = execute(decisionTable, values);
     Assert.assertEquals(1, result.getMatches().size());
     Assert.assertEquals(0, result.getMatches().get(0).getNode().getId());
 
@@ -71,14 +71,14 @@ public class HitPolicyTest {
   public void all() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "allHitPolicy.json");
 
-    DecisionTableModel decisionTable = decisionTableRepository.createBuilder()
+    DecisionProgram decisionTable = decisionTableRepository.createBuilder()
         .format(DecisionTableFormat.JSON)
         .src(stream)
         .build();
 
     Map<String, Object> values = new HashMap<>();
     values.put("firstName", "Mark");
-    DecisionTableResult result = execute(decisionTable, values);
+    DecisionResult result = execute(decisionTable, values);
     Assert.assertEquals(2, result.getMatches().size());
   }
 
@@ -86,19 +86,19 @@ public class HitPolicyTest {
   public void allWithFixedOverrideEvaluation() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "allHitPolicy.json");
 
-    DecisionTableModel decisionTable = decisionTableRepository.createBuilder()
+    DecisionProgram decisionTable = decisionTableRepository.createBuilder()
         .format(DecisionTableFormat.JSON)
         .src(stream)
         .build();
 
     Map<String, Object> values = new HashMap<>();
     values.put("firstName", DecisionTableFixedValue.ALWAYS_TRUE);
-    DecisionTableResult result = execute(decisionTable, values);
+    DecisionResult result = execute(decisionTable, values);
     Assert.assertEquals(2, result.getMatches().size());
   }
 
   
-  public DecisionTableResult execute(DecisionTableModel decisionTable, Map<String, Object> values) {
+  public DecisionResult execute(DecisionProgram decisionTable, Map<String, Object> values) {
     return decisionTableRepository.createExecutor().
         decisionTable(decisionTable).
         context((type) -> values.get(type.getName())).

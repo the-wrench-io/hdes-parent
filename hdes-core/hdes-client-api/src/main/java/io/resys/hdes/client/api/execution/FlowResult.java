@@ -27,18 +27,17 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
 
 
 
-public interface Flow extends Serializable {
+public interface FlowResult extends Serializable {
   String getId();
-  FlowModel getModel();
+  FlowProgram getModel();
   FlowContext getContext();
   Map<String, Object> getLog();
 
-  FlowTask start(FlowTaskModel model);
+  FlowTask start(Step model);
   FlowTask suspend(FlowTask task);
   FlowTask complete(FlowTask task);
   FlowTask end(FlowTask task);

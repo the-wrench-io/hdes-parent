@@ -25,14 +25,14 @@ import java.util.List;
 
 import java.util.function.Consumer;
 
-import io.resys.hdes.client.api.execution.Flow;
+import io.resys.hdes.client.api.execution.FlowResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 
 public class FlowServiceResponse implements ServiceResponse {
 
-  private final Flow flow;
+  private final FlowResult flow;
 
-  public FlowServiceResponse(Flow flow) {
+  public FlowServiceResponse(FlowResult flow) {
     super();
     this.flow = flow;
   }

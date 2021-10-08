@@ -22,7 +22,7 @@ package io.resys.wrench.assets.dt.spi.export;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 
@@ -37,8 +37,8 @@ public class DelegateDecisionTableExporter extends TemplateDecisionTableExporter
 
   @Override
   public String build() {
-    Assert.isTrue(dt != null, () -> "decision table can't be null!");
-    Assert.isTrue(format != null, () -> "format can't be null!");
+    HdesAssert.isTrue(dt != null, () -> "decision table can't be null!");
+    HdesAssert.isTrue(format != null, () -> "format can't be null!");
 
     DecisionTableExporter delegate;
     switch(format) {

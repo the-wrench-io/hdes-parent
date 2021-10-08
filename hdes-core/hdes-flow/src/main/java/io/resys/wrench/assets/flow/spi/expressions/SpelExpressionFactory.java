@@ -33,6 +33,7 @@ import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 
 import io.resys.hdes.client.api.model.ImmutableFlowTaskValue;
+import io.resys.hdes.client.spi.flow.program.ImmutableStepExpression;
 
 public class SpelExpressionFactory implements ExpressionFactory {
 
@@ -45,7 +46,7 @@ public class SpelExpressionFactory implements ExpressionFactory {
     List<String> inputs = new ArrayList<>();
     getInputs(node, inputs);
 
-    SpelFlowTaskExpression spelFlowTaskExpression = new SpelFlowTaskExpression(expression, inputs);
+    ImmutableStepExpression spelFlowTaskExpression = new ImmutableStepExpression(expression, inputs);
     Map<String, String> inputMapping = new HashMap<>();
     inputs.forEach(name -> inputMapping.put(name, name));
 

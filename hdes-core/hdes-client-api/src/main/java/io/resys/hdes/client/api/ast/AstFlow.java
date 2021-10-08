@@ -32,7 +32,7 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 public interface AstFlow extends AstBody, Serializable {
-  NodeFlow getSrc();
+  AstFlowRoot getSrc();
   List<FlowAstCommandMessage> getMessages();
   List<FlowAstAutocomplete> getAutocomplete();
 
@@ -68,56 +68,56 @@ public interface AstFlow extends AstBody, Serializable {
   //public ImmutableNodeInputType(String name, String ref, String value) {
   
   @Value.Immutable
-  interface FlowAstInputType extends Serializable {
+  interface AstFlowInputType extends Serializable {
     String getName();
     String getValue();
     @Nullable
     String getRef();
   }
 
-  interface NodeFlow extends FlowAstNode {
-    FlowAstNode getId();
-    FlowAstNode getDescription();
-    Collection<FlowAstInputType> getTypes();
-    Map<String, FlowAstInput> getInputs();
-    Map<String, FlowAstTask> getTasks();
+  interface AstFlowRoot extends AstFlowNode {
+    AstFlowNode getId();
+    AstFlowNode getDescription();
+    Collection<AstFlowInputType> getTypes();
+    Map<String, AstFlowInputNode> getInputs();
+    Map<String, AstFlowTaskNode> getTasks();
   }
 
-  interface FlowAstTask extends FlowAstNode {
-    FlowAstNode getId();
+  interface AstFlowTaskNode extends AstFlowNode {
+    AstFlowNode getId();
     int getOrder();
-    FlowAstNode getThen();
-    FlowAstRef getRef();
-    FlowAstRef getUserTask();
-    FlowAstRef getDecisionTable();
-    FlowAstRef getService();
-    Map<String, FlowAstSwitch> getSwitch();
+    AstFlowNode getThen();
+    AstFlowRefNode getRef();
+    AstFlowRefNode getUserTask();
+    AstFlowRefNode getDecisionTable();
+    AstFlowRefNode getService();
+    Map<String, AstFlowSwitchNode> getSwitch();
   }
 
-  interface FlowAstRef extends FlowAstNode {
-    FlowAstNode getRef();
-    FlowAstNode getCollection();
-    FlowAstNode getInputsNode();
-    Map<String, FlowAstNode> getInputs();
+  interface AstFlowRefNode extends AstFlowNode {
+    AstFlowNode getRef();
+    AstFlowNode getCollection();
+    AstFlowNode getInputsNode();
+    Map<String, AstFlowNode> getInputs();
   }
 
-  interface FlowAstSwitch extends FlowAstNode {
+  interface AstFlowSwitchNode extends AstFlowNode {
     int getOrder();
-    FlowAstNode getWhen();
-    FlowAstNode getThen();
+    AstFlowNode getWhen();
+    AstFlowNode getThen();
   }
 
-  interface FlowAstInput extends FlowAstNode {
-    FlowAstNode getRequired();
-    FlowAstNode getType();
-    FlowAstNode getDebugValue();
+  interface AstFlowInputNode extends AstFlowNode {
+    AstFlowNode getRequired();
+    AstFlowNode getType();
+    AstFlowNode getDebugValue();
   }
 
-  interface FlowAstNode extends Serializable, Comparable<FlowAstNode> {
-    FlowAstNode getParent();
+  interface AstFlowNode extends Serializable, Comparable<AstFlowNode> {
+    AstFlowNode getParent();
     String getKeyword();
-    Map<String, FlowAstNode> getChildren();
-    FlowAstNode get(String name);
+    Map<String, AstFlowNode> getChildren();
+    AstFlowNode get(String name);
     String getValue();
     AstChangeset getSource();
     boolean hasNonNull(String name);
@@ -125,8 +125,8 @@ public interface AstFlow extends AstBody, Serializable {
     int getEnd();
   }
   
-  interface NodeFlowVisitor {
-    void visit(NodeFlow node, ImmutableAstFlow.Builder nodesBuilder);
+  interface AstFlowNodeVisitor {
+    void visit(AstFlowRoot node, ImmutableAstFlow.Builder nodesBuilder);
   }
 
 }

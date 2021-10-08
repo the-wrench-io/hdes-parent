@@ -35,7 +35,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.spi.HdesAstTypesImpl;
 import io.resys.hdes.client.spi.util.FileUtils;
 
@@ -57,7 +57,7 @@ public class FlowAstTest {
         .srcAdd(5, "  - second task:")
         .build();
 
-    FlowAstNode node = ast.getSrc();
+    AstFlowNode node = ast.getSrc();
     List<FlowAstCommandMessage> messages = ast.getMessages();
     
     Assertions.assertTrue(messages.isEmpty());
@@ -91,7 +91,7 @@ public class FlowAstTest {
         .srcDel(4)
         .build();
     
-    FlowAstNode node = ast.getSrc();
+    AstFlowNode node = ast.getSrc();
     
     Assertions.assertTrue(messages.isEmpty());
     Assertions.assertEquals("uber description", node.get("description").getValue());
@@ -113,7 +113,7 @@ public class FlowAstTest {
         .srcAdd(1, "id: uber flow")
         .build();
     
-    FlowAstNode node = ast.getSrc();
+    AstFlowNode node = ast.getSrc();
 
     Assertions.assertTrue(messages.isEmpty());
     Assertions.assertEquals(3, node.getChildren().size());

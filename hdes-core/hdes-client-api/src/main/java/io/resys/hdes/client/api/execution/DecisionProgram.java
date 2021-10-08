@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.model;
+package io.resys.hdes.client.api.execution;
 
 /*-
  * #%L
@@ -23,45 +23,34 @@ package io.resys.hdes.client.api.model;
 import java.io.Serializable;
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.TypeDef;
+import org.immutables.value.Value;
+
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
+import io.resys.hdes.client.api.ast.TypeDef;
 
-public interface DecisionTableModel extends Model {
+@Value.Immutable
+public interface DecisionProgram extends Program {
   String getId();
-  String getDescription();
-  String getRev();
-  String getSrc();
   HitPolicy getHitPolicy();
-  List<DecisionTableDataType> getTypes();
-  DecisionTableNode getNode();
+  List<Row> getRows();
 
-  interface DecisionTableDataType extends Serializable, Comparable<DecisionTableDataType> {
-    int getOrder();
-    String getScript();
-    TypeDef getValue();
-  }
-
-  interface DecisionTableNode extends Serializable {
-    int getId();
+  @Value.Immutable
+  interface Row extends Serializable {
     int getOrder();
     
-    List<DecisionTableNodeInput> getInputs();
-    List<DecisionTableNodeOutput> getOutputs();
-    
-    DecisionTableNode getPrevious();
-    DecisionTableNode getNext();
+    List<RowAccepts> getAccepts();
+    List<RowReturns> getReturns();
   }
 
-  
-  interface DecisionTableNodeInput extends Serializable {
+  @Value.Immutable
+  interface RowAccepts extends Serializable {
     TypeDef getKey();
-    String getValue();
+    ExpressionProgram getExpression();
   }
   
-  interface DecisionTableNodeOutput extends Serializable {
+  @Value.Immutable
+  interface RowReturns extends Serializable {
     TypeDef getKey();
     Serializable getValue();
   }
-  
-  
 }

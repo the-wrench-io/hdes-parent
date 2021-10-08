@@ -28,14 +28,14 @@ import java.util.function.Supplier;
 
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstInputType;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstInputType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder.DataTypeRef;
 
-public class FlowDataTypeSupplier implements Supplier<Collection<FlowAstInputType>> {
+public class FlowDataTypeSupplier implements Supplier<Collection<AstFlowInputType>> {
 
   private final Collection<ValueType> supportedTypes = Arrays.asList(ValueType.ARRAY, 
       ValueType.TIME, ValueType.STRING, ValueType.BOOLEAN, ValueType.INTEGER, ValueType.LONG, ValueType.DECIMAL, 
@@ -48,8 +48,8 @@ public class FlowDataTypeSupplier implements Supplier<Collection<FlowAstInputTyp
   }
 
   @Override
-  public List<FlowAstInputType> get() {
-    List<FlowAstInputType> result = new ArrayList<>();
+  public List<AstFlowInputType> get() {
+    List<AstFlowInputType> result = new ArrayList<>();
 
     // Normal types
     for(ValueType valueType : supportedTypes) {

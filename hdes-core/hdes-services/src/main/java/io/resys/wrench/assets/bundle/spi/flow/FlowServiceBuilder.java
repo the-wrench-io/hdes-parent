@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.execution.FlowProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -66,10 +66,10 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
     boolean isDefault = StringUtils.isEmpty(src);
     String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
 
-    Map.Entry<String, FlowModel> commandsAndModel = flowModelRepository.createModel().content(content)
+    Map.Entry<String, FlowProgram> commandsAndModel = flowModelRepository.createModel().content(content)
         .rename(rename ? Optional.of(name) : Optional.empty())
         .build();
-    FlowModel model = commandsAndModel.getValue();
+    FlowProgram model = commandsAndModel.getValue();
     
     String serviceId = id == null ? idGen.nextId() : id;
     String pointer = serviceId + ".json";

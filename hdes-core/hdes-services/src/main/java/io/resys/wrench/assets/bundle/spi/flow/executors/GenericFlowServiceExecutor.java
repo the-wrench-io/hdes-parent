@@ -31,11 +31,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
+import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTaskStatus;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowProgram.StepBody;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
@@ -62,9 +62,9 @@ public class GenericFlowServiceExecutor extends ServiceFlowTaskExecutor {
   }
 
   @Override
-  public FlowTaskModel execute(Flow flow, FlowTask task) {
+  public Step execute(FlowResult flow, FlowTask task) {
     try {
-      FlowTaskModel node = flow.getModel().getTask().get(task.getModelId());
+      Step node = flow.getModel().getStep().get(task.getModelId());
       String flowTaskId = node.getBody().getRef();
 
       AssetService service = new GenericServiceQuery(serviceStore).flowTask(flowTaskId);
@@ -127,7 +127,7 @@ public class GenericFlowServiceExecutor extends ServiceFlowTaskExecutor {
   }
 
   @SuppressWarnings("rawtypes")
-  protected Map<String, Serializable> createVariables(Flow flow, FlowTask task, FlowTaskValue taskValue, Object outputs) {
+  protected Map<String, Serializable> createVariables(FlowResult flow, FlowTask task, StepBody taskValue, Object outputs) {
     final Serializable value;
     if(taskValue.isCollection()) {
       List<Serializable> entities = new ArrayList<>();

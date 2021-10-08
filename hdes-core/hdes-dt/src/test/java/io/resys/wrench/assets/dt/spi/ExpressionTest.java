@@ -30,18 +30,18 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.ast.AstBody.AstExpression;
-import io.resys.hdes.client.spi.expression.OperationFactory;
+import io.resys.hdes.client.api.ast.AstBody.Expression;
+import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
 import io.resys.wrench.assets.dt.spi.config.TestDtConfig;
 
 @RunWith(BlockJUnit4ClassRunner.class)
 public class ExpressionTest {
 
-  private Supplier<OperationFactory.Builder> expressionBuilder = () -> (OperationFactory.builder().objectMapper(TestDtConfig.objectMapper()));
+  private Supplier<ExpressionProgramFactory.Builder> expressionBuilder = () -> (ExpressionProgramFactory.builder().objectMapper(TestDtConfig.objectMapper()));
 
   @Test
   public void stringIn() throws IOException {
-    AstExpression expression = build(ValueType.STRING, "in[\"aaa\", \"bbb\"]");
+    Expression expression = build(ValueType.STRING, "in[\"aaa\", \"bbb\"]");
     Assert.assertEquals(true, expression.getValue("aaa"));
     Assert.assertEquals(true, expression.getValue("bbb"));
     Assert.assertEquals(false, expression.getValue("c"));
@@ -49,7 +49,7 @@ public class ExpressionTest {
 
   @Test
   public void stringNotIn() throws IOException {
-    AstExpression expression = build(ValueType.STRING, "not in[\"sdsd\", \"dsdx\"]");
+    Expression expression = build(ValueType.STRING, "not in[\"sdsd\", \"dsdx\"]");
 
     Assert.assertEquals(true, expression.getValue("a"));
     Assert.assertEquals(true, expression.getValue("c"));
@@ -58,7 +58,7 @@ public class ExpressionTest {
 
   @Test
   public void toNumberComparison() throws IOException {
-    AstExpression expression = build(ValueType.INTEGER, "<= 10");
+    Expression expression = build(ValueType.INTEGER, "<= 10");
 
     Assert.assertEquals(true, expression.getValue(1));
     Assert.assertEquals(false, expression.getValue(11));
@@ -66,7 +66,7 @@ public class ExpressionTest {
 
   @Test
   public void toNumberRange() throws IOException {
-    AstExpression expression = build(ValueType.INTEGER, "[1..3]");
+    Expression expression = build(ValueType.INTEGER, "[1..3]");
 
     // include start and end
     Assert.assertEquals(true, expression.getValue(1));
@@ -98,7 +98,7 @@ public class ExpressionTest {
 
   @Test
   public void toBoolean() throws IOException {
-    AstExpression expression = build(ValueType.BOOLEAN, "true");
+    Expression expression = build(ValueType.BOOLEAN, "true");
 
     Assert.assertEquals(true, expression.getValue(true));
     Assert.assertEquals(false, expression.getValue(false));
@@ -111,7 +111,7 @@ public class ExpressionTest {
   @Test
   public void toDate() throws IOException {
     // equals
-    AstExpression expression = build(ValueType.DATE_TIME, "equals 2017-07-03T00:00:00Z");
+    Expression expression = build(ValueType.DATE_TIME, "equals 2017-07-03T00:00:00Z");
     Assert.assertEquals(true, expression.getValue(ValueBuilder.parseLocalDateTime("2017-07-03T00:00:00Z")));
 
     // after
@@ -135,14 +135,14 @@ public class ExpressionTest {
     Assert.assertEquals(false, expression.getValue(ValueBuilder.parseLocalDateTime("2017-07-03T00:00:04Z")));
   }
 
-  public AstExpression build(ValueType type, String src) {
+  public Expression build(ValueType type, String src) {
     
     return new LoggingDecisionTableExpression(expressionBuilder.get().src(src).valueType(type).build());
   }
   
-  public static class LoggingDecisionTableExpression implements AstExpression {
-    private final AstExpression delegate;
-    public LoggingDecisionTableExpression(AstExpression delegate) {
+  public static class LoggingDecisionTableExpression implements Expression {
+    private final Expression delegate;
+    public LoggingDecisionTableExpression(Expression delegate) {
       this.delegate = delegate;
     }
 

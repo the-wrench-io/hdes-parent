@@ -84,6 +84,8 @@ public abstract class TypeDef implements Serializable {
   public enum AssociationType { ONE_TO_ONE, ONE_TO_MANY }
   public enum Direction { IN, OUT }
   public enum ValueType {
-    TIME, DATE, DATE_TIME, INSTANT, STRING, INTEGER, LONG, DECIMAL, BOOLEAN, PERIOD, DURATION, PERCENT, OBJECT, ARRAY, MAP;
+    TIME, DATE, DATE_TIME, INSTANT, PERIOD, DURATION, 
+    STRING, INTEGER, LONG, DECIMAL, BOOLEAN, PERCENT, OBJECT, ARRAY,
+    MAP, FLOW_CONTEXT;
   }
 }

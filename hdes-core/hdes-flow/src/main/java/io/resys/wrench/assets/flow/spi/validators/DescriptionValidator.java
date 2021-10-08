@@ -3,11 +3,11 @@ package io.resys.wrench.assets.flow.spi.validators;
 import org.apache.commons.lang3.StringUtils;
 
 import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 
 /*-
  * #%L
@@ -29,10 +29,10 @@ import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
  * #L%
  */
 
-public class DescriptionValidator implements NodeFlowVisitor {
+public class DescriptionValidator implements AstFlowNodeVisitor {
 
   @Override
-  public void visit(NodeFlow node, ImmutableAstFlow.Builder modelBuilder) {
+  public void visit(AstFlowRoot node, ImmutableAstFlow.Builder modelBuilder) {
     if(node.getDescription() == null) {
       return;
     }
@@ -41,7 +41,7 @@ public class DescriptionValidator implements NodeFlowVisitor {
           ImmutableFlowAstCommandMessage.builder()
           .line(node.getDescription().getStart())
           .value("flow description must have a value")
-          .range(FlowNodesFactory.range().build(0, node.getDescription().getSource().getValue().length()))
+          .range(AstFlowNodesFactory.range().build(0, node.getDescription().getSource().getValue().length()))
           .type(FlowCommandMessageType.WARNING)
           .build());
     }

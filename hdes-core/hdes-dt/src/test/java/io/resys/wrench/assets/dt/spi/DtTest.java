@@ -30,9 +30,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
-import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.model.DecisionTableModel;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
+import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
@@ -47,9 +47,9 @@ public class DtTest {
   public void readerNodeOrderTest() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "dt.json");
 
-    DecisionTableModel decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
+    DecisionProgram decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
-    DecisionTableNode node = decisionTable.getNode();
+    Row node = decisionTable.getRows();
     Assert.assertEquals(0, node.getId());
     Assert.assertEquals(null, node.getPrevious());
 
@@ -68,7 +68,7 @@ public class DtTest {
   public void executionTest() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "dt.json");
 
-    DecisionTableModel decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
+    DecisionProgram decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
     Map<String, Object> values = new HashMap<>();
     values.put("sriBoolean", false);
@@ -113,7 +113,7 @@ public class DtTest {
 //   }
 
 
-    DecisionTableResult result = decisionTableRepository.createExecutor().
+    DecisionResult result = decisionTableRepository.createExecutor().
         decisionTable(decisionTable).
         context((type) -> values.get(type.getName())).
         execute();
@@ -127,12 +127,12 @@ public class DtTest {
   public void nullEqualsNull() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "nullEqualsNull.json");
 
-    DecisionTableModel decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
+    DecisionProgram decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
     Map<String, Object> values = new HashMap<>();
     values.put("risk", null);
 
-    DecisionTableResult result = decisionTableRepository.createExecutor().
+    DecisionResult result = decisionTableRepository.createExecutor().
         decisionTable(decisionTable).
         context((type) -> values.get(type.getName())).
         execute();

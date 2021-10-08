@@ -26,26 +26,26 @@ import java.util.List;
 import java.util.Map;
 
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstRef;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRefNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 
-public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlowVisitor {
+public class TaskRefAutocomplete extends TemplateAutocomplete implements AstFlowNodeVisitor {
 
   public TaskRefAutocomplete(ServiceStore serviceStore) {
     super(serviceStore);
   }
 
   @Override
-  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
-    Map<String, FlowAstTask> tasks = flow.getTasks();
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    Map<String, AstFlowTaskNode> tasks = flow.getTasks();
     if(tasks.isEmpty()) {
       return;
     }
@@ -61,8 +61,8 @@ public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlo
     }
 
 
-    for(FlowAstTask task : tasks.values()) {
-      FlowAstRef ref = task.getRef();
+    for(AstFlowTaskNode task : tasks.values()) {
+      AstFlowRefNode ref = task.getRef();
       if(ref == null) {
         continue;
       }
@@ -77,12 +77,12 @@ public class TaskRefAutocomplete extends TemplateAutocomplete implements NodeFlo
 
       FlowAstCommandRange range;
       if(ref.getRef() == null) {
-        range = FlowNodesFactory.range().build(ref.getStart(), ref.getEnd(), true);
+        range = AstFlowNodesFactory.range().build(ref.getStart(), ref.getEnd(), true);
       } else {
-        range = FlowNodesFactory.range().build(task.getRef().getStart(), task.getRef().getEnd(), false);
+        range = AstFlowNodesFactory.range().build(task.getRef().getStart(), task.getRef().getEnd(), false);
       }
 
-      refs.forEach(r -> modelBuilder.addAutocomplete(FlowNodesFactory.ac().id(TaskRefAutocomplete.class.getSimpleName())
+      refs.forEach(r -> modelBuilder.addAutocomplete(AstFlowNodesFactory.ac().id(TaskRefAutocomplete.class.getSimpleName())
           .addField(8, NodeFlowBean.KEY_REF, r)
           .addRange(range)
           .build()));

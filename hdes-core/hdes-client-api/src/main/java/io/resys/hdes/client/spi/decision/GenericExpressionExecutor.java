@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.expression;
+package io.resys.hdes.client.spi.decision;
 
 /*-
  * #%L
@@ -26,15 +26,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.ast.AstBody.AstExpression;
-import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
+import io.resys.hdes.client.api.execution.ExpressionProgram;
+import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GenericExpressionExecutor implements NodeExpressionExecutor {
 
 
   private final ObjectMapper objectMapper;
-  private final Map<String, AstExpression> cache = new ConcurrentHashMap<>();
+  private final Map<String, ExpressionProgram> cache = new ConcurrentHashMap<>();
 
   public GenericExpressionExecutor(ObjectMapper objectMapper) {
     super();
@@ -48,16 +49,16 @@ public class GenericExpressionExecutor implements NodeExpressionExecutor {
     } else if(entity == null) {
       return false;
     }
-    Assert.notNull(entity, () -> "Type: \"" + type + "\" expression: \"" + value + "\" entity can't be null!");
+    HdesAssert.notNull(entity, () -> "Type: \"" + type + "\" expression: \"" + value + "\" entity can't be null!");
     if(value == null || value.isEmpty()) {
       return true;
     }
-    AstExpression expression = getExpression(value, type);
-    return (boolean) expression.getValue(entity);
+    ExpressionProgram expression = getExpression(value, type);
+    return (boolean) expression.run(entity).getValue();
   }
 
   @Override
-  public AstExpression getExpression(String src, ValueType type) {
+  public ExpressionProgram getExpression(String src, ValueType type) {
     if(src == null) {
       return null;
     }
@@ -65,7 +66,7 @@ public class GenericExpressionExecutor implements NodeExpressionExecutor {
     if(cache.containsKey(cacheKey)) {
       return cache.get(cacheKey);
     }
-    AstExpression exp = OperationFactory.builder().objectMapper(objectMapper).src(src).valueType(type).build();
+    ExpressionProgram exp = ExpressionProgramFactory.builder().objectMapper(objectMapper).src(src).valueType(type).build();
     cache.put(cacheKey, exp);
     return exp;
   }

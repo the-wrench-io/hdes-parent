@@ -28,24 +28,24 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeInput;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNodeOutput;
+import io.resys.hdes.client.api.execution.DecisionProgram.Row;
+import io.resys.hdes.client.api.execution.DecisionProgram.RowAccepts;
+import io.resys.hdes.client.api.execution.DecisionProgram.RowReturns;
 
-public class ImmutableDecisionTableNode implements DecisionTableNode {
+public class ImmutableDecisionTableNode implements Row {
 
   private static final long serialVersionUID = 6182243429408952190L;
 
   private final int id;
   private final int order;
-  private final List<DecisionTableNodeInput> inputs;
-  private final List<DecisionTableNodeOutput> outputs;
+  private final List<RowAccepts> inputs;
+  private final List<RowReturns> outputs;
   @JsonIgnore
-  private final DecisionTableNode previous;
-  private DecisionTableNode next;
+  private final Row previous;
+  private Row next;
 
   public ImmutableDecisionTableNode(
-      int id, int order, Map<TypeDef, String> inputs, Map<TypeDef, Serializable> outputs, DecisionTableNode previous) {
+      int id, int order, Map<TypeDef, String> inputs, Map<TypeDef, Serializable> outputs, Row previous) {
     super();
     this.order = order;
     this.id = id;
@@ -60,22 +60,22 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
   }
 
   @Override
-  public List<DecisionTableNodeInput> getInputs() {
+  public List<RowAccepts> getAccepts() {
     return inputs;
   }
 
   @Override
-  public List<DecisionTableNodeOutput> getOutputs() {
+  public List<RowReturns> getReturns() {
     return outputs;
   }
 
   @Override
-  public DecisionTableNode getPrevious() {
+  public Row getPrevious() {
     return previous;
   }
 
   @Override
-  public DecisionTableNode getNext() {
+  public Row getNext() {
     return next;
   }
   @Override
@@ -126,11 +126,11 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
     return true;
   }
 
-  public void setNext(DecisionTableNode next) {
+  public void setNext(Row next) {
     this.next = next;
   }
   
-  private static final class ImmutableDecisionTableNodeOutput implements DecisionTableNodeOutput {
+  private static final class ImmutableDecisionTableNodeOutput implements RowReturns {
     private static final long serialVersionUID = 7364145982894215127L;
     private final TypeDef key;
     private final Serializable value;
@@ -176,7 +176,7 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
     }
   }
   
-  private static final class ImmutableDecisionTableNodeInput implements DecisionTableNodeInput {
+  private static final class ImmutableDecisionTableNodeInput implements RowAccepts {
     private static final long serialVersionUID = -6095582758590972380L;
     private final TypeDef key;
     private final String value;
@@ -188,7 +188,7 @@ public class ImmutableDecisionTableNode implements DecisionTableNode {
     public TypeDef getKey() {
       return key;
     }
-    public String getValue() {
+    public String getExpression() {
       return value;
     }
     @Override

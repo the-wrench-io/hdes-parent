@@ -24,15 +24,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 
-public class InputsAutocomplete implements NodeFlowVisitor {
+public class InputsAutocomplete implements AstFlowNodeVisitor {
 
   private final static List<String> AFTER = Arrays.asList(
       NodeFlowBean.KEY_ID,
@@ -40,8 +40,8 @@ public class InputsAutocomplete implements NodeFlowVisitor {
       );
 
   @Override
-  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
-    FlowAstNode node = flow.get(NodeFlowBean.KEY_INPUTS);
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    AstFlowNode node = flow.get(NodeFlowBean.KEY_INPUTS);
     if(node != null) {
       return;
     }
@@ -58,7 +58,7 @@ public class InputsAutocomplete implements NodeFlowVisitor {
     int end = flow.hasNonNull(NodeFlowBean.KEY_TASKS) ? flow.get(NodeFlowBean.KEY_TASKS).getStart() - 1 : flow.getEnd();
 
     modelBuilder.addAutocomplete(
-        FlowNodesFactory.ac()
+        AstFlowNodesFactory.ac()
         .id(InputsAutocomplete.class.getSimpleName())
         .addField(NodeFlowBean.KEY_INPUTS)
         .addField(2, "myInputParam")

@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.resys.hdes.client.api.ast.AstBody.AstExpression;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.ColumnExpressionType;
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
@@ -49,8 +48,9 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
+import io.resys.hdes.client.api.execution.ExpressionProgram;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 
 
@@ -116,15 +116,15 @@ public class CommandMapper {
       return String.valueOf(idGen++);
     }
     private MutableHeader getHeader(String id) {
-      Assert.isTrue(headers.containsKey(id), () -> "no header with id: " + id + "!");
+      HdesAssert.isTrue(headers.containsKey(id), () -> "no header with id: " + id + "!");
       return headers.get(id);
     }
     private MutableCell getCell(String id) {
-      Assert.isTrue(cells.containsKey(id), () -> "no cell with id: " + id + "!");
+      HdesAssert.isTrue(cells.containsKey(id), () -> "no cell with id: " + id + "!");
       return cells.get(id);
     }
     private MutableRow getRow(String id) {
-      Assert.isTrue(rows.containsKey(id), () -> "no row with id: " + id + "!");
+      HdesAssert.isTrue(rows.containsKey(id), () -> "no row with id: " + id + "!");
       return rows.get(id);
     }
     private ValueType getValueType(MutableHeader header) {
@@ -187,7 +187,7 @@ public class CommandMapper {
         .forEach(cell -> {
 
           try {
-            AstExpression expression = dataTypeFactory.expression(valueType, cell.getValue());
+            ExpressionProgram expression = dataTypeFactory.expression(valueType, cell.getValue());
             if(expression.getConstants().size() == 1) {
               cell.setValue(expression.getConstants().get(0));
             }
@@ -203,7 +203,7 @@ public class CommandMapper {
     private String getExpression(ValueType valueType, ColumnExpressionType value, String columnValue) {
       String constant;
       try {
-        AstExpression expression = dataTypeFactory.expression(valueType, columnValue);
+        ExpressionProgram expression = dataTypeFactory.expression(valueType, columnValue);
         if(expression.getConstants().size() != 1) {
           return null;
         }
@@ -380,7 +380,7 @@ public class CommandMapper {
       }
       
       try {
-        return dataTypeFactory.expression(ValueType.MAP, header.getScript()).getValue(context) + "";
+        return dataTypeFactory.expression(ValueType.MAP, header.getScript()).run(context) + "";
       } catch(Exception e) {
         return null;
       }

@@ -42,38 +42,38 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstSwitch;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstTask;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowSwitchNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
 import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
-import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
-import io.resys.hdes.client.api.model.ImmutableFlowModel;
-import io.resys.hdes.client.api.model.ImmutableFlowTaskValue;
+import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowProgram.StepBody;
+import io.resys.hdes.client.api.execution.ImmutableFlowProgram;
+import io.resys.hdes.client.api.execution.ImmutableStepBody;
+import io.resys.hdes.client.spi.flow.ast.NodeFlowAdapter;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
+import io.resys.hdes.client.spi.flow.program.ImmutableStep;
 import io.resys.wrench.assets.flow.spi.FlowDefinitionException;
 import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
-import io.resys.wrench.assets.flow.spi.model.ImmutableFlowTaskModel;
-import io.resys.wrench.assets.flow.spi.support.NodeFlowAdapter;
 
 public class CommandFlowModelBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(CommandFlowModelBuilder.class);
-  private static final ImmutableFlowTaskModel EMPTY = new ImmutableFlowTaskModel("empty", null, FlowTaskType.END);
+  private static final ImmutableStep EMPTY = new ImmutableStep("empty", null, FlowTaskType.END);
 
   private final HdesAstTypes nodeRepository;
   private final ObjectMapper objectMapper;
   private final ExpressionFactory parser;
   private final String input;
 
-  private final ImmutableFlowTaskModel endNode = new ImmutableFlowTaskModel("end", null, FlowTaskType.END);
-  private final Map<String, ImmutableFlowTaskModel> taskModels = new HashMap<>();
+  private final ImmutableStep endNode = new ImmutableStep("end", null, FlowTaskType.END);
+  private final Map<String, ImmutableStep> taskModels = new HashMap<>();
 
-  private List<FlowAstTask> tasksByOrder;
-  private Map<String, FlowAstTask> tasksById;
+  private List<AstFlowTaskNode> tasksByOrder;
+  private Map<String, AstFlowTaskNode> tasksById;
   private String flowId;
   private Optional<String> rename;
 
@@ -90,7 +90,7 @@ public class CommandFlowModelBuilder {
     this.rename = rename;
   }
 
-  private NodeFlow parseModel(ArrayNode src) throws IOException {
+  private AstFlowRoot parseModel(ArrayNode src) throws IOException {
     final var ast = nodeRepository.flow().src(src).build();
     List<String> messages = ast.getMessages().stream()
         .filter(t -> t.getType() == FlowCommandMessageType.ERROR)
@@ -103,16 +103,16 @@ public class CommandFlowModelBuilder {
     return ast.getSrc();
   } 
   
-  public Map.Entry<String, FlowModel> build() {
+  public Map.Entry<String, FlowProgram> build() {
     try {
-      final NodeFlow data;
+      final AstFlowRoot data;
       final ArrayNode src;
       final String input;
       if(rename.isPresent()) {
         
         ArrayNode original = (ArrayNode) objectMapper.readTree(this.input);
-        NodeFlow originalModel = parseModel(original);
-        FlowAstNode idNode = originalModel.getId();
+        AstFlowRoot originalModel = parseModel(original);
+        AstFlowNode idNode = originalModel.getId();
         
         ObjectNode renameNode = objectMapper.createObjectNode();
         renameNode.set("id", IntNode.valueOf(idNode.getStart()));
@@ -135,33 +135,31 @@ public class CommandFlowModelBuilder {
       Collections.sort(tasksByOrder);
       flowId = NodeFlowAdapter.getStringValue(data.getId());
 
-      FlowAstTask firstTask = data.getTasks().values().stream()
+      AstFlowTaskNode firstTask = data.getTasks().values().stream()
           .filter(task -> task.getOrder() == 0)
           .findFirst().orElse(null);
 
-      final ImmutableFlowTaskModel task = tasksById.isEmpty() ? EMPTY: createNode(firstTask);
-      final FlowModel model = ImmutableFlowModel.builder()
+      final ImmutableStep task = tasksById.isEmpty() ? EMPTY: createNode(firstTask);
+      final FlowProgram model = ImmutableFlowProgram.builder()
           .id(flowId)
           .rev(src.size())
-          .src(data.getValue())
-          .description(NodeFlowAdapter.getStringValue(data.getDescription()))
-          .task(task)
+          .step(task)
           .tasks(getTasks(task))
-          .inputs(NodeFlowAdapter.getInputs(data, nodeRepository))
+          .acceptDefs(NodeFlowAdapter.getInputs(data, nodeRepository))
           .build();
       
-      return new AbstractMap.SimpleEntry<String, FlowModel>(input, model);
+      return new AbstractMap.SimpleEntry<String, FlowProgram>(input, model);
     } catch(IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
   
-  private Collection<FlowTaskModel> getTasks(FlowTaskModel node) {
-    Map<String, FlowTaskModel> result = new HashMap<>();
+  private Collection<Step> getTasks(Step node) {
+    Map<String, Step> result = new HashMap<>();
     getServices(result, node);
     return result.values();
   }
-  private void getServices(Map<String, FlowTaskModel> visited, FlowTaskModel node) {
+  private void getServices(Map<String, Step> visited, Step node) {
     if(visited.containsKey(node.getId())) {
       return;
     }
@@ -169,21 +167,21 @@ public class CommandFlowModelBuilder {
     node.getNext().forEach(n -> getServices(visited, n));
   }
 
-  protected ImmutableFlowTaskModel createNode(FlowAstTask task) {
+  protected ImmutableStep createNode(AstFlowTaskNode task) {
     String taskId = NodeFlowAdapter.getStringValue(task.getId());
     if(taskModels.containsKey(taskId)) {
       return taskModels.get(taskId);
     }
 
     FlowTaskType type = NodeFlowAdapter.getTaskType(task);
-    FlowTaskValue taskValue = createFlowTaskValue(task, type);
-    final ImmutableFlowTaskModel result = new ImmutableFlowTaskModel(taskId, taskValue, type);
+    StepBody taskValue = createFlowTaskValue(task, type);
+    final ImmutableStep result = new ImmutableStep(taskId, taskValue, type);
     taskModels.put(taskId, result);
 
-    final ImmutableFlowTaskModel intermediate;
+    final ImmutableStep intermediate;
 
     if(type != FlowTaskType.EMPTY) {
-      intermediate = new ImmutableFlowTaskModel(taskId + "-" + FlowTaskType.MERGE, null, FlowTaskType.MERGE);
+      intermediate = new ImmutableStep(taskId + "-" + FlowTaskType.MERGE, null, FlowTaskType.MERGE);
       result.addNext(intermediate);
     } else {
       intermediate = result;
@@ -207,20 +205,20 @@ public class CommandFlowModelBuilder {
     }
 
     // Exclusive decision gateway
-    ImmutableFlowTaskModel exclusive = new ImmutableFlowTaskModel(taskId + "-" + FlowTaskType.EXCLUSIVE, null, FlowTaskType.EXCLUSIVE);
+    ImmutableStep exclusive = new ImmutableStep(taskId + "-" + FlowTaskType.EXCLUSIVE, null, FlowTaskType.EXCLUSIVE);
     intermediate.addNext(exclusive);
 
-    List<FlowAstSwitch> decisions = new ArrayList<>(task.getSwitch().values());
+    List<AstFlowSwitchNode> decisions = new ArrayList<>(task.getSwitch().values());
     Collections.sort(decisions, (o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
 
-    for(FlowAstSwitch decision : decisions) {
+    for(AstFlowSwitchNode decision : decisions) {
       String decisionId = decision.getKeyword();
 
       try {
         String when = NodeFlowAdapter.getStringValue(decision.getWhen());
         String thenValue = NodeFlowAdapter.getStringValue(decision.getThen());
 
-        ImmutableFlowTaskModel next = new ImmutableFlowTaskModel(
+        ImmutableStep next = new ImmutableStep(
             decisionId,
             parser.get(when),
             FlowTaskType.DECISION);
@@ -231,7 +229,7 @@ public class CommandFlowModelBuilder {
         }
 
       } catch(Exception e) {
-        ImmutableFlowTaskModel errorModel = new ImmutableFlowTaskModel(decisionId, null, FlowTaskType.DECISION);
+        ImmutableStep errorModel = new ImmutableStep(decisionId, null, FlowTaskType.DECISION);
         String message = "Failed to evaluate expression: \"" + taskId + "\" in flow: " + flowId + ", decision: " + errorModel.getId() + "!" + System.lineSeparator() + e.getMessage();
         LOGGER.error(message, e);
         throw new FlowDefinitionException(message, errorModel, e);
@@ -241,13 +239,13 @@ public class CommandFlowModelBuilder {
     return result;
   }
 
-  private String getThenTaskId(FlowAstTask task, String then, FlowTaskType type) {
+  private String getThenTaskId(AstFlowTaskNode task, String then, FlowTaskType type) {
     if(!NodeFlowBean.VALUE_NEXT.equalsIgnoreCase(then)) {
       return then;
     }
 
-    FlowAstTask next = null;
-    for(FlowAstTask node : tasksByOrder) {
+    AstFlowTaskNode next = null;
+    for(AstFlowTaskNode node : tasksByOrder) {
       if(node.getStart() > task.getStart()) {
         next = node;
       }
@@ -255,29 +253,29 @@ public class CommandFlowModelBuilder {
 
     if(next == null) {
       String taskId = NodeFlowAdapter.getStringValue(task.getId());
-      ImmutableFlowTaskModel errorModel = new ImmutableFlowTaskModel(taskId, null, type);
+      ImmutableStep errorModel = new ImmutableStep(taskId, null, type);
       String message = "There are no next task after: \"" + taskId + "\" in flow: " + flowId + ", decision: " + errorModel.getId() + "!";
       throw new FlowDefinitionException(message, errorModel);
     }
     return NodeFlowAdapter.getStringValue(next.getId());
   }
 
-  public FlowTaskValue createFlowTaskValue(FlowAstTask task, FlowTaskType type) {
+  public StepBody createFlowTaskValue(AstFlowTaskNode task, FlowTaskType type) {
     if(type == FlowTaskType.SERVICE || type == FlowTaskType.DT || type == FlowTaskType.USER_TASK) {
 
       boolean collection = NodeFlowAdapter.getBooleanValue(task.getRef().getCollection());
       String ref = NodeFlowAdapter.getStringValue(task.getRef().getRef());
       Map<String, String> inputs = new HashMap<>();
-      for(Map.Entry<String, FlowAstNode> entry : task.getRef().getInputs().entrySet()) {
+      for(Map.Entry<String, AstFlowNode> entry : task.getRef().getInputs().entrySet()) {
         inputs.put(entry.getKey(), NodeFlowAdapter.getStringValue(entry.getValue()));
       }
-      return ImmutableFlowTaskValue.builder()
+      return ImmutableStepBody.builder()
           .isCollection(collection)
           .ref(ref)
           .putAllInputs(inputs)
           .build();
     } else if(type == FlowTaskType.EMPTY) {
-      return ImmutableFlowTaskValue.builder().isCollection(false).build();
+      return ImmutableStepBody.builder().isCollection(false).build();
     }
 
     throw new IllegalArgumentException("Can't create task value from type: " + type + "!");

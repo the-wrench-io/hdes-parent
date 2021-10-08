@@ -26,7 +26,7 @@ import java.util.List;
 
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.AstService;
-import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.execution.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
@@ -37,7 +37,7 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 
 public class FlowTaskServiceDataModelBuilder {
 
-  public ServiceDataModel build(String id, String name, Service script, ServiceStore serviceStore) {
+  public ServiceDataModel build(String id, String name, ServiceProgram script, ServiceStore serviceStore) {
     List<ServiceAssociation> associations = new ArrayList<>();
     List<ServiceError> errors = new ArrayList<>();
     AstService model = script.getModel();

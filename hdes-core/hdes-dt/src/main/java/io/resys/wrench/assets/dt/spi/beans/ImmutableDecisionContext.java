@@ -22,7 +22,7 @@ import io.resys.hdes.client.api.ast.TypeDef;
  * #L%
  */
 
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionContext;
+import io.resys.hdes.client.api.execution.DecisionResult.DecisionContext;
 
 public class ImmutableDecisionContext implements DecisionContext {
 

@@ -27,8 +27,6 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-
 public interface AstBody extends Serializable {
   
   String getName();
@@ -46,10 +44,7 @@ public interface AstBody extends Serializable {
     List<TypeDef> getReturnDefs();
   }
   
-  interface AstExpression {
+  interface Expression {
     String getSrc();
-    ValueType getType();
-    List<String> getConstants();
-    Object getValue(Object entity);
   }
 }

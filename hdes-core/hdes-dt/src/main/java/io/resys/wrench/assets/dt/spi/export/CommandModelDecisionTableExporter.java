@@ -32,8 +32,8 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
+import io.resys.hdes.client.api.execution.DecisionProgram.DecisionTableDataType;
+import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 
@@ -58,14 +58,14 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
   public List<AstCommand> buildCommands() {
     List<DecisionTableDataType> headers = dt.getTypes();
     List<AstCommand> result = createHeaderCommands(headers);
-    createRow(headers, 1, dt.getNode(), result);
+    createRow(headers, 1, dt.getRows(), result);
     result.add(ImmutableAstCommand.builder().value(dt.getId()).type(AstCommandValue.SET_NAME).build());
     result.add(ImmutableAstCommand.builder().value(dt.getDescription()).type(AstCommandValue.SET_DESCRIPTION).build());
     result.add(ImmutableAstCommand.builder().value(dt.getHitPolicy().name()).type(AstCommandValue.SET_HIT_POLICY).build());
     return result;
   }
 
-  private void createRow(List<DecisionTableDataType> headers, int rows, DecisionTableNode node, List<AstCommand> result) {
+  private void createRow(List<DecisionTableDataType> headers, int rows, Row node, List<AstCommand> result) {
     if(node == null) {
       return;
     }
@@ -73,14 +73,14 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
     result.add(ImmutableAstCommand.builder().type(AstCommandValue.ADD_ROW).build());
 
     Map<String, Object> entries = new HashMap<>();
-    node.getInputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
-    node.getOutputs().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
+    node.getAccepts().forEach(e -> entries.put(e.getKey().getName(), e.getExpression()));
+    node.getReturns().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
 
     for(DecisionTableDataType header : headers) {
-      Object value = entries.get(header.getValue().getName());
+      Object value = entries.get(header.getExpression().getName());
       result.add(ImmutableAstCommand.builder()
           .id(String.valueOf(nextId++))
-          .value(value == null ? null : header.getValue().getSerializer().serialize(header.getValue(), value))
+          .value(value == null ? null : header.getExpression().getSerializer().serialize(header.getExpression(), value))
           .type(AstCommandValue.SET_CELL_VALUE)
           .build());
     }
@@ -92,10 +92,10 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
     int index = 0;
     for(DecisionTableDataType dataType : headers) {
       String id = String.valueOf(index);
-      result.add(ImmutableAstCommand.builder().type(dataType.getValue().getDirection() == Direction.IN ? AstCommandValue.ADD_HEADER_IN : AstCommandValue.ADD_HEADER_OUT).build());
-      result.add(ImmutableAstCommand.builder().id(id).value(dataType.getValue().getName()).type(AstCommandValue.SET_HEADER_REF).build());
+      result.add(ImmutableAstCommand.builder().type(dataType.getExpression().getDirection() == Direction.IN ? AstCommandValue.ADD_HEADER_IN : AstCommandValue.ADD_HEADER_OUT).build());
+      result.add(ImmutableAstCommand.builder().id(id).value(dataType.getExpression().getName()).type(AstCommandValue.SET_HEADER_REF).build());
       result.add(ImmutableAstCommand.builder().id(id).value(dataType.getScript()).type(AstCommandValue.SET_HEADER_SCRIPT).build());
-      result.add(ImmutableAstCommand.builder().id(id).value(dataType.getValue().getValueType() == null ? null : dataType.getValue().getValueType().name()).type(AstCommandValue.SET_HEADER_TYPE).build());
+      result.add(ImmutableAstCommand.builder().id(id).value(dataType.getExpression().getValueType() == null ? null : dataType.getExpression().getValueType().name()).type(AstCommandValue.SET_HEADER_TYPE).build());
       index++;
     }
     return result;

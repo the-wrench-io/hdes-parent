@@ -29,11 +29,11 @@ import java.util.function.Supplier;
 
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutput;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
+import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.execution.DecisionResult.DecisionTableOutput;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowProgram.StepBody;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
@@ -55,10 +55,10 @@ public class GenericFlowDtExecutor implements FlowTaskExecutor  {
 
   @SuppressWarnings("unchecked")
   @Override
-  public FlowTaskModel execute(Flow flow, FlowTask task) {
-    FlowTaskModel node = flow.getModel().getTask().get(task.getModelId());
+  public Step execute(FlowResult flow, FlowTask task) {
+    Step node = flow.getModel().getStep().get(task.getModelId());
 
-    FlowTaskValue taskValue = node.getBody();
+    StepBody taskValue = node.getBody();
     AssetService service = query.get().dt(taskValue.getRef());
 
     Map<String, Serializable> inputs = new HashMap<>();
@@ -72,7 +72,7 @@ public class GenericFlowDtExecutor implements FlowTaskExecutor  {
     return node.getNext().iterator().next();
   }
 
-  protected Map<String, Serializable> createVariables(Flow flow, FlowTask task, FlowTaskValue taskValue, List<DecisionTableOutput> outputs) {
+  protected Map<String, Serializable> createVariables(FlowResult flow, FlowTask task, StepBody taskValue, List<DecisionTableOutput> outputs) {
     final Serializable value;
     if(taskValue.isCollection()) {
       List<Serializable> entities = new ArrayList<>();

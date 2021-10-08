@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.flow.spi.model;
+package io.resys.hdes.client.spi.flow.program;
 
 /*-
  * #%L
@@ -25,36 +25,38 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskValue;
+import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowProgram.StepBody;
 
 @JsonIgnoreProperties("previous")
-public class ImmutableFlowTaskModel implements FlowTaskModel {
+public class ImmutableStep implements Step {
+  public static final ImmutableStep EMPTY = new ImmutableStep("empty", null, FlowTaskType.END);
+  
 
   private static final long serialVersionUID = -882704966799718075L;
 
   private final String id;
-  private final List<FlowTaskModel> next = new ArrayList<>();
+  private final List<Step> next = new ArrayList<>();
 
-  private FlowTaskValue value;
+  private StepBody value;
   private FlowTaskType type;
-  private FlowTaskModel previous;
+  private Step previous;
 
-  public ImmutableFlowTaskModel(String id, FlowTaskValue value, FlowTaskType type) {
+  public ImmutableStep(String id, StepBody value, FlowTaskType type) {
     super();
     this.id = id;
     this.value = value;
     this.type = type;
   }
 
-  public void addNext(ImmutableFlowTaskModel node) {
+  public void addNext(ImmutableStep node) {
     node.previous = this;
     next.add(node);
   }
 
   @Override
-  public FlowTaskValue getBody() {
+  public StepBody getBody() {
     return value;
   }
 
@@ -64,12 +66,12 @@ public class ImmutableFlowTaskModel implements FlowTaskModel {
   }
 
   @Override
-  public FlowTaskModel getPrevious() {
+  public Step getPrevious() {
     return previous;
   }
 
   @Override
-  public List<FlowTaskModel> getNext() {
+  public List<Step> getNext() {
     return next;
   }
 
@@ -79,13 +81,13 @@ public class ImmutableFlowTaskModel implements FlowTaskModel {
   }
 
   @Override
-  public FlowTaskModel get(String id) {
+  public Step get(String id) {
     if(id == this.id) {
       return this;
     }
 
-    for(FlowTaskModel node : next) {
-      FlowTaskModel result = node.get(id);
+    for(Step node : next) {
+      Step result = node.get(id);
       if(result != null) {
         return result;
       }
@@ -121,14 +123,14 @@ public class ImmutableFlowTaskModel implements FlowTaskModel {
       result.append(id);
     }
 
-    for(FlowTaskModel flowMetamodelNode : next) {
-      result.append(((ImmutableFlowTaskModel) flowMetamodelNode).toString(visited));
+    for(Step flowMetamodelNode : next) {
+      result.append(((ImmutableStep) flowMetamodelNode).toString(visited));
     }
 
     return result.toString();
   }
   private String getIndent(List<String> visited) {
-    FlowTaskModel flowMetamodelNode = previous;
+    Step flowMetamodelNode = previous;
     int total = 4;
     while(flowMetamodelNode != null) {
       if(visited.contains(flowMetamodelNode.getId())) {

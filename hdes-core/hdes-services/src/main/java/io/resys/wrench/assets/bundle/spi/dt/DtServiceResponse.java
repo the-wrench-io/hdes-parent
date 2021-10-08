@@ -27,14 +27,14 @@ import java.util.function.Consumer;
 
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.execution.DecisionTableResult;
+import io.resys.hdes.client.api.execution.DecisionResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 
 public class DtServiceResponse implements ServiceResponse {
 
-  private final DecisionTableResult result;
+  private final DecisionResult result;
 
-  public DtServiceResponse(DecisionTableResult result) {
+  public DtServiceResponse(DecisionResult result) {
     super();
     this.result = result;
   }

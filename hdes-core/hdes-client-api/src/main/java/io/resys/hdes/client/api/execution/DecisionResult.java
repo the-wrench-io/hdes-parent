@@ -24,21 +24,21 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import io.resys.hdes.client.api.ast.AstBody.Expression;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.ast.AstBody.AstExpression;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
+import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 
-public interface DecisionTableResult extends Serializable {
-  List<DecisionTableDecision> getRejections();
-  List<DecisionTableDecision> getMatches();
+public interface DecisionResult extends Serializable {
+  List<DecisionExpression> getRejections();
+  List<DecisionExpression> getMatches();
   List<DecisionTableOutput> getOutputs();
 
-  interface DecisionTableDecision extends Serializable {
+  interface DecisionExpression extends Serializable {
     List<DecisionContext> getContext();
-    DecisionTableNode getNode();
+    Row getNode();
     boolean isMatch();
-    Map<String, AstExpression> getExpressions();
+    Map<String, Expression> getExpressions();
   }
   
   interface DecisionContext {
@@ -49,15 +49,15 @@ public interface DecisionTableResult extends Serializable {
   interface DecisionTableOutput extends Serializable {
     int getId();
     int getOrder();
-    Map<String, AstExpression> getExpressions();
+    Map<String, Expression> getExpressions();
     Map<String, Serializable> getValues();
   }
   
   interface NodeExpressionExecutor {
-    AstExpression getExpression(String src, ValueType type);
+    ExpressionProgram getExpression(String src, ValueType type);
     boolean execute(String expression, ValueType type, Object entity);
   }
   interface HitPolicyExecutor {
-    boolean execute(DecisionTableDecision decision);
+    boolean execute(DecisionExpression decision);
   }
 }

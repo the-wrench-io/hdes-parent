@@ -47,7 +47,7 @@ import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.decision.ast.CommandMapper;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class DecisionAstBuilderImpl implements DecisionAstBuilder {
 
@@ -73,7 +73,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
     if(src == null) {
       return this;
     }
-    Assert.isTrue(src.isArray(), () -> "src must be array node!");
+    HdesAssert.isTrue(src.isArray(), () -> "src must be array node!");
     this.src = new ArrayList<>();
     for(JsonNode node : src) {
       final String type = getString(node, "type");

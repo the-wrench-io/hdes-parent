@@ -30,26 +30,31 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
-import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.model.DecisionTableModel;
-import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.execution.FlowResult;
 
 public interface HdesClient {
   AstBuilder ast();
+  ProgramBuilder program();
   HdesStore store();
-  ModelBuilder model();
   ExecutorBuilder executor();
 
+  interface ProgramBuilder {
+    FlowProgram ast(AstFlow ast);
+    DecisionProgram ast(AstDecision ast);
+    AstService ast(AstService ast);
+  }
   
   interface FlowExecutor {
     Object andGetTask(String task);
-    Flow andGetBody();
+    FlowResult andGetBody();
   }
   interface DecisionExecutor {
     Map<String, Serializable> andGet();
     List<Map<String, Serializable>> andFind();
-    DecisionTableResult andGetBody();
+    DecisionResult andGetBody();
   }
 
   interface ServiceExecutor {
@@ -62,23 +67,17 @@ public interface HdesClient {
     
     // From model or by Id
     FlowExecutor flow(String modelId);
-    FlowExecutor flow(FlowModel model);
+    FlowExecutor flow(FlowProgram model);
 
     // From model or by Id
     DecisionExecutor decision(String modelId);
-    DecisionExecutor decision(DecisionTableModel model);
+    DecisionExecutor decision(DecisionProgram model);
     
     // From model or by Id
     ServiceExecutor service(String modelId);
     ServiceExecutor service(AstService model);
   }
   
-  interface ModelBuilder {
-    FlowModel ast(AstFlow ast);
-    DecisionTableModel ast(AstDecision ast);
-    AstService ast(AstService ast);
-  }
-
   interface AstBuilder {
     AstBuilder commands(ArrayNode src, Integer version);
     AstBuilder commands(List<AstCommand> src, Integer version);

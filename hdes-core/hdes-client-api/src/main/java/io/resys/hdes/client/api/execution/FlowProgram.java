@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.model;
+package io.resys.hdes.client.api.execution;
 
 /*-
  * #%L
@@ -33,40 +33,35 @@ import org.immutables.value.Value;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
-public interface FlowModel extends Model {
+public interface FlowProgram extends Program {
   String getId();
   int getRev();
-  @Nullable
-  String getDescription();
-  String getSrc();
-  Collection<TypeDef> getInputs();
-  FlowTaskModel getTask();
-  Collection<FlowTaskModel> getTasks();
+  Collection<TypeDef> getAcceptDefs();
+  Step getStep();
+  Collection<Step> getSteps();
 
-  interface FlowTaskModel extends Serializable {
-    FlowTaskModel get(String taskId);
+  interface Step extends Serializable {
+    Step get(String taskId);
     String getId();
     @Nullable
-    FlowTaskValue getBody();
+    StepBody getBody();
     FlowTaskType getType();
-    FlowTaskModel getPrevious();
-    List<FlowTaskModel> getNext();
+    Step getPrevious();
+    List<Step> getNext();
   }
 
   @Value.Immutable
-  interface FlowTaskValue extends Serializable {
+  interface StepBody extends Serializable {
     @Nullable
     String getRef();
     @Nullable
-    FlowTaskExpression getExpression();
+    StepExpression getExpression();
     
     Map<String, String> getInputs();
     boolean isCollection();
   }
 
-  interface FlowTaskExpression extends Serializable {
-    String getValue();
-    List<String> getInputs();
+  interface StepExpression extends Serializable {
     boolean eval(FlowTaskExpressionContext context);
   }
   

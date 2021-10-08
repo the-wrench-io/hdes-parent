@@ -36,9 +36,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutput;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.execution.DecisionResult.DecisionTableOutput;
+import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
@@ -152,7 +152,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
           @Override
           public Object andGetTask(String taskName) {
             validateFlowInput(service.get(), inputs);
-            Flow flow = service.get().newExecution().insert((Serializable) inputs).run().get();
+            FlowResult flow = service.get().newExecution().insert((Serializable) inputs).run().get();
             
             Collection<FlowTask> tasks = flow.getContext().getTasks(taskName);
             if(tasks.isEmpty()) {

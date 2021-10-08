@@ -45,15 +45,14 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.Cell;
-import io.resys.hdes.client.api.ast.AstDecision.Row;
-import io.resys.hdes.client.api.model.DecisionTableModel;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableDataType;
-import io.resys.hdes.client.api.model.DecisionTableModel.DecisionTableNode;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.execution.DecisionProgram.DecisionTableDataType;
+import io.resys.hdes.client.api.execution.DecisionProgram.Row;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
 import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTable;
@@ -81,7 +80,7 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   }
 
   @Override
-  public DecisionTableModel build() {
+  public DecisionProgram build() {
     try {
       
       final String src;
@@ -102,9 +101,9 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
           .build();
 
       List<DecisionTableDataType> types = createTypes(commandModel);
-      Map<Integer, TypeDef> typesById = types.stream().collect(Collectors.toMap(t -> t.getOrder(), t -> t.getValue()));
+      Map<Integer, TypeDef> typesById = types.stream().collect(Collectors.toMap(t -> t.getOrder(), t -> t.getExpression()));
 
-      DecisionTableNode first = null;
+      Row first = null;
       ImmutableDecisionTableNode previous = null;
       for(Row row : commandModel.getRows()) {
         int id = previous == null ? 0 : previous.getId() + 1;
@@ -160,7 +159,6 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
       if(type.getDirection() == Direction.IN) {
         result.put(type, value.getValue());
       }
-
     }
     return Collections.unmodifiableMap(result);
   }
@@ -207,14 +205,14 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   }
   @Override
   public DecisionTableBuilder format(DecisionTableFormat format) {
-    Assert.notNull(format, () -> "format can't be null!");
+    HdesAssert.notNull(format, () -> "format can't be null!");
     this.format = format;
     return this;
   }
   
   @Override 
   public DecisionTableBuilder rename(Optional<String> rename) {
-    Assert.notNull(rename, () -> "rename can't be null!");
+    HdesAssert.notNull(rename, () -> "rename can't be null!");
     this.rename = rename;
     return this;
   }

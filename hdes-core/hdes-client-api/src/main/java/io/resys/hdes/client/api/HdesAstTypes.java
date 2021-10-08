@@ -31,7 +31,7 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.AstService;
 
 public interface HdesAstTypes {
@@ -75,7 +75,7 @@ public interface HdesAstTypes {
     FlowAstBuilder srcDel(int line);
     FlowAstBuilder rev(Integer version);
     FlowAstBuilder autocomplete(boolean autocomplete);
-    FlowAstBuilder visitors(NodeFlowVisitor ... visitors);
+    FlowAstBuilder visitors(AstFlowNodeVisitor ... visitors);
     AstFlow build();
   }
 

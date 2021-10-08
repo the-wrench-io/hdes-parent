@@ -35,9 +35,9 @@ import org.springframework.util.StringUtils;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociationType;
@@ -61,14 +61,14 @@ public class FlowServiceDataModelBuilder {
     this.serviceStore = serviceStore;
   }
 
-  public ServiceDataModel build(String id, FlowModel flowModel, Timestamp modified) {
-    List<TypeDef> params = new ArrayList<>(flowModel.getInputs());
+  public ServiceDataModel build(String id, FlowProgram flowModel, Timestamp modified) {
+    List<TypeDef> params = new ArrayList<>(flowModel.getAcceptDefs());
     Map<String, TypeDef> allParams = createModelParameterMap(flowModel, params);
 
     List<ServiceError> errors = new ArrayList<>();
     List<ServiceAssociation> assocs = new ArrayList<>();
 
-    for(FlowTaskModel taskModel : flowModel.getTasks()) {
+    for(Step taskModel : flowModel.getSteps()) {
 
       ServiceType serviceType = getServiceType(taskModel);
       if(serviceType != null) {
@@ -131,7 +131,7 @@ public class FlowServiceDataModelBuilder {
 
 
   protected Map<String, TypeDef> getTaskServiceInput(
-      FlowTaskModel taskModel, Map<String, TypeDef> allParams,
+      Step taskModel, Map<String, TypeDef> allParams,
       AssetService refService) {
 
     Map<String, TypeDef> serviceTypes = refService.getDataModel().getParams().stream()
@@ -150,11 +150,11 @@ public class FlowServiceDataModelBuilder {
   }
 
 
-  protected Map<String, TypeDef> createModelParameterMap(FlowModel flowModel, List<TypeDef> params) {
+  protected Map<String, TypeDef> createModelParameterMap(FlowProgram flowModel, List<TypeDef> params) {
     Map<String, TypeDef> result = new HashMap<>();
     params.forEach(p -> result.put(p.getName(), p));
 
-    for(FlowTaskModel taskModel : flowModel.getTasks()) {
+    for(Step taskModel : flowModel.getSteps()) {
       String taskServiceName = getTaskServiceName(taskModel);
       ServiceType serviceType = getServiceType(taskModel);
       if(serviceType == null) {
@@ -185,13 +185,13 @@ public class FlowServiceDataModelBuilder {
     return new GenericServiceQuery(serviceStore);
   }
 
-  protected boolean isTaskServiceCollection(FlowTaskModel taskModel) {
+  protected boolean isTaskServiceCollection(Step taskModel) {
     return taskModel.getBody() != null ? taskModel.getBody().isCollection() : false;
   }
-  protected String getTaskServiceName(FlowTaskModel taskModel) {
+  protected String getTaskServiceName(Step taskModel) {
     return taskModel.getBody() != null ? taskModel.getBody().getRef() : null;
   }
-  protected ServiceType getServiceType(FlowTaskModel taskModel) {
+  protected ServiceType getServiceType(Step taskModel) {
     switch(taskModel.getType()) {
     case DT: return ServiceType.DT;
     case SERVICE: return ServiceType.FLOW_TASK;

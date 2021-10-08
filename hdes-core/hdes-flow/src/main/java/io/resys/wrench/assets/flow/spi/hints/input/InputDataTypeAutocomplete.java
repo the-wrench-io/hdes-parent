@@ -28,15 +28,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstInput;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlow;
-import io.resys.hdes.client.api.ast.AstFlow.NodeFlowVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 
-public class InputDataTypeAutocomplete implements NodeFlowVisitor {
+public class InputDataTypeAutocomplete implements AstFlowNodeVisitor {
 
   private static final String ID = InputDataTypeAutocomplete.class.getSimpleName();
   private static final Collection<String> TYPES = Arrays.asList(
@@ -48,25 +48,25 @@ public class InputDataTypeAutocomplete implements NodeFlowVisitor {
       .collect(Collectors.toList());
 
   @Override
-  public void visit(NodeFlow flow, ImmutableAstFlow.Builder modelBuilder) {
-    Map<String, FlowAstInput> inputs = flow.getInputs();
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    Map<String, AstFlowInputNode> inputs = flow.getInputs();
 
     if(inputs.isEmpty()) {
       return;
     }
 
     List<FlowAstCommandRange> ranges = new ArrayList<>();
-    for(FlowAstInput input : inputs.values()) {
+    for(AstFlowInputNode input : inputs.values()) {
       if(input.getType() != null) {
-        ranges.add(FlowNodesFactory.range().build(input.getType().getStart()));
+        ranges.add(AstFlowNodesFactory.range().build(input.getType().getStart()));
       } else {
-        ranges.add(FlowNodesFactory.range().build(input.getStart(), input.getEnd(), true));
+        ranges.add(AstFlowNodesFactory.range().build(input.getStart(), input.getEnd(), true));
       }
     }
 
     for(String type : TYPES) {
       if(!ranges.isEmpty()) {
-        modelBuilder.addAutocomplete(FlowNodesFactory.ac()
+        modelBuilder.addAutocomplete(AstFlowNodesFactory.ac()
             .id(ID)
             .addField("    " + NodeFlowBean.KEY_TYPE, type)
             .addRange(ranges)

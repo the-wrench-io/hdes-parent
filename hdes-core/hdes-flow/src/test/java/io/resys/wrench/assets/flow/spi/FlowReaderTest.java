@@ -29,10 +29,10 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowStatus;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.execution.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.spi.config.TestFlowConfig;
@@ -48,11 +48,11 @@ public class FlowReaderTest {
   public void amlTest() throws IOException {
     String content = new FlowFlatToCommandBuilder(objectMapper).build(FileUtils.toInputStream(getClass(), "aml-flow.yaml"));
 
-    FlowModel flowMetamodel = flowRepository.createModel().content(content).build().getValue();
+    FlowProgram flowMetamodel = flowRepository.createModel().content(content).build().getValue();
 //    FlowModel flowMetamodel = flowMetamodelRepository.createBuilder().format(FlowFormat.JSON).stream(context.getResource("classpath:aml-flow.yaml").getInputStream()).build();
     Assert.assertNotNull(flowMetamodel);
 
-    Flow flow = flowRepository.createExecutor().insert("whitelist", true).run(flowMetamodel);
+    FlowResult flow = flowRepository.createExecutor().insert("whitelist", true).run(flowMetamodel);
 
     // Assert till first form
     Assert.assertEquals(FlowStatus.SUSPENDED, flow.getContext().getStatus());
@@ -75,7 +75,7 @@ public class FlowReaderTest {
     String content = new FlowFlatToCommandBuilder(objectMapper).build(FileUtils.toInputStream(getClass(), "self-ref.yaml"));
 
 
-    FlowModel flowMetamodel = flowRepository.createModel().content(content).build().getValue();
+    FlowProgram flowMetamodel = flowRepository.createModel().content(content).build().getValue();
     Assert.assertNotNull(flowMetamodel);
 
     //FlowRepository.Flow flow = flowRepository.createBuilder().insert("whitelist", true).run("self ref");

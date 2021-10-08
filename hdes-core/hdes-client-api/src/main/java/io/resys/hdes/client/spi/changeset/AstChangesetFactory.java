@@ -35,7 +35,7 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.spi.changeset.beans.AstChangesetBean;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class AstChangesetFactory {
 
@@ -109,7 +109,7 @@ public class AstChangesetFactory {
 
     public SourceBuilder set(int line, String value) {
       Optional<AstChangesetBean> source = sourcesAdded.stream().filter(s -> s.getLine() == line).findFirst();
-      Assert.isTrue(source.isPresent(), () -> String.format("Can't change value of non existing line: %s!", line));
+      HdesAssert.isTrue(source.isPresent(), () -> String.format("Can't change value of non existing line: %s!", line));
       source.get().add(
           ImmutableAstCommand.builder().id(String.valueOf(line)).value(value).type(AstCommandValue.SET).build());
       return this;

@@ -28,8 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.execution.Service;
-import io.resys.hdes.client.api.execution.Service.ServiceInit;
+import io.resys.hdes.client.api.execution.ServiceProgram;
+import io.resys.hdes.client.api.execution.ServiceProgram.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -76,10 +76,10 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
     final String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
     
     try {
-      final Service script;
+      final ServiceProgram script;
       
       if(rename) {
-        final Service originalScript = scriptRepository.createBuilder().src(content).build();
+        final ServiceProgram originalScript = scriptRepository.createBuilder().src(content).build();
         final String originalName = originalScript.getModel().getName();
         final String newContent = content.replaceAll(originalName, name);
         

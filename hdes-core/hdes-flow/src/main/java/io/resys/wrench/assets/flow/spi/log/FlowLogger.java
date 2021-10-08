@@ -24,17 +24,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowHistory;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.execution.FlowResult.FlowHistory;
+import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
 
 public class FlowLogger {
 
-  private Flow flow;
+  private FlowResult flow;
 
-  public FlowLogger flow(Flow flow) {
+  public FlowLogger flow(FlowResult flow) {
     this.flow = flow;
     return this;
   }
@@ -44,7 +44,7 @@ public class FlowLogger {
     BiConsumer<String, Object> parent = (key, value) -> result.put(key, value);
     for(FlowHistory history : flow.getContext().getHistory()) {
       FlowTask task = flow.getContext().getTask(history.getId());
-      FlowTaskModel taskModel = flow.getModel().getTasks().stream().filter(t -> t.getId().equals(task.getModelId())).findFirst().get();
+      Step taskModel = flow.getModel().getSteps().stream().filter(t -> t.getId().equals(task.getModelId())).findFirst().get();
       if(taskModel.getType() == FlowTaskType.DT || taskModel.getType() == FlowTaskType.SERVICE) {
         parent = createTaskLog(parent, task);
       }

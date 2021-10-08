@@ -34,7 +34,7 @@ public class HdesClientImpl implements HdesClient {
   }
 
   @Override
-  public ModelBuilder model() {
+  public ProgramBuilder program() {
     // TODO Auto-generated method stub
     throw new RuntimeException("Need to implemented the client");
   }

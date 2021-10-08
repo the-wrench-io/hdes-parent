@@ -49,7 +49,7 @@ import io.resys.hdes.client.api.exceptions.ServiceAstException;
 import io.resys.hdes.client.api.execution.ServiceData;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class ServiceAstBuilderImpl implements ServiceAstBuilder {
 
@@ -95,7 +95,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
 
   @Override
   public AstService build() {
-    Assert.notNull(src, () -> "src can't ne null!");
+    HdesAssert.notNull(src, () -> "src can't ne null!");
 
     final var value = new StringBuilder();
     final var changes = AstChangesetFactory.src(src, rev);
@@ -136,11 +136,11 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
           && !Modifier.isVolatile(method.getModifiers())) {
 
         Headers params = getParams(method);
-        Assert.isTrue(result.isEmpty(), () -> "Only one 'execute' method allowed!");
+        HdesAssert.isTrue(result.isEmpty(), () -> "Only one 'execute' method allowed!");
         result.add(params);
       }
     }
-    Assert.isTrue(result.size() == 1, () -> "There must be one 'execute' method!");
+    HdesAssert.isTrue(result.size() == 1, () -> "There must be one 'execute' method!");
     return result.iterator().next();
   }
   
@@ -191,7 +191,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
     int index = 0;
 
-    Assert.isTrue(Serializable.class.isAssignableFrom(type), () -> "Flow types must implement Serializable!");
+    HdesAssert.isTrue(Serializable.class.isAssignableFrom(type), () -> "Flow types must implement Serializable!");
     for(Field field : type.getDeclaredFields()) {
       int modifier = field.getModifiers();
       if( Modifier.isFinal(modifier) ||
