@@ -25,12 +25,12 @@ import java.util.List;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
-public interface DecisionProgram extends Program {
-  String getId();
+public interface DecisionProgram extends Program<AstDecision> {
   HitPolicy getHitPolicy();
   List<Row> getRows();
 

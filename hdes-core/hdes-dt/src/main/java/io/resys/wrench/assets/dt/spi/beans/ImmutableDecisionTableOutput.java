@@ -23,7 +23,6 @@ package io.resys.wrench.assets.dt.spi.beans;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstBody.Expression;
 import io.resys.hdes.client.api.execution.DecisionResult.DecisionTableOutput;
 
 public class ImmutableDecisionTableOutput implements DecisionTableOutput {
@@ -33,11 +32,11 @@ public class ImmutableDecisionTableOutput implements DecisionTableOutput {
   private final int id;
   private final int order;
   private final Map<String, Serializable> values;
-  private final Map<String, Expression> expressions;
+  private final Map<String, String> expressions;
   
   public ImmutableDecisionTableOutput(
       int id, int order, Map<String, Serializable> values,
-      Map<String, Expression> expressions) {
+      Map<String, String> expressions) {
     super();
     this.id = id;
     this.order = order;
@@ -46,7 +45,7 @@ public class ImmutableDecisionTableOutput implements DecisionTableOutput {
   }
 
   @Override
-  public Map<String, Expression> getExpressions() {
+  public Map<String, String> getExpressions() {
     return expressions;
   }
 

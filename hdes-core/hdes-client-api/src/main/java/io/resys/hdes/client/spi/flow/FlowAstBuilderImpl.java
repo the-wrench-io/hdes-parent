@@ -53,9 +53,9 @@ import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstFlowInputType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
-import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeBean;
@@ -75,13 +75,15 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
 
   private final NodeFlowBean result = new NodeFlowBean(inputTypes);
   private final ObjectMapper yamlMapper;
+  private final HdesTypeDefsFactory typeDefs;
   private final List<FlowAstCommandMessage> messages = new ArrayList<>();
   private List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   
-  public FlowAstBuilderImpl(ObjectMapper yamlMapper) {
+  public FlowAstBuilderImpl(ObjectMapper yamlMapper, HdesTypeDefsFactory typeDefs) {
     super();
     this.yamlMapper = yamlMapper;
+    this.typeDefs = typeDefs;
   }
 
   @Override
@@ -149,8 +151,8 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         .name(id == null ? "": id.getValue())
         .rev(this.rev == null ? src.size() : this.rev)
         .src(flow)
-        // TODO::: HEADERS
-        .headers(ImmutableHeaders.builder().build())
+        .source(flow.getValue())
+        .headers(AstFlowNodesFactory.headers(typeDefs).build(flow))
         .build();
   }
   @Override

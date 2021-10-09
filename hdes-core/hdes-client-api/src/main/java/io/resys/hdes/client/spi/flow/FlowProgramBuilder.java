@@ -1,5 +1,25 @@
 package io.resys.hdes.client.spi.flow;
 
+/*-
+ * #%L
+ * hdes-client-api
+ * %%
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,6 +45,7 @@ import io.resys.hdes.client.api.execution.FlowProgram.StepBody;
 import io.resys.hdes.client.api.execution.ImmutableFlowProgram;
 import io.resys.hdes.client.api.execution.ImmutableStepBody;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.spi.flow.program.ImmutableStep;
 import io.resys.hdes.client.spi.flow.program.ImmutableStepExpression;
@@ -47,9 +68,9 @@ public class FlowProgramBuilder {
   public FlowProgram build(AstFlow ast) {
     final var data = ast.getSrc();
     
-    this.flowId = getStringValue(data.getId());
+    this.flowId = AstFlowNodesFactory.getStringValue(data.getId());
     this.tasksById = data.getTasks().values().stream()
-        .collect(Collectors.toMap(n -> getStringValue(n.getId()), n -> n));
+        .collect(Collectors.toMap(n -> AstFlowNodesFactory.getStringValue(n.getId()), n -> n));
     
     this.tasksByOrder = new ArrayList<>(data.getTasks().values());
     Collections.sort(tasksByOrder);
@@ -65,6 +86,7 @@ public class FlowProgramBuilder {
     
     return ImmutableFlowProgram.builder()
         .id(flowId)
+        .ast(ast)
         .step(task)
         .steps(steps.values())
         .acceptDefs(visitAcceptDefs(data))
@@ -81,7 +103,7 @@ public class FlowProgramBuilder {
 
 
   private ImmutableStep visitTasks(AstFlowTaskNode task) {
-    String taskId = getStringValue(task.getId());
+    String taskId = AstFlowNodesFactory.getStringValue(task.getId());
     if(taskModels.containsKey(taskId)) {
       return taskModels.get(taskId);
     }
@@ -100,8 +122,8 @@ public class FlowProgramBuilder {
       intermediate = result;
     }
 
-    boolean isEnd = endNode.getId().equals(getStringValue(task.getThen()));
-    String then = getStringValue(task.getThen());
+    boolean isEnd = endNode.getId().equals(AstFlowNodesFactory.getStringValue(task.getThen()));
+    String then = AstFlowNodesFactory.getStringValue(task.getThen());
 
     // Add next
     if(then != null && !isEnd) {
@@ -128,9 +150,13 @@ public class FlowProgramBuilder {
       String decisionId = decision.getKeyword();
 
       try {
-        String when = getStringValue(decision.getWhen());
-        String thenValue = getStringValue(decision.getThen());
-        final var expression = typesFactory.expression(ValueType.FLOW_CONTEXT, when);
+        String when = AstFlowNodesFactory.getStringValue(decision.getWhen());
+        String thenValue = AstFlowNodesFactory.getStringValue(decision.getThen());
+        
+        final var isTrue = when == null || when.isBlank();
+        final var expression = isTrue ? 
+            typesFactory.expression(ValueType.FLOW_CONTEXT, "true") :
+            typesFactory.expression(ValueType.FLOW_CONTEXT, when);
         
         Map<String, String> inputMapping = new HashMap<>();
         expression.getConstants().forEach(name -> inputMapping.put(name, name));
@@ -170,21 +196,21 @@ public class FlowProgramBuilder {
     }
 
     if(next == null) {
-      String taskId = getStringValue(task.getId());
+      String taskId = AstFlowNodesFactory.getStringValue(task.getId());
       String message = "There are no next task after: \"" + taskId + "\" in flow: " + flowId + ", decision: " + taskId + "!";
       throw new FlowAstException(message);
     }
-    return getStringValue(next.getId());
+    return AstFlowNodesFactory.getStringValue(next.getId());
   }
 
   public StepBody createFlowTaskValue(AstFlowTaskNode task, FlowTaskType type) {
     if(type == FlowTaskType.SERVICE || type == FlowTaskType.DT || type == FlowTaskType.USER_TASK) {
 
-      boolean collection = getBooleanValue(task.getRef().getCollection());
-      String ref = getStringValue(task.getRef().getRef());
+      boolean collection = AstFlowNodesFactory.getBooleanValue(task.getRef().getCollection());
+      String ref = AstFlowNodesFactory.getStringValue(task.getRef().getRef());
       Map<String, String> inputs = new HashMap<>();
       for(Map.Entry<String, AstFlowNode> entry : task.getRef().getInputs().entrySet()) {
-        inputs.put(entry.getKey(), getStringValue(entry.getValue()));
+        inputs.put(entry.getKey(), AstFlowNodesFactory.getStringValue(entry.getValue()));
       }
       return ImmutableStepBody.builder()
           .isCollection(collection)
@@ -210,12 +236,12 @@ public class FlowProgramBuilder {
       }
       try {
         ValueType valueType = ValueType.valueOf(entry.getValue().getType().getValue());
-        boolean required = getBooleanValue(entry.getValue().getRequired());
+        boolean required = AstFlowNodesFactory.getBooleanValue(entry.getValue().getRequired());
         result.add(this.typesFactory.dataType()
             .id(entry.getValue().getStart() + "")
             .order(index++)
             .name(entry.getKey()).valueType(valueType).direction(Direction.IN).required(required)
-            .values(getStringValue(entry.getValue().getDebugValue()))
+            .values(AstFlowNodesFactory.getStringValue(entry.getValue().getDebugValue()))
             .build());
         
       } catch (Exception e) {
@@ -237,19 +263,4 @@ public class FlowProgramBuilder {
 
     return FlowTaskType.EMPTY;
   }
-
-  private static String getStringValue(AstFlowNode node) {
-    if (node == null || node.getValue() == null) {
-      return null;
-    }
-    return node.getValue();
-  }
-
-  private static boolean getBooleanValue(AstFlowNode node) {
-    if (node == null || node.getValue() == null) {
-      return false;
-    }
-    return Boolean.parseBoolean(node.getValue());
-  }
-
 }

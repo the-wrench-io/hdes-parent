@@ -30,10 +30,12 @@ import org.immutables.value.Value;
 public interface AstBody extends Serializable {
   
   String getName();
+  int getRev();
+  String getSource();
+  
   @Nullable
   String getDescription();
-  int getRev();
-  
+
   List<AstCommand> getCommands();
   Headers getHeaders();
   

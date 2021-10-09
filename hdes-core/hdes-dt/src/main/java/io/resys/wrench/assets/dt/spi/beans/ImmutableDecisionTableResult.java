@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.execution.DecisionResult;
 import io.resys.hdes.client.api.execution.DecisionProgram.RowReturns;
+import io.resys.hdes.client.api.execution.DecisionResult;
 
 public class ImmutableDecisionTableResult implements DecisionResult {
 
@@ -55,7 +55,7 @@ public class ImmutableDecisionTableResult implements DecisionResult {
   @Override
   public List<DecisionTableOutput> getOutputs() {
     return getMatches().stream()
-        .map(m -> new ImmutableDecisionTableOutput(m.getNode().getId(), m.getNode().getOrder(), Collections.unmodifiableMap(toValues(m)), m.getExpressions()))
+        .map(m -> new ImmutableDecisionTableOutput(m.getNode().getOrder(), m.getNode().getOrder(), Collections.unmodifiableMap(toValues(m)), m.getExpressions()))
         .collect(Collectors.toList());
   }
 

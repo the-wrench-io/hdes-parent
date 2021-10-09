@@ -33,7 +33,7 @@ public class ServiceHistoric implements ServiceProgram {
     this.model = model;
   }
   @Override
-  public AstService getModel() {
+  public AstService getAst() {
     return model;
   }
 
@@ -44,5 +44,9 @@ public class ServiceHistoric implements ServiceProgram {
 
   @Override
   public void stop() {
+  }
+  @Override
+  public String getId() {
+    return model.getName();
   }
 }

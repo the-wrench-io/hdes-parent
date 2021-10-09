@@ -33,9 +33,9 @@ import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 @Value.Immutable
 public interface AstDecision extends AstBody, Serializable {
   
-  HitPolicy getHitPolicy();
   List<String> getHeaderTypes();
   Map<ValueType, List<String>> getHeaderExpressions();
+  HitPolicy getHitPolicy();
   List<Row> getRows();
 
   @Value.Immutable

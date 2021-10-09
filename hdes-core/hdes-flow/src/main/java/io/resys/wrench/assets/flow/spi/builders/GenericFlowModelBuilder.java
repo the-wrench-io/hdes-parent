@@ -30,16 +30,14 @@ import org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.execution.FlowProgram;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowModelBuilder;
-import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
 
 public class GenericFlowModelBuilder implements FlowRepository.FlowModelBuilder {
 
-  private final ExpressionFactory parser;
-  private final HdesAstTypes nodeRepository;
+  private final HdesClient nodeRepository;
   private final ObjectMapper objectMapper;
 
   private String input;
@@ -48,10 +46,8 @@ public class GenericFlowModelBuilder implements FlowRepository.FlowModelBuilder 
   private Optional<String> rename;
   
   public GenericFlowModelBuilder(
-      ExpressionFactory parser,
-      HdesAstTypes nodeRepository,
+      HdesClient nodeRepository,
       ObjectMapper objectMapper) {
-    this.parser = parser;
     this.nodeRepository = nodeRepository;
     this.objectMapper = objectMapper;
   }
@@ -78,7 +74,7 @@ public class GenericFlowModelBuilder implements FlowRepository.FlowModelBuilder 
   @Override
   public Map.Entry<String, FlowProgram> build() {
     return new CommandFlowModelBuilder(
-        nodeRepository, objectMapper, parser, input, 
+        nodeRepository, objectMapper, input, 
         rename == null ? Optional.empty() : rename).build();
   }
 

@@ -24,10 +24,10 @@ import java.util.function.Supplier;
 
 import org.springframework.util.Assert;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportBuilder;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportType;
 import io.resys.hdes.client.api.execution.DecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportBuilder;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
@@ -63,7 +63,7 @@ public class GenericExportBuilder implements ExportBuilder {
 
     service.newExecution().run(e -> stringBuilder.append(exporter.get()
         .format(DecisionTableFormat.valueOf(type.name()))
-        .src((DecisionProgram) e)
+        .src(((DecisionProgram) e).getAst())
         .build()));
 
     return stringBuilder.toString();

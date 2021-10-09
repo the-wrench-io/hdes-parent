@@ -1,7 +1,5 @@
 package io.resys.wrench.assets.script.spi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /*-
  * #%L
  * hdes-script
@@ -22,16 +20,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * #L%
  */
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 import io.resys.wrench.assets.script.spi.builders.GenericScriptBuilder;
 
 public class GenericScriptRepository implements ScriptRepository {
-  private final HdesAstTypes dataTypeRepository;
+  private final HdesClient dataTypeRepository;
   private final ObjectMapper objectMapper;
 
   public GenericScriptRepository( 
-      HdesAstTypes dataTypeRepository, ObjectMapper objectMapper) {
+      HdesClient dataTypeRepository, ObjectMapper objectMapper) {
     super();
     this.dataTypeRepository = dataTypeRepository;
     this.objectMapper = objectMapper;

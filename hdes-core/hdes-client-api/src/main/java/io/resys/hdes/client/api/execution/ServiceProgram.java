@@ -24,8 +24,7 @@ import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstService;
 
-public interface ServiceProgram {
-  AstService getModel();
+public interface ServiceProgram extends Program<AstService> {
   Object execute(List<Object> context, ServiceInit init);
   void stop();  
   

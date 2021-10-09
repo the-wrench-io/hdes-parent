@@ -23,20 +23,21 @@ package io.resys.wrench.assets.dt.spi.builders;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.AstBody.Expression;
 import io.resys.hdes.client.api.execution.DecisionProgram;
-import io.resys.hdes.client.api.execution.DecisionResult;
 import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 import io.resys.hdes.client.api.execution.DecisionProgram.RowAccepts;
+import io.resys.hdes.client.api.execution.DecisionResult;
 import io.resys.hdes.client.api.execution.DecisionResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionResult.DecisionExpression;
 import io.resys.hdes.client.api.execution.DecisionResult.HitPolicyExecutor;
 import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
+import io.resys.hdes.client.api.execution.ExpressionProgram;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFixedValue;
@@ -74,15 +75,15 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
     HdesAssert.notNull(context, () -> "context can't be null!");
 
     List<DecisionExpression> decisions = new ArrayList<>();
-    Row node = decisionTable.getRows();
+    Iterator<Row> it = decisionTable.getRows().iterator();
     HitPolicyExecutor hitPolicy = new DelegateHitPolicyExecutor(decisionTable);
-    while(node != null) {
+    while(it.hasNext()) {
+      final var node = it.next();
       DecisionExpression decision = execute(node);
       decisions.add(decision);
       if(!hitPolicy.execute(decision)) {
         break;
       }
-      node = node.getNext();
     }
 
     return new ImmutableDecisionTableResult(Collections.unmodifiableList(decisions));
@@ -93,12 +94,12 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
     
     List<DecisionContext> data = new ArrayList<>();
     
-    Map<String, Expression> expressions = new HashMap<>();
+    Map<String, String> expressions = new HashMap<>();
     for(RowAccepts input : node.getAccepts()) {
       Object contextEntity = this.context.apply(input.getKey());
       if(DecisionTableFixedValue.ALWAYS_TRUE == contextEntity) {
-        Expression expression = expressionExecutor.getExpression(input.getExpression(), input.getKey().getValueType());
-        expressions.put(input.getKey().getName(), expression);
+        ExpressionProgram expression = input.getExpression();
+        expressions.put(input.getKey().getName(), expression.getSrc());
         
         if(!Boolean.FALSE.equals(match)) {
           match = true;
@@ -112,9 +113,8 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
       if(Boolean.FALSE.equals(match)) {
         continue;
       }
-      match = expressionExecutor.execute(input.getExpression(), input.getKey().getValueType(), entity);
-      Expression expression = expressionExecutor.getExpression(input.getExpression(), input.getKey().getValueType());
-      expressions.put(input.getKey().getName(), expression);
+      match = Boolean.TRUE.equals(input.getExpression().run(entity).getValue());
+      expressions.put(input.getKey().getName(), input.getExpression().getSrc());
       
     }
     return new ImmutableDecisionTableDecision(data, node, node.getAccepts().isEmpty() || Boolean.TRUE.equals(match), Collections.unmodifiableMap(expressions));

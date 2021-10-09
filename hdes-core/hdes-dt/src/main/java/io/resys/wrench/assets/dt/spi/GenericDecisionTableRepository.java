@@ -22,9 +22,8 @@ package io.resys.wrench.assets.dt.spi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
-import io.resys.hdes.client.spi.HdesAstTypesImpl;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.spi.builders.CommandDecisionTableBuilder;
 import io.resys.wrench.assets.dt.spi.builders.GenericDecisionTableExecutor;
@@ -34,20 +33,21 @@ public class GenericDecisionTableRepository implements DecisionTableRepository {
 
   private final ObjectMapper objectMapper;
   private final NodeExpressionExecutor expressionExecutor;
-  private final HdesAstTypes ast;
+  private final HdesClient client;
+  
   public GenericDecisionTableRepository(
       ObjectMapper objectMapper,
-      HdesAstTypes dataTypeRepository,
+      HdesClient client,
       NodeExpressionExecutor expressionExecutor) {
     super();
     this.objectMapper = objectMapper;
     this.expressionExecutor = expressionExecutor;
-    this.ast = new HdesAstTypesImpl(objectMapper);
+    this.client = client;
   }
 
   @Override
   public DecisionTableBuilder createBuilder() {
-    return new CommandDecisionTableBuilder(objectMapper, () -> ast);
+    return new CommandDecisionTableBuilder(objectMapper, client);
   }
   @Override
   public DecisionTableExecutor createExecutor() {

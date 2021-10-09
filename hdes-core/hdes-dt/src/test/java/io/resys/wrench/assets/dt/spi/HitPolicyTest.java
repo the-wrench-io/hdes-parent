@@ -57,14 +57,14 @@ public class HitPolicyTest {
     values.put("regionName", "FIN");
     DecisionResult result = execute(decisionTable, values);
     Assert.assertEquals(1, result.getMatches().size());
-    Assert.assertEquals(0, result.getMatches().get(0).getNode().getId());
+    Assert.assertEquals(0, result.getMatches().get(0).getNode().getOrder());
 
 
     values = new HashMap<>();
     values.put("regionName", "X");
     result = execute(decisionTable, values);
     Assert.assertEquals(1, result.getMatches().size());
-    Assert.assertEquals(1, result.getMatches().get(0).getNode().getId());
+    Assert.assertEquals(1, result.getMatches().get(0).getNode().getOrder());
   }
 
   @Test

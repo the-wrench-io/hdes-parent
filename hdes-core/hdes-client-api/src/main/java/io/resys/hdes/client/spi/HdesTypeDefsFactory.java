@@ -1,5 +1,7 @@
 package io.resys.hdes.client.spi;
 
+import java.io.IOException;
+
 /*-
  * #%L
  * wrench-assets-datatypes
@@ -35,6 +37,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
+import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.ImmutableTypeDef;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Deserializer;
@@ -275,6 +278,14 @@ public class HdesTypeDefsFactory {
           .deserializer(deserializer)
           .serializer(serializer)
           .build();
+    }
+  }
+  
+  public String commands(List<AstCommand> commands) {
+    try {
+      return objectMapper.writeValueAsString(commands);
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
     }
   }
 }

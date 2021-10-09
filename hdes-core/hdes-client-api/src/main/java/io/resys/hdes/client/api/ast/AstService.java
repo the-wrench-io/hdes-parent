@@ -27,6 +27,5 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 public interface AstService extends AstBody, Serializable {
-  String getSrc();
   Class<?> getType();
 }

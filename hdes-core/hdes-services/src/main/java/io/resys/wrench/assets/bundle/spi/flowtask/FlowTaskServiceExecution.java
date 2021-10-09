@@ -45,7 +45,7 @@ public class FlowTaskServiceExecution implements ServiceExecution {
     super();
     this.script = script;
     this.init = init;
-    this.taskInputModel = script.getModel().getHeaders().getAcceptDefs().stream()
+    this.taskInputModel = script.getAst().getHeaders().getAcceptDefs().stream()
         .filter(p -> p.getData())
         .findFirst()
         .orElse(null);
@@ -94,7 +94,7 @@ public class FlowTaskServiceExecution implements ServiceExecution {
         }
       };
     } catch(Exception e) {
-      throw new FlowTaskExecutorException(script.getModel().getSrc(), e.getMessage(), e);
+      throw new FlowTaskExecutorException(script.getAst().getSource(), e.getMessage(), e);
     }
   }
 

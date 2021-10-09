@@ -26,9 +26,9 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.spi.HdesAstTypesImpl;
+import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.wrench.assets.flow.api.FlowRepository;
@@ -40,11 +40,10 @@ import io.resys.wrench.assets.flow.spi.executors.ExclusiveFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.MergeFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.ServiceFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.UserFlowTaskExecutor;
-import io.resys.wrench.assets.flow.spi.expressions.SpelExpressionFactory;
 
 public class TestFlowConfig {
   private static ObjectMapper objectMapper = new ObjectMapper();
-  private static HdesAstTypes nodeRepository = new HdesAstTypesImpl(objectMapper);
+  private static HdesClient nodeRepository = HdesClientImpl.builder().objectMapper(objectMapper).build();
   private static FlowExecutorRepository flowExecutorFactory;
   private static FlowRepository flowRepository;
 
@@ -52,17 +51,15 @@ public class TestFlowConfig {
     return objectMapper;
   }
   
-  public static HdesAstTypes nodeRepository() {
+  public static HdesClient nodeRepository() {
     return nodeRepository;
   }
 
   public static FlowRepository flowRepository() {
     if (flowRepository == null) {
-      SpelExpressionFactory parser = new SpelExpressionFactory();
-
       flowRepository = new GenericFlowRepository(nodeRepository, 
           flowExecutorFactory(), 
-          parser, objectMapper, 
+          objectMapper, 
           Clock.systemUTC());
     }
     return flowRepository;

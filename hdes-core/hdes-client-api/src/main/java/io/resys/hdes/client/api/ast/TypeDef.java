@@ -31,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 @Value.Immutable
-public abstract class TypeDef implements Serializable {
+public abstract class TypeDef implements Serializable, Comparable<TypeDef> {
   private static final long serialVersionUID = -1945170579949676929L;
   
   public abstract String getId(); // GID
@@ -66,6 +66,11 @@ public abstract class TypeDef implements Serializable {
   @JsonIgnore
   public String toString(Object value) {
     return getSerializer().serialize(this, value);
+  }
+  @JsonIgnore
+  @Override
+  public int compareTo(TypeDef o) {
+    return Integer.compare(getOrder(), o.getOrder());
   }
     
   public interface Deserializer {

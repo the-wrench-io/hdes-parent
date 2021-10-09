@@ -37,9 +37,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
-import io.resys.hdes.client.spi.HdesAstTypesImpl;
+import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.spi.GenericDecisionTableRepository;
@@ -75,9 +74,9 @@ public class TestDtConfig {
   public static DecisionTableRepository decisionTableRepository() {
     if(decisionTableRepository == null) {
       NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper());
-      HdesAstTypes dataTypeRepository = new HdesAstTypesImpl(objectMapper());
+      HdesClientImpl client = HdesClientImpl.builder().objectMapper(objectMapper()).build();
       
-      decisionTableRepository = new GenericDecisionTableRepository(objectMapper(), dataTypeRepository, expressionExecutor);
+      decisionTableRepository = new GenericDecisionTableRepository(objectMapper(), client, expressionExecutor);
     }
     return decisionTableRepository;
   }

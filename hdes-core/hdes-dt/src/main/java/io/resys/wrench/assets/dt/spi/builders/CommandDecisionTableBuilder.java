@@ -22,16 +22,8 @@ package io.resys.wrench.assets.dt.spi.builders;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -43,29 +35,20 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision;
-import io.resys.hdes.client.api.ast.AstDecision.Cell;
-import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.execution.DecisionProgram;
-import io.resys.hdes.client.api.execution.DecisionProgram.DecisionTableDataType;
-import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTable;
-import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableDataType;
-import io.resys.wrench.assets.dt.spi.beans.ImmutableDecisionTableNode;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 
 
 public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(CommandDecisionTableBuilder.class);
   private final ObjectMapper objectMapper;
-  private final Supplier<HdesAstTypes> commandBuilder;
-  private final List<String> errors = new ArrayList<>();
+  private final HdesClient client;
 
   protected String src;
   protected Optional<String> rename = Optional.empty();
@@ -74,9 +57,9 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
   
   public CommandDecisionTableBuilder(
       ObjectMapper objectMapper,
-      Supplier<HdesAstTypes> commandBuilder) {
+      HdesClient client) {
     this.objectMapper = objectMapper;
-    this.commandBuilder = commandBuilder;
+    this.client = client;
   }
 
   @Override
@@ -96,90 +79,16 @@ public class CommandDecisionTableBuilder implements DecisionTableBuilder {
         src = this.src;
       }
       
-      AstDecision commandModel = commandBuilder.get().decision()
-          .src(objectMapper.readTree(src))
-          .build();
+      AstDecision ast = client.ast()
+          .commands((ArrayNode) objectMapper.readTree(src), null)
+          .decision();
 
-      List<DecisionTableDataType> types = createTypes(commandModel);
-      Map<Integer, TypeDef> typesById = types.stream().collect(Collectors.toMap(t -> t.getOrder(), t -> t.getExpression()));
-
-      Row first = null;
-      ImmutableDecisionTableNode previous = null;
-      for(Row row : commandModel.getRows()) {
-        int id = previous == null ? 0 : previous.getId() + 1;
-        ImmutableDecisionTableNode current = new ImmutableDecisionTableNode(id, row.getOrder(), getInputs(typesById, row), getOutputs(typesById, row), previous);
-        if(first == null) {
-          first = current;
-        }
-        if(previous != null) {
-          previous.setNext(current);
-        }
-        previous = current;
-      }
-
-      if(!errors.isEmpty()) {
-        LOGGER.error(new StringBuilder()
-            .append("Error in DT: ").append(commandModel.getName())
-            .append(System.lineSeparator())
-            .append(String.join(System.lineSeparator(), errors))
-            .toString());
-      }
-      
-      return new ImmutableDecisionTable(
-          commandModel.getName(), String.valueOf(commandModel.getRev()), 
-          src,
-          commandModel.getDescription(), commandModel.getHitPolicy(), types, first);
+      return client.program().ast(ast);
 
     } catch(IOException e) {
       throw new DecisionTableException(e.getMessage(), e);
     }
-  }
-
-  protected List<DecisionTableDataType> createTypes(AstDecision data) {
-    List<DecisionTableDataType> result = new ArrayList<>();
-    int index = 0;
-    
-    List<TypeDef> allHeaders = new ArrayList<>();
-    allHeaders.addAll(data.getHeaders().getAcceptDefs());
-    allHeaders.addAll(data.getHeaders().getReturnDefs());
-    
-    for(TypeDef header : allHeaders) {
-      result.add(new ImmutableDecisionTableDataType(
-          index++, header.getScript(), header));
-    }
-    Collections.sort(result);
-    return Collections.unmodifiableList(result);
-  }
-
-  protected Map<TypeDef, String> getInputs(Map<Integer, TypeDef> typesById, Row entry) {
-    Map<TypeDef, String> result = new HashMap<>();
-    int index = 0;
-    for(Cell value : entry.getCells()) {
-      TypeDef type = typesById.get(index++);
-      if(type.getDirection() == Direction.IN) {
-        result.put(type, value.getValue());
-      }
-    }
-    return Collections.unmodifiableMap(result);
-  }
-
-  protected Map<TypeDef, Serializable> getOutputs(Map<Integer, TypeDef> typesById, Row entry) {
-    Map<TypeDef, Serializable> result = new HashMap<>();
-    int index = 0;
-    for(Cell value : entry.getCells()) {
-      TypeDef type = typesById.get(index++);
-      if(type.getDirection() == Direction.OUT) {
-        try {
-          result.put(type, type.toValue(value.getValue()));
-        } catch (Exception e) {
-          result.put(type, null);
-          errors.add("Error in output column type parsing: " + type.getName());
-        }
-      }
-    }
-    return Collections.unmodifiableMap(result);
-  }
-  
+  }  
   @Override
   public DecisionTableBuilder src(InputStream inputStream) {
     try {

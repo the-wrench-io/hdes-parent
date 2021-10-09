@@ -64,6 +64,9 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
 
   @Override
   public DecisionAstBuilderImpl src(List<AstCommand> src) {
+    if(src == null) {
+      return this;
+    }
     this.src = src;
     return this;
   }

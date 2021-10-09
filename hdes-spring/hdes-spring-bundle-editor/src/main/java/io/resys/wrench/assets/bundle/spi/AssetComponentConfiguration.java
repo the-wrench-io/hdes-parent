@@ -42,12 +42,12 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
 import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
 import io.resys.hdes.client.api.execution.ServiceProgram.ServiceInit;
-import io.resys.hdes.client.spi.HdesAstTypesImpl;
+import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
@@ -92,7 +92,6 @@ import io.resys.wrench.assets.flow.spi.executors.EmptyFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.EndFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.ExclusiveFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.MergeFlowTaskExecutor;
-import io.resys.wrench.assets.flow.spi.expressions.SpelExpressionFactory;
 import io.resys.wrench.assets.flow.spi.hints.DescAutocomplete;
 import io.resys.wrench.assets.flow.spi.hints.IdAutocomplete;
 import io.resys.wrench.assets.flow.spi.hints.input.InputAutocomplete;
@@ -125,7 +124,7 @@ public class AssetComponentConfiguration {
       AssetConfigBean assetConfigBean, ServiceStore origServiceStore) {
     
     final ClockRepository clockRepository = new SystemClockRepository();
-    final HdesAstTypes dataTypeRepository = new HdesAstTypesImpl(objectMapper);
+    final HdesClient dataTypeRepository = HdesClientImpl.builder().objectMapper(objectMapper).build();
     final DecisionTableRepository decisionTableRepository = decisionTableRepository(dataTypeRepository, objectMapper, origServiceStore);
     final FlowRepository flowRepository = flowRepository(dataTypeRepository, clockRepository, origServiceStore, objectMapper);
     final ScriptRepository scriptRepository = scriptRepository(objectMapper, dataTypeRepository, context);
@@ -180,19 +179,18 @@ public class AssetComponentConfiguration {
   }
   
   
-  private DecisionTableRepository decisionTableRepository(HdesAstTypes dataTypeRepository, ObjectMapper objectMapper, ServiceStore serviceStore) {
+  private DecisionTableRepository decisionTableRepository(HdesClient dataTypeRepository, ObjectMapper objectMapper, ServiceStore serviceStore) {
     NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper);
     return new GenericDecisionTableRepository(objectMapper, dataTypeRepository, expressionExecutor);
   }
 
 
   private FlowRepository flowRepository(
-      HdesAstTypes dataTypeRepository,
+      HdesClient dataTypeRepository,
       ClockRepository clockRepository,
       ServiceStore serviceStore, 
       ObjectMapper objectMapper) {
 
-    SpelExpressionFactory parser = new SpelExpressionFactory();
     ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
     List<AstFlowNodeVisitor> visitors = Arrays.asList(
@@ -231,11 +229,11 @@ public class AssetComponentConfiguration {
 
     FlowExecutorRepository executorRepository = new GenericFlowExecutorFactory(executors);  
     //FlowAstFactory nodeRepository = new GenericNodeRepository(mapper, new FlowDataTypeSupplier(serviceStore));
-    return new GenericFlowRepository(dataTypeRepository, executorRepository, parser, objectMapper, clockRepository.get());
+    return new GenericFlowRepository(dataTypeRepository, executorRepository, objectMapper, clockRepository.get());
   }
 
 
-  private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesAstTypes dataTypeRepository, ApplicationContext context) {
+  private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesClient dataTypeRepository, ApplicationContext context) {
     return new GenericScriptRepository(dataTypeRepository, objectMapper);
   }
 

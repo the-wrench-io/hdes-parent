@@ -119,7 +119,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
       return ImmutableAstService.builder()
           .name(beanType.getSimpleName())
           .headers(method)
-          .src(source)
+          .source(source)
           .rev(changes.getCommands().size())
           .commands(changes.getCommands())
           .type(beanType)

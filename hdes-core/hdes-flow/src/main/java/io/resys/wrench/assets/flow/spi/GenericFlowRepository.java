@@ -4,7 +4,7 @@ import java.time.Clock;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 
 /*-
@@ -30,25 +30,21 @@ import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.spi.builders.GenericFlowModelBuilder;
 import io.resys.wrench.assets.flow.spi.builders.GenericFlowModelExecutor;
-import io.resys.wrench.assets.flow.spi.expressions.ExpressionFactory;
 
 public class GenericFlowRepository implements FlowRepository {
 
-  private final ExpressionFactory parser;
   private final Clock clock;
   private final FlowExecutorRepository executorRepository;
-  private final HdesAstTypes dataTypeRepository;
+  private final HdesClient dataTypeRepository;
   private final ObjectMapper objectMapper;
 
   public GenericFlowRepository(
-      HdesAstTypes dataTypeRepository,
+      HdesClient dataTypeRepository,
       FlowExecutorRepository executorRepository,
-      ExpressionFactory parser,
       ObjectMapper objectMapper,
       Clock clock) {
     super();
     this.executorRepository = executorRepository;
-    this.parser = parser;
     this.dataTypeRepository = dataTypeRepository;
     this.objectMapper = objectMapper;
     this.clock = clock;
@@ -56,7 +52,7 @@ public class GenericFlowRepository implements FlowRepository {
 
   @Override
   public FlowModelBuilder createModel() {
-    return new GenericFlowModelBuilder(parser, dataTypeRepository, objectMapper);
+    return new GenericFlowModelBuilder(dataTypeRepository, objectMapper);
   }
   @Override
   public FlowModelExporter createExporter() {

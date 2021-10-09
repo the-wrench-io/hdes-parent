@@ -36,8 +36,8 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.execution.FlowProgram;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
 import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociationType;
@@ -119,7 +119,7 @@ public class FlowServiceDataModelBuilder {
     }
 
     return new ImmutableServiceDataModel(
-        id, flowModel.getId(), flowModel.getDescription(),
+        id, flowModel.getId(), flowModel.getAst().getDescription(),
         ServiceType.FLOW,
         flowModel.getClass(),
         errors.isEmpty() ? ServiceStatus.OK : ServiceStatus.ERROR,

@@ -26,10 +26,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
+import io.resys.hdes.client.api.ast.ImmutableAstFlowInputType;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstInputType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder;
@@ -56,7 +56,7 @@ public class FlowDataTypeSupplier implements Supplier<Collection<AstFlowInputTyp
       //(String name, String ref, String value)
       
       result.add(
-          ImmutableFlowAstInputType.builder()
+          ImmutableAstFlowInputType.builder()
           .name(valueType.name())
           .value(valueType.name())
           .build()
@@ -75,7 +75,7 @@ public class FlowDataTypeSupplier implements Supplier<Collection<AstFlowInputTyp
               .name(type.getName())
               .build();
           result.add(
-              ImmutableFlowAstInputType.builder()
+              ImmutableAstFlowInputType.builder()
               .name(ref.getValue())
               .ref(ref.getValue())
               .value(type.getValueType().name())

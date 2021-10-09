@@ -23,8 +23,8 @@ package io.resys.wrench.assets.script.spi;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.execution.ServiceProgram;
 import io.resys.wrench.assets.script.api.ServiceException;
 
@@ -59,8 +59,13 @@ public class ServiceTemplate implements ServiceProgram {
     return null;
   }
   @Override
-  public AstService getModel() {
+  public AstService getAst() {
     return model;
+  }
+
+  @Override
+  public String getId() {
+    return model.getName();
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

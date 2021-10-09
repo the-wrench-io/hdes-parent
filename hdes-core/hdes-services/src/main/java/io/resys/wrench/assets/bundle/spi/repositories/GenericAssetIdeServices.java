@@ -49,12 +49,12 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
-import io.resys.hdes.client.api.execution.FlowResult;
 import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.execution.FlowResult;
 import io.resys.hdes.client.api.execution.FlowResult.FlowContext;
 import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
-import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
 import io.resys.hdes.client.api.execution.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
@@ -376,10 +376,9 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createDtCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    AstDecision commandModel  = assetServiceRepository.getTypes().decision()
-        .src(command.getInput())
-        .rev(command.getRev())
-        .build();
+    AstDecision commandModel  = assetServiceRepository.getTypes().ast()
+        .commands((ArrayNode) command.getInput(), command.getRev())
+        .decision();
 
     JsonNode output = objectMapper.convertValue(commandModel, JsonNode.class);
     return output;
@@ -388,10 +387,9 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    AstFlow commandModel  = assetServiceRepository.getTypes().flow()
-        .src((ArrayNode) command.getInput())
-        .rev(command.getRev())
-        .build();
+    AstFlow commandModel  = assetServiceRepository.getTypes().ast()
+        .commands((ArrayNode) command.getInput(), command.getRev())
+        .flow();
 
     JsonNode output = objectMapper.convertValue(commandModel, JsonNode.class);
     return output;
@@ -405,7 +403,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
         .rev(command.getRev())
         .build();
 
-    JsonNode output = objectMapper.convertValue(commandModel.getModel(), JsonNode.class);
+    JsonNode output = objectMapper.convertValue(commandModel.getAst(), JsonNode.class);
     return output;
   }
 

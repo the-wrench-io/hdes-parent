@@ -105,7 +105,7 @@ public class ExpressionProgramFactory {
           throw new DecisionAstException("Unknown type: " + valueType + "!");
         }
 
-        return new ImmutableExpressionProgram(operation, valueType, Collections.unmodifiableList(constants));
+        return new ImmutableExpressionProgram(operation, valueType, Collections.unmodifiableList(constants), src);
       } catch (Exception e) {
         throw new DecisionAstException(e.getMessage(), e);
       }
@@ -114,31 +114,36 @@ public class ExpressionProgramFactory {
 
   private static class ImmutableExpressionProgram implements ExpressionProgram {
     private final Operation expression;
+    private final String src;
     private final ValueType type;
     private final List<String> constants;
 
-    public ImmutableExpressionProgram(Operation expression, ValueType type, List<String> constants) {
+    public ImmutableExpressionProgram(Operation expression, ValueType type, List<String> constants, String src) {
       super();
       this.expression = expression;
       this.type = type;
       this.constants = constants;
+      this.src = src;
+    }
+    @Override
+    public String getSrc() {
+      return src;
     }
     @Override
     public ValueType getType() {
       return type;
     }
-
     @Override
     public List<String> getConstants() {
       return constants;
     }
-
     @SuppressWarnings("unchecked")
     @Override
     public ExpressionResult run(Object entity) {
       return ImmutableExpressionResult.builder()
           .constants(constants)
           .value(expression.apply(entity))
+          .type(type)
           .build();
     }
   }

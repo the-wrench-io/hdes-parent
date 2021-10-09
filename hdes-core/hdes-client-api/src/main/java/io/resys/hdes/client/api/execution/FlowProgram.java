@@ -30,12 +30,11 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
-public interface FlowProgram extends Program {
-  String getId();
-  int getRev();
+public interface FlowProgram extends Program<AstFlow> {
   Collection<TypeDef> getAcceptDefs();
   Step getStep();
   Collection<Step> getSteps();

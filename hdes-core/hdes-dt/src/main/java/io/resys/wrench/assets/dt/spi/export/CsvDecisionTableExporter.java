@@ -23,15 +23,15 @@ package io.resys.wrench.assets.dt.spi.export;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+import io.resys.hdes.client.api.ast.AstDecision.Row;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.DecisionProgram.DecisionTableDataType;
-import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 
 public class CsvDecisionTableExporter extends TemplateDecisionTableExporter implements DecisionTableExporter {
@@ -41,35 +41,44 @@ public class CsvDecisionTableExporter extends TemplateDecisionTableExporter impl
     StringBuilder stringBuilder = new StringBuilder();
     List<TypeDef> headers = new ArrayList<>();
     List<String> headerNames = new ArrayList<>();
-    for(DecisionTableDataType dataType : dt.getTypes()) {
-      headers.add(dataType.getExpression());
-      headerNames.add(dataType.getExpression().getName());
+    
+    for(final var dataType : dt.getHeaders().getAcceptDefs()) {
+      headers.add(dataType);
+      headerNames.add(dataType.getName());
+    }    
+    for(final var dataType : dt.getHeaders().getReturnDefs()) {
+      headers.add(dataType);
+      headerNames.add(dataType.getName());
     }
 
     try {
       CSVPrinter csvPrinter = new CSVPrinter(stringBuilder, CSVFormat.DEFAULT.withDelimiter(';').withHeader(headerNames.toArray(new String[] {})));
-      print(csvPrinter, dt.getRows(), headerNames);
+      print(csvPrinter, dt.getRows().iterator(), headerNames);
       return stringBuilder.toString();
     } catch(IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
 
-  protected void print(CSVPrinter csvPrinter, Row node, List<String> headerNames) throws IOException {
-    if(node == null) {
+  protected void print(CSVPrinter csvPrinter, Iterator<Row> it, List<String> headerNames) throws IOException {
+    if(!it.hasNext()) {
       return;
     }
 
+    final var node = it.next();
     Map<String, Object> entries = new HashMap<>();
-    node.getAccepts().forEach(e -> entries.put(e.getKey().getName(), e.getExpression()));
-    node.getReturns().forEach(e -> entries.put(e.getKey().getName(), e.getValue()));
-
+    node.getCells().forEach(cell -> entries.put(cell.getHeader(), cell.getValue()));
+    
     List<Object> values = new ArrayList<>();
     for(String name : headerNames) {
       Object value = entries.get(name);
-      values.add(value);
+      if(value == null) {
+        values.add("");  
+      } else {
+        values.add(value);
+      }
     }
     csvPrinter.printRecord(values);
-    print(csvPrinter, node.getNext(), headerNames);
+    print(csvPrinter, it, headerNames);
   }
 }

@@ -26,14 +26,13 @@ import java.util.Set;
 
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
-import io.resys.hdes.client.spi.flow.ast.NodeFlowAdapter;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
@@ -61,7 +60,7 @@ public class PartialTaskInputsAutocomplete extends TemplateAutocomplete implemen
         continue;
       }
 
-      String taskServiceName = NodeFlowAdapter.getStringValue(taskModel.getRef().getRef());
+      String taskServiceName = AstFlowNodesFactory.getStringValue(taskModel.getRef().getRef());
       ServiceType serviceType = getServiceType(taskModel);
       if(serviceType == null || StringUtils.isEmpty(taskServiceName)) {
         continue;

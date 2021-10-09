@@ -37,6 +37,7 @@ import io.resys.hdes.client.api.execution.FlowResult;
 
 public interface HdesClient {
   AstBuilder ast();
+  HdesAstTypes astTypes();
   ProgramBuilder program();
   HdesStore store();
   ExecutorBuilder executor();
@@ -80,8 +81,11 @@ public interface HdesClient {
   
   interface AstBuilder {
     AstBuilder commands(ArrayNode src, Integer version);
+    AstBuilder commands(ArrayNode src);
     AstBuilder commands(List<AstCommand> src, Integer version);
+    AstBuilder commands(List<AstCommand> src);
     AstBuilder syntax(String src);
+
 
     AstFlow flow();
     AstDecision decision();

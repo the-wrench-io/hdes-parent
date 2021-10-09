@@ -24,14 +24,34 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
+import java.util.function.Supplier;
 
+import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstBody.Headers;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstAutocomplete;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstAutocomplete;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandRange;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.exceptions.FlowAstException;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 
 public class AstFlowNodesFactory {
 
+  public static HeadersBuilder headers(HdesClient types) {
+    return new HeadersBuilder(() -> types.astTypes().dataType());
+  }
+  public static HeadersBuilder headers(HdesTypeDefsFactory types) {
+    return new HeadersBuilder(() -> types.dataType());
+  }
   public static AcBuilder ac() {
     return new AcBuilder();
   }
@@ -126,4 +146,52 @@ public class AstFlowNodesFactory {
     }
 
   }
+  
+  public static String getStringValue(AstFlowNode node) {
+    if (node == null || node.getValue() == null) {
+      return null;
+    }
+    return node.getValue();
+  }
+
+  public static boolean getBooleanValue(AstFlowNode node) {
+    if (node == null || node.getValue() == null) {
+      return false;
+    }
+    return Boolean.parseBoolean(node.getValue());
+  }
+  
+  public static class HeadersBuilder {
+    private final Supplier<DataTypeAstBuilder> types;
+    public HeadersBuilder(Supplier<DataTypeAstBuilder> types) {
+      this.types = types;      
+    }
+    public Headers build(AstFlowRoot data) {
+      Map<String, AstFlowInputNode> inputs = data.getInputs();
+
+      int index = 0;
+      Collection<TypeDef> result = new ArrayList<>();
+      for (Map.Entry<String, AstFlowInputNode> entry : inputs.entrySet()) {
+        if (entry.getValue().getType() == null) {
+          continue;
+        }
+        try {
+          ValueType valueType = ValueType.valueOf(entry.getValue().getType().getValue());
+          boolean required = getBooleanValue(entry.getValue().getRequired());
+          result.add(this.types.get()
+              .id(entry.getValue().getStart() + "")
+              .order(index++)
+              .name(entry.getKey()).valueType(valueType).direction(Direction.IN).required(required)
+              .values(getStringValue(entry.getValue().getDebugValue()))
+              .build());
+          
+        } catch (Exception e) {
+          final String msg = String.format("Failed to convert data type from: %s, error: %s", entry.getValue().getType().getValue(), e.getMessage());
+          throw new FlowAstException(msg, e);
+        }
+      }
+      return ImmutableHeaders.builder().acceptDefs(result).build();
+    } 
+  }
+
 }

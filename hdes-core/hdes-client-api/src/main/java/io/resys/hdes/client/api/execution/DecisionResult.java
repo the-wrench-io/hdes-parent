@@ -24,7 +24,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstBody.Expression;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.execution.DecisionProgram.Row;
@@ -38,7 +37,7 @@ public interface DecisionResult extends Serializable {
     List<DecisionContext> getContext();
     Row getNode();
     boolean isMatch();
-    Map<String, Expression> getExpressions();
+    Map<String, String> getExpressions();
   }
   
   interface DecisionContext {
@@ -49,7 +48,7 @@ public interface DecisionResult extends Serializable {
   interface DecisionTableOutput extends Serializable {
     int getId();
     int getOrder();
-    Map<String, Expression> getExpressions();
+    Map<String, String> getExpressions();
     Map<String, Serializable> getValues();
   }
   

@@ -30,14 +30,14 @@ import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
+import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.TypeDef;
@@ -45,7 +45,6 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.execution.FlowProgram.Step;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
-import io.resys.hdes.client.spi.flow.ast.NodeFlowAdapter;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
@@ -56,9 +55,9 @@ import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
 public class FlowServiceDataModelValidator implements AstFlowNodeVisitor {
 
   private final ServiceStore serviceStore;
-  private final HdesAstTypes dataTypeRepository;
+  private final HdesClient dataTypeRepository;
 
-  public FlowServiceDataModelValidator(ServiceStore serviceStore, HdesAstTypes dataTypeRepository) {
+  public FlowServiceDataModelValidator(ServiceStore serviceStore, HdesClient dataTypeRepository) {
     this.serviceStore = serviceStore;
     this.dataTypeRepository = dataTypeRepository;
   }
@@ -66,7 +65,7 @@ public class FlowServiceDataModelValidator implements AstFlowNodeVisitor {
   @Override
   public void visit(AstFlowRoot node, ImmutableAstFlow.Builder modelBuilder) {
 
-    List<TypeDef> params = new ArrayList<>(NodeFlowAdapter.getInputs(node, dataTypeRepository));
+    List<TypeDef> params = new ArrayList<>(AstFlowNodesFactory.headers(dataTypeRepository).build(node).getAcceptDefs());
     Map<String, AstFlowInputNode> unusedInputs = new HashMap<>(node.getInputs());
     Map<String, TypeDef> allParams = createModelParameterMap(node, params);
 
@@ -88,7 +87,7 @@ public class FlowServiceDataModelValidator implements AstFlowNodeVisitor {
       }
 
       // no ref value
-      String taskServiceName = NodeFlowAdapter.getStringValue(taskModel.getRef().getRef());
+      String taskServiceName = AstFlowNodesFactory.getStringValue(taskModel.getRef().getRef());
       if(StringUtils.isEmpty(taskServiceName)) {
         modelBuilder.addMessages(
             error(
@@ -192,7 +191,7 @@ public class FlowServiceDataModelValidator implements AstFlowNodeVisitor {
     for(Map.Entry<String, AstFlowNode> entry : taskModel.getRef().getInputs().entrySet()) {
 
       AstFlowNode node = entry.getValue();
-      String mappingName = NodeFlowAdapter.getStringValue(node);
+      String mappingName = AstFlowNodesFactory.getStringValue(node);
       if(StringUtils.isEmpty(mappingName)) {
         modelBuilder.addMessages(
             error(
@@ -246,7 +245,7 @@ public class FlowServiceDataModelValidator implements AstFlowNodeVisitor {
       if(taskModel.getRef() == null) {
         continue;
       }
-      String taskServiceName = NodeFlowAdapter.getStringValue(taskModel.getRef().getRef());
+      String taskServiceName = AstFlowNodesFactory.getStringValue(taskModel.getRef().getRef());
       ServiceType serviceType = getServiceType(taskModel);
       if(serviceType == null || StringUtils.isEmpty(taskServiceName)) {
         continue;
@@ -257,7 +256,7 @@ public class FlowServiceDataModelValidator implements AstFlowNodeVisitor {
       }
       for(TypeDef param : service.getDataModel().getParams()) {
         if(param.getDirection() == Direction.OUT) {
-          String name = NodeFlowAdapter.getStringValue(taskModel.getId()) + "." + param.getName();
+          String name = AstFlowNodesFactory.getStringValue(taskModel.getId()) + "." + param.getName();
           Assert.isTrue(!result.containsKey(name), "Can't have duplicate param: " + name + "!");
           result.put(name, param);
         }

@@ -96,7 +96,7 @@ public class CommandMapper {
   }
 
   public static class Builder {
-    private final HdesTypeDefsFactory dataTypeFactory; 
+    private final HdesTypeDefsFactory typeDefs; 
     private long idGen = 0;
     private String name;
     private String description;
@@ -109,7 +109,7 @@ public class CommandMapper {
 
     public Builder(HdesTypeDefsFactory dataTypeFactory) {
       super();
-      this.dataTypeFactory = dataTypeFactory;
+      this.typeDefs = dataTypeFactory;
     }
     
     private String nextId() {
@@ -187,7 +187,7 @@ public class CommandMapper {
         .forEach(cell -> {
 
           try {
-            ExpressionProgram expression = dataTypeFactory.expression(valueType, cell.getValue());
+            ExpressionProgram expression = typeDefs.expression(valueType, cell.getValue());
             if(expression.getConstants().size() == 1) {
               cell.setValue(expression.getConstants().get(0));
             }
@@ -203,7 +203,7 @@ public class CommandMapper {
     private String getExpression(ValueType valueType, ColumnExpressionType value, String columnValue) {
       String constant;
       try {
-        ExpressionProgram expression = dataTypeFactory.expression(valueType, columnValue);
+        ExpressionProgram expression = typeDefs.expression(valueType, columnValue);
         if(expression.getConstants().size() != 1) {
           return null;
         }
@@ -380,7 +380,7 @@ public class CommandMapper {
       }
       
       try {
-        return dataTypeFactory.expression(ValueType.MAP, header.getScript()).run(context) + "";
+        return typeDefs.expression(ValueType.MAP, header.getScript()).run(context) + "";
       } catch(Exception e) {
         return null;
       }
@@ -392,7 +392,7 @@ public class CommandMapper {
       .forEach(h -> h.getCells().forEach(c -> c.setValue(resolveScriptValue(h, c))));
       
       List<TypeDef> headers = this.headers.values().stream().sorted()
-          .map(h -> (TypeDef) dataTypeFactory.dataType()
+          .map(h -> (TypeDef) typeDefs.dataType()
               .direction(h.getDirection())
               .name(h.getName())
               .valueType(h.getValue())
@@ -416,8 +416,10 @@ public class CommandMapper {
             .build()
           )
           .collect(Collectors.toList());
+      
+      final HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
+      final var source = new DecisionAstSourceBuilder().build(headers, rows, name, description, hitPolicy);
 
-      HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
       return ImmutableAstDecision.builder()
           .name(name)
           .description(description)
@@ -430,6 +432,7 @@ public class CommandMapper {
               .returnDefs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
               .build())
           .rows(rows)
+          .source(typeDefs.commands(source))
           .build();
     }
   }

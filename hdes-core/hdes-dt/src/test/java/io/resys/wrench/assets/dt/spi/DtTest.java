@@ -23,6 +23,7 @@ package io.resys.wrench.assets.dt.spi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -31,8 +32,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 
 import io.resys.hdes.client.api.execution.DecisionProgram;
-import io.resys.hdes.client.api.execution.DecisionResult;
 import io.resys.hdes.client.api.execution.DecisionProgram.Row;
+import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.spi.util.DateParser;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
@@ -49,19 +51,13 @@ public class DtTest {
 
     DecisionProgram decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
-    Row node = decisionTable.getRows();
-    Assert.assertEquals(0, node.getId());
-    Assert.assertEquals(null, node.getPrevious());
-
-    Assert.assertEquals(1, node.getNext().getId());
-    Assert.assertEquals(node, node.getNext().getPrevious());
-
-    Assert.assertEquals(2, node.getNext().getNext().getId());
-    Assert.assertEquals(3, node.getNext().getNext().getNext().getId());
-    Assert.assertEquals(4, node.getNext().getNext().getNext().getNext().getId());
-
-    Assert.assertEquals(3, node.getNext().getNext().getNext().getNext().getPrevious().getId());
-    Assert.assertEquals(null, node.getNext().getNext().getNext().getNext().getNext());
+    List<Row> rows = decisionTable.getRows();
+    Assert.assertEquals(0, rows.get(0).getOrder());
+    Assert.assertEquals(1, rows.get(1).getOrder());
+    Assert.assertEquals(2, rows.get(2).getOrder());
+    Assert.assertEquals(3, rows.get(3).getOrder());
+    Assert.assertEquals(4, rows.get(4).getOrder());
+    Assert.assertEquals(5, rows.size());
   }
 
   @Test
@@ -74,7 +70,7 @@ public class DtTest {
     values.put("sriBoolean", false);
     values.put("risk", "CAREFUL");
     values.put("sri", 1);
-    values.put("sriDate", ValueBuilder.parseLocalDate("2017-07-03"));
+    values.put("sriDate", DateParser.parseLocalDate("2017-07-03"));
 
 // Match 1
 //   {
@@ -119,8 +115,8 @@ public class DtTest {
         execute();
 
     Assert.assertEquals(2, result.getMatches().size());
-    Assert.assertEquals(0, result.getMatches().get(0).getNode().getId());
-    Assert.assertEquals(2, result.getMatches().get(1).getNode().getId());
+    Assert.assertEquals(0, result.getMatches().get(0).getNode().getOrder());
+    Assert.assertEquals(2, result.getMatches().get(1).getNode().getOrder());
   }
 
   @Test

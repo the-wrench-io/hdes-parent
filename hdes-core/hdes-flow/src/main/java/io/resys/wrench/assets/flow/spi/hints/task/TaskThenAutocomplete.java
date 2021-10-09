@@ -24,13 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
-import io.resys.hdes.client.spi.flow.ast.NodeFlowAdapter;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 
 public class TaskThenAutocomplete implements AstFlowNodeVisitor {
@@ -43,13 +42,13 @@ public class TaskThenAutocomplete implements AstFlowNodeVisitor {
       return;
     }
 
-    List<String> ref = tasks.values().stream().map(t -> NodeFlowAdapter.getStringValue(t.getId()))
+    List<String> ref = tasks.values().stream().map(t -> AstFlowNodesFactory.getStringValue(t.getId()))
         .filter(t -> t != null).collect(Collectors.toList());
     ref.add(NodeFlowBean.VALUE_END);
 
     for(AstFlowTaskNode task : tasks.values()) {
 
-      String taskId = NodeFlowAdapter.getStringValue(task.getId());
+      String taskId = AstFlowNodesFactory.getStringValue(task.getId());
       final FlowAstCommandRange range;
 
       if(task.getThen() == null) {

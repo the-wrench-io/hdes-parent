@@ -22,6 +22,9 @@ package io.resys.hdes.client.api.execution;
 
 import java.io.Serializable;
 
-public interface Program extends Serializable {
+import io.resys.hdes.client.api.ast.AstBody;
 
+public interface Program<A extends AstBody> extends Serializable {
+  String getId();
+  A getAst();
 }

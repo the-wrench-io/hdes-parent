@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.dt.spi;
+package io.resys.hdes.client.spi.util;
 
 /*-
  * #%L
@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class ValueBuilder {
+public class DateParser {
 
   public static LocalDateTime parseLocalDateTime(String date) {
     try {

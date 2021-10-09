@@ -24,7 +24,6 @@ import java.util.List;
 
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstBody.Expression;
 import io.resys.hdes.client.api.execution.DecisionProgram.Row;
 import io.resys.hdes.client.api.execution.DecisionResult.DecisionContext;
 import io.resys.hdes.client.api.execution.DecisionResult.DecisionExpression;
@@ -35,10 +34,10 @@ public class ImmutableDecisionTableDecision implements DecisionExpression {
 
   private final List<DecisionContext> context;
   private final Row node;
-  private final Map<String, Expression> expressions;
+  private final Map<String, String> expressions;
   private final boolean match;
 
-  public ImmutableDecisionTableDecision(List<DecisionContext> data, Row node, boolean match, Map<String, Expression> expressions) {
+  public ImmutableDecisionTableDecision(List<DecisionContext> data, Row node, boolean match, Map<String, String> expressions) {
     super();
     this.context = data;
     this.node = node;
@@ -56,7 +55,7 @@ public class ImmutableDecisionTableDecision implements DecisionExpression {
     return context;
   }
   @Override
-  public Map<String, Expression> getExpressions() {
+  public Map<String, String> getExpressions() {
     return expressions;
   }
   @Override

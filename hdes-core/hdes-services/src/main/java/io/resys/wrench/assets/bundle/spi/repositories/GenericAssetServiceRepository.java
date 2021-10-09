@@ -34,7 +34,7 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.execution.DecisionResult.DecisionTableOutput;
 import io.resys.hdes.client.api.execution.FlowResult;
@@ -59,10 +59,10 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   private final ScriptRepository scriptRepository;
   private final ServiceStore serviceStore;
   private final ObjectMapper objectMapper;
-  private final HdesAstTypes types;
+  private final HdesClient types;
 
   public GenericAssetServiceRepository(
-      HdesAstTypes types,
+      HdesClient types,
       ObjectMapper objectMapper,
       DecisionTableRepository decisionTableRepository,
       FlowRepository flowRepository,
@@ -245,7 +245,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   }
 
   @Override
-  public HdesAstTypes getTypes() {
+  public HdesClient getTypes() {
     return types;
   }
 }

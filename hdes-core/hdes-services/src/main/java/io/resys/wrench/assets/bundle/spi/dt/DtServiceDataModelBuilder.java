@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.execution.DecisionProgram;
@@ -37,11 +36,14 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 public class DtServiceDataModelBuilder {
 
   public ServiceDataModel build(String id, DecisionProgram dt) {
-    List<TypeDef> params = dt.getTypes().stream().map(h -> h.getExpression()).collect(Collectors.toList());
+    List<TypeDef> params = new ArrayList<>();
+    params.addAll(dt.getAst().getHeaders().getAcceptDefs());
+    params.addAll(dt.getAst().getHeaders().getReturnDefs());
+    
     List<ServiceError> errors = new ArrayList<>();
 
     return new ImmutableServiceDataModel(
-        id, dt.getId(), dt.getDescription(),
+        id, dt.getId(), dt.getAst().getDescription(),
         ServiceType.DT,
         dt.getClass(),
         errors.isEmpty() ? ServiceStatus.OK : ServiceStatus.ERROR,

@@ -82,9 +82,9 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
 
     return ImmutableServiceBuilder.newFlow()
         .setId(serviceId)
-        .setRev(model.getRev() + "")
+        .setRev(model.getAst().getRev() + "")
         .setName(model.getId())
-        .setDescription(model.getDescription())
+        .setDescription(model.getAst().getDescription())
         .setSrc(commandsAndModel.getKey())
         .setPointer(pointer)
         .setModel(dataModel)
