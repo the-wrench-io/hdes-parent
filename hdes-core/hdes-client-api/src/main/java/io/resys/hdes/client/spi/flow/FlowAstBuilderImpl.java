@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes.FlowAstBuilder;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
 import io.resys.hdes.client.api.ast.AstChangeset;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
@@ -147,6 +148,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
     AstFlowNode id = flow.getId();
     
     return ast
+        .bodyType(EntityType.FLOW)
         .messages(messages)
         .name(id == null ? "": id.getValue())
         .rev(this.rev == null ? src.size() : this.rev)

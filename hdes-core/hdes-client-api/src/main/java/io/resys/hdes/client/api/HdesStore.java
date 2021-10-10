@@ -29,8 +29,9 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstBody;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
@@ -102,10 +103,6 @@ public interface HdesStore {
     String getValue();
     EntityType getType();
     T getBody();
-  }
-  
-  enum EntityType { 
-    FLOW, FLOW_TASK, DT, TAG, DATA_TYPE 
   }
   
   @JsonSerialize(as = ImmutableStoreExceptionMsg.class)

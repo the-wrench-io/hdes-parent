@@ -34,7 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.ast.AstCommand;
@@ -285,6 +287,30 @@ public class HdesTypeDefsFactory {
     try {
       return objectMapper.writeValueAsString(commands);
     } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+  
+  public ArrayNode commands(String commands) {
+    try {
+      return (ArrayNode) objectMapper.readTree(commands);
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+  
+  public Map<String, Object> toMap(Object entity) {
+    try {
+      return objectMapper.convertValue(entity, Map.class);
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+  
+  public Map<String, Object> toMap(JsonNode entity) {
+    try {
+      return objectMapper.convertValue(entity, Map.class);
+    } catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }

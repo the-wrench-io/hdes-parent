@@ -23,6 +23,8 @@ package io.resys.hdes.client.api.programs;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.client.api.ast.AstDecision;
@@ -39,16 +41,36 @@ public interface DecisionProgram extends Program<AstDecision> {
     List<DecisionRowAccepts> getAccepts();
     List<DecisionRowReturns> getReturns();
   }
-
   @Value.Immutable
   interface DecisionRowAccepts extends Serializable {
     TypeDef getKey();
     ExpressionProgram getExpression();
   }
-  
   @Value.Immutable
   interface DecisionRowReturns extends Serializable {
     TypeDef getKey();
     Serializable getValue();
+  }
+  
+  
+  @Value.Immutable
+  interface DecisionResult extends ProgramResult {
+    List<DecisionLog> getRejections();
+    List<DecisionLog> getMatches();
+  }
+  @Value.Immutable
+  interface DecisionLog extends Serializable {
+    Boolean getMatch();
+    Integer getOrder();
+    List<DecisionLogEntry> getAccepts();
+    List<DecisionLogEntry> getReturns();
+  }
+  @Value.Immutable
+  interface DecisionLogEntry extends Serializable {
+    Boolean getMatch();
+    TypeDef getHeaderType();
+    String getExpression();
+    @Nullable
+    Serializable getUsedValue();
   }
 }

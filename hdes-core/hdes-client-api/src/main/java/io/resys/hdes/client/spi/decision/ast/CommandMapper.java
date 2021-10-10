@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
 import io.resys.hdes.client.api.ast.AstDecision.ColumnExpressionType;
@@ -422,6 +423,7 @@ public class CommandMapper {
 
       return ImmutableAstDecision.builder()
           .name(name)
+          .bodyType(EntityType.DT)
           .description(description)
           .rev(version)
           .hitPolicy(hitPolicy)

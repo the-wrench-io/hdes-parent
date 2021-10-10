@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesAstTypes.ServiceAstBuilder;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
 import io.resys.hdes.client.api.ast.AstBody.Headers;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
@@ -117,6 +118,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
       final Headers method = getHeaders(beanType);
       
       return ImmutableAstService.builder()
+          .bodyType(EntityType.FLOW_TASK)
           .name(beanType.getSimpleName())
           .headers(method)
           .source(source)

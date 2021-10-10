@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.ast.AstCommand;
@@ -31,7 +32,7 @@ import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.programs.DecisionProgram;
-import io.resys.hdes.client.api.programs.DecisionResult;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowResult;
 import io.resys.hdes.client.api.programs.ServiceResult;
@@ -64,8 +65,9 @@ public interface HdesClient {
   }
   
   interface ExecutorBuilder {
-    ExecutorBuilder withMap(Map<String, Object> input);
-    ExecutorBuilder withEntity(Object inputObject);
+    ExecutorBuilder inputMap(Map<String, Object> input);
+    ExecutorBuilder inputEntity(Object inputObject);
+    ExecutorBuilder inputJson(JsonNode json);
     
     // From model or by Id
     FlowExecutor flow(String modelId);
@@ -83,6 +85,7 @@ public interface HdesClient {
   interface AstBuilder {
     AstBuilder commands(ArrayNode src, Integer version);
     AstBuilder commands(ArrayNode src);
+    AstBuilder commands(String src);
     AstBuilder commands(List<AstCommand> src, Integer version);
     AstBuilder commands(List<AstCommand> src);
     AstBuilder syntax(String src);

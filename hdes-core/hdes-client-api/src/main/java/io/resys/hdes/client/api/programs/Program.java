@@ -23,13 +23,20 @@ package io.resys.hdes.client.api.programs;
 import java.io.Serializable;
 
 import io.resys.hdes.client.api.ast.AstBody;
+import io.resys.hdes.client.api.ast.TypeDef;
 
 public interface Program<A extends AstBody> extends Serializable {
   String getId();
   A getAst();
   
-  
   interface ProgramResult extends Serializable {
     
+  }
+  
+  interface ProgramContext {
+    Serializable getValue(TypeDef typeDef);
+    FlowProgram getFlowProgram(String name);
+    DecisionProgram getDecisionProgram(String name);
+    ServiceProgram getServiceProgram(String name);
   }
 }

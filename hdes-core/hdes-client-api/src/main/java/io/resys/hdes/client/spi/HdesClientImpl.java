@@ -1,5 +1,7 @@
 package io.resys.hdes.client.spi;
 
+import java.io.Serializable;
+
 /*-
  * #%L
  * hdes-client-api
@@ -21,7 +23,9 @@ package io.resys.hdes.client.spi;
  */
 
 import java.util.List;
+import java.util.Map;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -33,8 +37,10 @@ import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
+import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
@@ -68,6 +74,11 @@ public class HdesClientImpl implements HdesClient {
       @Override
       public AstDecision decision() {
         return ast.decision().src(json).src(commands).rev(version).build();
+      }
+      @Override
+      public AstBuilder commands(String src) {
+        this.json = types.commands(src);
+        return this;
       }
       @Override
       public AstBuilder syntax(String syntax) {
@@ -113,11 +124,68 @@ public class HdesClientImpl implements HdesClient {
       }
     };
   }
-
   @Override
   public ExecutorBuilder executor() {
-    // TODO Auto-generated method stub
-    return null;
+    return new ExecutorBuilder() {
+      final ImmutableProgramContext.Builder data = ImmutableProgramContext.builder(types);
+      @Override
+      public ExecutorBuilder inputMap(Map<String, Object> input) {
+        this.data.map(input);
+        return this;
+      }
+      @Override
+      public ExecutorBuilder inputEntity(Object inputObject) {
+        this.data.entity(inputObject);
+        return this;
+      }
+      @Override
+      public ExecutorBuilder inputJson(JsonNode inputObject) {
+        this.data.entity(inputObject);
+        return this;
+      }
+      @Override
+      public ServiceExecutor service(AstService model) {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      @Override
+      public ServiceExecutor service(String modelId) {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      @Override
+      public FlowExecutor flow(FlowProgram model) {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      @Override
+      public FlowExecutor flow(String modelId) {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      @Override
+      public DecisionExecutor decision(DecisionProgram program) {
+        return new DecisionExecutor() {
+          @Override
+          public DecisionResult andGetBody() {
+            return DecisionProgramExecutor.run(program, data.build());
+          }
+          @Override
+          public Map<String, Serializable> andGet() {
+            return DecisionProgramExecutor.get(andGetBody());
+          }
+          @Override
+          public List<Map<String, Serializable>> andFind() {
+            return DecisionProgramExecutor.find(andGetBody());
+          }
+        };
+      }
+      @Override
+      public DecisionExecutor decision(String modelId) {
+        // TODO Auto-generated method stub
+        return null;
+      }
+    };
   }
 
   

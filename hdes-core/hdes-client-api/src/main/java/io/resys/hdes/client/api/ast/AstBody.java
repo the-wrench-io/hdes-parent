@@ -38,15 +38,15 @@ public interface AstBody extends Serializable {
 
   List<AstCommand> getCommands();
   Headers getHeaders();
-  
+  EntityType getBodyType();
   
   @Value.Immutable
   interface Headers extends Serializable {
     List<TypeDef> getAcceptDefs();
     List<TypeDef> getReturnDefs();
   }
-  
-  interface Expression {
-    String getSrc();
+
+  enum EntityType { 
+    FLOW, FLOW_TASK, DT, TAG, DATA_TYPE 
   }
 }

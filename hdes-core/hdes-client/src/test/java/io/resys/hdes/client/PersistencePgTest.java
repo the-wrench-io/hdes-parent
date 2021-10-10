@@ -25,9 +25,9 @@ import java.time.Duration;
 import org.junit.jupiter.api.Assertions;
 
 import io.resys.hdes.client.api.HdesStore.Entity;
-import io.resys.hdes.client.api.HdesStore.EntityType;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
 import io.resys.hdes.client.api.ImmutableUpdateAstType;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
