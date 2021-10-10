@@ -22,6 +22,9 @@ package io.resys.hdes.client.api.programs;
 
 import java.io.Serializable;
 
-public interface ServiceResult extends Serializable {
+import io.resys.hdes.client.api.programs.Program.ProgramResult;
 
+public interface ServiceResult extends ProgramResult {
+
+  Serializable getValue();
 }

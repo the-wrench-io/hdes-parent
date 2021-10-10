@@ -37,13 +37,13 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
 import io.resys.hdes.client.api.ast.AstDecision.ColumnExpressionType;
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
-import io.resys.hdes.client.api.ast.AstDecision.Row;
 import io.resys.hdes.client.api.ast.ImmutableAstDecision;
-import io.resys.hdes.client.api.ast.ImmutableCell;
+import io.resys.hdes.client.api.ast.ImmutableAstDecisionCell;
+import io.resys.hdes.client.api.ast.ImmutableAstDecisionRow;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
-import io.resys.hdes.client.api.ast.ImmutableRow;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
@@ -403,14 +403,14 @@ public class CommandMapper {
           .collect(Collectors.toList());
 
       
-      List<Row> rows = this.rows.values().stream().sorted()
-          .map(r -> ImmutableRow.builder()
+      List<AstDecisionRow> rows = this.rows.values().stream().sorted()
+          .map(r -> ImmutableAstDecisionRow.builder()
             .id(r.getId())
             .order(r.getOrder())
             .cells(this.headers.values().stream().sorted()
                 .map(h -> {
                   MutableCell c = h.getRowCell(r.getId());
-                  return ImmutableCell.builder().id(c.getId()).value(c.getValue()).header(h.getId()).build();
+                  return ImmutableAstDecisionCell.builder().id(c.getId()).value(c.getValue()).header(h.getId()).build();
                 })
                 .collect(Collectors.toList()))
             .build()

@@ -26,30 +26,28 @@ import java.util.List;
 import org.immutables.value.Value;
 
 import io.resys.hdes.client.api.ast.AstDecision;
-import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
 public interface DecisionProgram extends Program<AstDecision> {
-  HitPolicy getHitPolicy();
-  List<Row> getRows();
+  List<DecisionRow> getRows();
 
   @Value.Immutable
-  interface Row extends Serializable {
+  interface DecisionRow extends Serializable {
     int getOrder();
     
-    List<RowAccepts> getAccepts();
-    List<RowReturns> getReturns();
+    List<DecisionRowAccepts> getAccepts();
+    List<DecisionRowReturns> getReturns();
   }
 
   @Value.Immutable
-  interface RowAccepts extends Serializable {
+  interface DecisionRowAccepts extends Serializable {
     TypeDef getKey();
     ExpressionProgram getExpression();
   }
   
   @Value.Immutable
-  interface RowReturns extends Serializable {
+  interface DecisionRowReturns extends Serializable {
     TypeDef getKey();
     Serializable getValue();
   }

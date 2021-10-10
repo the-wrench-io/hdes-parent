@@ -31,7 +31,7 @@ public class DelegateHitPolicyExecutor implements HitPolicyExecutor {
   private HitPolicyExecutor delgate;
 
   public DelegateHitPolicyExecutor(DecisionProgram decisionTable) {
-    HitPolicy hitPolicy = decisionTable.getHitPolicy() == null ? HitPolicy.ALL : decisionTable.getHitPolicy();
+    HitPolicy hitPolicy = decisionTable.getAst().getHitPolicy();
 
     switch(hitPolicy) {
     case FIRST:

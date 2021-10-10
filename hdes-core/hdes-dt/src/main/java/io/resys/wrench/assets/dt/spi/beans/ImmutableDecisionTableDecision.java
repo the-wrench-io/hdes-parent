@@ -24,7 +24,7 @@ import java.util.List;
 
 import java.util.Map;
 
-import io.resys.hdes.client.api.programs.DecisionProgram.Row;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRow;
 import io.resys.hdes.client.api.programs.DecisionResult.DecisionContext;
 import io.resys.hdes.client.api.programs.DecisionResult.DecisionExpression;
 
@@ -33,11 +33,11 @@ public class ImmutableDecisionTableDecision implements DecisionExpression {
   private static final long serialVersionUID = 3977249182024873157L;
 
   private final List<DecisionContext> context;
-  private final Row node;
+  private final DecisionRow node;
   private final Map<String, String> expressions;
   private final boolean match;
 
-  public ImmutableDecisionTableDecision(List<DecisionContext> data, Row node, boolean match, Map<String, String> expressions) {
+  public ImmutableDecisionTableDecision(List<DecisionContext> data, DecisionRow node, boolean match, Map<String, String> expressions) {
     super();
     this.context = data;
     this.node = node;
@@ -59,7 +59,7 @@ public class ImmutableDecisionTableDecision implements DecisionExpression {
     return expressions;
   }
   @Override
-  public Row getNode() {
+  public DecisionRow getNode() {
     return node;
   }
 }

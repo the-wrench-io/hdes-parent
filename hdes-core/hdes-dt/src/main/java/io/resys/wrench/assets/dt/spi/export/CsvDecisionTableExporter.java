@@ -30,7 +30,7 @@ import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
-import io.resys.hdes.client.api.ast.AstDecision.Row;
+import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 
@@ -60,7 +60,7 @@ public class CsvDecisionTableExporter extends TemplateDecisionTableExporter impl
     }
   }
 
-  protected void print(CSVPrinter csvPrinter, Iterator<Row> it, List<String> headerNames) throws IOException {
+  protected void print(CSVPrinter csvPrinter, Iterator<AstDecisionRow> it, List<String> headerNames) throws IOException {
     if(!it.hasNext()) {
       return;
     }

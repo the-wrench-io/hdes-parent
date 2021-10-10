@@ -28,10 +28,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.Program.ProgramResult;
 
 
 
-public interface FlowResult extends Serializable {
+public interface FlowResult extends ProgramResult {
   String getId();
   FlowProgram getModel();
   FlowContext getContext();

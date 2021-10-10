@@ -27,9 +27,10 @@ import javax.annotation.Nullable;
 import org.immutables.value.Value;
 
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.programs.Program.ProgramResult;
 
 @Value.Immutable
-public interface ExpressionResult {
+public interface ExpressionResult extends ProgramResult {
   ValueType getType();
   List<String> getConstants();
   

@@ -34,6 +34,7 @@ import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.ServiceResult;
 
 public interface HdesClient {
   AstBuilder ast();
@@ -59,7 +60,7 @@ public interface HdesClient {
   }
 
   interface ServiceExecutor {
-    Serializable andGetBody();
+    ServiceResult andGetBody();
   }
   
   interface ExecutorBuilder {

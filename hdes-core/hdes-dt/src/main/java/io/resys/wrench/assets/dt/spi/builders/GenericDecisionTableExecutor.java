@@ -32,8 +32,8 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionResult;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
-import io.resys.hdes.client.api.programs.DecisionProgram.Row;
-import io.resys.hdes.client.api.programs.DecisionProgram.RowAccepts;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRow;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRowAccepts;
 import io.resys.hdes.client.api.programs.DecisionResult.DecisionContext;
 import io.resys.hdes.client.api.programs.DecisionResult.DecisionExpression;
 import io.resys.hdes.client.api.programs.DecisionResult.HitPolicyExecutor;
@@ -75,7 +75,7 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
     HdesAssert.notNull(context, () -> "context can't be null!");
 
     List<DecisionExpression> decisions = new ArrayList<>();
-    Iterator<Row> it = decisionTable.getRows().iterator();
+    Iterator<DecisionRow> it = decisionTable.getRows().iterator();
     HitPolicyExecutor hitPolicy = new DelegateHitPolicyExecutor(decisionTable);
     while(it.hasNext()) {
       final var node = it.next();
@@ -89,13 +89,13 @@ public class GenericDecisionTableExecutor implements DecisionTableExecutor {
     return new ImmutableDecisionTableResult(Collections.unmodifiableList(decisions));
   }
 
-  protected DecisionExpression execute(Row node) {
+  protected DecisionExpression execute(DecisionRow node) {
     Boolean match = null;
     
     List<DecisionContext> data = new ArrayList<>();
     
     Map<String, String> expressions = new HashMap<>();
-    for(RowAccepts input : node.getAccepts()) {
+    for(DecisionRowAccepts input : node.getAccepts()) {
       Object contextEntity = this.context.apply(input.getKey());
       if(DecisionTableFixedValue.ALWAYS_TRUE == contextEntity) {
         ExpressionProgram expression = input.getExpression();

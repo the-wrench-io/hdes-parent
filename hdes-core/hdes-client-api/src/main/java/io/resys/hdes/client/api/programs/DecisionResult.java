@@ -26,16 +26,17 @@ import java.util.Map;
 
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.programs.DecisionProgram.Row;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRow;
+import io.resys.hdes.client.api.programs.Program.ProgramResult;
 
-public interface DecisionResult extends Serializable {
+public interface DecisionResult extends ProgramResult {
   List<DecisionExpression> getRejections();
   List<DecisionExpression> getMatches();
   List<DecisionTableOutput> getOutputs();
 
   interface DecisionExpression extends Serializable {
     List<DecisionContext> getContext();
-    Row getNode();
+    DecisionRow getNode();
     boolean isMatch();
     Map<String, String> getExpressions();
   }

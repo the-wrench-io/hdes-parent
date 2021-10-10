@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.programs.DecisionResult;
-import io.resys.hdes.client.api.programs.DecisionProgram.RowReturns;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRowReturns;
 
 public class ImmutableDecisionTableResult implements DecisionResult {
 
@@ -61,7 +61,7 @@ public class ImmutableDecisionTableResult implements DecisionResult {
 
   protected Map<String, Serializable> toValues(DecisionExpression decision) {
     Map<String, Serializable> result = new HashMap<>();
-    for(RowReturns entry : decision.getNode().getReturns()) {
+    for(DecisionRowReturns entry : decision.getNode().getReturns()) {
       result.put(entry.getKey().getName(), entry.getValue());
     }
     return result;

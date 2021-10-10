@@ -36,17 +36,17 @@ public interface AstDecision extends AstBody, Serializable {
   List<String> getHeaderTypes();
   Map<ValueType, List<String>> getHeaderExpressions();
   HitPolicy getHitPolicy();
-  List<Row> getRows();
+  List<AstDecisionRow> getRows();
 
   @Value.Immutable
-  interface Row extends Serializable {
+  interface AstDecisionRow extends Serializable {
     String getId();
     int getOrder();
-    List<Cell> getCells();
+    List<AstDecisionCell> getCells();
   }
 
   @Value.Immutable
-  interface Cell extends Serializable {
+  interface AstDecisionCell extends Serializable {
     String getId();
     String getHeader();
     @Nullable    

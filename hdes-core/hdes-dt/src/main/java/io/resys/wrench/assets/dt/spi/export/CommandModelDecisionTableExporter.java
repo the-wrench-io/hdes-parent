@@ -31,8 +31,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstDecision.Cell;
-import io.resys.hdes.client.api.ast.AstDecision.Row;
+import io.resys.hdes.client.api.ast.AstDecision.AstDecisionCell;
+import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
@@ -70,7 +70,7 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
     return result;
   }
 
-  private void createRow(List<TypeDef> headers, int rows, Iterator<Row> it, List<AstCommand> result) {
+  private void createRow(List<TypeDef> headers, int rows, Iterator<AstDecisionRow> it, List<AstCommand> result) {
     if(!it.hasNext()) {
       return;
     }
@@ -78,10 +78,10 @@ public class CommandModelDecisionTableExporter extends TemplateDecisionTableExpo
     result.add(ImmutableAstCommand.builder().type(AstCommandValue.ADD_ROW).build());
 
     final var node = it.next();
-    Map<String, Cell> entries = node.getCells().stream().collect(Collectors.toMap(e -> e.getHeader(), e -> e));
+    Map<String, AstDecisionCell> entries = node.getCells().stream().collect(Collectors.toMap(e -> e.getHeader(), e -> e));
 
     for(TypeDef header : headers) {
-      Cell value = entries.get(header.getName());
+      AstDecisionCell value = entries.get(header.getName());
       result.add(ImmutableAstCommand.builder()
           .id(String.valueOf(nextId++))
           .value(value == null ? null : value.getValue())

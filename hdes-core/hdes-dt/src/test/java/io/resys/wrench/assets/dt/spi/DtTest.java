@@ -33,7 +33,7 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionResult;
-import io.resys.hdes.client.api.programs.DecisionProgram.Row;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRow;
 import io.resys.hdes.client.spi.util.DateParser;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
@@ -51,7 +51,7 @@ public class DtTest {
 
     DecisionProgram decisionTable = decisionTableRepository.createBuilder().format(DecisionTableFormat.JSON).src(stream).build();
 
-    List<Row> rows = decisionTable.getRows();
+    List<DecisionRow> rows = decisionTable.getRows();
     Assert.assertEquals(0, rows.get(0).getOrder());
     Assert.assertEquals(1, rows.get(1).getOrder());
     Assert.assertEquals(2, rows.get(2).getOrder());
