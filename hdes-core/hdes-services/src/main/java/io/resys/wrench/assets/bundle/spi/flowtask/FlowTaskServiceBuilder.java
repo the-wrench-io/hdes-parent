@@ -28,8 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.execution.ServiceProgram;
-import io.resys.hdes.client.api.execution.ServiceProgram.ServiceInit;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;

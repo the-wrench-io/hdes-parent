@@ -45,7 +45,7 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.ast.TypeDef.ValueTypeResolver;
-import io.resys.hdes.client.api.execution.ExpressionProgram;
+import io.resys.hdes.client.api.programs.ExpressionProgram;
 import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
 import io.resys.hdes.client.spi.serializers.DateDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.DateTimeDataTypeDeserializer;

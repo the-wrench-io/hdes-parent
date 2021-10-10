@@ -34,7 +34,7 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.ImmutableAstService;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
-import io.resys.hdes.client.api.execution.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
 import io.resys.wrench.assets.script.spi.ServiceHistoric;

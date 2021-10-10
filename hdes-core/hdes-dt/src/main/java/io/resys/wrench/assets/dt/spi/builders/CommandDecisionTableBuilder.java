@@ -37,8 +37,8 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.ast.AstDecision;
-import io.resys.hdes.client.api.execution.DecisionProgram;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableBuilder;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;

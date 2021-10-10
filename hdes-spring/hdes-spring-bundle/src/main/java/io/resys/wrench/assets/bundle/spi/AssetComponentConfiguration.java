@@ -43,9 +43,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
-import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
-import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.execution.ServiceProgram.ServiceInit;
+import io.resys.hdes.client.api.programs.DecisionResult.NodeExpressionExecutor;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;

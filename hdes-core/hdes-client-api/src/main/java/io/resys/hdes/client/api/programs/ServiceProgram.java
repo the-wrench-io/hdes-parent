@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.execution;
+package io.resys.hdes.client.api.programs;
 
 /*-
  * #%L
@@ -20,11 +20,26 @@ package io.resys.hdes.client.api.execution;
  * #L%
  */
 
-import java.io.Serializable;
+import java.util.List;
 
-import io.resys.hdes.client.api.ast.AstBody;
+import io.resys.hdes.client.api.ast.AstService;
 
-public interface Program<A extends AstBody> extends Serializable {
-  String getId();
-  A getAst();
+public interface ServiceProgram extends Program<AstService> {
+  Object execute(List<Object> context, ServiceInit init);
+  void stop();  
+  
+  @FunctionalInterface
+  interface ServiceInit {
+    <T> T get(Class<T> type);
+  }
+  interface ServiceExecutorType0<O> {
+    O execute();
+  }  
+  interface ServiceExecutorType1<I, O> {
+    O execute(I input1);
+  }
+
+  interface ServiceExecutorType2<I, I2, O> {
+    O execute(I input1, I2 input2);
+  }
 }

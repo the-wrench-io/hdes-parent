@@ -25,8 +25,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTaskStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
 
 public class FlowTaskBean implements FlowTask {
 

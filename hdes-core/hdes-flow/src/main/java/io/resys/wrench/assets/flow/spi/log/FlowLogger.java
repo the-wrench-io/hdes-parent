@@ -24,11 +24,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowResult.FlowHistory;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
-import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowHistory;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 
 public class FlowLogger {
 

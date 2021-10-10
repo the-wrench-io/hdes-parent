@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.execution;
+package io.resys.hdes.client.api.programs;
 
 /*-
  * #%L
@@ -20,8 +20,19 @@ package io.resys.hdes.client.api.execution;
  * #L%
  */
 
-import java.io.Serializable;
+import java.util.List;
 
-public interface ServiceResult extends Serializable {
+import javax.annotation.Nullable;
 
+import org.immutables.value.Value;
+
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+
+@Value.Immutable
+public interface ExpressionResult {
+  ValueType getType();
+  List<String> getConstants();
+  
+  @Nullable
+  Object getValue();
 }

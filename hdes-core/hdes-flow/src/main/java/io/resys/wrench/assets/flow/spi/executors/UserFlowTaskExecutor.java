@@ -1,8 +1,8 @@
 package io.resys.wrench.assets.flow.spi.executors;
 
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 
 /*-
  * #%L

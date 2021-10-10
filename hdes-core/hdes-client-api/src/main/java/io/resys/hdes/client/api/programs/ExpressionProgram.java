@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.execution;
+package io.resys.hdes.client.api.programs;
 
 /*-
  * #%L
@@ -20,14 +20,13 @@ package io.resys.hdes.client.api.execution;
  * #L%
  */
 
+import java.util.List;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ServiceData {
-  String value() default "";
+public interface ExpressionProgram {
+  String getSrc();
+  ValueType getType();
+  List<String> getConstants();
+  ExpressionResult run(Object context);
 }

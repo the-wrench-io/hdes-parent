@@ -36,9 +36,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.DecisionResult.DecisionTableOutput;
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.DecisionResult.DecisionTableOutput;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;

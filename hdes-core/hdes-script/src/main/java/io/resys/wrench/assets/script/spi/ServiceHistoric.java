@@ -23,7 +23,7 @@ package io.resys.wrench.assets.script.spi;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstService;
-import io.resys.hdes.client.api.execution.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 
 
 public class ServiceHistoric implements ServiceProgram {

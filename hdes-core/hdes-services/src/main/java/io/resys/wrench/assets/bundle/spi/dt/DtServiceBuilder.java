@@ -25,7 +25,7 @@ import java.util.Optional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;

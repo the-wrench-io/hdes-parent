@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.execution.DecisionProgram.RowReturns;
-import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.api.programs.DecisionResult;
+import io.resys.hdes.client.api.programs.DecisionProgram.RowReturns;
 
 public class ImmutableDecisionTableResult implements DecisionResult {
 

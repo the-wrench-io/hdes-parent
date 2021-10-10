@@ -28,8 +28,8 @@ import java.util.function.Consumer;
 
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.execution.DecisionProgram;
-import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;

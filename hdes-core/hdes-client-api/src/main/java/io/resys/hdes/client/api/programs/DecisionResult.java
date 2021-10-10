@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.execution;
+package io.resys.hdes.client.api.programs;
 
 /*-
  * #%L
@@ -26,7 +26,7 @@ import java.util.Map;
 
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.execution.DecisionProgram.Row;
+import io.resys.hdes.client.api.programs.DecisionProgram.Row;
 
 public interface DecisionResult extends Serializable {
   List<DecisionExpression> getRejections();

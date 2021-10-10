@@ -25,9 +25,9 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
-import io.resys.hdes.client.api.execution.FlowProgram.StepBody;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.StepBody;
 
 @JsonIgnoreProperties("previous")
 public class ImmutableStep implements Step {

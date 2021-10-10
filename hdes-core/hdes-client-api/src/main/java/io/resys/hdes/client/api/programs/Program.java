@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.execution;
+package io.resys.hdes.client.api.programs;
 
 /*-
  * #%L
@@ -20,13 +20,11 @@ package io.resys.hdes.client.api.execution;
  * #L%
  */
 
-import java.util.List;
+import java.io.Serializable;
 
-import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.ast.AstBody;
 
-public interface ExpressionProgram {
-  String getSrc();
-  ValueType getType();
-  List<String> getConstants();
-  ExpressionResult run(Object context);
+public interface Program<A extends AstBody> extends Serializable {
+  String getId();
+  A getAst();
 }

@@ -1,7 +1,7 @@
 package io.resys.wrench.assets.dt.spi.export;
 
 import io.resys.hdes.client.api.ast.AstDecision;
-import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionProgram;
 
 /*-
  * #%L

@@ -24,8 +24,8 @@ package io.resys.wrench.assets.flow.spi;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowTaskBuilder;

@@ -36,7 +36,7 @@ import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
-import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowProgram;
 
 public class CommandFlowModelBuilder {
   private final HdesClient client;

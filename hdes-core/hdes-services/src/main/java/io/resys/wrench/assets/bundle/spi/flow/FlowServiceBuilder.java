@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;

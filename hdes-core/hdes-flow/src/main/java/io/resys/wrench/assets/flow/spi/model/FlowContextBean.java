@@ -29,10 +29,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.execution.FlowResult.FlowContext;
-import io.resys.hdes.client.api.execution.FlowResult.FlowHistory;
-import io.resys.hdes.client.api.execution.FlowResult.FlowStatus;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult.FlowContext;
+import io.resys.hdes.client.api.programs.FlowResult.FlowHistory;
+import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class FlowContextBean implements FlowContext {

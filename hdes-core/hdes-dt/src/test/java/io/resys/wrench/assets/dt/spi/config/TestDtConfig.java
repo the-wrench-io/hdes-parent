@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
+import io.resys.hdes.client.api.programs.DecisionResult.NodeExpressionExecutor;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;

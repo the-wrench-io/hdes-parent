@@ -23,7 +23,7 @@ package io.resys.wrench.assets.dt.spi;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
+import io.resys.hdes.client.api.programs.DecisionResult.NodeExpressionExecutor;
 import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.dt.spi.builders.CommandDecisionTableBuilder;
 import io.resys.wrench.assets.dt.spi.builders.GenericDecisionTableExecutor;

@@ -25,11 +25,11 @@ import java.util.function.Function;
 
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowExecutor;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowResult.FlowStatus;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
-import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
 import io.resys.wrench.assets.flow.spi.FlowException;
 

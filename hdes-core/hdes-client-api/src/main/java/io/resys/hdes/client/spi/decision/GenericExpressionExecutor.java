@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.execution.DecisionResult.NodeExpressionExecutor;
-import io.resys.hdes.client.api.execution.ExpressionProgram;
+import io.resys.hdes.client.api.programs.ExpressionProgram;
+import io.resys.hdes.client.api.programs.DecisionResult.NodeExpressionExecutor;
 import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
 import io.resys.hdes.client.spi.util.HdesAssert;
 

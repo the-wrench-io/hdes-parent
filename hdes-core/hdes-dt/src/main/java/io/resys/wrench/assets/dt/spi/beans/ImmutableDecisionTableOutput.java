@@ -23,7 +23,7 @@ package io.resys.wrench.assets.dt.spi.beans;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.hdes.client.api.execution.DecisionResult.DecisionTableOutput;
+import io.resys.hdes.client.api.programs.DecisionResult.DecisionTableOutput;
 
 public class ImmutableDecisionTableOutput implements DecisionTableOutput {
 

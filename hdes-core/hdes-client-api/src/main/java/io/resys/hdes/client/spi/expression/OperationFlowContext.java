@@ -39,7 +39,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.execution.FlowProgram.FlowTaskExpressionContext;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskExpressionContext;
 
 public class OperationFlowContext {
   private final static ExpressionParser PARSER = new SpelExpressionParser();

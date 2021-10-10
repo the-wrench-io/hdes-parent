@@ -28,8 +28,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.DecisionProgram;
-import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionResult;
 
 public interface DecisionTableRepository {
 

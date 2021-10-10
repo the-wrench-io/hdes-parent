@@ -25,9 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTaskStatus;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
 import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
 import io.resys.wrench.assets.bundle.spi.flow.executors.VariableResolver;
 

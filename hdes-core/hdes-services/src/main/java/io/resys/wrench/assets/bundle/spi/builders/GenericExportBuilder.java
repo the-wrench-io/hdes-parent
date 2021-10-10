@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ExportType;

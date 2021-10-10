@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.execution;
+package io.resys.hdes.client.api.programs;
 
 /*-
  * #%L
@@ -20,19 +20,14 @@ package io.resys.hdes.client.api.execution;
  * #L%
  */
 
-import java.util.List;
 
-import javax.annotation.Nullable;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.immutables.value.Value;
-
-import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-
-@Value.Immutable
-public interface ExpressionResult {
-  ValueType getType();
-  List<String> getConstants();
-  
-  @Nullable
-  Object getValue();
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface ServiceData {
+  String value() default "";
 }

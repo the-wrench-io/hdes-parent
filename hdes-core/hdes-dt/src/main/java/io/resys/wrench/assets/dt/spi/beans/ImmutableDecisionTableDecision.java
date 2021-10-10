@@ -24,9 +24,9 @@ import java.util.List;
 
 import java.util.Map;
 
-import io.resys.hdes.client.api.execution.DecisionProgram.Row;
-import io.resys.hdes.client.api.execution.DecisionResult.DecisionContext;
-import io.resys.hdes.client.api.execution.DecisionResult.DecisionExpression;
+import io.resys.hdes.client.api.programs.DecisionProgram.Row;
+import io.resys.hdes.client.api.programs.DecisionResult.DecisionContext;
+import io.resys.hdes.client.api.programs.DecisionResult.DecisionExpression;
 
 public class ImmutableDecisionTableDecision implements DecisionExpression {
 

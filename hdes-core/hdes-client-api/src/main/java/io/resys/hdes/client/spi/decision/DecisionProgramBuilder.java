@@ -28,11 +28,11 @@ import java.util.stream.Collectors;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.Cell;
 import io.resys.hdes.client.api.ast.AstDecision.Row;
-import io.resys.hdes.client.api.execution.DecisionProgram;
 import io.resys.hdes.client.api.execution.ImmutableDecisionProgram;
 import io.resys.hdes.client.api.execution.ImmutableRow;
 import io.resys.hdes.client.api.execution.ImmutableRowAccepts;
 import io.resys.hdes.client.api.execution.ImmutableRowReturns;
+import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 
 public class DecisionProgramBuilder {

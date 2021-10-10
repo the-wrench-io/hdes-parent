@@ -29,10 +29,10 @@ import org.junit.runners.BlockJUnit4ClassRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowProgram;
-import io.resys.hdes.client.api.execution.FlowResult.FlowStatus;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.spi.config.TestFlowConfig;

@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.ServiceProgram;
-import io.resys.hdes.client.api.execution.ServiceProgram.ServiceInit;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;

@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.script.api.ServiceException;
 
 public class ServiceTemplate implements ServiceProgram {

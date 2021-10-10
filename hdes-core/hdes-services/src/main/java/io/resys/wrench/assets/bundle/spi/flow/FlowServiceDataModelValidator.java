@@ -43,7 +43,7 @@ import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;

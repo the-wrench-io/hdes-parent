@@ -26,7 +26,7 @@ import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;

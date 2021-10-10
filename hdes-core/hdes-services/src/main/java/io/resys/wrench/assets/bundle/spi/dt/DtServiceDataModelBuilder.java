@@ -26,7 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.execution.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;

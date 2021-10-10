@@ -1,4 +1,4 @@
-package io.resys.hdes.client.api.execution;
+package io.resys.hdes.client.api.programs;
 
 /*-
  * #%L
@@ -27,7 +27,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
 
 
 

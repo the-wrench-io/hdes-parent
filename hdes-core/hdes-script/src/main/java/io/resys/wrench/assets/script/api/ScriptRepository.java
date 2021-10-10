@@ -24,7 +24,7 @@ import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.resys.hdes.client.api.execution.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 
 public interface ScriptRepository {
 

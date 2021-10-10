@@ -31,7 +31,7 @@ import org.apache.commons.io.IOUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.execution.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowModelBuilder;
 

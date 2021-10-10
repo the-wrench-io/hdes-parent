@@ -30,10 +30,10 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
-import io.resys.hdes.client.api.execution.DecisionProgram;
-import io.resys.hdes.client.api.execution.DecisionResult;
-import io.resys.hdes.client.api.execution.FlowProgram;
-import io.resys.hdes.client.api.execution.FlowResult;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionResult;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
 
 public interface HdesClient {
   AstBuilder ast();

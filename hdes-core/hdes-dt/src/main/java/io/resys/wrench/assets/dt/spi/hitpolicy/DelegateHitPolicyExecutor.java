@@ -21,9 +21,9 @@ package io.resys.wrench.assets.dt.spi.hitpolicy;
  */
 
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
-import io.resys.hdes.client.api.execution.DecisionProgram;
-import io.resys.hdes.client.api.execution.DecisionResult.DecisionExpression;
-import io.resys.hdes.client.api.execution.DecisionResult.HitPolicyExecutor;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionResult.DecisionExpression;
+import io.resys.hdes.client.api.programs.DecisionResult.HitPolicyExecutor;
 import io.resys.wrench.assets.dt.spi.exceptions.DecisionTableException;
 
 public class DelegateHitPolicyExecutor implements HitPolicyExecutor {

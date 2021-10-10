@@ -25,9 +25,9 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowProgram;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 
 public interface FlowRepository {
   

@@ -31,11 +31,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
-import io.resys.hdes.client.api.execution.FlowProgram.StepBody;
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTask;
-import io.resys.hdes.client.api.execution.FlowResult.FlowTaskStatus;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.StepBody;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;

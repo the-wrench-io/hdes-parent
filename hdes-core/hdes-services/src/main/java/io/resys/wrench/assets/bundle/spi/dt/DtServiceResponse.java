@@ -27,7 +27,7 @@ import java.util.function.Consumer;
 
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.execution.DecisionResult;
+import io.resys.hdes.client.api.programs.DecisionResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 
 public class DtServiceResponse implements ServiceResponse {

@@ -25,9 +25,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.execution.FlowResult;
-import io.resys.hdes.client.api.execution.FlowProgram;
-import io.resys.hdes.client.api.execution.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.flow.spi.log.FlowLogger;
 
