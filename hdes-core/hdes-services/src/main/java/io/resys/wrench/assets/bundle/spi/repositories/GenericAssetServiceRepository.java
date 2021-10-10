@@ -36,8 +36,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.programs.FlowResult;
 import io.resys.hdes.client.api.programs.DecisionResult.DecisionTableOutput;
+import io.resys.hdes.client.api.programs.FlowResult;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
@@ -47,14 +47,12 @@ import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
 import io.resys.wrench.assets.bundle.spi.migration.GenericServiceExporter;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 
 public class GenericAssetServiceRepository implements AssetServiceRepository {
 
   private final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders;
-  private final DecisionTableRepository decisionTableRepository;
   private final FlowRepository flowRepository;
   private final ScriptRepository scriptRepository;
   private final ServiceStore serviceStore;
@@ -64,7 +62,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   public GenericAssetServiceRepository(
       HdesClient types,
       ObjectMapper objectMapper,
-      DecisionTableRepository decisionTableRepository,
       FlowRepository flowRepository,
       ScriptRepository scriptRepository,
       
@@ -74,7 +71,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     super();
     this.types = types;
     this.objectMapper = objectMapper;
-    this.decisionTableRepository = decisionTableRepository;
     this.flowRepository = flowRepository;
     this.scriptRepository = scriptRepository;
     
@@ -100,7 +96,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
 
   @Override
   public ExportBuilder createExport() {
-    return new GenericExportBuilder(() -> decisionTableRepository.createExporter());
+    return new GenericExportBuilder();
   }
   
   @Override
@@ -108,11 +104,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     HashBuilder hashBuilder = new HashBuilder();
     createQuery().list().stream().sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).forEachOrdered(hashBuilder::add);
     return hashBuilder.build();
-  }
-
-  @Override
-  public DecisionTableRepository getDtRepo() {
-    return decisionTableRepository;
   }
   @Override
   public ScriptRepository getStRepo() {

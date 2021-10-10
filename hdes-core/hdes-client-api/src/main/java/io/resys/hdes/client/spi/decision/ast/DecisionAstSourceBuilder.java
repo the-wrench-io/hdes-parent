@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionCell;
-import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
+import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
@@ -39,7 +39,7 @@ public class DecisionAstSourceBuilder {
 
   
   
-  public List<AstCommand> build(List<TypeDef> headers, List<AstDecisionRow> rows, String name, String description, HitPolicy hitPolicy) {
+  public static List<AstCommand> build(List<TypeDef> headers, List<AstDecisionRow> rows, String name, String description, HitPolicy hitPolicy) {
     List<AstCommand> result = createHeaderCommands(headers);
     createRow(headers, 1, rows.iterator(), result);
     result.add(ImmutableAstCommand.builder().value(name).type(AstCommandValue.SET_NAME).build());
@@ -48,7 +48,7 @@ public class DecisionAstSourceBuilder {
     return result;
   }
 
-  private void createRow(List<TypeDef> headers, int rows, Iterator<AstDecisionRow> it, List<AstCommand> result) {
+  private static void createRow(List<TypeDef> headers, int rows, Iterator<AstDecisionRow> it, List<AstCommand> result) {
     if(!it.hasNext()) {
       return;
     }
@@ -69,7 +69,7 @@ public class DecisionAstSourceBuilder {
     createRow(headers, ++rows, it, result);
   }
 
-  private List<AstCommand> createHeaderCommands(List<TypeDef> headers) {
+  private static List<AstCommand> createHeaderCommands(List<TypeDef> headers) {
     List<AstCommand> result = new ArrayList<>();
     int index = 0;
     for(TypeDef dataType : headers) {

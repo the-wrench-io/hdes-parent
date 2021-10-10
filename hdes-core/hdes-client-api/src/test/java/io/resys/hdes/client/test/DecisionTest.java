@@ -121,4 +121,42 @@ public class DecisionTest {
 
     Assertions.assertEquals(1, result.getMatches().size());
   }
+  
+  @Test
+  public void firstHitPolicy() throws IOException {
+    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/firstHitPolicy.json")).decision();
+    final var program = client.program().ast(ast);
+
+    Map<String, Object> values = new HashMap<>();
+    values.put("regionName", "FIN");
+    DecisionResult result = client.executor().inputMap(values).decision(program).andGetBody();;
+    Assertions.assertEquals(1, result.getMatches().size());
+    Assertions.assertEquals(0, result.getMatches().get(0).getOrder());
+
+
+    values = new HashMap<>();
+    values.put("regionName", "X");
+    result = client.executor().inputMap(values).decision(program).andGetBody();
+    Assertions.assertEquals(1, result.getMatches().size());
+    Assertions.assertEquals(1, result.getMatches().get(0).getOrder());
+  }
+
+  @Test
+  public void all() throws IOException {
+    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/allHitPolicy.json")).decision();
+    final var program = client.program().ast(ast);
+
+    Map<String, Object> values = new HashMap<>();
+    values.put("firstName", "Mark");
+    DecisionResult result = client.executor().inputMap(values).decision(program).andGetBody();;
+    Assertions.assertEquals(2, result.getMatches().size());
+  }
+  
+  @Test
+  public void csvImportCommand() throws IOException {
+    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/dt-import.json")).decision();
+    final var program = client.program().ast(ast);
+    Assertions.assertNotNull(program);
+  }
+
 }

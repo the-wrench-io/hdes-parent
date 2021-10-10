@@ -59,4 +59,10 @@ public class HdesClientImpl implements HdesClient {
     throw new RuntimeException("Need to implemented the client");
   }
 
+  @Override
+  public CSVBuilder csv() {
+    // TODO Auto-generated method stub
+    throw new RuntimeException("Need to implemented the client");
+  }
+
 }

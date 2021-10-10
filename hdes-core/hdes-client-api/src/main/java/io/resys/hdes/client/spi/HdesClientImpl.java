@@ -1,6 +1,7 @@
 package io.resys.hdes.client.spi;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /*-
  * #%L
@@ -39,6 +40,7 @@ import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.spi.decision.DecisionCSVBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
@@ -61,7 +63,7 @@ public class HdesClientImpl implements HdesClient {
     return new AstBuilder() {
       private String syntax;
       private Integer version;
-      private List<AstCommand> commands;
+      private final List<AstCommand> commands = new ArrayList<>();
       private ArrayNode json;
       @Override
       public AstService service() {
@@ -87,7 +89,7 @@ public class HdesClientImpl implements HdesClient {
       }
       @Override
       public AstBuilder commands(List<AstCommand> src, Integer version) {
-        this.commands = src;
+        this.commands.addAll(src);
         this.version = version;
         return this;
       }
@@ -222,5 +224,14 @@ public class HdesClientImpl implements HdesClient {
   @Override
   public HdesAstTypes astTypes() {
     return ast;
+  }
+  @Override
+  public CSVBuilder csv() {
+    return new CSVBuilder() {
+      @Override
+      public String ast(AstDecision ast) {
+        return DecisionCSVBuilder.build(ast);
+      }
+    };
   }
 }

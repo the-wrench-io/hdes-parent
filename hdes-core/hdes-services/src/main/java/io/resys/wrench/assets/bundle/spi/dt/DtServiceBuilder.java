@@ -1,6 +1,7 @@
 package io.resys.wrench.assets.bundle.spi.dt;
 
-import java.util.Optional;
+import java.util.Arrays;
+import java.util.Collections;
 
 /*-
  * #%L
@@ -25,6 +26,9 @@ import java.util.Optional;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
@@ -33,20 +37,18 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.spi.builders.ImmutableServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.TemplateServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
 
 public class DtServiceBuilder extends TemplateServiceBuilder {
 
   private final ServiceIdGen serviceStore;
-  private final DecisionTableRepository decisionTableRepository;
+  private final HdesClient decisionTableRepository;
   private final ClockRepository clockRepository;
   private final String defaultContent;
   private boolean rename;
   
   public DtServiceBuilder(
       ServiceIdGen serviceStore,
-      DecisionTableRepository decisionTableRepository,
+      HdesClient decisionTableRepository,
       ClockRepository clockRepository,
       String defaultContent) {
     super();
@@ -62,12 +64,15 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
       Assert.isTrue(!StringUtils.isEmpty(name), "Decision table name must be defined!");
     }
     String content = StringUtils.isEmpty(src) ? defaultContent.replace("{{name}}", name) : src;
-    DecisionProgram decisionTable = decisionTableRepository.createBuilder()
-        .format(DecisionTableFormat.JSON)
-        .src(content)
-        .rename(rename ? Optional.of(name) : Optional.empty())
-        .build();
-
+    
+    final var ast = decisionTableRepository.ast()
+      .commands(content)
+      .commands(rename ? 
+          Arrays.asList(ImmutableAstCommand.builder().type(AstCommandValue.SET_NAME).value(name).build()) : 
+          Collections.emptyList())
+      .decision();
+    
+    DecisionProgram decisionTable = decisionTableRepository.program().ast(ast);
     String serviceId = id == null ? serviceStore.nextId() : id;
     ServiceDataModel dataModel = new DtServiceDataModelBuilder().build(serviceId, decisionTable);
     String pointer = serviceId + ".json";

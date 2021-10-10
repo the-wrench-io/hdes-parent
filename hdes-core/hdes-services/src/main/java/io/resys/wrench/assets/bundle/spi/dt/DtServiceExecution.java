@@ -28,20 +28,21 @@ import java.util.function.Consumer;
 
 import org.springframework.util.Assert;
 
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.programs.DecisionProgram;
-import io.resys.hdes.client.api.programs.DecisionResult;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 
 public class DtServiceExecution implements ServiceExecution {
 
-  private final DecisionTableRepository decisionTableRepository;
+  private final HdesClient decisionTableRepository;
   private final DecisionProgram decisionTable;
   private final List<Object> inputs = new ArrayList<>();
-  private DtInputResolver dtInputResolver;
+  private ExecutorInput dtInputResolver;
 
-  public DtServiceExecution(DecisionTableRepository decisionTableRepository, DecisionProgram decisionTable) {
+  public DtServiceExecution(HdesClient decisionTableRepository, DecisionProgram decisionTable) {
     super();
     this.decisionTableRepository = decisionTableRepository;
     this.decisionTable = decisionTable;
@@ -52,9 +53,9 @@ public class DtServiceExecution implements ServiceExecution {
     if(bean == null) {
       return this;
     }
-    if(bean instanceof DtInputResolver) {
+    if(bean instanceof ExecutorInput) {
       Assert.isNull(dtInputResolver, "dtInputResolver can be inserted only once!");
-      dtInputResolver = (DtInputResolver) bean;
+      dtInputResolver = (ExecutorInput) bean;
     } else {
       inputs.add(bean);
     }
@@ -66,7 +67,10 @@ public class DtServiceExecution implements ServiceExecution {
     Assert.notNull(dtInputResolver, "dtInputResolver must be inserted!");
 
     // Custom resolver
-    DecisionResult result = decisionTableRepository.createExecutor().decisionTable(decisionTable).context(dtInputResolver).execute();
+    DecisionResult result = decisionTableRepository.executor()
+        .inputList(inputs)
+        .decision(decisionTable)
+        .andGetBody();
     return new DtServiceResponse(result);
 
   }

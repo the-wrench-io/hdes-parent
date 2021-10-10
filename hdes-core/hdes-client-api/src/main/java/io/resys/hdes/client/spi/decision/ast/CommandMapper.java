@@ -419,7 +419,7 @@ public class CommandMapper {
           .collect(Collectors.toList());
       
       final HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
-      final var source = new DecisionAstSourceBuilder().build(headers, rows, name, description, hitPolicy);
+      final var source = DecisionAstSourceBuilder.build(headers, rows, name, description, hitPolicy);
 
       return ImmutableAstDecision.builder()
           .name(name)

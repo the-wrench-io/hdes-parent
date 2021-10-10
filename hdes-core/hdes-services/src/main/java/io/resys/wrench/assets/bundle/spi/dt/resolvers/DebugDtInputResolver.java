@@ -23,10 +23,10 @@ package io.resys.wrench.assets.bundle.spi.dt.resolvers;
 import java.io.Serializable;
 import java.util.Map;
 
+import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
 
-public class DebugDtInputResolver implements Serializable, DtInputResolver {
+public class DebugDtInputResolver implements Serializable, ExecutorInput {
 
   private static final long serialVersionUID = 8818379343078413837L;
 

@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.dt.spi.export;
+package io.resys.hdes.client.spi.decision;
 
 /*-
  * #%L
@@ -30,14 +30,13 @@ import java.util.Map;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
+import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableExporter;
 
-public class CsvDecisionTableExporter extends TemplateDecisionTableExporter implements DecisionTableExporter {
+public class DecisionCSVBuilder {
 
-  @Override
-  public String build() {
+  public static String build(AstDecision dt) {
     StringBuilder stringBuilder = new StringBuilder();
     List<TypeDef> headers = new ArrayList<>();
     List<String> headerNames = new ArrayList<>();
@@ -60,7 +59,7 @@ public class CsvDecisionTableExporter extends TemplateDecisionTableExporter impl
     }
   }
 
-  protected void print(CSVPrinter csvPrinter, Iterator<AstDecisionRow> it, List<String> headerNames) throws IOException {
+  protected static void print(CSVPrinter csvPrinter, Iterator<AstDecisionRow> it, List<String> headerNames) throws IOException {
     if(!it.hasNext()) {
       return;
     }

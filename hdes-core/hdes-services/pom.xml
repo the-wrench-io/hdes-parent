@@ -25,10 +25,6 @@
     </dependency>
     <dependency>
       <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-dt</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.resys.hdes</groupId>
       <artifactId>hdes-script</artifactId>
     </dependency>
 
