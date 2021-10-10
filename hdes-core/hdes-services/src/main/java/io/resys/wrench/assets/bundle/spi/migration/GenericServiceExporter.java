@@ -82,7 +82,7 @@ public class GenericServiceExporter implements MigrationBuilder {
 
   private MigrationValue visitDt(AssetService service) {
     DecisionProgram dt = serviceRepository.getDtRepo().createBuilder().format(DecisionTableFormat.JSON)
-        .src(service.getSrc()).build();
+        .src().build();
     final var exporter = (CommandModelDecisionTableExporter) new CommandModelDecisionTableExporter(objectMapper)
         .src(dt.getAst());
 

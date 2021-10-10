@@ -40,15 +40,12 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
-import io.resys.hdes.client.api.programs.DecisionResult.NodeExpressionExecutor;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 import io.resys.hdes.client.spi.HdesClientImpl;
-import io.resys.hdes.client.spi.decision.GenericExpressionExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -81,8 +78,6 @@ import io.resys.wrench.assets.bundle.spi.store.PostProcessingServiceStore;
 import io.resys.wrench.assets.bundle.spi.tag.TagServiceBuilder;
 import io.resys.wrench.assets.context.config.AssetConfigBean;
 import io.resys.wrench.assets.context.config.GitConfigBean;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.spi.GenericDecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.wrench.assets.flow.api.FlowRepository;
@@ -125,7 +120,6 @@ public class AssetComponentConfiguration {
     
     final ClockRepository clockRepository = new SystemClockRepository();
     final HdesClient dataTypeRepository = HdesClientImpl.builder().objectMapper(objectMapper).build();
-    final DecisionTableRepository decisionTableRepository = decisionTableRepository(dataTypeRepository, objectMapper, origServiceStore);
     final FlowRepository flowRepository = flowRepository(dataTypeRepository, clockRepository, origServiceStore, objectMapper);
     final ScriptRepository scriptRepository = scriptRepository(objectMapper, dataTypeRepository, context);
     
@@ -138,7 +132,7 @@ public class AssetComponentConfiguration {
     
     final ServiceIdGen idGen = new GenericServiceIdGen();
     final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders = new HashMap<>();
-    builders.put(ServiceType.DT, (store) -> new DtServiceBuilder(idGen, decisionTableRepository, clockRepository, getDefaultContent(ServiceType.DT)));
+    builders.put(ServiceType.DT, (store) -> new DtServiceBuilder(idGen, dataTypeRepository, clockRepository, getDefaultContent(ServiceType.DT)));
     builders.put(ServiceType.FLOW, (store) -> new FlowServiceBuilder(idGen, store, flowRepository, flowRepository, clockRepository, getDefaultContent(ServiceType.FLOW)));
     builders.put(ServiceType.FLOW_TASK, (store) -> new FlowTaskServiceBuilder(idGen, store, init, scriptRepository, objectMapper, getDefaultContent(ServiceType.FLOW_TASK)));
     builders.put(ServiceType.TAG, (store) -> new TagServiceBuilder(assetConfigBean.getTagFormat(), idGen, getDefaultContent(ServiceType.TAG)));
@@ -152,7 +146,7 @@ public class AssetComponentConfiguration {
     final ServiceStore serviceStore = new PostProcessingServiceStore(origServiceStore, servicePostProcessorSupplier); 
     
     return new GenericAssetServiceRepository(dataTypeRepository, objectMapper,
-        decisionTableRepository, flowRepository, scriptRepository, 
+        flowRepository, scriptRepository, 
         builders, serviceStore);
   }
 
@@ -177,21 +171,12 @@ public class AssetComponentConfiguration {
       result.load();
     }
   }
-  
-  
-  private DecisionTableRepository decisionTableRepository(HdesClient dataTypeRepository, ObjectMapper objectMapper, ServiceStore serviceStore) {
-    NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper);
-    return new GenericDecisionTableRepository(objectMapper, dataTypeRepository, expressionExecutor);
-  }
-
 
   private FlowRepository flowRepository(
       HdesClient dataTypeRepository,
       ClockRepository clockRepository,
       ServiceStore serviceStore, 
       ObjectMapper objectMapper) {
-
-    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 
     List<AstFlowNodeVisitor> visitors = Arrays.asList(
         new IdAutocomplete(),
