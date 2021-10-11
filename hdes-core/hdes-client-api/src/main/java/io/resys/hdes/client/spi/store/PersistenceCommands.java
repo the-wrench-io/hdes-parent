@@ -7,7 +7,7 @@ import io.resys.hdes.client.api.HdesStore.Entity;
 import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
-import io.resys.hdes.client.api.ast.AstType;
+import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.exceptions.StoreException;
 import io.resys.hdes.client.spi.store.PersistenceConfig.EntityState;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
@@ -48,7 +48,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   }
   
   @Override
-  public <T extends AstType> Uni<Entity<T>> delete(Entity<T> toBeDeleted) {
+  public <T extends AstBody> Uni<Entity<T>> delete(Entity<T> toBeDeleted) {
     return config.getClient().commit().head()
         .head(config.getRepoName(), config.getHeadName())
         .message("delete type: '" + toBeDeleted.getType() + "', with id: '" + toBeDeleted.getId() + "'")
@@ -60,7 +60,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
             return toBeDeleted;
           }
           // TODO
-          throw new StoreException("DELETE_FAIL", (Entity<AstType>)toBeDeleted, convertMessages(commit));
+          throw new StoreException("DELETE_FAIL", (Entity<AstBody>)toBeDeleted, convertMessages(commit));
         });
   }
   
@@ -73,7 +73,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
 
   
   @Override
-  public <T extends AstType> Uni<Entity<T>> save(Entity<T> toBeSaved) {
+  public <T extends AstBody> Uni<Entity<T>> save(Entity<T> toBeSaved) {
     return config.getClient().commit().head()
       .head(config.getRepoName(), config.getHeadName())
       .message("update type: '" + toBeSaved.getType() + "', with id: '" + toBeSaved.getId() + "'")
@@ -85,7 +85,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
           return toBeSaved;
         }
         // TODO
-        throw new StoreException("DELETE_FAIL", (Entity<AstType>)toBeSaved, convertMessages(commit));
+        throw new StoreException("DELETE_FAIL", (Entity<AstBody>)toBeSaved, convertMessages(commit));
       });
   }
 
@@ -118,7 +118,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   }
 
   @Override
-  public <T extends AstType> Uni<EntityState<T>> get(String id) {
+  public <T extends AstBody> Uni<EntityState<T>> get(String id) {
     return config.getClient()
         .objects().blobState()
         .repo(config.getRepoName())

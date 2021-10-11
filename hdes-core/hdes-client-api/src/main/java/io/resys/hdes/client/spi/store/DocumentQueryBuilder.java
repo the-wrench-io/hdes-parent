@@ -3,7 +3,7 @@ package io.resys.hdes.client.spi.store;
 import io.resys.hdes.client.api.HdesStore.Entity;
 import io.resys.hdes.client.api.HdesStore.QueryBuilder;
 import io.resys.hdes.client.api.HdesStore.StoreState;
-import io.resys.hdes.client.api.ast.AstType;
+import io.resys.hdes.client.api.ast.AstBody;
 import io.smallrye.mutiny.Uni;
 
 public class DocumentQueryBuilder extends PersistenceCommands implements QueryBuilder {
@@ -18,7 +18,7 @@ public class DocumentQueryBuilder extends PersistenceCommands implements QueryBu
   }
 
   @Override
-  public Uni<Entity<AstType>> get(String id) {
+  public Uni<Entity<AstBody>> get(String id) {
     var result = super.get(id);
     return result.onItem().transform(entityState->entityState.getEntity());
   }

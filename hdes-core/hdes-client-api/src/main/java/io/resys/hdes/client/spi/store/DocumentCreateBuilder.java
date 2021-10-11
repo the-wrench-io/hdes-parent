@@ -1,25 +1,23 @@
 package io.resys.hdes.client.spi.store;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.HdesStore.CreateAstType;
 import io.resys.hdes.client.api.HdesStore.CreateBuilder;
 import io.resys.hdes.client.api.HdesStore.Entity;
-import io.resys.hdes.client.api.HdesStore.EntityType;
 import io.resys.hdes.client.api.ImmutableEntity;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
-import io.resys.hdes.client.api.ast.AstType;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.ImmutableAstDataType;
-import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
-import io.resys.hdes.client.api.ast.ImmutableDecisionAstType;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
-import io.resys.hdes.client.api.ast.ImmutableServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.exceptions.DataTypeException;
+import io.resys.hdes.client.api.ast.AstBody;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.ImmutableAstDecision;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.api.ast.ImmutableAstService;
 import io.resys.hdes.client.api.exceptions.StoreException;
+import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.smallrye.mutiny.Uni;
 
@@ -34,107 +32,68 @@ public class DocumentCreateBuilder implements CreateBuilder {
   }
   
   @Override
-  public Uni<Entity<FlowAstType>> flow(String name) {
+  public Uni<Entity<AstFlow>> flow(String name) {
     final var gid = gid(EntityType.FLOW);
-    final var flow = ImmutableFlowAstType.builder()
+    final var flow = ImmutableAstFlow.builder()
         .name(name)
         .rev(1)
-        //.headers(ImmutableAstHeaders.builder()
-        //    .addInputs(ImmutableAstDataType.builder().))
+        //.headers(ImmutableAstHeaders.builder().build()
+        //    .withInputs(ImmutableAstDataType.builder().name("test").valueType(ValueType.STRING).build()))
         //.src("")
         .build();
     //TODO: initialize flow from template
-    final Entity<FlowAstType> entity = ImmutableEntity.<FlowAstType>builder()
+    final Entity<AstFlow> entity = ImmutableEntity.<AstFlow>builder()
         .id(gid)
         .type(EntityType.FLOW)
         .body(flow)
         .build();
     
-    return config.getClient().commit().head()
-      .head(config.getRepoName(), config.getHeadName())
-      .message("creating-flow")
-      .parentIsLatest()
-      .author(getAuthor())
-      .append(gid, config.getSerializer().toString(entity))
-      .build().onItem().transform(commit -> {
-        if(commit.getStatus() == CommitStatus.OK) {
-          return entity;
-        }
-        String code = "CREATE_FLOW"; //TODO
-        throw new StoreException(code, null,
-            ImmutableStoreExceptionMsg.builder()
-            .addAllArgs(commit.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
-            .build());
-      });
+    String message = "creating-flow";
+    String code = "CREATE_FLOW"; //TODO
+    return saveCommit(gid, entity, message, code);
 
   }
 
+
+
   @Override
-  public Uni<Entity<DecisionAstType>> decision(String name) {
+  public Uni<Entity<AstDecision>> decision(String name) {
     final var gid = gid(EntityType.DT);
-    final var decision = ImmutableDecisionAstType.builder()
+    final var decision = ImmutableAstDecision.builder()
         .name(name)
         .build();
-    final Entity<DecisionAstType> entity = ImmutableEntity.<DecisionAstType>builder()
+    final Entity<AstDecision> entity = ImmutableEntity.<AstDecision>builder()
         .id(gid)
         .type(EntityType.DT)
         .body(decision)
         .build();
     
-    return config.getClient().commit().head()
-      .head(config.getRepoName(), config.getHeadName())
-      .message("creating-decision")
-      .parentIsLatest()
-      .author(getAuthor())
-      .append(gid, config.getSerializer().toString(entity))
-      .build().onItem().transform(commit -> {
-        if(commit.getStatus() == CommitStatus.OK) {
-          return entity;
-        }
-        String code = "CREATE_DECISION"; //TODO
-        throw new StoreException(code, null,
-            ImmutableStoreExceptionMsg.builder()
-            .addAllArgs(commit.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
-            .build());
-      });
+    String message = "creating-decision";
+    String code = "CREATE_DECISION"; //TODO
+    return saveCommit(gid, entity, message, code);
   }
 
   @Override
-  public Uni<Entity<ServiceAstType>> service(String name) {
+  public Uni<Entity<AstService>> service(String name) {
     final var gid = gid(EntityType.FLOW_TASK);
-    final var decision = ImmutableServiceAstType.builder()
+    final var decision = ImmutableAstService.builder()
         .name(name)
         .build();
-    final Entity<ServiceAstType> entity = ImmutableEntity.<ServiceAstType>builder()
+    final Entity<AstService> entity = ImmutableEntity.<AstService>builder()
         .id(gid)
         .type(EntityType.FLOW_TASK)
         .body(decision)
         .build();
     
-    return config.getClient().commit().head()
-      .head(config.getRepoName(), config.getHeadName())
-      .message("creating-service")
-      .parentIsLatest()
-      .author(getAuthor())
-      .append(gid, config.getSerializer().toString(entity))
-      .build().onItem().transform(commit -> {
-        if(commit.getStatus() == CommitStatus.OK) {
-          return entity;
-        }
-        String code = "CREATE_SERVICE"; //TODO
-        throw new StoreException(code, null,
-            ImmutableStoreExceptionMsg.builder()
-            .addAllArgs(commit.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
-            .build());
-      });
+    String message = "creating-service";
+    String code = "CREATE_SERVICE"; //TODO
+    return saveCommit(gid, entity, message, code);
   }
 
-  private String getAuthor() {
-    return config.getAuthorProvider().getAuthor();
-  }
+
 
   @Override
-  public Uni<Entity<AstType>> build(CreateAstType newType) {
+  public Uni<Entity<AstBody>> build(CreateAstType newType) {
     /* TODO
     switch (newType.getType()) {
     case FLOW: return flow(newType.getName());
@@ -146,7 +105,35 @@ public class DocumentCreateBuilder implements CreateBuilder {
     return null;
   }
 
+  private <T extends AstBody> Uni<Entity<T>> saveCommit(
+      final String gid, final Entity<T> entity, String message,
+      String code) {
+    return config.getClient().commit().head()
+      .head(config.getRepoName(), config.getHeadName())
+      .message(message)
+      .parentIsLatest()
+      .author(getAuthor())
+      .append(gid, config.getSerializer().toString(entity))
+      .build().onItem().transform(commit -> {
+        if(commit.getStatus() == CommitStatus.OK) {
+          return entity;
+        }
+        throw new StoreException(code, null,
+            ImmutableStoreExceptionMsg.builder()
+            .addAllArgs(getCommitMessages(commit))
+            .build());
+      });
+  }
+  
   private String gid(EntityType type) {
     return config.getGidProvider().getNextId(type);
+  }
+  
+  private List<String> getCommitMessages(CommitResult commit) {
+    return commit.getMessages().stream().map(commitMessage->commitMessage.getText()).collect(Collectors.toList());
+  }
+
+  private String getAuthor() {
+    return config.getAuthorProvider().getAuthor();
   }
 }

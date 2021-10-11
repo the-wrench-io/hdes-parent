@@ -25,9 +25,9 @@ import java.util.Collection;
 import org.immutables.value.Value;
 
 import io.resys.hdes.client.api.HdesStore.Entity;
-import io.resys.hdes.client.api.HdesStore.EntityType;
 import io.resys.hdes.client.api.HdesStore.StoreState;
-import io.resys.hdes.client.api.ast.AstType;
+import io.resys.hdes.client.api.ast.AstBody;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
@@ -54,7 +54,7 @@ public interface PersistenceConfig {
   
   interface Deserializer {
     Entity<?> fromString(String value);
-    <T extends AstType> Entity<T> fromString(EntityType type, String value);
+    <T extends AstBody> Entity<T> fromString(EntityType type, String value);
   }
   Serializer getSerializer();
   Deserializer getDeserializer();
@@ -65,16 +65,16 @@ public interface PersistenceConfig {
   }
   
   @Value.Immutable
-  interface EntityState<T extends AstType> {
+  interface EntityState<T extends AstBody> {
     ObjectsResult<BlobObject> getSrc();
     Entity<T> getEntity();
   }
   
   interface Commands {
-    <T extends AstType> Uni<Entity<T>> delete(Entity<T> toBeDeleted);
+    <T extends AstBody> Uni<Entity<T>> delete(Entity<T> toBeDeleted);
     Uni<StoreState> get();
-    <T extends AstType> Uni<EntityState<T>> get(String id);
-    <T extends AstType> Uni<Entity<T>> save(Entity<T> toBeSaved);
+    <T extends AstBody> Uni<EntityState<T>> get(String id);
+    <T extends AstBody> Uni<Entity<T>> save(Entity<T> toBeSaved);
     Uni<Collection<Entity<?>>> save(Collection<Entity<?>> toBeSaved);
   }  
 }
