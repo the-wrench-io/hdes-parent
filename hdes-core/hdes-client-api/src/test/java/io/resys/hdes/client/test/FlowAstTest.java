@@ -28,28 +28,21 @@ import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
-import io.resys.hdes.client.spi.HdesAstTypesImpl;
 import io.resys.hdes.client.spi.util.FileUtils;
 
 
 public class FlowAstTest {
 
-  private static ObjectMapper objectMapper = new ObjectMapper();
-  private static HdesAstTypes nodeRepository = new HdesAstTypesImpl(objectMapper);
-
-
   @Test
   public void indentNormal() throws IOException {
     
-    final var ast = nodeRepository.flow()
+    final var ast = TestUtils.client.astTypes().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")
         .srcAdd(3, "tasks:")
@@ -81,7 +74,7 @@ public class FlowAstTest {
   @Test
   public void deleteId() throws IOException {
     List<FlowAstCommandMessage> messages = new ArrayList<>();
-    final var ast = nodeRepository.flow()
+    final var ast = TestUtils.client.astTypes().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")
         .srcAdd(3, "tasks:")
@@ -103,7 +96,7 @@ public class FlowAstTest {
   @Test
   public void deleteAndSetId() throws IOException {
     List<FlowAstCommandMessage> messages = new ArrayList<>();
-    final var ast = nodeRepository.flow()
+    final var ast = TestUtils.client.astTypes().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")
         .srcAdd(3, "tasks:")
@@ -131,10 +124,10 @@ public class FlowAstTest {
   @Test
   public void assets() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "flow/trafficMain.in.json");
-    String content = objectMapper.readValue(stream, ObjectNode.class).get("content").asText();
+    String content = TestUtils.objectMapper.readValue(stream, ObjectNode.class).get("content").asText();
 
-    ArrayNode commands = objectMapper.readValue(content, ArrayNode.class);
-    AstFlow flowCommandModel = nodeRepository.flow().src(commands).build();
+    ArrayNode commands = TestUtils.objectMapper.readValue(content, ArrayNode.class);
+    AstFlow flowCommandModel = TestUtils.client.astTypes().flow().src(commands).build();
 
     String expected = FileUtils.toString(getClass(), "flow/trafficMain.out.yaml");
     Assertions.assertEquals(expected, flowCommandModel.getSrc().getValue());

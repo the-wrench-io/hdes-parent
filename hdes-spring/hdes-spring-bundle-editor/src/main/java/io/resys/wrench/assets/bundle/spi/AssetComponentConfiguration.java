@@ -44,8 +44,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 import io.resys.hdes.client.spi.HdesClientImpl;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -102,8 +102,6 @@ import io.resys.wrench.assets.flow.spi.hints.task.TaskThenAutocomplete;
 import io.resys.wrench.assets.flow.spi.hints.task.TasksAutocomplete;
 import io.resys.wrench.assets.flow.spi.validators.DescriptionValidator;
 import io.resys.wrench.assets.flow.spi.validators.IdValidator;
-import io.resys.wrench.assets.script.api.ScriptRepository;
-import io.resys.wrench.assets.script.spi.GenericScriptRepository;
 
 
 @Configuration
@@ -121,7 +119,7 @@ public class AssetComponentConfiguration {
     final ClockRepository clockRepository = new SystemClockRepository();
     final HdesClient dataTypeRepository = HdesClientImpl.builder().objectMapper(objectMapper).build();
     final FlowRepository flowRepository = flowRepository(dataTypeRepository, clockRepository, origServiceStore, objectMapper);
-    final ScriptRepository scriptRepository = scriptRepository(objectMapper, dataTypeRepository, context);
+
     
     final ServiceInit init = new ServiceInit() {
       @Override
@@ -133,8 +131,8 @@ public class AssetComponentConfiguration {
     final ServiceIdGen idGen = new GenericServiceIdGen();
     final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders = new HashMap<>();
     builders.put(ServiceType.DT, (store) -> new DtServiceBuilder(idGen, dataTypeRepository, clockRepository, getDefaultContent(ServiceType.DT)));
-    builders.put(ServiceType.FLOW, (store) -> new FlowServiceBuilder(idGen, store, flowRepository, flowRepository, clockRepository, getDefaultContent(ServiceType.FLOW)));
-    builders.put(ServiceType.FLOW_TASK, (store) -> new FlowTaskServiceBuilder(idGen, store, init, scriptRepository, objectMapper, getDefaultContent(ServiceType.FLOW_TASK)));
+    builders.put(ServiceType.FLOW, (store) -> new FlowServiceBuilder(idGen, store, flowRepository, clockRepository, getDefaultContent(ServiceType.FLOW)));
+    builders.put(ServiceType.FLOW_TASK, (store) -> new FlowTaskServiceBuilder(idGen, store, dataTypeRepository, objectMapper, getDefaultContent(ServiceType.FLOW_TASK)));
     builders.put(ServiceType.TAG, (store) -> new TagServiceBuilder(assetConfigBean.getTagFormat(), idGen, getDefaultContent(ServiceType.TAG)));
     
     final Map<ServiceType, ServicePostProcessor> postProcessors = new HashMap<>();
@@ -146,7 +144,7 @@ public class AssetComponentConfiguration {
     final ServiceStore serviceStore = new PostProcessingServiceStore(origServiceStore, servicePostProcessorSupplier); 
     
     return new GenericAssetServiceRepository(dataTypeRepository, objectMapper,
-        flowRepository, scriptRepository, 
+        flowRepository, 
         builders, serviceStore);
   }
 
@@ -215,11 +213,6 @@ public class AssetComponentConfiguration {
     FlowExecutorRepository executorRepository = new GenericFlowExecutorFactory(executors);  
     //FlowAstFactory nodeRepository = new GenericNodeRepository(mapper, new FlowDataTypeSupplier(serviceStore));
     return new GenericFlowRepository(dataTypeRepository, executorRepository, objectMapper, clockRepository.get());
-  }
-
-
-  private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesClient dataTypeRepository, ApplicationContext context) {
-    return new GenericScriptRepository(dataTypeRepository, objectMapper);
   }
 
   protected String getDefaultContent(ServiceType type) {

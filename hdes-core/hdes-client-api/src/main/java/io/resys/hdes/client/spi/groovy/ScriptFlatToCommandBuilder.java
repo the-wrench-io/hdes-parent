@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.script.spi.builders;
+package io.resys.hdes.client.spi.groovy;
 
 /*-
  * #%L

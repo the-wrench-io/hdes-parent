@@ -58,26 +58,20 @@ import io.resys.hdes.client.spi.serializers.TimeDataTypeDeserializer;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesTypeDefsFactory {
-
+  @FunctionalInterface
+  public interface ServiceInit {
+    <T> T get(Class<T> type);
+  }
+  
+  private final ServiceInit serviceInit;
   private final Map<ValueType, Deserializer> deserializers;
   private final Map<ValueType, Serializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
   private final ObjectMapper objectMapper; 
-  
-  public HdesTypeDefsFactory(
-      ObjectMapper objectMapper,
-      Map<ValueType, Deserializer> deserializers,
-      Map<ValueType, Serializer> serializers,
-      ValueTypeResolver valueTypeResolver) {
-    super();
-    this.deserializers = deserializers;
-    this.serializers = serializers;
-    this.valueTypeResolver = valueTypeResolver;
-    this.objectMapper = objectMapper;
-  }
 
-  public HdesTypeDefsFactory(ObjectMapper objectMapper) {
+  public HdesTypeDefsFactory(ObjectMapper objectMapper, ServiceInit serviceInit) {
     this.objectMapper = objectMapper;
+    this.serviceInit = serviceInit;
     
     Map<ValueType, Deserializer> deserializers = new HashMap<>();
     this.deserializers = Collections.unmodifiableMap(deserializers);
@@ -314,4 +308,9 @@ public class HdesTypeDefsFactory {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
+  
+  public ServiceInit getServiceInit() {
+    return this.serviceInit;
+  }
+   
 }

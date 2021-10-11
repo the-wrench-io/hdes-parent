@@ -27,24 +27,25 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 import io.resys.hdes.client.spi.decision.DecisionAstBuilderImpl;
 import io.resys.hdes.client.spi.flow.FlowAstBuilderImpl;
+import io.resys.hdes.client.spi.groovy.GroovyCompilationCustomizer;
 import io.resys.hdes.client.spi.groovy.ServiceAstBuilderImpl;
-import io.resys.hdes.client.spi.groovy.ServiceExecutorCompilationCustomizer;
 
 public class HdesAstTypesImpl implements HdesAstTypes {
   private final ObjectMapper yaml = new ObjectMapper(new YAMLFactory());
   private final GroovyClassLoader gcl;
   private final HdesTypeDefsFactory typeDefs;
   
-  public HdesAstTypesImpl(ObjectMapper objectMapper) {
+  public HdesAstTypesImpl(ObjectMapper objectMapper, ServiceInit init) {
     super();
     CompilerConfiguration config = new CompilerConfiguration();
     config.setTargetBytecode(CompilerConfiguration.JDK8);
-    config.addCompilationCustomizers(new ServiceExecutorCompilationCustomizer());
+    config.addCompilationCustomizers(new GroovyCompilationCustomizer());
     
     this.gcl = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), config);
-    this.typeDefs = new HdesTypeDefsFactory(objectMapper);
+    this.typeDefs = new HdesTypeDefsFactory(objectMapper, init);
   }
   @Override
   public DecisionAstBuilder decision() {

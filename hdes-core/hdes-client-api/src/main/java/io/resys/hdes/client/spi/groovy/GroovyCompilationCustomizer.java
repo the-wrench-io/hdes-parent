@@ -32,13 +32,13 @@ import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 
-import io.resys.hdes.client.api.programs.ServiceProgram.ServiceExecutorType0;
-import io.resys.hdes.client.api.programs.ServiceProgram.ServiceExecutorType1;
-import io.resys.hdes.client.api.programs.ServiceProgram.ServiceExecutorType2;
+import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType0;
+import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType1;
+import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType2;
 
-public class ServiceExecutorCompilationCustomizer extends CompilationCustomizer {
+public class GroovyCompilationCustomizer extends CompilationCustomizer {
 
-  public ServiceExecutorCompilationCustomizer() {
+  public GroovyCompilationCustomizer() {
     super(CompilePhase.CONVERSION);
  }
   

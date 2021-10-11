@@ -40,7 +40,6 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
 
   private final ServiceIdGen idGen;
   private final FlowRepository flowRepository;
-  private final FlowRepository flowModelRepository;
   private final ClockRepository clockRepository;
   private final String defaultContent;
   private final ServiceStore store;
@@ -50,13 +49,11 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
       ServiceIdGen idGen,
       ServiceStore store,
       FlowRepository flowRepository,
-      FlowRepository flowModelRepository,
       ClockRepository clockRepository, String defaultContent) {
     super();
     this.idGen = idGen;
     this.store = store;
     this.flowRepository = flowRepository;
-    this.flowModelRepository = flowModelRepository;
     this.clockRepository = clockRepository;
     this.defaultContent = defaultContent;
   }
@@ -66,7 +63,7 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
     boolean isDefault = StringUtils.isEmpty(src);
     String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
 
-    Map.Entry<String, FlowProgram> commandsAndModel = flowModelRepository.createModel().content(content)
+    Map.Entry<String, FlowProgram> commandsAndModel = flowRepository.createModel().content(content)
         .rename(rename ? Optional.of(name) : Optional.empty())
         .build();
     FlowProgram model = commandsAndModel.getValue();

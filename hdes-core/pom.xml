@@ -16,7 +16,6 @@
     <module>hdes-client</module>
     <module>hdes-covertype</module>
     <module>hdes-flow</module>
-    <module>hdes-script</module>
     <module>hdes-services</module>
   </modules>
 

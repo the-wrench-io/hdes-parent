@@ -40,10 +40,14 @@ import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 import io.resys.hdes.client.spi.decision.DecisionCSVBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
+import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesClientImpl implements HdesClient {
@@ -113,8 +117,8 @@ public class HdesClientImpl implements HdesClient {
   public ProgramBuilder program() {
     return new ProgramBuilder() {
       @Override
-      public AstService ast(AstService ast) {
-        return null;
+      public ServiceProgram ast(AstService ast) {
+        return new ServiceProgramBuilder(types).build(ast);
       }
       @Override
       public DecisionProgram ast(AstDecision ast) {
@@ -156,11 +160,14 @@ public class HdesClientImpl implements HdesClient {
         return this;
       }
       @Override
-      public ServiceExecutor service(AstService model) {
-        // TODO Auto-generated method stub
-        return null;
+      public ServiceExecutor service(AstService ast) {
+        return new ServiceExecutor() {
+          @Override
+          public ServiceResult andGetBody() {
+            return null;
+          }
+        };
       }
-
       @Override
       public FlowExecutor flow(FlowProgram model) {
         // TODO Auto-generated method stub
@@ -214,10 +221,15 @@ public class HdesClientImpl implements HdesClient {
   
   public static class Builder {  
     private ObjectMapper objectMapper;
+    private ServiceInit serviceInit;
     private HdesStore store;
     
     public Builder objectMapper(ObjectMapper objectMapper) {
       this.objectMapper = objectMapper;
+      return this;
+    }
+    public Builder serviceInit(ServiceInit serviceInit) {
+      this.serviceInit = serviceInit;
       return this;
     }
     public Builder store(HdesStore store) {
@@ -225,9 +237,10 @@ public class HdesClientImpl implements HdesClient {
       return this;
     }
     public HdesClientImpl build() {
-      HdesAssert.notNull(objectMapper, () -> "ObjectMapper must be defined!");
-      final var types = new HdesTypeDefsFactory(objectMapper);
-      final var ast = new HdesAstTypesImpl(objectMapper);
+      HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
+      HdesAssert.notNull(serviceInit, () -> "serviceInit must be defined!");
+      final var types = new HdesTypeDefsFactory(objectMapper, serviceInit);
+      final var ast = new HdesAstTypesImpl(objectMapper, serviceInit);
       return new HdesClientImpl(types, store, ast);
     }
   }

@@ -28,7 +28,6 @@ import java.util.function.Consumer;
 
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
@@ -36,15 +35,13 @@ import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
 public class FlowTaskServiceExecution implements ServiceExecution {
 
   private final ServiceProgram script;
-  private final ServiceInit init;
   private final List<Object> facts = new ArrayList<>();
   private final TypeDef taskInputModel;
   private FlowTaskInput taskInput;
 
-  public FlowTaskServiceExecution(ServiceProgram script, ServiceInit init) {
+  public FlowTaskServiceExecution(ServiceProgram script) {
     super();
     this.script = script;
-    this.init = init;
     this.taskInputModel = script.getAst().getHeaders().getAcceptDefs().stream()
         .filter(p -> p.getData())
         .findFirst()

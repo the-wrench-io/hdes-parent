@@ -49,11 +49,11 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
 import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult;
 import io.resys.hdes.client.api.programs.FlowResult.FlowContext;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices;
@@ -398,12 +398,11 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowTaskCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    ServiceProgram commandModel  = assetServiceRepository.getStRepo().createBuilder()
-        .src(command.getInput())
-        .rev(command.getRev())
-        .build();
-
-    JsonNode output = objectMapper.convertValue(commandModel.getAst(), JsonNode.class);
+    AstService commandModel  = assetServiceRepository.getTypes().ast()
+        .commands((ArrayNode) command.getInput(), command.getRev())
+        .service();
+    
+    JsonNode output = objectMapper.convertValue(commandModel, JsonNode.class);
     return output;
   }
 

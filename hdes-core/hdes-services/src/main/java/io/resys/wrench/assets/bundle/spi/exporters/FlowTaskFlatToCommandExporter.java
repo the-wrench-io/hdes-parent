@@ -46,7 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import io.resys.wrench.assets.script.spi.builders.ScriptFlatToCommandBuilder;
+import io.resys.hdes.client.spi.groovy.ScriptFlatToCommandBuilder;
 
 public class FlowTaskFlatToCommandExporter {
   private final ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();

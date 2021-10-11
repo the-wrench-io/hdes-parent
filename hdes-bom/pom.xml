@@ -24,11 +24,6 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-script</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-services</artifactId>
         <version>${project.version}</version>
       </dependency>

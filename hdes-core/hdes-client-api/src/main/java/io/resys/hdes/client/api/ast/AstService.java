@@ -27,5 +27,22 @@ import org.immutables.value.Value;
 
 @Value.Immutable
 public interface AstService extends AstBody, Serializable {
-  Class<?> getType();
+
+  Class<ServiceExecutorType> getBeanType();
+  AstServiceType getExecutorType();
+  
+  
+  enum AstServiceType { TYPE_0, TYPE_1, TYPE_2 }
+  
+  interface ServiceExecutorType {}
+  
+  interface ServiceExecutorType0<O  extends Serializable> extends ServiceExecutorType {
+    O execute();
+  }  
+  interface ServiceExecutorType1<I, O extends Serializable> extends ServiceExecutorType {
+    O execute(I input1);
+  }
+  interface ServiceExecutorType2<I, I2, O extends Serializable> extends ServiceExecutorType {
+    O execute(I input1, I2 input2);
+  }
 }

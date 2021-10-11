@@ -48,13 +48,11 @@ import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
 import io.resys.wrench.assets.bundle.spi.migration.GenericServiceExporter;
 import io.resys.wrench.assets.flow.api.FlowRepository;
-import io.resys.wrench.assets.script.api.ScriptRepository;
 
 public class GenericAssetServiceRepository implements AssetServiceRepository {
 
   private final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders;
   private final FlowRepository flowRepository;
-  private final ScriptRepository scriptRepository;
   private final ServiceStore serviceStore;
   private final ObjectMapper objectMapper;
   private final HdesClient types;
@@ -63,7 +61,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
       HdesClient types,
       ObjectMapper objectMapper,
       FlowRepository flowRepository,
-      ScriptRepository scriptRepository,
       
       Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders,
       ServiceStore serviceStore) {
@@ -72,7 +69,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     this.types = types;
     this.objectMapper = objectMapper;
     this.flowRepository = flowRepository;
-    this.scriptRepository = scriptRepository;
     
     this.builders = builders;
     this.serviceStore = serviceStore;
@@ -99,11 +95,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     createQuery().list().stream().sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).forEachOrdered(hashBuilder::add);
     return hashBuilder.build();
   }
-  @Override
-  public ScriptRepository getStRepo() {
-    return scriptRepository;
-  }
-
   @Override
   public FlowRepository getFlRepo() {
     return flowRepository;
