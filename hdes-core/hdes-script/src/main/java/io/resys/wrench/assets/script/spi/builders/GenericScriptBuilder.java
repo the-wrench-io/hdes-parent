@@ -30,12 +30,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
-import io.resys.hdes.client.api.ast.ImmutableServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.execution.Service;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.ImmutableAstService;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.script.api.ScriptRepository.ScriptBuilder;
 import io.resys.wrench.assets.script.spi.ServiceHistoric;
 import io.resys.wrench.assets.script.spi.ServiceTemplate;
@@ -43,14 +43,14 @@ import io.resys.wrench.assets.script.spi.ServiceTemplate;
 public class GenericScriptBuilder implements ScriptBuilder {
   private static final Charset UTF_8 = Charset.forName("utf-8");
 
-  private final HdesAstTypes dataTypeRepository;
+  private final HdesClient dataTypeRepository;
   private final ObjectMapper objectMapper;
 
   private String src;
   private Integer rev;
   private JsonNode jsonNode;
 
-  public GenericScriptBuilder(HdesAstTypes dataTypeRepository, ObjectMapper objectMapper) {
+  public GenericScriptBuilder(HdesClient dataTypeRepository, ObjectMapper objectMapper) {
     super();
     this.dataTypeRepository = dataTypeRepository;
     this.objectMapper = objectMapper;
@@ -85,8 +85,8 @@ public class GenericScriptBuilder implements ScriptBuilder {
   }
 
   @Override
-  public Service build() {
-    Assert.isTrue(src != null || jsonNode != null, () -> "src can't be null!");
+  public ServiceProgram build() {
+    HdesAssert.isTrue(src != null || jsonNode != null, () -> "src can't be null!");
     if (src != null) {
       try {
         jsonNode = objectMapper.readTree(src);
@@ -96,18 +96,17 @@ public class GenericScriptBuilder implements ScriptBuilder {
     }
 
     final ArrayNode sourceCommands = (ArrayNode) (jsonNode.isArray() ? jsonNode : jsonNode.get("commands"));
-    final var ast = dataTypeRepository.service().src(sourceCommands).build();
+    final var ast = dataTypeRepository.ast().commands(sourceCommands).service();
     try {
       final Class<?> beanType = ast.getType();
       return new ServiceTemplate(ast, beanType);
     } catch (Exception e) {
       if (this.rev != null) {
-        ServiceAstType model = ImmutableServiceAstType.builder()
+        AstService model = ImmutableAstService.builder()
             .name("historic")
-            .src(ast.getSrc())
             .commands(ast.getCommands())
             .rev(ast.getCommands().size())
-            .headers(ImmutableAstHeaders.builder().build())
+            .headers(ImmutableHeaders.builder().build())
             .build();
         return new ServiceHistoric(model);
       }

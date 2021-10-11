@@ -1,5 +1,7 @@
 package io.resys.hdes.client;
 
+import io.resys.hdes.client.api.HdesAstTypes;
+
 /*-
  * #%L
  * hdes-client
@@ -42,7 +44,7 @@ public class HdesClientImpl implements HdesClient {
   }
 
   @Override
-  public ModelBuilder model() {
+  public ProgramBuilder program() {
     // TODO Auto-generated method stub
     throw new RuntimeException("Need to implemented the client");
   }
@@ -57,6 +59,18 @@ public class HdesClientImpl implements HdesClient {
   public HdesStore store() {
     // TODO Auto-generated method stub
     return new HdesDocumentStore(config);
+  }
+
+  @Override
+  public HdesAstTypes astTypes() {
+    // TODO Auto-generated method stub
+    throw new RuntimeException("Need to implemented the client");
+  }
+
+  @Override
+  public CSVBuilder csv() {
+    // TODO Auto-generated method stub
+    throw new RuntimeException("Need to implemented the client");
   }
 
 }

@@ -22,7 +22,7 @@ package io.resys.wrench.assets.flow.spi.model;
 
 import java.time.LocalDateTime;
 
-import io.resys.hdes.client.api.execution.Flow.FlowHistory;
+import io.resys.hdes.client.api.programs.FlowResult.FlowHistory;
 
 public class FlowHistoryBean implements FlowHistory {
 

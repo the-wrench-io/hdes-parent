@@ -25,31 +25,31 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 
-public class InputAutocomplete implements NodeFlowVisitor {
+public class InputAutocomplete implements AstFlowNodeVisitor {
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    FlowAstNode node = flow.get(NodeFlowBean.KEY_INPUTS);
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    AstFlowNode node = flow.get(NodeFlowBean.KEY_INPUTS);
     if(node == null) {
       return;
     }
 
-    List<FlowAstNode> allInputs = new ArrayList<>(node.getChildren().values());
+    List<AstFlowNode> allInputs = new ArrayList<>(node.getChildren().values());
     int previous = node.getStart();
     Collections.sort(allInputs);
 
     Collection<FlowAstCommandRange> range = new ArrayList<>();
-    for(FlowAstNode input : allInputs) {
+    for(AstFlowNode input : allInputs) {
       if(input.getStart() - previous > 1) {
-        range.add(FlowNodesFactory.range().build(previous + 1, input.getStart() - 1));
+        range.add(AstFlowNodesFactory.range().build(previous + 1, input.getStart() - 1));
       }
       previous = node.getStart();
     }
@@ -58,7 +58,7 @@ public class InputAutocomplete implements NodeFlowVisitor {
     int end = flow.hasNonNull(NodeFlowBean.KEY_TASKS) ? flow.get(NodeFlowBean.KEY_TASKS).getStart() - 1 : flow.getEnd();
 
     modelBuilder.addAutocomplete(
-        FlowNodesFactory.ac()
+        AstFlowNodesFactory.ac()
         .id(InputAutocomplete.class.getSimpleName())
         .addField(2, "{name}")
         .addField(4, "required", "{required}")

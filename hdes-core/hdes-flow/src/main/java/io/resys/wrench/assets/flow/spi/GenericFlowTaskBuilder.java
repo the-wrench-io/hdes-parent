@@ -24,8 +24,8 @@ package io.resys.wrench.assets.flow.spi;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowTaskBuilder;
@@ -41,7 +41,7 @@ public class GenericFlowTaskBuilder implements FlowRepository.FlowTaskBuilder {
   }
 
   @Override
-  public FlowTask complete(Flow flow, String id) {
+  public FlowTask complete(FlowResult flow, String id) {
     FlowTask task = flow.getContext().getTask(id);
     if(data != null) {
       task.putVariables(data);

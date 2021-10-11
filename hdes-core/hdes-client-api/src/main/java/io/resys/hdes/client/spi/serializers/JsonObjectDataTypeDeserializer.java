@@ -24,10 +24,10 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.DataTypeDeserializer;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Deserializer;
 
-public class JsonObjectDataTypeDeserializer implements DataTypeDeserializer {
+public class JsonObjectDataTypeDeserializer implements Deserializer {
 
   private final ObjectMapper objectMapper;
 
@@ -37,7 +37,7 @@ public class JsonObjectDataTypeDeserializer implements DataTypeDeserializer {
   }
 
   @Override
-  public Serializable deserialize(AstDataType dataType, Object value) {
+  public Serializable deserialize(TypeDef dataType, Object value) {
     if(value == null) {
       return null;
     }

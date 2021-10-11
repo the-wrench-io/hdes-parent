@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.execution.Flow.FlowContext;
-import io.resys.hdes.client.api.execution.Flow.FlowHistory;
-import io.resys.hdes.client.api.execution.Flow.FlowStatus;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.programs.FlowResult.FlowContext;
+import io.resys.hdes.client.api.programs.FlowResult.FlowHistory;
+import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class FlowContextBean implements FlowContext {
 
@@ -113,7 +113,7 @@ public class FlowContextBean implements FlowContext {
   @Override
   public FlowTask getTask(String taskId) {
     Optional<FlowTask> task = this.tasks.stream().filter(t -> t.getId().equals(taskId)).findFirst();
-    Assert.isTrue(task.isPresent(), () -> "No task with id:" + taskId + " known task id-s: " + this.tasks.stream().map(t -> t.getId()).collect(Collectors.toList())+ "!");
+    HdesAssert.isTrue(task.isPresent(), () -> "No task with id:" + taskId + " known task id-s: " + this.tasks.stream().map(t -> t.getId()).collect(Collectors.toList())+ "!");
     return task.get();
   }
   @Override

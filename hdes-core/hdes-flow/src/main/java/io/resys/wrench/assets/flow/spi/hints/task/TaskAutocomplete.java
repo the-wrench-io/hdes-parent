@@ -24,43 +24,43 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstNode;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 
-public class TaskAutocomplete implements NodeFlowVisitor {
+public class TaskAutocomplete implements AstFlowNodeVisitor {
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    FlowAstNode tasks = flow.get(NodeFlowBean.KEY_TASKS);
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    AstFlowNode tasks = flow.get(NodeFlowBean.KEY_TASKS);
     if(tasks == null) {
       return;
     }
 
-    List<FlowAstNode> taskChildren = new ArrayList<>(flow.getTasks().values());
+    List<AstFlowNode> taskChildren = new ArrayList<>(flow.getTasks().values());
     Collections.sort(taskChildren);
 
     List<FlowAstCommandRange> ranges = new ArrayList<>();
     int previous = tasks.getStart();
-    for(FlowAstNode child : taskChildren) {
+    for(AstFlowNode child : taskChildren) {
 
       int start = child.getStart() - 1;
       if(previous <= start) {
-        ranges.add(FlowNodesFactory.range().build(previous, start));
+        ranges.add(AstFlowNodesFactory.range().build(previous, start));
       }
       previous = child.getEnd() + 1;
     }
 
     if(flow.getEnd() >= previous) {
-      ranges.add(FlowNodesFactory.range().build(previous, flow.getEnd()));
+      ranges.add(AstFlowNodesFactory.range().build(previous, flow.getEnd()));
     }
 
     modelBuilder.addAutocomplete(
-        FlowNodesFactory.ac()
+        AstFlowNodesFactory.ac()
         .id(TaskAutocomplete.class.getSimpleName())
         .addField(2, "- {name}")
         .addField(6, "id", "{id}")

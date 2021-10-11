@@ -26,7 +26,7 @@
   {
     "id": 4,
     "type": "ADD",
-    "value": "import io.resys.hdes.client.api.execution.ServiceData;",
+    "value": "import io.resys.hdes.client.api.programs.ServiceData;",
     "origin": "SOURCE"
   },
   {

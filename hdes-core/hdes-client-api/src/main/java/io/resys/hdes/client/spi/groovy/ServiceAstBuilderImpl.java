@@ -36,30 +36,31 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesAstTypes.ServiceAstBuilder;
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.AstType.AstHeaders;
-import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
-import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
-import io.resys.hdes.client.api.ast.ImmutableServiceAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstBody.Headers;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.ast.ImmutableAstService;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.ServiceAstException;
-import io.resys.hdes.client.api.execution.ServiceData;
-import io.resys.hdes.client.spi.HdesDataTypeFactory;
+import io.resys.hdes.client.api.programs.ServiceData;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class ServiceAstBuilderImpl implements ServiceAstBuilder {
 
   
-  private final HdesDataTypeFactory dataTypeRepository;
-  private final List<AstCommandType> src = new ArrayList<>();
+  private final HdesTypeDefsFactory dataTypeRepository;
+  private final List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   private final GroovyClassLoader gcl;
 
-  public ServiceAstBuilderImpl(HdesDataTypeFactory dataTypeRepository, GroovyClassLoader gcl) {
+  public ServiceAstBuilderImpl(HdesTypeDefsFactory dataTypeRepository, GroovyClassLoader gcl) {
     super();
     this.dataTypeRepository = dataTypeRepository;
     this.gcl = gcl;
@@ -72,14 +73,14 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
     for (JsonNode node : src) {
       final String type = getString(node, "type");
-      this.src.add(ImmutableAstCommandType.builder().id(getString(node, "id")).value(getString(node, "value"))
+      this.src.add(ImmutableAstCommand.builder().id(getString(node, "id")).value(getString(node, "value"))
           .type(AstCommandValue.valueOf(type)).build());
     }
     return this;
   }
 
   @Override
-  public ServiceAstBuilderImpl src(List<AstCommandType> src) {
+  public ServiceAstBuilderImpl src(List<AstCommand> src) {
     if (src == null) {
       return this;
     }
@@ -94,8 +95,8 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
   }
 
   @Override
-  public ServiceAstType build() {
-    Assert.notNull(src, () -> "src can't ne null!");
+  public AstService build() {
+    HdesAssert.notNull(src, () -> "src can't ne null!");
 
     final var value = new StringBuilder();
     final var changes = AstChangesetFactory.src(src, rev);
@@ -114,12 +115,13 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     
     try {
       final Class<?> beanType = gcl.parseClass(source);
-      final AstHeaders method = getHeaders(beanType);
+      final Headers method = getHeaders(beanType);
       
-      return ImmutableServiceAstType.builder()
+      return ImmutableAstService.builder()
+          .bodyType(EntityType.FLOW_TASK)
           .name(beanType.getSimpleName())
           .headers(method)
-          .src(source)
+          .source(source)
           .rev(changes.getCommands().size())
           .commands(changes.getCommands())
           .type(beanType)
@@ -129,24 +131,24 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
   }
   
-  protected AstHeaders getHeaders(Class<?> beanType) {
-    List<AstHeaders> result = new ArrayList<>();
+  protected Headers getHeaders(Class<?> beanType) {
+    List<Headers> result = new ArrayList<>();
     for (Method method : beanType.getDeclaredMethods()) {
       if (method.getName().equals("execute") && Modifier.isPublic(method.getModifiers())
           && !Modifier.isVolatile(method.getModifiers())) {
 
-        AstHeaders params = getParams(method);
-        Assert.isTrue(result.isEmpty(), () -> "Only one 'execute' method allowed!");
+        Headers params = getParams(method);
+        HdesAssert.isTrue(result.isEmpty(), () -> "Only one 'execute' method allowed!");
         result.add(params);
       }
     }
-    Assert.isTrue(result.size() == 1, () -> "There must be one 'execute' method!");
+    HdesAssert.isTrue(result.size() == 1, () -> "There must be one 'execute' method!");
     return result.iterator().next();
   }
   
 
-  protected AstHeaders getParams(Method method) {
-    final var result = ImmutableAstHeaders.builder();
+  protected Headers getParams(Method method) {
+    final var result = ImmutableHeaders.builder();
     int index = 0;
     for(Parameter parameter : method.getParameters()) {
       Class<?> type = parameter.getType();
@@ -161,7 +163,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
           beanType(parameter.getType()).
           valueType(ValueType.OBJECT);
       getWrenchFlowParameter(dataTypeBuilder, parameter.getType(), isData, Direction.IN);
-      result.addInputs(dataTypeBuilder.build());
+      result.addAcceptDefs(dataTypeBuilder.build());
     }
 
     index = 0;
@@ -178,7 +180,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
           beanType(returnType).
           valueType(ValueType.OBJECT);
       getWrenchFlowParameter(dataTypeBuilder, returnType, true, Direction.OUT);
-      result.addOutputs(dataTypeBuilder.build());
+      result.addReturnDefs(dataTypeBuilder.build());
     }
 
     return result.build();
@@ -191,7 +193,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
     int index = 0;
 
-    Assert.isTrue(Serializable.class.isAssignableFrom(type), () -> "Flow types must implement Serializable!");
+    HdesAssert.isTrue(Serializable.class.isAssignableFrom(type), () -> "Flow types must implement Serializable!");
     for(Field field : type.getDeclaredFields()) {
       int modifier = field.getModifiers();
       if( Modifier.isFinal(modifier) ||

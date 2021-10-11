@@ -47,15 +47,15 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowContext;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.execution.Service;
-import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowContext;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
@@ -166,7 +166,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
       } else if(service.getType() == ServiceType.FLOW) {
 
         if(entity.getInput() != null) {
-          Map.Entry<Flow, ObjectNode> result = transientFlowExecutor.debug(service, objectMapper.readTree(entity.getInput()));
+          Map.Entry<FlowResult, ObjectNode> result = transientFlowExecutor.debug(service, objectMapper.readTree(entity.getInput()));
           Map<String, Object> output = new HashMap<>();
           
           output.put("debug", result.getKey());
@@ -199,7 +199,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
             JsonNode transaction;
             
             try {
-              Flow flow = executeCsvRecord(headers, row, service);
+              FlowResult flow = executeCsvRecord(headers, row, service);
               transaction = getLastTask(flow);
             } catch(DataException e) {
               transaction = objectMapper.createObjectNode();
@@ -266,9 +266,9 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   }
   
   
-  private JsonNode getLastTask(Flow flow) {
+  private JsonNode getLastTask(FlowResult flow) {
     FlowContext context = flow.getContext();
-    FlowModel model = flow.getModel();
+    FlowProgram model = flow.getModel();
     Object output = null;
     for(FlowTask task : context.getTasks()) {
       if(isTaskPartOfOutput(task, model)) {
@@ -292,8 +292,8 @@ public class GenericAssetIdeServices implements AssetIdeServices {
     return jsonNode;
   }
   
-  private boolean isTaskPartOfOutput(FlowTask task, FlowModel model) {
-    for(FlowTaskModel taskModel : model.getTasks()) {
+  private boolean isTaskPartOfOutput(FlowTask task, FlowProgram model) {
+    for(Step taskModel : model.getSteps()) {
       if(!taskModel.getId().equals(task.getModelId())) {
         continue;
       }
@@ -304,7 +304,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
     return false;
   }
   
-  private Flow executeCsvRecord(Map<Integer, String> headers, CSVRecord row, AssetService service) throws JsonProcessingException {
+  private FlowResult executeCsvRecord(Map<Integer, String> headers, CSVRecord row, AssetService service) throws JsonProcessingException {
     ObjectNode inputEntity = objectMapper.createObjectNode();
     int columnIndex = 0;
     for(String columnValue : row) {
@@ -315,7 +315,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
         inputEntity.set(columnName, objectMapper.convertValue(columnValue, JsonNode.class));
       }
     }
-    Map.Entry<Flow, ObjectNode> result = transientFlowExecutor.execute(service, inputEntity);
+    Map.Entry<FlowResult, ObjectNode> result = transientFlowExecutor.execute(service, inputEntity);
     return result.getKey();
   }
   
@@ -376,10 +376,9 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createDtCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    DecisionAstType commandModel  = assetServiceRepository.getTypes().decision()
-        .src(command.getInput())
-        .rev(command.getRev())
-        .build();
+    AstDecision commandModel  = assetServiceRepository.getTypes().ast()
+        .commands((ArrayNode) command.getInput(), command.getRev())
+        .decision();
 
     JsonNode output = objectMapper.convertValue(commandModel, JsonNode.class);
     return output;
@@ -388,10 +387,9 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    FlowAstType commandModel  = assetServiceRepository.getTypes().flow()
-        .src((ArrayNode) command.getInput())
-        .rev(command.getRev())
-        .build();
+    AstFlow commandModel  = assetServiceRepository.getTypes().ast()
+        .commands((ArrayNode) command.getInput(), command.getRev())
+        .flow();
 
     JsonNode output = objectMapper.convertValue(commandModel, JsonNode.class);
     return output;
@@ -400,12 +398,12 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   protected JsonNode createFlowTaskCommands(AssetCommand command) {
     Assert.isTrue(command.getInput() == null || command.getInput().isArray(), "command input must be array!");
 
-    Service commandModel  = assetServiceRepository.getStRepo().createBuilder()
+    ServiceProgram commandModel  = assetServiceRepository.getStRepo().createBuilder()
         .src(command.getInput())
         .rev(command.getRev())
         .build();
 
-    JsonNode output = objectMapper.convertValue(commandModel.getModel(), JsonNode.class);
+    JsonNode output = objectMapper.convertValue(commandModel.getAst(), JsonNode.class);
     return output;
   }
 

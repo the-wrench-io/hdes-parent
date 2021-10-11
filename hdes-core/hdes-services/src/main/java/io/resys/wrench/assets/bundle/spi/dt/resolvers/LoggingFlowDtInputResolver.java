@@ -23,22 +23,22 @@ package io.resys.wrench.assets.bundle.spi.dt.resolvers;
 import java.io.Serializable;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
+import io.resys.hdes.client.api.HdesClient.ExecutorInput;
+import io.resys.hdes.client.api.ast.TypeDef;
 
-public class LoggingFlowDtInputResolver implements Serializable, DtInputResolver {
+public class LoggingFlowDtInputResolver implements Serializable, ExecutorInput {
   private static final long serialVersionUID = 599120195165289167L;
   private final Map<String, Serializable> log;
-  private final DtInputResolver delegate;
+  private final ExecutorInput delegate;
 
-  public LoggingFlowDtInputResolver(Map<String, Serializable> log, DtInputResolver delegate) {
+  public LoggingFlowDtInputResolver(Map<String, Serializable> log, ExecutorInput delegate) {
     super();
     this.log = log;
     this.delegate = delegate;
   }
 
   @Override
-  public Object apply(AstDataType t) {
+  public Object apply(TypeDef t) {
     Object result = delegate.apply(t);
     if(result == null || result instanceof Serializable) {
       log.put(t.getName(), (Serializable) result);

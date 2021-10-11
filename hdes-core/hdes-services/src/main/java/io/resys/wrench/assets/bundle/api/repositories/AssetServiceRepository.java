@@ -35,11 +35,10 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 
@@ -48,17 +47,15 @@ public interface AssetServiceRepository {
   ServiceExecutor executor();
   ServiceBuilder createBuilder(ServiceType type);
   ServiceQuery createQuery();
-  ExportBuilder createExport();
   ServiceStore createStore();
   String getHash();
   MigrationBuilder createMigration();
   Migration readMigration(String json);
   String toSrc(MigrationValue migration);
   
-  HdesAstTypes getTypes();
-  DecisionTableRepository getDtRepo();
   ScriptRepository getStRepo();
   FlowRepository getFlRepo();
+  HdesClient getTypes();
   
   interface MigrationBuilder {
     Migration build();
@@ -79,7 +76,7 @@ public interface AssetServiceRepository {
     String getId();
     ServiceType getType();
     String getName();
-    List<AstCommandType> getCommands();
+    List<AstCommand> getCommands();
   }
   
   interface ServiceExecutor {
@@ -98,12 +95,6 @@ public interface AssetServiceRepository {
     DtServiceExecutor withEntity(Object inputObject);
     Map<String, Serializable> andGet();
     List<Map<String, Serializable>> andFind();
-  }
-  
-  interface ExportBuilder {
-    ExportBuilder type(ExportType type);
-    ExportBuilder service(AssetService service);
-    String build();
   }
 
   interface ServiceStore {
@@ -202,7 +193,7 @@ public interface AssetServiceRepository {
     ServiceType getType();
     ServiceStatus getStatus();
     List<ServiceError> getErrors();
-    List<AstDataType> getParams();
+    List<TypeDef> getParams();
     List<ServiceAssociation> getAssociations();
     ServiceDataModel withErrors(List<ServiceError> errors);
     ServiceDataModel withTimestamps(Timestamp created, Timestamp modified);

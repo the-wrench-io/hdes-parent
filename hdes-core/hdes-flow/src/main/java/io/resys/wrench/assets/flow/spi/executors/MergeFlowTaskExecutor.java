@@ -1,10 +1,10 @@
 package io.resys.wrench.assets.flow.spi.executors;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowStatus;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
 
 /*-
  * #%L
@@ -31,8 +31,8 @@ import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 public class MergeFlowTaskExecutor implements FlowTaskExecutor {
 
   @Override
-  public FlowTaskModel execute(Flow flow, FlowTask task) {
-    FlowTaskModel node = flow.getModel().getTask().get(task.getModelId());
+  public Step execute(FlowResult flow, FlowTask task) {
+    Step node = flow.getModel().getStep().get(task.getModelId());
 
     boolean isOpen = flow.getContext().getTasks().stream()
         .filter(e -> e.getModelId().equals(node.getPrevious().getId()))

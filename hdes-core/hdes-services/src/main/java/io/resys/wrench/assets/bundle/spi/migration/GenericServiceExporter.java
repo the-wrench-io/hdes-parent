@@ -28,18 +28,20 @@ import java.io.SequenceInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.hdes.client.api.ast.AstCommandType.AstCommandValue;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.ImmutableAstCommandType;
-import io.resys.hdes.client.api.execution.Service;
-import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
@@ -48,8 +50,6 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Mig
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigration;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigrationValue;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.spi.export.CommandModelDecisionTableExporter;
 
 
 
@@ -80,26 +80,26 @@ public class GenericServiceExporter implements MigrationBuilder {
     }
   }
 
-  private MigrationValue visitDt(AssetService service) {
-    DecisionTableModel dt = serviceRepository.getDtRepo().createBuilder().format(DecisionTableFormat.JSON)
-        .src(service.getSrc()).build();
-    final var exporter = (CommandModelDecisionTableExporter) new CommandModelDecisionTableExporter(objectMapper)
-        .src(dt);
+  private MigrationValue visitDt(AssetService service) throws IOException {
+    final var dt = serviceRepository.getTypes().ast().commands(service.getSrc()).decision();
 
-    return ImmutableMigrationValue.builder().type(ServiceType.DT).name(service.getName())
+    return ImmutableMigrationValue.builder()
         .id(md5(service.getSrc()))
-        .addAllCommands(exporter.buildCommands()).build();
+        .type(ServiceType.DT)
+        .name(service.getName())
+        .addAllCommands(objectMapper.readValue(dt.getSource(), new TypeReference<List<AstCommand>>() {}))
+        .build();
   }
 
   private MigrationValue visitSt(AssetService service) throws IOException {
     final var builder = ImmutableMigrationValue.builder().id(md5(service.getSrc())).name(service.getName()).type(ServiceType.FLOW_TASK);
-    Service commandModel  = serviceRepository.getStRepo().createBuilder().src(service.getSrc()).build();
-    BufferedReader br = new BufferedReader(new StringReader(commandModel.getModel().getSrc()));
+    ServiceProgram commandModel  = serviceRepository.getStRepo().createBuilder().src(service.getSrc()).build();
+    BufferedReader br = new BufferedReader(new StringReader(commandModel.getAst().getSource()));
     try {
       String line;
       int index = 0;
       while ((line = br.readLine()) != null) {
-        final var command = ImmutableAstCommandType.builder().id(String.valueOf(index++)).value(line)
+        final var command = ImmutableAstCommand.builder().id(String.valueOf(index++)).value(line)
             .type(AstCommandValue.ADD).build();
         builder.addCommands(command);
       }
@@ -112,15 +112,15 @@ public class GenericServiceExporter implements MigrationBuilder {
   private MigrationValue visitFl(AssetService service) throws IOException {
     final var builder = ImmutableMigrationValue.builder().name(service.getName()).id(md5(service.getSrc())).type(ServiceType.FLOW);
     
-    FlowAstType commandModel  = serviceRepository.getTypes().flow()
-        .src((ArrayNode) objectMapper.readTree(service.getSrc()))
-        .build();
+    AstFlow commandModel  = serviceRepository.getTypes().ast()
+        .commands((ArrayNode) objectMapper.readTree(service.getSrc()))
+        .flow();
     BufferedReader br = new BufferedReader(new StringReader(commandModel.getSrc().getValue()));
     try {
       String line;
       int index = 0;
       while ((line = br.readLine()) != null) {
-        final var command = ImmutableAstCommandType.builder().id(String.valueOf(index++)).value(line)
+        final var command = ImmutableAstCommand.builder().id(String.valueOf(index++)).value(line)
             .type(AstCommandValue.ADD).build();
         builder.addCommands(command);
       }

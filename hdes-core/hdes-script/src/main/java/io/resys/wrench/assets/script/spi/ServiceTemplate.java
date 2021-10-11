@@ -23,15 +23,15 @@ package io.resys.wrench.assets.script.spi;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.script.api.ServiceException;
 
-public class ServiceTemplate implements Service {
-  private final ServiceAstType model;
+public class ServiceTemplate implements ServiceProgram {
+  private final AstService model;
   private final Class<?> beanType;
-  private final List<AstDataType> inputs;
+  private final List<TypeDef> inputs;
   private boolean created;
   @SuppressWarnings("rawtypes")
   private ServiceExecutorType0 type0;
@@ -41,10 +41,10 @@ public class ServiceTemplate implements Service {
   private ServiceExecutorType2 type2;
   
   public ServiceTemplate(
-      ServiceAstType model, Class<?> beanType) {
+      AstService model, Class<?> beanType) {
     this.beanType = beanType;
     this.model = model;
-    this.inputs = model.getHeaders().getInputs().stream()
+    this.inputs = model.getHeaders().getAcceptDefs().stream()
         .sorted((p1, p2) -> Integer.compare(p1.getOrder(), p2.getOrder()))
         .collect(Collectors.toList());
   }
@@ -59,8 +59,13 @@ public class ServiceTemplate implements Service {
     return null;
   }
   @Override
-  public ServiceAstType getModel() {
+  public AstService getAst() {
     return model;
+  }
+
+  @Override
+  public String getId() {
+    return model.getName();
   }
 
   @SuppressWarnings({ "rawtypes", "unchecked" })

@@ -23,69 +23,94 @@ package io.resys.hdes.client.api;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-import io.resys.hdes.client.api.ast.AstCommandType;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.FlowAstType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.execution.DecisionTableResult;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.model.DecisionTableModel;
-import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.ServiceResult;
 
 public interface HdesClient {
   AstBuilder ast();
+  HdesAstTypes astTypes();
+  ProgramBuilder program();
   HdesStore store();
-  ModelBuilder model();
   ExecutorBuilder executor();
+  CSVBuilder csv();
+  
+  
+  interface CSVBuilder {
+    String ast(AstDecision ast);
+  }
+  
+//  ExportBuilder export();
+//  
+//  interface ExportBuilder {
+//    String build();
+//  }
 
+  interface ProgramBuilder {
+    FlowProgram ast(AstFlow ast);
+    DecisionProgram ast(AstDecision ast);
+    AstService ast(AstService ast);
+  }
   
   interface FlowExecutor {
     Object andGetTask(String task);
-    Flow andGetBody();
+    FlowResult andGetBody();
   }
   interface DecisionExecutor {
     Map<String, Serializable> andGet();
     List<Map<String, Serializable>> andFind();
-    DecisionTableResult andGetBody();
+    DecisionResult andGetBody();
   }
 
   interface ServiceExecutor {
-    Serializable andGetBody();
+    ServiceResult andGetBody();
   }
   
+  interface ExecutorInput extends Function<TypeDef, Object> {};
+  
   interface ExecutorBuilder {
-    ExecutorBuilder withMap(Map<String, Object> input);
-    ExecutorBuilder withEntity(Object inputObject);
+    ExecutorBuilder inputMap(Map<String, Object> input);
+    ExecutorBuilder inputEntity(Object inputObject);
+    ExecutorBuilder inputList(List<Object> inputObject);
+    ExecutorBuilder inputJson(JsonNode json);
+    ExecutorBuilder input(ExecutorInput input);
     
     // From model or by Id
     FlowExecutor flow(String modelId);
-    FlowExecutor flow(FlowModel model);
+    FlowExecutor flow(FlowProgram model);
 
     // From model or by Id
     DecisionExecutor decision(String modelId);
-    DecisionExecutor decision(DecisionTableModel model);
+    DecisionExecutor decision(DecisionProgram model);
     
     // From model or by Id
     ServiceExecutor service(String modelId);
-    ServiceExecutor service(ServiceAstType model);
+    ServiceExecutor service(AstService model);
   }
   
-  interface ModelBuilder {
-    FlowModel ast(FlowAstType ast);
-    DecisionTableModel ast(DecisionAstType ast);
-    ServiceAstType ast(ServiceAstType ast);
-  }
-
   interface AstBuilder {
     AstBuilder commands(ArrayNode src, Integer version);
-    AstBuilder commands(List<AstCommandType> src, Integer version);
+    AstBuilder commands(ArrayNode src);
+    AstBuilder commands(String src);
+    AstBuilder commands(List<AstCommand> src, Integer version);
+    AstBuilder commands(List<AstCommand> src);
     AstBuilder syntax(String src);
 
-    FlowAstType flow();
-    DecisionAstType decision();
-    ServiceAstType service();
+
+    AstFlow flow();
+    AstDecision decision();
+    AstService service();
   }
 }

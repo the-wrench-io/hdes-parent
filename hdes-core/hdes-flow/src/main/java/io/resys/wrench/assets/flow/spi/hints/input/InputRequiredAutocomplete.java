@@ -24,31 +24,31 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstCommandRange;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInput;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 
-public class InputRequiredAutocomplete implements NodeFlowVisitor {
+public class InputRequiredAutocomplete implements AstFlowNodeVisitor {
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
-    Map<String, FlowAstInput> inputs = flow.getInputs();
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
+    Map<String, AstFlowInputNode> inputs = flow.getInputs();
 
     if(inputs.isEmpty()) {
       return;
     }
 
     List<FlowAstCommandRange> ranges = new ArrayList<>();
-    for(FlowAstInput input : inputs.values()) {
+    for(AstFlowInputNode input : inputs.values()) {
       FlowAstCommandRange range;
       if(input.getRequired() != null) {
-        range = FlowNodesFactory.range().build(input.getRequired().getStart());
+        range = AstFlowNodesFactory.range().build(input.getRequired().getStart());
       } else {
-        range = FlowNodesFactory.range().build(input.getStart(), input.getEnd(), true);
+        range = AstFlowNodesFactory.range().build(input.getStart(), input.getEnd(), true);
       }
 
       ranges.add(range);
@@ -56,12 +56,12 @@ public class InputRequiredAutocomplete implements NodeFlowVisitor {
 
     if(!ranges.isEmpty()) {
       modelBuilder
-        .addAutocomplete(FlowNodesFactory.ac()
+        .addAutocomplete(AstFlowNodesFactory.ac()
           .id(InputRequiredAutocomplete.class.getSimpleName())
           .addField("    " + NodeFlowBean.KEY_REQ, true)
           .addRange(ranges)
           .build())
-        .addAutocomplete(FlowNodesFactory.ac()
+        .addAutocomplete(AstFlowNodesFactory.ac()
           .id(InputRequiredAutocomplete.class.getSimpleName())
           .addField("    " + NodeFlowBean.KEY_REQ, false)
           .addRange(ranges)

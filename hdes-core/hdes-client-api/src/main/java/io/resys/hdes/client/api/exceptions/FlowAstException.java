@@ -36,6 +36,11 @@ public class FlowAstException extends RuntimeException {
     this.src = src;
   }
 
+  public FlowAstException(String message, Exception e) {
+    super(message, e);
+    this.src = null;
+  }
+  
   public String getSrc() {
     return src;
   }

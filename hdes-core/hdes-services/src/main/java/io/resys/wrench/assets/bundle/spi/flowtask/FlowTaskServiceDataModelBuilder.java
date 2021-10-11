@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
@@ -37,32 +37,32 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 
 public class FlowTaskServiceDataModelBuilder {
 
-  public ServiceDataModel build(String id, String name, Service script, ServiceStore serviceStore) {
+  public ServiceDataModel build(String id, String name, ServiceProgram script, ServiceStore serviceStore) {
     List<ServiceAssociation> associations = new ArrayList<>();
     List<ServiceError> errors = new ArrayList<>();
-    ServiceAstType model = script.getModel();
+    AstService model = script.getAst();
 
-    List<AstDataType> params = getScriptParameterModels(model);
+    List<TypeDef> params = getScriptParameterModels(model);
 
     return new ImmutableServiceDataModel(
         id, name, null,
         ServiceType.FLOW_TASK,
-        script.getModel().getType(),
+        script.getAst().getType(),
         errors.isEmpty() ? ServiceStatus.OK : ServiceStatus.ERROR,
             Collections.unmodifiableList(errors),
             Collections.unmodifiableList(params),
             Collections.unmodifiableList(associations));
   }
 
-  protected List<AstDataType> getScriptParameterModels(ServiceAstType model) {
+  protected List<TypeDef> getScriptParameterModels(AstService model) {
     // drop dummy layer
-    List<AstDataType> result = new ArrayList<>();
+    List<TypeDef> result = new ArrayList<>();
     
-    model.getHeaders().getInputs().stream()
+    model.getHeaders().getAcceptDefs().stream()
       .filter(p -> p.getData())
       .forEach(p -> result.addAll(p.getProperties()));
     
-    model.getHeaders().getOutputs().stream()
+    model.getHeaders().getReturnDefs().stream()
       .forEach(p -> result.addAll(p.getProperties()));
     
     return result;

@@ -27,14 +27,14 @@ import java.util.function.Consumer;
 
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.execution.DecisionTableResult;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 
 public class DtServiceResponse implements ServiceResponse {
 
-  private final DecisionTableResult result;
+  private final DecisionResult result;
 
-  public DtServiceResponse(DecisionTableResult result) {
+  public DtServiceResponse(DecisionResult result) {
     super();
     this.result = result;
   }
@@ -45,22 +45,22 @@ public class DtServiceResponse implements ServiceResponse {
 
   @Override
   public void forEach(Consumer<Object> consumer) {
-    result.getOutputs().forEach(consumer);
+    result.getMatches().forEach(consumer);
   }
 
   @Override
   public List<?> list() {
-    return Collections.unmodifiableList(result.getOutputs());
+    return Collections.unmodifiableList(result.getMatches());
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> T get() {
-    Assert.isTrue(result.getOutputs().size() < 2, "Expected 1 or 0 results but got: " + result.getOutputs().size() + "!");
-    if(result.getOutputs().isEmpty()) {
+    Assert.isTrue(result.getMatches().size() < 2, "Expected 1 or 0 results but got: " + result.getMatches().size() + "!");
+    if(result.getMatches().isEmpty()) {
       return null;
     }
-    return (T) result.getOutputs().iterator().next();
+    return (T) result.getMatches().iterator().next();
   }
 
   @Override

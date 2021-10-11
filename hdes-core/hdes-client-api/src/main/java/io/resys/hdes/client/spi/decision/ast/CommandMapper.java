@@ -36,21 +36,22 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.Direction;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.AstType.AstExpression;
-import io.resys.hdes.client.api.ast.DecisionAstType;
-import io.resys.hdes.client.api.ast.DecisionAstType.ColumnExpressionType;
-import io.resys.hdes.client.api.ast.DecisionAstType.HitPolicy;
-import io.resys.hdes.client.api.ast.DecisionAstType.Row;
-import io.resys.hdes.client.api.ast.ImmutableAstHeaders;
-import io.resys.hdes.client.api.ast.ImmutableCell;
-import io.resys.hdes.client.api.ast.ImmutableDecisionAstType;
-import io.resys.hdes.client.api.ast.ImmutableRow;
+import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
+import io.resys.hdes.client.api.ast.AstDecision.ColumnExpressionType;
+import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
+import io.resys.hdes.client.api.ast.ImmutableAstDecision;
+import io.resys.hdes.client.api.ast.ImmutableAstDecisionCell;
+import io.resys.hdes.client.api.ast.ImmutableAstDecisionRow;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
-import io.resys.hdes.client.spi.HdesDataTypeFactory;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.programs.ExpressionProgram;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 
 
@@ -91,12 +92,12 @@ public class CommandMapper {
     }
   }
   
-  public static Builder builder(HdesDataTypeFactory dataTypeFactory) {
+  public static Builder builder(HdesTypeDefsFactory dataTypeFactory) {
     return new Builder(dataTypeFactory);
   }
 
   public static class Builder {
-    private final HdesDataTypeFactory dataTypeFactory; 
+    private final HdesTypeDefsFactory typeDefs; 
     private long idGen = 0;
     private String name;
     private String description;
@@ -107,24 +108,24 @@ public class CommandMapper {
     private final Map<String, MutableCell> cells = new HashMap<>();
     private final Map<String, MutableRow> rows = new HashMap<>();
 
-    public Builder(HdesDataTypeFactory dataTypeFactory) {
+    public Builder(HdesTypeDefsFactory dataTypeFactory) {
       super();
-      this.dataTypeFactory = dataTypeFactory;
+      this.typeDefs = dataTypeFactory;
     }
     
     private String nextId() {
       return String.valueOf(idGen++);
     }
     private MutableHeader getHeader(String id) {
-      Assert.isTrue(headers.containsKey(id), () -> "no header with id: " + id + "!");
+      HdesAssert.isTrue(headers.containsKey(id), () -> "no header with id: " + id + "!");
       return headers.get(id);
     }
     private MutableCell getCell(String id) {
-      Assert.isTrue(cells.containsKey(id), () -> "no cell with id: " + id + "!");
+      HdesAssert.isTrue(cells.containsKey(id), () -> "no cell with id: " + id + "!");
       return cells.get(id);
     }
     private MutableRow getRow(String id) {
-      Assert.isTrue(rows.containsKey(id), () -> "no row with id: " + id + "!");
+      HdesAssert.isTrue(rows.containsKey(id), () -> "no row with id: " + id + "!");
       return rows.get(id);
     }
     private ValueType getValueType(MutableHeader header) {
@@ -187,7 +188,7 @@ public class CommandMapper {
         .forEach(cell -> {
 
           try {
-            AstExpression expression = dataTypeFactory.expression(valueType, cell.getValue());
+            ExpressionProgram expression = typeDefs.expression(valueType, cell.getValue());
             if(expression.getConstants().size() == 1) {
               cell.setValue(expression.getConstants().get(0));
             }
@@ -203,7 +204,7 @@ public class CommandMapper {
     private String getExpression(ValueType valueType, ColumnExpressionType value, String columnValue) {
       String constant;
       try {
-        AstExpression expression = dataTypeFactory.expression(valueType, columnValue);
+        ExpressionProgram expression = typeDefs.expression(valueType, columnValue);
         if(expression.getConstants().size() != 1) {
           return null;
         }
@@ -380,19 +381,19 @@ public class CommandMapper {
       }
       
       try {
-        return dataTypeFactory.expression(ValueType.MAP, header.getScript()).getValue(context) + "";
+        return typeDefs.expression(ValueType.MAP, header.getScript()).run(context) + "";
       } catch(Exception e) {
         return null;
       }
     }
 
-    public DecisionAstType build() {
+    public AstDecision build() {
       this.headers.values().stream()
       .filter(h -> !StringUtils.isEmpty(h.getScript()))
       .forEach(h -> h.getCells().forEach(c -> c.setValue(resolveScriptValue(h, c))));
       
-      List<AstDataType> headers = this.headers.values().stream().sorted()
-          .map(h -> (AstDataType) dataTypeFactory.dataType()
+      List<TypeDef> headers = this.headers.values().stream().sorted()
+          .map(h -> (TypeDef) typeDefs.dataType()
               .direction(h.getDirection())
               .name(h.getName())
               .valueType(h.getValue())
@@ -403,36 +404,42 @@ public class CommandMapper {
           .collect(Collectors.toList());
 
       
-      List<Row> rows = this.rows.values().stream().sorted()
-          .map(r -> ImmutableRow.builder()
+      List<AstDecisionRow> rows = this.rows.values().stream().sorted()
+          .map(r -> ImmutableAstDecisionRow.builder()
             .id(r.getId())
             .order(r.getOrder())
             .cells(this.headers.values().stream().sorted()
                 .map(h -> {
                   MutableCell c = h.getRowCell(r.getId());
-                  return ImmutableCell.builder().id(c.getId()).value(c.getValue()).header(h.getId()).build();
+                  return ImmutableAstDecisionCell.builder().id(c.getId()).value(c.getValue()).header(h.getId()).build();
                 })
                 .collect(Collectors.toList()))
             .build()
           )
           .collect(Collectors.toList());
+      
+      final HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
+      final var source = DecisionAstSourceBuilder.build(headers, rows, name, description, hitPolicy);
 
-      HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
-      return ImmutableDecisionAstType.builder()
+      return ImmutableAstDecision.builder()
           .name(name)
+          .bodyType(EntityType.DT)
           .description(description)
           .rev(version)
           .hitPolicy(hitPolicy)
           .headerTypes(headerTypes)
           .headerExpressions(headerExpressions)
-          .headers(ImmutableAstHeaders.builder()
-              .inputs(headers.stream().filter(p -> p.getDirection() == Direction.IN).collect(Collectors.toList()))
-              .outputs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
+          .headers(ImmutableHeaders.builder()
+              .acceptDefs(headers.stream().filter(p -> p.getDirection() == Direction.IN).collect(Collectors.toList()))
+              .returnDefs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
               .build())
           .rows(rows)
+          .source(typeDefs.commands(source))
           .build();
     }
   }
+
+  
 
   private static class MutableHeader implements Comparable<MutableHeader> {
 

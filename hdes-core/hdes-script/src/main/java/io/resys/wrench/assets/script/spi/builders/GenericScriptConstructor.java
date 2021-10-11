@@ -20,7 +20,7 @@ package io.resys.wrench.assets.script.spi.builders;
  * #L%
  */
 
-import io.resys.hdes.client.api.execution.Service.ServiceInit;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 
 public class GenericScriptConstructor implements ServiceInit {
 

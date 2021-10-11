@@ -20,22 +20,22 @@ package io.resys.wrench.assets.script.api;
  * #L%
  */
 
-import io.resys.hdes.client.api.ast.ServiceAstType;
+import io.resys.hdes.client.api.ast.AstService;
 
 public class ServiceException extends RuntimeException {
 
   private static final long serialVersionUID = 4696840189119749118L;
 
-  public ServiceException(ServiceAstType type, String message, Throwable cause) {
+  public ServiceException(AstService type, String message, Throwable cause) {
     super(formatMessage(type, message), cause);
   }
 
-  public ServiceException(ServiceAstType type, String message) {
+  public ServiceException(AstService type, String message) {
     super(formatMessage(type, message));
   }
 
   
-  private static String formatMessage(ServiceAstType type, String msg) {
+  private static String formatMessage(AstService type, String msg) {
     return "Exception on service: '" + type.getName() + "'" + System.lineSeparator() + msg;
   }
 }

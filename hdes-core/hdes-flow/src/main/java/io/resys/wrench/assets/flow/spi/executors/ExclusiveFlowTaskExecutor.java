@@ -27,11 +27,11 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.spi.FlowException;
 
@@ -39,23 +39,23 @@ public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTas
   private static final Logger LOGGER = LoggerFactory.getLogger(ExclusiveFlowTaskExecutor.class);
 
   @Override
-  public FlowTaskModel execute(Flow flow, FlowTask task) {
-    FlowTaskModel node = flow.getModel().getTask().get(task.getModelId());
+  public Step execute(FlowResult flow, FlowTask task) {
+    Step node = flow.getModel().getStep().get(task.getModelId());
 
     // Need to eval all child node to figure out what's the next node
-    FlowTaskModel defaultNode = null;
-    for(FlowTaskModel next : node.getNext()) {
+    Step defaultNode = null;
+    for(Step next : node.getNext()) {
       if(next.getBody() == null) {
         defaultNode = next;
         continue;
       }
       if(eval(flow, task, next)) {
-        Assert.isTrue(next.getNext().size() <= 1, () -> "There can be only 1 or 0 next nodes in single decision point: " + next.getId() + "!");
+        HdesAssert.isTrue(next.getNext().size() <= 1, () -> "There can be only 1 or 0 next nodes in single decision point: " + next.getId() + "!");
         if(next.getNext().isEmpty()) {
           return null;
         }
         flow.complete(task);
-        FlowTaskModel result = next.getNext().iterator().next();
+        Step result = next.getNext().iterator().next();
         return result;
       }
     }
@@ -66,7 +66,7 @@ public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTas
     throw new IllegalArgumentException("No matching expressions for switch node: " + node.getId() + "!");
   }
 
-  protected boolean eval(Flow flow, FlowTask task, FlowTaskModel node) {
+  protected boolean eval(FlowResult flow, FlowTask task, Step node) {
     try {
       return node.getBody().getExpression().eval((name) -> getFlowContextValue(flow, name));
     } catch(Exception e) {
@@ -76,7 +76,7 @@ public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTas
     }
   }
 
-  protected Object getFlowContextValue(Flow flow, String name) {
+  protected Object getFlowContextValue(FlowResult flow, String name) {
     Map<String, Serializable> vars = new HashMap<>();
     vars.putAll(flow.getContext().getVariables());
 

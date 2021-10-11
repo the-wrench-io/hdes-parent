@@ -24,10 +24,9 @@ import java.util.ArrayList;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.model.DecisionTableModel;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
@@ -36,12 +35,15 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 
 public class DtServiceDataModelBuilder {
 
-  public ServiceDataModel build(String id, DecisionTableModel dt) {
-    List<AstDataType> params = dt.getTypes().stream().map(h -> h.getValue()).collect(Collectors.toList());
+  public ServiceDataModel build(String id, DecisionProgram dt) {
+    List<TypeDef> params = new ArrayList<>();
+    params.addAll(dt.getAst().getHeaders().getAcceptDefs());
+    params.addAll(dt.getAst().getHeaders().getReturnDefs());
+    
     List<ServiceError> errors = new ArrayList<>();
 
     return new ImmutableServiceDataModel(
-        id, dt.getId(), dt.getDescription(),
+        id, dt.getId(), dt.getAst().getDescription(),
         ServiceType.DT,
         dt.getClass(),
         errors.isEmpty() ? ServiceStatus.OK : ServiceStatus.ERROR,

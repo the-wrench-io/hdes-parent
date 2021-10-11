@@ -28,8 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.execution.Service;
-import io.resys.hdes.client.api.execution.Service.ServiceInit;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -76,11 +76,11 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
     final String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
     
     try {
-      final Service script;
+      final ServiceProgram script;
       
       if(rename) {
-        final Service originalScript = scriptRepository.createBuilder().src(content).build();
-        final String originalName = originalScript.getModel().getName();
+        final ServiceProgram originalScript = scriptRepository.createBuilder().src(content).build();
+        final String originalName = originalScript.getAst().getName();
         final String newContent = content.replaceAll(originalName, name);
         
         script = scriptRepository.createBuilder().src(newContent).build();
@@ -88,16 +88,16 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
         script = scriptRepository.createBuilder().src(content).build();
       }
             
-      final String name = script.getModel().getName();
+      final String name = script.getAst().getName();
       final String pointer = serviceId + ".json";
       final ServiceDataModel dataModel = new FlowTaskServiceDataModelBuilder().build(serviceId, name, script, serviceStore);
 
       return ImmutableServiceBuilder.newFlowTask()
           .setId(serviceId)
-          .setRev(script.getModel().getRev() + "")
+          .setRev(script.getAst().getRev() + "")
           .setName(name)
           .setDescription(null)
-          .setSrc(objectMapper.writeValueAsString(script.getModel().getCommands()))
+          .setSrc(objectMapper.writeValueAsString(script.getAst().getCommands()))
           .setPointer(pointer)
           .setModel(dataModel)
           .setExecution(() -> new FlowTaskServiceExecution(script, init))

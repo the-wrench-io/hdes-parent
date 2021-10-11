@@ -26,16 +26,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.ValueType;
-import io.resys.hdes.client.api.ast.FlowAstType.FlowAstInputType;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstInputType;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
+import io.resys.hdes.client.api.ast.ImmutableAstFlowInputType;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.DataTypeRefBuilder.DataTypeRef;
 
-public class FlowDataTypeSupplier implements Supplier<Collection<FlowAstInputType>> {
+public class FlowDataTypeSupplier implements Supplier<Collection<AstFlowInputType>> {
 
   private final Collection<ValueType> supportedTypes = Arrays.asList(ValueType.ARRAY, 
       ValueType.TIME, ValueType.STRING, ValueType.BOOLEAN, ValueType.INTEGER, ValueType.LONG, ValueType.DECIMAL, 
@@ -48,15 +48,15 @@ public class FlowDataTypeSupplier implements Supplier<Collection<FlowAstInputTyp
   }
 
   @Override
-  public List<FlowAstInputType> get() {
-    List<FlowAstInputType> result = new ArrayList<>();
+  public List<AstFlowInputType> get() {
+    List<AstFlowInputType> result = new ArrayList<>();
 
     // Normal types
     for(ValueType valueType : supportedTypes) {
       //(String name, String ref, String value)
       
       result.add(
-          ImmutableFlowAstInputType.builder()
+          ImmutableAstFlowInputType.builder()
           .name(valueType.name())
           .value(valueType.name())
           .build()
@@ -66,8 +66,8 @@ public class FlowDataTypeSupplier implements Supplier<Collection<FlowAstInputTyp
 
     // Reference type
     for(AssetService service : serviceStore.list()) {
-      List<AstDataType> types = service.getDataModel().getParams();
-      for(AstDataType type : types) {
+      List<TypeDef> types = service.getDataModel().getParams();
+      for(TypeDef type : types) {
         if(supportedTypes.contains(type.getValueType())) {
           DataTypeRef ref = DataTypeRefBuilder
               .of(service.getType())
@@ -75,7 +75,7 @@ public class FlowDataTypeSupplier implements Supplier<Collection<FlowAstInputTyp
               .name(type.getName())
               .build();
           result.add(
-              ImmutableFlowAstInputType.builder()
+              ImmutableAstFlowInputType.builder()
               .name(ref.getValue())
               .ref(ref.getValue())
               .value(type.getValueType().name())

@@ -25,22 +25,22 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.model.FlowModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.flow.spi.log.FlowLogger;
 
-public class GenericFlow implements Flow {
+public class GenericFlow implements FlowResult {
 
   private static final long serialVersionUID = -6048886689681204156L;
 
   private final String id;
-  private final FlowModel model;
+  private final FlowProgram model;
   private final FlowContext context;
   private final Clock clock;
 
-  public GenericFlow(String id, FlowModel model, FlowContext context, Clock clock) {
+  public GenericFlow(String id, FlowProgram model, FlowContext context, Clock clock) {
     super();
     this.id = id;
     this.model = model;
@@ -52,7 +52,7 @@ public class GenericFlow implements Flow {
     return id;
   }
   @Override
-  public FlowModel getModel() {
+  public FlowProgram getModel() {
     return model;
   }
   @Override
@@ -60,7 +60,7 @@ public class GenericFlow implements Flow {
     return context;
   }
   @Override
-  public FlowTask start(FlowTaskModel model) {
+  public FlowTask start(Step model) {
     Optional<FlowTask> openFlowTask = context.getTasks(model.getId()).stream().filter(t -> t.getStatus() == FlowTaskStatus.OPEN).findFirst();
     if(openFlowTask.isPresent()) {
       return openFlowTask.get();
@@ -84,7 +84,7 @@ public class GenericFlow implements Flow {
   }
   @Override
   public FlowTask complete(FlowTask task) {
-    Assert.isTrue(task.getStatus() == FlowTaskStatus.OPEN, () -> "Flow task: \"" + id + "\" status must be OPEN but was: " + task.getStatus() + "!");
+    HdesAssert.isTrue(task.getStatus() == FlowTaskStatus.OPEN, () -> "Flow task: \"" + id + "\" status must be OPEN but was: " + task.getStatus() + "!");
     context.getHistory(task.getId()).setEnd(now());
     task.setStatus(FlowTaskStatus.COMPLETED);
     return task;
@@ -99,7 +99,7 @@ public class GenericFlow implements Flow {
   }
   @Override
   public FlowTask end(FlowTask task) {
-    Assert.isTrue(task.getStatus() == FlowTaskStatus.COMPLETED, () -> "Flow task: \"" + id + "\" status must be COMPLETED but was: " + task.getStatus() + "!");
+    HdesAssert.isTrue(task.getStatus() == FlowTaskStatus.COMPLETED, () -> "Flow task: \"" + id + "\" status must be COMPLETED but was: " + task.getStatus() + "!");
     context.setStatus(FlowStatus.ENDED).setPointer(null);
     return task;
   }

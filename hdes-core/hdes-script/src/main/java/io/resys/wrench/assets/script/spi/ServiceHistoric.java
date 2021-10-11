@@ -22,18 +22,18 @@ package io.resys.wrench.assets.script.spi;
 
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.ServiceAstType;
-import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 
 
-public class ServiceHistoric implements Service {
-  private final ServiceAstType model;
+public class ServiceHistoric implements ServiceProgram {
+  private final AstService model;
   
-  public ServiceHistoric(ServiceAstType model) {
+  public ServiceHistoric(AstService model) {
     this.model = model;
   }
   @Override
-  public ServiceAstType getModel() {
+  public AstService getAst() {
     return model;
   }
 
@@ -44,5 +44,9 @@ public class ServiceHistoric implements Service {
 
   @Override
   public void stop() {
+  }
+  @Override
+  public String getId() {
+    return model.getName();
   }
 }

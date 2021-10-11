@@ -25,9 +25,9 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.FlowModel;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 
 public interface FlowRepository {
   
@@ -37,17 +37,17 @@ public interface FlowRepository {
   FlowTaskBuilder createTaskBuilder();
   
   interface FlowTaskBuilder {
-    FlowTask complete(Flow flow, String taskId);
+    FlowTask complete(FlowResult flow, String taskId);
     FlowTaskBuilder data(Map<String, Serializable> data);
   }
   
   interface FlowModelExecutor {
     FlowModelExecutor insert(String name, Serializable value);
-    Flow run(FlowModel model);
+    FlowResult run(FlowProgram model);
   }
 
   interface FlowModelExporter {
-    FlowModelExporter src(FlowModel model);
+    FlowModelExporter src(FlowProgram model);
     String build();
   }
 
@@ -57,6 +57,6 @@ public interface FlowRepository {
     FlowModelBuilder rename(Optional<String> rename);
     FlowModelBuilder dryRun();
     FlowModelBuilder stream(InputStream inputStream);
-    Map.Entry<String, FlowModel> build();
+    Map.Entry<String, FlowProgram> build();
   }
 }

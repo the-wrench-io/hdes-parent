@@ -22,10 +22,10 @@ package io.resys.hdes.client.spi.serializers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.ast.AstDataType.DataTypeSerializer;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 
-public class GenericDataTypeSerializer implements DataTypeSerializer {
+public class GenericDataTypeSerializer implements Serializer {
 
   private final ObjectMapper objectMapper;
 
@@ -35,7 +35,7 @@ public class GenericDataTypeSerializer implements DataTypeSerializer {
   }
 
   @Override
-  public String serialize(AstDataType dataType, Object value) {
+  public String serialize(TypeDef dataType, Object value) {
     if(value == null) {
       return null;
     }

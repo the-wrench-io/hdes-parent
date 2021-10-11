@@ -25,11 +25,11 @@ import java.util.function.Function;
 
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowExecutor;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowStatus;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
 import io.resys.wrench.assets.flow.spi.FlowException;
 
@@ -44,17 +44,17 @@ public class GenericFlowExecutor implements FlowExecutor {
   }
 
   @Override
-  public void execute(Flow flow) {
+  public void execute(FlowResult flow) {
     flow.getContext().setStatus(FlowStatus.RUNNING);
-    FlowTaskModel node = flow.getModel().getTask().get(flow.getContext().getPointer());
+    Step node = flow.getModel().getStep().get(flow.getContext().getPointer());
     run(flow, node);
   }
 
-  protected void run(Flow flow, FlowTaskModel node) {
+  protected void run(FlowResult flow, Step node) {
 
     try {
       FlowTask executable = flow.start(node);
-      FlowTaskModel next = executor.apply(node.getType()).execute(flow, executable);
+      Step next = executor.apply(node.getType()).execute(flow, executable);
 
       if(flow.getContext().getStatus() == FlowStatus.ENDED ||
           flow.getContext().getStatus() == FlowStatus.SUSPENDED) {

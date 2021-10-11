@@ -1,8 +1,8 @@
 package io.resys.wrench.assets.flow.spi.executors;
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 
 /*-
  * #%L
@@ -29,7 +29,7 @@ import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 public class EndFlowTaskExecutor implements FlowTaskExecutor {
 
   @Override
-  public FlowTaskModel execute(Flow flow, FlowTask task) {
+  public Step execute(FlowResult flow, FlowTask task) {
     flow.complete(task);
     flow.end(task);
     return null;

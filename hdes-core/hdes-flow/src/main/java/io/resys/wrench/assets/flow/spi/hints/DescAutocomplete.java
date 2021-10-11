@@ -24,20 +24,20 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlow;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.spi.flow.ast.FlowNodesFactory;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstType;
 
-public class DescAutocomplete implements NodeFlowVisitor {
+public class DescAutocomplete implements AstFlowNodeVisitor {
 
   private final static List<String> BEFORE = Arrays.asList(
       NodeFlowBean.KEY_INPUTS,
       NodeFlowBean.KEY_TASKS);
 
   @Override
-  public void visit(NodeFlow flow, ImmutableFlowAstType.Builder modelBuilder) {
+  public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
     if(flow.getDescription() != null || flow.getId() == null) {
       return;
     }
@@ -50,7 +50,7 @@ public class DescAutocomplete implements NodeFlowVisitor {
     int end = before.orElse(flow.getEnd());
 
     modelBuilder.addAutocomplete(
-        FlowNodesFactory.ac()
+        AstFlowNodesFactory.ac()
         .id(DescAutocomplete.class.getSimpleName())
         .addField(NodeFlowBean.KEY_DESC)
         .addRange(start, end)

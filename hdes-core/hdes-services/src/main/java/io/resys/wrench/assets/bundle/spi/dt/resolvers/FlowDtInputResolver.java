@@ -24,14 +24,14 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTaskStatus;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
-import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
+import io.resys.hdes.client.api.HdesClient.ExecutorInput;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
 import io.resys.wrench.assets.bundle.spi.flow.executors.VariableResolver;
 
-public class FlowDtInputResolver implements Serializable, DtInputResolver {
+public class FlowDtInputResolver implements Serializable, ExecutorInput {
 
   private static final long serialVersionUID = 8818379343078413837L;
   private final VariableResolver variableResolver;
@@ -39,7 +39,7 @@ public class FlowDtInputResolver implements Serializable, DtInputResolver {
   private final Map<String, Serializable> tasks;
   private final Map<String, String> mapping;
 
-  public FlowDtInputResolver(Flow flow, FlowTaskModel node, VariableResolver variableResolver) {
+  public FlowDtInputResolver(FlowResult flow, Step node, VariableResolver variableResolver) {
     mapping = node.getBody().getInputs();
     variables = new HashMap<>();
     tasks = new HashMap<>();
@@ -55,7 +55,7 @@ public class FlowDtInputResolver implements Serializable, DtInputResolver {
   }
 
   @Override
-  public Object apply(AstDataType t) {
+  public Object apply(TypeDef t) {
     String name = mapping.get(t.getName());
 
     // Flat mapping

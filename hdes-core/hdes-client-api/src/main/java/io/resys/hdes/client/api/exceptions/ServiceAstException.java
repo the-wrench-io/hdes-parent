@@ -20,15 +20,15 @@ package io.resys.hdes.client.api.exceptions;
  * #L%
  */
 
-import io.resys.hdes.client.api.ast.AstCommandType;
+import io.resys.hdes.client.api.ast.AstCommand;
 
 public class ServiceAstException extends RuntimeException {
 
   private static final long serialVersionUID = -7154685569622201632L;
 
-  private final AstCommandType command;
+  private final AstCommand command;
 
-  public ServiceAstException(AstCommandType command, String message, Throwable cause) {
+  public ServiceAstException(AstCommand command, String message, Throwable cause) {
     super(message, cause);
     this.command = command;
   }
@@ -42,12 +42,12 @@ public class ServiceAstException extends RuntimeException {
     this.command = null;
   }
 
-  public ServiceAstException(AstCommandType command, String message) {
+  public ServiceAstException(AstCommand command, String message) {
     super(message);
     this.command = command;
   }
 
-  public AstCommandType getCommand() {
+  public AstCommand getCommand() {
     return command;
   }
 

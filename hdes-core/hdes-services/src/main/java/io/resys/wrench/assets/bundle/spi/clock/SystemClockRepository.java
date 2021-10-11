@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-import io.resys.hdes.client.spi.util.Assert;
+import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class SystemClockRepository implements ClockRepository {
   private Clock clock;
@@ -44,7 +44,7 @@ public class SystemClockRepository implements ClockRepository {
 
   @Override
   public void set(Clock clock) {
-    Assert.notNull(clock, () -> "clock can not be null!");
+    HdesAssert.notNull(clock, () -> "clock can not be null!");
     this.clock = clock;
   }
 
@@ -65,7 +65,7 @@ public class SystemClockRepository implements ClockRepository {
 
   @Override
   public Date toDate(LocalDate localDate) {
-    Assert.notNull(localDate, () -> "localDate can not be null!");
+    HdesAssert.notNull(localDate, () -> "localDate can not be null!");
     return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
   }
 }

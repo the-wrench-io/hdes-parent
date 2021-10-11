@@ -20,42 +20,42 @@ package io.resys.wrench.assets.flow.spi;
  * #L%
  */
 
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskModel;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.Step;
 
 public class FlowException extends RuntimeException {
 
   private static final long serialVersionUID = 6659681954052672940L;
 
-  private final FlowTaskModel node;
-  private final Flow flow;
+  private final Step node;
+  private final FlowResult flow;
   
-  public FlowException(String message, Flow flow, FlowTaskModel node, Throwable cause) {
+  public FlowException(String message, FlowResult flow, Step node, Throwable cause) {
     super(message, cause);
     this.node = node;
     this.flow = flow;
   }
-  public FlowException(String message, Flow flow, FlowTaskModel node) {
+  public FlowException(String message, FlowResult flow, Step node) {
     super(message);
     this.node = node;
     this.flow = flow;
   }
-  public FlowException(Flow flow, String message) {
+  public FlowException(FlowResult flow, String message) {
     super(message);
     this.node = null;
     this.flow = flow;
   }
 
-  public FlowException(Flow flow, String message, Throwable cause) {
+  public FlowException(FlowResult flow, String message, Throwable cause) {
     super(message, cause);
     this.node = null;
     this.flow = flow;
   }
 
-  public FlowTaskModel getNode() {
+  public Step getNode() {
     return node;
   }
-  public Flow getFlow() {
+  public FlowResult getFlow() {
     return flow;
   }
 }

@@ -34,37 +34,34 @@ import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.hdes.client.api.execution.DecisionTableResult.DecisionTableOutput;
-import io.resys.hdes.client.api.execution.Flow;
-import io.resys.hdes.client.api.execution.Flow.FlowTask;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionLog;
+import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
-import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
 import io.resys.wrench.assets.bundle.spi.dt.resolvers.MatchingDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
 import io.resys.wrench.assets.bundle.spi.migration.GenericServiceExporter;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository;
 import io.resys.wrench.assets.script.api.ScriptRepository;
 
 public class GenericAssetServiceRepository implements AssetServiceRepository {
 
   private final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders;
-  private final DecisionTableRepository decisionTableRepository;
   private final FlowRepository flowRepository;
   private final ScriptRepository scriptRepository;
   private final ServiceStore serviceStore;
   private final ObjectMapper objectMapper;
-  private final HdesAstTypes types;
+  private final HdesClient types;
 
   public GenericAssetServiceRepository(
-      HdesAstTypes types,
+      HdesClient types,
       ObjectMapper objectMapper,
-      DecisionTableRepository decisionTableRepository,
       FlowRepository flowRepository,
       ScriptRepository scriptRepository,
       
@@ -74,7 +71,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     super();
     this.types = types;
     this.objectMapper = objectMapper;
-    this.decisionTableRepository = decisionTableRepository;
     this.flowRepository = flowRepository;
     this.scriptRepository = scriptRepository;
     
@@ -97,22 +93,11 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   public ServiceStore createStore() {
     return serviceStore;
   }
-
-  @Override
-  public ExportBuilder createExport() {
-    return new GenericExportBuilder(() -> decisionTableRepository.createExporter());
-  }
-  
   @Override
   public String getHash() {
     HashBuilder hashBuilder = new HashBuilder();
     createQuery().list().stream().sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).forEachOrdered(hashBuilder::add);
     return hashBuilder.build();
-  }
-
-  @Override
-  public DecisionTableRepository getDtRepo() {
-    return decisionTableRepository;
   }
   @Override
   public ScriptRepository getStRepo() {
@@ -152,7 +137,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
           @Override
           public Object andGetTask(String taskName) {
             validateFlowInput(service.get(), inputs);
-            Flow flow = service.get().newExecution().insert((Serializable) inputs).run().get();
+            FlowResult flow = service.get().newExecution().insert((Serializable) inputs).run().get();
             
             Collection<FlowTask> tasks = flow.getContext().getTasks(taskName);
             if(tasks.isEmpty()) {
@@ -164,7 +149,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             return delegate;
           }
           private void validateFlowInput(AssetService service, Map<String, Object> input) {
-            for(AstDataType dataType : service.getDataModel().getParams()) {
+            for(TypeDef dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "Flow with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
               }
@@ -195,7 +180,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             return this;
           }
           private void validateDtInput(AssetService service, Map<String, Object> input) {
-            for(AstDataType dataType : service.getDataModel().getParams()) {
+            for(TypeDef dataType : service.getDataModel().getParams()) {
               if(dataType.isRequired() && input.get(dataType.getName()) == null) {
                 throw new DataException(422, new Message("E003", "DT with id: " + service.getName() + " can't have null input: " + dataType.getName() + "!"));
               }
@@ -205,16 +190,16 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
           public Map<String, Serializable> andGet() {
             validateDtInput(service.get(), inputs);
             final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
-            final DecisionTableOutput output = dt.get();
-            return output.getValues();
+            final DecisionLog output = dt.get();
+            return DecisionProgramExecutor.toValues(output);
           }
           
           @Override
           public List<Map<String, Serializable>> andFind() {
             validateDtInput(service.get(), inputs);
             final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
-            final List<DecisionTableOutput> output = (List<DecisionTableOutput>) dt.list();
-            return output.stream().map(e -> e.getValues()).collect(Collectors.toList());
+            final List<DecisionLog> output = (List<DecisionLog>) dt.list();
+            return output.stream().map(e -> DecisionProgramExecutor.toValues(e)).collect(Collectors.toList());
           }
         };
       }
@@ -245,7 +230,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   }
 
   @Override
-  public HdesAstTypes getTypes() {
+  public HdesClient getTypes() {
     return types;
   }
 }

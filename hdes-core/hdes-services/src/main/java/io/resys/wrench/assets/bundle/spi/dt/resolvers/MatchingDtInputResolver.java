@@ -24,11 +24,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.resys.hdes.client.api.ast.AstDataType;
-import io.resys.wrench.assets.bundle.spi.dt.DtInputResolver;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
+import io.resys.hdes.client.api.HdesClient.ExecutorInput;
+import io.resys.hdes.client.api.ast.TypeDef;
 
-public class MatchingDtInputResolver implements Serializable, DtInputResolver {
+
+public class MatchingDtInputResolver implements Serializable, ExecutorInput {
 
   private static final long serialVersionUID = 8818379343078413837L;
 
@@ -39,14 +39,9 @@ public class MatchingDtInputResolver implements Serializable, DtInputResolver {
   }
 
   @Override
-  public Object apply(AstDataType t) {
+  public Object apply(TypeDef t) {
     String name = t.getName();
-
-    // Flat mapping
-    if(variables.containsKey(name)) {
-      return variables.get(name);
-    }
-    return DecisionTableRepository.DecisionTableFixedValue.ALWAYS_TRUE;
+    return variables.get(name);
   }
   
   public static Builder builder() {

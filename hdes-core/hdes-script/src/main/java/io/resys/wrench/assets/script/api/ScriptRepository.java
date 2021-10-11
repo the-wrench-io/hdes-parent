@@ -24,7 +24,7 @@ import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import io.resys.hdes.client.api.execution.Service;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 
 public interface ScriptRepository {
 
@@ -35,7 +35,7 @@ public interface ScriptRepository {
     ScriptBuilder src(JsonNode src);
     ScriptBuilder src(String src);
     ScriptBuilder rev(Integer rev);
-    Service build();
+    ServiceProgram build();
   }
 
   interface ScriptContext {

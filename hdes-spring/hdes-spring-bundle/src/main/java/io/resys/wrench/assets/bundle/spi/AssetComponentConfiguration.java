@@ -39,15 +39,12 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import io.resys.hdes.client.api.HdesAstTypes;
-import io.resys.hdes.client.api.ast.FlowAstType.NodeFlowVisitor;
-import io.resys.hdes.client.api.execution.DecisionTableResult.NodeExpressionExecutor;
-import io.resys.hdes.client.api.execution.Service.ServiceInit;
-import io.resys.hdes.client.api.model.FlowModel.FlowTaskType;
-import io.resys.hdes.client.spi.HdesAstTypesImpl;
-import io.resys.hdes.client.spi.expression.GenericExpressionExecutor;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
+import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -78,8 +75,6 @@ import io.resys.wrench.assets.bundle.spi.store.GenericServiceIdGen;
 import io.resys.wrench.assets.bundle.spi.store.ListAssetLoader;
 import io.resys.wrench.assets.bundle.spi.store.PostProcessingServiceStore;
 import io.resys.wrench.assets.bundle.spi.tag.TagServiceBuilder;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository;
-import io.resys.wrench.assets.dt.spi.GenericDecisionTableRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.wrench.assets.flow.api.FlowRepository;
@@ -89,7 +84,6 @@ import io.resys.wrench.assets.flow.spi.executors.EmptyFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.EndFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.ExclusiveFlowTaskExecutor;
 import io.resys.wrench.assets.flow.spi.executors.MergeFlowTaskExecutor;
-import io.resys.wrench.assets.flow.spi.expressions.SpelExpressionFactory;
 import io.resys.wrench.assets.flow.spi.hints.DescAutocomplete;
 import io.resys.wrench.assets.flow.spi.hints.IdAutocomplete;
 import io.resys.wrench.assets.flow.spi.hints.input.InputAutocomplete;
@@ -126,16 +120,14 @@ public class AssetComponentConfiguration {
     };
     
     final ClockRepository clockRepository = new SystemClockRepository();
-    final HdesAstTypes dataTypeRepository = new HdesAstTypesImpl(objectMapper);
+    final HdesClient dataTypeRepository = HdesClientImpl.builder().objectMapper(objectMapper).build();
     
-    
-    final DecisionTableRepository decisionTableRepository = decisionTableRepository(dataTypeRepository, objectMapper, origServiceStore);
     final FlowRepository flowRepository = flowRepository(dataTypeRepository, clockRepository, origServiceStore, objectMapper);
     final ScriptRepository scriptRepository = scriptRepository(objectMapper, dataTypeRepository, context);
     
     final ServiceIdGen idGen = new GenericServiceIdGen();
     final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders = new HashMap<>();
-    builders.put(ServiceType.DT, (store) -> new DtServiceBuilder(idGen, decisionTableRepository, clockRepository, getDefaultContent(ServiceType.DT)));
+    builders.put(ServiceType.DT, (store) -> new DtServiceBuilder(idGen, dataTypeRepository, clockRepository, getDefaultContent(ServiceType.DT)));
     builders.put(ServiceType.FLOW, (store) -> new FlowServiceBuilder(idGen, store, flowRepository, flowRepository, clockRepository, getDefaultContent(ServiceType.FLOW)));
     builders.put(ServiceType.FLOW_TASK, (store) -> new FlowTaskServiceBuilder(idGen, store, init, scriptRepository, objectMapper, getDefaultContent(ServiceType.FLOW_TASK)));
     builders.put(ServiceType.TAG, (store) -> new TagServiceBuilder("", idGen, getDefaultContent(ServiceType.TAG)));
@@ -150,7 +142,7 @@ public class AssetComponentConfiguration {
     
     return new GenericAssetServiceRepository(
         dataTypeRepository, objectMapper,
-        decisionTableRepository, flowRepository, scriptRepository, 
+        flowRepository, scriptRepository, 
         builders, serviceStore);
   }
 
@@ -176,23 +168,13 @@ public class AssetComponentConfiguration {
     }
   }
   
-  
-  private DecisionTableRepository decisionTableRepository(HdesAstTypes dataTypeRepository, ObjectMapper objectMapper, ServiceStore serviceStore) {
-    NodeExpressionExecutor expressionExecutor = new GenericExpressionExecutor(objectMapper);
-    return new GenericDecisionTableRepository(objectMapper, dataTypeRepository, expressionExecutor);
-  }
-
-
   private FlowRepository flowRepository(
-      HdesAstTypes dataTypeRepository,
+      HdesClient dataTypeRepository,
       ClockRepository clockRepository,
       ServiceStore serviceStore, 
       ObjectMapper objectMapper) {
 
-    SpelExpressionFactory parser = new SpelExpressionFactory();
-    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-
-    List<NodeFlowVisitor> visitors = Arrays.asList(
+    List<AstFlowNodeVisitor> visitors = Arrays.asList(
         new IdAutocomplete(),
         new DescAutocomplete(),
         new InputsAutocomplete(),
@@ -229,11 +211,11 @@ public class AssetComponentConfiguration {
     FlowExecutorRepository executorRepository = new GenericFlowExecutorFactory(executors);  
     //FlowAstFactory nodeRepository = new GenericNodeRepository(mapper, new FlowDataTypeSupplier(serviceStore));
     
-    return new GenericFlowRepository(dataTypeRepository, executorRepository, parser, objectMapper, clockRepository.get());
+    return new GenericFlowRepository(dataTypeRepository, executorRepository, objectMapper, clockRepository.get());
   }
 
 
-  private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesAstTypes dataTypeRepository, ApplicationContext context) {
+  private ScriptRepository scriptRepository(ObjectMapper objectMapper, HdesClient dataTypeRepository, ApplicationContext context) {
     return new GenericScriptRepository(dataTypeRepository, objectMapper);
   }
 
