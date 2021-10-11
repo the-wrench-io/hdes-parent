@@ -6,6 +6,8 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 
+
+
 public class TestUtils {
 
   public static ObjectMapper objectMapper = new ObjectMapper();
@@ -22,5 +24,4 @@ public class TestUtils {
         }
       })
       .build();
-
 }

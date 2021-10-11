@@ -309,6 +309,14 @@ public class HdesTypeDefsFactory {
     }
   }
   
+  public Object toType(Object value, Class<?> toType) {
+    try {
+      return objectMapper.convertValue(value, toType);
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+  
   public ServiceInit getServiceInit() {
     return this.serviceInit;
   }

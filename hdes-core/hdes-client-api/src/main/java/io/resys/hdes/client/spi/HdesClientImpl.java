@@ -48,6 +48,7 @@ import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
+import io.resys.hdes.client.spi.groovy.ServiceProgramExecutor;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesClientImpl implements HdesClient {
@@ -160,11 +161,11 @@ public class HdesClientImpl implements HdesClient {
         return this;
       }
       @Override
-      public ServiceExecutor service(AstService ast) {
+      public ServiceExecutor service(ServiceProgram program) {
         return new ServiceExecutor() {
           @Override
           public ServiceResult andGetBody() {
-            return null;
+            return ServiceProgramExecutor.run(program, data.build());
           }
         };
       }

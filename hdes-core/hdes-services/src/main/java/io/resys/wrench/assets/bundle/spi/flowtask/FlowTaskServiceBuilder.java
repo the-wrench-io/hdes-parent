@@ -97,7 +97,7 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
           .setSrc(script.getSource())
           .setPointer(pointer)
           .setModel(dataModel)
-          .setExecution(() -> new FlowTaskServiceExecution(scriptRepository.program().ast(script)))
+          .setExecution(() -> new FlowTaskServiceExecution(scriptRepository.program().ast(script), scriptRepository))
           .build();
 
     } catch (Exception e) {

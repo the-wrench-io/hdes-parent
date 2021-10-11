@@ -98,7 +98,7 @@ public interface HdesClient {
     
     // From model or by Id
     ServiceExecutor service(String modelId);
-    ServiceExecutor service(AstService model);
+    ServiceExecutor service(ServiceProgram model);
   }
   
   interface AstBuilder {

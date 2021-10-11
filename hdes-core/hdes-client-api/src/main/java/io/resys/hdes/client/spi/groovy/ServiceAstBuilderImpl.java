@@ -122,11 +122,11 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
       @SuppressWarnings("unchecked")
       final Class<ServiceExecutorType> beanType = gcl.parseClass(source);
       final AstServiceType executorType;
-      if(beanType.isAssignableFrom(ServiceExecutorType0.class)) {
+      if(ServiceExecutorType0.class.isAssignableFrom(beanType)) {
         executorType = AstServiceType.TYPE_0;
-      } else if(beanType.isAssignableFrom(ServiceExecutorType1.class)) {
+      } else if(ServiceExecutorType1.class.isAssignableFrom(beanType)) {
         executorType = AstServiceType.TYPE_1;
-      } else if(beanType.isAssignableFrom(ServiceExecutorType2.class)) {
+      } else if(ServiceExecutorType2.class.isAssignableFrom(beanType)) {
         executorType = AstServiceType.TYPE_2;
       } else {
         throw new ServiceAstException(

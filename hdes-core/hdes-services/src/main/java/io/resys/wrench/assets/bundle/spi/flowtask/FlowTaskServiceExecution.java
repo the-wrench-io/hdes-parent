@@ -21,12 +21,13 @@ package io.resys.wrench.assets.bundle.spi.flowtask;
  */
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.Consumer;
 
-import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.HdesClient.ExecutorBuilder;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
@@ -35,39 +36,27 @@ import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
 public class FlowTaskServiceExecution implements ServiceExecution {
 
   private final ServiceProgram script;
-  private final List<Object> facts = new ArrayList<>();
-  private final TypeDef taskInputModel;
-  private FlowTaskInput taskInput;
+  private final ExecutorBuilder builder;
 
-  public FlowTaskServiceExecution(ServiceProgram script) {
+  public FlowTaskServiceExecution(ServiceProgram script, HdesClient client) {
     super();
     this.script = script;
-    this.taskInputModel = script.getAst().getHeaders().getAcceptDefs().stream()
-        .filter(p -> p.getData())
-        .findFirst()
-        .orElse(null);
+    this.builder = client.executor();
   }
 
   @Override
   public ServiceExecution insert(Serializable bean) {
     if(bean instanceof FlowTaskInput) {
-      taskInput = (FlowTaskInput) bean;
+      builder.inputMap(new HashMap<>(((FlowTaskInput) bean).getValue()));
     } else {
-      facts.add(bean);
+      builder.inputEntity(bean);
     }
     return this;
   }
   @Override
   public ServiceResponse run() {
-
-    if(taskInputModel != null && taskInput != null) {
-      Object flowTaskInput = taskInputModel.toValue(taskInput.getValue());
-      facts.add(flowTaskInput);
-    }
-
     try {
-      Object result = script.execute(facts, init);
-      facts.clear();
+      Object result = builder.service(script).andGetBody().getValue();
       return new ServiceResponse() {
         @Override
         public void close() throws Exception {
