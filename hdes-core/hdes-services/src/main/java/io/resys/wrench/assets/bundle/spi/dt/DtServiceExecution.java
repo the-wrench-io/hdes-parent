@@ -69,6 +69,7 @@ public class DtServiceExecution implements ServiceExecution {
     // Custom resolver
     DecisionResult result = decisionTableRepository.executor()
         .inputList(inputs)
+        .input(dtInputResolver)
         .decision(decisionTable)
         .andGetBody();
     return new DtServiceResponse(result);

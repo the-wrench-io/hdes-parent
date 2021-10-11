@@ -129,10 +129,20 @@ public class HdesClientImpl implements HdesClient {
   @Override
   public ExecutorBuilder executor() {
     return new ExecutorBuilder() {
-      final ImmutableProgramContext.Builder data = ImmutableProgramContext.builder(types);
+      private final ImmutableProgramContext.Builder data = ImmutableProgramContext.builder(types);
       @Override
       public ExecutorBuilder inputMap(Map<String, Object> input) {
         this.data.map(input);
+        return this;
+      }
+      @Override
+      public ExecutorBuilder input(ExecutorInput input) {
+        this.data.callback(input);
+        return this;
+      }
+      @Override
+      public ExecutorBuilder inputList(List<Object> inputObject) {
+        this.data.entity(inputObject);
         return this;
       }
       @Override
@@ -150,18 +160,9 @@ public class HdesClientImpl implements HdesClient {
         // TODO Auto-generated method stub
         return null;
       }
-      @Override
-      public ServiceExecutor service(String modelId) {
-        // TODO Auto-generated method stub
-        return null;
-      }
+
       @Override
       public FlowExecutor flow(FlowProgram model) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      @Override
-      public FlowExecutor flow(String modelId) {
         // TODO Auto-generated method stub
         return null;
       }
@@ -181,6 +182,16 @@ public class HdesClientImpl implements HdesClient {
             return DecisionProgramExecutor.find(andGetBody());
           }
         };
+      }
+      @Override
+      public FlowExecutor flow(String modelId) {
+        // TODO Auto-generated method stub
+        return null;
+      }
+      @Override
+      public ServiceExecutor service(String modelId) {
+        // TODO Auto-generated method stub
+        return null;
       }
       @Override
       public DecisionExecutor decision(String modelId) {

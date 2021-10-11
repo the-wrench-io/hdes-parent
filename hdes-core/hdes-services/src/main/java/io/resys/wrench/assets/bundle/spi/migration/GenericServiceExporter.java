@@ -28,18 +28,20 @@ import java.io.SequenceInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.api.programs.DecisionProgram;
-import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
@@ -48,8 +50,6 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Mig
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigration;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableMigrationValue;
-import io.resys.wrench.assets.dt.api.DecisionTableRepository.DecisionTableFormat;
-import io.resys.wrench.assets.dt.spi.export.CommandModelDecisionTableExporter;
 
 
 
@@ -80,15 +80,15 @@ public class GenericServiceExporter implements MigrationBuilder {
     }
   }
 
-  private MigrationValue visitDt(AssetService service) {
-    DecisionProgram dt = serviceRepository.getDtRepo().createBuilder().format(DecisionTableFormat.JSON)
-        .src().build();
-    final var exporter = (CommandModelDecisionTableExporter) new CommandModelDecisionTableExporter(objectMapper)
-        .src(dt.getAst());
+  private MigrationValue visitDt(AssetService service) throws IOException {
+    final var dt = serviceRepository.getTypes().ast().commands(service.getSrc()).decision();
 
-    return ImmutableMigrationValue.builder().type(ServiceType.DT).name(service.getName())
+    return ImmutableMigrationValue.builder()
         .id(md5(service.getSrc()))
-        .addAllCommands(exporter.buildCommands()).build();
+        .type(ServiceType.DT)
+        .name(service.getName())
+        .addAllCommands(objectMapper.readValue(dt.getSource(), new TypeReference<List<AstCommand>>() {}))
+        .build();
   }
 
   private MigrationValue visitSt(AssetService service) throws IOException {

@@ -1,11 +1,35 @@
 package io.resys.hdes.client.spi;
 
+/*-
+ * #%L
+ * hdes-client-api
+ * %%
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
@@ -14,14 +38,25 @@ import io.resys.hdes.client.api.programs.ServiceProgram;
 
 public class ImmutableProgramContext implements ProgramContext {
 
-  private final Map<String, Object> entity; 
-  public ImmutableProgramContext(Map<String, Object> entity) {
+  private final List<Supplier<Map<String, Object>>> inputs; 
+  private final ExecutorInput input;
+  private Map<String, Object> entity;
+  
+  public ImmutableProgramContext(List<Supplier<Map<String, Object>>> inputs, ExecutorInput input) {
     super();
-    this.entity = entity;
+    this.inputs = inputs;
+    this.input = input;
   }
 
   @Override
   public Serializable getValue(TypeDef typeDef) {
+    if(input != null) {
+      return (Serializable) input.apply(typeDef);
+    }
+    if(entity == null) {
+      entity = new HashMap<>();
+      inputs.forEach(e -> entity.putAll(e.get()));
+    }
     return (Serializable) entity.get(typeDef.getName());
   }
   @Override
@@ -43,25 +78,31 @@ public class ImmutableProgramContext implements ProgramContext {
   
   public static class Builder {
     private final HdesTypeDefsFactory factory;
-    private final Map<String, Object> entity = new HashMap<>();
+    private final List<Supplier<Map<String, Object>>> inputs = new ArrayList<>();
+    private ExecutorInput input;
+    
     public Builder(HdesTypeDefsFactory factory) {
       super();
       this.factory = factory;
     }
+    public Builder callback(ExecutorInput input) {
+      this.input = input;
+      return this;
+    }
     public Builder map(Map<String, Object> entity) {
-      this.entity.putAll(entity);
+      this.inputs.add(() -> entity);
       return this;
     }
     public Builder entity(Object entity) {
-      this.entity.putAll(this.factory.toMap(entity));
+      this.inputs.add(() -> this.factory.toMap(entity));
       return this;
     }
     public Builder json(JsonNode json) {
-      this.entity.putAll(this.factory.toMap(json));
+      this.inputs.add(() -> this.factory.toMap(json));
       return this;
     }
     public ImmutableProgramContext build() {
-      return new ImmutableProgramContext(entity);
+      return new ImmutableProgramContext(inputs, input);
     }
   }
 }

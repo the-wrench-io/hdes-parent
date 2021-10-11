@@ -22,12 +22,10 @@ package io.resys.hdes.client.spi.decision;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -54,7 +52,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
   private final static List<String> knownCommandTypes = Arrays.asList(AstCommandValue.values()).stream().map(c -> c.name()).collect(Collectors.toList());
 
   private final HdesTypeDefsFactory dataTypeFactory;
-  private List<AstCommand> src;
+  private final List<AstCommand> src = new ArrayList<>();
   private Integer rev;
 
   public DecisionAstBuilderImpl(HdesTypeDefsFactory dataTypeFactory) {
@@ -67,7 +65,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
     if(src == null) {
       return this;
     }
-    this.src = src;
+    this.src.addAll(src);
     return this;
   }
 
@@ -77,7 +75,6 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
       return this;
     }
     HdesAssert.isTrue(src.isArray(), () -> "src must be array node!");
-    this.src = new ArrayList<>();
     for(JsonNode node : src) {
       final String type = getString(node, "type");
       if(knownCommandTypes.contains(type)) {
@@ -95,7 +92,6 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
 
   @Override
   public AstDecision build() {
-    List<AstCommand> src = CollectionUtils.isEmpty(this.src) ? Collections.emptyList() : this.src;
     CommandMapper.Builder builder = CommandMapper.builder(dataTypeFactory);
 
     if(this.rev != null) {

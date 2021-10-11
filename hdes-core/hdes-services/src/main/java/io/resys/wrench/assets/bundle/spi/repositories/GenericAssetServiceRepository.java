@@ -36,11 +36,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.programs.DecisionResult.DecisionTableOutput;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionLog;
 import io.resys.hdes.client.api.programs.FlowResult;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
-import io.resys.wrench.assets.bundle.spi.builders.GenericExportBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
 import io.resys.wrench.assets.bundle.spi.dt.resolvers.MatchingDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
@@ -93,12 +93,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   public ServiceStore createStore() {
     return serviceStore;
   }
-
-  @Override
-  public ExportBuilder createExport() {
-    return new GenericExportBuilder();
-  }
-  
   @Override
   public String getHash() {
     HashBuilder hashBuilder = new HashBuilder();
@@ -196,16 +190,16 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
           public Map<String, Serializable> andGet() {
             validateDtInput(service.get(), inputs);
             final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
-            final DecisionTableOutput output = dt.get();
-            return output.getValues();
+            final DecisionLog output = dt.get();
+            return DecisionProgramExecutor.toValues(output);
           }
           
           @Override
           public List<Map<String, Serializable>> andFind() {
             validateDtInput(service.get(), inputs);
             final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
-            final List<DecisionTableOutput> output = (List<DecisionTableOutput>) dt.list();
-            return output.stream().map(e -> e.getValues()).collect(Collectors.toList());
+            final List<DecisionLog> output = (List<DecisionLog>) dt.list();
+            return output.stream().map(e -> DecisionProgramExecutor.toValues(e)).collect(Collectors.toList());
           }
         };
       }
