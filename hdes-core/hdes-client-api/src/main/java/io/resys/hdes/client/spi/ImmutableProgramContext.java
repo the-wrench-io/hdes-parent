@@ -69,7 +69,7 @@ public class ImmutableProgramContext implements ProgramContext {
       suppliers.forEach(e -> entity.putAll(e.get()));
     }
     
-    if(typeDef.getData()) {
+    if(typeDef.getData() && typeDef.getBeanType() != null) {
       return (Serializable) factory.toType(entity, typeDef.getBeanType());
     }
     

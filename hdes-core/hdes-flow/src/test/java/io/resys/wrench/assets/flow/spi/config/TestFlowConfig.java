@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
 import io.resys.hdes.client.spi.HdesClientImpl;
+import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.wrench.assets.flow.api.FlowRepository;
@@ -43,7 +44,18 @@ import io.resys.wrench.assets.flow.spi.executors.UserFlowTaskExecutor;
 
 public class TestFlowConfig {
   private static ObjectMapper objectMapper = new ObjectMapper();
-  private static HdesClient nodeRepository = HdesClientImpl.builder().objectMapper(objectMapper).build();
+  private static HdesClient nodeRepository = HdesClientImpl.builder().objectMapper(objectMapper)
+      .serviceInit(new ServiceInit() {
+        @Override
+        public <T> T get(Class<T> type) {
+          try {
+            return type.getDeclaredConstructor().newInstance();
+          } catch(Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+          }
+        }
+      })
+      .build();
   private static FlowExecutorRepository flowExecutorFactory;
   private static FlowRepository flowRepository;
 
