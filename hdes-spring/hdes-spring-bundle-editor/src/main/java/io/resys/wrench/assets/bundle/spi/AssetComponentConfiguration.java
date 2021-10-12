@@ -115,18 +115,16 @@ public class AssetComponentConfiguration {
   public AssetServiceRepository assetServiceRepository(
       ApplicationContext context, ObjectMapper objectMapper, 
       AssetConfigBean assetConfigBean, ServiceStore origServiceStore) {
-    
-    final ClockRepository clockRepository = new SystemClockRepository();
-    final HdesClient dataTypeRepository = HdesClientImpl.builder().objectMapper(objectMapper).build();
-    final FlowRepository flowRepository = flowRepository(dataTypeRepository, clockRepository, origServiceStore, objectMapper);
 
-    
     final ServiceInit init = new ServiceInit() {
       @Override
       public <T> T get(Class<T> type) {
         return context.getAutowireCapableBeanFactory().createBean(type);
       }
     };
+    final ClockRepository clockRepository = new SystemClockRepository();
+    final HdesClient dataTypeRepository = HdesClientImpl.builder().objectMapper(objectMapper).serviceInit(init).build();
+    final FlowRepository flowRepository = flowRepository(dataTypeRepository, clockRepository, origServiceStore, objectMapper);
     
     final ServiceIdGen idGen = new GenericServiceIdGen();
     final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders = new HashMap<>();

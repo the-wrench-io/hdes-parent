@@ -40,15 +40,22 @@ import io.resys.hdes.client.api.programs.ServiceProgram;
 public class ImmutableProgramContext implements ProgramContext {
 
   private final HdesTypeDefsFactory factory;
-  private final List<Supplier<Map<String, Object>>> suppliers;
+
+  private final ExecutorInput callbackThatWillSupplyAllData;
+  
+  // data object that should be directly transformed to target
   private final Object serviceData;
-  private final ExecutorInput input;
-  private Map<String, Object> entity;
+  
+  // generic data to transform to target
+  private Map<String, Object> genericData;
+  
+  // generic data sources that will be used for init of genericData
+  private final List<Supplier<Map<String, Object>>> suppliers;
   
   public ImmutableProgramContext(List<Supplier<Map<String, Object>>> inputs, Object serviceData, ExecutorInput input, HdesTypeDefsFactory factory) {
     super();
     this.suppliers = inputs;
-    this.input = input;
+    this.callbackThatWillSupplyAllData = input;
     this.factory = factory;
     this.serviceData = serviceData;
   }
@@ -56,24 +63,27 @@ public class ImmutableProgramContext implements ProgramContext {
   @Override
   public Serializable getValue(TypeDef typeDef) {
     // data class map compatible
-    if(input != null) {
-      return (Serializable) input.apply(typeDef);
+    if(callbackThatWillSupplyAllData != null) {
+      Serializable target = (Serializable) callbackThatWillSupplyAllData.apply(typeDef);
+      if(target != null) {
+        return target;
+      }
     }
     
     if(typeDef.getData() && serviceData != null) {
       return (Serializable) factory.toType(serviceData, typeDef.getBeanType());
     }
     
-    if(entity == null) {
-      entity = new HashMap<>();
-      suppliers.forEach(e -> entity.putAll(e.get()));
+    if(genericData == null) {
+      genericData = new HashMap<>();
+      suppliers.forEach(e -> genericData.putAll(e.get()));
     }
     
     if(typeDef.getData() && typeDef.getBeanType() != null) {
-      return (Serializable) factory.toType(entity, typeDef.getBeanType());
+      return (Serializable) factory.toType(genericData, typeDef.getBeanType());
     }
     
-    return (Serializable) entity.get(typeDef.getName());
+    return (Serializable) genericData.get(typeDef.getName());
   }
   @Override
   public FlowProgram getFlowProgram(String name) {
