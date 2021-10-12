@@ -1,5 +1,25 @@
 package io.resys.hdes.client.spi.store;
 
+/*-
+ * #%L
+ * hdes-client-api
+ * %%
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,7 +36,9 @@ import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.ImmutableAstDecision;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstService;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.exceptions.StoreException;
+import io.resys.hdes.client.spi.flow.FlowAstBuilderImpl;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.smallrye.mutiny.Uni;
@@ -36,10 +58,11 @@ public class DocumentCreateBuilder implements CreateBuilder {
     final var gid = gid(EntityType.FLOW);
     final var flow = ImmutableAstFlow.builder()
         .name(name)
-        .rev(1)
-        //.headers(ImmutableAstHeaders.builder().build()
-        //    .withInputs(ImmutableAstDataType.builder().name("test").valueType(ValueType.STRING).build()))
-        //.src("")
+//        .rev(1)
+//        .headers(ImmutableHeaders.builder().build())
+//        .bodyType(EntityType.FLOW)
+//        .src(null)
+//        .source("")
         .build();
     //TODO: initialize flow from template
     final Entity<AstFlow> entity = ImmutableEntity.<AstFlow>builder()
@@ -94,15 +117,14 @@ public class DocumentCreateBuilder implements CreateBuilder {
 
   @Override
   public Uni<Entity<AstBody>> build(CreateAstType newType) {
-    /* TODO
+    Uni<?> result;
     switch (newType.getType()) {
-    case FLOW: return flow(newType.getName());
-    case DT: return decision(newType.getName());
-    case FLOW_TASK: return service(newType.getName());
+    case FLOW: result = flow(newType.getName()); break;
+    case DT: result = decision(newType.getName()); break;
+    case FLOW_TASK: result = service(newType.getName()); break;
     default: throw new RuntimeException("Unrecognized type:" + newType.getType());
     }
-    */
-    return null;
+    return (Uni<Entity<AstBody>>) result;
   }
 
   private <T extends AstBody> Uni<Entity<T>> saveCommit(
@@ -118,7 +140,7 @@ public class DocumentCreateBuilder implements CreateBuilder {
         if(commit.getStatus() == CommitStatus.OK) {
           return entity;
         }
-        throw new StoreException(code, null,
+        throw new StoreException(code, (Entity<AstBody>)entity,
             ImmutableStoreExceptionMsg.builder()
             .addAllArgs(getCommitMessages(commit))
             .build());
