@@ -22,15 +22,15 @@ package io.resys.wrench.assets.flow.spi;
 
 import java.util.Map;
 
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepType;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.spi.executors.GenericFlowExecutor;
 
 public class GenericFlowExecutorFactory implements FlowExecutorRepository {
 
-  private final Map<FlowTaskType, FlowTaskExecutor> executors;
+  private final Map<FlowProgramStepType, FlowTaskExecutor> executors;
 
-  public GenericFlowExecutorFactory(Map<FlowTaskType, FlowTaskExecutor> executors) {
+  public GenericFlowExecutorFactory(Map<FlowProgramStepType, FlowTaskExecutor> executors) {
     this.executors = executors;
   }
 
@@ -40,7 +40,7 @@ public class GenericFlowExecutorFactory implements FlowExecutorRepository {
   }
 
   @Override
-  public FlowTaskExecutor createTaskExecutor(FlowTaskType type) {
+  public FlowTaskExecutor createTaskExecutor(FlowProgramStepType type) {
     if(!executors.containsKey(type)) {
       throw new FlowDefinitionException("No executor for flow type: " + type + "!");
     }

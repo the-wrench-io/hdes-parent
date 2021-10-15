@@ -1,7 +1,7 @@
 package io.resys.wrench.assets.flow.spi.executors;
 
 import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 
 /*-
@@ -29,8 +29,8 @@ import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 public class ServiceFlowTaskExecutor implements FlowExecutorRepository.FlowTaskExecutor {
 
   @Override
-  public Step execute(FlowResult flow, FlowTask task) {
-    Step node = flow.getModel().getStep().get(task.getModelId());
+  public FlowProgramStep execute(FlowResult flow, FlowTask task) {
+    FlowProgramStep node = flow.getModel().getStep().get(task.getModelId());
     flow.complete(task);
     return node.getNext().iterator().next();
   }

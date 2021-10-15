@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.flow.api;
+package io.resys.wrench.assets.bundle.spi.flowtask;
 
 /*-
  * #%L

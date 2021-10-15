@@ -1,5 +1,9 @@
 package io.resys.hdes.client.spi;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -34,12 +38,16 @@ import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
@@ -47,6 +55,7 @@ import io.resys.hdes.client.spi.decision.DecisionCSVBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
+import io.resys.hdes.client.spi.flow.FlowProgramExecutor;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
 import io.resys.hdes.client.spi.groovy.ServiceProgramExecutor;
 import io.resys.hdes.client.spi.util.HdesAssert;
@@ -66,7 +75,6 @@ public class HdesClientImpl implements HdesClient {
   @Override
   public AstBuilder ast() {
     return new AstBuilder() {
-      private String syntax;
       private Integer version;
       private final List<AstCommand> commands = new ArrayList<>();
       private ArrayNode json;
@@ -88,9 +96,26 @@ public class HdesClientImpl implements HdesClient {
         return this;
       }
       @Override
-      public AstBuilder syntax(String syntax) {
-        this.syntax = syntax;
-        return this;
+      public AstBuilder syntax(InputStream syntax) {
+        try {
+          BufferedReader br = new BufferedReader(new InputStreamReader(syntax));
+          String line;
+          int index = 0;
+          while ((line = br.readLine()) != null) {
+            commands.add(ImmutableAstCommand.builder()
+                .id(String.valueOf(index++))
+                .type(AstCommandValue.ADD)
+                .value(line)
+                .build());
+          }
+          return this;
+        } catch(IOException e) {
+          throw new RuntimeException(e.getMessage(), e);
+        } finally {
+          try {
+            syntax.close();
+          } catch(IOException e) {}
+        }
       }
       @Override
       public AstBuilder commands(List<AstCommand> src, Integer version) {
@@ -136,7 +161,11 @@ public class HdesClientImpl implements HdesClient {
     return new ExecutorBuilder() {
       private final ImmutableProgramContext.Builder data = ImmutableProgramContext.builder(types);
       @Override
-      public ExecutorBuilder inputMap(Map<String, Object> input) {
+      public ExecutorBuilder inputField(String name, Serializable value) {
+        return inputMap(Map.of(name, value));
+      }
+      @Override
+      public ExecutorBuilder inputMap(Map<String, Serializable> input) {
         this.data.map(input);
         return this;
       }
@@ -170,9 +199,18 @@ public class HdesClientImpl implements HdesClient {
         };
       }
       @Override
-      public FlowExecutor flow(FlowProgram model) {
-        // TODO Auto-generated method stub
-        return null;
+      public FlowExecutor flow(FlowProgram program) {
+        return new FlowExecutor() {
+          @Override
+          public FlowResultLog andGetTask(String task) {
+            return new FlowProgramExecutor(program, data.build(), types).run().getLogs().stream()
+                .filter(t -> t.getStepId().equals(task)).findFirst().orElse(null);
+          }
+          @Override
+          public FlowResult andGetBody() {
+            return new FlowProgramExecutor(program, data.build(), types).run();
+          }
+        };
       }
       @Override
       public DecisionExecutor decision(DecisionProgram program) {

@@ -20,14 +20,14 @@ package io.resys.hdes.client.api.exceptions;
  * #L%
  */
 
-public class ServiceProgramException extends RuntimeException {
+public class ProgramException extends RuntimeException {
 
   private static final long serialVersionUID = -7154685569622201632L;
 
-  public ServiceProgramException(String message) {
+  public ProgramException(String message) {
     super(message);
   }
-  public ServiceProgramException(String message, Throwable cause) {
+  public ProgramException(String message, Throwable cause) {
     super(message, cause);
   }
 

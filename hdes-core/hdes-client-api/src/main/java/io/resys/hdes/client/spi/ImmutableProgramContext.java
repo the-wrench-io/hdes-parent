@@ -47,12 +47,12 @@ public class ImmutableProgramContext implements ProgramContext {
   private final Object serviceData;
   
   // generic data to transform to target
-  private Map<String, Object> genericData;
+  private Map<String, Serializable> genericData;
   
   // generic data sources that will be used for init of genericData
-  private final List<Supplier<Map<String, Object>>> suppliers;
+  private final List<Supplier<Map<String, Serializable>>> suppliers;
   
-  public ImmutableProgramContext(List<Supplier<Map<String, Object>>> inputs, Object serviceData, ExecutorInput input, HdesTypeDefsFactory factory) {
+  public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypeDefsFactory factory) {
     super();
     this.suppliers = inputs;
     this.callbackThatWillSupplyAllData = input;
@@ -104,7 +104,7 @@ public class ImmutableProgramContext implements ProgramContext {
   
   public static class Builder {
     private final HdesTypeDefsFactory factory;
-    private final List<Supplier<Map<String, Object>>> suppliers = new ArrayList<>();
+    private final List<Supplier<Map<String, Serializable>>> suppliers = new ArrayList<>();
     private ExecutorInput input;
     private Object serviceData;
     
@@ -116,13 +116,15 @@ public class ImmutableProgramContext implements ProgramContext {
       this.input = input;
       return this;
     }
-    public Builder map(Map<String, Object> entity) {
+    public Builder map(Map<String, Serializable> entity) {
       this.suppliers.add(() -> entity);
       return this;
     }
     public Builder entity(Object entity) {
       if(entity.getClass().isAnnotationPresent(ServiceData.class)) {
         serviceData = entity;
+      } else if(entity instanceof Map) {
+        this.suppliers.add(() -> (Map) entity);
       } else {
         this.suppliers.add(() -> this.factory.toMap(entity));        
       }

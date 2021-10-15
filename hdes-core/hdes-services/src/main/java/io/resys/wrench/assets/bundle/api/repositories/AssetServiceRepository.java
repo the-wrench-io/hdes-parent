@@ -39,7 +39,6 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
-import io.resys.wrench.assets.flow.api.FlowRepository;
 
 public interface AssetServiceRepository {
 
@@ -52,7 +51,6 @@ public interface AssetServiceRepository {
   Migration readMigration(String json);
   String toSrc(MigrationValue migration);
   
-  FlowRepository getFlRepo();
   HdesClient getTypes();
   
   interface MigrationBuilder {

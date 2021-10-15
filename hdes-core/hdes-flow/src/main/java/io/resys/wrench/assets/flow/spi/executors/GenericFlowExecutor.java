@@ -23,41 +23,41 @@ package io.resys.wrench.assets.flow.spi.executors;
 
 import java.util.function.Function;
 
+import io.resys.wrench.assets.bundle.spi.flowtask.FlowTaskExecutorException;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowExecutor;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
-import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepType;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
+import io.resys.hdes.client.api.programs.FlowResult.FlowExecutionStatus;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
-import io.resys.wrench.assets.flow.api.FlowTaskExecutorException;
 import io.resys.wrench.assets.flow.spi.FlowException;
 
 public class GenericFlowExecutor implements FlowExecutor {
 
-  private final Function<FlowTaskType, FlowTaskExecutor> executor;
+  private final Function<FlowProgramStepType, FlowTaskExecutor> executor;
 
   public GenericFlowExecutor(
-      Function<FlowTaskType, FlowTaskExecutor> executor) {
+      Function<FlowProgramStepType, FlowTaskExecutor> executor) {
     super();
     this.executor = executor;
   }
 
   @Override
   public void execute(FlowResult flow) {
-    flow.getContext().setStatus(FlowStatus.RUNNING);
-    Step node = flow.getModel().getStep().get(flow.getContext().getPointer());
+    flow.getContext().setStatus(FlowExecutionStatus.RUNNING);
+    FlowProgramStep node = flow.getModel().getStep().get(flow.getContext().getPointer());
     run(flow, node);
   }
 
-  protected void run(FlowResult flow, Step node) {
+  protected void run(FlowResult flow, FlowProgramStep node) {
 
     try {
       FlowTask executable = flow.start(node);
-      Step next = executor.apply(node.getType()).execute(flow, executable);
+      FlowProgramStep next = executor.apply(node.getType()).execute(flow, executable);
 
-      if(flow.getContext().getStatus() == FlowStatus.ENDED ||
-          flow.getContext().getStatus() == FlowStatus.SUSPENDED) {
+      if(flow.getContext().getStatus() == FlowExecutionStatus.ENDED ||
+          flow.getContext().getStatus() == FlowExecutionStatus.SUSPENDED) {
 
         return;
       }

@@ -32,7 +32,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
-import io.resys.hdes.client.api.programs.ExpressionResult;
 import io.resys.hdes.client.api.programs.ImmutableExpressionResult;
 import io.resys.hdes.client.spi.util.HdesAssert;
 

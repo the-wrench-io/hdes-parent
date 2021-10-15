@@ -34,13 +34,16 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowExecutionStatus;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.spi.util.FileUtils;
 
 
-public class FlowAstTest {
+public class FlowTest {
 
   @Test
-  public void indentNormal() throws IOException {
+  public void astIndentNormal() throws IOException {
     
     final var ast = TestUtils.client.astTypes().flow()
         .srcAdd(1, "id: uber flow")
@@ -72,7 +75,7 @@ public class FlowAstTest {
 
 
   @Test
-  public void deleteId() throws IOException {
+  public void astDeleteId() throws IOException {
     List<FlowAstCommandMessage> messages = new ArrayList<>();
     final var ast = TestUtils.client.astTypes().flow()
         .srcAdd(1, "id: uber flow")
@@ -94,7 +97,7 @@ public class FlowAstTest {
   }
 
   @Test
-  public void deleteAndSetId() throws IOException {
+  public void astDeleteAndSetId() throws IOException {
     List<FlowAstCommandMessage> messages = new ArrayList<>();
     final var ast = TestUtils.client.astTypes().flow()
         .srcAdd(1, "id: uber flow")
@@ -122,7 +125,7 @@ public class FlowAstTest {
   }
   
   @Test
-  public void assets() throws IOException {
+  public void astTrafficExample() throws IOException {
     InputStream stream = FileUtils.toInputStream(getClass(), "flow/trafficMain.in.json");
     String content = TestUtils.objectMapper.readValue(stream, ObjectNode.class).get("content").asText();
 
@@ -131,6 +134,53 @@ public class FlowAstTest {
 
     String expected = FileUtils.toString(getClass(), "flow/trafficMain.out.yaml");
     Assertions.assertEquals(expected, flowCommandModel.getSrc().getValue());
+  }
+  
+  
+  @Test
+  public void programAmlTest() throws IOException {
+    final var syntax = FileUtils.toInputStream(getClass(), "flow/aml-flow.yaml");
+    final var ast = TestUtils.client.ast().syntax(syntax).flow();
+    final var program = TestUtils.client.program().ast(ast);
+
+    FlowResult flow = TestUtils.client.executor()
+        .inputField("whitelist", false)
+        .inputField("param1", 1)
+        .flow(program).andGetBody();
+
+    // Assert till first form
+    Assertions.assertEquals(FlowExecutionStatus.COMPLETED, flow.getStatus());
+    Assertions.assertEquals("resolveAmlViolation-MERGE", flow.getStepId());
+    Assertions.assertEquals("[addPartyToInvestigationList, resolveAmlViolation, resolveAmlViolation-MERGE]", flow.getShortHistory());
+
+    // Assert tasks
+    Assertions.assertEquals(3, flow.getLogs().size());
+    Assertions.assertEquals(1, flow.getLogs().stream().filter(t -> t.getStepId().equals("resolveAmlViolation")).count());
+
+    FlowResultLog task = flow.getLogs().stream().filter(t -> t.getStepId().equals("resolveAmlViolation")).findFirst().get();
+    Assertions.assertNotNull(task);
+    
+    flow = TestUtils.client.executor()
+        .inputField("whitelist", true)
+        .inputField("param1", 1)
+        .flow(program).andGetBody();
+    
+    // Flow should be completed
+    Assertions.assertEquals("[addPartyToInvestigationList, resolveAmlViolation, resolveAmlViolation-MERGE, resolveAmlViolation-EXCLUSIVE, addToWhitelist, rmInvList, end]", 
+        flow.getShortHistory());
+  }
+
+  @Test
+  public void programSelfRefTest() throws IOException {
+    final var syntax = FileUtils.toInputStream(getClass(), "flow/self-ref.yaml");
+    final var ast = TestUtils.client.ast().syntax(syntax).flow();
+    final var program = TestUtils.client.program().ast(ast);
+    FlowResult flow = TestUtils.client.executor()
+        .inputField("whitelist", true)
+        .flow(program).andGetBody();
+    
+    Assertions.assertEquals("[Add party to investigation list, Resolve aml violation, Resolve aml violation-EXCLUSIVE, addToWhitelist, rmInvList, end]", flow.getShortHistory());
+
   }
 
 }

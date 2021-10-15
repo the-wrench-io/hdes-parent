@@ -21,6 +21,7 @@ package io.resys.hdes.client.test;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,7 @@ public class DecisionTest {
     final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/dt.json")).decision();
     final var program = TestUtils.client.program().ast(ast);
 
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("sriBoolean", false);
     values.put("risk", "CAREFUL");
     values.put("sri", 1);
@@ -110,7 +111,7 @@ public class DecisionTest {
     final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/nullEqualsNull.json")).decision();
     final var program = TestUtils.client.program().ast(ast);
     
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("risk", null);
     
     DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();
@@ -123,7 +124,7 @@ public class DecisionTest {
     final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/firstHitPolicy.json")).decision();
     final var program = TestUtils.client.program().ast(ast);
 
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("regionName", "FIN");
     DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();;
     Assertions.assertEquals(1, result.getMatches().size());
@@ -142,7 +143,7 @@ public class DecisionTest {
     final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/allHitPolicy.json")).decision();
     final var program = TestUtils.client.program().ast(ast);
 
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("firstName", "Mark");
     DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();;
     Assertions.assertEquals(2, result.getMatches().size());

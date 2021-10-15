@@ -43,7 +43,7 @@ import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceQuery;
@@ -270,8 +270,8 @@ public class FlowServiceDataModelValidator implements AstFlowNodeVisitor {
     return new GenericServiceQuery(serviceStore);
   }
 
-  protected boolean isTaskServiceCollection(Step taskModel) {
-    return taskModel.getBody() != null ? taskModel.getBody().isCollection() : false;
+  protected boolean isTaskServiceCollection(FlowProgramStep taskModel) {
+    return taskModel.getBody() != null ? taskModel.getBody().getCollection() : false;
   }
   protected ServiceType getServiceType(AstFlowTaskNode taskModel) {
     if(taskModel.getDecisionTable() != null) {

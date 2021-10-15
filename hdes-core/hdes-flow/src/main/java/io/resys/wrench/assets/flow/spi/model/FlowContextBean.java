@@ -30,8 +30,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.programs.FlowResult.FlowContext;
-import io.resys.hdes.client.api.programs.FlowResult.FlowHistory;
-import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowExecutionLog;
+import io.resys.hdes.client.api.programs.FlowResult.FlowExecutionStatus;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
@@ -39,14 +39,14 @@ public class FlowContextBean implements FlowContext {
 
   private static final long serialVersionUID = -8670956405426919220L;
 
-  private FlowStatus status;
+  private FlowExecutionStatus status;
   private String pointer;
-  private final Collection<FlowHistory> history;
+  private final Collection<FlowResultLog> history;
   private final Collection<FlowTask> tasks;
   private final Map<String, Serializable> variables;
 
-  public FlowContextBean(FlowStatus status, String pointer,
-      Collection<FlowHistory> history, Collection<FlowTask> tasks, Map<String, Serializable> variables) {
+  public FlowContextBean(FlowExecutionStatus status, String pointer,
+      Collection<FlowResultLog> history, Collection<FlowTask> tasks, Map<String, Serializable> variables) {
     super();
     this.status = status;
     this.pointer = pointer;
@@ -55,11 +55,11 @@ public class FlowContextBean implements FlowContext {
     this.variables = variables;
   }
   @Override
-  public FlowStatus getStatus() {
+  public FlowExecutionStatus getStatus() {
     return status;
   }
   @Override
-  public FlowContext setStatus(FlowStatus status) {
+  public FlowContext setStatus(FlowExecutionStatus status) {
     this.status = status;
     return this;
   }
@@ -73,15 +73,15 @@ public class FlowContextBean implements FlowContext {
     return this;
   }
   @Override
-  public Collection<FlowHistory> getHistory() {
+  public Collection<FlowResultLog> getHistory() {
     return Collections.unmodifiableCollection(history);
   }
   @Override
-  public FlowHistory getHistory(String taskId) {
+  public FlowResultLog getHistory(String taskId) {
     return this.history.stream().filter(t -> t.getId().equals(taskId)).findFirst().get();
   }
   @Override
-  public FlowContext addHistory(FlowHistory history) {
+  public FlowContext addHistory(FlowResultLog history) {
     this.history.add(history);
     return this;
   }
@@ -105,7 +105,7 @@ public class FlowContextBean implements FlowContext {
   @Override
   public String getShortHistory() {
     List<String> result = new ArrayList<>();
-    for(FlowHistory history : history) {
+    for(FlowResultLog history : history) {
       result.add(history.getModelId());
     }
     return result.toString();

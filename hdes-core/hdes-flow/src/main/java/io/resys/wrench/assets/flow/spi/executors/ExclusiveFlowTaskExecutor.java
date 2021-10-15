@@ -28,7 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
 import io.resys.hdes.client.spi.util.HdesAssert;
@@ -39,12 +39,12 @@ public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTas
   private static final Logger LOGGER = LoggerFactory.getLogger(ExclusiveFlowTaskExecutor.class);
 
   @Override
-  public Step execute(FlowResult flow, FlowTask task) {
-    Step node = flow.getModel().getStep().get(task.getModelId());
+  public FlowProgramStep execute(FlowResult flow, FlowTask task) {
+    FlowProgramStep node = flow.getModel().getStep().get(task.getModelId());
 
     // Need to eval all child node to figure out what's the next node
-    Step defaultNode = null;
-    for(Step next : node.getNext()) {
+    FlowProgramStep defaultNode = null;
+    for(FlowProgramStep next : node.getNext()) {
       if(next.getBody() == null) {
         defaultNode = next;
         continue;
@@ -55,7 +55,7 @@ public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTas
           return null;
         }
         flow.complete(task);
-        Step result = next.getNext().iterator().next();
+        FlowProgramStep result = next.getNext().iterator().next();
         return result;
       }
     }
@@ -66,7 +66,7 @@ public class ExclusiveFlowTaskExecutor implements FlowExecutorRepository.FlowTas
     throw new IllegalArgumentException("No matching expressions for switch node: " + node.getId() + "!");
   }
 
-  protected boolean eval(FlowResult flow, FlowTask task, Step node) {
+  protected boolean eval(FlowResult flow, FlowTask task, FlowProgramStep node) {
     try {
       return node.getBody().getExpression().eval((name) -> getFlowContextValue(flow, name));
     } catch(Exception e) {

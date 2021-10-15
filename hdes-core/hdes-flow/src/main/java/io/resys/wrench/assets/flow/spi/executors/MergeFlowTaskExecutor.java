@@ -1,8 +1,8 @@
 package io.resys.wrench.assets.flow.spi.executors;
 
 import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
-import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
+import io.resys.hdes.client.api.programs.FlowResult.FlowExecutionStatus;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
 
@@ -31,8 +31,8 @@ import io.resys.wrench.assets.flow.api.FlowExecutorRepository.FlowTaskExecutor;
 public class MergeFlowTaskExecutor implements FlowTaskExecutor {
 
   @Override
-  public Step execute(FlowResult flow, FlowTask task) {
-    Step node = flow.getModel().getStep().get(task.getModelId());
+  public FlowProgramStep execute(FlowResult flow, FlowTask task) {
+    FlowProgramStep node = flow.getModel().getStep().get(task.getModelId());
 
     boolean isOpen = flow.getContext().getTasks().stream()
         .filter(e -> e.getModelId().equals(node.getPrevious().getId()))
@@ -40,7 +40,7 @@ public class MergeFlowTaskExecutor implements FlowTaskExecutor {
         .findFirst().isPresent();
 
     if(isOpen) {
-      flow.getContext().setStatus(FlowStatus.SUSPENDED);
+      flow.getContext().setStatus(FlowExecutionStatus.SUSPENDED);
       flow.suspend(task);
       return null;
     }

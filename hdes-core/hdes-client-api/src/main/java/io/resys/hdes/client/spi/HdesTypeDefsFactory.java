@@ -1,6 +1,7 @@
 package io.resys.hdes.client.spi;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /*-
  * #%L
@@ -293,7 +294,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
-  public Map<String, Object> toMap(Object entity) {
+  public Map<String, Serializable> toMap(Object entity) {
     try {
       return objectMapper.convertValue(entity, Map.class);
     } catch (Exception e) {
@@ -301,7 +302,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
-  public Map<String, Object> toMap(JsonNode entity) {
+  public Map<String, Serializable> toMap(JsonNode entity) {
     try {
       return objectMapper.convertValue(entity, Map.class);
     } catch (Exception e) {

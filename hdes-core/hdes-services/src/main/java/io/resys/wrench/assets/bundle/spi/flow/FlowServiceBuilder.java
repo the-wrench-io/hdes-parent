@@ -1,7 +1,7 @@
 package io.resys.wrench.assets.bundle.spi.flow;
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
 /*-
  * #%L
@@ -25,7 +25,12 @@ import java.util.Optional;
 
 import org.springframework.util.StringUtils;
 
-import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -34,12 +39,11 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.spi.builders.ImmutableServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.TemplateServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
-import io.resys.wrench.assets.flow.api.FlowRepository;
 
 public class FlowServiceBuilder extends TemplateServiceBuilder {
 
   private final ServiceIdGen idGen;
-  private final FlowRepository flowRepository;
+  private final HdesClient hdesClient;
   private final ClockRepository clockRepository;
   private final String defaultContent;
   private final ServiceStore store;
@@ -48,12 +52,13 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
   public FlowServiceBuilder(
       ServiceIdGen idGen,
       ServiceStore store,
-      FlowRepository flowRepository,
-      ClockRepository clockRepository, String defaultContent) {
+      HdesClient flowRepository,
+      ClockRepository clockRepository, 
+      String defaultContent) {
     super();
     this.idGen = idGen;
     this.store = store;
-    this.flowRepository = flowRepository;
+    this.hdesClient = flowRepository;
     this.clockRepository = clockRepository;
     this.defaultContent = defaultContent;
   }
@@ -63,10 +68,20 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
     boolean isDefault = StringUtils.isEmpty(src);
     String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
 
-    Map.Entry<String, FlowProgram> commandsAndModel = flowRepository.createModel().content(content)
-        .rename(rename ? Optional.of(name) : Optional.empty())
-        .build();
-    FlowProgram model = commandsAndModel.getValue();
+    final List<AstCommand> rename = new ArrayList<>();
+    if(this.rename && name != null) {
+      AstFlowRoot originalModel = hdesClient.ast().commands(content).flow().getSrc();
+      AstFlowNode idNode = originalModel.getId();
+
+      rename.add(ImmutableAstCommand.builder()
+          .id(idNode.getStart() + "")
+          .value("id: " + name)
+          .type(AstCommandValue.SET)
+          .build());
+    }
+
+    final var ast = hdesClient.ast().commands(content).commands(rename).flow();
+    final var program = hdesClient.program().ast(ast);
     
     String serviceId = id == null ? idGen.nextId() : id;
     String pointer = serviceId + ".json";
@@ -75,17 +90,17 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
       lastModified = clockRepository.toTimestamp();
     }
 
-    ServiceDataModel dataModel = new FlowServiceDataModelBuilder(store).build(serviceId, model, lastModified);
+    ServiceDataModel dataModel = new FlowServiceDataModelBuilder(store).build(serviceId, program, lastModified);
 
     return ImmutableServiceBuilder.newFlow()
         .setId(serviceId)
-        .setRev(model.getAst().getRev() + "")
-        .setName(model.getId())
-        .setDescription(model.getAst().getDescription())
-        .setSrc(commandsAndModel.getKey())
+        .setRev(program.getAst().getRev() + "")
+        .setName(program.getId())
+        .setDescription(program.getAst().getDescription())
+        .setSrc(program.getAst().getSrc().getValue())
         .setPointer(pointer)
         .setModel(dataModel)
-        .setExecution(() -> new FlowServiceExecution(model, flowRepository))
+        .setExecution(() -> new FlowServiceExecution(program, hdesClient))
         .build();
 
   }

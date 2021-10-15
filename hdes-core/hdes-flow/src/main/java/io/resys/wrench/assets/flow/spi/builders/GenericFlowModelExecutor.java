@@ -30,7 +30,7 @@ import java.util.UUID;
 
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowResult.FlowStatus;
+import io.resys.hdes.client.api.programs.FlowResult.FlowExecutionStatus;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
 import io.resys.wrench.assets.flow.api.FlowRepository.FlowModelExecutor;
 import io.resys.wrench.assets.flow.spi.model.FlowContextBean;
@@ -57,7 +57,7 @@ public class GenericFlowModelExecutor implements FlowModelExecutor {
   @Override
   public FlowResult run(FlowProgram model) {
     FlowContextBean context = new FlowContextBean(
-        FlowStatus.CREATED, model.getStep().getId(),
+        FlowExecutionStatus.CREATED, model.getStep().getId(),
         new ArrayList<>(), new ArrayList<>(), new HashMap<>(genericVariables));
 
     String id = UUID.randomUUID().toString();

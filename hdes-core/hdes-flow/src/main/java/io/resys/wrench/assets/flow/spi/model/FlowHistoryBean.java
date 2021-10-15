@@ -22,9 +22,9 @@ package io.resys.wrench.assets.flow.spi.model;
 
 import java.time.LocalDateTime;
 
-import io.resys.hdes.client.api.programs.FlowResult.FlowHistory;
+import io.resys.hdes.client.api.programs.FlowResult.FlowExecutionLog;
 
-public class FlowHistoryBean implements FlowHistory {
+public class FlowHistoryBean implements FlowResultLog {
 
   private static final long serialVersionUID = -8121017016883667984L;
   private String id;

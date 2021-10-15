@@ -27,7 +27,7 @@ import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepType;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 import io.resys.wrench.assets.flow.api.FlowExecutorRepository;
@@ -79,13 +79,13 @@ public class TestFlowConfig {
 
   public static FlowExecutorRepository flowExecutorFactory() {
     if (flowExecutorFactory == null) {
-      Map<FlowTaskType, FlowTaskExecutor> executors = new HashMap<>();
-      executors.put(FlowTaskType.USER_TASK, new UserFlowTaskExecutor());
-      executors.put(FlowTaskType.END, new EndFlowTaskExecutor());
-      executors.put(FlowTaskType.EXCLUSIVE, new ExclusiveFlowTaskExecutor());
-      executors.put(FlowTaskType.MERGE, new MergeFlowTaskExecutor());
-      executors.put(FlowTaskType.SERVICE, new ServiceFlowTaskExecutor());
-      executors.put(FlowTaskType.EMPTY, new EmptyFlowTaskExecutor());
+      Map<FlowProgramStepType, FlowTaskExecutor> executors = new HashMap<>();
+      executors.put(FlowProgramStepType.USER_TASK, new UserFlowTaskExecutor());
+      executors.put(FlowProgramStepType.END, new EndFlowTaskExecutor());
+      executors.put(FlowProgramStepType.EXCLUSIVE, new ExclusiveFlowTaskExecutor());
+      executors.put(FlowProgramStepType.MERGE, new MergeFlowTaskExecutor());
+      executors.put(FlowProgramStepType.SERVICE, new ServiceFlowTaskExecutor());
+      executors.put(FlowProgramStepType.EMPTY, new EmptyFlowTaskExecutor());
       flowExecutorFactory = new GenericFlowExecutorFactory(executors);
     }
     return flowExecutorFactory;

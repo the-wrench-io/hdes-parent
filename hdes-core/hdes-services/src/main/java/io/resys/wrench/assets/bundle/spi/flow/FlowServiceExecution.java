@@ -31,25 +31,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
-import io.resys.wrench.assets.flow.api.FlowRepository;
-import io.resys.wrench.assets.flow.api.FlowRepository.FlowModelExecutor;
 
 public class FlowServiceExecution implements ServiceExecution {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FlowServiceExecution.class);
 
   private final FlowProgram flowModel;
-  private final FlowRepository flowRepository;
+  private final HdesClient flowRepository;
   private final List<Serializable> facts = new ArrayList<>();
 
   public FlowServiceExecution(
       FlowProgram flowModel,
-      FlowRepository flowRepository) {
+      HdesClient flowRepository) {
     super();
     this.flowModel = flowModel;
     this.flowRepository = flowRepository;
@@ -65,16 +64,14 @@ public class FlowServiceExecution implements ServiceExecution {
   @Override
   public ServiceResponse run() {
     try {
-      FlowModelExecutor flowBuilder = flowRepository.createExecutor();
+      final var flowBuilder = flowRepository.executor();
 
       for(Serializable fact : facts) {
         if(fact instanceof Map) {
-          for(Map.Entry<?, ?> entry : ((Map<?, ?>) fact).entrySet()) {
-            flowBuilder.insert((String) entry.getKey(), (Serializable) entry.getValue());
-          }
+          flowBuilder.inputMap((Map<String, Serializable>) fact);
         }
       }
-      FlowResult flow = flowBuilder.run(flowModel);
+      FlowResult flow = flowBuilder.flow(flowModel).andGetBody();
       return new FlowServiceResponse(flow);
     } catch(RuntimeException e) {
       throw e;

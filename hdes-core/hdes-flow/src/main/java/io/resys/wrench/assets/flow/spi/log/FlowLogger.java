@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
-import io.resys.hdes.client.api.programs.FlowResult.FlowHistory;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepType;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
+import io.resys.hdes.client.api.programs.FlowResult.FlowExecutionLog;
 import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
 
 public class FlowLogger {
@@ -42,10 +42,10 @@ public class FlowLogger {
   public Map<String, Object> build() {
     Map<String, Object> result = new HashMap<>();
     BiConsumer<String, Object> parent = (key, value) -> result.put(key, value);
-    for(FlowHistory history : flow.getContext().getHistory()) {
+    for(FlowResultLog history : flow.getContext().getHistory()) {
       FlowTask task = flow.getContext().getTask(history.getId());
-      Step taskModel = flow.getModel().getSteps().stream().filter(t -> t.getId().equals(task.getModelId())).findFirst().get();
-      if(taskModel.getType() == FlowTaskType.DT || taskModel.getType() == FlowTaskType.SERVICE) {
+      FlowProgramStep taskModel = flow.getModel().getSteps().stream().filter(t -> t.getId().equals(task.getModelId())).findFirst().get();
+      if(taskModel.getType() == FlowProgramStepType.DT || taskModel.getType() == FlowProgramStepType.SERVICE) {
         parent = createTaskLog(parent, task);
       }
     }
@@ -55,8 +55,8 @@ public class FlowLogger {
 
   protected BiConsumer<String, Object> createTaskLog(BiConsumer<String, Object> parent, FlowTask task) {
     Map<String, Object> taskLog = new HashMap<>();
-    if(!task.getInputs().isEmpty()) {
-      taskLog.put("inputs", task.getInputs());
+    if(!task.getInputMapping().isEmpty()) {
+      taskLog.put("inputs", task.getInputMapping());
     }
     taskLog.put("output", task.getVariables().get(task.getModelId()));
     parent.accept(task.getModelId(), taskLog);

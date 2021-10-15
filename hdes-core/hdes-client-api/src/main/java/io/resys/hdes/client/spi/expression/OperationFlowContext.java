@@ -31,6 +31,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.PropertyAccessor;
 import org.springframework.expression.TypedValue;
+import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.expression.spel.SpelNode;
 import org.springframework.expression.spel.ast.CompoundExpression;
 import org.springframework.expression.spel.ast.PropertyOrFieldReference;
@@ -39,7 +40,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskExpressionContext;
+import io.resys.hdes.client.api.exceptions.ProgramException;
 
 public class OperationFlowContext {
   private final static ExpressionParser PARSER = new SpelExpressionParser();
@@ -60,15 +61,20 @@ public class OperationFlowContext {
       inputs.forEach(constants);
       
       return (FlowTaskExpressionContext context) -> {
-        StandardEvaluationContext evalContext = new StandardEvaluationContext(context);
-        evalContext.addPropertyAccessor(mapAccessor);
-        evalContext.addPropertyAccessor(contextAccessor);
-        return (boolean) exp.getValue(evalContext);
+        try {
+          StandardEvaluationContext evalContext = new StandardEvaluationContext(context);
+          evalContext.addPropertyAccessor(mapAccessor);
+          evalContext.addPropertyAccessor(contextAccessor);
+          return (boolean) exp.getValue(evalContext);
+        } catch(SpelEvaluationException e) {
+          
+          throw new ProgramException(
+              "Expression: '" + src + "' failed. "  + System.lineSeparator() + 
+              e.getMessage(), e);
+        }
       };
     }
   }
-  
-  
 
   private static void getInputs(SpelNode node, List<String> inputs) {
     if(node instanceof CompoundExpression) {
@@ -133,4 +139,8 @@ public class OperationFlowContext {
     public void write(EvaluationContext context, Object target, String name, Object newValue) throws AccessException {}
   }
 
+  
+  public interface FlowTaskExpressionContext {
+    Object apply(String name);
+  }
 }

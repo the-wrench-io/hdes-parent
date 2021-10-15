@@ -1,7 +1,6 @@
 package io.resys.wrench.assets.bundle.spi.repositories;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,22 +36,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionLog;
-import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
-import io.resys.wrench.assets.bundle.spi.dt.resolvers.MatchingDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.hash.HashBuilder;
 import io.resys.wrench.assets.bundle.spi.migration.GenericServiceExporter;
-import io.resys.wrench.assets.flow.api.FlowRepository;
 
 public class GenericAssetServiceRepository implements AssetServiceRepository {
 
   private final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders;
-  private final FlowRepository flowRepository;
   private final ServiceStore serviceStore;
   private final ObjectMapper objectMapper;
   private final HdesClient types;
@@ -60,7 +56,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
   public GenericAssetServiceRepository(
       HdesClient types,
       ObjectMapper objectMapper,
-      FlowRepository flowRepository,
       
       Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders,
       ServiceStore serviceStore) {
@@ -68,8 +63,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     super();
     this.types = types;
     this.objectMapper = objectMapper;
-    this.flowRepository = flowRepository;
-    
     this.builders = builders;
     this.serviceStore = serviceStore;
   }
@@ -95,11 +88,6 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
     createQuery().list().stream().sorted((s1, s2) -> s1.getId().compareTo(s2.getId())).forEachOrdered(hashBuilder::add);
     return hashBuilder.build();
   }
-  @Override
-  public FlowRepository getFlRepo() {
-    return flowRepository;
-  }
-
   @Override
   public ServiceExecutor executor() {
     return new ServiceExecutor() {
@@ -130,14 +118,12 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
             validateFlowInput(service.get(), inputs);
             FlowResult flow = service.get().newExecution().insert((Serializable) inputs).run().get();
             
-            Collection<FlowTask> tasks = flow.getContext().getTasks(taskName);
+            Optional<FlowResultLog> tasks = flow.getLogs().stream().filter(e -> e.getStepId().equals(taskName)).findFirst();
             if(tasks.isEmpty()) {
-              throw new DataException(422, new Message("E002", "Flow with id: " + flow.getModel().getId() + " does not have task with id: " + taskName + "!"));
+              throw new DataException(422, new Message("E002", "Flow with id: " + service.get().getName() + " does not have task with id: " + taskName + "!"));
             }
 
-            FlowTask task = tasks.iterator().next();
-            Serializable delegate = task.getVariables().get(taskName);
-            return delegate;
+            return tasks.get().getReturns();
           }
           private void validateFlowInput(AssetService service, Map<String, Object> input) {
             for(TypeDef dataType : service.getDataModel().getParams()) {
@@ -180,7 +166,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
           @Override
           public Map<String, Serializable> andGet() {
             validateDtInput(service.get(), inputs);
-            final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
+            final ServiceResponse dt = service.get().newExecution().insert((Serializable) inputs).run();
             final DecisionLog output = dt.get();
             return DecisionProgramExecutor.toValues(output);
           }
@@ -188,7 +174,7 @@ public class GenericAssetServiceRepository implements AssetServiceRepository {
           @Override
           public List<Map<String, Serializable>> andFind() {
             validateDtInput(service.get(), inputs);
-            final ServiceResponse dt = service.get().newExecution().insert(new MatchingDtInputResolver(inputs)).run();
+            final ServiceResponse dt = service.get().newExecution().insert((Serializable) inputs).run();
             final List<DecisionLog> output = (List<DecisionLog>) dt.list();
             return output.stream().map(e -> DecisionProgramExecutor.toValues(e)).collect(Collectors.toList());
           }

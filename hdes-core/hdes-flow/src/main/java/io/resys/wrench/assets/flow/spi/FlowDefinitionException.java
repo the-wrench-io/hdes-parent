@@ -20,15 +20,15 @@ package io.resys.wrench.assets.flow.spi;
  * #L%
  */
 
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 
 public class FlowDefinitionException extends RuntimeException {
 
   private static final long serialVersionUID = 2978117894572351791L;
 
-  private final Step node;
+  private final FlowProgramStep node;
 
-  public FlowDefinitionException(String message, Step node, Throwable cause) {
+  public FlowDefinitionException(String message, FlowProgramStep node, Throwable cause) {
     super(message, cause);
     this.node = node;
   }
@@ -38,7 +38,7 @@ public class FlowDefinitionException extends RuntimeException {
     this.node = null;
   }
 
-  public FlowDefinitionException(String message, Step node) {
+  public FlowDefinitionException(String message, FlowProgramStep node) {
     super(message);
     this.node = node;
   }
@@ -46,7 +46,7 @@ public class FlowDefinitionException extends RuntimeException {
     super(message);
     this.node = null;
   }
-  public Step getNode() {
+  public FlowProgramStep getNode() {
     return node;
   }
 }

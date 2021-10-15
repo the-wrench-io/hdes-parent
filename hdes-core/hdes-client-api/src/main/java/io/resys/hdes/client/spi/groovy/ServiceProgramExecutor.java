@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType0;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType1;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType2;
-import io.resys.hdes.client.api.exceptions.ServiceProgramException;
+import io.resys.hdes.client.api.exceptions.ProgramException;
 import io.resys.hdes.client.api.programs.ImmutableServiceResult;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.ServiceProgram;
@@ -54,7 +54,7 @@ public class ServiceProgramExecutor {
           .value(((ServiceExecutorType2) program.getBean()).execute(context.getValue(inputs.get(0)), context.getValue(inputs.get(1))))
           .build();
     default:
-      throw new ServiceProgramException("Service: '" + program.getId() + "' failure. Can't find/call execute method!");
+      throw new ProgramException("Service: '" + program.getId() + "' failure. Can't find/call execute method!");
     }
   }
 }

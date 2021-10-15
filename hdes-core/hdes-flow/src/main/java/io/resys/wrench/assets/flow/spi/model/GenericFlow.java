@@ -27,7 +27,7 @@ import java.util.Optional;
 
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.wrench.assets.flow.spi.log.FlowLogger;
 
@@ -60,7 +60,7 @@ public class GenericFlow implements FlowResult {
     return context;
   }
   @Override
-  public FlowTask start(Step model) {
+  public FlowTask start(FlowProgramStep model) {
     Optional<FlowTask> openFlowTask = context.getTasks(model.getId()).stream().filter(t -> t.getStatus() == FlowTaskStatus.OPEN).findFirst();
     if(openFlowTask.isPresent()) {
       return openFlowTask.get();
@@ -91,7 +91,7 @@ public class GenericFlow implements FlowResult {
   }
   @Override
   public FlowTask suspend(FlowTask task) {
-    context.setStatus(FlowStatus.SUSPENDED);
+    context.setStatus(FlowExecutionStatus.SUSPENDED);
     return task;
   }
   protected LocalDateTime now() {
@@ -100,7 +100,7 @@ public class GenericFlow implements FlowResult {
   @Override
   public FlowTask end(FlowTask task) {
     HdesAssert.isTrue(task.getStatus() == FlowTaskStatus.COMPLETED, () -> "Flow task: \"" + id + "\" status must be COMPLETED but was: " + task.getStatus() + "!");
-    context.setStatus(FlowStatus.ENDED).setPointer(null);
+    context.setStatus(FlowExecutionStatus.ENDED).setPointer(null);
     return task;
   }
   @Override

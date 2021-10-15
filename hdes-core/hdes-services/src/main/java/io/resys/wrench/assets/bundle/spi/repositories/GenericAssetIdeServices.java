@@ -50,12 +50,7 @@ import com.fasterxml.jackson.dataformat.csv.CsvSchema;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
-import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
-import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowResult.FlowContext;
-import io.resys.hdes.client.api.programs.FlowResult.FlowTask;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.wrench.assets.bundle.api.repositories.AssetIdeServices;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
@@ -66,9 +61,8 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableAssetError;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableAssetResource;
 import io.resys.wrench.assets.bundle.api.repositories.ImmutableAssetSummary;
-import io.resys.wrench.assets.bundle.spi.dt.resolvers.DebugDtInputResolver;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
-import io.resys.wrench.assets.bundle.spi.flow.executors.TransientFlowExecutor;
+import io.resys.wrench.assets.bundle.spi.flow.TransientFlowExecutor;
 import io.resys.wrench.assets.bundle.spi.flowtask.FlowTaskInput;
 
 public class GenericAssetIdeServices implements AssetIdeServices {
@@ -157,7 +151,7 @@ public class GenericAssetIdeServices implements AssetIdeServices {
          
        } else if(service.getType() == ServiceType.DT) {
          Object outputs = service.newExecution()
-          .insert(new DebugDtInputResolver(objectMapper.readValue(entity.getInput(), HashMap.class)))
+          .insert(objectMapper.readValue(entity.getInput(), HashMap.class))
           .run()
           .getDebug();
         
@@ -267,16 +261,8 @@ public class GenericAssetIdeServices implements AssetIdeServices {
   
   
   private JsonNode getLastTask(FlowResult flow) {
-    FlowContext context = flow.getContext();
-    FlowProgram model = flow.getModel();
-    Object output = null;
-    for(FlowTask task : context.getTasks()) {
-      if(isTaskPartOfOutput(task, model)) {
-        String modelId = task.getModelId();
-        output = task.getVariables().get(modelId);
-      }
-    }
-    
+
+    Object output = flow.getReturns();
     if(output == null) {
       output = new HashMap<>();
     }
@@ -290,18 +276,6 @@ public class GenericAssetIdeServices implements AssetIdeServices {
       }
     }
     return jsonNode;
-  }
-  
-  private boolean isTaskPartOfOutput(FlowTask task, FlowProgram model) {
-    for(Step taskModel : model.getSteps()) {
-      if(!taskModel.getId().equals(task.getModelId())) {
-        continue;
-      }
-      FlowTaskType taskType = taskModel.getType();
-      return taskType == FlowTaskType.DT || taskType == FlowTaskType.SERVICE;
-    }
-    
-    return false;
   }
   
   private FlowResult executeCsvRecord(Map<Integer, String> headers, CSVRecord row, AssetService service) throws JsonProcessingException {

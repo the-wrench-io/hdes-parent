@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.bundle.spi.flow.executors;
+package io.resys.wrench.assets.bundle.spi.flow;
 
 /*-
  * #%L
@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -39,9 +38,9 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DataTypeException;
-import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
-import io.resys.hdes.client.api.programs.FlowResult.FlowTaskStatus;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowExecutionStatus;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResultErrorLog;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
@@ -49,7 +48,6 @@ import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
 import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
 import io.resys.wrench.assets.bundle.spi.exceptions.Message;
 import io.resys.wrench.assets.bundle.spi.exceptions.MessageList;
-import io.resys.wrench.assets.flow.spi.FlowException;
 
 public class TransientFlowExecutor {
   private final ObjectMapper objectMapper;
@@ -77,16 +75,17 @@ public class TransientFlowExecutor {
       ServiceResponse response = service.newExecution().insert((Serializable) input).run();
       FlowResult flow = response.get();
 
-      return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, createOutput(flow));
-    } catch(FlowException e) {
-      final FlowResult flow = e.getFlow();
+      if(flow.getStatus() == FlowExecutionStatus.COMPLETED) {
+        return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, createOutput(flow));
+      }
+      
       final ObjectNode output = createOutput(flow);
-      final Map<String, String> errors = new HashMap<>();
-      errors.put("msg", e.getMessage());
-      errors.put("stackTrace", ExceptionUtils.getStackTrace(e));
-      output.set("_errors", objectMapper.convertValue(errors, ObjectNode.class));
-    
+      final List<FlowResultErrorLog> executionErrors = new ArrayList<>();
+      flow.getLogs().forEach(e -> executionErrors.addAll(e.getErrors()));
+      
+      output.set("_errors", objectMapper.convertValue(executionErrors, ArrayNode.class));
       return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, output);
+
     } catch(DataTypeException e) {
       Message error = AssetErrorCodes.FLOW_PROPERTY_INVALID.newMessage(e.getDataType().getName());
       throw new DataException(new MessageList().setStatus(422).add(error));
@@ -111,10 +110,14 @@ public class TransientFlowExecutor {
       ServiceResponse response = service.newExecution().insert((Serializable) input).run();
       FlowResult flow = response.get();
 
-      return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, createOutput(flow));
-    } catch(FlowException e) {
-      Message error = AssetErrorCodes.FLOW_EXEC_ERROR.newMessage(e.getMessage());
+      if(flow.getStatus() == FlowExecutionStatus.COMPLETED) {
+        return new AbstractMap.SimpleImmutableEntry<FlowResult, ObjectNode>(flow, createOutput(flow));  
+      }
+      
+      Message error = AssetErrorCodes.FLOW_EXEC_ERROR.newMessage("failed to execute flow");
       throw new DataException(new MessageList().setStatus(422).add(error));
+      
+
     } catch(DataTypeException e) {
       Message error = AssetErrorCodes.FLOW_PROPERTY_INVALID.newMessage(e.getDataType().getName());
       throw new DataException(new MessageList().setStatus(422).add(error));
@@ -137,15 +140,11 @@ public class TransientFlowExecutor {
 
   protected ObjectNode createOutput(FlowResult flow) {
     ObjectNode output = objectMapper.createObjectNode();
-    flow.getContext().getTasks().stream()
-    .filter(t -> t.getStatus() == FlowTaskStatus.COMPLETED)
+    flow.getLogs().stream()
+    .filter(t -> t.getReturns() != null)
     .forEach(t -> {
-
-      Step taskModel = flow.getModel().getStep().get(t.getModelId());
-      if(taskModel.getBody() != null) {
-        JsonNode node = objectMapper.valueToTree(t.getVariables().get(t.getModelId()));
-        output.set(taskModel.getId(), node);
-      }
+      JsonNode node = objectMapper.valueToTree( t.getReturns());
+      output.set(t.getStepId(), node);
     });
 
     return output;

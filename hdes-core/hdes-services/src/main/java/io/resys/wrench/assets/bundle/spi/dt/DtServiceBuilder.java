@@ -41,7 +41,7 @@ import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 public class DtServiceBuilder extends TemplateServiceBuilder {
 
   private final ServiceIdGen serviceStore;
-  private final HdesClient decisionTableRepository;
+  private final HdesClient hdesClient;
   private final ClockRepository clockRepository;
   private final String defaultContent;
   private boolean rename;
@@ -54,7 +54,7 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
     super();
     this.serviceStore = serviceStore;
     this.clockRepository = clockRepository;
-    this.decisionTableRepository = decisionTableRepository;
+    this.hdesClient = decisionTableRepository;
     this.defaultContent = defaultContent;
   }
 
@@ -65,14 +65,14 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
     }
     String content = StringUtils.isEmpty(src) ? defaultContent.replace("{{name}}", name) : src;
     
-    final var ast = decisionTableRepository.ast()
+    final var ast = hdesClient.ast()
       .commands(content)
       .commands(rename ? 
           Arrays.asList(ImmutableAstCommand.builder().type(AstCommandValue.SET_NAME).value(name).build()) : 
           Collections.emptyList())
       .decision();
     
-    DecisionProgram decisionTable = decisionTableRepository.program().ast(ast);
+    DecisionProgram decisionTable = hdesClient.program().ast(ast);
     String serviceId = id == null ? serviceStore.nextId() : id;
     ServiceDataModel dataModel = new DtServiceDataModelBuilder().build(serviceId, decisionTable);
     String pointer = serviceId + ".json";
@@ -85,7 +85,7 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
         .setSrc(decisionTable.getAst().getSource())
         .setPointer(pointer)
         .setModel(dataModel)
-        .setExecution(() -> new DtServiceExecution(decisionTableRepository, decisionTable))
+        .setExecution(() -> new DtServiceExecution(hdesClient, decisionTable))
         .build();
   }
 
