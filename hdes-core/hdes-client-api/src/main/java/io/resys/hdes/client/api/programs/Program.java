@@ -34,15 +34,18 @@ public interface Program<A extends AstBody> extends Serializable {
   A getAst();
   
   interface ProgramResult extends Serializable {
-    
-  }
+  }  
   
   interface ProgramContext {
     ProgramContextNamedValue getValue(String typeDefName);
     Serializable getValue(TypeDef typeDef);
-    FlowProgram getFlowProgram(String name);
-    DecisionProgram getDecisionProgram(String name);
-    ServiceProgram getServiceProgram(String name);
+    ProgramSupplier getPrograms();
+  }
+  
+  interface ProgramSupplier {
+    FlowProgram getFlow(String name);
+    DecisionProgram getDecision(String name);
+    ServiceProgram getService(String name);
   }
   
   @Value.Immutable

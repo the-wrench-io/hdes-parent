@@ -49,6 +49,7 @@ import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.ast.TypeDef.ValueTypeResolver;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
+import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
 import io.resys.hdes.client.spi.serializers.DateDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.DateTimeDataTypeDeserializer;
@@ -65,14 +66,16 @@ public class HdesTypeDefsFactory {
   }
   
   private final ServiceInit serviceInit;
+  private final HdesClientConfig config;
   private final Map<ValueType, Deserializer> deserializers;
   private final Map<ValueType, Serializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
   private final ObjectMapper objectMapper; 
 
-  public HdesTypeDefsFactory(ObjectMapper objectMapper, ServiceInit serviceInit) {
+  public HdesTypeDefsFactory(ObjectMapper objectMapper, ServiceInit serviceInit, HdesClientConfig config) {
     this.objectMapper = objectMapper;
     this.serviceInit = serviceInit;
+    this.config = config;
     
     Map<ValueType, Deserializer> deserializers = new HashMap<>();
     this.deserializers = Collections.unmodifiableMap(deserializers);
@@ -320,6 +323,10 @@ public class HdesTypeDefsFactory {
   
   public ServiceInit getServiceInit() {
     return this.serviceInit;
+  }
+  
+  public HdesClientConfig config() {
+    return config;
   }
    
 }

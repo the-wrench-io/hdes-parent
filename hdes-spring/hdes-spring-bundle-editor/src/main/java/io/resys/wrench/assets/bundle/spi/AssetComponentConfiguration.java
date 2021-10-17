@@ -39,6 +39,10 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 import io.resys.hdes.client.spi.flow.autocomplete.DescAutocomplete;
@@ -63,6 +67,7 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServicePostProcessorSupplier;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
+import io.resys.wrench.assets.bundle.spi.builders.GenericServiceQuery;
 import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 import io.resys.wrench.assets.bundle.spi.clock.SystemClockRepository;
 import io.resys.wrench.assets.bundle.spi.dt.DtServiceBuilder;
@@ -127,6 +132,20 @@ public class AssetComponentConfiguration {
           new IdValidator(),
           new DescriptionValidator()
         )
+        .programSupplier(new ProgramSupplier() {
+          @Override
+          public ServiceProgram getService(String name) {
+            return new GenericServiceQuery(origServiceStore).flowTask(name).newExecution().unwrap();
+          }
+          @Override
+          public FlowProgram getFlow(String name) {
+            return new GenericServiceQuery(origServiceStore).flow(name).newExecution().unwrap();
+          }
+          @Override
+          public DecisionProgram getDecision(String name) {
+            return new GenericServiceQuery(origServiceStore).dt(name).newExecution().unwrap();
+          }
+        })
         .build();
     
     final ServiceIdGen idGen = new GenericServiceIdGen();

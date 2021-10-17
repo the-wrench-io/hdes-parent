@@ -31,13 +31,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.programs.DecisionProgram;
-import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ImmutableProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
+import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
 import io.resys.hdes.client.api.programs.ServiceData;
-import io.resys.hdes.client.api.programs.ServiceProgram;
 
 public class ImmutableProgramContext implements ProgramContext {
 
@@ -102,20 +100,7 @@ public class ImmutableProgramContext implements ProgramContext {
       suppliers.forEach(e -> genericData.putAll(e.get()));
     }
   }
-  
-  @Override
-  public FlowProgram getFlowProgram(String name) {
-    throw new RuntimeException("must impl");
-  }
-  @Override
-  public DecisionProgram getDecisionProgram(String name) {
-    throw new RuntimeException("must impl");
-  }
-  @Override
-  public ServiceProgram getServiceProgram(String name) {
-    throw new RuntimeException("must impl");
-  }
-  
+
   public static Builder builder(HdesTypeDefsFactory factory) {
     return new Builder(factory);
   }
@@ -155,5 +140,10 @@ public class ImmutableProgramContext implements ProgramContext {
     public ImmutableProgramContext build() {
       return new ImmutableProgramContext(suppliers, serviceData, input, factory);
     }
+  }
+
+  @Override
+  public ProgramSupplier getPrograms() {
+    return factory.config().getPrograms();
   }
 }

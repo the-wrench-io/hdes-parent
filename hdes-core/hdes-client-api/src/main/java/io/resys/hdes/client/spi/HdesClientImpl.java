@@ -49,6 +49,7 @@ import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
+import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
@@ -283,6 +284,7 @@ public class HdesClientImpl implements HdesClient {
     private ObjectMapper objectMapper;
     private ServiceInit serviceInit;
     private HdesStore store;
+    private ProgramSupplier programSupplier;
     private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>();
 
     public Builder flowVisitors(AstFlowNodeVisitor ...visitors) {
@@ -297,6 +299,10 @@ public class HdesClientImpl implements HdesClient {
       this.serviceInit = serviceInit;
       return this;
     }
+    public Builder programSupplier(ProgramSupplier programSupplier) {
+      this.programSupplier = programSupplier;
+      return this;
+    }
     public Builder store(HdesStore store) {
       this.store = store;
       return this;
@@ -304,8 +310,9 @@ public class HdesClientImpl implements HdesClient {
     public HdesClientImpl build() {
       HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
       HdesAssert.notNull(serviceInit, () -> "serviceInit must be defined!");
-      final var config = new HdesClientConfigImpl(flowVisitors);
-      final var types = new HdesTypeDefsFactory(objectMapper, serviceInit);
+      HdesAssert.notNull(programSupplier, () -> "programSupplier must be defined!");
+      final var config = new HdesClientConfigImpl(flowVisitors, programSupplier);
+      final var types = new HdesTypeDefsFactory(objectMapper, serviceInit, config);
       final var ast = new HdesAstTypesImpl(objectMapper, serviceInit, config);
       return new HdesClientImpl(types, store, ast, config);
     }
@@ -313,8 +320,10 @@ public class HdesClientImpl implements HdesClient {
 
   private static class HdesClientConfigImpl implements HdesClientConfig {
     private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>();
-    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors) {
+    private final ProgramSupplier programs;
+    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors, ProgramSupplier programs) {
       this.flowVisitors.addAll(flowVisitors);
+      this.programs = programs;
     }
     @Override
     public List<AstFlowNodeVisitor> getFlowVisitors() {
@@ -324,6 +333,10 @@ public class HdesClientImpl implements HdesClient {
     public HdesClientConfig config(AstFlowNodeVisitor... changes) {
       this.flowVisitors.addAll(Arrays.asList(changes));
       return this;
+    }
+    @Override
+    public ProgramSupplier getPrograms() {
+      return programs;
     }
   }
 }

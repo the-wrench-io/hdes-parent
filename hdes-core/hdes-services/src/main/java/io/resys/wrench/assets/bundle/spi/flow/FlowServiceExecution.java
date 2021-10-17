@@ -34,6 +34,7 @@ import org.springframework.util.Assert;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
+import io.resys.hdes.client.api.programs.Program;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
@@ -85,6 +86,11 @@ public class FlowServiceExecution implements ServiceExecution {
   @Override
   public <T> void run(Consumer<T> serviceType) {
     serviceType.accept((T) flowModel);
+  }
+
+  @Override
+  public <T extends Program<?>> T unwrap() {
+    return (T) flowModel;
   }
 
 }

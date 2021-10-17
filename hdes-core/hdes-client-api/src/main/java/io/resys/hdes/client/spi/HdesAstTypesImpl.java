@@ -48,7 +48,7 @@ public class HdesAstTypesImpl implements HdesAstTypes {
     
     this.config = config;
     this.gcl = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), groovyConfig);
-    this.typeDefs = new HdesTypeDefsFactory(objectMapper, init);
+    this.typeDefs = new HdesTypeDefsFactory(objectMapper, init, config);
   }
   @Override
   public DecisionAstBuilder decision() {
