@@ -47,7 +47,6 @@ import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
@@ -58,6 +57,7 @@ import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
+import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeBean;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
@@ -65,8 +65,6 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class FlowAstBuilderImpl implements FlowAstBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(FlowAstBuilderImpl.class);
-  private final Collection<AstFlowNodeVisitor> visitors = new ArrayList<>();
-
   private final static String LINE_SEPARATOR = System.lineSeparator();
   private final static Collection<AstFlowInputType> inputTypes = Collections.unmodifiableList(    
       Arrays.asList(ValueType.STRING,  ValueType.BOOLEAN, ValueType.INTEGER, ValueType.LONG, ValueType.DECIMAL, ValueType.DATE, ValueType.DATE_TIME).stream()
@@ -74,6 +72,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
       .collect(Collectors.toList())
   );
 
+  private final Collection<AstFlowNodeVisitor> visitors = new ArrayList<>();
   private final NodeFlowBean result = new NodeFlowBean(inputTypes);
   private final ObjectMapper yamlMapper;
   private final HdesTypeDefsFactory typeDefs;
@@ -81,12 +80,13 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
   private List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   
-  public FlowAstBuilderImpl(ObjectMapper yamlMapper, HdesTypeDefsFactory typeDefs) {
+  public FlowAstBuilderImpl(ObjectMapper yamlMapper, HdesTypeDefsFactory typeDefs, Collection<AstFlowNodeVisitor> visitors) {
     super();
     this.yamlMapper = yamlMapper;
     this.typeDefs = typeDefs;
+    this.visitors.addAll(visitors);
   }
-
+  
   @Override
   public FlowAstBuilderImpl src(ArrayNode src) {
     if(src == null) {
@@ -157,41 +157,6 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         .headers(AstFlowNodesFactory.headers(typeDefs).build(flow))
         .build();
   }
-  @Override
-  public FlowAstBuilder visitors(AstFlowNodeVisitor... visitors) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override
-  public FlowAstBuilder autocomplete(boolean autocomplete) {
-//
-//    List<NodeFlowVisitor> visitors = Arrays.asList(
-//        new IdAutocomplete(),
-//        new DescAutocomplete(),
-//        new InputsAutocomplete(),
-//        new TasksAutocomplete(),
-//        new TaskThenAutocomplete(),
-//        new TaskRefAutocomplete(serviceStore),
-//        new InputRequiredAutocomplete(),
-//        new InputDataTypeAutocomplete(),
-//        new InputAutocomplete(),
-//        new TaskAutocomplete(),
-//        new TaskCollectionAutocomplete(),
-//        new TaskInputsAutocomplete(serviceStore),
-//        new PartialTaskInputsAutocomplete(serviceStore),
-//        new SwitchAutocomplete(),
-//        new InputDebugValueAutocomplete(),
-//        new SwitchBodyAutocomplete(),
-//        new TaskInputMappingAutocomplete(serviceStore),
-//
-//        new IdValidator(),
-//        new DescriptionValidator(),
-//        new FlowServiceDataModelValidator(serviceStore, dataTypeRepository)
-//        );
-//    
-    return null;
-  }
-
   public NodeFlowBean visitFlow(List<AstChangeset> sourcesAdded) {
 
     Iterator<AstChangeset> iterator = sourcesAdded.iterator();

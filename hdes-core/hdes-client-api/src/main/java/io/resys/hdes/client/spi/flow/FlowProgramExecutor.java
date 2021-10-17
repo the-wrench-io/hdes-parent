@@ -25,6 +25,7 @@ import io.resys.hdes.client.api.programs.ImmutableFlowResult;
 import io.resys.hdes.client.api.programs.ImmutableFlowResultErrorLog;
 import io.resys.hdes.client.api.programs.ImmutableFlowResultLog;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
+import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.expression.OperationFlowContext.FlowTaskExpressionContext;
@@ -54,7 +55,6 @@ public class FlowProgramExecutor {
     };
   }
 
-  
   public FlowResult run() {
     
     accepted.putAll(visitAcceptedDef(program, context));
@@ -127,7 +127,7 @@ public class FlowProgramExecutor {
 
   
   private FlowResultLog visitStep(String stepId) {
-    final var step = program.getSteps().get(stepId);
+    final var step = program.getSteps().get(stepId);    
     final var log = visitBody(step);
     
     switch (step.getPointer().getType()) {
@@ -294,28 +294,43 @@ public class FlowProgramExecutor {
       fullName.append(path);
       
       
-      // resolve based on accepted
-      if(prev == null && accepted.containsKey(path)) {
-        Object target = accepted.get(path);
-        if(Map.class.isAssignableFrom(target.getClass())) {
-          prev = (Map<String, Serializable>) target;
-        } else if(!isLast) {
-          prev = (Map<String, Serializable>) factory.toMap(target);
-        } else {
-          return (Serializable) target;
+      // first parameter
+      if(prev == null) {
+        // resolve based on accepted
+        if(accepted.containsKey(path)) {
+          Object target = accepted.get(path);
+          if(Map.class.isAssignableFrom(target.getClass())) {
+            prev = (Map<String, Serializable>) target;
+          } else if(!isLast) {
+            prev = (Map<String, Serializable>) factory.toMap(target);
+          } else {
+            return (Serializable) target;
+          }
+          continue;
         }
-        continue;
+      
+        // resolve from executed steps
+        if(stepLogs.containsKey(path)) {
+          FlowResultLog target = stepLogs.get(path);
+          prev = target.getReturns();
+          if(isLast) {
+            return (Serializable) prev;
+          }
+          continue; 
+        }
+        
+        // root context
+        final ProgramContextNamedValue contextValue = context.getValue(path);
+        if(contextValue.getFound()) {
+          Serializable result = contextValue.getValue();
+          if(isLast) {
+            return result;
+          } else if(contextValue instanceof Map) {
+            prev = (Map<String, Serializable>) result;
+          }
+        }
       }
       
-      // resolve from executed steps
-      if(prev == null && stepLogs.containsKey(path)) {
-        FlowResultLog target = stepLogs.get(path);
-        prev = target.getReturns();
-        if(isLast) {
-          return (Serializable) prev;
-        }
-        continue; 
-      }
       
       if(prev == null) {
         throw new ProgramException("Can't find parameter with name: '" + name + "'!");  
@@ -336,14 +351,15 @@ public class FlowProgramExecutor {
   
   
   public void visitShortHistory(FlowResultLog log) {
-    final var result = shortHistory;
-    if(stepLogs.containsKey(log.getStepId())) {
-      result.append(" -> (recursion) ");
-      result.append(System.lineSeparator() + getIndent(log));
-    } else {
-      result.append(" -> ");
+    if(!shortHistory.isEmpty()) {
+      shortHistory.append(" -> ");
     }
-    result.append(log.getStepId());
+    
+    if(stepLogs.containsKey(log.getStepId())) {
+      shortHistory.append("(recursion) ");
+      shortHistory.append(System.lineSeparator() + getIndent(log));
+    }
+    shortHistory.append(log.getStepId());
   }
   
   private String getIndent(FlowResultLog previous) {

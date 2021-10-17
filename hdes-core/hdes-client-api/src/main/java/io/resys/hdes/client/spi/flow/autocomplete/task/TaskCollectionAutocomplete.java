@@ -1,8 +1,8 @@
-package io.resys.wrench.assets.bundle.spi.flow.hints;
+package io.resys.hdes.client.spi.flow.autocomplete.task;
 
 /*-
  * #%L
- * wrench-assets-bundle
+ * wrench-assets-flow
  * %%
  * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
  * %%
@@ -21,7 +21,6 @@ package io.resys.wrench.assets.bundle.spi.flow.hints;
  */
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,60 +32,46 @@ import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 
-public class TaskRefAutocomplete extends TemplateAutocomplete implements AstFlowNodeVisitor {
-
-  public TaskRefAutocomplete(ServiceStore serviceStore) {
-    super(serviceStore);
-  }
+public class TaskCollectionAutocomplete implements AstFlowNodeVisitor {
 
   @Override
   public void visit(AstFlowRoot flow, ImmutableAstFlow.Builder modelBuilder) {
     Map<String, AstFlowTaskNode> tasks = flow.getTasks();
+
     if(tasks.isEmpty()) {
       return;
     }
 
-    Map<ServiceType, List<String>> services = new HashMap<>();
-    for(AssetService service : createQuery().list()) {
-      List<String> serviceNames = services.get(service.getType());
-      if(serviceNames == null) {
-        serviceNames = new ArrayList<>();
-        services.put(service.getType(), serviceNames);
-      }
-      serviceNames.add(service.getName());
-    }
-
-
+    List<FlowAstCommandRange> ranges = new ArrayList<>();
     for(AstFlowTaskNode task : tasks.values()) {
       AstFlowRefNode ref = task.getRef();
       if(ref == null) {
         continue;
       }
-      ServiceType serviceType = getServiceType(task);
-      if(serviceType == null) {
-        continue;
-      }
-      List<String> refs = services.get(serviceType);
-      if(refs == null) {
-        continue;
-      }
 
       FlowAstCommandRange range;
-      if(ref.getRef() == null) {
-        range = AstFlowNodesFactory.range().build(ref.getStart(), ref.getEnd(), true);
+      if(ref.getCollection() != null) {
+        range = AstFlowNodesFactory.range().build(ref.getCollection().getStart());
       } else {
-        range = AstFlowNodesFactory.range().build(task.getRef().getStart(), task.getRef().getEnd(), false);
+        range = AstFlowNodesFactory.range().build(ref.getStart(), ref.getEnd(), true);
       }
 
-      refs.forEach(r -> modelBuilder.addAutocomplete(AstFlowNodesFactory.ac().id(TaskRefAutocomplete.class.getSimpleName())
-          .addField(8, NodeFlowBean.KEY_REF, r)
-          .addRange(range)
-          .build()));
+      ranges.add(range);
+    }
 
+    if(!ranges.isEmpty()) {
+      modelBuilder
+      .addAutocomplete(AstFlowNodesFactory.ac()
+          .id(TaskCollectionAutocomplete.class.getSimpleName())
+          .addField("        " + NodeFlowBean.KEY_COLLECTION, true)
+          .addRange(ranges)
+          .build())
+      .addAutocomplete(AstFlowNodesFactory.ac()
+          .id(TaskCollectionAutocomplete.class.getSimpleName())
+          .addField("        " + NodeFlowBean.KEY_COLLECTION, false)
+          .addRange(ranges)
+          .build());
     }
   }
 }

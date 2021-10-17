@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -143,33 +144,42 @@ public class FlowTest {
     final var ast = TestUtils.client.ast().syntax(syntax).flow();
     final var program = TestUtils.client.program().ast(ast);
 
+    // switch 1
     FlowResult flow = TestUtils.client.executor()
-        .inputField("whitelist", false)
+        .inputField("whitelist", true)
         .inputField("param1", 1)
         .flow(program).andGetBody();
-
-    // Assert till first form
+    // last step
     Assertions.assertEquals(FlowExecutionStatus.COMPLETED, flow.getStatus());
-    Assertions.assertEquals("resolveAmlViolation-MERGE", flow.getStepId());
-    Assertions.assertEquals("[addPartyToInvestigationList, resolveAmlViolation, resolveAmlViolation-MERGE]", flow.getShortHistory());
-
-    // Assert tasks
-    Assertions.assertEquals(3, flow.getLogs().size());
+    Assertions.assertEquals("rmInvList", flow.getStepId());
+    Assertions.assertEquals("addPartyToInvestigationList -> resolveAmlViolation -> addToWhitelist -> rmInvList", flow.getShortHistory());
+    Assertions.assertEquals(4, flow.getLogs().size());
     Assertions.assertEquals(1, flow.getLogs().stream().filter(t -> t.getStepId().equals("resolveAmlViolation")).count());
 
     FlowResultLog task = flow.getLogs().stream().filter(t -> t.getStepId().equals("resolveAmlViolation")).findFirst().get();
     Assertions.assertNotNull(task);
     
+    // switch 2
     flow = TestUtils.client.executor()
-        .inputField("whitelist", true)
+        .inputField("whitelist", false)
+        .inputField("investigationList", true)
+        .inputField("param1", 1)
+        .flow(program).andGetBody();
+    Assertions.assertEquals("addPartyToInvestigationList -> resolveAmlViolation -> rmInvList", flow.getShortHistory());
+    
+    // switch 3
+    flow = TestUtils.client.executor()
+        .inputField("whitelist", false)
+        .inputField("investigationList", false)
+        .inputField("waitFiuDecision", true)
+        .inputField("rmInvList", true)
         .inputField("param1", 1)
         .flow(program).andGetBody();
     
-    // Flow should be completed
-    Assertions.assertEquals("[addPartyToInvestigationList, resolveAmlViolation, resolveAmlViolation-MERGE, resolveAmlViolation-EXCLUSIVE, addToWhitelist, rmInvList, end]", 
-        flow.getShortHistory());
+    Assertions.assertEquals("addPartyToInvestigationList -> resolveAmlViolation -> waitFiuDecision -> rmInvList", flow.getShortHistory());
   }
 
+  @Disabled
   @Test
   public void programSelfRefTest() throws IOException {
     final var syntax = FileUtils.toInputStream(getClass(), "flow/self-ref.yaml");

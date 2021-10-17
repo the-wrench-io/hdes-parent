@@ -28,6 +28,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
+import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.decision.DecisionAstBuilderImpl;
 import io.resys.hdes.client.spi.flow.FlowAstBuilderImpl;
 import io.resys.hdes.client.spi.groovy.GroovyCompilationCustomizer;
@@ -37,14 +38,16 @@ public class HdesAstTypesImpl implements HdesAstTypes {
   private final ObjectMapper yaml = new ObjectMapper(new YAMLFactory());
   private final GroovyClassLoader gcl;
   private final HdesTypeDefsFactory typeDefs;
+  private final HdesClientConfig config;
   
-  public HdesAstTypesImpl(ObjectMapper objectMapper, ServiceInit init) {
+  public HdesAstTypesImpl(ObjectMapper objectMapper, ServiceInit init, HdesClientConfig config) {
     super();
-    CompilerConfiguration config = new CompilerConfiguration();
-    config.setTargetBytecode(CompilerConfiguration.JDK8);
-    config.addCompilationCustomizers(new GroovyCompilationCustomizer());
+    CompilerConfiguration groovyConfig = new CompilerConfiguration();
+    groovyConfig.setTargetBytecode(CompilerConfiguration.JDK8);
+    groovyConfig.addCompilationCustomizers(new GroovyCompilationCustomizer());
     
-    this.gcl = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), config);
+    this.config = config;
+    this.gcl = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), groovyConfig);
     this.typeDefs = new HdesTypeDefsFactory(objectMapper, init);
   }
   @Override
@@ -53,7 +56,7 @@ public class HdesAstTypesImpl implements HdesAstTypes {
   }
   @Override
   public FlowAstBuilder flow() {
-    return new FlowAstBuilderImpl(yaml, typeDefs);
+    return new FlowAstBuilderImpl(yaml, typeDefs, config.getFlowVisitors());
   }
   @Override
   public ServiceAstBuilder service() {

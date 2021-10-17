@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /*-
  * #%L
@@ -51,6 +52,8 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
+import io.resys.hdes.client.spi.config.HdesClientConfig;
+import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.decision.DecisionCSVBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
@@ -65,12 +68,14 @@ public class HdesClientImpl implements HdesClient {
   private final HdesTypeDefsFactory types;
   private final HdesAstTypes ast;
   private final HdesStore store;
+  private final HdesClientConfig config;
   
-  public HdesClientImpl(HdesTypeDefsFactory types, HdesStore store, HdesAstTypes ast) {
+  public HdesClientImpl(HdesTypeDefsFactory types, HdesStore store, HdesAstTypes ast, HdesClientConfig config) {
     super();
     this.types = types;
     this.store = store;
     this.ast = ast;
+    this.config = config;
   }
   @Override
   public AstBuilder ast() {
@@ -247,11 +252,27 @@ public class HdesClientImpl implements HdesClient {
     };
   }
 
-  
   @Override
   public HdesStore store() {
     // TODO Auto-generated method stub
     return null;
+  }
+  @Override
+  public HdesAstTypes astTypes() {
+    return ast;
+  }
+  @Override
+  public CSVBuilder csv() {
+    return new CSVBuilder() {
+      @Override
+      public String ast(AstDecision ast) {
+        return DecisionCSVBuilder.build(ast);
+      }
+    };
+  }
+  
+  public HdesClientConfig config() {
+    return this.config;
   }
   
   public static Builder builder() {
@@ -262,7 +283,12 @@ public class HdesClientImpl implements HdesClient {
     private ObjectMapper objectMapper;
     private ServiceInit serviceInit;
     private HdesStore store;
-    
+    private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>();
+
+    public Builder flowVisitors(AstFlowNodeVisitor ...visitors) {
+      this.flowVisitors.addAll(Arrays.asList(visitors));
+      return this;
+    }
     public Builder objectMapper(ObjectMapper objectMapper) {
       this.objectMapper = objectMapper;
       return this;
@@ -278,23 +304,26 @@ public class HdesClientImpl implements HdesClient {
     public HdesClientImpl build() {
       HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
       HdesAssert.notNull(serviceInit, () -> "serviceInit must be defined!");
+      final var config = new HdesClientConfigImpl(flowVisitors);
       final var types = new HdesTypeDefsFactory(objectMapper, serviceInit);
-      final var ast = new HdesAstTypesImpl(objectMapper, serviceInit);
-      return new HdesClientImpl(types, store, ast);
+      final var ast = new HdesAstTypesImpl(objectMapper, serviceInit, config);
+      return new HdesClientImpl(types, store, ast, config);
     }
   }
 
-  @Override
-  public HdesAstTypes astTypes() {
-    return ast;
-  }
-  @Override
-  public CSVBuilder csv() {
-    return new CSVBuilder() {
-      @Override
-      public String ast(AstDecision ast) {
-        return DecisionCSVBuilder.build(ast);
-      }
-    };
+  private static class HdesClientConfigImpl implements HdesClientConfig {
+    private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>();
+    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors) {
+      this.flowVisitors.addAll(flowVisitors);
+    }
+    @Override
+    public List<AstFlowNodeVisitor> getFlowVisitors() {
+      return flowVisitors;
+    }
+    @Override
+    public HdesClientConfig config(AstFlowNodeVisitor... changes) {
+      this.flowVisitors.addAll(Arrays.asList(changes));
+      return this;
+    }
   }
 }

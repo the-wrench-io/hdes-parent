@@ -26,13 +26,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
-import io.resys.hdes.client.api.ast.AstDecision;
-import io.resys.hdes.client.api.ast.AstFlow;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowNodeVisitor;
-import io.resys.hdes.client.api.ast.AstService;
 
 public interface HdesAstTypes {
 
@@ -74,8 +73,6 @@ public interface HdesAstTypes {
     FlowAstBuilder srcAdd(int line, String value);
     FlowAstBuilder srcDel(int line);
     FlowAstBuilder rev(Integer version);
-    FlowAstBuilder autocomplete(boolean autocomplete);
-    FlowAstBuilder visitors(AstFlowNodeVisitor ... visitors);
     AstFlow build();
   }
 

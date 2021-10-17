@@ -33,7 +33,9 @@ import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.ImmutableProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
+import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 
@@ -74,10 +76,7 @@ public class ImmutableProgramContext implements ProgramContext {
       return (Serializable) factory.toType(serviceData, typeDef.getBeanType());
     }
     
-    if(genericData == null) {
-      genericData = new HashMap<>();
-      suppliers.forEach(e -> genericData.putAll(e.get()));
-    }
+    init();
     
     if(typeDef.getData() && typeDef.getBeanType() != null) {
       return (Serializable) factory.toType(genericData, typeDef.getBeanType());
@@ -85,6 +84,25 @@ public class ImmutableProgramContext implements ProgramContext {
     
     return (Serializable) genericData.get(typeDef.getName());
   }
+  
+  @Override
+  public ProgramContextNamedValue getValue(String typeDefName) {
+    init();
+    
+    if(genericData.containsKey(typeDefName)) {
+      return ImmutableProgramContextNamedValue.builder().value((Serializable) genericData.get(typeDefName)).found(true).build();
+    }
+    
+    return ImmutableProgramContextNamedValue.builder().found(false).build();
+  }
+  
+  private void init() {
+    if(genericData == null) {
+      genericData = new HashMap<>();
+      suppliers.forEach(e -> genericData.putAll(e.get()));
+    }
+  }
+  
   @Override
   public FlowProgram getFlowProgram(String name) {
     throw new RuntimeException("must impl");

@@ -38,9 +38,9 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
+import io.resys.hdes.client.spi.flow.validators.IdValidator;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -52,6 +52,7 @@ import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 import io.resys.wrench.assets.bundle.spi.clock.SystemClockRepository;
 import io.resys.wrench.assets.bundle.spi.dt.DtServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.flow.FlowServiceBuilder;
+import io.resys.wrench.assets.bundle.spi.flow.FlowServiceDataModelValidator;
 import io.resys.wrench.assets.bundle.spi.flowtask.FlowTaskServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.postprocessors.FlowDependencyServicePostProcessor;
 import io.resys.wrench.assets.bundle.spi.postprocessors.GenericServicePostProcessorSupplier;
@@ -79,33 +80,13 @@ public class AssetComponentConfiguration {
         return context.getAutowireCapableBeanFactory().createBean(type);
       }
     };
-    
-//    List<AstFlowNodeVisitor> visitors = Arrays.asList(
-//        new IdAutocomplete(),
-//        new DescAutocomplete(),
-//        new InputsAutocomplete(),
-//        new TasksAutocomplete(),
-//        new TaskThenAutocomplete(),
-//        new TaskRefAutocomplete(serviceStore),
-//        new InputRequiredAutocomplete(),
-//        new InputDataTypeAutocomplete(),
-//        new InputAutocomplete(),
-//        new TaskAutocomplete(),
-//        new TaskCollectionAutocomplete(),
-//        new TaskInputsAutocomplete(serviceStore),
-//        new PartialTaskInputsAutocomplete(serviceStore),
-//        new SwitchAutocomplete(),
-//        new InputDebugValueAutocomplete(),
-//        new SwitchBodyAutocomplete(),
-//        new TaskInputMappingAutocomplete(serviceStore),
-//
-//        new IdValidator(),
-//        new DescriptionValidator(),
-//        new FlowServiceDataModelValidator(serviceStore, dataTypeRepository)
-//        );
-    
+        
     final ClockRepository clockRepository = new SystemClockRepository();
-    final HdesClient hdesClient = HdesClientImpl.builder().objectMapper(objectMapper).serviceInit(init).build();
+    final HdesClientImpl hdesClient = HdesClientImpl.builder()
+        .objectMapper(objectMapper)
+        .serviceInit(init)
+        .flowVisitors(new IdValidator())
+        .build();
     
     final ServiceIdGen idGen = new GenericServiceIdGen();
     final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders = new HashMap<>();
@@ -122,6 +103,7 @@ public class AssetComponentConfiguration {
     final ServicePostProcessorSupplier servicePostProcessorSupplier = new GenericServicePostProcessorSupplier(postProcessors);
     final ServiceStore serviceStore = new PostProcessingServiceStore(origServiceStore, servicePostProcessorSupplier); 
     
+    hdesClient.config().config(new FlowServiceDataModelValidator(serviceStore, hdesClient));
     return new GenericAssetServiceRepository(hdesClient, objectMapper, builders, serviceStore);
   }
 
