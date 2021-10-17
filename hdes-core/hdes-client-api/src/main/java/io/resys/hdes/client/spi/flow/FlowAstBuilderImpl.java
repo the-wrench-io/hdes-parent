@@ -150,6 +150,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
     return ast
         .bodyType(EntityType.FLOW)
         .messages(messages)
+        .commands(changes.getCommands())
         .name(id == null ? "": id.getValue())
         .rev(this.rev == null ? src.size() : this.rev)
         .src(flow)

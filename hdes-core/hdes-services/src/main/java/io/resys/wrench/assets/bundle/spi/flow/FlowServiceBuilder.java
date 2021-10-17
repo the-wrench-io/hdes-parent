@@ -1,5 +1,6 @@
 package io.resys.wrench.assets.bundle.spi.flow;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,8 @@ import java.util.List;
 
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
@@ -47,15 +50,18 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
   private final ClockRepository clockRepository;
   private final String defaultContent;
   private final ServiceStore store;
+  private final ObjectMapper objectMapper;
   private boolean rename;
   
   public FlowServiceBuilder(
+      ObjectMapper objectMapper,
       ServiceIdGen idGen,
       ServiceStore store,
       HdesClient flowRepository,
       ClockRepository clockRepository, 
       String defaultContent) {
     super();
+    this.objectMapper = objectMapper;
     this.idGen = idGen;
     this.store = store;
     this.hdesClient = flowRepository;
@@ -92,17 +98,20 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
 
     ServiceDataModel dataModel = new FlowServiceDataModelBuilder(store).build(serviceId, program, lastModified);
 
-    return ImmutableServiceBuilder.newFlow()
-        .setId(serviceId)
-        .setRev(program.getAst().getRev() + "")
-        .setName(program.getId())
-        .setDescription(program.getAst().getDescription())
-        .setSrc(program.getAst().getSrc().getValue())
-        .setPointer(pointer)
-        .setModel(dataModel)
-        .setExecution(() -> new FlowServiceExecution(program, hdesClient))
-        .build();
-
+    try {
+      return ImmutableServiceBuilder.newFlow()
+          .setId(serviceId)
+          .setRev(program.getAst().getRev() + "")
+          .setName(program.getId())
+          .setDescription(program.getAst().getDescription())
+          .setSrc(objectMapper.writeValueAsString(program.getAst().getCommands()))
+          .setPointer(pointer)
+          .setModel(dataModel)
+          .setExecution(() -> new FlowServiceExecution(program, hdesClient))
+          .build();
+    } catch(IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
   }
 
   @Override

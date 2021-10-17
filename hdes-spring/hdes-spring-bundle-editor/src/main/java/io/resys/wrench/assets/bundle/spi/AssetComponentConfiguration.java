@@ -151,7 +151,7 @@ public class AssetComponentConfiguration {
     final ServiceIdGen idGen = new GenericServiceIdGen();
     final Map<ServiceType, Function<ServiceStore, ServiceBuilder>> builders = new HashMap<>();
     builders.put(ServiceType.DT, (store) -> new DtServiceBuilder(idGen, hdesClient, clockRepository, getDefaultContent(ServiceType.DT)));
-    builders.put(ServiceType.FLOW, (store) -> new FlowServiceBuilder(idGen, store, hdesClient, clockRepository, getDefaultContent(ServiceType.FLOW)));
+    builders.put(ServiceType.FLOW, (store) -> new FlowServiceBuilder(objectMapper, idGen, store, hdesClient, clockRepository, getDefaultContent(ServiceType.FLOW)));
     builders.put(ServiceType.FLOW_TASK, (store) -> new FlowTaskServiceBuilder(idGen, store, hdesClient, objectMapper, getDefaultContent(ServiceType.FLOW_TASK)));
     builders.put(ServiceType.TAG, (store) -> new TagServiceBuilder(assetConfigBean.getTagFormat(), idGen, getDefaultContent(ServiceType.TAG)));
     
