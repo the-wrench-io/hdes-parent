@@ -1,5 +1,7 @@
 package io.resys.hdes.client.spi.groovy;
 
+import java.util.stream.Collectors;
+
 /*-
  * #%L
  * hdes-client-api
@@ -36,10 +38,20 @@ public class ServiceProgramBuilder {
   public ServiceProgram build(AstService ast) {
     final ServiceExecutorType executable = typesFactory.getServiceInit().get(ast.getBeanType());
     
-    return ImmutableServiceProgram.builder()
-        .id(ast.getName())
-        .ast(ast)
-        .bean(executable)
-        .build();
+    final var inputs = ast.getHeaders().getAcceptDefs().stream()
+        .sorted((p1, p2) -> Integer.compare(p1.getOrder(), p2.getOrder()))
+        .collect(Collectors.toList());
+
+    final var program = ImmutableServiceProgram.builder().bean(executable).executorType(ast.getExecutorType());
+    switch (ast.getExecutorType()) {
+      case TYPE_1:
+        program.typeDef0(inputs.get(0));
+        break;
+      case TYPE_2:
+        program.typeDef0(inputs.get(0)).typeDef1(inputs.get(1));
+        break;
+      default: break;
+    } 
+    return program.build();
   }
 }

@@ -22,15 +22,24 @@ package io.resys.hdes.client.api.programs;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstService.AstServiceType;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType;
+import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
 public interface ServiceProgram extends Program<AstService> {
 
+  AstServiceType getExecutorType();
   ServiceExecutorType getBean();
+  @Nullable
+  TypeDef getTypeDef0();
+  @Nullable
+  TypeDef getTypeDef1();
   
   @Value.Immutable
   interface ServiceResult extends ProgramResult {

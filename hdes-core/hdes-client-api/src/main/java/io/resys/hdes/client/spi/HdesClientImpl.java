@@ -38,6 +38,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesStore;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision;
@@ -50,6 +51,7 @@ import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
@@ -58,6 +60,8 @@ import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.decision.DecisionCSVBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
+import io.resys.hdes.client.spi.envir.EnvirFactory;
+import io.resys.hdes.client.spi.envir.ImmutableEvirBuilderSourceEntity;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.flow.FlowProgramExecutor;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
@@ -66,18 +70,71 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesClientImpl implements HdesClient {
 
-  private final HdesTypeDefsFactory types;
+  private final HdesTypeDefsFactory defs;
   private final HdesAstTypes ast;
   private final HdesStore store;
   private final HdesClientConfig config;
   
   public HdesClientImpl(HdesTypeDefsFactory types, HdesStore store, HdesAstTypes ast, HdesClientConfig config) {
     super();
-    this.types = types;
+    this.defs = types;
     this.store = store;
     this.ast = ast;
     this.config = config;
   }
+  
+  @Override
+  public EnvirBuilder envir() {
+    EnvirFactory factory = new EnvirFactory(ast, defs);
+    return new EnvirBuilder() {
+      @Override
+      public EnvirCommandFormatBuilder addCommand() {
+        return new EnvirCommandFormatBuilder() {
+          private String id;
+          private AstBodyType type;
+          private String commandJson;
+          @Override
+          public EnvirCommandFormatBuilder id(String externalId) {
+            this.id = externalId;
+            return this;
+          }
+          @Override
+          public EnvirCommandFormatBuilder service(String commandJson) {
+            this.type = AstBodyType.FLOW_TASK;
+            this.commandJson = commandJson;
+            return null;
+          }
+          @Override
+          public EnvirCommandFormatBuilder flow(String commandJson) {
+            this.type = AstBodyType.FLOW;
+            this.commandJson = commandJson;
+            return this;
+          }
+          @Override
+          public EnvirCommandFormatBuilder decision(String commandJson) {
+            this.type = AstBodyType.DT;
+            this.commandJson = commandJson;
+            return this;
+          }
+          @Override
+          public void build() {
+            HdesAssert.notNull(id, () -> "id must be defined!");
+            HdesAssert.notNull(commandJson, () -> "commandJson must be defined!");
+            factory.add(ImmutableEvirBuilderSourceEntity.builder()
+                .externalId(id)
+                .bodyType(type)
+                .commands(defs.commandsList(commandJson))
+                .build());
+          }
+        };
+      }
+      @Override
+      public ProgramEnvir build() {
+        return factory.build();
+      }
+    };
+  }
+
   @Override
   public AstBuilder ast() {
     return new AstBuilder() {
@@ -98,7 +155,7 @@ public class HdesClientImpl implements HdesClient {
       }
       @Override
       public AstBuilder commands(String src) {
-        this.json = types.commands(src);
+        this.json = defs.commandsJson(src);
         return this;
       }
       @Override
@@ -150,22 +207,22 @@ public class HdesClientImpl implements HdesClient {
     return new ProgramBuilder() {
       @Override
       public ServiceProgram ast(AstService ast) {
-        return new ServiceProgramBuilder(types).build(ast);
+        return new ServiceProgramBuilder(defs).build(ast);
       }
       @Override
       public DecisionProgram ast(AstDecision ast) {
-        return new DecisionProgramBuilder(types).build(ast);
+        return new DecisionProgramBuilder(defs).build(ast);
       }
       @Override
       public FlowProgram ast(AstFlow ast) {
-        return new FlowProgramBuilder(types).build(ast);
+        return new FlowProgramBuilder(defs).build(ast);
       }
     };
   }
   @Override
   public ExecutorBuilder executor() {
     return new ExecutorBuilder() {
-      private final ImmutableProgramContext.Builder data = ImmutableProgramContext.builder(types);
+      private final ImmutableProgramContext.Builder data = ImmutableProgramContext.builder(defs);
       @Override
       public ExecutorBuilder inputField(String name, Serializable value) {
         return inputMap(Map.of(name, value));
@@ -209,12 +266,12 @@ public class HdesClientImpl implements HdesClient {
         return new FlowExecutor() {
           @Override
           public FlowResultLog andGetTask(String task) {
-            return new FlowProgramExecutor(program, data.build(), types).run().getLogs().stream()
+            return new FlowProgramExecutor(program, data.build(), defs).run().getLogs().stream()
                 .filter(t -> t.getStepId().equals(task)).findFirst().orElse(null);
           }
           @Override
           public FlowResult andGetBody() {
-            return new FlowProgramExecutor(program, data.build(), types).run();
+            return new FlowProgramExecutor(program, data.build(), defs).run();
           }
         };
       }
@@ -234,21 +291,6 @@ public class HdesClientImpl implements HdesClient {
             return DecisionProgramExecutor.find(andGetBody());
           }
         };
-      }
-      @Override
-      public FlowExecutor flow(String modelId) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      @Override
-      public ServiceExecutor service(String modelId) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      @Override
-      public DecisionExecutor decision(String modelId) {
-        // TODO Auto-generated method stub
-        return null;
       }
     };
   }

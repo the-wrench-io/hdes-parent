@@ -42,6 +42,7 @@ import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 
@@ -52,7 +53,21 @@ public interface HdesClient {
   HdesStore store();
   ExecutorBuilder executor();
   CSVBuilder csv();
+  EnvirBuilder envir();
   
+  
+  interface EnvirBuilder {
+    EnvirCommandFormatBuilder addCommand();
+    ProgramEnvir build();
+  }
+  
+  interface EnvirCommandFormatBuilder {
+    EnvirCommandFormatBuilder id(String externalId);
+    EnvirCommandFormatBuilder flow(String commandJson);
+    EnvirCommandFormatBuilder decision(String commandJson);
+    EnvirCommandFormatBuilder service(String commandJson);
+    void build();
+  }
   
   interface CSVBuilder {
     String ast(AstDecision ast);
@@ -94,17 +109,9 @@ public interface HdesClient {
     ExecutorBuilder inputList(List<Object> inputObject);
     ExecutorBuilder inputJson(JsonNode json);
     ExecutorBuilder input(ExecutorInput input);
-    
-    // From model or by Id
-    FlowExecutor flow(String modelId);
+  
     FlowExecutor flow(FlowProgram model);
-
-    // From model or by Id
-    DecisionExecutor decision(String modelId);
     DecisionExecutor decision(DecisionProgram model);
-    
-    // From model or by Id
-    ServiceExecutor service(String modelId);
     ServiceExecutor service(ServiceProgram model);
   }
   

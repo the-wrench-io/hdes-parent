@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.Program;
@@ -43,14 +44,17 @@ public class FlowServiceExecution implements ServiceExecution {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FlowServiceExecution.class);
 
+  private final AstFlow flow;
   private final FlowProgram flowModel;
   private final HdesClient flowRepository;
   private final List<Serializable> facts = new ArrayList<>();
 
   public FlowServiceExecution(
+      AstFlow flow,
       FlowProgram flowModel,
       HdesClient flowRepository) {
     super();
+    this.flow = flow;
     this.flowModel = flowModel;
     this.flowRepository = flowRepository;
   }
@@ -78,7 +82,7 @@ public class FlowServiceExecution implements ServiceExecution {
       throw e;
     } catch(Exception e) {
       LOGGER.error(e.getMessage(), e);
-      throw AssetErrorCodes.FLOW_START_ERROR.newException(flowModel.getId(), e.getMessage());
+      throw AssetErrorCodes.FLOW_START_ERROR.newException(flow.getName(), e.getMessage());
     }
   }
 

@@ -230,7 +230,7 @@ public class FlowProgramExecutor {
       }
     }
     default: 
-      throw new ProgramException("Flow with id: " + program.getId() + " step: '" + step.getId() + "' ref: '" + step.getBody().getRefType() + "' is not supported !");
+      throw new ProgramException("Flow step: '" + step.getId() + "' ref: '" + step.getBody().getRefType() + "' is not supported !");
     }
   }
   
@@ -273,7 +273,7 @@ public class FlowProgramExecutor {
         return visitStep(whenThen.getStepId());
       }
     }
-    throw new ProgramException("Flow with id: " + program.getId() + " switch: '" + step.getId() + "' does not match any expressions!");
+    throw new ProgramException("Flow switch: '" + step.getId() + "' does not match any expressions!");
   }
   
   private Map<String, Serializable> visitAcceptedDef(FlowProgram program, ProgramContext context) {
@@ -289,7 +289,7 @@ public class FlowProgramExecutor {
       }
     }
     if(!required.isEmpty()) {
-      throw new ProgramException("Flow with id: " + program.getId() + " can't have null inputs: " + String.join(", ", required) + "!");
+      throw new ProgramException("Flow can't have null inputs: " + String.join(", ", required) + "!");
     }
     
     return result;

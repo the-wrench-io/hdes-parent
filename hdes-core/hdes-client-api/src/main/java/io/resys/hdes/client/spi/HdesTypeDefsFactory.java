@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -281,7 +282,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
-  public String commands(List<AstCommand> commands) {
+  public String commandsString(List<AstCommand> commands) {
     try {
       return objectMapper.writeValueAsString(commands);
     } catch (IOException e) {
@@ -289,9 +290,16 @@ public class HdesTypeDefsFactory {
     }
   }
   
-  public ArrayNode commands(String commands) {
+  public ArrayNode commandsJson(String commands) {
     try {
       return (ArrayNode) objectMapper.readTree(commands);
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+  public List<AstCommand> commandsList(String commands) {
+    try {
+      return objectMapper.readValue(commands, new TypeReference<List<AstCommand>>() {});
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }

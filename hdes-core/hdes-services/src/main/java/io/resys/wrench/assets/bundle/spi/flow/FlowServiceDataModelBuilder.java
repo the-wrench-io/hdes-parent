@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
@@ -61,7 +62,7 @@ public class FlowServiceDataModelBuilder {
     this.serviceStore = serviceStore;
   }
 
-  public ServiceDataModel build(String id, FlowProgram flowModel, Timestamp modified) {
+  public ServiceDataModel build(String id, AstFlow flowModel, Timestamp modified) {
     List<TypeDef> params = new ArrayList<>(flowModel.getAcceptDefs());
     Map<String, TypeDef> allParams = createModelParameterMap(flowModel, params);
 
@@ -119,7 +120,7 @@ public class FlowServiceDataModelBuilder {
     }
 
     return new ImmutableServiceDataModel(
-        id, flowModel.getId(), flowModel.getAst().getDescription(),
+        id, ast.getName(), ast.getDescription(),
         ServiceType.FLOW,
         flowModel.getClass(),
         errors.isEmpty() ? ServiceStatus.OK : ServiceStatus.ERROR,

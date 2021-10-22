@@ -38,7 +38,7 @@ public interface AstBody extends Serializable {
 
   List<AstCommand> getCommands();
   Headers getHeaders();
-  EntityType getBodyType();
+  AstBodyType getBodyType();
   
   @Value.Immutable
   interface Headers extends Serializable {
@@ -46,7 +46,7 @@ public interface AstBody extends Serializable {
     List<TypeDef> getReturnDefs();
   }
 
-  enum EntityType { 
-    FLOW, FLOW_TASK, DT, TAG, DATA_TYPE 
+  enum AstBodyType { 
+    FLOW, FLOW_TASK, DT, TAG 
   }
 }

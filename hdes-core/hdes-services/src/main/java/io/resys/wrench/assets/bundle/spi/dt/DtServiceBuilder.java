@@ -3,6 +3,9 @@ package io.resys.wrench.assets.bundle.spi.dt;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /*-
  * #%L
  * wrench-component-assets
@@ -30,16 +33,22 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.ImmutableDecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
+import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
+import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceError;
 import io.resys.wrench.assets.bundle.spi.builders.ImmutableServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.TemplateServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 
 public class DtServiceBuilder extends TemplateServiceBuilder {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(DtServiceBuilder.class);
+  
   private final ServiceIdGen serviceStore;
   private final HdesClient hdesClient;
   private final ClockRepository clockRepository;
@@ -72,17 +81,35 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
           Collections.emptyList())
       .decision();
     
-    DecisionProgram decisionTable = hdesClient.program().ast(ast);
     String serviceId = id == null ? serviceStore.nextId() : id;
-    ServiceDataModel dataModel = new DtServiceDataModelBuilder().build(serviceId, decisionTable);
     String pointer = serviceId + ".json";
+    
+    DecisionProgram program = null;
+    ServiceDataModel dataModel = null;
+    try {
+      program = hdesClient.program().ast(ast);
+      dataModel = new DtServiceDataModelBuilder().build(serviceId, ast);
+    } catch(Exception e) {
+      LOGGER.error("Failed to decision table asset content from: " + serviceId + "!" + e.getMessage(), e);
+      program = ImmutableDecisionProgram.builder().build();
+      dataModel = new ImmutableServiceDataModel(
+          id, ast.getName(), ast.getDescription(),
+          ServiceType.DT,
+          ast.getClass(),
+          ServiceStatus.ERROR,
+          Arrays.asList(new ImmutableServiceError("program-error", e.getMessage())),
+          Collections.emptyList(),
+          Collections.emptyList());
+    }
+    
+    final DecisionProgram decisionTable = program;
 
     return ImmutableServiceBuilder.newDt()
         .setId(serviceId)
-        .setRev(decisionTable.getAst().getRev() + "")
-        .setName(decisionTable.getId())
-        .setDescription(decisionTable.getAst().getDescription())
-        .setSrc(decisionTable.getAst().getSource())
+        .setRev(ast.getRev() + "")
+        .setName(ast.getName())
+        .setDescription(ast.getDescription())
+        .setSrc(ast.getSource())
         .setPointer(pointer)
         .setModel(dataModel)
         .setExecution(() -> new DtServiceExecution(hdesClient, decisionTable))

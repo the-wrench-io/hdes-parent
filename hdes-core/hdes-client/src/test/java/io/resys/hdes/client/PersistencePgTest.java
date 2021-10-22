@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Assertions;
 import io.resys.hdes.client.api.HdesStore.Entity;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
 import io.resys.hdes.client.api.ImmutableUpdateAstType;
-import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
@@ -55,7 +55,7 @@ public class PersistencePgTest extends PgTestTemplate {
     repo.store().update()
       .build(ImmutableUpdateAstType.builder()
           .id(article1.getId())
-          .type(EntityType.FLOW)
+          .type(AstBodyType.FLOW)
           .addBody(ImmutableAstCommand.builder()
               .type(AstCommandValue.SET_BODY)
               .value("id: change flow symbolic id")

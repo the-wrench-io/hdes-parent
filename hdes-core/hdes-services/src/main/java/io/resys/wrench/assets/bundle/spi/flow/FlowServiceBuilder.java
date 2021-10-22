@@ -101,13 +101,13 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
     try {
       return ImmutableServiceBuilder.newFlow()
           .setId(serviceId)
-          .setRev(program.getAst().getRev() + "")
-          .setName(program.getId())
-          .setDescription(program.getAst().getDescription())
-          .setSrc(objectMapper.writeValueAsString(program.getAst().getCommands()))
+          .setRev(ast.getRev() + "")
+          .setName(ast.getName())
+          .setDescription(ast.getDescription())
+          .setSrc(objectMapper.writeValueAsString(ast.getCommands()))
           .setPointer(pointer)
           .setModel(dataModel)
-          .setExecution(() -> new FlowServiceExecution(program, hdesClient))
+          .setExecution(() -> new FlowServiceExecution(ast, program, hdesClient))
           .build();
     } catch(IOException e) {
       throw new RuntimeException(e.getMessage(), e);

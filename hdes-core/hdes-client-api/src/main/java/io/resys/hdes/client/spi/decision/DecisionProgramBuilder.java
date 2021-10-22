@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionCell;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
+import io.resys.hdes.client.api.exceptions.DecisionProgramException;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.ImmutableDecisionProgram;
 import io.resys.hdes.client.api.programs.ImmutableDecisionRow;
@@ -45,42 +46,47 @@ public class DecisionProgramBuilder {
   }
 
   public DecisionProgram build(AstDecision ast) {
-    final var program = ImmutableDecisionProgram.builder()
-        .id(ast.getName())
-        .ast(ast);
-    
-    final var accepts = ast.getHeaders().getAcceptDefs().stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
-    final var returns = ast.getHeaders().getReturnDefs().stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
-    final List<AstDecisionRow> rows = new ArrayList<>(ast.getRows());
-    Collections.sort(rows, (o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
-    
-    for(var row : rows) {
-      final var programRow = ImmutableDecisionRow.builder().order(row.getOrder());
-      for(AstDecisionCell value : row.getCells()) {
-        
-        if(accepts.containsKey(value.getHeader())) {
-          if(value.getValue() == null || value.getValue().isBlank()) {
-            continue;
-          }
-          final var typeDef = accepts.get(value.getHeader());
-          programRow.addAccepts(ImmutableDecisionRowAccepts.builder()
-              .key(typeDef)
-              .expression(typesFactory.expression(typeDef.getValueType(), value.getValue()))
-              .build());
-        } else {
-          if(value.getValue() == null) {
-            continue;
-          }
+    try {
+      final var program = ImmutableDecisionProgram.builder().hitPolicy(ast.getHitPolicy());
+      
+      final var accepts = ast.getHeaders().getAcceptDefs().stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
+      final var returns = ast.getHeaders().getReturnDefs().stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
+      final List<AstDecisionRow> rows = new ArrayList<>(ast.getRows());
+      Collections.sort(rows, (o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
+      
+      for(var row : rows) {
+        final var programRow = ImmutableDecisionRow.builder().order(row.getOrder());
+        for(AstDecisionCell value : row.getCells()) {
           
-          final var typeDef = returns.get(value.getHeader());
-          programRow.addReturns(ImmutableDecisionRowReturns.builder()
-              .key(typeDef)
-              .value(typeDef.toValue(value.getValue()))
-              .build());
+          if(accepts.containsKey(value.getHeader())) {
+            if(value.getValue() == null || value.getValue().isBlank()) {
+              continue;
+            }
+            final var typeDef = accepts.get(value.getHeader());
+            programRow.addAccepts(ImmutableDecisionRowAccepts.builder()
+                .key(typeDef)
+                .expression(typesFactory.expression(typeDef.getValueType(), value.getValue()))
+                .build());
+          } else {
+            if(value.getValue() == null) {
+              continue;
+            }
+            
+            final var typeDef = returns.get(value.getHeader());
+            programRow.addReturns(ImmutableDecisionRowReturns.builder()
+                .key(typeDef)
+                .value(typeDef.toValue(value.getValue()))
+                .build());
+          }
         }
+        program.addRows(programRow.build());
       }
-      program.addRows(programRow.build());
+      return program.build();
+    } catch(Exception e) {
+      throw new DecisionProgramException(
+          "Failed to create decision program from ast: '" + ast.getName() + "'!" +
+          System.lineSeparator() + e.getMessage(), e);
     }
-    return program.build();
+
   }
 }

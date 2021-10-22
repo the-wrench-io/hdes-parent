@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceError;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStatus;
@@ -35,17 +35,17 @@ import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceDataModel;
 
 public class DtServiceDataModelBuilder {
 
-  public ServiceDataModel build(String id, DecisionProgram dt) {
+  public ServiceDataModel build(String id, AstDecision ast) {
     List<TypeDef> params = new ArrayList<>();
-    params.addAll(dt.getAst().getHeaders().getAcceptDefs());
-    params.addAll(dt.getAst().getHeaders().getReturnDefs());
+    params.addAll(ast.getHeaders().getAcceptDefs());
+    params.addAll(ast.getHeaders().getReturnDefs());
     
     List<ServiceError> errors = new ArrayList<>();
 
     return new ImmutableServiceDataModel(
-        id, dt.getId(), dt.getAst().getDescription(),
+        id, ast.getName(), ast.getDescription(),
         ServiceType.DT,
-        dt.getClass(),
+        ast.getClass(),
         errors.isEmpty() ? ServiceStatus.OK : ServiceStatus.ERROR,
         Collections.emptyList(),
         Collections.unmodifiableList(params),

@@ -30,8 +30,6 @@ import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 public interface Program<A extends AstBody> extends Serializable {
-  String getId();
-  A getAst();
   
   interface ProgramResult extends Serializable {
   }  

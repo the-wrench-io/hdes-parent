@@ -65,4 +65,10 @@ public class HdesClientImpl implements HdesClient {
     throw new RuntimeException("Need to implemented the client");
   }
 
+  @Override
+  public EnvirBuilder envir() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

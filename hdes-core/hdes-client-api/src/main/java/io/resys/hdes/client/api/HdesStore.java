@@ -30,7 +30,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.resys.hdes.client.api.ast.AstBody;
-import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -75,7 +75,7 @@ public interface HdesStore {
   @Value.Immutable
   interface UpdateAstType extends Serializable {
     String getId();
-    EntityType getType();
+    AstBodyType getType();
     List<AstCommand> getBody();
   }
   
@@ -84,7 +84,7 @@ public interface HdesStore {
   @Value.Immutable
   interface CreateAstType extends Serializable {
     String getName();
-    EntityType getType();
+    AstBodyType getType();
   }
   
   @JsonSerialize(as = ImmutableStoreState.class)
@@ -101,7 +101,7 @@ public interface HdesStore {
   interface Entity<T extends AstBody> {
     String getId();
     String getValue();
-    EntityType getType();
+    AstBodyType getType();
     T getBody();
   }
   

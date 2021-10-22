@@ -63,8 +63,6 @@ public class FlowProgramBuilder {
   private final HdesTypeDefsFactory typesFactory;
   private final Map<String, FlowProgramStep> steps = new HashMap<>();
   private final Map<String, AstFlowTaskNode> tasksById = new HashMap<>();
-
-  private String flowId;
   
   public FlowProgramBuilder(HdesTypeDefsFactory typesFactory) {
     super();
@@ -72,14 +70,12 @@ public class FlowProgramBuilder {
   }
 
   public FlowProgram build(AstFlow ast) {
-    this.flowId = visitFlowId(ast);
+    final var flowId = visitFlowId(ast);
     final var firstTask = visitTasksById(ast);
     final var firstStep = firstTask == null ? END_STEP: visitTask(firstTask);
 
     
     return ImmutableFlowProgram.builder()
-        .id(flowId)
-        .ast(ast)
         .startStepId(firstStep.getId())
         .steps(steps)
         .acceptDefs(visitAcceptDefs(ast))
@@ -185,7 +181,7 @@ public class FlowProgramBuilder {
           typesFactory.expression(ValueType.FLOW_CONTEXT, when);
       condition.expression(expression).stepId(thenValue);
     } catch(Exception e) {
-      final var message = "Failed to evaluate expression: \"" + when + "\" in flow: " + flowId + ", decision: " + decisionId + "!" + System.lineSeparator() + e.getMessage();
+      final var message = "Failed to evaluate expression: \"" + when + "\" in flow decision: " + decisionId + "!" + System.lineSeparator() + e.getMessage();
       throw new FlowAstException(message, e);
     } 
     return condition.build();
