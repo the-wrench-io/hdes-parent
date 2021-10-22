@@ -44,7 +44,8 @@ public interface ProgramEnvir {
     AstBodyType getType();
     ProgramStatus getStatus();
     
-    List<ProgramError> getErrors();
+    List<ProgramMessage> getWarnings();
+    List<ProgramMessage> getErrors();
     List<TypeDef> getHeaders();
     List<ProgramAssociation> getAssociations();
     
@@ -64,7 +65,7 @@ public interface ProgramEnvir {
   }
 
   @Value.Immutable
-  interface ProgramError {
+  interface ProgramMessage {
     String getId();
     String getMsg();
     @JsonIgnore
@@ -72,5 +73,8 @@ public interface ProgramEnvir {
     Exception getException();
   }
 
-  enum ProgramStatus { UP, AST_ERROR, PROGRAM_ERROR, DEPENDENCY_ERROR }
+  enum ProgramStatus { UP, 
+    AST_ERROR, 
+    PROGRAM_ERROR, 
+    DEPENDENCY_ERROR }
 }

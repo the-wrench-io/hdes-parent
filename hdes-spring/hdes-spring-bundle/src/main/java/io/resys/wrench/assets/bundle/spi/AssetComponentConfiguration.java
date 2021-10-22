@@ -44,7 +44,6 @@ import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
-import io.resys.hdes.client.spi.flow.validators.IdValidator;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
@@ -90,7 +89,6 @@ public class AssetComponentConfiguration {
     final HdesClientImpl hdesClient = HdesClientImpl.builder()
         .objectMapper(objectMapper)
         .serviceInit(init)
-        .flowVisitors(new IdValidator())
         .programSupplier(new ProgramSupplier() {
           @Override
           public ServiceProgram getService(String name) {

@@ -15,16 +15,18 @@ import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepRefType;
 import io.resys.hdes.client.api.programs.ImmutableProgramAssociation;
-import io.resys.hdes.client.api.programs.ImmutableProgramError;
+import io.resys.hdes.client.api.programs.ImmutableProgramMessage;
 import io.resys.hdes.client.api.programs.ImmutableProgramWrapper;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
-import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramError;
+import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.spi.envir.EnvirFactory.EvirBuilderSourceEntity;
+import io.resys.hdes.client.spi.flow.validators.FlowAssociationValidator;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class AssociationVisitor {
@@ -34,7 +36,7 @@ public class AssociationVisitor {
         AstBodyType.FLOW_TASK, new ArrayList<String>(),
         AstBodyType.FLOW, new ArrayList<String>()
       ));
-  private final Map<String, List<ProgramError>> externalIdToDependencyErrors = new HashMap<>();
+  private final Map<String, List<ProgramMessage>> externalIdToDependencyErrors = new HashMap<>();
   private final Map<String, ProgramWrapper<?, ?>> externalIdToWrapper = new HashMap<>();
   private final Map<String, List<ProgramAssociation>> externalIdToAssoc = new HashMap<>();
 
@@ -59,111 +61,135 @@ public class AssociationVisitor {
         .collect(Collectors.toList());
   }
     
-  private List<ProgramAssociation> visitFlowProgramAssociation(ProgramWrapper<AstFlow, FlowProgram> wrapper) {
+  private void visitFlowProgramAssociation(ProgramWrapper<AstFlow, FlowProgram> wrapper) {
     if(wrapper.getProgram().isEmpty()) {
-      return Collections.emptyList();
+      return;
     }
     
     if(externalIdToAssoc.containsKey(wrapper.getId())) {
-      return externalIdToAssoc.get(wrapper.getId());
+      return;
     }
+    externalIdToAssoc.put(wrapper.getId(), new ArrayList<ProgramAssociation>());
     
-    final var result = new ArrayList<ProgramAssociation>();
-    externalIdToAssoc.put(wrapper.getId(), result);
-    
+    final var validator = new FlowAssociationValidator(wrapper.getAst().get());
     final var program = wrapper.getProgram().get();
-    for(final var step : program.getSteps().values()) {
-      if(step.getBody() == null) {
-        continue;
-      }
-      
-      List<String> refs = Collections.emptyList();
-      final var refType = step.getBody().getRefType();
-      if(refType == FlowProgramStepRefType.SERVICE) {
-        refs = typeToExternalId.get(AstBodyType.FLOW_TASK);
-      } else if(refType == FlowProgramStepRefType.DT) {
-        refs = typeToExternalId.get(AstBodyType.DT);
-      }
-      
-      final var ref = refs.stream()
-          .map(id -> externalIdToWrapper.get(id))
-          .filter(w -> w.getAst().isPresent())
-          .filter(w -> w.getAst().get().getName().equals(step.getBody().getRef()))
-          .collect(Collectors.toList());
-      
-      if(ref.isEmpty()) {
-        result.add(ImmutableProgramAssociation.builder()
-            .ref(step.getBody().getRef())
-            .owner(true)
-            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
-            .build());
-        externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramError.builder()
-            .id("dependency-error")
-            .msg("Missing dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "'!")
-            .build());
-      } else if(ref.size() > 1) {
-        result.add(ImmutableProgramAssociation.builder()
-            .owner(true)
-            .ref(step.getBody().getRef())
-            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
-            .build());
-        final var deps = String.join(",", ref.stream().map(e -> e.getId()).collect(Collectors.toList()));
-        externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramError.builder()
-            .id("dependency-error")
-            .msg("Found '" + ref.size() + "'" + 
-                 " ref: '" + step.getId() + "/" + step.getBody().getRef() + "'" + 
-                 " dependencies: '" + deps + "' instead of 1!")
-            .build());
-      }
-      
-      final var refWrapper = ref.get(0);
-      if(refWrapper.getStatus() != ProgramStatus.UP) {
-        result.add(ImmutableProgramAssociation.builder()
-            .ref(step.getBody().getRef())
-            .owner(true)
-            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
-            .build());
-        externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramError.builder()
-            .id("dependency-error")
-            .msg("Dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "' with id: '" + refWrapper.getId() + "' has a ERROR!")
-            .build());
-        
-        result.add(ImmutableProgramAssociation.builder()
-            .id(wrapper.getId())
-            .ref(wrapper.getAst().get().getName())
-            .refType(wrapper.getAst().get().getBodyType())
-            .owner(false)
-            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
-            .build());
-        
-        continue;
-      }
-      
-      if(refWrapper.getType() == AstBodyType.DT) {
-        AstDecision decision = (AstDecision) refWrapper.getAst().get();
-        Boolean collection = decision.getHitPolicy() == HitPolicy.ALL;
-        if(!step.getBody().getCollection().equals(collection)) {
-          result.add(ImmutableProgramAssociation.builder()
-              .ref(step.getBody().getRef())
-              .owner(true)
-              .refStatus(ProgramStatus.DEPENDENCY_ERROR)
-              .build());
-          externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramError.builder()
-              .id("dependency-error")
-              .msg("Dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "'"
-                  + " with id: '" + refWrapper.getId() + "'"
-                  + " has collection: '" + collection + "'"
-                  + " but flow has: '" + step.getBody().getCollection() + "'!")
-              .build());
-        }
-      }
-      
-      
-      
-      
+    program.getSteps().values().forEach(step -> visitFlowStep(wrapper, step, validator));
+    
+    final var error = validator.build();
+    
+    externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
+        .id("dependency-error")
+        .msg("Dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "'"
+            + " with id: '" + refWrapper.getId() + "'"
+            + " has collection: '" + collection + "'"
+            + " but flow has: '" + step.getBody().getCollection() + "'!")
+        .build());
+    final var result = externalIdToAssoc.get(wrapper.getId());
+    
+    
+  }
+  
+  private void visitFlowStep(ProgramWrapper<AstFlow, FlowProgram> wrapper, FlowProgramStep step, FlowAssociationValidator validator) {
+    if(step.getBody() == null) {
+      return;
+    } 
+    final var result = externalIdToAssoc.get(wrapper.getId());
+    final var refWrapper = visitRefWrapper(wrapper, step);
+  
+    if(refWrapper == null) {
+      return;
     }
     
-    return result;
+    if(refWrapper.getType() == AstBodyType.DT) {
+      AstDecision decision = (AstDecision) refWrapper.getAst().get();
+      Boolean collection = decision.getHitPolicy() == HitPolicy.ALL;
+      if(!step.getBody().getCollection().equals(collection)) {
+        result.add(ImmutableProgramAssociation.builder()
+            .ref(step.getBody().getRef())
+            .owner(true)
+            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+            .build());
+        externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
+            .id("dependency-error")
+            .msg("Dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "'"
+                + " with id: '" + refWrapper.getId() + "'"
+                + " has collection: '" + collection + "'"
+                + " but flow has: '" + step.getBody().getCollection() + "'!")
+            .build());
+      }
+    }
+    validator.visitStep(step, refWrapper);
+  }
+  
+  private ProgramWrapper<?, ?> visitRefWrapper(ProgramWrapper<AstFlow, FlowProgram> wrapper, FlowProgramStep step) {
+    List<String> refs = Collections.emptyList();
+    final var refType = step.getBody().getRefType();
+    if(refType == FlowProgramStepRefType.SERVICE) {
+      refs = typeToExternalId.get(AstBodyType.FLOW_TASK);
+    } else if(refType == FlowProgramStepRefType.DT) {
+      refs = typeToExternalId.get(AstBodyType.DT);
+    }
+    
+    final var result = externalIdToAssoc.get(wrapper.getId());
+    final var ref = refs.stream()
+        .map(id -> externalIdToWrapper.get(id))
+        .filter(w -> w.getAst().isPresent())
+        .filter(w -> w.getAst().get().getName().equals(step.getBody().getRef()))
+        .collect(Collectors.toList());
+    
+    if(ref.isEmpty()) {
+      result.add(ImmutableProgramAssociation.builder()
+          .ref(step.getBody().getRef())
+          .owner(true)
+          .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+          .build());
+      externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
+          .id("dependency-error")
+          .msg("Missing dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "'!")
+          .build());
+      
+      return null;
+    } else if(ref.size() > 1) {
+      result.add(ImmutableProgramAssociation.builder()
+          .owner(true)
+          .ref(step.getBody().getRef())
+          .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+          .build());
+      final var deps = String.join(",", ref.stream().map(e -> e.getId()).collect(Collectors.toList()));
+      externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
+          .id("dependency-error")
+          .msg("Found '" + ref.size() + "'" + 
+               " ref: '" + step.getId() + "/" + step.getBody().getRef() + "'" + 
+               " dependencies: '" + deps + "' instead of 1!")
+          .build());
+      
+      return null;
+    }
+    
+    final var refWrapper = ref.get(0);
+    if(refWrapper.getStatus() != ProgramStatus.UP) {
+      result.add(ImmutableProgramAssociation.builder()
+          .ref(step.getBody().getRef())
+          .owner(true)
+          .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+          .build());
+      externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
+          .id("dependency-error")
+          .msg("Dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "' with id: '" + refWrapper.getId() + "' has a ERROR!")
+          .build());
+      
+      result.add(ImmutableProgramAssociation.builder()
+          .id(wrapper.getId())
+          .ref(wrapper.getAst().get().getName())
+          .refType(wrapper.getAst().get().getBodyType())
+          .owner(false)
+          .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+          .build());
+      
+      return null;
+    }
+    
+    return refWrapper;
   }
   
   @SuppressWarnings("unchecked")

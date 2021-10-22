@@ -64,6 +64,7 @@ import io.resys.hdes.client.spi.envir.EnvirFactory;
 import io.resys.hdes.client.spi.envir.ImmutableEvirBuilderSourceEntity;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.flow.FlowProgramExecutor;
+import io.resys.hdes.client.spi.flow.validators.IdValidator;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
 import io.resys.hdes.client.spi.groovy.ServiceProgramExecutor;
 import io.resys.hdes.client.spi.util.HdesAssert;
@@ -327,7 +328,7 @@ public class HdesClientImpl implements HdesClient {
     private ServiceInit serviceInit;
     private HdesStore store;
     private ProgramSupplier programSupplier;
-    private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>();
+    private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>(Arrays.asList(new IdValidator()));
 
     public Builder flowVisitors(AstFlowNodeVisitor ...visitors) {
       this.flowVisitors.addAll(Arrays.asList(visitors));
