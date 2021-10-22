@@ -28,7 +28,6 @@ public class FlowAssociationValidator {
 
   private final AstFlow ast;
   private final Map<String, TypeDef> allParams = new HashMap<>();
-  private final Map<String, List<FlowAstCommandMessage>> messages = new HashMap<>();
   private final List<TaskStepToValidate> toValidate = new ArrayList<>();
   
   public FlowAssociationValidator(AstFlow ast) {
@@ -50,7 +49,7 @@ public class FlowAssociationValidator {
     toValidate.add(new TaskStepToValidate(step, wrapper, taskModel));
   }
   
-  public Map<String, List<FlowAstCommandMessage>> build() {    
+  public List<TaskStepToValidate> build() {    
     final var node = ast.getSrc();
     Map<String, AstFlowInputNode> unusedInputs = new HashMap<>(node.getInputs());
     for(final var entry : toValidate) {
@@ -100,14 +99,17 @@ public class FlowAssociationValidator {
     }
 
     // Unused inputs on task
+    TaskStepToValidate warnings = new TaskStepToValidate(null, null, null);
+    toValidate.add(warnings);
     for(AstFlowInputNode input : unusedInputs.values()) {
-      warning(
+      warning(warnings, 
           input.getStart(),
           input.getSource().getValue().length(),
           "Input: " + input.getKeyword() + " is unused!");
     }
     
-    return messages;
+    
+    return toValidate;
   }
 
 
@@ -146,7 +148,7 @@ public class FlowAssociationValidator {
   }
   
   private void error(TaskStepToValidate toValidate, int start, int range, String value) {
-    messages.add(ImmutableFlowAstCommandMessage.builder()
+    toValidate.getMessages().add(ImmutableFlowAstCommandMessage.builder()
         .line(start)
         .range(AstFlowNodesFactory.range().build(0, range))
         .type(FlowCommandMessageType.ERROR)
@@ -155,7 +157,7 @@ public class FlowAssociationValidator {
   }
 
   private void warning(TaskStepToValidate toValidate, int start, int range, String value) {
-    messages.add(ImmutableFlowAstCommandMessage.builder()
+    toValidate.getMessages().add(ImmutableFlowAstCommandMessage.builder()
         .line(start)
         .range(AstFlowNodesFactory.range().build(0, range))
         .type(FlowCommandMessageType.WARNING)
@@ -163,10 +165,11 @@ public class FlowAssociationValidator {
         .build());
   }
 
-  private static class TaskStepToValidate {
+  public static class TaskStepToValidate {
     private final FlowProgramStep step; 
     private final ProgramWrapper<?, ?> wrapper;
     private final AstFlowTaskNode taskNode;
+    private final List<FlowAstCommandMessage> messages = new ArrayList<>();
     private TaskStepToValidate(FlowProgramStep step, ProgramWrapper<?, ?> wrapper, AstFlowTaskNode taskNode) {
       super();
       this.step = step;
@@ -175,6 +178,9 @@ public class FlowAssociationValidator {
     }
     public FlowProgramStep getStep() {
       return step;
+    }
+    public List<FlowAstCommandMessage> getMessages() {
+      return messages;
     }
     public ProgramWrapper<?, ?> getWrapper() {
       return wrapper;

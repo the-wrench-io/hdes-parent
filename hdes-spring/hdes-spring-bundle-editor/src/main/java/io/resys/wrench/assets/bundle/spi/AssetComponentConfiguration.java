@@ -72,7 +72,6 @@ import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 import io.resys.wrench.assets.bundle.spi.clock.SystemClockRepository;
 import io.resys.wrench.assets.bundle.spi.dt.DtServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.flow.FlowServiceBuilder;
-import io.resys.wrench.assets.bundle.spi.flow.FlowServiceDataModelValidator;
 import io.resys.wrench.assets.bundle.spi.flow.hints.PartialTaskInputsAutocomplete;
 import io.resys.wrench.assets.bundle.spi.flow.hints.TaskInputMappingAutocomplete;
 import io.resys.wrench.assets.bundle.spi.flow.hints.TaskInputsAutocomplete;
@@ -168,8 +167,7 @@ public class AssetComponentConfiguration {
         new TaskRefAutocomplete(serviceStore),
         new TaskInputsAutocomplete(serviceStore),
         new PartialTaskInputsAutocomplete(serviceStore),
-        new TaskInputMappingAutocomplete(serviceStore),
-        new FlowServiceDataModelValidator(serviceStore, hdesClient)    
+        new TaskInputMappingAutocomplete(serviceStore)
     );
     
     return new GenericAssetServiceRepository(hdesClient, objectMapper, builders, serviceStore);

@@ -56,7 +56,6 @@ import io.resys.wrench.assets.bundle.spi.clock.ClockRepository;
 import io.resys.wrench.assets.bundle.spi.clock.SystemClockRepository;
 import io.resys.wrench.assets.bundle.spi.dt.DtServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.flow.FlowServiceBuilder;
-import io.resys.wrench.assets.bundle.spi.flow.FlowServiceDataModelValidator;
 import io.resys.wrench.assets.bundle.spi.flowtask.FlowTaskServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.postprocessors.FlowDependencyServicePostProcessor;
 import io.resys.wrench.assets.bundle.spi.postprocessors.GenericServicePostProcessorSupplier;
@@ -120,7 +119,6 @@ public class AssetComponentConfiguration {
     final ServicePostProcessorSupplier servicePostProcessorSupplier = new GenericServicePostProcessorSupplier(postProcessors);
     final ServiceStore serviceStore = new PostProcessingServiceStore(origServiceStore, servicePostProcessorSupplier); 
     
-    hdesClient.config().config(new FlowServiceDataModelValidator(serviceStore, hdesClient));
     return new GenericAssetServiceRepository(hdesClient, objectMapper, builders, serviceStore);
   }
 

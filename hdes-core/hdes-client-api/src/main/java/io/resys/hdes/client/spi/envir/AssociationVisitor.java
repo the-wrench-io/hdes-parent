@@ -37,6 +37,7 @@ public class AssociationVisitor {
         AstBodyType.FLOW, new ArrayList<String>()
       ));
   private final Map<String, List<ProgramMessage>> externalIdToDependencyErrors = new HashMap<>();
+  private final Map<String, List<ProgramMessage>> externalIdToDependencyWarnings = new HashMap<>();
   private final Map<String, ProgramWrapper<?, ?>> externalIdToWrapper = new HashMap<>();
   private final Map<String, List<ProgramAssociation>> externalIdToAssoc = new HashMap<>();
 
@@ -46,6 +47,7 @@ public class AssociationVisitor {
     externalIdToSource.put(source.getExternalId(), source);
     typeToExternalId.get(wrapper.getType()).add(wrapper.getId());
     externalIdToDependencyErrors.put(wrapper.getId(), new ArrayList<>());
+    externalIdToDependencyWarnings.put(wrapper.getId(), new ArrayList<>());
     return this;
   }
   
@@ -75,18 +77,36 @@ public class AssociationVisitor {
     final var program = wrapper.getProgram().get();
     program.getSteps().values().forEach(step -> visitFlowStep(wrapper, step, validator));
     
-    final var error = validator.build();
-    
-    externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
-        .id("dependency-error")
-        .msg("Dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "'"
-            + " with id: '" + refWrapper.getId() + "'"
-            + " has collection: '" + collection + "'"
-            + " but flow has: '" + step.getBody().getCollection() + "'!")
-        .build());
-    final var result = externalIdToAssoc.get(wrapper.getId());
-    
-    
+    for(final var entry : validator.build()) {
+      if(entry.getMessages().isEmpty()) {
+        continue;
+      }
+      
+      final var step = entry.getStep();
+      if(step != null) {
+        final var ref = entry.getStep().getBody().getRef();
+        
+        entry.getMessages().forEach(msg -> {
+          final var progMsg = ImmutableProgramMessage.builder().id("dependency-error").msg("line: " + msg.getLine() + ": " + msg.getValue()).build();          
+          externalIdToDependencyErrors.get(wrapper.getId()).add(progMsg);
+        });
+        
+        final var allAssoc = externalIdToAssoc.get(wrapper.getId());          
+        final var assoc = allAssoc.stream().filter(a -> a.getRef().equals(ref)).findFirst();
+        allAssoc.remove(assoc.get());
+        allAssoc.add(ImmutableProgramAssociation.builder()
+            .from(assoc.get())
+            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+            .build());
+      } else {
+        entry.getMessages().forEach(msg -> {
+          final var progMsg = ImmutableProgramMessage.builder().id("dependency-warning").msg("line: " + msg.getLine() + ": " + msg.getValue()).build();          
+          externalIdToDependencyWarnings.get(wrapper.getId()).add(progMsg);
+        });
+      }
+      
+      
+    }
   }
   
   private void visitFlowStep(ProgramWrapper<AstFlow, FlowProgram> wrapper, FlowProgramStep step, FlowAssociationValidator validator) {
@@ -204,7 +224,8 @@ public class AssociationVisitor {
           .errors(externalIdToDependencyErrors.get(wrapper.getId()))
           .associations(assoc == null ? Collections.emptyList() : assoc)
           .status(errors.isEmpty() ? wrapper.getStatus() : ProgramStatus.DEPENDENCY_ERROR)
-          .errors(errors)
+          .addAllErrors(errors)
+          .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
           .build();
     }
     case FLOW_TASK: {
@@ -216,7 +237,8 @@ public class AssociationVisitor {
           .errors(externalIdToDependencyErrors.get(wrapper.getId()))
           .associations(assoc == null ? Collections.emptyList() : assoc)
           .status(errors.isEmpty() ? wrapper.getStatus() : ProgramStatus.DEPENDENCY_ERROR)
-          .errors(errors)
+          .addAllErrors(errors)
+          .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
           .build();
     }
     case FLOW: {
@@ -229,7 +251,8 @@ public class AssociationVisitor {
           .errors(externalIdToDependencyErrors.get(wrapper.getId()))
           .associations(assoc == null ? Collections.emptyList() : assoc)
           .status(errors.isEmpty() ? wrapper.getStatus() : ProgramStatus.DEPENDENCY_ERROR)
-          .errors(errors)
+          .addAllErrors(errors)
+          .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
           .build();
     } 
     default: throw new IllegalArgumentException("unknown command format type: '" + wrapper.getType() + "'!");

@@ -24,12 +24,11 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Assertions;
 
-import io.resys.hdes.client.api.HdesStore.Entity;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
 import io.resys.hdes.client.api.ImmutableUpdateAstType;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.config.PgTestTemplate;
 import io.resys.hdes.client.config.RepositoryToStaticData;
@@ -43,7 +42,7 @@ public class PersistencePgTest extends PgTestTemplate {
   public void starter() {
     final var repo = getHdes("test1");
     
-    Entity<AstFlow> article1 = repo.store().create().flow("first-flow")
+    StoreEntity article1 = repo.store().create().flow("first-flow")
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
 
