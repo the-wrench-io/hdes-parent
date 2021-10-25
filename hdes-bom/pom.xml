@@ -24,11 +24,6 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-covertype</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-client-api</artifactId>
         <version>${project.version}</version>
       </dependency>

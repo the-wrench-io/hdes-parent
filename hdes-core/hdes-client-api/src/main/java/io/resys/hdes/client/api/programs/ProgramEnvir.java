@@ -73,7 +73,8 @@ public interface ProgramEnvir {
     Exception getException();
   }
 
-  enum ProgramStatus { UP, 
+  enum ProgramStatus { 
+    UP, 
     AST_ERROR, 
     PROGRAM_ERROR, 
     DEPENDENCY_ERROR }

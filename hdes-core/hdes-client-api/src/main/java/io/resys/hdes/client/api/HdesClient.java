@@ -48,13 +48,14 @@ import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 
 public interface HdesClient {
   AstBuilder ast();
-  HdesAstTypes astTypes();
   ProgramBuilder program();
-  HdesStore store();
   ExecutorBuilder executor();
-  CSVBuilder csv();
   EnvirBuilder envir();
   
+  HdesAstTypes astTypes();
+  HdesStore store();
+  CSVBuilder csv();
+
   
   interface EnvirBuilder {
     EnvirCommandFormatBuilder addCommand();
@@ -72,12 +73,6 @@ public interface HdesClient {
   interface CSVBuilder {
     String ast(AstDecision ast);
   }
-  
-//  ExportBuilder export();
-//  
-//  interface ExportBuilder {
-//    String build();
-//  }
 
   interface ProgramBuilder {
     FlowProgram ast(AstFlow ast);
