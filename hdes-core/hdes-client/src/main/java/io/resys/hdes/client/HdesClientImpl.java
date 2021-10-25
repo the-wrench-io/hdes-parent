@@ -54,7 +54,7 @@ public class HdesClientImpl implements HdesClient {
   }
 
   @Override
-  public HdesAstTypes astTypes() {
+  public HdesAstTypes types() {
     // TODO Auto-generated method stub
     throw new RuntimeException("Need to implemented the client");
   }

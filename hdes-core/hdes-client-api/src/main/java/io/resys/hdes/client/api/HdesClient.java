@@ -52,10 +52,10 @@ public interface HdesClient {
   ExecutorBuilder executor();
   EnvirBuilder envir();
   
-  HdesAstTypes astTypes();
+  HdesAstTypes types();
   HdesStore store();
   CSVBuilder csv();
-
+  
   
   interface EnvirBuilder {
     EnvirCommandFormatBuilder addCommand();

@@ -46,7 +46,7 @@ public class FlowTest {
   @Test
   public void astIndentNormal() throws IOException {
     
-    final var ast = TestUtils.client.astTypes().flow()
+    final var ast = TestUtils.client.types().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")
         .srcAdd(3, "tasks:")
@@ -78,7 +78,7 @@ public class FlowTest {
   @Test
   public void astDeleteId() throws IOException {
     List<FlowAstCommandMessage> messages = new ArrayList<>();
-    final var ast = TestUtils.client.astTypes().flow()
+    final var ast = TestUtils.client.types().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")
         .srcAdd(3, "tasks:")
@@ -100,7 +100,7 @@ public class FlowTest {
   @Test
   public void astDeleteAndSetId() throws IOException {
     List<FlowAstCommandMessage> messages = new ArrayList<>();
-    final var ast = TestUtils.client.astTypes().flow()
+    final var ast = TestUtils.client.types().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")
         .srcAdd(3, "tasks:")
@@ -131,7 +131,7 @@ public class FlowTest {
     String content = TestUtils.objectMapper.readValue(stream, ObjectNode.class).get("content").asText();
 
     ArrayNode commands = TestUtils.objectMapper.readValue(content, ArrayNode.class);
-    AstFlow flowCommandModel = TestUtils.client.astTypes().flow().src(commands).build();
+    AstFlow flowCommandModel = TestUtils.client.types().flow().src(commands).build();
 
     String expected = FileUtils.toString(getClass(), "flow/trafficMain.out.yaml");
     Assertions.assertEquals(expected, flowCommandModel.getSrc().getValue());

@@ -302,7 +302,7 @@ public class HdesClientImpl implements HdesClient {
     return null;
   }
   @Override
-  public HdesAstTypes astTypes() {
+  public HdesAstTypes types() {
     return ast;
   }
   @Override

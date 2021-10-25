@@ -47,7 +47,7 @@ import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 public class AstFlowNodesFactory {
 
   public static HeadersBuilder headers(HdesClient types) {
-    return new HeadersBuilder(() -> types.astTypes().dataType());
+    return new HeadersBuilder(() -> types.types().dataType());
   }
   public static HeadersBuilder headers(HdesTypeDefsFactory types) {
     return new HeadersBuilder(() -> types.dataType());
