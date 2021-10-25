@@ -90,7 +90,7 @@ public class DecisionProgramExecutor {
   }
   
   private static boolean visitHitPolicy(DecisionProgram program, DecisionLog decision) {
-    final var hitPolicy = program.getAst().getHitPolicy();
+    final var hitPolicy = program.getHitPolicy();
     switch(hitPolicy) {
     case FIRST:
       // match only the first

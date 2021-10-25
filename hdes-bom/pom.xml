@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.resys.hdes</groupId>
-    <artifactId>hdes</artifactId>
+    <artifactId>hdes-parent</artifactId>
     <version>3.y-SNAPSHOT</version>
   </parent>
 
@@ -19,22 +19,7 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-flow</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-script</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-services</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-covertype</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

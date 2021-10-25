@@ -22,11 +22,25 @@ package io.resys.hdes.client.api.programs;
 
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import org.immutables.value.Value;
+
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.programs.Program.ProgramResult;
 
 public interface ExpressionProgram {
   String getSrc();
   ValueType getType();
   List<String> getConstants();
   ExpressionResult run(Object context);
+
+  @Value.Immutable
+  interface ExpressionResult extends ProgramResult {
+    ValueType getType();
+    List<String> getConstants();
+    @Nullable
+    Object getValue();
+  }
+
 }

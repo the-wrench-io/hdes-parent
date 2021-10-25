@@ -21,6 +21,7 @@ package io.resys.hdes.client.test;
  */
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,23 +29,19 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRow;
-import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.util.DateParser;
 import io.resys.hdes.client.spi.util.FileUtils;
 
 public class DecisionTest {
 
-  private HdesClient client = HdesClientImpl.builder().objectMapper(new ObjectMapper()).build();
+  
 
   @Test
   public void readerNodeOrderTest() throws IOException {
-    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/dt.json")).decision();
-    final var decisionTable = client.program().ast(ast);
+    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/dt.json")).decision();
+    final var decisionTable = TestUtils.client.program().ast(ast);
 
     List<DecisionRow> rows = decisionTable.getRows();
     Assertions.assertEquals(0, rows.get(0).getOrder());
@@ -93,16 +90,16 @@ public class DecisionTest {
 //}
   @Test
   public void executionTest() throws IOException {
-    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/dt.json")).decision();
-    final var program = client.program().ast(ast);
+    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/dt.json")).decision();
+    final var program = TestUtils.client.program().ast(ast);
 
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("sriBoolean", false);
     values.put("risk", "CAREFUL");
     values.put("sri", 1);
     values.put("sriDate", DateParser.parseLocalDate("2017-07-03"));
     
-    DecisionResult result = client.executor().inputMap(values).decision(program).andGetBody();
+    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();
 
     Assertions.assertEquals(2, result.getMatches().size());
     Assertions.assertEquals(0, result.getMatches().get(0).getOrder());
@@ -111,51 +108,51 @@ public class DecisionTest {
 
   @Test
   public void nullEqualsNull() throws IOException {
-    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/nullEqualsNull.json")).decision();
-    final var program = client.program().ast(ast);
+    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/nullEqualsNull.json")).decision();
+    final var program = TestUtils.client.program().ast(ast);
     
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("risk", null);
     
-    DecisionResult result = client.executor().inputMap(values).decision(program).andGetBody();
+    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();
 
     Assertions.assertEquals(1, result.getMatches().size());
   }
   
   @Test
   public void firstHitPolicy() throws IOException {
-    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/firstHitPolicy.json")).decision();
-    final var program = client.program().ast(ast);
+    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/firstHitPolicy.json")).decision();
+    final var program = TestUtils.client.program().ast(ast);
 
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("regionName", "FIN");
-    DecisionResult result = client.executor().inputMap(values).decision(program).andGetBody();;
+    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();;
     Assertions.assertEquals(1, result.getMatches().size());
     Assertions.assertEquals(0, result.getMatches().get(0).getOrder());
 
 
     values = new HashMap<>();
     values.put("regionName", "X");
-    result = client.executor().inputMap(values).decision(program).andGetBody();
+    result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();
     Assertions.assertEquals(1, result.getMatches().size());
     Assertions.assertEquals(1, result.getMatches().get(0).getOrder());
   }
 
   @Test
   public void all() throws IOException {
-    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/allHitPolicy.json")).decision();
-    final var program = client.program().ast(ast);
+    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/allHitPolicy.json")).decision();
+    final var program = TestUtils.client.program().ast(ast);
 
-    Map<String, Object> values = new HashMap<>();
+    Map<String, Serializable> values = new HashMap<>();
     values.put("firstName", "Mark");
-    DecisionResult result = client.executor().inputMap(values).decision(program).andGetBody();;
+    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();;
     Assertions.assertEquals(2, result.getMatches().size());
   }
   
   @Test
   public void csvImportCommand() throws IOException {
-    final var ast = client.ast().commands(FileUtils.toString(getClass(), "decision/dt-import.json")).decision();
-    final var program = client.program().ast(ast);
+    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/dt-import.json")).decision();
+    final var program = TestUtils.client.program().ast(ast);
     Assertions.assertNotNull(program);
   }
 

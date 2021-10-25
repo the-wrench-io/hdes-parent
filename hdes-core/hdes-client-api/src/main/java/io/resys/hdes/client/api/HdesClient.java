@@ -1,5 +1,7 @@
 package io.resys.hdes.client.api;
 
+import java.io.InputStream;
+
 /*-
  * #%L
  * hdes-client-api
@@ -25,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -36,36 +40,49 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.FlowResult;
-import io.resys.hdes.client.api.programs.ServiceResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 
 public interface HdesClient {
   AstBuilder ast();
-  HdesAstTypes astTypes();
   ProgramBuilder program();
-  HdesStore store();
   ExecutorBuilder executor();
+  EnvirBuilder envir();
+  
+  HdesAstTypes types();
+  HdesStore store();
   CSVBuilder csv();
   
+  
+  interface EnvirBuilder {
+    EnvirCommandFormatBuilder addCommand();
+    ProgramEnvir build();
+  }
+  
+  interface EnvirCommandFormatBuilder {
+    EnvirCommandFormatBuilder id(String externalId);
+    EnvirCommandFormatBuilder flow(String commandJson);
+    EnvirCommandFormatBuilder decision(String commandJson);
+    EnvirCommandFormatBuilder service(String commandJson);
+    void build();
+  }
   
   interface CSVBuilder {
     String ast(AstDecision ast);
   }
-  
-//  ExportBuilder export();
-//  
-//  interface ExportBuilder {
-//    String build();
-//  }
 
   interface ProgramBuilder {
     FlowProgram ast(AstFlow ast);
     DecisionProgram ast(AstDecision ast);
-    AstService ast(AstService ast);
+    ServiceProgram ast(AstService ast);
   }
   
   interface FlowExecutor {
-    Object andGetTask(String task);
+    @Nullable
+    FlowResultLog andGetTask(String task);
     FlowResult andGetBody();
   }
   interface DecisionExecutor {
@@ -81,23 +98,16 @@ public interface HdesClient {
   interface ExecutorInput extends Function<TypeDef, Object> {};
   
   interface ExecutorBuilder {
-    ExecutorBuilder inputMap(Map<String, Object> input);
+    ExecutorBuilder inputField(String name, Serializable value);
+    ExecutorBuilder inputMap(Map<String, Serializable> input);
     ExecutorBuilder inputEntity(Object inputObject);
     ExecutorBuilder inputList(List<Object> inputObject);
     ExecutorBuilder inputJson(JsonNode json);
     ExecutorBuilder input(ExecutorInput input);
-    
-    // From model or by Id
-    FlowExecutor flow(String modelId);
+  
     FlowExecutor flow(FlowProgram model);
-
-    // From model or by Id
-    DecisionExecutor decision(String modelId);
     DecisionExecutor decision(DecisionProgram model);
-    
-    // From model or by Id
-    ServiceExecutor service(String modelId);
-    ServiceExecutor service(AstService model);
+    ServiceExecutor service(ServiceProgram model);
   }
   
   interface AstBuilder {
@@ -106,7 +116,7 @@ public interface HdesClient {
     AstBuilder commands(String src);
     AstBuilder commands(List<AstCommand> src, Integer version);
     AstBuilder commands(List<AstCommand> src);
-    AstBuilder syntax(String src);
+    AstBuilder syntax(InputStream syntax);
 
 
     AstFlow flow();

@@ -40,7 +40,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
-import io.resys.wrench.assets.bundle.spi.flow.executors.TransientFlowExecutor;
+import io.resys.wrench.assets.bundle.spi.flow.TransientFlowExecutor;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @EnableAutoConfiguration

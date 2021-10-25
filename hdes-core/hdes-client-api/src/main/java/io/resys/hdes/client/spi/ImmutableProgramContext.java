@@ -31,55 +31,85 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.programs.DecisionProgram;
-import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.ImmutableProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
-import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
+import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
+import io.resys.hdes.client.api.programs.ServiceData;
 
 public class ImmutableProgramContext implements ProgramContext {
 
-  private final List<Supplier<Map<String, Object>>> inputs; 
-  private final ExecutorInput input;
-  private Map<String, Object> entity;
+  private final HdesTypeDefsFactory factory;
+
+  private final ExecutorInput callbackThatWillSupplyAllData;
   
-  public ImmutableProgramContext(List<Supplier<Map<String, Object>>> inputs, ExecutorInput input) {
+  // data object that should be directly transformed to target
+  private final Object serviceData;
+  
+  // generic data to transform to target
+  private Map<String, Serializable> genericData;
+  
+  // generic data sources that will be used for init of genericData
+  private final List<Supplier<Map<String, Serializable>>> suppliers;
+  
+  public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypeDefsFactory factory) {
     super();
-    this.inputs = inputs;
-    this.input = input;
+    this.suppliers = inputs;
+    this.callbackThatWillSupplyAllData = input;
+    this.factory = factory;
+    this.serviceData = serviceData;
   }
 
   @Override
   public Serializable getValue(TypeDef typeDef) {
-    if(input != null) {
-      return (Serializable) input.apply(typeDef);
+    // data class map compatible
+    if(callbackThatWillSupplyAllData != null) {
+      Serializable target = (Serializable) callbackThatWillSupplyAllData.apply(typeDef);
+      if(target != null) {
+        return target;
+      }
     }
-    if(entity == null) {
-      entity = new HashMap<>();
-      inputs.forEach(e -> entity.putAll(e.get()));
+    
+    if(typeDef.getData() && serviceData != null) {
+      return (Serializable) factory.toType(serviceData, typeDef.getBeanType());
     }
-    return (Serializable) entity.get(typeDef.getName());
-  }
-  @Override
-  public FlowProgram getFlowProgram(String name) {
-    throw new RuntimeException("must impl");
-  }
-  @Override
-  public DecisionProgram getDecisionProgram(String name) {
-    throw new RuntimeException("must impl");
-  }
-  @Override
-  public ServiceProgram getServiceProgram(String name) {
-    throw new RuntimeException("must impl");
+    
+    init();
+    
+    if(typeDef.getData() && typeDef.getBeanType() != null) {
+      return (Serializable) factory.toType(genericData, typeDef.getBeanType());
+    }
+    
+    return (Serializable) genericData.get(typeDef.getName());
   }
   
+  @Override
+  public ProgramContextNamedValue getValue(String typeDefName) {
+    init();
+    
+    if(genericData.containsKey(typeDefName)) {
+      return ImmutableProgramContextNamedValue.builder().value((Serializable) genericData.get(typeDefName)).found(true).build();
+    }
+    
+    return ImmutableProgramContextNamedValue.builder().found(false).build();
+  }
+  
+  private void init() {
+    if(genericData == null) {
+      genericData = new HashMap<>();
+      suppliers.forEach(e -> genericData.putAll(e.get()));
+    }
+  }
+
   public static Builder builder(HdesTypeDefsFactory factory) {
     return new Builder(factory);
   }
   
   public static class Builder {
     private final HdesTypeDefsFactory factory;
-    private final List<Supplier<Map<String, Object>>> inputs = new ArrayList<>();
+    private final List<Supplier<Map<String, Serializable>>> suppliers = new ArrayList<>();
     private ExecutorInput input;
+    private Object serviceData;
     
     public Builder(HdesTypeDefsFactory factory) {
       super();
@@ -89,20 +119,31 @@ public class ImmutableProgramContext implements ProgramContext {
       this.input = input;
       return this;
     }
-    public Builder map(Map<String, Object> entity) {
-      this.inputs.add(() -> entity);
+    public Builder map(Map<String, Serializable> entity) {
+      this.suppliers.add(() -> entity);
       return this;
     }
     public Builder entity(Object entity) {
-      this.inputs.add(() -> this.factory.toMap(entity));
+      if(entity.getClass().isAnnotationPresent(ServiceData.class)) {
+        serviceData = entity;
+      } else if(entity instanceof Map) {
+        this.suppliers.add(() -> (Map) entity);
+      } else {
+        this.suppliers.add(() -> this.factory.toMap(entity));        
+      }
       return this;
     }
     public Builder json(JsonNode json) {
-      this.inputs.add(() -> this.factory.toMap(json));
+      this.suppliers.add(() -> this.factory.toMap(json));
       return this;
     }
     public ImmutableProgramContext build() {
-      return new ImmutableProgramContext(inputs, input);
+      return new ImmutableProgramContext(suppliers, serviceData, input, factory);
     }
+  }
+
+  @Override
+  public ProgramSupplier getPrograms() {
+    return factory.config().getPrograms();
   }
 }

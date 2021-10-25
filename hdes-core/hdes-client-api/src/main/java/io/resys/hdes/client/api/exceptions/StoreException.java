@@ -25,38 +25,37 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import io.resys.hdes.client.api.HdesStore.Entity;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
-import io.resys.hdes.client.api.ast.AstBody;
 
 public class StoreException extends RuntimeException {
 
   private static final long serialVersionUID = 7058468238867536222L;
 
   private final String code;
-  private final Optional<Entity<AstBody>> target;
+  private final Optional<StoreEntity> target;
   private final List<StoreExceptionMsg> messages = new ArrayList<>();
   
-  public StoreException(Exception e, String code, Entity<AstBody> target) {
+  public StoreException(Exception e, String code, StoreEntity target) {
     super(e.getMessage(), e);
     this.code = code;
     this.target = Optional.ofNullable(target);
   }
 
-  public StoreException(Exception e, String code, Entity<AstBody> target, StoreExceptionMsg ... msg) {
+  public StoreException(Exception e, String code, StoreEntity target, StoreExceptionMsg ... msg) {
     super(e.getMessage(), e);
     this.code = code;
     this.target = Optional.ofNullable(target);
     this.messages.addAll(Arrays.asList(msg));
   }
     
-  public StoreException(String code, Entity<AstBody> target) {
+  public StoreException(String code, StoreEntity target) {
     super();
     this.code = code;
     this.target = Optional.ofNullable(target);
   }
 
-  public StoreException(String code, Entity<AstBody> target, StoreExceptionMsg ... msg) {
+  public StoreException(String code, StoreEntity target, StoreExceptionMsg ... msg) {
     super();
     this.code = code;
     this.target = Optional.ofNullable(target);
@@ -67,7 +66,7 @@ public class StoreException extends RuntimeException {
   public String getCode() {
     return code;
   }
-  public Optional<Entity<AstBody>> getTarget() {
+  public Optional<StoreEntity> getTarget() {
     return target;
   }
   public List<StoreExceptionMsg> getMessages() {

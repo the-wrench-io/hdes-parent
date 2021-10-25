@@ -28,8 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.api.programs.ServiceProgram.ServiceInit;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.ast.AstService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
@@ -38,29 +38,26 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 import io.resys.wrench.assets.bundle.spi.builders.ImmutableServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.builders.TemplateServiceBuilder;
 import io.resys.wrench.assets.bundle.spi.exceptions.AssetErrorCodes;
-import io.resys.wrench.assets.script.api.ScriptRepository;
 
 public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
 
   private final ServiceIdGen idGen;
   private final ServiceStore serviceStore;  
-  private final ScriptRepository scriptRepository;
+  private final HdesClient scriptRepository;
   private final ObjectMapper objectMapper;
   private final String defaultContent;
-  private final ServiceInit init;
   private boolean rename;
   
   public FlowTaskServiceBuilder(
       ServiceIdGen idGen,
-      ServiceStore serviceStore,
-      ServiceInit init, 
-      ScriptRepository scriptRepository, 
-      ObjectMapper objectMapper, String defaultContent) {
+      ServiceStore serviceStore, 
+      HdesClient client,
+      ObjectMapper objectMapper, 
+      String defaultContent) {
     super();
     this.idGen = idGen;
-    this.init = init;
+    this.scriptRepository = client;
     this.serviceStore = serviceStore;
-    this.scriptRepository = scriptRepository;
     this.defaultContent = defaultContent;
     this.objectMapper = objectMapper;
   }
@@ -76,31 +73,31 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
     final String content = isDefault ? defaultContent.replace("{{id}}", name): this.src;
     
     try {
-      final ServiceProgram script;
+      final AstService script;
       
       if(rename) {
-        final ServiceProgram originalScript = scriptRepository.createBuilder().src(content).build();
-        final String originalName = originalScript.getAst().getName();
+        final AstService originalScript = scriptRepository.ast().commands(content).service();
+        final String originalName = originalScript.getName();
         final String newContent = content.replaceAll(originalName, name);
         
-        script = scriptRepository.createBuilder().src(newContent).build();
+        script = scriptRepository.ast().commands(newContent).service();
       } else {
-        script = scriptRepository.createBuilder().src(content).build();
+        script = scriptRepository.ast().commands(content).service();
       }
             
-      final String name = script.getAst().getName();
+      final String name = script.getName();
       final String pointer = serviceId + ".json";
       final ServiceDataModel dataModel = new FlowTaskServiceDataModelBuilder().build(serviceId, name, script, serviceStore);
 
       return ImmutableServiceBuilder.newFlowTask()
           .setId(serviceId)
-          .setRev(script.getAst().getRev() + "")
+          .setRev(script.getRev() + "")
           .setName(name)
           .setDescription(null)
-          .setSrc(objectMapper.writeValueAsString(script.getAst().getCommands()))
+          .setSrc(script.getSource())
           .setPointer(pointer)
           .setModel(dataModel)
-          .setExecution(() -> new FlowTaskServiceExecution(script, init))
+          .setExecution(() -> new FlowTaskServiceExecution(scriptRepository.program().ast(script), scriptRepository))
           .build();
 
     } catch (Exception e) {

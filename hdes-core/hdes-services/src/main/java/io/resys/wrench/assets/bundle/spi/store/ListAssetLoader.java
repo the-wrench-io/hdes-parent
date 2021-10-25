@@ -36,8 +36,8 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.MigrationValue;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
+import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.MigrationValue;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableService;
 import io.resys.wrench.assets.bundle.spi.beans.ImmutableServiceError;
@@ -133,7 +133,7 @@ public class ListAssetLoader {
       } catch (DataException e) {
         createDuplicateErrorService(r, s, e);
       } catch (Exception e) {
-        throw new RuntimeException("Failed to load asset content from: " + r.getFilename() + "!" + e.getMessage(), e);
+        throw new RuntimeException("Failed to load asset content from: " + r.getFilename() + "!" + System.lineSeparator() + e.getMessage(), e);
       }
       
     });

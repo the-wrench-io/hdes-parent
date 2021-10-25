@@ -21,10 +21,10 @@ package io.resys.hdes.client.api.programs;
  */
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -36,39 +36,74 @@ import io.resys.hdes.client.api.ast.TypeDef;
 @Value.Immutable
 public interface FlowProgram extends Program<AstFlow> {
   Collection<TypeDef> getAcceptDefs();
-  Step getStep();
-  Collection<Step> getSteps();
+  String getStartStepId();
+  Map<String, FlowProgramStep> getSteps();
 
-  interface Step extends Serializable {
-    Step get(String taskId);
+  @Value.Immutable
+  interface FlowProgramStep extends Serializable {
     String getId();
+    FlowProgramStepPointer getPointer();
     @Nullable
-    StepBody getBody();
-    FlowTaskType getType();
-    Step getPrevious();
-    List<Step> getNext();
+    FlowProgramStepBody getBody();
+  }
+  
+  @Value.Immutable
+  interface FlowProgramStepBody extends Serializable {
+    String getRef();
+    FlowProgramStepRefType getRefType();
+    Map<String, String> getInputMapping();
+    Boolean getCollection();
+  }
+  interface FlowProgramStepPointer extends Serializable {
+    FlowProgramStepPointerType getType();
+  }
+  @Value.Immutable
+  interface FlowProgramStepEndPointer extends FlowProgramStepPointer {
+  }
+  @Value.Immutable
+  interface FlowProgramStepThenPointer extends FlowProgramStepPointer {
+    String getStepId();
+  }
+  @Value.Immutable
+  interface FlowProgramStepWhenThenPointer extends FlowProgramStepPointer {
+    List<FlowProgramStepConditionalThenPointer> getConditions();
+  }
+  @Value.Immutable  
+  interface FlowProgramStepConditionalThenPointer {
+    @Nullable
+    ExpressionProgram getExpression();
+    String getStepId();
+  }
+  
+  @Value.Immutable
+  interface FlowResult extends ProgramResult {
+    String getStepId();
+    String getShortHistory();
+    List<FlowResultLog> getLogs();
+    FlowExecutionStatus getStatus();
+    Map<String, Serializable> getAccepts();
+    Map<String, Serializable> getReturns();
   }
 
   @Value.Immutable
-  interface StepBody extends Serializable {
-    @Nullable
-    String getRef();
-    @Nullable
-    StepExpression getExpression();
-    
-    Map<String, String> getInputs();
-    boolean isCollection();
-  }
-
-  interface StepExpression extends Serializable {
-    boolean eval(FlowTaskExpressionContext context);
+  interface FlowResultLog extends Serializable {
+    Integer getId();
+    String getStepId();
+    LocalDateTime getStart();
+    LocalDateTime getEnd();
+    List<FlowResultErrorLog> getErrors();
+    FlowExecutionStatus getStatus();
+    Map<String, Serializable> getAccepts();
+    Map<String, Serializable> getReturns();
   }
   
-  interface FlowTaskExpressionContext extends Function<String, Object> {
+  @Value.Immutable
+  interface FlowResultErrorLog extends Serializable {
+    String getId();
+    String getMsg();
   }
-
-
-  enum FlowTaskType {
-    DT, SERVICE, USER_TASK, EMPTY, DECISION, EXCLUSIVE, MERGE, END
-  }
+  
+  enum FlowProgramStepPointerType { SWITCH, THEN, END }
+  enum FlowProgramStepRefType { SERVICE, DT } 
+  enum FlowExecutionStatus { COMPLETED, ERROR }
 }

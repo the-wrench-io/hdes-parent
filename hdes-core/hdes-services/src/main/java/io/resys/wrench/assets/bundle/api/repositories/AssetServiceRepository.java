@@ -39,8 +39,7 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
-import io.resys.wrench.assets.flow.api.FlowRepository;
-import io.resys.wrench.assets.script.api.ScriptRepository;
+import io.resys.hdes.client.api.programs.Program;
 
 public interface AssetServiceRepository {
 
@@ -53,8 +52,6 @@ public interface AssetServiceRepository {
   Migration readMigration(String json);
   String toSrc(MigrationValue migration);
   
-  ScriptRepository getStRepo();
-  FlowRepository getFlRepo();
   HdesClient getTypes();
   
   interface MigrationBuilder {
@@ -154,6 +151,7 @@ public interface AssetServiceRepository {
   }
 
   interface ServiceExecution {
+    <T extends Program<?>> T unwrap();
     ServiceExecution insert(Serializable bean);
     <T> void run(Consumer<T> serviceType);
     ServiceResponse run();

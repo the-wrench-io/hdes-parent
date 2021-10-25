@@ -1,6 +1,7 @@
 package io.resys.hdes.client.spi;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /*-
  * #%L
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -48,6 +50,7 @@ import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.ast.TypeDef.ValueTypeResolver;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
+import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
 import io.resys.hdes.client.spi.serializers.DateDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.DateTimeDataTypeDeserializer;
@@ -58,26 +61,22 @@ import io.resys.hdes.client.spi.serializers.TimeDataTypeDeserializer;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesTypeDefsFactory {
-
+  @FunctionalInterface
+  public interface ServiceInit {
+    <T> T get(Class<T> type);
+  }
+  
+  private final ServiceInit serviceInit;
+  private final HdesClientConfig config;
   private final Map<ValueType, Deserializer> deserializers;
   private final Map<ValueType, Serializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
   private final ObjectMapper objectMapper; 
-  
-  public HdesTypeDefsFactory(
-      ObjectMapper objectMapper,
-      Map<ValueType, Deserializer> deserializers,
-      Map<ValueType, Serializer> serializers,
-      ValueTypeResolver valueTypeResolver) {
-    super();
-    this.deserializers = deserializers;
-    this.serializers = serializers;
-    this.valueTypeResolver = valueTypeResolver;
-    this.objectMapper = objectMapper;
-  }
 
-  public HdesTypeDefsFactory(ObjectMapper objectMapper) {
+  public HdesTypeDefsFactory(ObjectMapper objectMapper, ServiceInit serviceInit, HdesClientConfig config) {
     this.objectMapper = objectMapper;
+    this.serviceInit = serviceInit;
+    this.config = config;
     
     Map<ValueType, Deserializer> deserializers = new HashMap<>();
     this.deserializers = Collections.unmodifiableMap(deserializers);
@@ -283,7 +282,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
-  public String commands(List<AstCommand> commands) {
+  public String commandsString(List<AstCommand> commands) {
     try {
       return objectMapper.writeValueAsString(commands);
     } catch (IOException e) {
@@ -291,15 +290,22 @@ public class HdesTypeDefsFactory {
     }
   }
   
-  public ArrayNode commands(String commands) {
+  public ArrayNode commandsJson(String commands) {
     try {
       return (ArrayNode) objectMapper.readTree(commands);
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
+  public List<AstCommand> commandsList(String commands) {
+    try {
+      return objectMapper.readValue(commands, new TypeReference<List<AstCommand>>() {});
+    } catch (IOException e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
   
-  public Map<String, Object> toMap(Object entity) {
+  public Map<String, Serializable> toMap(Object entity) {
     try {
       return objectMapper.convertValue(entity, Map.class);
     } catch (Exception e) {
@@ -307,11 +313,28 @@ public class HdesTypeDefsFactory {
     }
   }
   
-  public Map<String, Object> toMap(JsonNode entity) {
+  public Map<String, Serializable> toMap(JsonNode entity) {
     try {
       return objectMapper.convertValue(entity, Map.class);
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
+  
+  public Object toType(Object value, Class<?> toType) {
+    try {
+      return objectMapper.convertValue(value, toType);
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
+  
+  public ServiceInit getServiceInit() {
+    return this.serviceInit;
+  }
+  
+  public HdesClientConfig config() {
+    return config;
+  }
+   
 }

@@ -24,14 +24,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowSwitchNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
 import io.resys.hdes.client.api.ast.TypeDef;
@@ -39,194 +36,159 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
 import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
-import io.resys.hdes.client.api.programs.FlowProgram.StepBody;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepBody;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepConditionalThenPointer;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepEndPointer;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepPointer;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepPointerType;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepRefType;
 import io.resys.hdes.client.api.programs.ImmutableFlowProgram;
-import io.resys.hdes.client.api.programs.ImmutableStepBody;
+import io.resys.hdes.client.api.programs.ImmutableFlowProgramStep;
+import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepBody;
+import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepConditionalThenPointer;
+import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepEndPointer;
+import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepThenPointer;
+import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepWhenThenPointer;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
-import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.spi.flow.program.ImmutableStep;
-import io.resys.hdes.client.spi.flow.program.ImmutableStepExpression;
 
 public class FlowProgramBuilder {
-  private final HdesTypeDefsFactory typesFactory;
+  private static final FlowProgramStepEndPointer END_STEP_POINTER = ImmutableFlowProgramStepEndPointer.builder().type(FlowProgramStepPointerType.END).build();
+  private static final FlowProgramStep END_STEP = ImmutableFlowProgramStep.builder()
+      .id("end")
+      .pointer(END_STEP_POINTER)
+      .build();
 
-  private final Map<String, ImmutableStep> taskModels = new HashMap<>();
-  private final ImmutableStep endNode = new ImmutableStep("end", null, FlowTaskType.END);
-  private List<AstFlowTaskNode> tasksByOrder;
-  private Map<String, AstFlowTaskNode> tasksById;  
-  private String flowId;
+  private final HdesTypeDefsFactory typesFactory;
+  private final Map<String, FlowProgramStep> steps = new HashMap<>();
+  private final Map<String, AstFlowTaskNode> tasksById = new HashMap<>();
   
   public FlowProgramBuilder(HdesTypeDefsFactory typesFactory) {
     super();
     this.typesFactory = typesFactory;
   }
 
-  
   public FlowProgram build(AstFlow ast) {
-    final var data = ast.getSrc();
-    
-    this.flowId = AstFlowNodesFactory.getStringValue(data.getId());
-    this.tasksById = data.getTasks().values().stream()
-        .collect(Collectors.toMap(n -> AstFlowNodesFactory.getStringValue(n.getId()), n -> n));
-    
-    this.tasksByOrder = new ArrayList<>(data.getTasks().values());
-    Collections.sort(tasksByOrder);
-    
-    final var firstTask = data.getTasks().values().stream()
-        .filter(task -> task.getOrder() == 0)
-        .findFirst().orElse(null);
+    final var flowId = visitFlowId(ast);
+    final var firstTask = visitTasksById(ast);
+    final var firstStep = firstTask == null ? END_STEP: visitTask(firstTask);
 
-    final ImmutableStep task = tasksById.isEmpty() ? ImmutableStep.EMPTY: visitTasks(firstTask);
-    
-    final Map<String, Step> steps = new HashMap<>();
-    visitSteps(steps, task);
     
     return ImmutableFlowProgram.builder()
-        .id(flowId)
-        .ast(ast)
-        .step(task)
-        .steps(steps.values())
-        .acceptDefs(visitAcceptDefs(data))
+        .startStepId(firstStep.getId())
+        .steps(steps)
+        .acceptDefs(visitAcceptDefs(ast))
         .build();
   }
-
-  private void visitSteps(Map<String, Step> visited, Step node) {
-    if(visited.containsKey(node.getId())) {
-      return;
-    }
-    visited.put(node.getId(), node);
-    node.getNext().forEach(n -> visitSteps(visited, n));
+  
+  private String visitFlowId(AstFlow ast) {
+    final var data = ast.getSrc();
+    return AstFlowNodesFactory.getStringValue(data.getId());
   }
 
+  private AstFlowTaskNode visitTasksById(AstFlow ast) {
+    AstFlowTaskNode firstTask = null;
+    final var data = ast.getSrc();
+    for(final var task : data.getTasks().values()) {
+      tasksById.put(AstFlowNodesFactory.getStringValue(task.getId()), task);
+      if(task.getOrder() == 0) {
+        firstTask = task;
+      }
+    }
+    return firstTask;
+  }
 
-  private ImmutableStep visitTasks(AstFlowTaskNode task) {
+  private FlowProgramStep visitTask(AstFlowTaskNode task) {
     String taskId = AstFlowNodesFactory.getStringValue(task.getId());
-    if(taskModels.containsKey(taskId)) {
-      return taskModels.get(taskId);
+    if(steps.containsKey(taskId)) {
+      return steps.get(taskId);
     }
 
-    FlowTaskType type = getTaskType(task);
-    StepBody taskValue = createFlowTaskValue(task, type);
-    final ImmutableStep result = new ImmutableStep(taskId, taskValue, type);
-    taskModels.put(taskId, result);
-
-    final ImmutableStep intermediate;
-
-    if(type != FlowTaskType.EMPTY) {
-      intermediate = new ImmutableStep(taskId + "-" + FlowTaskType.MERGE, null, FlowTaskType.MERGE);
-      result.addNext(intermediate);
-    } else {
-      intermediate = result;
-    }
-
-    boolean isEnd = endNode.getId().equals(AstFlowNodesFactory.getStringValue(task.getThen()));
-    String then = AstFlowNodesFactory.getStringValue(task.getThen());
-
-    // Add next
-    if(then != null && !isEnd) {
-      intermediate.addNext(visitTasks(tasksById.get(getThenTaskId(task, then, type))));
-    }
-
-    if(isEnd) {
-      intermediate.addNext(endNode);
-    }
-
-    // Only exclusive decisions have next in here
-    if(task.getSwitch().isEmpty()) {
-      return result;
-    }
-
-    // Exclusive decision gateway
-    ImmutableStep exclusive = new ImmutableStep(taskId + "-" + FlowTaskType.EXCLUSIVE, null, FlowTaskType.EXCLUSIVE);
-    intermediate.addNext(exclusive);
-
-    List<AstFlowSwitchNode> decisions = new ArrayList<>(task.getSwitch().values());
-    Collections.sort(decisions, (o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
-
-    for(AstFlowSwitchNode decision : decisions) {
-      String decisionId = decision.getKeyword();
-
-      try {
-        String when = AstFlowNodesFactory.getStringValue(decision.getWhen());
-        String thenValue = AstFlowNodesFactory.getStringValue(decision.getThen());
-        
-        final var isTrue = when == null || when.isBlank();
-        final var expression = isTrue ? 
-            typesFactory.expression(ValueType.FLOW_CONTEXT, "true") :
-            typesFactory.expression(ValueType.FLOW_CONTEXT, when);
-        
-        Map<String, String> inputMapping = new HashMap<>();
-        expression.getConstants().forEach(name -> inputMapping.put(name, name));
-        
-        final var body = ImmutableStepBody.builder()
-            .expression(new ImmutableStepExpression(expression))
-            .isCollection(false)
-            .inputs(inputMapping)
-            .build();
-
-        ImmutableStep next = new ImmutableStep(decisionId, body, FlowTaskType.DECISION);
-        exclusive.addNext(next);
-
-        if(thenValue != null && !endNode.getId().equals(thenValue)) {
-          next.addNext(visitTasks(tasksById.get(getThenTaskId(task, thenValue, type))));
-        }
-
-      } catch(Exception e) {
-        String message = "Failed to evaluate expression: \"" + taskId + "\" in flow: " + flowId + ", decision: " + decisionId + "!" + System.lineSeparator() + e.getMessage();
-        throw new FlowAstException(message, e);
-      }
-    }
-
-    return result;
+    final var body = visitStepBody(task);
+    final var pointer = visitStepPointer(task);
+    
+    final var step = ImmutableFlowProgramStep.builder()
+        .id(taskId)
+        .body(body)
+        .pointer(pointer)
+        .build();
+    
+    steps.put(step.getId(), step);
+    return step;
   }
 
-  private String getThenTaskId(AstFlowTaskNode task, String then, FlowTaskType type) {
-    if(!NodeFlowBean.VALUE_NEXT.equalsIgnoreCase(then)) {
-      return then;
+  public FlowProgramStepBody visitStepBody(AstFlowTaskNode task) {
+    if(task.getDecisionTable() == null && task.getService() == null) {
+      return null;
     }
 
-    AstFlowTaskNode next = null;
-    for(AstFlowTaskNode node : tasksByOrder) {
-      if(node.getStart() > task.getStart()) {
-        next = node;
-      }
+    final var collection = AstFlowNodesFactory.getBooleanValue(task.getRef().getCollection());
+    final var ref = AstFlowNodesFactory.getStringValue(task.getRef().getRef());
+    final var inputs = new HashMap<String, String>();
+    for(Map.Entry<String, AstFlowNode> entry : task.getRef().getInputs().entrySet()) {
+      inputs.put(entry.getKey(), AstFlowNodesFactory.getStringValue(entry.getValue()));
     }
-
-    if(next == null) {
-      String taskId = AstFlowNodesFactory.getStringValue(task.getId());
-      String message = "There are no next task after: \"" + taskId + "\" in flow: " + flowId + ", decision: " + taskId + "!";
-      throw new FlowAstException(message);
-    }
-    return AstFlowNodesFactory.getStringValue(next.getId());
-  }
-
-  public StepBody createFlowTaskValue(AstFlowTaskNode task, FlowTaskType type) {
-    if(type == FlowTaskType.SERVICE || type == FlowTaskType.DT || type == FlowTaskType.USER_TASK) {
-
-      boolean collection = AstFlowNodesFactory.getBooleanValue(task.getRef().getCollection());
-      String ref = AstFlowNodesFactory.getStringValue(task.getRef().getRef());
-      Map<String, String> inputs = new HashMap<>();
-      for(Map.Entry<String, AstFlowNode> entry : task.getRef().getInputs().entrySet()) {
-        inputs.put(entry.getKey(), AstFlowNodesFactory.getStringValue(entry.getValue()));
-      }
-      return ImmutableStepBody.builder()
-          .isCollection(collection)
-          .ref(ref)
-          .putAllInputs(inputs)
-          .build();
-    } else if(type == FlowTaskType.EMPTY) {
-      return ImmutableStepBody.builder().isCollection(false).build();
-    }
-
-    throw new IllegalArgumentException("Can't create task value from type: " + type + "!");
+    
+    final var refType = task.getDecisionTable() != null ? FlowProgramStepRefType.DT : FlowProgramStepRefType.SERVICE;
+    return ImmutableFlowProgramStepBody.builder()
+        .ref(ref).refType(refType)
+        .collection(collection)
+        .inputMapping(inputs)
+        .build();
   }
   
 
-  private Collection<TypeDef> visitAcceptDefs(AstFlowRoot data) {
-    Map<String, AstFlowInputNode> inputs = data.getInputs();
+  private FlowProgramStepPointer visitStepPointer(AstFlowTaskNode task) {
+    if(!task.getSwitch().isEmpty()) {
+      final var pointer = ImmutableFlowProgramStepWhenThenPointer.builder().type(FlowProgramStepPointerType.SWITCH);
+      final var decisions = new ArrayList<AstFlowSwitchNode>(task.getSwitch().values());
+      Collections.sort(decisions, (o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
+      decisions.forEach(d -> {
+        
+        final var condition = visitSwitchNode(d);
+        if(!condition.getStepId().equals(END_STEP.getId())) {
+          visitTask(tasksById.get(condition.getStepId()));
+        }
+        pointer.addConditions(condition);
+        
+        
+      });
+      return pointer.build();
+    }
+    
+    final var thenId = AstFlowNodesFactory.getStringValue(task.getThen());
+    if(thenId != null && !thenId.equals(END_STEP.getId())) {
+      visitTask(tasksById.get(thenId));
+      return ImmutableFlowProgramStepThenPointer.builder()
+          .type(FlowProgramStepPointerType.THEN)
+          .stepId(thenId)
+          .build();
+    }
+    
+    return END_STEP_POINTER;
+  }
+  
+  private FlowProgramStepConditionalThenPointer visitSwitchNode(AstFlowSwitchNode decision) {
+    final var condition = ImmutableFlowProgramStepConditionalThenPointer.builder();
+    final var decisionId = decision.getKeyword();
+    final var when = AstFlowNodesFactory.getStringValue(decision.getWhen());
+    final var thenValue = AstFlowNodesFactory.getStringValue(decision.getThen());    
+    try {
+      final var isTrue = when == null || when.isEmpty();
+      final var expression = isTrue ? 
+          typesFactory.expression(ValueType.FLOW_CONTEXT, "true") :
+          typesFactory.expression(ValueType.FLOW_CONTEXT, when);
+      condition.expression(expression).stepId(thenValue);
+    } catch(Exception e) {
+      final var message = "Failed to evaluate expression: \"" + when + "\" in flow decision: " + decisionId + "!" + System.lineSeparator() + e.getMessage();
+      throw new FlowAstException(message, e);
+    } 
+    return condition.build();
+  }
+  
+  private Collection<TypeDef> visitAcceptDefs(AstFlow ast) {
+    Map<String, AstFlowInputNode> inputs = ast.getSrc().getInputs();
 
     int index = 0;
     Collection<TypeDef> result = new ArrayList<>();
@@ -250,17 +212,5 @@ public class FlowProgramBuilder {
       }
     }
     return Collections.unmodifiableCollection(result);
-  }
-
-  private static FlowTaskType getTaskType(AstFlowTaskNode task) {
-    if (task.getUserTask() != null) {
-      return FlowTaskType.USER_TASK;
-    } else if (task.getDecisionTable() != null) {
-      return FlowTaskType.DT;
-    } else if (task.getService() != null) {
-      return FlowTaskType.SERVICE;
-    }
-
-    return FlowTaskType.EMPTY;
   }
 }

@@ -32,12 +32,13 @@ import java.util.stream.Collectors;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.FlowProgram.FlowTaskType;
-import io.resys.hdes.client.api.programs.FlowProgram.Step;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepRefType;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociation;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceAssociationType;
@@ -61,14 +62,14 @@ public class FlowServiceDataModelBuilder {
     this.serviceStore = serviceStore;
   }
 
-  public ServiceDataModel build(String id, FlowProgram flowModel, Timestamp modified) {
+  public ServiceDataModel build(String id, AstFlow flowModel, Timestamp modified) {
     List<TypeDef> params = new ArrayList<>(flowModel.getAcceptDefs());
     Map<String, TypeDef> allParams = createModelParameterMap(flowModel, params);
 
     List<ServiceError> errors = new ArrayList<>();
     List<ServiceAssociation> assocs = new ArrayList<>();
 
-    for(Step taskModel : flowModel.getSteps()) {
+    for(FlowProgramStep taskModel : flowModel.getSteps().values()) {
 
       ServiceType serviceType = getServiceType(taskModel);
       if(serviceType != null) {
@@ -109,8 +110,8 @@ public class FlowServiceDataModelBuilder {
         } else {
           assocs.add(new ImmutableServiceAssociation(taskModel.getId(), taskServiceName, serviceType, isTaskServiceCollection(taskModel) ? ServiceAssociationType.ONE_TO_MANY : ServiceAssociationType.ONE_TO_ONE, Direction.OUT));
         }
-      } else if(taskModel.getType() == FlowTaskType.DECISION) {
-        for(Map.Entry<String, String> input : taskModel.getBody().getInputs().entrySet()) {
+      } else if(taskModel.getBody() != null && taskModel.getBody().getRefType() == FlowProgramStepRefType.DT) {
+        for(Map.Entry<String, String> input : taskModel.getBody().getInputMapping().entrySet()) {
           if(!allParams.containsKey(input.getKey())) {
             errors.add(new ImmutableServiceError("flowTaskExpressionParamMissing", "Task: " + taskModel.getId() + ", is missing input: '" + input.getKey() + "'!"));
           }
@@ -119,7 +120,7 @@ public class FlowServiceDataModelBuilder {
     }
 
     return new ImmutableServiceDataModel(
-        id, flowModel.getId(), flowModel.getAst().getDescription(),
+        id, ast.getName(), ast.getDescription(),
         ServiceType.FLOW,
         flowModel.getClass(),
         errors.isEmpty() ? ServiceStatus.OK : ServiceStatus.ERROR,
@@ -131,7 +132,7 @@ public class FlowServiceDataModelBuilder {
 
 
   protected Map<String, TypeDef> getTaskServiceInput(
-      Step taskModel, Map<String, TypeDef> allParams,
+      FlowProgramStep taskModel, Map<String, TypeDef> allParams,
       AssetService refService) {
 
     Map<String, TypeDef> serviceTypes = refService.getDataModel().getParams().stream()
@@ -139,7 +140,7 @@ public class FlowServiceDataModelBuilder {
     .collect(Collectors.toMap(p -> p.getName(), p -> p));
 
     Map<String, TypeDef> result = new HashMap<>();
-    for(Map.Entry<String, String> entry : taskModel.getBody().getInputs().entrySet()) {
+    for(Map.Entry<String, String> entry : taskModel.getBody().getInputMapping().entrySet()) {
       if(!serviceTypes.containsKey(entry.getKey())) {
         errors.add(new ImmutableServiceError("flowTaskParamUnknown", "Task: " + taskModel.getId() + ", has unknown input: '" + entry.getKey() + "'!"));
       } else if(allParams.containsKey(entry.getValue())) {
@@ -154,7 +155,7 @@ public class FlowServiceDataModelBuilder {
     Map<String, TypeDef> result = new HashMap<>();
     params.forEach(p -> result.put(p.getName(), p));
 
-    for(Step taskModel : flowModel.getSteps()) {
+    for(FlowProgramStep taskModel : flowModel.getSteps().values()) {
       String taskServiceName = getTaskServiceName(taskModel);
       ServiceType serviceType = getServiceType(taskModel);
       if(serviceType == null) {
@@ -185,14 +186,17 @@ public class FlowServiceDataModelBuilder {
     return new GenericServiceQuery(serviceStore);
   }
 
-  protected boolean isTaskServiceCollection(Step taskModel) {
-    return taskModel.getBody() != null ? taskModel.getBody().isCollection() : false;
+  protected boolean isTaskServiceCollection(FlowProgramStep taskModel) {
+    return taskModel.getBody() != null ? taskModel.getBody().getCollection() : false;
   }
-  protected String getTaskServiceName(Step taskModel) {
+  protected String getTaskServiceName(FlowProgramStep taskModel) {
     return taskModel.getBody() != null ? taskModel.getBody().getRef() : null;
   }
-  protected ServiceType getServiceType(Step taskModel) {
-    switch(taskModel.getType()) {
+  protected ServiceType getServiceType(FlowProgramStep taskModel) {
+    if(taskModel.getBody() == null) {
+      return null;
+    }
+    switch(taskModel.getBody().getRefType()) {
     case DT: return ServiceType.DT;
     case SERVICE: return ServiceType.FLOW_TASK;
     default: return null;

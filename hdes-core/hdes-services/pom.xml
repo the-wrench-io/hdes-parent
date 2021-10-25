@@ -21,14 +21,8 @@
   <dependencies>
     <dependency>
       <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-flow</artifactId>
+      <artifactId>hdes-client-api</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-script</artifactId>
-    </dependency>
-
- 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-csv</artifactId>

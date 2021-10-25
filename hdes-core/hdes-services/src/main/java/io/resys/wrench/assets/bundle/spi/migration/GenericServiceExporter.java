@@ -41,7 +41,6 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
-import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Migration;
@@ -92,21 +91,14 @@ public class GenericServiceExporter implements MigrationBuilder {
   }
 
   private MigrationValue visitSt(AssetService service) throws IOException {
-    final var builder = ImmutableMigrationValue.builder().id(md5(service.getSrc())).name(service.getName()).type(ServiceType.FLOW_TASK);
-    ServiceProgram commandModel  = serviceRepository.getStRepo().createBuilder().src(service.getSrc()).build();
-    BufferedReader br = new BufferedReader(new StringReader(commandModel.getAst().getSource()));
-    try {
-      String line;
-      int index = 0;
-      while ((line = br.readLine()) != null) {
-        final var command = ImmutableAstCommand.builder().id(String.valueOf(index++)).value(line)
-            .type(AstCommandValue.ADD).build();
-        builder.addCommands(command);
-      }
-    } finally {
-      br.close();
-    }
-    return builder.build();
+    final var st = serviceRepository.getTypes().ast().commands(service.getSrc()).service();
+  
+    return ImmutableMigrationValue.builder()
+        .id(md5(service.getSrc()))
+        .type(ServiceType.FLOW_TASK)
+        .name(service.getName())
+        .addAllCommands(objectMapper.readValue(st.getSource(), new TypeReference<List<AstCommand>>() {}))
+        .build();
   }
 
   private MigrationValue visitFl(AssetService service) throws IOException {

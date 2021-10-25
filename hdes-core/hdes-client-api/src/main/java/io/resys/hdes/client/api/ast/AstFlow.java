@@ -124,9 +124,4 @@ public interface AstFlow extends AstBody, Serializable {
     int getStart();
     int getEnd();
   }
-  
-  interface AstFlowNodeVisitor {
-    void visit(AstFlowRoot node, ImmutableAstFlow.Builder nodesBuilder);
-  }
-
 }

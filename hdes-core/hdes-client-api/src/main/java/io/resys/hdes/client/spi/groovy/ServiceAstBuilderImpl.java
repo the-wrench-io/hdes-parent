@@ -36,11 +36,16 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesAstTypes.ServiceAstBuilder;
-import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.Headers;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstService.AstServiceType;
+import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType;
+import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType0;
+import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType1;
+import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType2;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.ImmutableAstService;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
@@ -114,20 +119,41 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     final var source = buildSource(value);
     
     try {
-      final Class<?> beanType = gcl.parseClass(source);
+      @SuppressWarnings("unchecked")
+      final Class<ServiceExecutorType> beanType = gcl.parseClass(source);
+      final AstServiceType executorType;
+      if(ServiceExecutorType0.class.isAssignableFrom(beanType)) {
+        executorType = AstServiceType.TYPE_0;
+      } else if(ServiceExecutorType1.class.isAssignableFrom(beanType)) {
+        executorType = AstServiceType.TYPE_1;
+      } else if(ServiceExecutorType2.class.isAssignableFrom(beanType)) {
+        executorType = AstServiceType.TYPE_2;
+      } else {
+        throw new ServiceAstException(
+            System.lineSeparator() +
+            "Failed to generate groovy service ast because service executor type could not be determined for: " + System.lineSeparator() +
+            source + System.lineSeparator()); 
+      }
+      
       final Headers method = getHeaders(beanType);
       
       return ImmutableAstService.builder()
-          .bodyType(EntityType.FLOW_TASK)
+          .bodyType(AstBodyType.FLOW_TASK)
           .name(beanType.getSimpleName())
           .headers(method)
           .source(source)
           .rev(changes.getCommands().size())
           .commands(changes.getCommands())
-          .type(beanType)
+          .beanType(beanType)
+          .executorType(executorType)
           .build();
+    } catch(ServiceAstException e) {
+      throw e;
     } catch (Exception e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new ServiceAstException(
+          System.lineSeparator() +
+          "Failed to generate groovy service ast from: " + System.lineSeparator() +
+          source + System.lineSeparator() + e.getMessage(), e);
     }
   }
   
@@ -166,7 +192,6 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
       result.addAcceptDefs(dataTypeBuilder.build());
     }
 
-    index = 0;
     Class<?> returnType = method.getReturnType();
     if(!returnType.isAnnotationPresent(ServiceData.class)) {
       throw new ServiceAstException("'execute' must be void or return type must define: " + ServiceData.class.getCanonicalName() + "!");

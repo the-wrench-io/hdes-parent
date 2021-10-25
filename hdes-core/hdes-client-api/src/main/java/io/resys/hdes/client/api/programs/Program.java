@@ -22,21 +22,35 @@ package io.resys.hdes.client.api.programs;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
+
+import org.immutables.value.Value;
+
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 public interface Program<A extends AstBody> extends Serializable {
-  String getId();
-  A getAst();
   
   interface ProgramResult extends Serializable {
-    
-  }
+  }  
   
   interface ProgramContext {
+    ProgramContextNamedValue getValue(String typeDefName);
     Serializable getValue(TypeDef typeDef);
-    FlowProgram getFlowProgram(String name);
-    DecisionProgram getDecisionProgram(String name);
-    ServiceProgram getServiceProgram(String name);
+    ProgramSupplier getPrograms();
+  }
+  
+  interface ProgramSupplier {
+    FlowProgram getFlow(String name);
+    DecisionProgram getDecision(String name);
+    ServiceProgram getService(String name);
+  }
+  
+  @Value.Immutable
+  interface ProgramContextNamedValue {
+    Boolean getFound();
+    
+    @Nullable
+    Serializable getValue();
   }
 }

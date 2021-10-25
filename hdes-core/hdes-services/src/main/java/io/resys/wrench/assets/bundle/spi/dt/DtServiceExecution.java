@@ -32,6 +32,7 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
+import io.resys.hdes.client.api.programs.Program;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
 
@@ -80,5 +81,10 @@ public class DtServiceExecution implements ServiceExecution {
   @Override
   public <T> void run(Consumer<T> serviceType) {
     serviceType.accept((T) decisionTable);
+  }
+
+  @Override
+  public <T extends Program<?>> T unwrap() {
+    return (T) decisionTable;
   }
 }

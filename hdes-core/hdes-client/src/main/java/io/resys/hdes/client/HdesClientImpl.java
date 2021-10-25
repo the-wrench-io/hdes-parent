@@ -62,7 +62,7 @@ public class HdesClientImpl implements HdesClient {
   }
 
   @Override
-  public HdesAstTypes astTypes() {
+  public HdesAstTypes types() {
     // TODO Auto-generated method stub
     throw new RuntimeException("Need to implemented the client");
   }
@@ -71,6 +71,12 @@ public class HdesClientImpl implements HdesClient {
   public CSVBuilder csv() {
     // TODO Auto-generated method stub
     throw new RuntimeException("Need to implemented the client");
+  }
+
+  @Override
+  public EnvirBuilder envir() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }
