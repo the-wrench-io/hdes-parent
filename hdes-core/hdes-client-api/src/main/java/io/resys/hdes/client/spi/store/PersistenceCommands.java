@@ -11,6 +11,11 @@ import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.exceptions.StoreException;
 import io.resys.hdes.client.spi.store.PersistenceConfig.EntityState;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
+import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
+import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
+import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
+import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsStatus;
+import io.smallrye.mutiny.Uni;
 
 /*-
  * #%L
@@ -32,11 +37,7 @@ import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
  * #L%
  */
 
-import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
-import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
-import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
-import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsStatus;
-import io.smallrye.mutiny.Uni;
+
 
 
 public class PersistenceCommands implements PersistenceConfig.Commands {
@@ -51,7 +52,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   public <T extends AstBody> Uni<StoreEntity> delete(StoreEntity toBeDeleted) {
     return config.getClient().commit().head()
         .head(config.getRepoName(), config.getHeadName())
-        .message("delete type: '" + toBeDeleted.getType() + "', with id: '" + toBeDeleted.getId() + "'")
+        .message("Delete type: '" + toBeDeleted.getType() + "', with id: '" + toBeDeleted.getId() + "'")
         .parentIsLatest()
         .author(config.getAuthorProvider().getAuthor())
         .remove(toBeDeleted.getId())
@@ -76,7 +77,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   public <T extends AstBody> Uni<StoreEntity> save(StoreEntity toBeSaved) {
     return config.getClient().commit().head()
       .head(config.getRepoName(), config.getHeadName())
-      .message("update type: '" + toBeSaved.getType() + "', with id: '" + toBeSaved.getId() + "'")
+      .message("Save type: '" + toBeSaved.getType() + "', with id: '" + toBeSaved.getId() + "'")
       .parentIsLatest()
       .author(config.getAuthorProvider().getAuthor())
       .append(toBeSaved.getId(), config.getSerializer().toString(toBeSaved))
@@ -85,9 +86,10 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
           return toBeSaved;
         }
         // TODO
-        throw new StoreException("DELETE_FAIL", toBeSaved, convertMessages(commit));
+        throw new StoreException("SAVE_FAIL", toBeSaved, convertMessages(commit));
       });
   }
+
 
   @Override
   public Uni<Collection<StoreEntity>> save(Collection<StoreEntity> entities) {
@@ -99,7 +101,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
     }
     
     return commitBuilder
-        .message("update type: '" + first.getType() + "', with id: '" + first.getId() + "'")
+        .message("Save type: '" + first.getType() + "', with id: '" + first.getId() + "'")
         .parentIsLatest()
         .author(config.getAuthorProvider().getAuthor())
         .build().onItem().transform(commit -> {

@@ -57,7 +57,6 @@ public class HdesClientImpl implements HdesClient {
 
   @Override
   public HdesStore store() {
-    // TODO Auto-generated method stub
     return new HdesDocumentStore(config);
   }
 

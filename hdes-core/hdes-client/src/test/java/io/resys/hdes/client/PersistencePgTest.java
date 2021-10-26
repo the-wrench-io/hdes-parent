@@ -42,7 +42,6 @@ import io.resys.hdes.client.config.RepositoryToStaticData;
 @TestProfile(PgProfile.class)
 public class PersistencePgTest extends PgTestTemplate {
 
-  @Disabled
   @Test
   public void starter() {
     final var repo = getHdes("test1");

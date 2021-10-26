@@ -1,5 +1,8 @@
 package io.resys.hdes.client.spi.store;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 /*-
  * #%L
  * hdes-client-api
@@ -23,6 +26,12 @@ package io.resys.hdes.client.spi.store;
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.UpdateAstType;
 import io.resys.hdes.client.api.HdesStore.UpdateBuilder;
+import io.resys.hdes.client.api.ImmutableStoreEntity;
+import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.exceptions.StoreException;
+import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
+import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.smallrye.mutiny.Uni;
 
 public class DocumentUpdateBuilder extends PersistenceCommands implements UpdateBuilder {
@@ -33,9 +42,49 @@ public class DocumentUpdateBuilder extends PersistenceCommands implements Update
 
   @Override
   public Uni<StoreEntity> build(UpdateAstType updateType) {
-    // TODO Auto-generated method stub
-    return null;
+    final var gid = gid(updateType.getType());
+
+    final StoreEntity entity = ImmutableStoreEntity.builder()
+        .id(gid)
+        .type(updateType.getType())
+        .value("")
+        .body(updateType.getBody())
+        .build();
+    
+    String message = "Update type";
+    String code = "UPDATE"; //TODO
+    return saveCommit(gid, entity, message, code);
   }
 
-
+  private Uni<StoreEntity> saveCommit(
+      final String gid, final StoreEntity entity, String message,
+      String code) {
+    return config.getClient().commit().head()
+      .head(config.getRepoName(), config.getHeadName())
+      .message(message)
+      .parentIsLatest()
+      .author(getAuthor())
+      .append(gid, config.getSerializer().toString(entity))
+      .build().onItem().transform(commit -> {
+        if(commit.getStatus() == CommitStatus.OK) {
+          return entity;
+        }
+        throw new StoreException(code, (StoreEntity)entity,
+            ImmutableStoreExceptionMsg.builder()
+            .addAllArgs(getCommitMessages(commit))
+            .build());
+      });
+  }
+  
+  private String gid(AstBodyType type) {
+    return config.getGidProvider().getNextId(type);
+  }
+  
+  private List<String> getCommitMessages(CommitResult commit) {
+    return commit.getMessages().stream().map(commitMessage->commitMessage.getText()).collect(Collectors.toList());
+  }
+  
+  private String getAuthor() {
+    return config.getAuthorProvider().getAuthor();
+  }
 }

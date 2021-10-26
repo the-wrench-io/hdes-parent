@@ -1,1 +1,20 @@
-// replace after test success
+
+Repo
+  - id: 1, rev: 2
+    name: test1
+
+Refs
+  - 3: main
+
+Tags
+
+Commits
+  - id: 3
+    tree: 4, parent: , message: Save type: 'FLOW', with id: 'FLOW-1'
+
+Trees
+  - id: 4
+    5: FLOW-1
+
+Blobs
+  - 5: {"id":"FLOW-1","value":"","type":"FLOW","body":[{"id":"0","value":"id: first-flow","type":"ADD"},{"id":"1","value":"description: ","type":"ADD"}]}

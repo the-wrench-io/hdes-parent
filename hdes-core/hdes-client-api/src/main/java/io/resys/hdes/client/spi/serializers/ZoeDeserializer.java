@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
+import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.spi.store.PersistenceConfig;
@@ -41,7 +42,6 @@ public class ZoeDeserializer implements PersistenceConfig.Deserializer {
     this.objectMapper = objectMapper;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <T extends AstBody> StoreEntity fromString(AstBodyType entityType, String value) {
     try {
@@ -70,13 +70,13 @@ public class ZoeDeserializer implements PersistenceConfig.Deserializer {
 
       switch (type) {
       case DT: {
-        return objectMapper.convertValue(node, new TypeReference<StoreEntity>() {});
+        return objectMapper.convertValue(node, new TypeReference<ImmutableStoreEntity>() {});
       }
       case FLOW: {
-        return objectMapper.convertValue(node, new TypeReference<StoreEntity>() {});
+        return objectMapper.convertValue(node, new TypeReference<ImmutableStoreEntity>() {});
       }
       case FLOW_TASK: {
-        return objectMapper.convertValue(node, new TypeReference<StoreEntity>() {});
+        return objectMapper.convertValue(node, new TypeReference<ImmutableStoreEntity>() {});
       }
       default:
         throw new RuntimeException("can't map: " + node);
