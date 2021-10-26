@@ -7,7 +7,6 @@ import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
-import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.exceptions.StoreException;
 import io.resys.hdes.client.spi.store.PersistenceConfig.EntityState;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
@@ -49,7 +48,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   }
   
   @Override
-  public <T extends AstBody> Uni<StoreEntity> delete(StoreEntity toBeDeleted) {
+  public Uni<StoreEntity> delete(StoreEntity toBeDeleted) {
     return config.getClient().commit().head()
         .head(config.getRepoName(), config.getHeadName())
         .message("Delete type: '" + toBeDeleted.getType() + "', with id: '" + toBeDeleted.getId() + "'")
@@ -67,6 +66,8 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   
   private StoreExceptionMsg convertMessages(CommitResult commit) {
     return ImmutableStoreExceptionMsg.builder()
+        .id(commit.getGid())
+        .value("") //TODO
         .addAllArgs(commit.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
         .build();
   }
@@ -74,7 +75,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
 
   
   @Override
-  public <T extends AstBody> Uni<StoreEntity> save(StoreEntity toBeSaved) {
+  public Uni<StoreEntity> save(StoreEntity toBeSaved) {
     return config.getClient().commit().head()
       .head(config.getRepoName(), config.getHeadName())
       .message("Save type: '" + toBeSaved.getType() + "', with id: '" + toBeSaved.getId() + "'")
@@ -120,7 +121,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   }
 
   @Override
-  public <T extends AstBody> Uni<EntityState<T>> get(String id) {
+  public Uni<EntityState> getEntityState(String id) {
     return config.getClient()
         .objects().blobState()
         .repo(config.getRepoName())
@@ -135,7 +136,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
           StoreEntity start = (StoreEntity) config.getDeserializer()
               .fromString(state.getObjects().getBlob().getValue());
           
-          var result = ImmutableEntityState.<T>builder()
+          var result = ImmutableEntityState.builder()
               .src(state)
               .entity(start)
               .build();

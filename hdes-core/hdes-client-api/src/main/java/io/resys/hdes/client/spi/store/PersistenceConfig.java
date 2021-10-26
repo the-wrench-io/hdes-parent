@@ -65,16 +65,16 @@ public interface PersistenceConfig {
   }
   
   @Value.Immutable
-  interface EntityState<T extends AstBody> {
+  interface EntityState {
     ObjectsResult<BlobObject> getSrc();
     StoreEntity getEntity();
   }
   
   interface Commands {
-    <T extends AstBody> Uni<StoreEntity> delete(StoreEntity toBeDeleted);
+    Uni<StoreEntity> delete(StoreEntity toBeDeleted);
     Uni<StoreState> get();
-    <T extends AstBody> Uni<EntityState<T>> get(String id);
-    <T extends AstBody> Uni<StoreEntity> save(StoreEntity toBeSaved);
+    Uni<EntityState> getEntityState(String id);
+    Uni<StoreEntity> save(StoreEntity toBeSaved);
     Uni<Collection<StoreEntity>> save(Collection<StoreEntity> toBeSaved);
   }  
 }
