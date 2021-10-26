@@ -24,47 +24,24 @@ public class GitDataSourceImpl implements HdesStore {
     this.location = location;
     this.conn = conn;
   }
+  
   @Override
-  public CreateBuilder create() {
-    return new CreateBuilder() {
-      
-      @Override
-      public Uni<StoreEntity> service(String id) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      
-      @Override
-      public Uni<StoreEntity> flow(String id) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      
-      @Override
-      public Uni<StoreEntity> decision(String id) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-      
-      @Override
-      public Uni<StoreEntity> build(CreateAstType newType) {
-        // TODO Auto-generated method stub
-        return null;
-      }
-    };
+  public Uni<StoreEntity> create(CreateAstType newType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  @Override
+  public Uni<StoreEntity> update(UpdateAstType updateType) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  @Override
+  public Uni<StoreEntity> delete(DeleteAstType deleteType) {
+    // TODO Auto-generated method stub
+    return null;
   }
   @Override
   public QueryBuilder query() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override
-  public DeleteBuilder delete() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  @Override
-  public UpdateBuilder update() {
     // TODO Auto-generated method stub
     return null;
   }

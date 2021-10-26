@@ -34,31 +34,17 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.smallrye.mutiny.Uni;
 
 public interface HdesStore {
-  CreateBuilder create();
+  Uni<StoreEntity> create(CreateAstType newType);
+  Uni<StoreEntity> update(UpdateAstType updateType);
+  Uni<StoreEntity> delete(DeleteAstType deleteType);
   QueryBuilder query();
-  DeleteBuilder delete();
-  UpdateBuilder update();
-  
-  interface DeleteBuilder {
-    Uni<StoreEntity> build(DeleteAstType deleteType);
-  }
-  
-  interface UpdateBuilder {
-    Uni<StoreEntity> build(UpdateAstType updateType); 
-  }
-  
+
+   
   interface QueryBuilder {
     Uni<StoreState> get();
     Uni<StoreEntity> get(String id);
   }
   
-  interface CreateBuilder {
-    Uni<StoreEntity> flow(String name);
-    Uni<StoreEntity> decision(String name);
-    Uni<StoreEntity> service(String name);
-    Uni<StoreEntity> build(CreateAstType newType);
-  }
-
   @JsonSerialize(as = ImmutableDeleteAstType.class)
   @JsonDeserialize(as = ImmutableDeleteAstType.class)
   @Value.Immutable
