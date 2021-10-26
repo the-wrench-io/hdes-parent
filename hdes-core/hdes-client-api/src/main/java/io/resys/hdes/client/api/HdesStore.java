@@ -66,8 +66,8 @@ public interface HdesStore {
     String getId();
   }
   
-  @JsonSerialize(as = ImmutableCreateAstType.class)
-  @JsonDeserialize(as = ImmutableCreateAstType.class)
+  @JsonSerialize(as = ImmutableUpdateAstType.class)
+  @JsonDeserialize(as = ImmutableUpdateAstType.class)
   @Value.Immutable
   interface UpdateAstType extends Serializable {
     String getId();
@@ -79,8 +79,9 @@ public interface HdesStore {
   @JsonDeserialize(as = ImmutableCreateAstType.class)
   @Value.Immutable
   interface CreateAstType extends Serializable {
-    String getName();
+    String getId();
     AstBodyType getType();
+    List<AstCommand> getBody();
   }
   
   @JsonSerialize(as = ImmutableStoreState.class)
@@ -93,10 +94,10 @@ public interface HdesStore {
   }
   
   @JsonSerialize(as = ImmutableStoreEntity.class)
+  @JsonDeserialize(as = ImmutableStoreEntity.class)
   @Value.Immutable
   interface StoreEntity {
     String getId();
-    String getValue();
     AstBodyType getType();
     List<AstCommand> getBody();
   }

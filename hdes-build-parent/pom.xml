@@ -34,9 +34,10 @@
     <hbvalidator.version>6.0.21.Final</hbvalidator.version>
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.24</slf4j.version>
-    
+
     <immutables.version>2.8.2</immutables.version>
     <findbugs.version>3.0.2</findbugs.version>
+    <ehcache.version>3.8.1</ehcache.version>
     <guava.version>30.0-jre</guava.version>
     <groovy.version>2.4.20</groovy.version>
     <gitplugin.version>2.2.4</gitplugin.version>
@@ -230,6 +231,13 @@
         <version>${immutables.version}</version>
         <scope>provided</scope>
       </dependency>
+
+      <dependency>
+        <groupId>org.ehcache</groupId>
+        <artifactId>ehcache</artifactId>
+        <version>${ehcache.version}</version>
+      </dependency>
+
 
       <!-- jackson -->
       <dependency>

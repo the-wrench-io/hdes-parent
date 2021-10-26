@@ -24,14 +24,20 @@ import java.io.Serializable;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 
 @Value.Immutable
+@JsonSerialize(as = ImmutableAstService.class)
+@JsonDeserialize(as = ImmutableAstService.class)
 public interface AstService extends AstBody, Serializable {
 
+  @JsonIgnore
   Class<ServiceExecutorType> getBeanType();
+  
   AstServiceType getExecutorType();
-  
-  
   enum AstServiceType { TYPE_0, TYPE_1, TYPE_2 }
   
   interface ServiceExecutorType {}
