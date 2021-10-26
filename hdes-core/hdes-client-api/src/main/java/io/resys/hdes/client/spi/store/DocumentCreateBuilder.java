@@ -25,24 +25,19 @@ import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.HdesStore.CreateAstType;
 import io.resys.hdes.client.api.HdesStore.CreateBuilder;
-import io.resys.hdes.client.api.HdesStore.Entity;
-import io.resys.hdes.client.api.ImmutableEntity;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
+import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
 import io.resys.hdes.client.api.ast.AstBody;
-import io.resys.hdes.client.api.ast.AstBody.EntityType;
-import io.resys.hdes.client.api.ast.AstDecision;
-import io.resys.hdes.client.api.ast.AstFlow;
-import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.ImmutableAstDecision;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstService;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.exceptions.StoreException;
-import io.resys.hdes.client.spi.flow.FlowAstBuilderImpl;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.smallrye.mutiny.Uni;
-
 
 public class DocumentCreateBuilder implements CreateBuilder {
 
@@ -54,21 +49,21 @@ public class DocumentCreateBuilder implements CreateBuilder {
   }
   
   @Override
-  public Uni<Entity<AstFlow>> flow(String name) {
-    final var gid = gid(EntityType.FLOW);
+  public Uni<StoreEntity> flow(String name) {
+    final var gid = gid(AstBodyType.FLOW);
     final var flow = ImmutableAstFlow.builder()
-        .name(name)
-//        .rev(1)
-//        .headers(ImmutableHeaders.builder().build())
-//        .bodyType(EntityType.FLOW)
-//        .src(null)
-//        .source("")
+      .name(name)
+      .rev(1)
+      .headers(ImmutableHeaders.builder().build())
+      .bodyType(AstBodyType.FLOW)
+      .src(null)
+      .source("")
         .build();
     //TODO: initialize flow from template
-    final Entity<AstFlow> entity = ImmutableEntity.<AstFlow>builder()
+    final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(gid)
-        .type(EntityType.FLOW)
-        .body(flow)
+        .type(AstBodyType.FLOW)
+        .body(flow.getCommands())
         .build();
     
     String message = "creating-flow";
@@ -80,15 +75,15 @@ public class DocumentCreateBuilder implements CreateBuilder {
 
 
   @Override
-  public Uni<Entity<AstDecision>> decision(String name) {
-    final var gid = gid(EntityType.DT);
+  public Uni<StoreEntity> decision(String name) {
+    final var gid = gid(AstBodyType.DT);
     final var decision = ImmutableAstDecision.builder()
         .name(name)
         .build();
-    final Entity<AstDecision> entity = ImmutableEntity.<AstDecision>builder()
+    final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(gid)
-        .type(EntityType.DT)
-        .body(decision)
+        .type(AstBodyType.DT)
+        .body(decision.getCommands())
         .build();
     
     String message = "creating-decision";
@@ -97,15 +92,15 @@ public class DocumentCreateBuilder implements CreateBuilder {
   }
 
   @Override
-  public Uni<Entity<AstService>> service(String name) {
-    final var gid = gid(EntityType.FLOW_TASK);
+  public Uni<StoreEntity> service(String name) {
+    final var gid = gid(AstBodyType.FLOW_TASK);
     final var decision = ImmutableAstService.builder()
         .name(name)
         .build();
-    final Entity<AstService> entity = ImmutableEntity.<AstService>builder()
+    final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(gid)
-        .type(EntityType.FLOW_TASK)
-        .body(decision)
+        .type(AstBodyType.FLOW_TASK)
+        .body(decision.getCommands())
         .build();
     
     String message = "creating-service";
@@ -116,7 +111,7 @@ public class DocumentCreateBuilder implements CreateBuilder {
 
 
   @Override
-  public Uni<Entity<AstBody>> build(CreateAstType newType) {
+  public Uni<StoreEntity> build(CreateAstType newType) {
     Uni<?> result;
     switch (newType.getType()) {
     case FLOW: result = flow(newType.getName()); break;
@@ -124,11 +119,11 @@ public class DocumentCreateBuilder implements CreateBuilder {
     case FLOW_TASK: result = service(newType.getName()); break;
     default: throw new RuntimeException("Unrecognized type:" + newType.getType());
     }
-    return (Uni<Entity<AstBody>>) result;
+    return (Uni<StoreEntity>) result;
   }
 
-  private <T extends AstBody> Uni<Entity<T>> saveCommit(
-      final String gid, final Entity<T> entity, String message,
+  private <T extends AstBody> Uni<StoreEntity> saveCommit(
+      final String gid, final StoreEntity entity, String message,
       String code) {
     return config.getClient().commit().head()
       .head(config.getRepoName(), config.getHeadName())
@@ -140,14 +135,14 @@ public class DocumentCreateBuilder implements CreateBuilder {
         if(commit.getStatus() == CommitStatus.OK) {
           return entity;
         }
-        throw new StoreException(code, (Entity<AstBody>)entity,
+        throw new StoreException(code, (StoreEntity)entity,
             ImmutableStoreExceptionMsg.builder()
             .addAllArgs(getCommitMessages(commit))
             .build());
       });
   }
   
-  private String gid(EntityType type) {
+  private String gid(AstBodyType type) {
     return config.getGidProvider().getNextId(type);
   }
   
@@ -158,4 +153,5 @@ public class DocumentCreateBuilder implements CreateBuilder {
   private String getAuthor() {
     return config.getAuthorProvider().getAuthor();
   }
+
 }

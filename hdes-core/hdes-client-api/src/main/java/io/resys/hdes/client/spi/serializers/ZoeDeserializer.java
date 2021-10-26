@@ -26,12 +26,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesStore.Entity;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ast.AstBody;
-import io.resys.hdes.client.api.ast.AstBody.EntityType;
-import io.resys.hdes.client.api.ast.AstDecision;
-import io.resys.hdes.client.api.ast.AstFlow;
-import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.spi.store.PersistenceConfig;
 
 
@@ -46,17 +43,17 @@ public class ZoeDeserializer implements PersistenceConfig.Deserializer {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends AstBody> Entity<T> fromString(EntityType entityType, String value) {
+  public <T extends AstBody> StoreEntity fromString(AstBodyType entityType, String value) {
     try {
       switch(entityType) {
         case DT: {
-          return (Entity<T>) objectMapper.readValue(value, new TypeReference<Entity<AstDecision>>() {});
+          return objectMapper.readValue(value, new TypeReference<StoreEntity>() {});
         }
         case FLOW: {
-          return (Entity<T>) objectMapper.readValue(value, new TypeReference<Entity<AstFlow>>() {});
+          return objectMapper.readValue(value, new TypeReference<StoreEntity>() {});
         }
         case FLOW_TASK: {
-          return (Entity<T>) objectMapper.readValue(value, new TypeReference<Entity<AstService>>() {});
+          return objectMapper.readValue(value, new TypeReference<StoreEntity>() {});
         }
         default: throw new RuntimeException("can't map: " + entityType);
       }
@@ -66,20 +63,20 @@ public class ZoeDeserializer implements PersistenceConfig.Deserializer {
   }
 
   @Override
-  public Entity<?> fromString(String value) {
+  public StoreEntity fromString(String value) {
     try {
       JsonNode node = objectMapper.readValue(value, JsonNode.class);
-      final EntityType type = EntityType.valueOf(node.get("type").textValue());
+      final AstBodyType type = AstBodyType.valueOf(node.get("type").textValue());
 
       switch (type) {
       case DT: {
-        return objectMapper.convertValue(node, new TypeReference<Entity<AstDecision>>() {});
+        return objectMapper.convertValue(node, new TypeReference<StoreEntity>() {});
       }
       case FLOW: {
-        return objectMapper.convertValue(node, new TypeReference<Entity<AstFlow>>() {});
+        return objectMapper.convertValue(node, new TypeReference<StoreEntity>() {});
       }
       case FLOW_TASK: {
-        return objectMapper.convertValue(node, new TypeReference<Entity<AstService>>() {});
+        return objectMapper.convertValue(node, new TypeReference<StoreEntity>() {});
       }
       default:
         throw new RuntimeException("can't map: " + node);

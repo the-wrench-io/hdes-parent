@@ -24,14 +24,14 @@ import java.util.Collection;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.HdesStore.Entity;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ast.AstBody;
-import io.resys.hdes.client.api.ast.AstBody.EntityType;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
 import io.smallrye.mutiny.Uni;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 
 @Value.Immutable
 public interface PersistenceConfig {
@@ -42,19 +42,19 @@ public interface PersistenceConfig {
   
   @FunctionalInterface
   interface GidProvider {
-    String getNextId(EntityType entity);
+    String getNextId(AstBodyType entity);
   }
   
   GidProvider getGidProvider();
   
   @FunctionalInterface
   interface Serializer {
-    String toString(Entity<?> entity);
+    String toString(StoreEntity entity);
   }
   
   interface Deserializer {
-    Entity<?> fromString(String value);
-    <T extends AstBody> Entity<T> fromString(EntityType type, String value);
+    StoreEntity fromString(String value);
+    <T extends AstBody> StoreEntity fromString(AstBodyType type, String value);
   }
   Serializer getSerializer();
   Deserializer getDeserializer();
@@ -67,14 +67,14 @@ public interface PersistenceConfig {
   @Value.Immutable
   interface EntityState<T extends AstBody> {
     ObjectsResult<BlobObject> getSrc();
-    Entity<T> getEntity();
+    StoreEntity getEntity();
   }
   
   interface Commands {
-    <T extends AstBody> Uni<Entity<T>> delete(Entity<T> toBeDeleted);
+    <T extends AstBody> Uni<StoreEntity> delete(StoreEntity toBeDeleted);
     Uni<StoreState> get();
     <T extends AstBody> Uni<EntityState<T>> get(String id);
-    <T extends AstBody> Uni<Entity<T>> save(Entity<T> toBeSaved);
-    Uni<Collection<Entity<?>>> save(Collection<Entity<?>> toBeSaved);
+    <T extends AstBody> Uni<StoreEntity> save(StoreEntity toBeSaved);
+    Uni<Collection<StoreEntity>> save(Collection<StoreEntity> toBeSaved);
   }  
 }

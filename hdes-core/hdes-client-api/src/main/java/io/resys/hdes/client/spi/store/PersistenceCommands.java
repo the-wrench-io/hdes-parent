@@ -3,7 +3,7 @@ package io.resys.hdes.client.spi.store;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import io.resys.hdes.client.api.HdesStore.Entity;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
@@ -48,7 +48,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   }
   
   @Override
-  public <T extends AstBody> Uni<Entity<T>> delete(Entity<T> toBeDeleted) {
+  public <T extends AstBody> Uni<StoreEntity> delete(StoreEntity toBeDeleted) {
     return config.getClient().commit().head()
         .head(config.getRepoName(), config.getHeadName())
         .message("delete type: '" + toBeDeleted.getType() + "', with id: '" + toBeDeleted.getId() + "'")
@@ -60,7 +60,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
             return toBeDeleted;
           }
           // TODO
-          throw new StoreException("DELETE_FAIL", (Entity<AstBody>)toBeDeleted, convertMessages(commit));
+          throw new StoreException("DELETE_FAIL", toBeDeleted, convertMessages(commit));
         });
   }
   
@@ -73,7 +73,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
 
   
   @Override
-  public <T extends AstBody> Uni<Entity<T>> save(Entity<T> toBeSaved) {
+  public <T extends AstBody> Uni<StoreEntity> save(StoreEntity toBeSaved) {
     return config.getClient().commit().head()
       .head(config.getRepoName(), config.getHeadName())
       .message("update type: '" + toBeSaved.getType() + "', with id: '" + toBeSaved.getId() + "'")
@@ -85,14 +85,14 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
           return toBeSaved;
         }
         // TODO
-        throw new StoreException("DELETE_FAIL", (Entity<AstBody>)toBeSaved, convertMessages(commit));
+        throw new StoreException("DELETE_FAIL", toBeSaved, convertMessages(commit));
       });
   }
 
   @Override
-  public Uni<Collection<Entity<?>>> save(Collection<Entity<?>> entities) {
+  public Uni<Collection<StoreEntity>> save(Collection<StoreEntity> entities) {
     final var commitBuilder = config.getClient().commit().head().head(config.getRepoName(), config.getHeadName());
-    final Entity<?> first = entities.iterator().next();
+    final StoreEntity first = entities.iterator().next();
     
     for(final var target : entities) {
       commitBuilder.append(target.getId(), config.getSerializer().toString(target));
@@ -130,7 +130,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
             // TODO
             throw new StoreException("GET_FAIL", null, convertMessages(state));
           }
-          Entity<T> start = (Entity<T>) config.getDeserializer()
+          StoreEntity start = (StoreEntity) config.getDeserializer()
               .fromString(state.getObjects().getBlob().getValue());
           
           var result = ImmutableEntityState.<T>builder()

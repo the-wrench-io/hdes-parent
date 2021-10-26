@@ -22,7 +22,7 @@ package io.resys.hdes.client.spi.store;
 
 import io.resys.hdes.client.api.HdesStore.DeleteAstType;
 import io.resys.hdes.client.api.HdesStore.DeleteBuilder;
-import io.resys.hdes.client.api.HdesStore.Entity;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.spi.store.PersistenceConfig.EntityState;
 import io.smallrye.mutiny.Uni;
@@ -34,7 +34,7 @@ public class DocumentDeleteBuilder extends PersistenceCommands implements Delete
   }
 
   @Override
-  public Uni<Entity<AstBody>> build(DeleteAstType deleteType) {
+  public Uni<StoreEntity> build(DeleteAstType deleteType) {
     final Uni<EntityState<AstBody>> query = get(deleteType.getId());
     
     return query.onItem().transformToUni(state -> delete(state.getEntity()));

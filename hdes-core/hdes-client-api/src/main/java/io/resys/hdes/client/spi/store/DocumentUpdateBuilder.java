@@ -20,10 +20,9 @@ package io.resys.hdes.client.spi.store;
  * #L%
  */
 
-import io.resys.hdes.client.api.HdesStore.Entity;
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.UpdateAstType;
 import io.resys.hdes.client.api.HdesStore.UpdateBuilder;
-import io.resys.hdes.client.api.ast.AstBody;
 import io.smallrye.mutiny.Uni;
 
 public class DocumentUpdateBuilder extends PersistenceCommands implements UpdateBuilder {
@@ -33,7 +32,7 @@ public class DocumentUpdateBuilder extends PersistenceCommands implements Update
   }
 
   @Override
-  public Uni<Entity<AstBody>> build(UpdateAstType updateType) {
+  public Uni<StoreEntity> build(UpdateAstType updateType) {
     // TODO Auto-generated method stub
     return null;
   }
