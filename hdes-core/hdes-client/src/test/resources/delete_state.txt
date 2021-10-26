@@ -11,20 +11,16 @@ Tags
 Commits
   - id: 4
     tree: 5, parent: , message: Save type: 'FLOW', with id: 'FLOW-1'
-  - id: 6
-    tree: 7, parent: 4, message: Update type
   - id: 3
-    tree: 8, parent: 6, message: delete type: 'FLOW', with id: 'FLOW-1'
+    tree: 6, parent: 4, message: Save type: 'FLOW', with id: 'FLOW-1'
 
 Trees
   - id: 5
-    9: FLOW-1
-  - id: 7
-    9: FLOW-1
-    10: FLOW-2
-  - id: 8
-    10: FLOW-2
+    7: FLOW-1
+  - id: 6
+    8: FLOW-1
+  - id: 9
 
 Blobs
-  - 9: {"id":"FLOW-1","value":"","type":"FLOW","body":[{"id":"0","value":"id: first-flow","type":"ADD"},{"id":"1","value":"description: ","type":"ADD"}]}
-  - 10: {"id":"FLOW-2","value":"","type":"FLOW","body":[{"id":null,"value":"id: change flow symbolic id","type":"SET_BODY"}]}
+  - 7: {"id":"FLOW-1","value":"","type":"FLOW","body":[{"id":"0","value":"id: first-flow","type":"ADD"},{"id":"1","value":"description: ","type":"ADD"}]}
+  - 8: {"id":"FLOW-1","value":"","type":"FLOW","body":[{"id":null,"value":"id: change flow symbolic id","type":"SET_BODY"}]}
