@@ -29,6 +29,11 @@ public class HdesAssert {
       throw new IllegalArgumentException(getMessage(message));
     }
   }
+  public static void notEmpty(String object, Supplier<String> message) {
+    if (object == null || object.isBlank()) {
+      throw new IllegalArgumentException(getMessage(message));
+    }
+  }
   public static void isTrue(boolean expression, Supplier<String> message) {
     if (!expression) {
       throw new IllegalArgumentException(getMessage(message));

@@ -28,9 +28,14 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 
 @Value.Immutable
+@JsonSerialize(as = ImmutableAstDecision.class)
+@JsonDeserialize(as = ImmutableAstDecision.class)
 public interface AstDecision extends AstBody, Serializable {
   
   List<String> getHeaderTypes();
@@ -39,6 +44,8 @@ public interface AstDecision extends AstBody, Serializable {
   List<AstDecisionRow> getRows();
 
   @Value.Immutable
+  @JsonSerialize(as = ImmutableAstDecisionRow.class)
+  @JsonDeserialize(as = ImmutableAstDecisionRow.class)
   interface AstDecisionRow extends Serializable {
     String getId();
     int getOrder();
@@ -46,6 +53,8 @@ public interface AstDecision extends AstBody, Serializable {
   }
 
   @Value.Immutable
+  @JsonSerialize(as = ImmutableAstDecisionCell.class)
+  @JsonDeserialize(as = ImmutableAstDecisionCell.class)
   interface AstDecisionCell extends Serializable {
     String getId();
     String getHeader();
