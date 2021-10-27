@@ -39,7 +39,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-import io.resys.hdes.client.git.spi.GitDataSourceImpl.GitEntry;
+import io.resys.hdes.client.git.spi.HdesStoreGit.GitEntry;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
@@ -73,7 +73,7 @@ public class GitConnectionFactory {
   public static GitConnection create(GitInit config) throws IOException, 
       RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
     
-    final var path = StringUtils.isEmpty(config.getRemote()) ? Files.createTempDirectory("git_repo") : new File(config.getRemote()).toPath();
+    final var path = StringUtils.isEmpty(config.getRemote()) ? Files.createTempDirectory("git_repo") : new File(config.getStorage()).toPath();
     final var resolver = new PathMatchingResourcePatternResolver();
     final var privateKey = copyKey(resolver, path, config.getSshPath(), "id_rsa", "Define git respository private key for assets");
     final var knownHosts = copyKey(resolver, path, config.getSshPath() + ".known_hosts", "id_rsa.known_hosts", "Define git respository known hosts for assets");

@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
@@ -26,28 +27,28 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
 
 
-public class GitDataSourceImpl implements HdesStore {
-  private static final Logger LOGGER = LoggerFactory.getLogger(GitDataSourceImpl.class);
+public class HdesStoreGit implements HdesStore {
+  private static final Logger LOGGER = LoggerFactory.getLogger(HdesStoreGit.class);
   
   private final StoreEntityLocation location;
   private final GitConnection conn;
   private final ObjectMapper objectMapper;
   private final GitCredsSupplier creds;
   
-  interface FileMarker {
-    String getAbsolutePath();
-  }
-  
+  @Value.Immutable
   public interface GitCreds {
     String getUser();
     String getEmail();
   } 
   
-  public interface GitCredsSupplier {
-    GitCreds get();
+  public interface GitCredsSupplier extends Supplier<GitCreds> {}
+  
+  
+  interface FileMarker {
+    String getAbsolutePath();
   }
   
-  public GitDataSourceImpl(StoreEntityLocation location, GitConnection conn, ObjectMapper objectMapper, GitCredsSupplier creds) {
+  public HdesStoreGit(StoreEntityLocation location, GitConnection conn, ObjectMapper objectMapper, GitCredsSupplier creds) {
     super();
     this.location = location;
     this.conn = conn;
@@ -191,7 +192,32 @@ public class GitDataSourceImpl implements HdesStore {
     private ObjectMapper objectMapper;
     private GitCredsSupplier creds;
     
-    public GitDataSourceImpl build() {
+    public Builder remote(String remote) {
+      this.remote = remote;
+      return this;
+    }
+    public Builder branch(String branch) {
+      this.branch = branch;
+      return this;
+    }
+    public Builder storage(String storage) {
+      this.storage = storage;
+      return this;
+    }
+    public Builder sshPath(String sshPath) {
+      this.sshPath = sshPath;
+      return this;
+    }
+    public Builder objectMapper(ObjectMapper objectMapper) {
+      this.objectMapper = objectMapper;
+      return this;
+    }
+    public Builder creds(GitCredsSupplier creds) {
+      this.creds = creds;
+      return this;
+    }
+    
+    public HdesStoreGit build() {
       HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
       HdesAssert.notNull(creds, () -> "creds must be defined!");
       
@@ -199,7 +225,7 @@ public class GitDataSourceImpl implements HdesStore {
       if(LOGGER.isDebugEnabled()) {
         final var log = new StringBuilder()
             .append(System.lineSeparator())
-            .append("Configuring GIT: ")
+            .append("Configuring GIT: ").append(System.lineSeparator())
             .append("  remote: '").append(remote).append("'").append(System.lineSeparator())
             .append("  branch: '").append(branch).append("'").append(System.lineSeparator())
             .append("  storage: '").append(storage).append("'").append(System.lineSeparator())
@@ -224,7 +250,7 @@ public class GitDataSourceImpl implements HdesStore {
       if(LOGGER.isDebugEnabled()) {
         final var log = new StringBuilder()
             .append(System.lineSeparator())
-            .append("Configured GIT: ")
+            .append("Configured GIT: ").append(System.lineSeparator())
             .append("  cloned into directory: '").append(conn.getParentPath()).append("'").append(System.lineSeparator())
             .append("  working directory: '").append(conn.getAbsolutePath()).append("'").append(System.lineSeparator())
             .append("  assets directory: '").append(conn.getAbsoluteAssetsPath()).append("'").append(System.lineSeparator())
@@ -242,7 +268,7 @@ public class GitDataSourceImpl implements HdesStore {
         throw new RuntimeException(e.getMessage(), e);
       };
       
-      return new GitDataSourceImpl(location, conn, objectMapper, creds);
+      return new HdesStoreGit(location, conn, objectMapper, creds);
     }
   }
   
@@ -253,6 +279,7 @@ public class GitDataSourceImpl implements HdesStore {
     Timestamp getModified();
     AstBodyType getBodyType();
     String getRevision();
+    String getBlobHash();
     String getTreeValue();
     String getBlobValue();
   }

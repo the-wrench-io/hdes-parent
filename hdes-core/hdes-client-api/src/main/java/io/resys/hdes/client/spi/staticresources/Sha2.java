@@ -13,4 +13,12 @@ public class Sha2 {
         .toString();
     return id;
   }
+  
+  public static String blob(String value) {
+    String id = Hashing
+        .murmur3_128()
+        .hashString(value, Charsets.UTF_8)
+        .toString();
+    return id;
+  }
 }

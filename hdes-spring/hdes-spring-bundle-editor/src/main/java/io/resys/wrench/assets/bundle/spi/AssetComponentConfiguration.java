@@ -100,7 +100,9 @@ public class AssetComponentConfiguration {
   @Bean
   public AssetServiceRepository assetServiceRepository(
       ApplicationContext context, ObjectMapper objectMapper, 
-      AssetConfigBean assetConfigBean, ServiceStore origServiceStore) {
+      AssetConfigBean assetConfigBean
+      //, ServiceStore origServiceStore
+      ) {
 
     final ServiceInit init = new ServiceInit() {
       @Override
@@ -134,15 +136,15 @@ public class AssetComponentConfiguration {
         .programSupplier(new ProgramSupplier() {
           @Override
           public ServiceProgram getService(String name) {
-            return new GenericServiceQuery(origServiceStore).flowTask(name).newExecution().unwrap();
+            return new GenericServiceQuery(null).flowTask(name).newExecution().unwrap();
           }
           @Override
           public FlowProgram getFlow(String name) {
-            return new GenericServiceQuery(origServiceStore).flow(name).newExecution().unwrap();
+            return new GenericServiceQuery(null).flow(name).newExecution().unwrap();
           }
           @Override
           public DecisionProgram getDecision(String name) {
-            return new GenericServiceQuery(origServiceStore).dt(name).newExecution().unwrap();
+            return new GenericServiceQuery(null).dt(name).newExecution().unwrap();
           }
         })
         .build();
@@ -160,7 +162,7 @@ public class AssetComponentConfiguration {
     postProcessors.put(ServiceType.DATA_TYPE, new ListServicePostProcessor(new FlowDependencyServicePostProcessor(builders)));
     
     final ServicePostProcessorSupplier servicePostProcessorSupplier = new GenericServicePostProcessorSupplier(postProcessors);
-    final ServiceStore serviceStore = new PostProcessingServiceStore(origServiceStore, servicePostProcessorSupplier); 
+    final ServiceStore serviceStore = new PostProcessingServiceStore(null, servicePostProcessorSupplier); 
     
     
     hdesClient.config().config(
