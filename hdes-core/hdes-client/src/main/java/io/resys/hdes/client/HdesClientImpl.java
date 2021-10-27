@@ -24,11 +24,19 @@ import io.resys.hdes.client.api.HdesAstTypes;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesStore;
+import io.resys.hdes.client.spi.store.HdesDocumentStore;
+import io.resys.hdes.client.spi.store.PersistenceConfig;
 
 public class HdesClientImpl implements HdesClient {
 
   
   
+  private final PersistenceConfig config;
+  
+  public HdesClientImpl(PersistenceConfig config) {
+    this.config = config;
+  }
+
   @Override
   public AstBuilder ast() {
     // TODO Auto-generated method stub
@@ -49,8 +57,7 @@ public class HdesClientImpl implements HdesClient {
 
   @Override
   public HdesStore store() {
-    // TODO Auto-generated method stub
-    throw new RuntimeException("Need to implemented the client");
+    return new HdesDocumentStore(config);
   }
 
   @Override
