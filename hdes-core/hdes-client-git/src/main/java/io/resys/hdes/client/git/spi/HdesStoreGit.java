@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
@@ -61,7 +62,8 @@ public class HdesStoreGit implements HdesStore {
     
     return Uni.createFrom().item(() -> {
       try {
-        final var resourceName = location.getAbsolutePath(newType.getBodyType(), newType.getId());
+        final var id = UUID.randomUUID().toString();
+        final var resourceName = location.getAbsolutePath(newType.getBodyType(), id);
         final var assetName = resourceName.startsWith("file:") ? resourceName.substring(5) : resourceName;
         
         File outputFile = new File(assetName);
@@ -79,7 +81,7 @@ public class HdesStoreGit implements HdesStore {
     
         // copy data to file
         final StoreEntity src = ImmutableStoreEntity.builder()
-            .id(newType.getId())
+            .id(id)
             .body(newType.getBody())
             .bodyType(newType.getBodyType())
             .build();
@@ -97,7 +99,7 @@ public class HdesStoreGit implements HdesStore {
         
         final var created = Timestamp.valueOf(LocalDateTime.now());
         final var gitEntry = ImmutableGitEntry.builder()
-          .id(newType.getId())
+          .id(id)
           .modified(created)
           .created(created)
           .revision("")

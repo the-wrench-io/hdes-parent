@@ -91,7 +91,7 @@ public class SshGitRepository implements GitRepository {
   private final Git git;
   private final String workingDir;
   private final String message;
-  private final Author committer;
+  private final GitCreds committer;
   private final String path;
   private final String basePath; 
   private final TransportConfigCallback transportConfigCallback;
