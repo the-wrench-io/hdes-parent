@@ -27,7 +27,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.git.spi.GitConnectionFactory.GitConnection;
 import io.resys.hdes.client.git.spi.GitDataSourceImpl.GitEntry;
-import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
 
 public class GitDataSourceLoader implements AutoCloseable {
@@ -41,6 +40,7 @@ public class GitDataSourceLoader implements AutoCloseable {
   
   @Value.Immutable
   public interface GitFile {
+    String getId();
     String getTreeValue();
     String getBlobValue();
     AstBodyType getBodyType();
@@ -79,7 +79,9 @@ public class GitDataSourceLoader implements AutoCloseable {
       final var files = new ArrayList<GitFile>();
       for (final var resource : resolver.getResources(location)) {
         final var content = getContent(resource);
+        final var fileName = resource.getFilename();
         final var gitFile = ImmutableGitFile.builder()
+          .id(fileName.substring(0, fileName.indexOf(".")))
           .treeValue(this.location.getFileName(bodyType, resource.getFilename()))
           .blobValue(content)
           .bodyType(bodyType)
@@ -121,7 +123,7 @@ public class GitDataSourceLoader implements AutoCloseable {
       Timestamp created = new Timestamp(revWalk.next().getCommitTime() * 1000L);
             
       return ImmutableGitEntry.builder()
-          .id(Sha2.blobId(entry.getTreeValue(), ""))
+          .id(entry.getId())
           .bodyType(entry.getBodyType())
           .treeValue(entry.getTreeValue())
           .blobValue(entry.getBlobValue())

@@ -25,6 +25,7 @@ import java.time.Duration;
 import org.junit.jupiter.api.Assertions;
 
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
+import io.resys.hdes.client.api.ImmutableCreateAstType;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
 import io.resys.hdes.client.api.ImmutableUpdateAstType;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
@@ -42,7 +43,13 @@ public class PersistencePgTest extends PgTestTemplate {
   public void starter() {
     final var repo = getHdes("test1");
     
-    StoreEntity article1 = repo.store().create().flow("first-flow")
+    StoreEntity article1 = repo.store().create(
+        ImmutableCreateAstType.builder().bodyType(AstBodyType.FLOW)
+            .addBody(ImmutableAstCommand.builder()
+            .type(AstCommandValue.SET_BODY)
+            .value("id: firstFlow")
+            .build())
+        .build())
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
 
@@ -51,15 +58,13 @@ public class PersistencePgTest extends PgTestTemplate {
     var actual = super.toRepoExport("test1");
     Assertions.assertEquals(expected, actual);
     
-    repo.store().update()
-      .build(ImmutableUpdateAstType.builder()
-          .id(article1.getId())
-          .type(AstBodyType.FLOW)
-          .addBody(ImmutableAstCommand.builder()
-              .type(AstCommandValue.SET_BODY)
-              .value("id: change flow symbolic id")
-              .build())
-          .build())
+    repo.store().update(ImmutableUpdateAstType.builder()
+        .id(article1.getId())
+        .addBody(ImmutableAstCommand.builder()
+            .type(AstCommandValue.SET_BODY)
+            .value("id: change flow symbolic id")
+            .build())
+        .build())
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
     
@@ -70,8 +75,7 @@ public class PersistencePgTest extends PgTestTemplate {
     Assertions.assertEquals(expected, actual);
     
     
-    repo.store().delete()
-      .build(ImmutableDeleteAstType.builder().id(article1.getId()).build())
+    repo.store().delete(ImmutableDeleteAstType.builder().id(article1.getId()).build())
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
     
