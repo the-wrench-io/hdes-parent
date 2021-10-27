@@ -64,6 +64,7 @@ public class PersistencePgTest extends PgTestTemplate {
     
     repo.store().update(ImmutableUpdateAstType.builder()
         .id(article1.getId())
+        .bodyType(AstBodyType.FLOW)
         .addBody(ImmutableAstCommand.builder()
             .type(AstCommandValue.SET_BODY)
             .value("id: change flow symbolic id")

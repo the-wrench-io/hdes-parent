@@ -45,18 +45,7 @@ public class ZoeDeserializer implements PersistenceConfig.Deserializer {
   @Override
   public <T extends AstBody> StoreEntity fromString(AstBodyType entityType, String value) {
     try {
-      switch(entityType) {
-        case DT: {
-          return objectMapper.readValue(value, new TypeReference<StoreEntity>() {});
-        }
-        case FLOW: {
-          return objectMapper.readValue(value, new TypeReference<StoreEntity>() {});
-        }
-        case FLOW_TASK: {
-          return objectMapper.readValue(value, new TypeReference<StoreEntity>() {});
-        }
-        default: throw new RuntimeException("can't map: " + entityType);
-      }
+      return objectMapper.readValue(value, new TypeReference<StoreEntity>() {});
     } catch (IOException e) {
       throw new RuntimeException(e.getMessage(), e);
     }
@@ -66,22 +55,7 @@ public class ZoeDeserializer implements PersistenceConfig.Deserializer {
   public StoreEntity fromString(String value) {
     try {
       JsonNode node = objectMapper.readValue(value, JsonNode.class);
-      final AstBodyType type = AstBodyType.valueOf(node.get("type").textValue());
-
-      switch (type) {
-      case DT: {
-        return objectMapper.convertValue(node, new TypeReference<ImmutableStoreEntity>() {});
-      }
-      case FLOW: {
-        return objectMapper.convertValue(node, new TypeReference<ImmutableStoreEntity>() {});
-      }
-      case FLOW_TASK: {
-        return objectMapper.convertValue(node, new TypeReference<ImmutableStoreEntity>() {});
-      }
-      default:
-        throw new RuntimeException("can't map: " + node);
-      }
-
+      return objectMapper.convertValue(node, new TypeReference<ImmutableStoreEntity>() {});
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage() + System.lineSeparator() + value, e);
     }

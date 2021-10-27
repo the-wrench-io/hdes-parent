@@ -19,8 +19,7 @@ Trees
     7: FLOW-1
   - id: 6
     8: FLOW-1
-  - id: 9
 
 Blobs
-  - 7: {"id":"FLOW-1","type":"FLOW","body":[{"id":"0","value":"id: first-flow","type":"ADD"},{"id":"1","value":"description: ","type":"ADD"}]}
-  - 8: {"id":"FLOW-1","type":"FLOW","body":[{"id":null,"value":"id: change flow symbolic id","type":"SET_BODY"}]}
+  - 7: {"id":"FLOW-1","bodyType":"FLOW","body":[{"id":null,"value":"id: firstFlow","type":"SET_BODY"}]}
+  - 8: {"id":"FLOW-1","bodyType":"FLOW","body":[{"id":null,"value":"id: change flow symbolic id","type":"SET_BODY"}]}
