@@ -38,9 +38,13 @@ public class GitDataSourceImpl implements HdesStore {
     String getAbsolutePath();
   }
   
-  public interface GitCredsSupplier {
+  public interface GitCreds {
     String getUser();
     String getEmail();
+  } 
+  
+  public interface GitCredsSupplier {
+    GitCreds get();
   }
   
   public GitDataSourceImpl(StoreEntityLocation location, GitConnection conn, ObjectMapper objectMapper, GitCredsSupplier creds) {
@@ -131,7 +135,7 @@ public class GitDataSourceImpl implements HdesStore {
     final var cache = conn.getCacheManager().getCache(conn.getCacheName(), String.class, GitEntry.class);
     final var git = conn.getClient();
     final var callback = conn.getCallback();
-    
+    final var creds = this.creds.get();
     try {
       // pull
       git.pull().setTransportConfigCallback(callback).call().getFetchResult();

@@ -53,7 +53,7 @@ public class ImmutableServiceBuilder {
     Assert.notNull(name, "name can't be null!");
     Assert.notNull(src, "src can't be null!");
     Assert.notNull(pointer, "pointer can't be null!");
-    Assert.notNull(model, "model can't be null!");
+    //Assert.notNull(model, "model can't be null!");
     Assert.notNull(execution, "execution can't be null!");
     Assert.notNull(rev, "rev can't be null!");
 
