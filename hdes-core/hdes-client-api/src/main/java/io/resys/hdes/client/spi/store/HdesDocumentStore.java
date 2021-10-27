@@ -51,11 +51,11 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
   @Override
   public Uni<StoreEntity> create(CreateAstType newType) {
     Uni<StoreEntity> result;
-    switch (newType.getType()) {
+    switch (newType.getBodyType()) {
     case FLOW: result = flow(newType.getId()); break;
     case DT: result = decision(newType.getId()); break;
     case FLOW_TASK: result = service(newType.getId()); break;
-    default: throw new RuntimeException("Unrecognized type:" + newType.getType());
+    default: throw new RuntimeException("Unrecognized type:" + newType.getBodyType());
     }
     return result;
   }
@@ -66,7 +66,7 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
   public Uni<StoreEntity> update(UpdateAstType updateType) {
     final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(updateType.getId())
-        .type(updateType.getType())
+        //.type(updateType.getBodyType())
         .body(updateType.getBody())
         .build();
     
@@ -96,7 +96,7 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
         .build();
     final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(gid)
-        .type(AstBodyType.DT)
+        .bodyType(AstBodyType.DT)
         .body(decision.getCommands())
         .build();
     
@@ -110,7 +110,7 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
         .build();
     final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(gid)
-        .type(AstBodyType.FLOW_TASK)
+        .bodyType(AstBodyType.FLOW_TASK)
         .body(decision.getCommands())
         .build();
     
@@ -120,7 +120,7 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
   private StoreEntity initializeFlow(String name, final String gid) {
     final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(gid)
-        .type(AstBodyType.FLOW)
+        .bodyType(AstBodyType.FLOW)
         .addBody(ImmutableAstCommand.builder().type(AstCommandValue.ADD).id("0").value("id: " + name).build())
         .addBody(ImmutableAstCommand.builder().type(AstCommandValue.ADD).id("1").value("description: ").build())
         .build();

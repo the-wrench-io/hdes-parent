@@ -51,7 +51,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   public Uni<StoreEntity> delete(StoreEntity toBeDeleted) {
     return config.getClient().commit().head()
         .head(config.getRepoName(), config.getHeadName())
-        .message("Delete type: '" + toBeDeleted.getType() + "', with id: '" + toBeDeleted.getId() + "'")
+        .message("Delete type: '" + toBeDeleted.getBodyType() + "', with id: '" + toBeDeleted.getId() + "'")
         .parentIsLatest()
         .author(config.getAuthorProvider().getAuthor())
         .remove(toBeDeleted.getId())
@@ -78,7 +78,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
   public Uni<StoreEntity> save(StoreEntity toBeSaved) {
     return config.getClient().commit().head()
       .head(config.getRepoName(), config.getHeadName())
-      .message("Save type: '" + toBeSaved.getType() + "', with id: '" + toBeSaved.getId() + "'")
+      .message("Save type: '" + toBeSaved.getBodyType() + "', with id: '" + toBeSaved.getId() + "'")
       .parentIsLatest()
       .author(config.getAuthorProvider().getAuthor())
       .append(toBeSaved.getId(), config.getSerializer().toString(toBeSaved))
@@ -102,7 +102,7 @@ public class PersistenceCommands implements PersistenceConfig.Commands {
     }
     
     return commitBuilder
-        .message("Save type: '" + first.getType() + "', with id: '" + first.getId() + "'")
+        .message("Save type: '" + first.getBodyType() + "', with id: '" + first.getId() + "'")
         .parentIsLatest()
         .author(config.getAuthorProvider().getAuthor())
         .build().onItem().transform(commit -> {

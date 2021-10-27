@@ -62,6 +62,7 @@ public class GitConnectionFactory {
     String getCacheName();
     Integer getCacheHeap();
     
+    String getAssetsPath();          // relative path starts from repository root
     Path getParentPath();           // path where git repository is cloned
     String getAbsolutePath();       // git working directory path
     String getAbsoluteAssetsPath(); // absolute path for assets in the git working directory 
@@ -99,8 +100,9 @@ public class GitConnectionFactory {
     // git 
     git.getRepository().getRefDatabase().getRefsByPrefix(Constants.R_TAGS);
     
+    final var assetPath = "src/main/resources/assets/";
     final var absolutePath = git.getRepository().getWorkTree().getAbsolutePath();
-    final var assetPath = "/" + FileUtils.cleanPath(absolutePath) + "/src/main/resources/assets/";
+    final var absoluteAssetPath = "/" + FileUtils.cleanPath(absolutePath) + "/" + assetPath;
     
     // init cache
     final var cacheName = "hdesGitCache";
@@ -122,7 +124,8 @@ public class GitConnectionFactory {
         .parentPath(path)
         .callback(callback)
         .absolutePath(absolutePath)
-        .absoluteAssetsPath(assetPath)
+        .absoluteAssetsPath(absoluteAssetPath)
+        .assetsPath(assetPath)
         .build();
   }
   

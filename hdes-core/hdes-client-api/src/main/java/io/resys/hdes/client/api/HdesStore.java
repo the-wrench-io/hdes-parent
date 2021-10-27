@@ -57,7 +57,6 @@ public interface HdesStore {
   @Value.Immutable
   interface UpdateAstType extends Serializable {
     String getId();
-    AstBodyType getType();
     List<AstCommand> getBody();
   }
   
@@ -66,7 +65,7 @@ public interface HdesStore {
   @Value.Immutable
   interface CreateAstType extends Serializable {
     String getId();
-    AstBodyType getType();
+    AstBodyType getBodyType();
     List<AstCommand> getBody();
   }
   
@@ -84,7 +83,7 @@ public interface HdesStore {
   @Value.Immutable
   interface StoreEntity {
     String getId();
-    AstBodyType getType();
+    AstBodyType getBodyType();
     List<AstCommand> getBody();
   }
   

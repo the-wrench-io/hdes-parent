@@ -40,7 +40,7 @@ public class StoreEntityLocation implements Serializable {
   }
   //getResourceName
   public String getFileName(AstBodyType type, String pointer) {
-    return getPath(type) + "/" + pointer;
+    return getPath(type) + "/" + pointer + ".json";
   }
   //getResourceId
   public String getBaseName(AstBodyType type, String filename) {

@@ -36,7 +36,6 @@ import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceBuilder;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceDataModel;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceIdGen;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
 import io.resys.wrench.assets.bundle.spi.builders.ImmutableServiceBuilder;
@@ -96,7 +95,7 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
       lastModified = clockRepository.toTimestamp();
     }
 
-    ServiceDataModel dataModel = new FlowServiceDataModelBuilder(store).build(serviceId, program, lastModified);
+//    ServiceDataModel dataModel = new FlowServiceDataModelBuilder(store).build(serviceId, program, lastModified);
 
     try {
       return ImmutableServiceBuilder.newFlow()
@@ -106,7 +105,7 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
           .setDescription(ast.getDescription())
           .setSrc(objectMapper.writeValueAsString(ast.getCommands()))
           .setPointer(pointer)
-          .setModel(dataModel)
+          //.setModel(dataModel)
           .setExecution(() -> new FlowServiceExecution(ast, program, hdesClient))
           .build();
     } catch(IOException e) {

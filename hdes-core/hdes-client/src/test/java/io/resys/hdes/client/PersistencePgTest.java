@@ -48,9 +48,12 @@ public class PersistencePgTest extends PgTestTemplate {
     final var repo = getHdes("test1");
     
     StoreEntity article1 = repo.store().create(
-        ImmutableCreateAstType.builder()
-          .id("first-flow")
-          .type(AstBodyType.FLOW).build())
+        ImmutableCreateAstType.builder().bodyType(AstBodyType.FLOW)
+            .addBody(ImmutableAstCommand.builder()
+            .type(AstCommandValue.SET_BODY)
+            .value("id: firstFlow")
+            .build())
+        .build())
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
 
@@ -60,13 +63,12 @@ public class PersistencePgTest extends PgTestTemplate {
     Assertions.assertEquals(expected, actual);
     
     repo.store().update(ImmutableUpdateAstType.builder()
-          .id(article1.getId())
-          .type(AstBodyType.FLOW)
-          .addBody(ImmutableAstCommand.builder()
-              .type(AstCommandValue.SET_BODY)
-              .value("id: change flow symbolic id")
-              .build())
-          .build())
+        .id(article1.getId())
+        .addBody(ImmutableAstCommand.builder()
+            .type(AstCommandValue.SET_BODY)
+            .value("id: change flow symbolic id")
+            .build())
+        .build())
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
     

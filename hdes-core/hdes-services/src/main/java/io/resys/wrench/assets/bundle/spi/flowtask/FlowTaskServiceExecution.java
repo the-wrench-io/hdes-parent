@@ -81,7 +81,7 @@ public class FlowTaskServiceExecution implements ServiceExecution {
         }
       };
     } catch(Exception e) {
-      throw new FlowTaskExecutorException(script.getAst().getSource(), e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
     }
   }
 
