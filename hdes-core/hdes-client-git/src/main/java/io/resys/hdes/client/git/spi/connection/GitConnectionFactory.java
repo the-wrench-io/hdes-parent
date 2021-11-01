@@ -1,4 +1,4 @@
-package io.resys.hdes.client.git.spi;
+package io.resys.hdes.client.git.spi.connection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -24,53 +25,32 @@ import org.eclipse.jgit.transport.OpenSshConfig.Host;
 import org.eclipse.jgit.transport.SshSessionFactory;
 import org.eclipse.jgit.transport.SshTransport;
 import org.eclipse.jgit.util.FS;
-import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
-import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-import io.resys.hdes.client.git.spi.HdesStoreGit.GitEntry;
+import io.resys.hdes.client.git.spi.connection.GitConnection.GitCredsSupplier;
+import io.resys.hdes.client.git.spi.connection.GitConnection.GitEntry;
+import io.resys.hdes.client.git.spi.connection.GitConnection.GitInit;
+import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GitConnectionFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitConnectionFactory.class);
+
   
-  @Value.Immutable
-  public interface GitInit {
-    String getBranch();
-    String getRemote();
-    String getSshPath();
-    String getStorage();
-  }
-  
-  @Value.Immutable
-  public interface GitConnection {
-    GitInit getInit();
-    
-    CacheManager getCacheManager();
-    String getCacheName();
-    Integer getCacheHeap();
-    
-    String getAssetsPath();          // relative path starts from repository root
-    Path getParentPath();           // path where git repository is cloned
-    String getAbsolutePath();       // git working directory path
-    String getAbsoluteAssetsPath(); // absolute path for assets in the git working directory 
-    TransportConfigCallback getCallback();
-    Git getClient();
-  }
-  
-  public static GitConnection create(GitInit config) throws IOException, 
+  public static GitConnection create(GitInit config, GitCredsSupplier creds, ObjectMapper objectMapper) throws IOException, 
       RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
     
     final var path = StringUtils.isEmpty(config.getRemote()) ? Files.createTempDirectory("git_repo") : new File(config.getStorage()).toPath();
@@ -86,8 +66,13 @@ public class GitConnectionFactory {
     if(clone.exists()) {
       LOGGER.debug("Checking out branch: {}", config.getBranch());
       git = Git.open(clone);
-      git.checkout().setName(config.getBranch()).call();
-      git.pull().setTransportConfigCallback(callback).call();
+      
+      if(!git.getRepository().getBranch().equals(config.getBranch())) {
+        git.reset().setMode(ResetType.HARD).call();
+        git.checkout().setName(config.getBranch()).call();
+        git.pull().setTransportConfigCallback(callback).call();        
+      }
+
     } else {
       LOGGER.debug("Cloning new repository branch: {}", config.getBranch());
       git = Git.cloneRepository().
@@ -117,7 +102,9 @@ public class GitConnectionFactory {
     
     return ImmutableGitConnection.builder()
         .init(config)
+        .serializer(new GitSerializerImpl(objectMapper))
         .client(git)
+        .location(new StoreEntityLocation(absoluteAssetPath))
         .cacheManager(cacheManager)
         .cacheName(cacheName)
         .cacheHeap(cacheHeap)
@@ -126,6 +113,7 @@ public class GitConnectionFactory {
         .absolutePath(absolutePath)
         .absoluteAssetsPath(absoluteAssetPath)
         .assetsPath(assetPath)
+        .creds(creds)
         .build();
   }
   
@@ -181,4 +169,5 @@ public class GitConnectionFactory {
       // Oh well. They don't have a known hosts in home.
     }
   }
+  
 }

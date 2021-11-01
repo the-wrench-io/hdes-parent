@@ -23,15 +23,14 @@ package io.resys.hdes.client;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
-import io.resys.hdes.client.api.ImmutableCreateAstType;
+import io.resys.hdes.client.api.ImmutableCreateStoreEntity;
 import io.resys.hdes.client.api.ImmutableDeleteAstType;
-import io.resys.hdes.client.api.ImmutableUpdateAstType;
+import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
@@ -48,7 +47,7 @@ public class PersistencePgTest extends PgTestTemplate {
     final var repo = getHdes("test1");
     
     StoreEntity article1 = repo.store().create(
-        ImmutableCreateAstType.builder().bodyType(AstBodyType.FLOW)
+        ImmutableCreateStoreEntity.builder().bodyType(AstBodyType.FLOW)
             .addBody(ImmutableAstCommand.builder()
             .type(AstCommandValue.SET_BODY)
             .value("id: firstFlow")
@@ -62,7 +61,7 @@ public class PersistencePgTest extends PgTestTemplate {
     var actual = super.toRepoExport("test1");
     Assertions.assertEquals(expected, actual);
     
-    repo.store().update(ImmutableUpdateAstType.builder()
+    repo.store().update(ImmutableUpdateStoreEntity.builder()
         .id(article1.getId())
         .bodyType(AstBodyType.FLOW)
         .addBody(ImmutableAstCommand.builder()

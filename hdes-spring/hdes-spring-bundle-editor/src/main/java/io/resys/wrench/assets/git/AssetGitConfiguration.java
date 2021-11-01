@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.git.spi.HdesStoreGit;
-import io.resys.hdes.client.git.spi.HdesStoreGit.GitCredsSupplier;
-import io.resys.hdes.client.git.spi.ImmutableGitCreds;
+import io.resys.hdes.client.git.spi.connection.GitConnection.GitCredsSupplier;
+import io.resys.hdes.client.git.spi.connection.ImmutableGitCreds;
 import io.resys.wrench.assets.context.config.GitConfigBean;
 
 @ConditionalOnProperty(name = "wrench.assets.git.enabled", havingValue = "true")

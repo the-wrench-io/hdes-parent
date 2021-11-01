@@ -39,7 +39,7 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
   }
 
   @Override
-  public Uni<StoreEntity> create(CreateAstType newType) {
+  public Uni<StoreEntity> create(CreateStoreEntity newType) {
     final var gid = gid(newType.getBodyType());
     final StoreEntity entity = ImmutableStoreEntity.builder()
     .id(gid)
@@ -50,7 +50,7 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
   }
 
   @Override
-  public Uni<StoreEntity> update(UpdateAstType updateType) {
+  public Uni<StoreEntity> update(UpdateStoreEntity updateType) {
     final StoreEntity entity = ImmutableStoreEntity.builder()
         .id(updateType.getId())
         .bodyType(updateType.getBodyType())
