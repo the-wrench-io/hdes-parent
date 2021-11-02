@@ -61,6 +61,7 @@ import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeBean;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
+import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class FlowAstBuilderImpl implements FlowAstBuilder {
@@ -155,6 +156,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         .rev(this.rev == null ? src.size() : this.rev)
         .src(flow)
         .source(flow.getValue())
+        .hash(Sha2.blob(flow.getValue()))
         .headers(AstFlowNodesFactory.headers(typeDefs).build(flow))
         .build();
   }

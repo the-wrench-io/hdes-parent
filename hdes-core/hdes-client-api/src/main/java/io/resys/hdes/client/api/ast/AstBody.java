@@ -31,6 +31,7 @@ public interface AstBody extends Serializable {
   
   String getName();
   int getRev();
+  String getHash();
   String getSource();
   
   @Nullable

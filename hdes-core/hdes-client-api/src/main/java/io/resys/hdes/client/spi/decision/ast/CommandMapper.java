@@ -51,6 +51,7 @@ import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
+import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 
@@ -420,7 +421,8 @@ public class CommandMapper {
       
       final HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
       final var source = DecisionAstSourceBuilder.build(headers, rows, name, description, hitPolicy);
-
+      final var sourceString = typeDefs.commandsString(source);
+      
       return ImmutableAstDecision.builder()
           .name(name)
           .bodyType(AstBodyType.DT)
@@ -434,7 +436,8 @@ public class CommandMapper {
               .returnDefs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
               .build())
           .rows(rows)
-          .source(typeDefs.commandsString(source))
+          .hash(Sha2.blob(sourceString))
+          .source(sourceString)
           .build();
     }
   }

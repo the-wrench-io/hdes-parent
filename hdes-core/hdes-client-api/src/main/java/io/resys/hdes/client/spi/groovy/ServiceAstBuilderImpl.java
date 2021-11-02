@@ -55,6 +55,7 @@ import io.resys.hdes.client.api.exceptions.ServiceAstException;
 import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
+import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class ServiceAstBuilderImpl implements ServiceAstBuilder {
@@ -144,6 +145,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
           .source(source)
           .rev(changes.getCommands().size())
           .commands(changes.getCommands())
+          .hash(Sha2.blob(source))
           .beanType(beanType)
           .executorType(executorType)
           .build();
