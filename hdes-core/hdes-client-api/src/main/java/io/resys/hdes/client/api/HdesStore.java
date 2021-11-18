@@ -84,6 +84,7 @@ public interface HdesStore {
   interface StoreEntity {
     String getId();
     AstBodyType getBodyType();
+    String getHash();
     List<AstCommand> getBody();
   }
   

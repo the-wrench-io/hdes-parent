@@ -90,8 +90,7 @@ public class DecisionTest {
 //}
   @Test
   public void executionTest() throws IOException {
-    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/dt.json")).decision();
-    final var program = TestUtils.client.program().ast(ast);
+    final var envir = TestUtils.client.envir().addCommand().id("test1").decision(FileUtils.toString(getClass(), "decision/dt.json")).build().build();
 
     Map<String, Serializable> values = new HashMap<>();
     values.put("sriBoolean", false);
@@ -99,7 +98,7 @@ public class DecisionTest {
     values.put("sri", 1);
     values.put("sriDate", DateParser.parseLocalDate("2017-07-03"));
     
-    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();
+    DecisionResult result = TestUtils.client.executor(envir).inputMap(values).decision("testDecisionTable").andGetBody();
 
     Assertions.assertEquals(2, result.getMatches().size());
     Assertions.assertEquals(0, result.getMatches().get(0).getOrder());
@@ -108,44 +107,41 @@ public class DecisionTest {
 
   @Test
   public void nullEqualsNull() throws IOException {
-    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/nullEqualsNull.json")).decision();
-    final var program = TestUtils.client.program().ast(ast);
+    final var envir = TestUtils.client.envir().addCommand().id("test1").decision(FileUtils.toString(getClass(), "decision/nullEqualsNull.json")).build().build();
     
     Map<String, Serializable> values = new HashMap<>();
     values.put("risk", null);
     
-    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();
+    DecisionResult result = TestUtils.client.executor(envir).inputMap(values).decision("nullEqualsNull").andGetBody();
 
     Assertions.assertEquals(1, result.getMatches().size());
   }
   
   @Test
   public void firstHitPolicy() throws IOException {
-    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/firstHitPolicy.json")).decision();
-    final var program = TestUtils.client.program().ast(ast);
+    final var envir = TestUtils.client.envir().addCommand().id("test1").decision(FileUtils.toString(getClass(), "decision/firstHitPolicy.json")).build().build();
 
     Map<String, Serializable> values = new HashMap<>();
     values.put("regionName", "FIN");
-    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();;
+    DecisionResult result = TestUtils.client.executor(envir).inputMap(values).decision("testRegion").andGetBody();
     Assertions.assertEquals(1, result.getMatches().size());
     Assertions.assertEquals(0, result.getMatches().get(0).getOrder());
 
 
     values = new HashMap<>();
     values.put("regionName", "X");
-    result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();
+    result = TestUtils.client.executor(envir).inputMap(values).decision("testRegion").andGetBody();
     Assertions.assertEquals(1, result.getMatches().size());
     Assertions.assertEquals(1, result.getMatches().get(0).getOrder());
   }
 
   @Test
   public void all() throws IOException {
-    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/allHitPolicy.json")).decision();
-    final var program = TestUtils.client.program().ast(ast);
+    final var envir = TestUtils.client.envir().addCommand().id("test1").decision(FileUtils.toString(getClass(), "decision/allHitPolicy.json")).build().build();
 
     Map<String, Serializable> values = new HashMap<>();
     values.put("firstName", "Mark");
-    DecisionResult result = TestUtils.client.executor().inputMap(values).decision(program).andGetBody();;
+    DecisionResult result = TestUtils.client.executor(envir).inputMap(values).decision("hitPolicyExample").andGetBody();
     Assertions.assertEquals(2, result.getMatches().size());
   }
   

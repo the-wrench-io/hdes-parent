@@ -39,18 +39,19 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepRefType;
 import io.resys.hdes.client.api.programs.ImmutableProgramAssociation;
 import io.resys.hdes.client.api.programs.ImmutableProgramMessage;
+import io.resys.hdes.client.api.programs.ImmutableProgramSource;
 import io.resys.hdes.client.api.programs.ImmutableProgramWrapper;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
+import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramSource;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.spi.envir.EnvirFactory.EvirBuilderSourceEntity;
 import io.resys.hdes.client.spi.flow.validators.FlowAssociationValidator;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class AssociationVisitor {
-  private final Map<String, EvirBuilderSourceEntity> externalIdToSource = new HashMap<>();
+  private final Map<String, ProgramSource> externalIdToSource = new HashMap<>();
   private final Map<AstBodyType, List<String>> typeToExternalId = new HashMap<>(Map.of(
         AstBodyType.DT, new ArrayList<String>(),
         AstBodyType.FLOW_TASK, new ArrayList<String>(),
@@ -61,15 +62,20 @@ public class AssociationVisitor {
   private final Map<String, ProgramWrapper<?, ?>> externalIdToWrapper = new HashMap<>();
   private final Map<String, List<ProgramAssociation>> externalIdToAssoc = new HashMap<>();
 
-  public AssociationVisitor add(EvirBuilderSourceEntity source, ProgramWrapper<?, ?> wrapper) {
-    final var externalId = source.getExternalId();
-    HdesAssert.isTrue(!this.externalIdToSource.containsKey(externalId), () -> "commandJson with id: '" + externalId + "' is already defined!");
-    externalIdToSource.put(source.getExternalId(), source);
+  public AssociationVisitor add(ProgramWrapper<?, ?> wrapper) {
+    HdesAssert.isTrue(!this.externalIdToSource.containsKey(wrapper.getId()), () -> "commandJson with id: '" + wrapper.getId() + "' is already defined!");
+    externalIdToSource.put(wrapper.getId(), wrapper.getSource().orElseGet(() -> ImmutableProgramSource.builder()
+        .id(wrapper.getId())
+        .bodyType(wrapper.getType())
+        .hash("")
+        .build()));
     typeToExternalId.get(wrapper.getType()).add(wrapper.getId());
     externalIdToDependencyErrors.put(wrapper.getId(), new ArrayList<>());
     externalIdToDependencyWarnings.put(wrapper.getId(), new ArrayList<>());
+    externalIdToWrapper.put(wrapper.getId(), wrapper);
     return this;
   }
+  
   
   @SuppressWarnings("unchecked")
   public Collection<ProgramWrapper<?, ?>> build() {

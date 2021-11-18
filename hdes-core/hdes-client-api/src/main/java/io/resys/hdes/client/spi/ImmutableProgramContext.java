@@ -31,15 +31,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ImmutableProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceData;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 
 public class ImmutableProgramContext implements ProgramContext {
 
   private final HdesTypeDefsFactory factory;
+  private final ProgramSupplier programSupplier;
 
   private final ExecutorInput callbackThatWillSupplyAllData;
   
@@ -52,12 +57,26 @@ public class ImmutableProgramContext implements ProgramContext {
   // generic data sources that will be used for init of genericData
   private final List<Supplier<Map<String, Serializable>>> suppliers;
   
-  public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypeDefsFactory factory) {
+  public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypeDefsFactory factory, ProgramEnvir envir) {
     super();
     this.suppliers = inputs;
     this.callbackThatWillSupplyAllData = input;
     this.factory = factory;
     this.serviceData = serviceData;
+    this.programSupplier = new ProgramSupplier() {
+      @Override
+      public ServiceProgram getService(String name) {
+        return (ServiceProgram) envir.getServicesByName().get(name).getProgram().get();
+      }
+      @Override
+      public FlowProgram getFlow(String name) {
+        return (FlowProgram) envir.getFlowsByName().get(name).getProgram().get();
+      }
+      @Override
+      public DecisionProgram getDecision(String name) {
+        return (DecisionProgram) envir.getDecisionsByName().get(name).getProgram().get();
+      }
+    };
   }
 
   @Override
@@ -100,20 +119,26 @@ public class ImmutableProgramContext implements ProgramContext {
       suppliers.forEach(e -> genericData.putAll(e.get()));
     }
   }
-
-  public static Builder builder(HdesTypeDefsFactory factory) {
-    return new Builder(factory);
+  @Override
+  public ProgramSupplier getPrograms() {
+    return programSupplier;
+  }
+  
+  public static Builder builder(HdesTypeDefsFactory factory, ProgramEnvir envir) {
+    return new Builder(factory, envir);
   }
   
   public static class Builder {
     private final HdesTypeDefsFactory factory;
     private final List<Supplier<Map<String, Serializable>>> suppliers = new ArrayList<>();
+    private final ProgramEnvir envir;
     private ExecutorInput input;
     private Object serviceData;
     
-    public Builder(HdesTypeDefsFactory factory) {
+    public Builder(HdesTypeDefsFactory factory, ProgramEnvir envir) {
       super();
       this.factory = factory;
+      this.envir = envir;
     }
     public Builder callback(ExecutorInput input) {
       this.input = input;
@@ -138,12 +163,8 @@ public class ImmutableProgramContext implements ProgramContext {
       return this;
     }
     public ImmutableProgramContext build() {
-      return new ImmutableProgramContext(suppliers, serviceData, input, factory);
+      return new ImmutableProgramContext(suppliers, serviceData, input, factory, envir);
     }
   }
 
-  @Override
-  public ProgramSupplier getPrograms() {
-    return factory.config().getPrograms();
-  }
 }

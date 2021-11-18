@@ -23,10 +23,6 @@ package io.resys.hdes.client.test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.programs.DecisionProgram;
-import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
-import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
 
@@ -37,23 +33,6 @@ public class TestUtils {
   public static ObjectMapper objectMapper = new ObjectMapper();
   public static HdesClient client = HdesClientImpl.builder()
       .objectMapper(objectMapper)
-      .programSupplier(new ProgramSupplier() {
-        @Override
-        public ServiceProgram getService(String name) {
-          // TODO Auto-generated method stub
-          return null;
-        }
-        @Override
-        public FlowProgram getFlow(String name) {
-          // TODO Auto-generated method stub
-          return null;
-        }
-        @Override
-        public DecisionProgram getDecision(String name) {
-          // TODO Auto-generated method stub
-          return null;
-        }
-      })
       .serviceInit(new ServiceInit() {
         @Override
         public <T> T get(Class<T> type) {

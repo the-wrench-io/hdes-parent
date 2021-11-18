@@ -23,6 +23,7 @@ package io.resys.hdes.client.test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -32,9 +33,11 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
+import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowExecutionStatus;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
@@ -140,15 +143,20 @@ public class FlowTest {
   
   @Test
   public void programAmlTest() throws IOException {
-    final var syntax = FileUtils.toInputStream(getClass(), "flow/aml-flow.yaml");
-    final var ast = TestUtils.client.ast().syntax(syntax).flow();
-    final var program = TestUtils.client.program().ast(ast);
+    final var envir = TestUtils.client.envir().addCommand().id("test1")
+        .flow(
+            TestUtils.objectMapper.writeValueAsString(Arrays.asList(ImmutableAstCommand.builder()
+                .type(AstCommandValue.SET_BODY)
+                .value(FileUtils.toString(getClass(), "flow/aml-flow.yaml"))
+                .build()))
+            
+            ).build().build();
 
     // switch 1
-    FlowResult flow = TestUtils.client.executor()
+    FlowResult flow = TestUtils.client.executor(envir)
         .inputField("whitelist", true)
         .inputField("param1", 1)
-        .flow(program).andGetBody();
+        .flow("aml flow").andGetBody();
     // last step
     Assertions.assertEquals(FlowExecutionStatus.COMPLETED, flow.getStatus());
     Assertions.assertEquals("rmInvList", flow.getStepId());
@@ -160,21 +168,21 @@ public class FlowTest {
     Assertions.assertNotNull(task);
     
     // switch 2
-    flow = TestUtils.client.executor()
+    flow = TestUtils.client.executor(envir)
         .inputField("whitelist", false)
         .inputField("investigationList", true)
         .inputField("param1", 1)
-        .flow(program).andGetBody();
+        .flow("aml flow").andGetBody();
     Assertions.assertEquals("addPartyToInvestigationList -> resolveAmlViolation -> rmInvList", flow.getShortHistory());
     
     // switch 3
-    flow = TestUtils.client.executor()
+    flow = TestUtils.client.executor(envir)
         .inputField("whitelist", false)
         .inputField("investigationList", false)
         .inputField("waitFiuDecision", true)
         .inputField("rmInvList", true)
         .inputField("param1", 1)
-        .flow(program).andGetBody();
+        .flow("aml flow").andGetBody();
     
     Assertions.assertEquals("addPartyToInvestigationList -> resolveAmlViolation -> waitFiuDecision -> rmInvList", flow.getShortHistory());
   }
@@ -182,12 +190,12 @@ public class FlowTest {
   @Disabled
   @Test
   public void programSelfRefTest() throws IOException {
-    final var syntax = FileUtils.toInputStream(getClass(), "flow/self-ref.yaml");
-    final var ast = TestUtils.client.ast().syntax(syntax).flow();
-    final var program = TestUtils.client.program().ast(ast);
-    FlowResult flow = TestUtils.client.executor()
+    final var envir = TestUtils.client.envir().addCommand().id("test1").flow(FileUtils.toString(getClass(), "flow/self-ref.yaml")).build().build();
+    
+    
+    FlowResult flow = TestUtils.client.executor(envir)
         .inputField("whitelist", true)
-        .flow(program).andGetBody();
+        .flow("test").andGetBody();
     
     Assertions.assertEquals("[Add party to investigation list, Resolve aml violation, Resolve aml violation-EXCLUSIVE, addToWhitelist, rmInvList, end]", flow.getShortHistory());
 

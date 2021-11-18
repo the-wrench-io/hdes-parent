@@ -49,7 +49,12 @@ public class HdesStoreGit implements HdesStore {
         final var file = git.create(newType.getBodyType(), newType.getBody());
         final var refresh = git.push(file);
         cache(refresh);
-        return (StoreEntity) ImmutableStoreEntity.builder().id(file.getId()).body(newType.getBody()).bodyType(newType.getBodyType()).build();        
+        return (StoreEntity) ImmutableStoreEntity.builder()
+            .id(file.getId())
+            .hash(file.getBlobHash())
+            .body(newType.getBody())
+            .bodyType(newType.getBodyType())
+            .build();        
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
             .append("Failed to create store entity: '").append(newType.getBodyType()).append("'").append(System.lineSeparator())
@@ -69,7 +74,11 @@ public class HdesStoreGit implements HdesStore {
         final var file = git.update(updateType.getId(), updateType.getBodyType(), updateType.getBody());
         final var refresh = git.push(file);
         cache(refresh);
-        return (StoreEntity) ImmutableStoreEntity.builder().id(file.getId()).body(updateType.getBody()).bodyType(updateType.getBodyType()).build();        
+        return (StoreEntity) ImmutableStoreEntity.builder()
+            .id(file.getId())
+            .hash(file.getBlobHash())
+            .body(updateType.getBody()).bodyType(updateType.getBodyType())
+            .build();        
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
             .append("Failed to update store entity: '").append(updateType.getBodyType()).append("'").append(System.lineSeparator())
@@ -93,6 +102,7 @@ public class HdesStoreGit implements HdesStore {
         return (StoreEntity) ImmutableStoreEntity.builder().id(deleteType.getId())
             .body(gitFile.getCommands())
             .bodyType(gitFile.getBodyType())
+            .hash(gitFile.getBlobHash())
             .build();        
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
@@ -174,6 +184,7 @@ public class HdesStoreGit implements HdesStore {
             .id(entry.getId())
             .bodyType(entry.getBodyType())
             .body(entry.getCommands())
+            .hash(entry.getBlobHash())
             .build();
       }
       @Override

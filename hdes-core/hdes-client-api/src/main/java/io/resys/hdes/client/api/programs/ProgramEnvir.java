@@ -32,11 +32,18 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
 public interface ProgramEnvir {  
   Map<String, ProgramWrapper<?, ?>> getValues();
+  Map<String, ProgramWrapper<AstFlow, FlowProgram>> getFlowsByName();
+  Map<String, ProgramWrapper<AstDecision, DecisionProgram>> getDecisionsByName();
+  Map<String, ProgramWrapper<AstService, ServiceProgram>> getServicesByName();
 
   @Value.Immutable
   interface ProgramWrapper<A extends AstBody, P extends Program<?>> {
@@ -49,6 +56,8 @@ public interface ProgramEnvir {
     List<TypeDef> getHeaders();
     List<ProgramAssociation> getAssociations();
     
+    @JsonIgnore
+    Optional<ProgramSource> getSource();
     @JsonIgnore
     Optional<A> getAst();
     @JsonIgnore
@@ -71,6 +80,14 @@ public interface ProgramEnvir {
     @JsonIgnore
     @Nullable
     Exception getException();
+  }
+  
+  @Value.Immutable
+  interface ProgramSource {
+    String getId();
+    String getHash();
+    AstBodyType getBodyType();
+    List<AstCommand> getCommands();
   }
 
   enum ProgramStatus { 

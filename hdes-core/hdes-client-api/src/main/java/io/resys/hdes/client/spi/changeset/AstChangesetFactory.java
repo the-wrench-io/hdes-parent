@@ -81,15 +81,25 @@ public class AstChangesetFactory {
     }
     
     private void visitCommand(AstCommand command) {
-      int line = Integer.parseInt(command.getId());
+      
       AstCommandValue type = command.getType();
 
       String text = command.getValue();
       if (type == AstCommandValue.DELETE) {
+        int line = Integer.parseInt(command.getId());
         sourceBuilder.delete(line, Integer.parseInt(command.getValue()));
       } else if (type == AstCommandValue.ADD) {
+        int line = Integer.parseInt(command.getId());
         sourceBuilder.add(line, text);
+      } else if(type == AstCommandValue.SET_BODY) {
+        String lines[] = text.split("\\r?\\n");
+        int lineNumber = 1;
+        for(final var lineValue : lines) {
+          sourceBuilder.add(lineNumber++, lineValue);  
+        }
+        
       } else {
+        int line = Integer.parseInt(command.getId());
         sourceBuilder.set(line, text);
       }
       commands.add(command);

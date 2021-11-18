@@ -36,6 +36,7 @@ import io.resys.hdes.client.git.spi.GitDataSourceLoader.GitFile;
 import io.resys.hdes.client.git.spi.GitDataSourceLoader.GitFileReload;
 import io.resys.hdes.client.git.spi.connection.GitConnection;
 import io.resys.hdes.client.git.spi.connection.GitConnection.GitEntry;
+import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GitFiles {
@@ -182,6 +183,7 @@ public class GitFiles {
         .id(id)
         .treeValue(conn.getAssetsPath() +  location.getFileName(bodyType, id))
         .blobValue(blob)
+        .blobHash(Sha2.blob(blob))
         .bodyType(bodyType)
         .build();
   }
@@ -211,6 +213,7 @@ public class GitFiles {
         .treeValue(conn.getAssetsPath() +  location.getFileName(bodyType, id))
         .blobValue(blob)
         .bodyType(bodyType)
+        .blobHash(Sha2.blob(blob))
         .build();
   }
   

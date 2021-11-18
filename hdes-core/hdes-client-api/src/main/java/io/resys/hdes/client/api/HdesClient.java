@@ -32,6 +32,7 @@ import javax.annotation.Nullable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -49,7 +50,7 @@ import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 public interface HdesClient {
   AstBuilder ast();
   ProgramBuilder program();
-  ExecutorBuilder executor();
+  ExecutorBuilder executor(ProgramEnvir envir);
   EnvirBuilder envir();
   
   HdesAstTypes types();
@@ -58,16 +59,23 @@ public interface HdesClient {
   
   
   interface EnvirBuilder {
+    EnvirBuilder from(ProgramEnvir envir);
     EnvirCommandFormatBuilder addCommand();
     ProgramEnvir build();
   }
+
   
   interface EnvirCommandFormatBuilder {
     EnvirCommandFormatBuilder id(String externalId);
+    
     EnvirCommandFormatBuilder flow(String commandJson);
     EnvirCommandFormatBuilder decision(String commandJson);
     EnvirCommandFormatBuilder service(String commandJson);
-    void build();
+    
+    EnvirCommandFormatBuilder flow(StoreEntity entity);
+    EnvirCommandFormatBuilder decision(StoreEntity entity);
+    EnvirCommandFormatBuilder service(StoreEntity entity);
+    EnvirBuilder build();
   }
   
   interface CSVBuilder {
@@ -104,10 +112,10 @@ public interface HdesClient {
     ExecutorBuilder inputList(List<Object> inputObject);
     ExecutorBuilder inputJson(JsonNode json);
     ExecutorBuilder input(ExecutorInput input);
-  
-    FlowExecutor flow(FlowProgram model);
-    DecisionExecutor decision(DecisionProgram model);
-    ServiceExecutor service(ServiceProgram model);
+    
+    FlowExecutor flow(String nameOrId);
+    DecisionExecutor decision(String nameOrId);
+    ServiceExecutor service(String nameOrId);
   }
   
   interface AstBuilder {

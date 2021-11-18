@@ -24,11 +24,9 @@ import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
-import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
 
 public interface HdesClientConfig {
 
-  ProgramSupplier getPrograms();
   List<AstFlowNodeVisitor> getFlowVisitors();
   HdesClientConfig config(AstFlowNodeVisitor ... changes);
   

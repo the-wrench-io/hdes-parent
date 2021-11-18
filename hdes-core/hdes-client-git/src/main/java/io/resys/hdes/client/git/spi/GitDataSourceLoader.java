@@ -58,6 +58,7 @@ public class GitDataSourceLoader implements AutoCloseable {
     String getId();
     String getTreeValue();
     String getBlobValue();
+    String getBlobHash();
     AstBodyType getBodyType();
   }
   
