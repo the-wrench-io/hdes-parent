@@ -23,7 +23,10 @@ package io.resys.hdes.client.spi.store;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.spi.store.PersistenceConfig.EntityState;
+import io.resys.hdes.client.spi.store.thena.DocumentQueryBuilder;
+import io.resys.hdes.client.spi.store.thena.PersistenceCommands;
+import io.resys.hdes.client.spi.store.thena.PersistenceConfig;
+import io.resys.hdes.client.spi.store.thena.PersistenceConfig.EntityState;
 import io.smallrye.mutiny.Uni;
 
 public class HdesDocumentStore extends PersistenceCommands implements HdesStore {

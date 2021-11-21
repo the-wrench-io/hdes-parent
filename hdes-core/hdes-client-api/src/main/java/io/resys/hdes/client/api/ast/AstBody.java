@@ -27,17 +27,14 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 public interface AstBody extends Serializable {
-  
   String getName();
-  int getRev();
-  String getHash();
-  String getSource();
   
   @Nullable
   String getDescription();
-
-  List<AstCommand> getCommands();
   Headers getHeaders();
   AstBodyType getBodyType();
   
@@ -49,5 +46,16 @@ public interface AstBody extends Serializable {
 
   enum AstBodyType { 
     FLOW, FLOW_TASK, DT, TAG 
+  }
+  
+  
+  @JsonSerialize(as = ImmutableAstSource.class)
+  @JsonDeserialize(as = ImmutableAstSource.class)
+  @Value.Immutable
+  interface AstSource extends Serializable {
+    String getId();
+    String getHash();
+    AstBodyType getBodyType();
+    List<AstCommand> getCommands();
   }
 }

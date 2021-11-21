@@ -35,9 +35,7 @@ public class ImmutableServiceBuilder {
   private final ServiceType type;
   private String id;
   private String name;
-  private String rev;
   private String description;
-  private String src;
   private String metadata;
   private String pointer;
   private ServiceDataModel model;
@@ -51,33 +49,24 @@ public class ImmutableServiceBuilder {
   public AssetService build() {
     Assert.notNull(type, "type can't be null!");
     Assert.notNull(name, "name can't be null!");
-    Assert.notNull(src, "src can't be null!");
     Assert.notNull(pointer, "pointer can't be null!");
     //Assert.notNull(model, "model can't be null!");
     Assert.notNull(execution, "execution can't be null!");
-    Assert.notNull(rev, "rev can't be null!");
 
-    return new ImmutableService(id, pointer, rev,
-        type, name, description, src, metadata, model, execution);
+    return new ImmutableService(id, pointer,
+        type, name, description, metadata, model, execution);
   }
   public ImmutableServiceBuilder setId(String id) {
     this.id = id;
     return this;
   }
-  public ImmutableServiceBuilder setRev(String rev) {
-    this.rev = rev;
-    return this;
-  }
+
   public ImmutableServiceBuilder setName(String name) {
     this.name = name;
     return this;
   }
   public ImmutableServiceBuilder setDescription(String description) {
     this.description = description;
-    return this;
-  }
-  public ImmutableServiceBuilder setSrc(String src) {
-    this.src = src;
     return this;
   }
   public ImmutableServiceBuilder setPointer(String pointer) {
@@ -99,10 +88,8 @@ public class ImmutableServiceBuilder {
   public static ImmutableServiceBuilder from(AssetService service) {
     return new ImmutableServiceBuilder(service.getType())
         .setId(service.getId())
-        .setRev(service.getRev())
         .setName(service.getName())
         .setDescription(service.getDescription())
-        .setSrc(service.getSrc())
         .setPointer(service.getPointer())
         .setModel(service.getDataModel())
         .setExecution(service.getExecution())

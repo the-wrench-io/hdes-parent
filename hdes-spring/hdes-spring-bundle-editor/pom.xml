@@ -12,11 +12,7 @@
   <dependencies>
     <dependency>
       <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-services</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.resys.hdes</groupId>
-      <artifactId>hdes-client-git</artifactId>
+      <artifactId>hdes-client-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>

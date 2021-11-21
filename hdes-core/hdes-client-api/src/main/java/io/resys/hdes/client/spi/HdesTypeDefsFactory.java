@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.ImmutableTypeDef;
 import io.resys.hdes.client.api.ast.TypeDef;
@@ -60,22 +61,15 @@ import io.resys.hdes.client.spi.serializers.JsonObjectDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.TimeDataTypeDeserializer;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
-public class HdesTypeDefsFactory {
-  @FunctionalInterface
-  public interface ServiceInit {
-    <T> T get(Class<T> type);
-  }
-  
-  private final ServiceInit serviceInit;
+public class HdesTypeDefsFactory implements HdesTypesMapper {
   private final HdesClientConfig config;
   private final Map<ValueType, Deserializer> deserializers;
   private final Map<ValueType, Serializer> serializers;
   private final ValueTypeResolver valueTypeResolver;
   private final ObjectMapper objectMapper; 
 
-  public HdesTypeDefsFactory(ObjectMapper objectMapper, ServiceInit serviceInit, HdesClientConfig config) {
+  public HdesTypeDefsFactory(ObjectMapper objectMapper, HdesClientConfig config) {
     this.objectMapper = objectMapper;
-    this.serviceInit = serviceInit;
     this.config = config;
     
     Map<ValueType, Deserializer> deserializers = new HashMap<>();
@@ -130,10 +124,12 @@ public class HdesTypeDefsFactory {
 
   }
 
+  @Override
   public DataTypeAstBuilder dataType() {
     return new GenericDataTypeBuilder();
   }
   
+  @Override
   public ExpressionProgram expression(ValueType valueType, String src) {
     ExpressionProgram expression = ExpressionProgramFactory.builder()
         .objectMapper(objectMapper)
@@ -282,6 +278,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
+  @Override
   public String commandsString(List<AstCommand> commands) {
     try {
       return objectMapper.writeValueAsString(commands);
@@ -290,6 +287,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
+  @Override
   public ArrayNode commandsJson(String commands) {
     try {
       return (ArrayNode) objectMapper.readTree(commands);
@@ -297,6 +295,7 @@ public class HdesTypeDefsFactory {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
+  @Override
   public List<AstCommand> commandsList(String commands) {
     try {
       return objectMapper.readValue(commands, new TypeReference<List<AstCommand>>() {});
@@ -305,6 +304,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
+  @Override
   public Map<String, Serializable> toMap(Object entity) {
     try {
       return objectMapper.convertValue(entity, Map.class);
@@ -313,6 +313,7 @@ public class HdesTypeDefsFactory {
     }
   }
   
+  @Override
   public Map<String, Serializable> toMap(JsonNode entity) {
     try {
       return objectMapper.convertValue(entity, Map.class);
@@ -321,16 +322,13 @@ public class HdesTypeDefsFactory {
     }
   }
   
+  @Override
   public Object toType(Object value, Class<?> toType) {
     try {
       return objectMapper.convertValue(value, toType);
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }
-  }
-  
-  public ServiceInit getServiceInit() {
-    return this.serviceInit;
   }
   
   public HdesClientConfig config() {

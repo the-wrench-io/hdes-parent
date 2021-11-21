@@ -32,6 +32,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.exceptions.ProgramException;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowExecutionStatus;
@@ -46,14 +47,13 @@ import io.resys.hdes.client.api.programs.ImmutableFlowResultErrorLog;
 import io.resys.hdes.client.api.programs.ImmutableFlowResultLog;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.expression.OperationFlowContext.FlowTaskExpressionContext;
 import io.resys.hdes.client.spi.groovy.ServiceProgramExecutor;
 
 public class FlowProgramExecutor {
   private static final Logger LOGGER = LoggerFactory.getLogger(FlowProgramExecutor.class);
-  private final HdesTypeDefsFactory factory;
+  private final HdesTypesMapper factory;
   private final FlowProgram program;
   private final ProgramContext context;
   private final Map<String, Serializable> accepted = new HashMap<>();
@@ -62,7 +62,7 @@ public class FlowProgramExecutor {
   private final StringBuilder shortHistory = new StringBuilder();
   private final FlowTaskExpressionContext expressionContext;
   
-  public FlowProgramExecutor(FlowProgram program, ProgramContext context, HdesTypeDefsFactory factory) {
+  public FlowProgramExecutor(FlowProgram program, ProgramContext context, HdesTypesMapper factory) {
     super();
     this.program = program;
     this.context = context;

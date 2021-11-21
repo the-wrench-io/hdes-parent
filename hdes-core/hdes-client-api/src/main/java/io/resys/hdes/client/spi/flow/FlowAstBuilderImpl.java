@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes.FlowAstBuilder;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstChangeset;
 import io.resys.hdes.client.api.ast.AstCommand;
@@ -55,13 +56,11 @@ import io.resys.hdes.client.api.ast.ImmutableAstFlowInputType;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeBean;
 import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
-import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class FlowAstBuilderImpl implements FlowAstBuilder {
@@ -76,12 +75,12 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
   private final Collection<AstFlowNodeVisitor> visitors = new ArrayList<>();
   private final NodeFlowBean result = new NodeFlowBean(inputTypes);
   private final ObjectMapper yamlMapper;
-  private final HdesTypeDefsFactory typeDefs;
+  private final HdesTypesMapper typeDefs;
   private final List<FlowAstCommandMessage> messages = new ArrayList<>();
   private List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   
-  public FlowAstBuilderImpl(ObjectMapper yamlMapper, HdesTypeDefsFactory typeDefs, Collection<AstFlowNodeVisitor> visitors) {
+  public FlowAstBuilderImpl(ObjectMapper yamlMapper, HdesTypesMapper typeDefs, Collection<AstFlowNodeVisitor> visitors) {
     super();
     this.yamlMapper = yamlMapper;
     this.typeDefs = typeDefs;
@@ -151,12 +150,8 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
     return ast
         .bodyType(AstBodyType.FLOW)
         .messages(messages)
-        .commands(changes.getCommands())
         .name(id == null ? "": id.getValue())
-        .rev(this.rev == null ? src.size() : this.rev)
         .src(flow)
-        .source(flow.getValue())
-        .hash(Sha2.blob(flow.getValue()))
         .headers(AstFlowNodesFactory.headers(typeDefs).build(flow))
         .build();
   }

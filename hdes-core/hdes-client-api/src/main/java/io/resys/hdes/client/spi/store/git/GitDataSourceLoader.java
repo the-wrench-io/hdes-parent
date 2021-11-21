@@ -1,4 +1,4 @@
-package io.resys.hdes.client.git.spi;
+package io.resys.hdes.client.spi.store.git;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -32,11 +32,9 @@ import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
-import io.resys.hdes.client.git.spi.connection.GitConnection;
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitEntry;
-import io.resys.hdes.client.git.spi.connection.ImmutableGitEntry;
 import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GitDataSourceLoader implements AutoCloseable {
@@ -159,6 +157,7 @@ public class GitDataSourceLoader implements AutoCloseable {
           .treeValue(treeValue)
           .blobValue(content)
           .bodyType(bodyType)
+          .blobHash(Sha2.blob(content))
           .build();
         files.add(gitFile);
         

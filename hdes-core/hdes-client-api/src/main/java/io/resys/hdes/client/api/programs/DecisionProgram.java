@@ -27,12 +27,11 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
-public interface DecisionProgram extends Program<AstDecision> {
+public interface DecisionProgram extends Program {
   List<DecisionRow> getRows();
   HitPolicy getHitPolicy();
   

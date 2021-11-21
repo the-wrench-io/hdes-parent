@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.store;
+package io.resys.hdes.client.spi.store.thena;
 
 import io.resys.hdes.client.api.HdesStore.QueryBuilder;
 

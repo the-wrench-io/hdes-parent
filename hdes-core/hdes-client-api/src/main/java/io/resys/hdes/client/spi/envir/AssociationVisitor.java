@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -39,11 +40,9 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepRefType;
 import io.resys.hdes.client.api.programs.ImmutableProgramAssociation;
 import io.resys.hdes.client.api.programs.ImmutableProgramMessage;
-import io.resys.hdes.client.api.programs.ImmutableProgramSource;
 import io.resys.hdes.client.api.programs.ImmutableProgramWrapper;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
-import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramSource;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
@@ -51,7 +50,7 @@ import io.resys.hdes.client.spi.flow.validators.FlowAssociationValidator;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class AssociationVisitor {
-  private final Map<String, ProgramSource> externalIdToSource = new HashMap<>();
+  private final Map<String, AstSource> externalIdToSource = new HashMap<>();
   private final Map<AstBodyType, List<String>> typeToExternalId = new HashMap<>(Map.of(
         AstBodyType.DT, new ArrayList<String>(),
         AstBodyType.FLOW_TASK, new ArrayList<String>(),
@@ -64,11 +63,7 @@ public class AssociationVisitor {
 
   public AssociationVisitor add(ProgramWrapper<?, ?> wrapper) {
     HdesAssert.isTrue(!this.externalIdToSource.containsKey(wrapper.getId()), () -> "commandJson with id: '" + wrapper.getId() + "' is already defined!");
-    externalIdToSource.put(wrapper.getId(), wrapper.getSource().orElseGet(() -> ImmutableProgramSource.builder()
-        .id(wrapper.getId())
-        .bodyType(wrapper.getType())
-        .hash("")
-        .build()));
+    externalIdToSource.put(wrapper.getId(), wrapper.getSource());
     typeToExternalId.get(wrapper.getType()).add(wrapper.getId());
     externalIdToDependencyErrors.put(wrapper.getId(), new ArrayList<>());
     externalIdToDependencyWarnings.put(wrapper.getId(), new ArrayList<>());
@@ -247,9 +242,9 @@ public class AssociationVisitor {
       final var errors = externalIdToDependencyErrors.get(wrapper.getId());
       return builder
           .from((ProgramWrapper<AstDecision, DecisionProgram>) wrapper)
-          .errors(externalIdToDependencyErrors.get(wrapper.getId()))
           .associations(assoc == null ? Collections.emptyList() : assoc)
           .status(errors.isEmpty() ? wrapper.getStatus() : ProgramStatus.DEPENDENCY_ERROR)
+          .addAllErrors(externalIdToDependencyErrors.get(wrapper.getId()))
           .addAllErrors(errors)
           .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
           .build();
@@ -260,9 +255,9 @@ public class AssociationVisitor {
       final var errors = externalIdToDependencyErrors.get(wrapper.getId());
       return builder
           .from((ProgramWrapper<AstService, ServiceProgram>) wrapper)
-          .errors(externalIdToDependencyErrors.get(wrapper.getId()))
           .associations(assoc == null ? Collections.emptyList() : assoc)
           .status(errors.isEmpty() ? wrapper.getStatus() : ProgramStatus.DEPENDENCY_ERROR)
+          .addAllErrors(externalIdToDependencyErrors.get(wrapper.getId()))
           .addAllErrors(errors)
           .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
           .build();
@@ -274,9 +269,9 @@ public class AssociationVisitor {
       
       return builder
           .from((ProgramWrapper<AstFlow, FlowProgram>) wrapper)
-          .errors(externalIdToDependencyErrors.get(wrapper.getId()))
           .associations(assoc == null ? Collections.emptyList() : assoc)
           .status(errors.isEmpty() ? wrapper.getStatus() : ProgramStatus.DEPENDENCY_ERROR)
+          .addAllErrors(externalIdToDependencyErrors.get(wrapper.getId()))
           .addAllErrors(errors)
           .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
           .build();

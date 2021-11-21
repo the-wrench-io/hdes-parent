@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
@@ -50,7 +51,6 @@ import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepConditionalThen
 import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepEndPointer;
 import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepThenPointer;
 import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepWhenThenPointer;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 
 public class FlowProgramBuilder {
@@ -60,11 +60,11 @@ public class FlowProgramBuilder {
       .pointer(END_STEP_POINTER)
       .build();
 
-  private final HdesTypeDefsFactory typesFactory;
+  private final HdesTypesMapper typesFactory;
   private final Map<String, FlowProgramStep> steps = new HashMap<>();
   private final Map<String, AstFlowTaskNode> tasksById = new HashMap<>();
   
-  public FlowProgramBuilder(HdesTypeDefsFactory typesFactory) {
+  public FlowProgramBuilder(HdesTypesMapper typesFactory) {
     super();
     this.typesFactory = typesFactory;
   }

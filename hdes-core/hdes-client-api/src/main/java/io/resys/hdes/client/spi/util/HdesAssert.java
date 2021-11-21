@@ -23,20 +23,26 @@ package io.resys.hdes.client.spi.util;
 import java.util.function.Supplier;
 
 public class HdesAssert {
-  
+  public static class HdesAssertException extends IllegalArgumentException {
+    private static final long serialVersionUID = 6305063707279384796L;
+    public HdesAssertException(String s) {
+      super(s);
+    }
+  }
+
   public static void notNull(Object object, Supplier<String> message) {
     if (object == null) {
-      throw new IllegalArgumentException(getMessage(message));
+      throw new HdesAssertException(getMessage(message));
     }
   }
   public static void notEmpty(String object, Supplier<String> message) {
     if (object == null || object.isBlank()) {
-      throw new IllegalArgumentException(getMessage(message));
+      throw new HdesAssertException(getMessage(message));
     }
   }
   public static void isTrue(boolean expression, Supplier<String> message) {
     if (!expression) {
-      throw new IllegalArgumentException(getMessage(message));
+      throw new HdesAssertException(getMessage(message));
     }
   }
   private static String getMessage(Supplier<String> supplier) {

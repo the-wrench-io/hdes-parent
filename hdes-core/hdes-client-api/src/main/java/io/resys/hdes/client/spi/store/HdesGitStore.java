@@ -1,4 +1,4 @@
-package io.resys.hdes.client.git.spi;
+package io.resys.hdes.client.spi.store;
 
 import java.util.List;
 
@@ -12,18 +12,20 @@ import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreState;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.git.spi.GitDataSourceLoader.GitFileReload;
-import io.resys.hdes.client.git.spi.connection.GitConnection;
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitCredsSupplier;
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitEntry;
-import io.resys.hdes.client.git.spi.connection.GitConnectionFactory;
-import io.resys.hdes.client.git.spi.connection.ImmutableGitInit;
+import io.resys.hdes.client.spi.store.git.GitConnection;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitCredsSupplier;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
+import io.resys.hdes.client.spi.store.git.GitConnectionFactory;
+import io.resys.hdes.client.spi.store.git.GitDataSourceLoader;
+import io.resys.hdes.client.spi.store.git.GitDataSourceLoader.GitFileReload;
+import io.resys.hdes.client.spi.store.git.GitFiles;
+import io.resys.hdes.client.spi.store.git.ImmutableGitInit;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
 
 
-public class HdesStoreGit implements HdesStore {
-  private static final Logger LOGGER = LoggerFactory.getLogger(HdesStoreGit.class);
+public class HdesGitStore implements HdesStore {
+  private static final Logger LOGGER = LoggerFactory.getLogger(HdesGitStore.class);
 
   private final GitConnection conn;
   
@@ -31,7 +33,7 @@ public class HdesStoreGit implements HdesStore {
     String getAbsolutePath();
   }
   
-  public HdesStoreGit(GitConnection conn) {
+  public HdesGitStore(GitConnection conn) {
     super();
     this.conn = conn;
   }
@@ -206,8 +208,9 @@ public class HdesStoreGit implements HdesStore {
             final var mapped = map(entry.getValue());
             switch (mapped.getBodyType()) {
             case FLOW: state.putFlows(entry.getKey(), map(entry.getValue())); break;
-            case FLOW_TASK: state.putFlows(entry.getKey(), map(entry.getValue())); break;
-            case DT: state.putFlows(entry.getKey(), map(entry.getValue())); break;
+            case FLOW_TASK: state.putServices(entry.getKey(), map(entry.getValue())); break;
+            case DT: state.putDecisions(entry.getKey(), map(entry.getValue())); break;
+            case TAG: state.putTags(entry.getKey(), map(entry.getValue())); break;
             default: throw new RuntimeException("Unknown body type: '" + mapped.getBodyType() + "'!");
             }
           }
@@ -254,7 +257,7 @@ public class HdesStoreGit implements HdesStore {
       return this;
     }
     
-    public HdesStoreGit build() {
+    public HdesGitStore build() {
       HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
       HdesAssert.notNull(creds, () -> "creds must be defined!");
       
@@ -305,7 +308,7 @@ public class HdesStoreGit implements HdesStore {
         throw new RuntimeException(e.getMessage(), e);
       };
       
-      return new HdesStoreGit(conn);
+      return new HdesGitStore(conn);
     }
   }
 }

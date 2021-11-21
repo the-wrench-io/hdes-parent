@@ -10,6 +10,7 @@ import io.resys.hdes.client.api.HdesClient.DecisionExecutor;
 import io.resys.hdes.client.api.HdesClient.ExecutorBuilder;
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.HdesClient.FlowExecutor;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.HdesClient.ServiceExecutor;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
@@ -28,10 +29,10 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesClientExecutorBuilder implements ExecutorBuilder {
   private final ProgramEnvir envir;
-  private final HdesTypeDefsFactory defs;
+  private final HdesTypesMapper defs;
   private final ImmutableProgramContext.Builder data;
   
-  public HdesClientExecutorBuilder(ProgramEnvir envir, HdesTypeDefsFactory defs) {
+  public HdesClientExecutorBuilder(ProgramEnvir envir, HdesTypesMapper defs) {
     this.envir = envir;
     this.defs = defs;
     this.data = ImmutableProgramContext.builder(defs, envir);

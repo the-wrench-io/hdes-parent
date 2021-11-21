@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
@@ -50,8 +51,6 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
-import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 
@@ -93,23 +92,22 @@ public class CommandMapper {
     }
   }
   
-  public static Builder builder(HdesTypeDefsFactory dataTypeFactory) {
+  public static Builder builder(HdesTypesMapper dataTypeFactory) {
     return new Builder(dataTypeFactory);
   }
 
   public static class Builder {
-    private final HdesTypeDefsFactory typeDefs; 
+    private final HdesTypesMapper typeDefs; 
     private long idGen = 0;
     private String name;
     private String description;
     private HitPolicy hitPolicy;
-    private int version;
     
     private final Map<String, MutableHeader> headers = new HashMap<>();
     private final Map<String, MutableCell> cells = new HashMap<>();
     private final Map<String, MutableRow> rows = new HashMap<>();
 
-    public Builder(HdesTypeDefsFactory dataTypeFactory) {
+    public Builder(HdesTypesMapper dataTypeFactory) {
       super();
       this.typeDefs = dataTypeFactory;
     }
@@ -142,10 +140,6 @@ public class CommandMapper {
     }
     public Builder hitPolicy(HitPolicy hitPolicy) {
       this.hitPolicy = hitPolicy;
-      return this;
-    }
-    public Builder version(int version) {
-      this.version = version;
       return this;
     }
     public Map.Entry<String, Builder> addHeader(Direction direction, String name) {
@@ -420,14 +414,10 @@ public class CommandMapper {
           .collect(Collectors.toList());
       
       final HitPolicy hitPolicy = this.hitPolicy == null ? HitPolicy.ALL : this.hitPolicy;
-      final var source = DecisionAstSourceBuilder.build(headers, rows, name, description, hitPolicy);
-      final var sourceString = typeDefs.commandsString(source);
-      
       return ImmutableAstDecision.builder()
           .name(name)
           .bodyType(AstBodyType.DT)
           .description(description)
-          .rev(version)
           .hitPolicy(hitPolicy)
           .headerTypes(headerTypes)
           .headerExpressions(headerExpressions)
@@ -436,8 +426,6 @@ public class CommandMapper {
               .returnDefs(headers.stream().filter(p -> p.getDirection() == Direction.OUT).collect(Collectors.toList()))
               .build())
           .rows(rows)
-          .hash(Sha2.blob(sourceString))
-          .source(sourceString)
           .build();
     }
   }

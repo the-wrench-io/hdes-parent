@@ -36,6 +36,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesAstTypes.ServiceAstBuilder;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.Headers;
 import io.resys.hdes.client.api.ast.AstCommand;
@@ -53,20 +54,18 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.ServiceAstException;
 import io.resys.hdes.client.api.programs.ServiceData;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
-import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class ServiceAstBuilderImpl implements ServiceAstBuilder {
 
   
-  private final HdesTypeDefsFactory dataTypeRepository;
+  private final HdesTypesMapper dataTypeRepository;
   private final List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   private final GroovyClassLoader gcl;
 
-  public ServiceAstBuilderImpl(HdesTypeDefsFactory dataTypeRepository, GroovyClassLoader gcl) {
+  public ServiceAstBuilderImpl(HdesTypesMapper dataTypeRepository, GroovyClassLoader gcl) {
     super();
     this.dataTypeRepository = dataTypeRepository;
     this.gcl = gcl;
@@ -142,10 +141,6 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
           .bodyType(AstBodyType.FLOW_TASK)
           .name(beanType.getSimpleName())
           .headers(method)
-          .source(source)
-          .rev(changes.getCommands().size())
-          .commands(changes.getCommands())
-          .hash(Sha2.blob(source))
           .beanType(beanType)
           .executorType(executorType)
           .build();

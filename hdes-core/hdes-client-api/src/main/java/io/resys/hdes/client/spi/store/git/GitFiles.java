@@ -1,4 +1,4 @@
-package io.resys.hdes.client.git.spi;
+package io.resys.hdes.client.spi.store.git;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -32,11 +32,10 @@ import org.slf4j.LoggerFactory;
 import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
-import io.resys.hdes.client.git.spi.GitDataSourceLoader.GitFile;
-import io.resys.hdes.client.git.spi.GitDataSourceLoader.GitFileReload;
-import io.resys.hdes.client.git.spi.connection.GitConnection;
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitEntry;
 import io.resys.hdes.client.spi.staticresources.Sha2;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
+import io.resys.hdes.client.spi.store.git.GitDataSourceLoader.GitFile;
+import io.resys.hdes.client.spi.store.git.GitDataSourceLoader.GitFileReload;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GitFiles {

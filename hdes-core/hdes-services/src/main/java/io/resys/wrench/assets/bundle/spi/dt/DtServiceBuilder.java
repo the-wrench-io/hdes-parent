@@ -106,10 +106,8 @@ public class DtServiceBuilder extends TemplateServiceBuilder {
 
     return ImmutableServiceBuilder.newDt()
         .setId(serviceId)
-        .setRev(ast.getRev() + "")
         .setName(ast.getName())
         .setDescription(ast.getDescription())
-        .setSrc(ast.getSource())
         .setPointer(pointer)
         .setModel(dataModel)
         .setExecution(() -> new DtServiceExecution(hdesClient, decisionTable))

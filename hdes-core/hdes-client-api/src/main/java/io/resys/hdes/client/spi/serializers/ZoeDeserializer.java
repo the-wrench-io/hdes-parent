@@ -30,7 +30,7 @@ import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.spi.store.PersistenceConfig;
+import io.resys.hdes.client.spi.store.thena.PersistenceConfig;
 
 
 public class ZoeDeserializer implements PersistenceConfig.Deserializer {

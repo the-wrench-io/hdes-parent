@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.HdesAstTypes.DecisionAstBuilder;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision;
@@ -43,7 +44,6 @@ import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 import io.resys.hdes.client.spi.decision.ast.CommandMapper;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
@@ -51,11 +51,11 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
 
   private final static List<String> knownCommandTypes = Arrays.asList(AstCommandValue.values()).stream().map(c -> c.name()).collect(Collectors.toList());
 
-  private final HdesTypeDefsFactory dataTypeFactory;
+  private final HdesTypesMapper dataTypeFactory;
   private final List<AstCommand> src = new ArrayList<>();
   private Integer rev;
 
-  public DecisionAstBuilderImpl(HdesTypeDefsFactory dataTypeFactory) {
+  public DecisionAstBuilderImpl(HdesTypesMapper dataTypeFactory) {
     super();
     this.dataTypeFactory = dataTypeFactory;
   }
@@ -103,10 +103,8 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
         }
         execute(builder, command);
       }
-      builder.version(limit);
     } else {
       src.forEach(command -> execute(builder, command));
-      builder.version(src.size());
     }
 
     return builder.build();

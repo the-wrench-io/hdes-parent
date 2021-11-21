@@ -32,14 +32,17 @@ import javax.annotation.Nullable;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
+import io.resys.hdes.client.api.programs.ExpressionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
@@ -53,9 +56,22 @@ public interface HdesClient {
   ExecutorBuilder executor(ProgramEnvir envir);
   EnvirBuilder envir();
   
+  HdesTypesMapper mapper();
   HdesAstTypes types();
   HdesStore store();
   CSVBuilder csv();
+  
+  
+  public interface HdesTypesMapper {
+    DataTypeAstBuilder dataType();
+    ExpressionProgram expression(ValueType valueType, String src);
+    String commandsString(List<AstCommand> commands);
+    ArrayNode commandsJson(String commands);
+    List<AstCommand> commandsList(String commands);
+    Map<String, Serializable> toMap(Object entity);
+    Map<String, Serializable> toMap(JsonNode entity);
+    Object toType(Object value, Class<?> toType);
+  }
   
   
   interface EnvirBuilder {

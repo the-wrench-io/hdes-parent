@@ -34,27 +34,23 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 public class ImmutableService implements AssetService {
 
   private final String id;
-  private final String rev;
   private final ServiceType type;
   private final String name;
   private final String description;
-  private final String src;
   private final String metadata;
   private final String pointer;
   private final ServiceDataModel dataModel;
   private final Supplier<ServiceExecution> execution;
   
   public ImmutableService(
-      String id, String pointer, String rev,
-      ServiceType type, String name, String description, String src, String metadata,
+      String id, String pointer,
+      ServiceType type, String name, String description, String metadata,
       ServiceDataModel dataModel, Supplier<ServiceExecution> execution) {
     super();
     this.id = id;
-    this.rev = rev;
     this.type = type;
     this.name = name;
     this.description = description;
-    this.src = src;
     this.metadata = metadata;
     this.pointer = pointer;
     this.dataModel = dataModel;
@@ -65,11 +61,9 @@ public class ImmutableService implements AssetService {
     return new ImmutableService(
         service.getId(),
         service.getPointer(),
-        service.getRev(),
         service.getType(),
         service.getName(),
         service.getDescription(),
-        service.getSrc(),
         service.getMetadata(),
         service.getDataModel(),
         service.getExecution());
@@ -79,11 +73,9 @@ public class ImmutableService implements AssetService {
     return new ImmutableService(
         service.getId(),
         service.getPointer(),
-        service.getRev(),
         service.getType(),
         newName,
         service.getDescription(),
-        service.getSrc(),
         service.getMetadata(),
         service.getDataModel().withErrors(errors),
         service.getExecution());
@@ -93,11 +85,9 @@ public class ImmutableService implements AssetService {
     return new ImmutableService(
         service.getId(),
         service.getPointer(),
-        service.getRev(),
         service.getType(),
         service.getName(),
         service.getDescription(),
-        service.getSrc(),
         service.getMetadata(),
         service.getDataModel().withTimestamps(created, modified),
         service.getExecution());
@@ -117,10 +107,6 @@ public class ImmutableService implements AssetService {
   @Override
   public String getDescription() {
     return description;
-  }
-  @Override
-  public String getSrc() {
-    return src;
   }
   @Override
   public String getPointer() {
@@ -148,10 +134,5 @@ public class ImmutableService implements AssetService {
   @Override
   public String getMetadata() {
     return metadata;
-  }
-
-  @Override
-  public String getRev() {
-    return rev;
   }
 }

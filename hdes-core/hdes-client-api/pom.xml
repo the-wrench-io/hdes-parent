@@ -16,7 +16,19 @@
       <artifactId>value</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
+    <dependency>
+      <groupId>org.ehcache</groupId>
+      <artifactId>ehcache</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit.ssh.jsch</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
@@ -25,7 +37,12 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-expression</artifactId>
     </dependency>
-    
+    <dependency>
+      <groupId>io.resys.hdes</groupId>
+      <artifactId>thena-docdb-api</artifactId>
+    </dependency>
+
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -33,10 +50,6 @@
     <dependency>
       <groupId>io.smallrye.reactive</groupId>
       <artifactId>mutiny</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.resys.hdes</groupId>
-      <artifactId>thena-docdb-api</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>

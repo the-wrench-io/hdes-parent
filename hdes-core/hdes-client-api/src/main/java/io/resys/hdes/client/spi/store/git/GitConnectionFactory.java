@@ -1,4 +1,4 @@
-package io.resys.hdes.client.git.spi.connection;
+package io.resys.hdes.client.spi.store.git;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,10 +39,10 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitCredsSupplier;
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitEntry;
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitInit;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitCredsSupplier;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitInit;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
@@ -90,7 +90,7 @@ public class GitConnectionFactory {
     final var absoluteAssetPath = "/" + FileUtils.cleanPath(absolutePath) + "/" + assetPath;
     
     // init cache
-    final var cacheName = "hdesGitCache";
+    final var cacheName = GitConnectionFactory.class.getCanonicalName();
     final var cacheHeap = 200;
     final var cacheManager = CacheManagerBuilder.newCacheManagerBuilder() 
         .withCache(cacheName,

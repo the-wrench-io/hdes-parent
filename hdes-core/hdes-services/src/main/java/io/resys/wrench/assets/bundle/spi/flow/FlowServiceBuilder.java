@@ -1,6 +1,5 @@
 package io.resys.wrench.assets.bundle.spi.flow;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,20 +96,13 @@ public class FlowServiceBuilder extends TemplateServiceBuilder {
 
 //    ServiceDataModel dataModel = new FlowServiceDataModelBuilder(store).build(serviceId, program, lastModified);
 
-    try {
-      return ImmutableServiceBuilder.newFlow()
-          .setId(serviceId)
-          .setRev(ast.getRev() + "")
-          .setName(ast.getName())
-          .setDescription(ast.getDescription())
-          .setSrc(objectMapper.writeValueAsString(ast.getCommands()))
-          .setPointer(pointer)
-          //.setModel(dataModel)
-          .setExecution(() -> new FlowServiceExecution(ast, program, hdesClient))
-          .build();
-    } catch(IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+    return ImmutableServiceBuilder.newFlow()
+        .setId(serviceId)
+        .setName(ast.getName())
+        .setDescription(ast.getDescription())
+        .setPointer(pointer)
+        .setExecution(() -> new FlowServiceExecution(ast, program, hdesClient))
+        .build();
   }
 
   @Override

@@ -38,7 +38,7 @@ import io.resys.hdes.client.HdesClientImpl;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.spi.serializers.ZoeDeserializer;
 import io.resys.hdes.client.spi.store.ImmutablePersistenceConfig;
-import io.resys.hdes.client.spi.store.PersistenceConfig;
+import io.resys.hdes.client.spi.store.thena.PersistenceConfig;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoResult;
 import io.resys.thena.docdb.api.models.Repo;

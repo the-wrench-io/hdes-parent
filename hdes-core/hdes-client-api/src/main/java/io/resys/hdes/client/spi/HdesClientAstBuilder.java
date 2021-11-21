@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesClient.AstBuilder;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision;
@@ -19,14 +20,14 @@ import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 
 public class HdesClientAstBuilder implements AstBuilder {
-  private final HdesTypeDefsFactory defs;
+  private final HdesTypesMapper defs;
   private final HdesAstTypes ast;
   
   private Integer version;
   private final List<AstCommand> commands = new ArrayList<>();
   private ArrayNode json;
   
-  public HdesClientAstBuilder(HdesTypeDefsFactory defs, HdesAstTypes ast) {
+  public HdesClientAstBuilder(HdesTypesMapper defs, HdesAstTypes ast) {
     super();
     this.defs = defs;
     this.ast = ast;

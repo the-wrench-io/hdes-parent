@@ -43,10 +43,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.util.WebUtils;
 
-import io.resys.wrench.assets.bundle.spi.exceptions.DataException;
-import io.resys.wrench.assets.bundle.spi.exceptions.DataRedirectException;
-import io.resys.wrench.assets.bundle.spi.exceptions.Message;
-
 
 @ControllerAdvice
 public class AssetExceptionMapping {
@@ -105,14 +101,9 @@ public class AssetExceptionMapping {
 
   private Map.Entry<Integer, List<Message>> createBody(Exception e, String hash) {
     List<Message> messages = new ArrayList<>();
-    int status;
-    if(e instanceof DataException) {
-      status = ((DataException) e).getMessagesList().getStatus();
-      messages.addAll(((DataException) e).getMessagesList().get());
-    } else {
-      status = 500;
-      messages.add(new Message("internalError", "internal error, see log code"));
-    }
+    int status = 500;
+    messages.add(new Message("internalError", "internal error, see log code"));
+    
 
     List<Message> body = messages.stream()
         .map(m -> translate(m.setLogCode(hash)))

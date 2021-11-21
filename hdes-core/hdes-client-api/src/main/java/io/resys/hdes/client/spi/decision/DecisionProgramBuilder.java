@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionCell;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
@@ -34,13 +35,12 @@ import io.resys.hdes.client.api.programs.ImmutableDecisionProgram;
 import io.resys.hdes.client.api.programs.ImmutableDecisionRow;
 import io.resys.hdes.client.api.programs.ImmutableDecisionRowAccepts;
 import io.resys.hdes.client.api.programs.ImmutableDecisionRowReturns;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 
 public class DecisionProgramBuilder {
 
-  private final HdesTypeDefsFactory typesFactory;
+  private final HdesTypesMapper typesFactory;
   
-  public DecisionProgramBuilder(HdesTypeDefsFactory typesFactory) {
+  public DecisionProgramBuilder(HdesTypesMapper typesFactory) {
     super();
     this.typesFactory = typesFactory;
   }

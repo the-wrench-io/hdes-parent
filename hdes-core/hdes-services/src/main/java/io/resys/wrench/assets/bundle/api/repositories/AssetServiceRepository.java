@@ -143,15 +143,13 @@ public interface AssetServiceRepository {
     String getName();
     String getDescription();
     String getMetadata();
-    String getSrc();
     String getPointer();
-    String getRev();
     ServiceExecution newExecution();
     Supplier<ServiceExecution> getExecution();
   }
 
   interface ServiceExecution {
-    <T extends Program<?>> T unwrap();
+    <T extends Program> T unwrap();
     ServiceExecution insert(Serializable bean);
     <T> void run(Consumer<T> serviceType);
     ServiceResponse run();

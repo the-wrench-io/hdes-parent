@@ -24,7 +24,6 @@ import java.io.Serializable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import org.slf4j.Logger;
@@ -34,7 +33,6 @@ import org.springframework.util.Assert;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.programs.FlowProgram;
-import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.Program;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceResponse;
@@ -69,15 +67,15 @@ public class FlowServiceExecution implements ServiceExecution {
   @Override
   public ServiceResponse run() {
     try {
-      final var flowBuilder = flowRepository.executor();
-
-      for(Serializable fact : facts) {
-        if(fact instanceof Map) {
-          flowBuilder.inputMap((Map<String, Serializable>) fact);
-        }
-      }
-      FlowResult flow = flowBuilder.flow(flowModel).andGetBody();
-      return new FlowServiceResponse(flow);
+//      final var flowBuilder = flowRepository.executor();
+//
+//      for(Serializable fact : facts) {
+//        if(fact instanceof Map) {
+//          flowBuilder.inputMap((Map<String, Serializable>) fact);
+//        }
+//      }
+//      FlowResult flow = flowBuilder.flow(flowModel).andGetBody();
+      return null; //new FlowServiceResponse(flow);
     } catch(RuntimeException e) {
       throw e;
     } catch(Exception e) {
@@ -93,7 +91,7 @@ public class FlowServiceExecution implements ServiceExecution {
   }
 
   @Override
-  public <T extends Program<?>> T unwrap() {
+  public <T extends Program> T unwrap() {
     return (T) flowModel;
   }
 

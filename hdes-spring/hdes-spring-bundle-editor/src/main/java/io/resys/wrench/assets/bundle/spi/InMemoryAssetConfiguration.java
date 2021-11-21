@@ -24,21 +24,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceStore;
-import io.resys.wrench.assets.bundle.spi.store.AssetLocation;
-import io.resys.wrench.assets.bundle.spi.store.InMemoryAssetStore;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.resys.hdes.client.api.HdesStore;
+import io.resys.hdes.client.spi.store.HdesInMemoryStore;
 
 @ConditionalOnProperty(name = "wrench.assets.git.enabled", havingValue = "false", matchIfMissing = true)
 @Configuration
 public class InMemoryAssetConfiguration {
-
   @Bean
-  public AssetLocation classpathAssetLocation() {
-    return new AssetLocation("classpath*:", "assets/", false);
-  }
-
-  @Bean
-  public ServiceStore serviceStore() {
-    return new InMemoryAssetStore();
+  public HdesStore serviceStore(ObjectMapper objectMapper) {
+    return HdesInMemoryStore.builder().objectMapper(objectMapper).build();
   }
 }

@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.Headers;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
@@ -42,14 +43,13 @@ import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
 
 public class AstFlowNodesFactory {
 
   public static HeadersBuilder headers(HdesClient types) {
     return new HeadersBuilder(() -> types.types().dataType());
   }
-  public static HeadersBuilder headers(HdesTypeDefsFactory types) {
+  public static HeadersBuilder headers(HdesTypesMapper types) {
     return new HeadersBuilder(() -> types.dataType());
   }
   public static AcBuilder ac() {

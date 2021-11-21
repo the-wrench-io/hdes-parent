@@ -21,13 +21,9 @@ package io.resys.wrench.assets.bundle.spi.flowtask;
  */
 
 import java.io.Serializable;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.function.Consumer;
 
 import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.HdesClient.ExecutorBuilder;
 import io.resys.hdes.client.api.programs.Program;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceExecution;
@@ -36,19 +32,19 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ser
 public class FlowTaskServiceExecution implements ServiceExecution {
 
   private final ServiceProgram script;
-  private final ExecutorBuilder builder;
+  //private final ExecutorBuilder builder;
   public FlowTaskServiceExecution(ServiceProgram script, HdesClient client) {
     super();
     this.script = script;
-    this.builder = client.executor();
+    //this.builder = client.executor();
   }
 
   @Override
   public ServiceExecution insert(Serializable bean) {
     if(bean instanceof FlowTaskInput) {
-      builder.inputMap(new HashMap<>(((FlowTaskInput) bean).getValue()));
+      //builder.inputMap(new HashMap<>(((FlowTaskInput) bean).getValue()));
     } else {
-      builder.inputEntity(bean);
+      //builder.inputEntity(bean);
     }
     return this;
   }
@@ -57,29 +53,30 @@ public class FlowTaskServiceExecution implements ServiceExecution {
     try {
 
       
-      Object result = builder.service(script).andGetBody().getValue();
-      return new ServiceResponse() {
-        @Override
-        public void close() throws Exception {
-        }
-        @Override
-        public void forEach(Consumer<Object> consumer) {
-        }
-        @Override
-        public List<?> list() {
-          return Collections.emptyList();
-        }
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> T get() {
-          return (T) result;
-        }
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> T getDebug() {
-          return (T) result;
-        }
-      };
+//      Object result = builder.service(script).andGetBody().getValue();
+//      return new ServiceResponse() {
+//        @Override
+//        public void close() throws Exception {
+//        }
+//        @Override
+//        public void forEach(Consumer<Object> consumer) {
+//        }
+//        @Override
+//        public List<?> list() {
+//          return Collections.emptyList();
+//        }
+//        @SuppressWarnings("unchecked")
+//        @Override
+//        public <T> T get() {
+//          return (T) result;
+//        }
+//        @SuppressWarnings("unchecked")
+//        @Override
+//        public <T> T getDebug() {
+//          return (T) result;
+//        }
+//      };
+      return null;
     } catch(Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }
@@ -92,7 +89,7 @@ public class FlowTaskServiceExecution implements ServiceExecution {
   }
 
   @Override
-  public <T extends Program<?>> T unwrap() {
+  public <T extends Program> T unwrap() {
     return (T) script;
   }
 }

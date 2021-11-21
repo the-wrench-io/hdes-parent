@@ -1,4 +1,4 @@
-package io.resys.hdes.client.git.spi.connection;
+package io.resys.hdes.client.spi.store.git;
 
 import java.nio.file.Path;
 import java.sql.Timestamp;

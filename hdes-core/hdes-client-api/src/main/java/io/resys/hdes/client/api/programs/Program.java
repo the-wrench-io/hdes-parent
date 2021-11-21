@@ -26,10 +26,9 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.TypeDef;
 
-public interface Program<A extends AstBody> extends Serializable {
+public interface Program extends Serializable {
   
   interface ProgramResult extends Serializable {
   }  

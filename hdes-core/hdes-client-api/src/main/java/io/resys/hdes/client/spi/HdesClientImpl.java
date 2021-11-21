@@ -37,9 +37,11 @@ import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
+import io.resys.hdes.client.spi.cache.HdesClientCache;
+import io.resys.hdes.client.spi.cache.HdesClientEhCache;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
+import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
 import io.resys.hdes.client.spi.decision.DecisionCSVBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.envir.ProgramEnvirFactory;
@@ -50,12 +52,12 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesClientImpl implements HdesClient {
 
-  private final HdesTypeDefsFactory defs;
+  private final HdesTypesMapper defs;
   private final HdesAstTypes ast;
   private final HdesStore store;
   private final HdesClientConfig config;
   
-  public HdesClientImpl(HdesTypeDefsFactory types, HdesStore store, HdesAstTypes ast, HdesClientConfig config) {
+  public HdesClientImpl(HdesTypesMapper types, HdesStore store, HdesAstTypes ast, HdesClientConfig config) {
     super();
     this.defs = types;
     this.store = store;
@@ -68,7 +70,7 @@ public class HdesClientImpl implements HdesClient {
   }
   @Override
   public EnvirBuilder envir() {
-    ProgramEnvirFactory factory = new ProgramEnvirFactory(ast, defs, null);
+    ProgramEnvirFactory factory = new ProgramEnvirFactory(ast, defs, config);
     return new HdesClientEnvirBuilder(factory, defs);
   }
   @Override
@@ -84,11 +86,15 @@ public class HdesClientImpl implements HdesClient {
     return ast;
   }
   @Override
+  public HdesTypesMapper mapper() {
+    return defs;
+  }
+  @Override
   public ProgramBuilder program() {
     return new ProgramBuilder() {
       @Override
       public ServiceProgram ast(AstService ast) {
-        return new ServiceProgramBuilder(defs).build(ast);
+        return new ServiceProgramBuilder(config).build(ast);
       }
       @Override
       public DecisionProgram ast(AstDecision ast) {
@@ -122,6 +128,7 @@ public class HdesClientImpl implements HdesClient {
     private ObjectMapper objectMapper;
     private ServiceInit serviceInit;
     private HdesStore store;
+    private HdesClientCache cache;
     private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>(Arrays.asList(new IdValidator()));
 
     public Builder flowVisitors(AstFlowNodeVisitor ...visitors) {
@@ -136,6 +143,10 @@ public class HdesClientImpl implements HdesClient {
       this.serviceInit = serviceInit;
       return this;
     }
+    public Builder cache(HdesClientCache cache) {
+      this.cache = cache;
+      return this;
+    }
     public Builder store(HdesStore store) {
       this.store = store;
       return this;
@@ -143,17 +154,35 @@ public class HdesClientImpl implements HdesClient {
     public HdesClientImpl build() {
       HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
       HdesAssert.notNull(serviceInit, () -> "serviceInit must be defined!");
-      final var config = new HdesClientConfigImpl(flowVisitors);
-      final var types = new HdesTypeDefsFactory(objectMapper, serviceInit, config);
-      final var ast = new HdesAstTypesImpl(objectMapper, serviceInit, config);
+      
+      HdesClientCache cache = this.cache;
+      if(cache == null) {
+        cache = HdesClientEhCache.builder().build();
+      }
+      
+      final var config = new HdesClientConfigImpl(flowVisitors, cache, serviceInit);
+      final HdesTypesMapper types = new HdesTypeDefsFactory(objectMapper, config);
+      final var ast = new HdesAstTypesImpl(objectMapper, config);
       return new HdesClientImpl(types, store, ast, config);
     }
   }
 
   private static class HdesClientConfigImpl implements HdesClientConfig {
     private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>();
-    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors) {
+    private final HdesClientCache cache;
+    private final ServiceInit serviceInit;
+    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors, HdesClientCache cache, ServiceInit serviceInit) {
       this.flowVisitors.addAll(flowVisitors);
+      this.cache = cache;
+      this.serviceInit = serviceInit;
+    }
+    @Override
+    public ServiceInit getServiceInit() {
+      return serviceInit;
+    }
+    @Override
+    public HdesClientCache getCache() {
+      return cache;
     }
     @Override
     public List<AstFlowNodeVisitor> getFlowVisitors() {

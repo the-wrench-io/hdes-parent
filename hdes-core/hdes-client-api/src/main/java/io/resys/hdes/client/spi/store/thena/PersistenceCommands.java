@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.store;
+package io.resys.hdes.client.spi.store.thena;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -8,7 +8,7 @@ import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
 import io.resys.hdes.client.api.exceptions.StoreException;
-import io.resys.hdes.client.spi.store.PersistenceConfig.EntityState;
+import io.resys.hdes.client.spi.store.thena.PersistenceConfig.EntityState;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;

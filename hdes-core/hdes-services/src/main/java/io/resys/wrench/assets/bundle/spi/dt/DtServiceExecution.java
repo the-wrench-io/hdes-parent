@@ -68,10 +68,10 @@ public class DtServiceExecution implements ServiceExecution {
     Assert.notNull(dtInputResolver, "dtInputResolver must be inserted!");
 
     // Custom resolver
-    DecisionResult result = decisionTableRepository.executor()
+    DecisionResult result = decisionTableRepository.executor(null)
         .inputList(inputs)
         .input(dtInputResolver)
-        .decision(decisionTable)
+        .decision(null)
         .andGetBody();
     return new DtServiceResponse(result);
 
@@ -84,7 +84,7 @@ public class DtServiceExecution implements ServiceExecution {
   }
 
   @Override
-  public <T extends Program<?>> T unwrap() {
+  public <T extends Program> T unwrap() {
     return (T) decisionTable;
   }
 }

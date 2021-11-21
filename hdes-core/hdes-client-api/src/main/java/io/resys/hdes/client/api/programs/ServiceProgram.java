@@ -26,13 +26,12 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
-import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstService.AstServiceType;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 @Value.Immutable
-public interface ServiceProgram extends Program<AstService> {
+public interface ServiceProgram extends Program {
 
   AstServiceType getExecutorType();
   ServiceExecutorType getBean();

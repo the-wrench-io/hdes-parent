@@ -26,17 +26,17 @@ import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType;
 import io.resys.hdes.client.api.programs.ImmutableServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
+import io.resys.hdes.client.spi.config.HdesClientConfig;
 
 public class ServiceProgramBuilder {
-  private final HdesTypeDefsFactory typesFactory;
+  private final HdesClientConfig config;
 
-  public ServiceProgramBuilder(HdesTypeDefsFactory typesFactory) {
+  public ServiceProgramBuilder(HdesClientConfig config) {
     super();
-    this.typesFactory = typesFactory;
+    this.config = config;
   }
   public ServiceProgram build(AstService ast) {
-    final ServiceExecutorType executable = typesFactory.getServiceInit().get(ast.getBeanType());
+    final ServiceExecutorType executable = config.getServiceInit().get(ast.getBeanType());
     
     final var inputs = ast.getHeaders().getAcceptDefs().stream()
         .sorted((p1, p2) -> Integer.compare(p1.getOrder(), p2.getOrder()))

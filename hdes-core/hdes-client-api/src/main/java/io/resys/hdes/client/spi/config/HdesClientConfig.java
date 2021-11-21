@@ -24,9 +24,17 @@ import java.util.List;
 
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+import io.resys.hdes.client.spi.cache.HdesClientCache;
 
 public interface HdesClientConfig {
 
+  @FunctionalInterface
+  interface ServiceInit {
+    <T> T get(Class<T> type);
+  }
+  
+  ServiceInit getServiceInit();
+  HdesClientCache getCache();
   List<AstFlowNodeVisitor> getFlowVisitors();
   HdesClientConfig config(AstFlowNodeVisitor ... changes);
   

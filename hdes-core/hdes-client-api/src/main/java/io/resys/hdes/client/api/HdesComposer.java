@@ -1,5 +1,7 @@
 package io.resys.hdes.client.api;
 
+import java.io.Serializable;
+
 /*-
  * #%L
  * hdes-client-api
@@ -32,6 +34,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -45,12 +48,55 @@ import io.smallrye.mutiny.Uni;
  * Backend for composer related service. 
  * Provides mutability of the assets.
  */
-public interface HdesComposer {
-  
+public interface HdesComposer {  
   Uni<ComposerState> get();
+  Uni<ComposerEntity<?>> get(String id);
+  Uni<List<ComposerEntity<?>>> getHistory(String id);
   Uni<ComposerState> update(UpdateEntity asset);
   Uni<ComposerState> create(CreateEntity asset);
   Uni<ComposerState> delete(String id);
+  Uni<ComposerState> copyAs(CopyAs copyAs);
+  Uni<DebugResponse> debug(DebugRequest entity);
+  Uni<ComposerEntity<?>> dryRun(UpdateEntity entity);
+  Uni<StoreDump> getStoreDump();
+  
+
+  @JsonSerialize(as = ImmutableDebugResponse.class)
+  @JsonDeserialize(as = ImmutableDebugResponse.class)
+  @Value.Immutable
+  interface DebugResponse extends Serializable {
+    String getId();
+    @Nullable
+    String getBody();
+  }
+  
+  @JsonSerialize(as = ImmutableDebugRequest.class)
+  @JsonDeserialize(as = ImmutableDebugRequest.class)
+  @Value.Immutable
+  interface DebugRequest extends Serializable {
+    String getId();
+    @Nullable
+    String getInput();
+    @Nullable
+    String getInputCsv();
+  }
+  
+  @JsonSerialize(as = ImmutableCopyAs.class)
+  @JsonDeserialize(as = ImmutableCopyAs.class)
+  @Value.Immutable
+  interface CopyAs extends Serializable {
+    String getId(); // id of the entity
+    String getName(); // new name of the entity
+  }
+  
+  @JsonSerialize(as = ImmutableStoreDump.class)
+  @JsonDeserialize(as = ImmutableStoreDump.class)
+  @Value.Immutable
+  interface StoreDump extends Serializable {
+    String getId();
+    List<AstSource> getValue();
+  }
+
   
   @Value.Immutable
   @JsonSerialize(as = ImmutableComposerState.class)
@@ -58,7 +104,7 @@ public interface HdesComposer {
   interface ComposerState {
     Map<String, ComposerEntity<AstFlow>> getFlows();
     Map<String, ComposerEntity<AstService>> getServices();
-    Map<String, ComposerEntity<AstDecision>> getDecisionss();
+    Map<String, ComposerEntity<AstDecision>> getDecisions();
   }
 
   @Value.Immutable
@@ -68,7 +114,7 @@ public interface HdesComposer {
     String getId();
     @Nullable
     A getAst();
-    
+    AstSource getSource();
     List<ProgramMessage> getWarnings();
     List<ProgramMessage> getErrors();
     List<ProgramAssociation> getAssociations();

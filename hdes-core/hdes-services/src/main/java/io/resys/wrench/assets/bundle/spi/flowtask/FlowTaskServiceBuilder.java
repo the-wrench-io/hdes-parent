@@ -91,10 +91,8 @@ public class FlowTaskServiceBuilder extends TemplateServiceBuilder {
 
       return ImmutableServiceBuilder.newFlowTask()
           .setId(serviceId)
-          .setRev(script.getRev() + "")
           .setName(name)
           .setDescription(null)
-          .setSrc(script.getSource())
           .setPointer(pointer)
           .setModel(dataModel)
           .setExecution(() -> new FlowTaskServiceExecution(scriptRepository.program().ast(script), scriptRepository))

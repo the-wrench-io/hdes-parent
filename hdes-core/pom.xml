@@ -14,8 +14,6 @@
   <modules>
     <module>hdes-client-api</module> 
     <module>hdes-client</module>
-    <module>hdes-services</module>
-    <module>hdes-client-git</module>
   </modules>
 
 </project>

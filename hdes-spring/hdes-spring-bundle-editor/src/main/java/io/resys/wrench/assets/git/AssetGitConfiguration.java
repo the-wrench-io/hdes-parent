@@ -8,14 +8,13 @@ import org.springframework.context.annotation.Bean;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesStore;
-import io.resys.hdes.client.git.spi.HdesStoreGit;
-import io.resys.hdes.client.git.spi.connection.GitConnection.GitCredsSupplier;
-import io.resys.hdes.client.git.spi.connection.ImmutableGitCreds;
+import io.resys.hdes.client.spi.store.HdesGitStore;
+import io.resys.hdes.client.spi.store.git.GitConnection.GitCredsSupplier;
+import io.resys.hdes.client.spi.store.git.ImmutableGitCreds;
 import io.resys.wrench.assets.context.config.GitConfigBean;
 
 @ConditionalOnProperty(name = "wrench.assets.git.enabled", havingValue = "true")
 public class AssetGitConfiguration {
-
   
   @Bean
   public HdesStore hdesStore(Optional<GitCredsSupplier> authorProvider, GitConfigBean gitConfigBean, ObjectMapper objectMapper) {
@@ -30,7 +29,7 @@ public class AssetGitConfiguration {
       creds = authorProvider.get();
     }
     
-    return HdesStoreGit.builder()
+    return HdesGitStore.builder()
         .remote(gitConfigBean.getRepositoryUrl())
         .branch(gitConfigBean.getBranchSpecifier())
         .sshPath(gitConfigBean.getPrivateKey())
@@ -39,30 +38,4 @@ public class AssetGitConfiguration {
         .creds(creds)
         .build();
   }
-  
-  
-  
-//  @Bean
-//  public GitRepository gitRepository(
-//      GitConfigBean gitConfigBean, 
-//      Optional<AssetAuthorProvider> authorProvider) 
-//      throws InvalidRemoteException, IOException, GitAPIException {
-//    
-//    if(authorProvider.isEmpty()) {
-//      if(gitConfigBean.getEmail() != null && gitConfigBean.getEmail().contains("@")) {
-//        authorProvider = Optional.of(() -> new AssetAuthorProvider.Author(gitConfigBean.getEmail().split("@")[0], gitConfigBean.getEmail()));
-//      } else {
-//        authorProvider = Optional.of(() -> new AssetAuthorProvider.Author("assetManager", "assetManager@resys.io"));  
-//      } 
-//    }
-//    return new SshGitRepository(gitConfigBean.toConfig(), authorProvider.get());
-//  }
-//  @Bean
-//  public AssetLocation gitAsssetLocation(GitRepository gitRepository) {
-//    return new AssetLocation(gitRepository.getWorkingDir(), "/assets/", true);
-//  }
-//  @Bean
-//  public ServiceStore serviceStore(GitRepository gitRepository, AssetLocation location) {
-//    return new GitAssetStore(gitRepository, location);
-//  }
 }

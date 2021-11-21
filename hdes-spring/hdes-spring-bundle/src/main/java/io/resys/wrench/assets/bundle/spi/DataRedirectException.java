@@ -2,9 +2,9 @@ package io.resys.wrench.assets.bundle.spi;
 
 /*-
  * #%L
- * hdes-spring-bundle
+ * wrench-component-context
  * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,18 +20,17 @@ package io.resys.wrench.assets.bundle.spi;
  * #L%
  */
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+public class DataRedirectException extends RuntimeException {
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+  private static final long serialVersionUID = 3959814206762067663L;
+  private final String url;
 
-import io.resys.hdes.client.api.HdesStore;
-import io.resys.hdes.client.spi.store.HdesInMemoryStore;
+  public DataRedirectException(String url) {
+    super();
+    this.url = url;
+  }
 
-@Configuration
-public class InMemoryAssetConfiguration {
-  @Bean
-  public HdesStore serviceStore(ObjectMapper objectMapper) {
-    return HdesInMemoryStore.builder().objectMapper(objectMapper).build();
+  public String getUrl() {
+    return url;
   }
 }

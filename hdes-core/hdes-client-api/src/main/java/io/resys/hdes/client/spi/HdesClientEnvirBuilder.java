@@ -2,9 +2,10 @@ package io.resys.hdes.client.spi;
 
 import io.resys.hdes.client.api.HdesClient.EnvirBuilder;
 import io.resys.hdes.client.api.HdesClient.EnvirCommandFormatBuilder;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.api.programs.ImmutableProgramSource;
+import io.resys.hdes.client.api.ast.ImmutableAstSource;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.spi.envir.ProgramEnvirFactory;
 import io.resys.hdes.client.spi.staticresources.Sha2;
@@ -12,10 +13,10 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class HdesClientEnvirBuilder implements EnvirBuilder {
   private final ProgramEnvirFactory factory;
-  private final HdesTypeDefsFactory defs;
+  private final HdesTypesMapper defs;
   private ProgramEnvir envir;
   
-  public HdesClientEnvirBuilder(ProgramEnvirFactory factory, HdesTypeDefsFactory defs) {
+  public HdesClientEnvirBuilder(ProgramEnvirFactory factory, HdesTypesMapper defs) {
     super();
     this.factory = factory;
     this.defs = defs;
@@ -76,7 +77,7 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
         HdesAssert.isTrue(commandJson != null || entity != null, () -> "commandJson or entity must be defined!");
         HdesAssert.isTrue(commandJson == null || entity == null, () -> "commandJson and entity can't be both defined!");
         
-        factory.add(ImmutableProgramSource.builder()
+        factory.add(ImmutableAstSource.builder()
             .id(id)
             .bodyType(type)
             .hash(entity == null ? Sha2.blob(commandJson) : entity.getHash())

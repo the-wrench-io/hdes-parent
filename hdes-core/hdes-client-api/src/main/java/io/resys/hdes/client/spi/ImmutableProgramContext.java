@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
@@ -43,7 +44,7 @@ import io.resys.hdes.client.api.programs.ServiceProgram;
 
 public class ImmutableProgramContext implements ProgramContext {
 
-  private final HdesTypeDefsFactory factory;
+  private final HdesTypesMapper factory;
   private final ProgramSupplier programSupplier;
 
   private final ExecutorInput callbackThatWillSupplyAllData;
@@ -57,7 +58,7 @@ public class ImmutableProgramContext implements ProgramContext {
   // generic data sources that will be used for init of genericData
   private final List<Supplier<Map<String, Serializable>>> suppliers;
   
-  public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypeDefsFactory factory, ProgramEnvir envir) {
+  public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypesMapper factory, ProgramEnvir envir) {
     super();
     this.suppliers = inputs;
     this.callbackThatWillSupplyAllData = input;
@@ -124,18 +125,18 @@ public class ImmutableProgramContext implements ProgramContext {
     return programSupplier;
   }
   
-  public static Builder builder(HdesTypeDefsFactory factory, ProgramEnvir envir) {
+  public static Builder builder(HdesTypesMapper factory, ProgramEnvir envir) {
     return new Builder(factory, envir);
   }
   
   public static class Builder {
-    private final HdesTypeDefsFactory factory;
+    private final HdesTypesMapper factory;
     private final List<Supplier<Map<String, Serializable>>> suppliers = new ArrayList<>();
     private final ProgramEnvir envir;
     private ExecutorInput input;
     private Object serviceData;
     
-    public Builder(HdesTypeDefsFactory factory, ProgramEnvir envir) {
+    public Builder(HdesTypesMapper factory, ProgramEnvir envir) {
       super();
       this.factory = factory;
       this.envir = envir;

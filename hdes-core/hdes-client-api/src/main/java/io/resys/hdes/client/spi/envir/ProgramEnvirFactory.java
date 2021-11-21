@@ -28,7 +28,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
@@ -40,36 +42,38 @@ import io.resys.hdes.client.api.programs.ImmutableProgramMessage;
 import io.resys.hdes.client.api.programs.ImmutableProgramWrapper;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
-import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramSource;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory;
+import io.resys.hdes.client.spi.cache.HdesClientCache;
+import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
 
 public class ProgramEnvirFactory {
 
+  private final HdesClientConfig config;
   private final HdesAstTypes hdesTypes;
-  private final HdesTypeDefsFactory hdesFactory;
-  private final ProgramEnvirCache cache;
+  private final HdesTypesMapper hdesFactory;
+  private final HdesClientCache cache;
   private final AssociationVisitor tree = new AssociationVisitor();
   private final List<String> visitedIds = new ArrayList<>();
   private ProgramEnvir baseEnvir;
   
-  public ProgramEnvirFactory(HdesAstTypes hdesTypes, HdesTypeDefsFactory hdesFactory, ProgramEnvirCache cache) {
+  public ProgramEnvirFactory(HdesAstTypes hdesTypes, HdesTypesMapper hdesFactory, HdesClientConfig config) {
     super();
     this.hdesTypes = hdesTypes;
     this.hdesFactory = hdesFactory;
-    this.cache = cache;
+    this.cache = config.getCache();
+    this.config = config;
   }
   
   public ProgramEnvirFactory add(ProgramEnvir envir) {
     this.baseEnvir = envir;
     return this;
   }
-  public ProgramEnvirFactory add(ProgramSource entity) {
+  public ProgramEnvirFactory add(AstSource entity) {
     final var wrapper = visitSource(entity);
     visitedIds.add(wrapper.getId());
     tree.add(wrapper);
@@ -104,14 +108,7 @@ public class ProgramEnvirFactory {
     return envir.build();
   }
   
-  private ProgramWrapper<?, ?> visitSource(ProgramSource entity) {
-    if(cache != null) {
-      final var cached = cache.get(entity.getHash());
-      if(cached.isPresent()) {
-        return cached.get();
-      }
-    }
-    
+  private ProgramWrapper<?, ?> visitSource(AstSource entity) {
     ProgramWrapper<?, ?> result = null;
     switch (entity.getBodyType()) {
     case DT: result = visitDecision(entity); break;
@@ -119,20 +116,20 @@ public class ProgramEnvirFactory {
     case FLOW_TASK: result = visitFlowTask(entity); break;
     default: throw new IllegalArgumentException("unknown command format type: '" + entity.getBodyType() + "'!");
     }
-    
-    if(cache != null) {
-      cache.add(result);
-    }
-    
     return result;
   }
 
-  private ProgramWrapper<AstDecision, DecisionProgram> visitDecision(ProgramSource src) {
+  private ProgramWrapper<AstDecision, DecisionProgram> visitDecision(AstSource src) {
     final ImmutableProgramWrapper.Builder<AstDecision, DecisionProgram> builder = ImmutableProgramWrapper.builder();
     builder.status(ProgramStatus.UP);
     AstDecision ast = null;
     try {
-      ast = hdesTypes.decision().src(src.getCommands()).build();
+      final var cached = cache.getAst(src);
+      if(cached.isPresent()) {
+        ast = (AstDecision) cached.get();
+      } else {
+        ast = hdesTypes.decision().src(src.getCommands()).build();
+      }
     } catch(Exception e) {
       builder.status(ProgramStatus.AST_ERROR).addAllErrors(visitException(e));
     }
@@ -140,24 +137,41 @@ public class ProgramEnvirFactory {
     DecisionProgram program = null;
     if(ast != null) {
       try {
-        program = new DecisionProgramBuilder(hdesFactory).build(ast);
+        final var cached = cache.getProgram(src);
+        if(cached.isPresent()) {
+          program = (DecisionProgram) cached.get();
+        } else {
+          program = new DecisionProgramBuilder(hdesFactory).build(ast);
+          cache.setProgram(program, src);          
+        }
+
       } catch(Exception e) {
         builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
       }
     }
-    return builder.id(src.getId()).source(src)
+    
+    return builder.id(src.getId())
         .type(AstBodyType.DT)
-        .ast(Optional.ofNullable(ast)).program(Optional.ofNullable(program))
+        .ast(Optional.ofNullable(ast))
+        .program(Optional.ofNullable(program))
+        .source(src)
         .build();
   }
   
-  private ProgramWrapper<AstFlow, FlowProgram> visitFlow(ProgramSource src) {
+  private ProgramWrapper<AstFlow, FlowProgram> visitFlow(AstSource src) {
     final ImmutableProgramWrapper.Builder<AstFlow, FlowProgram> builder = ImmutableProgramWrapper.builder();
     builder.status(ProgramStatus.UP);
     
     AstFlow ast = null;
     try {
-      ast = hdesTypes.flow().src(src.getCommands()).build();
+      
+      final var cached = cache.getAst(src);
+      if(cached.isPresent()) {
+        ast = (AstFlow) cached.get();
+      } else {
+        ast = hdesTypes.flow().src(src.getCommands()).build();
+        cache.setAst(ast, src);
+      }
       final var errors = ast.getMessages().stream()
         .filter(m -> m.getType() == FlowCommandMessageType.ERROR)
         .map(error -> ImmutableProgramMessage.builder()
@@ -178,22 +192,36 @@ public class ProgramEnvirFactory {
     FlowProgram program = null;
     if(ast != null) {
       try {
-        program = new FlowProgramBuilder(hdesFactory).build(ast);
+        final var cached = cache.getProgram(src);
+        if(cached.isPresent()) {
+          program = (FlowProgram) cached.get();
+        } else {
+          program = new FlowProgramBuilder(hdesFactory).build(ast);
+          cache.setProgram(program, src);
+        }
+
       } catch(Exception e) {
         builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
       }
     }
-    return builder.id(src.getId()).source(src)
+    return builder.id(src.getId())
         .ast(Optional.ofNullable(ast)).program(Optional.ofNullable(program))
+        .source(src)
         .type(AstBodyType.FLOW).build(); 
   }
   
-  private ProgramWrapper<AstService, ServiceProgram> visitFlowTask(ProgramSource src) {
+  private ProgramWrapper<AstService, ServiceProgram> visitFlowTask(AstSource src) {
     final ImmutableProgramWrapper.Builder<AstService, ServiceProgram> builder = ImmutableProgramWrapper.builder();
     builder.status(ProgramStatus.UP);
     AstService ast = null;
-    try {
-      ast = hdesTypes.service().src(src.getCommands()).build();
+    try {      
+      final var cached = cache.getAst(src);
+      if(cached.isPresent()) {
+        ast = (AstService) cached.get();
+      } else {
+        ast = hdesTypes.service().src(src.getCommands()).build();
+        cache.setAst(ast, src);
+      }
     } catch(Exception e) {
       builder.status(ProgramStatus.AST_ERROR).addAllErrors(visitException(e));
     }
@@ -201,20 +229,28 @@ public class ProgramEnvirFactory {
     ServiceProgram program = null;
     if(ast != null) {
       try {
-        program = new ServiceProgramBuilder(hdesFactory).build(ast);
+        
+        final var cached = cache.getProgram(src);
+        if(cached.isPresent()) {
+          program = (ServiceProgram) cached.get();
+        } else {
+          program = new ServiceProgramBuilder(config).build(ast);
+          cache.setProgram(program, src);
+        }        
       } catch(Exception e) {
         builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
       }
     }
-    return builder.id(src.getId()).source(src).type(AstBodyType.FLOW_TASK)
+    return builder.id(src.getId()).type(AstBodyType.FLOW_TASK)
         .ast(Optional.ofNullable(ast)).program(Optional.ofNullable(program))
+        .source(src)
         .build(); 
   }
   
   private List<ProgramMessage> visitException(Exception e) {
     return Arrays.asList(ImmutableProgramMessage.builder()
           .id("exception")
-          .msg(e.getMessage())
+          .msg(e.getMessage().replaceAll("\"", "'"))
           .exception(e)
           .build()
         );

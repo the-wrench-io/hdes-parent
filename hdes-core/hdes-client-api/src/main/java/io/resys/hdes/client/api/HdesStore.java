@@ -45,6 +45,8 @@ public interface HdesStore {
     Uni<StoreEntity> get(String id);
   }
   
+  
+  
   @JsonSerialize(as = ImmutableDeleteAstType.class)
   @JsonDeserialize(as = ImmutableDeleteAstType.class)
   @Value.Immutable
@@ -57,7 +59,6 @@ public interface HdesStore {
   @Value.Immutable
   interface UpdateStoreEntity extends Serializable {
     String getId();
-    AstBodyType getBodyType();
     List<AstCommand> getBody();
   }
   
@@ -73,6 +74,7 @@ public interface HdesStore {
   @JsonDeserialize(as = ImmutableStoreState.class)
   @Value.Immutable
   interface StoreState {
+    Map<String, StoreEntity> getTags();
     Map<String, StoreEntity> getFlows();
     Map<String, StoreEntity> getServices();
     Map<String, StoreEntity> getDecisions();
