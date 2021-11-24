@@ -26,25 +26,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.immutables.value.Value;
-
 import com.google.common.collect.Range;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
+import io.resys.hdes.client.api.ast.AstChangeset.CommandsAndChanges;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.ast.ImmutableCommandsAndChanges;
 import io.resys.hdes.client.spi.changeset.beans.AstChangesetBean;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class AstChangesetFactory {
 
-  @Value.Immutable
-  public interface CommandsAndChanges {
-    List<AstCommand> getCommands();
-    List<AstChangeset> getSrc();
-  } 
-  
   public static SourceBuilder src() {
     return new SourceBuilder();
   }

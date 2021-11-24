@@ -39,10 +39,12 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import io.resys.hdes.client.api.config.GitConfig;
+import io.resys.hdes.client.api.config.GitConfig.GitCredsSupplier;
+import io.resys.hdes.client.api.config.GitConfig.GitEntry;
+import io.resys.hdes.client.api.config.GitConfig.GitInit;
+import io.resys.hdes.client.api.config.ImmutableGitConfig;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitCredsSupplier;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitInit;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
@@ -50,7 +52,7 @@ public class GitConnectionFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitConnectionFactory.class);
 
   
-  public static GitConnection create(GitInit config, GitCredsSupplier creds, ObjectMapper objectMapper) throws IOException, 
+  public static GitConfig create(GitInit config, GitCredsSupplier creds, ObjectMapper objectMapper) throws IOException, 
       RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
     
     final var path = StringUtils.isEmpty(config.getRemote()) ? Files.createTempDirectory("git_repo") : new File(config.getStorage()).toPath();
@@ -100,7 +102,7 @@ public class GitConnectionFactory {
         .build(); 
     cacheManager.init();
     
-    return ImmutableGitConnection.builder()
+    return ImmutableGitConfig.builder()
         .init(config)
         .serializer(new GitSerializerImpl(objectMapper))
         .client(git)

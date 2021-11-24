@@ -36,9 +36,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.resys.hdes.client.HdesClientImpl;
 import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.config.ThenaConfig;
 import io.resys.hdes.client.spi.serializers.ZoeDeserializer;
 import io.resys.hdes.client.spi.store.ImmutablePersistenceConfig;
-import io.resys.hdes.client.spi.store.thena.PersistenceConfig;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoResult;
 import io.resys.thena.docdb.api.models.Repo;
@@ -106,7 +106,7 @@ public class PgTestTemplate {
         .await().atMost(Duration.ofMinutes(1));
     final AtomicInteger gid = new AtomicInteger(0);
     
-    PersistenceConfig config = ImmutablePersistenceConfig.builder()
+    ThenaConfig config = ImmutablePersistenceConfig.builder()
         .client(client).repoName(repoId).headName("main")
         .gidProvider(type -> {
             return type + "-" + gid.incrementAndGet();

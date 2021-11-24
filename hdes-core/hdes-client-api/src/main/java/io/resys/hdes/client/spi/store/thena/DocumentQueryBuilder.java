@@ -24,11 +24,12 @@ import io.resys.hdes.client.api.HdesStore.QueryBuilder;
 
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreState;
+import io.resys.hdes.client.api.config.ThenaConfig;
 import io.smallrye.mutiny.Uni;
 
 public class DocumentQueryBuilder extends PersistenceCommands implements QueryBuilder {
 
-  public DocumentQueryBuilder(PersistenceConfig config) {
+  public DocumentQueryBuilder(ThenaConfig config) {
     super(config);
   }
 

@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.store.git;
+package io.resys.hdes.client.api.config;
 
 import java.nio.file.Path;
 import java.sql.Timestamp;
@@ -15,7 +15,7 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
 
 @Value.Immutable
-public interface GitConnection {
+public interface GitConfig {
   GitInit getInit();
   
   StoreEntityLocation getLocation();
@@ -65,5 +65,19 @@ public interface GitConnection {
     String write(List<AstCommand> commands);
   }
   interface GitCredsSupplier extends Supplier<GitCreds> {}
+ 
+  @Value.Immutable
+  interface GitFileReload {
+    String getTreeValue();
+  }
+  
+  @Value.Immutable
+  interface GitFile {
+    String getId();
+    String getTreeValue();
+    String getBlobValue();
+    String getBlobHash();
+    AstBodyType getBodyType();
+  }
   
 }

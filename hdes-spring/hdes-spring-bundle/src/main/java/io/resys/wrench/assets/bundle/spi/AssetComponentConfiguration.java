@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.spi.HdesClientImpl;
-import io.resys.hdes.client.spi.HdesTypeDefsFactory.ServiceInit;
+import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
 
 
 @Configuration

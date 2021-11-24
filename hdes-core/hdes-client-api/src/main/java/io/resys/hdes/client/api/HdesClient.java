@@ -38,6 +38,7 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.programs.DecisionProgram;
@@ -146,5 +147,6 @@ public interface HdesClient {
     AstFlow flow();
     AstDecision decision();
     AstService service();
+    AstTag tag();
   }
 }

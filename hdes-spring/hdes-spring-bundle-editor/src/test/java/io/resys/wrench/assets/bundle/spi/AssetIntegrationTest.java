@@ -25,6 +25,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.ehcache.xml.model.ServiceType;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -42,7 +43,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
 import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.ServiceType;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)

@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.store.thena;
+package io.resys.hdes.client.api.config;
 
 import java.util.Collection;
 
@@ -34,7 +34,7 @@ import io.smallrye.mutiny.Uni;
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 
 @Value.Immutable
-public interface PersistenceConfig {
+public interface ThenaConfig {
   DocDB getClient();
   String getRepoName();
   String getHeadName();

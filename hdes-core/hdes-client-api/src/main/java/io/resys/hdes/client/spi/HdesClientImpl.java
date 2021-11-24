@@ -29,6 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.HdesCache;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -37,7 +38,6 @@ import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.spi.cache.HdesClientCache;
 import io.resys.hdes.client.spi.cache.HdesClientEhCache;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
@@ -128,7 +128,7 @@ public class HdesClientImpl implements HdesClient {
     private ObjectMapper objectMapper;
     private ServiceInit serviceInit;
     private HdesStore store;
-    private HdesClientCache cache;
+    private HdesCache cache;
     private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>(Arrays.asList(new IdValidator()));
 
     public Builder flowVisitors(AstFlowNodeVisitor ...visitors) {
@@ -143,7 +143,7 @@ public class HdesClientImpl implements HdesClient {
       this.serviceInit = serviceInit;
       return this;
     }
-    public Builder cache(HdesClientCache cache) {
+    public Builder cache(HdesCache cache) {
       this.cache = cache;
       return this;
     }
@@ -155,7 +155,7 @@ public class HdesClientImpl implements HdesClient {
       HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
       HdesAssert.notNull(serviceInit, () -> "serviceInit must be defined!");
       
-      HdesClientCache cache = this.cache;
+      HdesCache cache = this.cache;
       if(cache == null) {
         cache = HdesClientEhCache.builder().build();
       }
@@ -169,9 +169,9 @@ public class HdesClientImpl implements HdesClient {
 
   private static class HdesClientConfigImpl implements HdesClientConfig {
     private final List<AstFlowNodeVisitor> flowVisitors = new ArrayList<>();
-    private final HdesClientCache cache;
+    private final HdesCache cache;
     private final ServiceInit serviceInit;
-    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors, HdesClientCache cache, ServiceInit serviceInit) {
+    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors, HdesCache cache, ServiceInit serviceInit) {
       this.flowVisitors.addAll(flowVisitors);
       this.cache = cache;
       this.serviceInit = serviceInit;
@@ -181,7 +181,7 @@ public class HdesClientImpl implements HdesClient {
       return serviceInit;
     }
     @Override
-    public HdesClientCache getCache() {
+    public HdesCache getCache() {
       return cache;
     }
     @Override

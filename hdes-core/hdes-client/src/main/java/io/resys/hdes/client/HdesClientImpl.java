@@ -24,16 +24,16 @@ import io.resys.hdes.client.api.HdesAstTypes;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesStore;
+import io.resys.hdes.client.api.config.ThenaConfig;
 import io.resys.hdes.client.spi.store.HdesDocumentStore;
-import io.resys.hdes.client.spi.store.thena.PersistenceConfig;
 
 public class HdesClientImpl implements HdesClient {
 
   
   
-  private final PersistenceConfig config;
+  private final ThenaConfig config;
   
-  public HdesClientImpl(PersistenceConfig config) {
+  public HdesClientImpl(ThenaConfig config) {
     this.config = config;
   }
 

@@ -30,10 +30,10 @@ import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.spi.store.thena.PersistenceConfig;
+import io.resys.hdes.client.api.config.ThenaConfig;
 
 
-public class ZoeDeserializer implements PersistenceConfig.Deserializer {
+public class ZoeDeserializer implements ThenaConfig.Deserializer {
 
   private ObjectMapper objectMapper;
   

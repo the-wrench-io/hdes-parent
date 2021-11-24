@@ -21,6 +21,7 @@ package io.resys.hdes.client.api;
  */
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -38,14 +39,16 @@ public interface HdesStore {
   Uni<StoreEntity> update(UpdateStoreEntity updateType);
   Uni<StoreEntity> delete(DeleteAstType deleteType);
   QueryBuilder query();
+  HistoryQuery history();
 
+  interface HistoryQuery {
+    Uni<HistoryEntity> get(String id);
+  }
    
   interface QueryBuilder {
     Uni<StoreState> get();
     Uni<StoreEntity> get(String id);
   }
-  
-  
   
   @JsonSerialize(as = ImmutableDeleteAstType.class)
   @JsonDeserialize(as = ImmutableDeleteAstType.class)
@@ -87,6 +90,24 @@ public interface HdesStore {
     String getId();
     AstBodyType getBodyType();
     String getHash();
+    List<AstCommand> getBody();
+  }
+  
+  @JsonSerialize(as = ImmutableHistoryEntity.class)
+  @JsonDeserialize(as = ImmutableHistoryEntity.class)
+  @Value.Immutable
+  interface HistoryEntity {
+    String getId();
+    AstBodyType getBodyType();
+    List<DetachedEntity> getBody();
+  }
+  
+  @JsonSerialize(as = ImmutableDetachedEntity.class)
+  @JsonDeserialize(as = ImmutableDetachedEntity.class)
+  @Value.Immutable
+  interface DetachedEntity {
+    String getHash();
+    LocalDateTime getCreated();
     List<AstCommand> getBody();
   }
   

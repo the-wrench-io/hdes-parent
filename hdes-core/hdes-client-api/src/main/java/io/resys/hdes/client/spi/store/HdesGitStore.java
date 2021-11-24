@@ -12,14 +12,14 @@ import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreState;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.spi.store.git.GitConnection;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitCredsSupplier;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
+import io.resys.hdes.client.api.config.GitConfig;
+import io.resys.hdes.client.api.config.GitConfig.GitCredsSupplier;
+import io.resys.hdes.client.api.config.GitConfig.GitEntry;
+import io.resys.hdes.client.api.config.GitConfig.GitFileReload;
+import io.resys.hdes.client.api.config.ImmutableGitInit;
 import io.resys.hdes.client.spi.store.git.GitConnectionFactory;
 import io.resys.hdes.client.spi.store.git.GitDataSourceLoader;
-import io.resys.hdes.client.spi.store.git.GitDataSourceLoader.GitFileReload;
 import io.resys.hdes.client.spi.store.git.GitFiles;
-import io.resys.hdes.client.spi.store.git.ImmutableGitInit;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
 
@@ -27,13 +27,13 @@ import io.smallrye.mutiny.Uni;
 public class HdesGitStore implements HdesStore {
   private static final Logger LOGGER = LoggerFactory.getLogger(HdesGitStore.class);
 
-  private final GitConnection conn;
+  private final GitConfig conn;
   
   interface FileMarker {
     String getAbsolutePath();
   }
   
-  public HdesGitStore(GitConnection conn) {
+  public HdesGitStore(GitConfig conn) {
     super();
     this.conn = conn;
   }
@@ -69,21 +69,21 @@ public class HdesGitStore implements HdesStore {
   
   @Override
   public Uni<StoreEntity> update(UpdateStoreEntity updateType) {
-    return Uni.createFrom().item(() -> {
+    return query().get(updateType.getId()).onItem().transform((oldState) -> {
       try {
-        HdesAssert.isTrue(updateType.getBodyType() != AstBodyType.TAG, () -> "Tags can't be updated!" );
+        HdesAssert.isTrue(oldState.getBodyType() != AstBodyType.TAG, () -> "Tags can't be updated!" );
         final var git = GitFiles.builder().git(conn).build();
-        final var file = git.update(updateType.getId(), updateType.getBodyType(), updateType.getBody());
+        final var file = git.update(updateType.getId(), oldState.getBodyType(), updateType.getBody());
         final var refresh = git.push(file);
         cache(refresh);
         return (StoreEntity) ImmutableStoreEntity.builder()
             .id(file.getId())
             .hash(file.getBlobHash())
-            .body(updateType.getBody()).bodyType(updateType.getBodyType())
+            .body(updateType.getBody()).bodyType(oldState.getBodyType())
             .build();        
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
-            .append("Failed to update store entity: '").append(updateType.getBodyType()).append("'").append(System.lineSeparator())
+            .append("Failed to update store entity: '").append(oldState.getBodyType()).append("'").append(System.lineSeparator())
             .append("  - with commands: ").append(conn.getSerializer().write(updateType.getBody())).append(System.lineSeparator()) 
             .append("  - because: ").append(e.getMessage()).toString(), e);
         throw new RuntimeException(e.getMessage(), e);
@@ -279,7 +279,7 @@ public class HdesGitStore implements HdesStore {
       HdesAssert.notEmpty(sshPath, () -> "sshPath must be defined! SshPath must contain 2 files(classpath or folder), private key and known host: 'id_rsa', 'id_rsa.known_hosts'. Classpath example: 'classpath:ssh/id_rsa'");
       
       final var init = ImmutableGitInit.builder().branch(branch).remote(remote).storage(storage).sshPath(sshPath).build();
-      final GitConnection conn;
+      final GitConfig conn;
       try {
         conn = GitConnectionFactory.create(init, creds, objectMapper);
       } catch(Exception e) {

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.ast.AstCommand;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitSerializer;
+import io.resys.hdes.client.api.config.GitConfig.GitSerializer;
 
 public class GitSerializerImpl implements GitSerializer {
 

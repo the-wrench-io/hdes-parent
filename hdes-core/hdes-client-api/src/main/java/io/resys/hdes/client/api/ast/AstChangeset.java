@@ -22,8 +22,16 @@ package io.resys.hdes.client.api.ast;
 
 import java.util.List;
 
+import org.immutables.value.Value;
+
 public interface AstChangeset {
   int getLine();
   String getValue();
   List<AstCommand> getCommands();
+  
+  @Value.Immutable
+  interface CommandsAndChanges {
+    List<AstCommand> getCommands();
+    List<AstChangeset> getSrc();
+  }
 }

@@ -27,7 +27,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.resys.hdes.client.api.HdesAstTypes;
+import io.resys.hdes.client.api.HdesCache;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
@@ -45,18 +49,17 @@ import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
-import io.resys.hdes.client.spi.cache.HdesClientCache;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
 
 public class ProgramEnvirFactory {
-
+  private static final Logger LOGGER = LoggerFactory.getLogger(ProgramEnvirFactory.class);
   private final HdesClientConfig config;
   private final HdesAstTypes hdesTypes;
   private final HdesTypesMapper hdesFactory;
-  private final HdesClientCache cache;
+  private final HdesCache cache;
   private final AssociationVisitor tree = new AssociationVisitor();
   private final List<String> visitedIds = new ArrayList<>();
   private ProgramEnvir baseEnvir;
@@ -129,8 +132,13 @@ public class ProgramEnvirFactory {
         ast = (AstDecision) cached.get();
       } else {
         ast = hdesTypes.decision().src(src.getCommands()).build();
+        cache.setAst(ast, src);
       }
     } catch(Exception e) {
+      LOGGER.error(new StringBuilder()
+          .append(e.getMessage()).append(System.lineSeparator())
+          .append("  - decision source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+          .toString(), e);
       builder.status(ProgramStatus.AST_ERROR).addAllErrors(visitException(e));
     }
     
@@ -146,6 +154,10 @@ public class ProgramEnvirFactory {
         }
 
       } catch(Exception e) {
+        LOGGER.error(new StringBuilder()
+            .append(e.getMessage()).append(System.lineSeparator())
+            .append("  - decision source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString(), e);
         builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
       }
     }
@@ -186,6 +198,10 @@ public class ProgramEnvirFactory {
       }
       
     } catch(Exception e) {
+      LOGGER.error(new StringBuilder()
+          .append(e.getMessage()).append(System.lineSeparator())
+          .append("  - flow source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+          .toString(), e);
       builder.status(ProgramStatus.AST_ERROR).addAllErrors(visitException(e));
     }
     
@@ -201,6 +217,10 @@ public class ProgramEnvirFactory {
         }
 
       } catch(Exception e) {
+        LOGGER.error(new StringBuilder()
+            .append(e.getMessage()).append(System.lineSeparator())
+            .append("  - flow source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString(), e);
         builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
       }
     }
@@ -223,6 +243,10 @@ public class ProgramEnvirFactory {
         cache.setAst(ast, src);
       }
     } catch(Exception e) {
+      LOGGER.error(new StringBuilder()
+          .append(e.getMessage()).append(System.lineSeparator())
+          .append("  - service source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+          .toString(), e);
       builder.status(ProgramStatus.AST_ERROR).addAllErrors(visitException(e));
     }
     
@@ -238,6 +262,10 @@ public class ProgramEnvirFactory {
           cache.setProgram(program, src);
         }        
       } catch(Exception e) {
+        LOGGER.error(new StringBuilder()
+            .append(e.getMessage()).append(System.lineSeparator())
+            .append("  - service source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString(), e);
         builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
       }
     }

@@ -22,7 +22,7 @@ package io.resys.hdes.client.api.exceptions;
 
 import io.resys.hdes.client.api.ast.AstCommand;
 
-public class DecisionAstException extends RuntimeException {
+public class DecisionAstException extends AstException {
 
   private static final long serialVersionUID = -7154685569622201632L;
 

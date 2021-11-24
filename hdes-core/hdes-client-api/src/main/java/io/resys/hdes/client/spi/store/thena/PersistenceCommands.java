@@ -7,8 +7,10 @@ import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
+import io.resys.hdes.client.api.config.ImmutableEntityState;
+import io.resys.hdes.client.api.config.ThenaConfig;
+import io.resys.hdes.client.api.config.ThenaConfig.EntityState;
 import io.resys.hdes.client.api.exceptions.StoreException;
-import io.resys.hdes.client.spi.store.thena.PersistenceConfig.EntityState;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
@@ -39,10 +41,10 @@ import io.smallrye.mutiny.Uni;
 
 
 
-public class PersistenceCommands implements PersistenceConfig.Commands {
-  protected final PersistenceConfig config;
+public class PersistenceCommands implements ThenaConfig.Commands {
+  protected final ThenaConfig config;
 
-  public PersistenceCommands(PersistenceConfig config) {
+  public PersistenceCommands(ThenaConfig config) {
     super();
     this.config = config;
   }

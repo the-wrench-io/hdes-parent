@@ -32,6 +32,7 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import io.resys.hdes.client.api.HdesStore.HistoryEntity;
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
@@ -39,6 +40,7 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
@@ -50,8 +52,8 @@ import io.smallrye.mutiny.Uni;
  */
 public interface HdesComposer {  
   Uni<ComposerState> get();
-  Uni<ComposerEntity<?>> get(String id);
-  Uni<List<ComposerEntity<?>>> getHistory(String id);
+  Uni<ComposerEntity<?>> get(String idOrName);
+  Uni<HistoryEntity> getHistory(String id);
   Uni<ComposerState> update(UpdateEntity asset);
   Uni<ComposerState> create(CreateEntity asset);
   Uni<ComposerState> delete(String id);
@@ -102,6 +104,7 @@ public interface HdesComposer {
   @JsonSerialize(as = ImmutableComposerState.class)
   @JsonDeserialize(as = ImmutableComposerState.class)
   interface ComposerState {
+    Map<String, ComposerEntity<AstTag>> getTags();
     Map<String, ComposerEntity<AstFlow>> getFlows();
     Map<String, ComposerEntity<AstService>> getServices();
     Map<String, ComposerEntity<AstDecision>> getDecisions();

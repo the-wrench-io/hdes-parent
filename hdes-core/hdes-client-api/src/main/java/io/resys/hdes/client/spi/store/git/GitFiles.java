@@ -32,17 +32,20 @@ import org.slf4j.LoggerFactory;
 import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.config.GitConfig;
+import io.resys.hdes.client.api.config.GitConfig.GitEntry;
+import io.resys.hdes.client.api.config.GitConfig.GitFile;
+import io.resys.hdes.client.api.config.GitConfig.GitFileReload;
+import io.resys.hdes.client.api.config.ImmutableGitFile;
+import io.resys.hdes.client.api.config.ImmutableGitFileReload;
 import io.resys.hdes.client.spi.staticresources.Sha2;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
-import io.resys.hdes.client.spi.store.git.GitDataSourceLoader.GitFile;
-import io.resys.hdes.client.spi.store.git.GitDataSourceLoader.GitFileReload;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GitFiles {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitFiles.class);
-  private final GitConnection conn;
+  private final GitConfig conn;
   
-  public GitFiles(GitConnection connection) {
+  public GitFiles(GitConfig connection) {
     super();
     this.conn = connection;
   }
@@ -300,9 +303,9 @@ public class GitFiles {
   }
   
   public static class Builder {
-    private GitConnection conn;
+    private GitConfig conn;
     
-    public Builder git(GitConnection conn) {
+    public Builder git(GitConfig conn) {
       this.conn = conn;
       return this;
     }

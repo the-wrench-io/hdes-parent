@@ -23,16 +23,16 @@ package io.resys.hdes.client.spi.store;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.config.ThenaConfig;
+import io.resys.hdes.client.api.config.ThenaConfig.EntityState;
 import io.resys.hdes.client.spi.store.thena.DocumentQueryBuilder;
 import io.resys.hdes.client.spi.store.thena.PersistenceCommands;
-import io.resys.hdes.client.spi.store.thena.PersistenceConfig;
-import io.resys.hdes.client.spi.store.thena.PersistenceConfig.EntityState;
 import io.smallrye.mutiny.Uni;
 
 public class HdesDocumentStore extends PersistenceCommands implements HdesStore {
 
   
-  public HdesDocumentStore(PersistenceConfig config) {
+  public HdesDocumentStore(ThenaConfig config) {
     super(config);
   }
 
@@ -45,22 +45,26 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
   public Uni<StoreEntity> create(CreateStoreEntity newType) {
     final var gid = gid(newType.getBodyType());
     final StoreEntity entity = ImmutableStoreEntity.builder()
-    .id(gid)
-    .bodyType(newType.getBodyType())
-    .body(newType.getBody())
-    .build();
+      .id(gid)
+      .bodyType(newType.getBodyType())
+      .body(newType.getBody())
+      .build();
     return super.save(entity);
   }
 
   @Override
   public Uni<StoreEntity> update(UpdateStoreEntity updateType) {
-    final StoreEntity entity = ImmutableStoreEntity.builder()
-        .id(updateType.getId())
-        .bodyType(updateType.getBodyType())
-        .body(updateType.getBody())
-        .build();
+   
     
-    return super.save(entity); 
+    final Uni<EntityState> query = getEntityState(updateType.getId());
+    return query.onItem().transformToUni(state -> {
+      final StoreEntity entity = ImmutableStoreEntity.builder()
+          .id(updateType.getId())
+          .bodyType(state.getEntity().getBodyType())
+          .body(updateType.getBody())
+          .build();
+      return super.save(entity);
+    });
   }
 
   @Override

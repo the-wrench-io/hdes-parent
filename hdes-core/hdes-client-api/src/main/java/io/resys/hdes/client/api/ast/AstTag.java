@@ -1,10 +1,10 @@
-package io.resys.hdes.client.api.exceptions;
+package io.resys.hdes.client.api.ast;
 
 /*-
  * #%L
  * wrench-assets-flow
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2016 - 2018 Copyright 2016 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,28 +20,17 @@ package io.resys.hdes.client.api.exceptions;
  * #L%
  */
 
-public class FlowAstException extends AstException {
+import java.io.Serializable;
 
-  private static final long serialVersionUID = -6178092648334273740L;
+import org.immutables.value.Value;
 
-  private final String src;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-  public FlowAstException(String message) {
-    super(message);
-    this.src = null;
-  }
 
-  public FlowAstException(String message, String src) {
-    super(message);
-    this.src = src;
-  }
-
-  public FlowAstException(String message, Exception e) {
-    super(message, e);
-    this.src = null;
-  }
-  
-  public String getSrc() {
-    return src;
-  }
+@Value.Immutable
+@JsonSerialize(as = ImmutableAstTag.class)
+@JsonDeserialize(as = ImmutableAstTag.class)
+public interface AstTag extends AstBody, Serializable {
+  String getName();
 }

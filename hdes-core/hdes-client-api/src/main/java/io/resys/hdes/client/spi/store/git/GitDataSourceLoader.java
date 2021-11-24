@@ -22,7 +22,6 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
 import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
 import org.eclipse.jgit.treewalk.filter.TreeFilter;
-import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -32,35 +31,25 @@ import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.config.GitConfig;
+import io.resys.hdes.client.api.config.GitConfig.GitEntry;
+import io.resys.hdes.client.api.config.GitConfig.GitFile;
+import io.resys.hdes.client.api.config.ImmutableGitEntry;
+import io.resys.hdes.client.api.config.ImmutableGitFile;
 import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
-import io.resys.hdes.client.spi.store.git.GitConnection.GitEntry;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GitDataSourceLoader implements AutoCloseable {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitDataSourceLoader.class);
   private static final String TAG_PREFIX = "refs/tags/";
   private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-  private final GitConnection conn;
+  private final GitConfig conn;
   private final Repository repo;
   private final ObjectId start;
   private final StoreEntityLocation location;
 
-  @Value.Immutable
-  public interface GitFileReload {
-    String getTreeValue();
-  }
-  
-  @Value.Immutable
-  public interface GitFile {
-    String getId();
-    String getTreeValue();
-    String getBlobValue();
-    String getBlobHash();
-    AstBodyType getBodyType();
-  }
-  
-  public GitDataSourceLoader(GitConnection conn) throws IOException {
+  public GitDataSourceLoader(GitConfig conn) throws IOException {
     super();
     this.repo = conn.getClient().getRepository();
     this.conn = conn;
