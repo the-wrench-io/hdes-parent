@@ -1,4 +1,4 @@
-package io.resys.hdes.client.config;
+package io.resys.hdes.client.test.config;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

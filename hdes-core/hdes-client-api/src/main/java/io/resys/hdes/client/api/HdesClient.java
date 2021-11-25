@@ -72,6 +72,7 @@ public interface HdesClient {
     Map<String, Serializable> toMap(Object entity);
     Map<String, Serializable> toMap(JsonNode entity);
     Object toType(Object value, Class<?> toType);
+    String toJson(Object anyObject);
   }
   
   

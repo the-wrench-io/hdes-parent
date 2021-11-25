@@ -15,18 +15,19 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.exceptions.ComposerException;
+import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
 
 public class CopyAsEntityVisitor {
 
   private final CopyAs asset;
   private final ComposerState state;
-  private final OptimiseCommmands optimise;
+  private final AstCommandOptimiser optimise;
   
   public CopyAsEntityVisitor(ComposerState state, CopyAs asset, HdesClient client) {
     super();
     this.asset = asset;
     this.state = state;
-    this.optimise = new OptimiseCommmands(client);
+    this.optimise = new AstCommandOptimiser(client);
   }
   public CreateStoreEntity visit() {
     visitValidations();

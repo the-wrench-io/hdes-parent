@@ -1,4 +1,4 @@
-package io.resys.hdes.client;
+package io.resys.hdes.client.test;
 
 /*-
  * #%L
@@ -34,9 +34,9 @@ import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
-import io.resys.hdes.client.config.PgProfile;
-import io.resys.hdes.client.config.PgTestTemplate;
-import io.resys.hdes.client.config.RepositoryToStaticData;
+import io.resys.hdes.client.test.config.PgProfile;
+import io.resys.hdes.client.test.config.PgTestTemplate;
+import io.resys.hdes.client.test.config.RepositoryToStaticData;
 
 @QuarkusTest
 @TestProfile(PgProfile.class)
@@ -63,7 +63,6 @@ public class PersistencePgTest extends PgTestTemplate {
     
     repo.store().update(ImmutableUpdateStoreEntity.builder()
         .id(article1.getId())
-        .bodyType(AstBodyType.FLOW)
         .addBody(ImmutableAstCommand.builder()
             .type(AstCommandValue.SET_BODY)
             .value("id: change flow symbolic id")

@@ -50,6 +50,7 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.Serializer;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.ast.TypeDef.ValueTypeResolver;
+import io.resys.hdes.client.api.exceptions.HdesJsonException;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.expression.ExpressionProgramFactory;
@@ -283,7 +284,16 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     try {
       return objectMapper.writeValueAsString(commands);
     } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new HdesJsonException(e.getMessage(), e);
+    }
+  }
+  
+  @Override
+  public String toJson(Object anyObject) {
+    try {
+      return objectMapper.writeValueAsString(anyObject);
+    } catch (IOException e) {
+      throw new HdesJsonException(e.getMessage(), e);
     }
   }
   
@@ -292,7 +302,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     try {
       return (ArrayNode) objectMapper.readTree(commands);
     } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new HdesJsonException(e.getMessage(), e);
     }
   }
   @Override
@@ -300,7 +310,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     try {
       return objectMapper.readValue(commands, new TypeReference<List<AstCommand>>() {});
     } catch (IOException e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new HdesJsonException(e.getMessage(), e);
     }
   }
   
@@ -309,7 +319,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     try {
       return objectMapper.convertValue(entity, Map.class);
     } catch (Exception e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new HdesJsonException(e.getMessage(), e);
     }
   }
   
@@ -318,7 +328,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     try {
       return objectMapper.convertValue(entity, Map.class);
     } catch (Exception e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new HdesJsonException(e.getMessage(), e);
     }
   }
   
@@ -327,7 +337,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     try {
       return objectMapper.convertValue(value, toType);
     } catch (Exception e) {
-      throw new RuntimeException(e.getMessage(), e);
+      throw new HdesJsonException(e.getMessage(), e);
     }
   }
   

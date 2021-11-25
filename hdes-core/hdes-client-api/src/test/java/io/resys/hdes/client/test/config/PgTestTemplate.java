@@ -1,4 +1,4 @@
-package io.resys.hdes.client.config;
+package io.resys.hdes.client.test.config;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -34,11 +34,13 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import io.resys.hdes.client.HdesClientImpl;
 import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.config.ImmutableThenaConfig;
 import io.resys.hdes.client.api.config.ThenaConfig;
+import io.resys.hdes.client.spi.HdesClientImpl;
+import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
 import io.resys.hdes.client.spi.serializers.ZoeDeserializer;
-import io.resys.hdes.client.spi.store.ImmutablePersistenceConfig;
+import io.resys.hdes.client.spi.store.HdesDocumentStore;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoResult;
 import io.resys.thena.docdb.api.models.Repo;
@@ -106,7 +108,7 @@ public class PgTestTemplate {
         .await().atMost(Duration.ofMinutes(1));
     final AtomicInteger gid = new AtomicInteger(0);
     
-    ThenaConfig config = ImmutablePersistenceConfig.builder()
+    ThenaConfig config = ImmutableThenaConfig.builder()
         .client(client).repoName(repoId).headName("main")
         .gidProvider(type -> {
             return type + "-" + gid.incrementAndGet();
@@ -121,7 +123,21 @@ public class PgTestTemplate {
         .deserializer(new ZoeDeserializer(objectMapper))
         .authorProvider(()-> "test author")
         .build();
-    return new HdesClientImpl(config);
+    
+    final var store = new HdesDocumentStore(config);
+    
+    return HdesClientImpl.builder().objectMapper(objectMapper).store(store)
+        .serviceInit(new ServiceInit() {
+            @Override
+            public <T> T get(Class<T> type) {
+              try {
+                return type.getDeclaredConstructor().newInstance();
+              } catch(Exception e) {
+                throw new RuntimeException(e.getMessage(), e);
+              }
+            }
+          })
+        .build();
   }
   
 }

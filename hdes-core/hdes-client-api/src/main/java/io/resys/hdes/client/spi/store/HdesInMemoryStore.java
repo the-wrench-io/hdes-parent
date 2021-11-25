@@ -64,6 +64,11 @@ public class HdesInMemoryStore implements HdesStore {
   public Uni<StoreEntity> delete(DeleteAstType deleteType) {
     throw new RuntimeException("read only store!");
   }
+  
+  @Override
+  public HistoryQuery history() {
+    throw new RuntimeException("read only store!");
+  }
 
   @Override
   public QueryBuilder query() {
@@ -213,6 +218,5 @@ public class HdesInMemoryStore implements HdesStore {
       LOGGER.debug(migLog.toString());
       return new HdesInMemoryStore(entities);
     }
-  
   }
 }

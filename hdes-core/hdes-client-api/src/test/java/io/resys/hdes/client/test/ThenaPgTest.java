@@ -1,4 +1,4 @@
-package io.resys.hdes.client;
+package io.resys.hdes.client.test;
 
 /*-
  * #%L
@@ -31,8 +31,8 @@ import org.slf4j.LoggerFactory;
 
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
-import io.resys.hdes.client.config.PgProfile;
-import io.resys.hdes.client.config.PgTestTemplate;
+import io.resys.hdes.client.test.config.PgProfile;
+import io.resys.hdes.client.test.config.PgTestTemplate;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoResult;

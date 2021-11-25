@@ -6,55 +6,51 @@ import java.util.List;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesComposer;
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
+import io.resys.hdes.client.api.HdesStore.StoreState;
+import io.resys.hdes.client.api.ImmutableComposerState;
 import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
-import io.resys.hdes.client.spi.composer.ComposerStateVisitor;
+import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 import io.resys.hdes.client.spi.composer.CopyAsEntityVisitor;
 import io.resys.hdes.client.spi.composer.CreateEntityVisitor;
 import io.resys.hdes.client.spi.composer.DataDumpVisitor;
+import io.resys.hdes.client.spi.composer.DebugVisitor;
 import io.resys.hdes.client.spi.composer.DryRunVisitor;
 import io.smallrye.mutiny.Uni;
 
 public class HdesComposerImpl implements HdesComposer {
 
   private final HdesClient client;
-  private final ComposerStateVisitor state;
-  private final DataDumpVisitor datadump;
-  private final DryRunVisitor dryrun;
 
   public HdesComposerImpl(HdesClient client) {
     super();
     this.client = client;
-    this.state = new ComposerStateVisitor(client);
-    this.datadump = new DataDumpVisitor(client);
-    this.dryrun = new DryRunVisitor(client);
   }
 
   @Override
   public Uni<ComposerState> get() {
-    return client.store().query().get().onItem().transform(state::visit);
+    return client.store().query().get().onItem().transform(this::state);
   }
   @Override
   public Uni<ComposerState> update(UpdateEntity asset) {
     return client.store().update(ImmutableUpdateStoreEntity.builder().id(asset.getId()).body(asset.getBody()).build())
         .onItem().transformToUni((updated) ->  
-          client.store().query().get().onItem().transform(state::visit)
+          client.store().query().get().onItem().transform(this::state)
         );
   }
   @Override
   public Uni<ComposerState> create(CreateEntity asset) {
-    return client.store().query().get().onItem().transform(state::visit)
+    return client.store().query().get().onItem().transform(this::state)
         .onItem().transformToUni(state -> client.store().create(new CreateEntityVisitor(state, asset).visit()))
-        .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(state::visit));
+        .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
   }
   @Override
   public Uni<ComposerState> delete(String id) {
-    client.store().query().get().onItem().transform(state::visit);
+    client.store().query().get().onItem().transform(this::state);
     return null;
   }
-
   @Override
   public Uni<ComposerEntity<?>> get(String idOrName) {
-    return client.store().query().get().onItem().transform(state::visit)
+    return client.store().query().get().onItem().transform(this::state)
       .onItem().transform(state -> {
         List<ComposerEntity<?>> entities = new ArrayList<>();
         entities.addAll(state.getDecisions().values());
@@ -66,33 +62,38 @@ public class HdesComposerImpl implements HdesComposer {
             .findFirst().orElse(null);
       });
   }
-
   @Override
   public Uni<HistoryEntity> getHistory(String id) {
     return client.store().history().get(id);
   }
-
   @Override
   public Uni<ComposerState> copyAs(CopyAs copyAs) {
-    return client.store().query().get().onItem().transform(state::visit)
+    return client.store().query().get().onItem().transform(this::state)
         .onItem().transform(state -> new CopyAsEntityVisitor(state, copyAs, client).visit())
         .onItem().transformToUni(newEntity -> client.store().create(newEntity))
-        .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(state::visit));
+        .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
   }
-
   @Override
   public Uni<DebugResponse> debug(DebugRequest entity) {
-    // TODO Auto-generated method stub
-    return null;
+    return client.store().query().get().onItem()
+        .transform(state -> new DebugVisitor(client).visit(entity, state));
   }
-
   @Override
   public Uni<ComposerEntity<?>> dryRun(UpdateEntity entity) {
-    return client.store().query().get().onItem().transform(state -> dryrun.visit(state, entity));
+    return client.store().query().get().onItem().transform(state -> new DryRunVisitor(client).visit(state, entity));
   }
-
   @Override
   public Uni<StoreDump> getStoreDump() {
-    return client.store().query().get().onItem().transform(datadump::visit);
+    return client.store().query().get().onItem().transform(state -> new DataDumpVisitor(client).visit(state));
+  }
+  
+  private ComposerState state(StoreState source) {
+    // create envir
+    final var envir = ComposerEntityMapper.toEnvir(client.envir(), source).build();
+    
+    // map envir
+    final var builder = ImmutableComposerState.builder();
+    envir.getValues().values().forEach(v -> ComposerEntityMapper.toComposer(builder, v));
+    return (ComposerState) builder.build(); 
   }
 }

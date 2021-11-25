@@ -22,6 +22,9 @@ package io.resys.hdes.client.spi.util;
 
 import java.util.function.Supplier;
 
+import io.resys.hdes.client.api.exceptions.HdesBadRequestException;
+import io.resys.hdes.client.api.exceptions.HdesEntityNotFoundException;
+
 public class HdesAssert {
   public static class HdesAssertException extends IllegalArgumentException {
     private static final long serialVersionUID = 6305063707279384796L;
@@ -30,6 +33,19 @@ public class HdesAssert {
     }
   }
 
+  public static void notFound(Object object, Supplier<String> message) {
+    if (object == null) {
+      throw new HdesEntityNotFoundException(getMessage(message));
+    }
+  }
+
+  public static void isTrueOrBadRequest(boolean expression, Supplier<String> message) {
+    if (!expression) {
+      throw new HdesBadRequestException(getMessage(message));
+    }
+  }
+
+  
   public static void notNull(Object object, Supplier<String> message) {
     if (object == null) {
       throw new HdesAssertException(getMessage(message));

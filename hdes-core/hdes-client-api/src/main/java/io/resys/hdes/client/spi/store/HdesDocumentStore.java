@@ -78,4 +78,10 @@ public class HdesDocumentStore extends PersistenceCommands implements HdesStore 
     return config.getGidProvider().getNextId(type);
   }
 
+  @Override
+  public HistoryQuery history() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

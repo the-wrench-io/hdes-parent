@@ -20,6 +20,7 @@ import io.resys.hdes.client.api.ImmutableStoreDump;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.ImmutableAstSource;
 
@@ -28,12 +29,12 @@ import io.resys.hdes.client.api.ast.ImmutableAstSource;
 public class DataDumpVisitor {
 
   private final HdesTypesMapper defs;
-  private final OptimiseCommmands optimise;
+  private final AstCommandOptimiser optimise;
   
   public DataDumpVisitor(HdesClient client) {
     super();
     this.defs = client.mapper();
-    this.optimise = new OptimiseCommmands(client);
+    this.optimise = new AstCommandOptimiser(client);
   }
 
   private static String md5(String ...input) {

@@ -1,4 +1,4 @@
-package io.resys.hdes.client.config;
+package io.resys.hdes.client.test.config;
 
 import java.util.Map;
 

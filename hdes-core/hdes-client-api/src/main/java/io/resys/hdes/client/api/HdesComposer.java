@@ -80,7 +80,7 @@ public interface HdesComposer {
     @Nullable
     String getInput();
     @Nullable
-    String getInputCsv();
+    String getInputCSV();
   }
   
   @JsonSerialize(as = ImmutableCopyAs.class)

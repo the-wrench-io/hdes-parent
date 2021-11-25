@@ -1,5 +1,7 @@
 package io.resys.hdes.client.spi.composer;
 
+import io.resys.hdes.client.api.HdesClient.EnvirBuilder;
+import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableComposerEntity;
 import io.resys.hdes.client.api.ImmutableComposerState;
 import io.resys.hdes.client.api.ast.AstDecision;
@@ -10,6 +12,13 @@ import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 
 public class ComposerEntityMapper {
 
+  
+  public static EnvirBuilder toEnvir(EnvirBuilder envirBuilder, StoreState source) {
+    source.getDecisions().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).decision(v).build());
+    source.getServices().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).service(v).build());
+    source.getFlows().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).flow(v).build());
+    return envirBuilder;
+  }
   
   public static void toComposer(ImmutableComposerState.Builder builder, ProgramWrapper<?, ?> wrapper) {
     switch (wrapper.getSource().getBodyType()) {

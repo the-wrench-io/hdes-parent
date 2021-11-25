@@ -193,7 +193,9 @@ public class HdesGitStore implements HdesStore {
       public Uni<StoreEntity> get(String id) {
         return Uni.createFrom().item(() -> {
           final var cache = conn.getCacheManager().getCache(conn.getCacheName(), String.class, GitEntry.class);
-          return map(cache.get(id));
+          final var entity = cache.get(id);
+          HdesAssert.notFound(entity, () -> "Entity was not found by id: '"  + id + "'!");
+          return map(entity);
         });
       }
       
@@ -310,5 +312,11 @@ public class HdesGitStore implements HdesStore {
       
       return new HdesGitStore(conn);
     }
+  }
+
+  @Override
+  public HistoryQuery history() {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

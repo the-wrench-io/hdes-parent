@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.composer;
+package io.resys.hdes.client.spi.changeset;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,13 +16,12 @@ import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
-import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
 import io.resys.hdes.client.spi.decision.DecisionAstBuilderImpl;
 
-public class OptimiseCommmands {
+public class AstCommandOptimiser {
   private final HdesTypesMapper defs;
 
-  public OptimiseCommmands(HdesClient client) {
+  public AstCommandOptimiser(HdesClient client) {
     super();
     this.defs = client.mapper();
   }
