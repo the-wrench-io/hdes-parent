@@ -181,7 +181,7 @@ public class GitDataSourceLoader implements AutoCloseable {
       revWalk.setTreeFilter(treeFilter);
       revWalk.sort(RevSort.COMMIT_TIME_DESC);
       final var modTree = revWalk.next();
-      final var modified = new Timestamp(modTree.getCommitTime() * 1000L);
+      final var modified = (modTree != null ? new Timestamp(modTree.getCommitTime() * 1000L) : new Timestamp(System.currentTimeMillis()));
 
       revWalk.reset();
       revWalk.markStart(commit);
