@@ -42,18 +42,18 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.resys.hdes.client.api.HdesAstTypes.FlowAstBuilder;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstBody.AstCommandMessage;
+import io.resys.hdes.client.api.ast.AstBody.CommandMessageType;
 import io.resys.hdes.client.api.ast.AstChangeset;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
-import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.api.ast.ImmutableAstFlowInputType;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
@@ -76,7 +76,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
   private final NodeFlowBean result = new NodeFlowBean(inputTypes);
   private final ObjectMapper yamlMapper;
   private final HdesTypesMapper typeDefs;
-  private final List<FlowAstCommandMessage> messages = new ArrayList<>();
+  private final List<AstCommandMessage> messages = new ArrayList<>();
   private List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   
@@ -138,10 +138,10 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
     } catch(Exception e) {
       LOGGER.error(e.getMessage(), e);
       messages.add(
-          ImmutableFlowAstCommandMessage.builder()
+          ImmutableAstCommandMessage.builder()
           .line(0)
           .value("message: " + e.getMessage())
-          .type(FlowCommandMessageType.ERROR)
+          .type(CommandMessageType.ERROR)
           .build());
     }
     
@@ -188,11 +188,11 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
       if(containsOnlySpaces || endsWithSpace) {
         int start = containsOnlySpaces ? 0 : getSpaceStart(lineContent);
         int end = lineContent.length();
-        messages.add(ImmutableFlowAstCommandMessage.builder()
+        messages.add(ImmutableAstCommandMessage.builder()
             .line(lineNumber)
             .range(AstFlowNodesFactory.range().build(start, end))
             .value("space has no meaning")
-            .type(FlowCommandMessageType.WARNING)
+            .type(CommandMessageType.WARNING)
             .build());
       }
 
@@ -208,10 +208,10 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
       int indent = getIndent(lineContent);
       if(indent % 2 != 0) {
         String message = String.format("Incorrect indent: %s, at line: %s!", indent, lineNumber);
-        messages.add(ImmutableFlowAstCommandMessage.builder()
+        messages.add(ImmutableAstCommandMessage.builder()
             .line(lineNumber)
             .value(message)
-            .type(FlowCommandMessageType.ERROR)
+            .type(CommandMessageType.ERROR)
             .build());
         return result.setEnd(lineNumber).setValue(buildSource(value));
       }
@@ -226,10 +226,10 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
 
       if(parent == null) {
         String message = String.format("Incorrect indent at line: %s, expecting: %s but was: %s!", lineNumber, indentToFind, indent);
-        messages.add(ImmutableFlowAstCommandMessage.builder()
+        messages.add(ImmutableAstCommandMessage.builder()
             .line(lineNumber)
             .value(message)
-            .type(FlowCommandMessageType.ERROR)
+            .type(CommandMessageType.ERROR)
             .build());
         return result.setEnd(lineNumber).setValue(buildSource(value));
       }
@@ -238,10 +238,10 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         parent = parent.addChild(src, indent, keywordAndValue.getKey(), keywordAndValue.getValue());
       } catch(FlowAstException e) {
         messages.add(
-            ImmutableFlowAstCommandMessage.builder()
+            ImmutableAstCommandMessage.builder()
             .line(lineNumber)
             .value(e.getMessage())
-            .type(FlowCommandMessageType.ERROR)
+            .type(CommandMessageType.ERROR)
             .build());
         return result.setEnd(lineNumber).setValue(value.toString());
       }
@@ -292,19 +292,19 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
         }
       } else {
         String message = String.format("Unknown content on line: %d", lineNumber);
-        messages.add(ImmutableFlowAstCommandMessage.builder()
+        messages.add(ImmutableAstCommandMessage.builder()
             .line(lineNumber)
             .value(message)
-            .type(FlowCommandMessageType.ERROR)
+            .type(CommandMessageType.ERROR)
             .build());
         return null;
       }
     } catch(IOException e) {
       String message = String.format("Unknown content on line: %d", lineNumber);
-      messages.add(ImmutableFlowAstCommandMessage.builder()
+      messages.add(ImmutableAstCommandMessage.builder()
           .line(lineNumber)
           .value(message)
-          .type(FlowCommandMessageType.ERROR)
+          .type(CommandMessageType.ERROR)
           .build());
       return null;
     }

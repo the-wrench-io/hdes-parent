@@ -24,10 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.resys.hdes.client.api.ast.AstBody.AstCommandRange;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRefNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
@@ -43,14 +43,14 @@ public class TaskCollectionAutocomplete implements AstFlowNodeVisitor {
       return;
     }
 
-    List<FlowAstCommandRange> ranges = new ArrayList<>();
+    List<AstCommandRange> ranges = new ArrayList<>();
     for(AstFlowTaskNode task : tasks.values()) {
       AstFlowRefNode ref = task.getRef();
       if(ref == null) {
         continue;
       }
 
-      FlowAstCommandRange range;
+      AstCommandRange range;
       if(ref.getCollection() != null) {
         range = AstFlowNodesFactory.range().build(ref.getCollection().getStart());
       } else {

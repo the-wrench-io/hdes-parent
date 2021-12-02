@@ -35,9 +35,9 @@ import io.resys.hdes.client.api.HdesCache;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
+import io.resys.hdes.client.api.ast.AstBody.CommandMessageType;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
-import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
@@ -185,7 +185,7 @@ public class ProgramEnvirFactory {
         cache.setAst(ast, src);
       }
       final var errors = ast.getMessages().stream()
-        .filter(m -> m.getType() == FlowCommandMessageType.ERROR)
+        .filter(m -> m.getType() == CommandMessageType.ERROR)
         .map(error -> ImmutableProgramMessage.builder()
             .id("ast-error")
             .msg("line: " + error.getLine() + ": " + error.getValue())
@@ -242,6 +242,16 @@ public class ProgramEnvirFactory {
         ast = hdesTypes.service().src(src.getCommands()).build();
         cache.setAst(ast, src);
       }
+      
+      final var errors = ast.getMessages().stream()
+          .filter(m -> m.getType() == CommandMessageType.ERROR)
+          .map(error -> ImmutableProgramMessage.builder()
+              .id("ast-error")
+              .msg("line: " + error.getLine() + ": " + error.getValue())
+              .build())
+          .collect(Collectors.toList());
+        builder.addAllErrors(errors);
+        
     } catch(Exception e) {
       LOGGER.error(new StringBuilder()
           .append(e.getMessage()).append(System.lineSeparator())

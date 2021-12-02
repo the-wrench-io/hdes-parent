@@ -38,6 +38,8 @@ public interface AstBody extends Serializable {
   Headers getHeaders();
   AstBodyType getBodyType();
   
+  List<AstCommandMessage> getMessages();
+  
   @Value.Immutable
   interface Headers extends Serializable {
     List<TypeDef> getAcceptDefs();
@@ -58,4 +60,30 @@ public interface AstBody extends Serializable {
     AstBodyType getBodyType();
     List<AstCommand> getCommands();
   }
+  
+  @JsonSerialize(as = ImmutableAstCommandMessage.class)
+  @JsonDeserialize(as = ImmutableAstCommandMessage.class)
+  @Value.Immutable
+  interface AstCommandMessage extends Serializable {
+    int getLine();
+    String getValue();
+    CommandMessageType getType();
+    @Nullable
+    AstCommandRange getRange();
+  }
+  
+  @JsonSerialize(as = ImmutableAstCommandRange.class)
+  @JsonDeserialize(as = ImmutableAstCommandRange.class)
+  @Value.Immutable
+  interface AstCommandRange extends Serializable {
+    int getStart();
+    int getEnd();
+    @Nullable
+    Integer getColumn();
+    @Nullable
+    Boolean getInsert();
+  }
+
+  enum CommandMessageType { ERROR, WARNING }
+  
 }

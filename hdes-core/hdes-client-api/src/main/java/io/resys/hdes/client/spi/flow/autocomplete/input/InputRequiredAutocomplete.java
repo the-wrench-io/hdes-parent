@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import io.resys.hdes.client.api.ast.AstBody.AstCommandRange;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
@@ -42,9 +42,9 @@ public class InputRequiredAutocomplete implements AstFlowNodeVisitor {
       return;
     }
 
-    List<FlowAstCommandRange> ranges = new ArrayList<>();
+    List<AstCommandRange> ranges = new ArrayList<>();
     for(AstFlowInputNode input : inputs.values()) {
-      FlowAstCommandRange range;
+      AstCommandRange range;
       if(input.getRequired() != null) {
         range = AstFlowNodesFactory.range().build(input.getRequired().getStart());
       } else {

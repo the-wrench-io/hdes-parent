@@ -33,10 +33,10 @@ import org.junit.jupiter.api.Test;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import io.resys.hdes.client.api.ast.AstBody.AstCommandMessage;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowExecutionStatus;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
@@ -58,7 +58,7 @@ public class FlowTest {
         .build();
 
     AstFlowNode node = ast.getSrc();
-    List<FlowAstCommandMessage> messages = ast.getMessages();
+    List<AstCommandMessage> messages = ast.getMessages();
     
     Assertions.assertTrue(messages.isEmpty());
 
@@ -80,7 +80,7 @@ public class FlowTest {
 
   @Test
   public void astDeleteId() throws IOException {
-    List<FlowAstCommandMessage> messages = new ArrayList<>();
+    List<AstCommandMessage> messages = new ArrayList<>();
     final var ast = TestUtils.client.types().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")
@@ -102,7 +102,7 @@ public class FlowTest {
 
   @Test
   public void astDeleteAndSetId() throws IOException {
-    List<FlowAstCommandMessage> messages = new ArrayList<>();
+    List<AstCommandMessage> messages = new ArrayList<>();
     final var ast = TestUtils.client.types().flow()
         .srcAdd(1, "id: uber flow")
         .srcAdd(2, "description: uber description")

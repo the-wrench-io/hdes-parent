@@ -30,14 +30,14 @@ import java.util.function.Supplier;
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
+import io.resys.hdes.client.api.ast.AstBody.AstCommandRange;
 import io.resys.hdes.client.api.ast.AstBody.Headers;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.FlowAstAutocomplete;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableFlowAstAutocomplete;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
@@ -62,27 +62,27 @@ public class AstFlowNodesFactory {
   
   public static class RangeBuilder {
     
-    public ImmutableFlowAstCommandRange build(int start, int end, Boolean insert) {
-      return ImmutableFlowAstCommandRange.builder().start(start).end(end).insert(insert).build();
+    public ImmutableAstCommandRange build(int start, int end, Boolean insert) {
+      return ImmutableAstCommandRange.builder().start(start).end(end).insert(insert).build();
     }
 
-    public ImmutableFlowAstCommandRange build(int start, int end, Boolean insert, Integer column) {
-      return ImmutableFlowAstCommandRange.builder().start(start).end(end).insert(insert).column(column).build();
+    public ImmutableAstCommandRange build(int start, int end, Boolean insert, Integer column) {
+      return ImmutableAstCommandRange.builder().start(start).end(end).insert(insert).column(column).build();
     }
 
-    public ImmutableFlowAstCommandRange build(int start, int end) {
-      return ImmutableFlowAstCommandRange.builder().start(start).end(end).build();
+    public ImmutableAstCommandRange build(int start, int end) {
+      return ImmutableAstCommandRange.builder().start(start).end(end).build();
     }
 
-    public ImmutableFlowAstCommandRange build(int start) {
-      return ImmutableFlowAstCommandRange.builder().start(start).end(start).build();
+    public ImmutableAstCommandRange build(int start) {
+      return ImmutableAstCommandRange.builder().start(start).end(start).build();
     }
   }
 
   public static class AcBuilder {
     private static final String FIELD = ":";
     private String id;
-    private final Collection<FlowAstCommandRange> range = new ArrayList<>();
+    private final Collection<AstCommandRange> range = new ArrayList<>();
     private final Collection<String> value = new ArrayList<>();
 
     public AcBuilder id(String id) {
@@ -94,11 +94,11 @@ public class AstFlowNodesFactory {
       range.add(AstFlowNodesFactory.range().build(start, end));
       return this;
     }
-    public AcBuilder addRange(FlowAstCommandRange range) {
+    public AcBuilder addRange(AstCommandRange range) {
       this.range.add(range);
       return this;
     }
-    public AcBuilder addRange(Collection<FlowAstCommandRange> range) {
+    public AcBuilder addRange(Collection<AstCommandRange> range) {
       this.range.addAll(range);
       return this;
     }

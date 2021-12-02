@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import io.resys.hdes.client.api.ast.AstBody.AstCommandRange;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
@@ -40,7 +40,7 @@ public class SwitchBodyAutocomplete implements AstFlowNodeVisitor {
       return;
     }
 
-    List<FlowAstCommandRange> ranges = new ArrayList<>();
+    List<AstCommandRange> ranges = new ArrayList<>();
     for(AstFlowTaskNode child : tasks) {
       if(child.getDecisionTable() == null && child.getService() == null) {
         ranges.add(AstFlowNodesFactory.range().build(child.getStart(), child.getEnd(), true));

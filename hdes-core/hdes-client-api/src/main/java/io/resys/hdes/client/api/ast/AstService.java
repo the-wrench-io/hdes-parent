@@ -35,7 +35,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public interface AstService extends AstBody, Serializable {
 
   @JsonIgnore
-  Class<ServiceExecutorType> getBeanType();
+  Class<? extends ServiceExecutorType> getBeanType();
+  String getValue();
   
   AstServiceType getExecutorType();
   enum AstServiceType { TYPE_0, TYPE_1, TYPE_2 }

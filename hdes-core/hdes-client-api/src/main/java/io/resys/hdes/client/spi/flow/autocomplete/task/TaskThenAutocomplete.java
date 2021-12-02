@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.resys.hdes.client.api.ast.AstBody.AstCommandRange;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
@@ -49,7 +49,7 @@ public class TaskThenAutocomplete implements AstFlowNodeVisitor {
     for(AstFlowTaskNode task : tasks.values()) {
 
       String taskId = AstFlowNodesFactory.getStringValue(task.getId());
-      final FlowAstCommandRange range;
+      final AstCommandRange range;
 
       if(task.getThen() == null) {
         int start = task.getId() == null ? task.getStart() : task.getId().getEnd();

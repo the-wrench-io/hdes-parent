@@ -39,37 +39,16 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public interface AstFlow extends AstBody, Serializable {
   
   AstFlowRoot getSrc();
-  List<FlowAstCommandMessage> getMessages();
   List<FlowAstAutocomplete> getAutocomplete();
 
   @Value.Immutable
   interface FlowAstAutocomplete extends Serializable {
     String getId();
-    List<FlowAstCommandRange> getRange();
+    List<AstCommandRange> getRange();
     List<String> getValue();
   }
 
-  @Value.Immutable
-  interface FlowAstCommandMessage extends Serializable {
-    int getLine();
-    String getValue();
-    FlowCommandMessageType getType();
-    @Nullable
-    FlowAstCommandRange getRange();
-  }
 
-  @Value.Immutable
-  interface FlowAstCommandRange extends Serializable {
-    int getStart();
-    int getEnd();
-    @Nullable
-    Integer getColumn();
-    @Nullable
-    Boolean getInsert();
-  }
-
-  enum FlowCommandMessageType { ERROR, WARNING }
-  
   //v.name(), null, v.name()
   //public ImmutableNodeInputType(String name, String ref, String value) {
   

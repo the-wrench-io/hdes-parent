@@ -181,6 +181,7 @@ public class AssociationVisitor {
     if(ref.isEmpty()) {
       result.add(ImmutableProgramAssociation.builder()
           .ref(step.getBody().getRef())
+          .refType(step.getBody().getRefType() == FlowProgramStepRefType.DT ? AstBodyType.DT : AstBodyType.FLOW_TASK)
           .owner(true)
           .refStatus(ProgramStatus.DEPENDENCY_ERROR)
           .build());

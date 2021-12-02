@@ -29,13 +29,13 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import io.resys.hdes.client.api.ast.AstBody.AstCommandMessage;
+import io.resys.hdes.client.api.ast.AstBody.CommandMessageType;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandMessage;
-import io.resys.hdes.client.api.ast.AstFlow.FlowCommandMessageType;
-import io.resys.hdes.client.api.ast.ImmutableFlowAstCommandMessage;
+import io.resys.hdes.client.api.ast.ImmutableAstCommandMessage;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
@@ -168,19 +168,19 @@ public class FlowAssociationValidator {
   }
   
   private void error(TaskStepToValidate toValidate, int start, int range, String value) {
-    toValidate.getMessages().add(ImmutableFlowAstCommandMessage.builder()
+    toValidate.getMessages().add(ImmutableAstCommandMessage.builder()
         .line(start)
         .range(AstFlowNodesFactory.range().build(0, range))
-        .type(FlowCommandMessageType.ERROR)
+        .type(CommandMessageType.ERROR)
         .value(value)
         .build());
   }
 
   private void warning(TaskStepToValidate toValidate, int start, int range, String value) {
-    toValidate.getMessages().add(ImmutableFlowAstCommandMessage.builder()
+    toValidate.getMessages().add(ImmutableAstCommandMessage.builder()
         .line(start)
         .range(AstFlowNodesFactory.range().build(0, range))
-        .type(FlowCommandMessageType.WARNING)
+        .type(CommandMessageType.WARNING)
         .value(value)
         .build());
   }
@@ -189,7 +189,7 @@ public class FlowAssociationValidator {
     private final FlowProgramStep step; 
     private final ProgramWrapper<?, ?> wrapper;
     private final AstFlowTaskNode taskNode;
-    private final List<FlowAstCommandMessage> messages = new ArrayList<>();
+    private final List<AstCommandMessage> messages = new ArrayList<>();
     private TaskStepToValidate(FlowProgramStep step, ProgramWrapper<?, ?> wrapper, AstFlowTaskNode taskNode) {
       super();
       this.step = step;
@@ -199,7 +199,7 @@ public class FlowAssociationValidator {
     public FlowProgramStep getStep() {
       return step;
     }
-    public List<FlowAstCommandMessage> getMessages() {
+    public List<AstCommandMessage> getMessages() {
       return messages;
     }
     public ProgramWrapper<?, ?> getWrapper() {

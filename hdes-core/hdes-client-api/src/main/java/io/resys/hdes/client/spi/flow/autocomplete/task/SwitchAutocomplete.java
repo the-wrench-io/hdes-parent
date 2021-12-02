@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.resys.hdes.client.api.ast.AstBody.AstCommandRange;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
-import io.resys.hdes.client.api.ast.AstFlow.FlowAstCommandRange;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 import io.resys.hdes.client.spi.config.HdesClientConfig.AstFlowNodeVisitor;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
@@ -44,7 +44,7 @@ public class SwitchAutocomplete implements AstFlowNodeVisitor {
     List<AstFlowNode> taskChildren = new ArrayList<>(flow.getTasks().values());
     Collections.sort(taskChildren);
 
-    List<FlowAstCommandRange> ranges = new ArrayList<>();
+    List<AstCommandRange> ranges = new ArrayList<>();
     int previous = tasks.getStart();
     for(AstFlowNode child : taskChildren) {
 
