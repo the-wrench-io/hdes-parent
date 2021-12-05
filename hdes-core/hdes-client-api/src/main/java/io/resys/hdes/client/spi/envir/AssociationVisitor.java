@@ -94,8 +94,8 @@ public class AssociationVisitor {
     }
     externalIdToAssoc.put(wrapper.getId(), new ArrayList<ProgramAssociation>());
     
-    final var validator = new FlowAssociationValidator(wrapper.getAst().get());
     final var program = wrapper.getProgram().get();
+    final var validator = new FlowAssociationValidator(wrapper.getAst().get());
     program.getSteps().values().forEach(step -> visitFlowStep(wrapper, step, validator));
     
     for(final var entry : validator.build()) {
@@ -165,10 +165,15 @@ public class AssociationVisitor {
   private ProgramWrapper<?, ?> visitRefWrapper(ProgramWrapper<AstFlow, FlowProgram> wrapper, FlowProgramStep step) {
     List<String> refs = Collections.emptyList();
     final var refType = step.getBody().getRefType();
+    final AstBodyType bodyType;
     if(refType == FlowProgramStepRefType.SERVICE) {
+      bodyType = AstBodyType.FLOW_TASK;
       refs = typeToExternalId.get(AstBodyType.FLOW_TASK);
     } else if(refType == FlowProgramStepRefType.DT) {
+      bodyType = AstBodyType.DT;
       refs = typeToExternalId.get(AstBodyType.DT);
+    } else {
+      bodyType = AstBodyType.FLOW;
     }
     
     final var result = externalIdToAssoc.get(wrapper.getId());
@@ -181,7 +186,7 @@ public class AssociationVisitor {
     if(ref.isEmpty()) {
       result.add(ImmutableProgramAssociation.builder()
           .ref(step.getBody().getRef())
-          .refType(step.getBody().getRefType() == FlowProgramStepRefType.DT ? AstBodyType.DT : AstBodyType.FLOW_TASK)
+          .refType(bodyType)
           .owner(true)
           .refStatus(ProgramStatus.DEPENDENCY_ERROR)
           .build());
@@ -196,6 +201,7 @@ public class AssociationVisitor {
           .owner(true)
           .ref(step.getBody().getRef())
           .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+          .refType(bodyType)
           .build());
       final var deps = String.join(",", ref.stream().map(e -> e.getId()).collect(Collectors.toList()));
       externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
@@ -210,25 +216,28 @@ public class AssociationVisitor {
     
     final var refWrapper = ref.get(0);
     if(refWrapper.getStatus() != ProgramStatus.UP) {
-      result.add(ImmutableProgramAssociation.builder()
-          .ref(step.getBody().getRef())
-          .owner(true)
-          .refStatus(ProgramStatus.DEPENDENCY_ERROR)
-          .build());
       externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
           .id("dependency-error")
           .msg("Dependency for ref: '" + step.getId() + "/" + step.getBody().getRef() + "' with id: '" + refWrapper.getId() + "' has a ERROR!")
           .build());
       
       result.add(ImmutableProgramAssociation.builder()
-          .id(wrapper.getId())
-          .ref(wrapper.getAst().get().getName())
-          .refType(wrapper.getAst().get().getBodyType())
-          .owner(false)
+          .id(refWrapper.getId())
+          .ref(refWrapper.getAst().get().getName())
+          .refType(bodyType)
+          .owner(true)
           .refStatus(ProgramStatus.DEPENDENCY_ERROR)
           .build());
       
       return null;
+    } else {
+      result.add(ImmutableProgramAssociation.builder()
+          .id(refWrapper.getId())
+          .ref(refWrapper.getAst().get().getName())
+          .refType(bodyType)
+          .owner(true)
+          .refStatus(refWrapper.getStatus())
+          .build());      
     }
     
     return refWrapper;

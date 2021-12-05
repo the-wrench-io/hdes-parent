@@ -134,6 +134,19 @@ public class ProgramEnvirFactory {
         ast = hdesTypes.decision().src(src.getCommands()).build();
         cache.setAst(ast, src);
       }
+      
+      final var errors = ast.getMessages().stream()
+        .filter(m -> m.getType() == CommandMessageType.ERROR)
+        .map(error -> ImmutableProgramMessage.builder()
+            .id("ast-error")
+            .msg("line: " + error.getLine() + ": " + error.getValue())
+            .build())
+        .collect(Collectors.toList());
+      builder.addAllErrors(errors);
+      
+      if(!errors.isEmpty()) {
+        builder.status(ProgramStatus.AST_ERROR);
+      }
     } catch(Exception e) {
       LOGGER.error(new StringBuilder()
           .append(e.getMessage()).append(System.lineSeparator())
@@ -251,7 +264,9 @@ public class ProgramEnvirFactory {
               .build())
           .collect(Collectors.toList());
         builder.addAllErrors(errors);
-        
+      if(!errors.isEmpty()) {
+        builder.status(ProgramStatus.AST_ERROR);
+      }
     } catch(Exception e) {
       LOGGER.error(new StringBuilder()
           .append(e.getMessage()).append(System.lineSeparator())

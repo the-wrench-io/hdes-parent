@@ -1,5 +1,25 @@
 package io.resys.hdes.client.spi;
 
+/*-
+ * #%L
+ * hdes-client-api
+ * %%
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +140,7 @@ public class HdesClientExecutorBuilder implements ExecutorBuilder {
     }
     
     ProgramWrapper<?, ?> wrapper = wrapperByNameOrId;
-    HdesAssert.isTrue(wrapper != null, () -> "Can't find program by nameOrId: '" + nameOrId + "', names: [" + String.join(", ", src.keySet())  + "]!");
+    HdesAssert.isTrue(wrapper != null, () -> "Can't find program by nameOrId: '" + nameOrId + "', known names: [" + String.join(", ", src.keySet())  + "]!");
     HdesAssert.isTrue(wrapper.getStatus() == ProgramStatus.UP, () -> "Can't run program by name/id: '" + nameOrId + "' because program status is: '" + wrapper.getStatus() + "'!");
     return (T) wrapper.getProgram().get();
   }

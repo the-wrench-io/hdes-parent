@@ -166,7 +166,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
       
       return ImmutableAstService.builder()
           .bodyType(AstBodyType.FLOW_TASK)
-          .name(UUID.randomUUID().toString())
+          .name(parseFailSafeName(source))
           .headers(ImmutableHeaders.builder().build())
           .beanType(FailSafeService.class)
           .executorType(AstServiceType.TYPE_0)
@@ -179,6 +179,22 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
   }
 
+  private String parseFailSafeName(String source) {
+    try {
+      final var def = "public class "; 
+      final var clean = source.replaceAll("  ", " ");
+      final var defIndex = clean.indexOf(def);
+      if(defIndex < 0) {
+        return UUID.randomUUID().toString();    
+      }
+      final var start = defIndex + def.length();
+      final var end = clean.indexOf(" ", start);
+      return clean.substring(start, end);
+    } catch(Exception e) {
+      return UUID.randomUUID().toString();  
+    }
+  }
+  
   protected Headers getHeaders(Class<?> beanType) {
     List<Headers> result = new ArrayList<>();
     for (Method method : beanType.getDeclaredMethods()) {
