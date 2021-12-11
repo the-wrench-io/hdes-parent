@@ -1,5 +1,8 @@
 package io.resys.hdes.client.spi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*-
  * #%L
  * hdes-client-api
@@ -35,6 +38,7 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
   private final ProgramEnvirFactory factory;
   private final HdesTypesMapper defs;
   private ProgramEnvir envir;
+  private final List<String> cachlessIds = new ArrayList<>();
   
   public HdesClientEnvirBuilder(ProgramEnvirFactory factory, HdesTypesMapper defs) {
     super();
@@ -49,6 +53,7 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
       private AstBodyType type;
       private String commandJson;
       private StoreEntity entity;
+      private boolean cachless;
       
       @Override
       public EnvirCommandFormatBuilder id(String externalId) {
@@ -92,6 +97,11 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
         return this;
       }
       @Override
+      public EnvirCommandFormatBuilder cachless() {
+        this.cachless = true;
+        return this;
+      }
+      @Override
       public EnvirBuilder build() {
         HdesAssert.notNull(id, () -> "id must be defined!");
         HdesAssert.isTrue(commandJson != null || entity != null, () -> "commandJson or entity must be defined!");
@@ -102,7 +112,8 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
             .bodyType(type)
             .hash(entity == null ? Sha2.blob(commandJson) : entity.getHash())
             .commands(entity == null ? defs.commandsList(commandJson) : entity.getBody())
-            .build());
+            .build(), cachless);
+        
         
         return enviBuilder;
       }

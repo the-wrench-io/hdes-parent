@@ -85,6 +85,7 @@ public interface HdesClient {
   
   interface EnvirCommandFormatBuilder {
     EnvirCommandFormatBuilder id(String externalId);
+    EnvirCommandFormatBuilder cachless();
     
     EnvirCommandFormatBuilder flow(String commandJson);
     EnvirCommandFormatBuilder decision(String commandJson);
@@ -93,6 +94,7 @@ public interface HdesClient {
     EnvirCommandFormatBuilder flow(StoreEntity entity);
     EnvirCommandFormatBuilder decision(StoreEntity entity);
     EnvirCommandFormatBuilder service(StoreEntity entity);
+    
     EnvirBuilder build();
   }
   

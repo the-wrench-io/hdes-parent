@@ -58,9 +58,9 @@ public class DryRunVisitor {
     if(source.getDecisions().containsKey(entity.getId())) {
       oldEntity = source.getDecisions().get(entity.getId());
     } else if(source.getServices().containsKey(entity.getId())) {
-      oldEntity = source.getServices().get(entity.getId());;
+      oldEntity = source.getServices().get(entity.getId());
     } else if(source.getFlows().containsKey(entity.getId())) {
-      oldEntity = source.getFlows().get(entity.getId());;
+      oldEntity = source.getFlows().get(entity.getId());
     } else {
       throw new ComposerException("Unknown entity: '" + entity.getId() + "'!");
     }
@@ -69,13 +69,13 @@ public class DryRunVisitor {
     final StoreEntity newEntity = ImmutableStoreEntity.builder().from(oldEntity).body(entity.getBody()).build();
     switch (oldEntity.getBodyType()) {
     case DT:
-      envirBuilder.addCommand().decision(newEntity).build();
+      envirBuilder.addCommand().id(entity.getId()).decision(newEntity).cachless().build();
       break;
     case FLOW:
-      envirBuilder.addCommand().flow(newEntity).build();
+      envirBuilder.addCommand().id(entity.getId()).flow(newEntity).cachless().build();
       break;      
     case FLOW_TASK: 
-      envirBuilder.addCommand().service(newEntity).build();
+      envirBuilder.addCommand().id(entity.getId()).service(newEntity).cachless().build();
     default: throw new ComposerException("Unknown entity: '" + entity.getId() + "'!");
     }
     

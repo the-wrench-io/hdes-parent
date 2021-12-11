@@ -32,12 +32,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public interface AstBody extends Serializable {
   String getName();
-  
   @Nullable
   String getDescription();
   Headers getHeaders();
   AstBodyType getBodyType();
-  
   List<AstCommandMessage> getMessages();
   
   @Value.Immutable

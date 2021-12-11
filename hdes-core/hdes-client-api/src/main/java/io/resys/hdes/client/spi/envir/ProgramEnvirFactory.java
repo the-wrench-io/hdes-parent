@@ -62,6 +62,7 @@ public class ProgramEnvirFactory {
   private final HdesCache cache;
   private final AssociationVisitor tree = new AssociationVisitor();
   private final List<String> visitedIds = new ArrayList<>();
+  private final List<String> cachlessIds = new ArrayList<>();
   private ProgramEnvir baseEnvir;
   
   public ProgramEnvirFactory(HdesAstTypes hdesTypes, HdesTypesMapper hdesFactory, HdesClientConfig config) {
@@ -76,7 +77,10 @@ public class ProgramEnvirFactory {
     this.baseEnvir = envir;
     return this;
   }
-  public ProgramEnvirFactory add(AstSource entity) {
+  public ProgramEnvirFactory add(AstSource entity, boolean cachless) {
+    if(cachless) {
+      cachlessIds.add(entity.getId());
+    }
     final var wrapper = visitSource(entity);
     visitedIds.add(wrapper.getId());
     tree.add(wrapper);
@@ -127,12 +131,17 @@ public class ProgramEnvirFactory {
     builder.status(ProgramStatus.UP);
     AstDecision ast = null;
     try {
-      final var cached = cache.getAst(src);
-      if(cached.isPresent()) {
-        ast = (AstDecision) cached.get();
-      } else {
+      
+      if(cachlessIds.contains(src.getId())) {
         ast = hdesTypes.decision().src(src.getCommands()).build();
-        cache.setAst(ast, src);
+      } else {
+        final var cached = cache.getAst(src);
+        if(cached.isPresent()) {
+          ast = (AstDecision) cached.get();
+        } else {
+          ast = hdesTypes.decision().src(src.getCommands()).build();
+          cache.setAst(ast, src);
+        }
       }
       
       final var errors = ast.getMessages().stream()
@@ -158,14 +167,17 @@ public class ProgramEnvirFactory {
     DecisionProgram program = null;
     if(ast != null) {
       try {
-        final var cached = cache.getProgram(src);
-        if(cached.isPresent()) {
-          program = (DecisionProgram) cached.get();
-        } else {
+        if(cachlessIds.contains(src.getId())) {
           program = new DecisionProgramBuilder(hdesFactory).build(ast);
-          cache.setProgram(program, src);          
+        } else {
+          final var cached = cache.getProgram(src);
+          if(cached.isPresent()) {
+            program = (DecisionProgram) cached.get();
+          } else {
+            program = new DecisionProgramBuilder(hdesFactory).build(ast);
+            cache.setProgram(program, src);          
+          }
         }
-
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
             .append(e.getMessage()).append(System.lineSeparator())
@@ -189,13 +201,16 @@ public class ProgramEnvirFactory {
     
     AstFlow ast = null;
     try {
-      
-      final var cached = cache.getAst(src);
-      if(cached.isPresent()) {
-        ast = (AstFlow) cached.get();
-      } else {
+      if(cachlessIds.contains(src.getId())) {
         ast = hdesTypes.flow().src(src.getCommands()).build();
-        cache.setAst(ast, src);
+      } else {
+        final var cached = cache.getAst(src);
+        if(cached.isPresent()) {
+          ast = (AstFlow) cached.get();
+        } else {
+          ast = hdesTypes.flow().src(src.getCommands()).build();
+          cache.setAst(ast, src);
+        }
       }
       final var errors = ast.getMessages().stream()
         .filter(m -> m.getType() == CommandMessageType.ERROR)
@@ -221,14 +236,17 @@ public class ProgramEnvirFactory {
     FlowProgram program = null;
     if(ast != null) {
       try {
-        final var cached = cache.getProgram(src);
-        if(cached.isPresent()) {
-          program = (FlowProgram) cached.get();
-        } else {
+        if(cachlessIds.contains(src.getId())) {
           program = new FlowProgramBuilder(hdesFactory).build(ast);
-          cache.setProgram(program, src);
+        } else {
+          final var cached = cache.getProgram(src);
+          if(cached.isPresent()) {
+            program = (FlowProgram) cached.get();
+          } else {
+            program = new FlowProgramBuilder(hdesFactory).build(ast);
+            cache.setProgram(program, src);
+          }
         }
-
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
             .append(e.getMessage()).append(System.lineSeparator())
@@ -248,12 +266,16 @@ public class ProgramEnvirFactory {
     builder.status(ProgramStatus.UP);
     AstService ast = null;
     try {      
-      final var cached = cache.getAst(src);
-      if(cached.isPresent()) {
-        ast = (AstService) cached.get();
-      } else {
+      if(cachlessIds.contains(src.getId())) {
         ast = hdesTypes.service().src(src.getCommands()).build();
-        cache.setAst(ast, src);
+      } else {
+        final var cached = cache.getAst(src);
+        if(cached.isPresent()) {
+          ast = (AstService) cached.get();
+        } else {
+          ast = hdesTypes.service().src(src.getCommands()).build();
+          cache.setAst(ast, src);
+        }
       }
       
       final var errors = ast.getMessages().stream()
@@ -278,14 +300,17 @@ public class ProgramEnvirFactory {
     ServiceProgram program = null;
     if(ast != null) {
       try {
-        
-        final var cached = cache.getProgram(src);
-        if(cached.isPresent()) {
-          program = (ServiceProgram) cached.get();
+        if(cachlessIds.contains(src.getId())) {
+          program = new ServiceProgramBuilder(config).build(ast);          
         } else {
-          program = new ServiceProgramBuilder(config).build(ast);
-          cache.setProgram(program, src);
-        }        
+          final var cached = cache.getProgram(src);
+          if(cached.isPresent()) {
+            program = (ServiceProgram) cached.get();
+          } else {
+            program = new ServiceProgramBuilder(config).build(ast);
+            cache.setProgram(program, src);
+          }
+        }
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
             .append(e.getMessage()).append(System.lineSeparator())
@@ -308,6 +333,4 @@ public class ProgramEnvirFactory {
           .build()
         );
   }
-  
-  
 }
