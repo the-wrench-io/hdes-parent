@@ -87,7 +87,7 @@ public class AstChangesetFactory {
         sourceBuilder.add(line, text);
       } else if(type == AstCommandValue.SET_BODY) {
         String lines[] = text.split("\\r?\\n");
-        int lineNumber = 1;
+        int lineNumber = 0;
         for(final var lineValue : lines) {
           sourceBuilder.add(lineNumber++, lineValue);  
         }
