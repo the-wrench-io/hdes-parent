@@ -23,6 +23,7 @@ package io.resys.hdes.client.api.config;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.eclipse.jgit.api.Git;
@@ -89,6 +90,9 @@ public interface GitConfig {
   @Value.Immutable
   interface GitFileReload {
     String getTreeValue();
+    String getId();
+    AstBodyType getBodyType();
+    Optional<GitFile> getFile();
   }
   
   @Value.Immutable

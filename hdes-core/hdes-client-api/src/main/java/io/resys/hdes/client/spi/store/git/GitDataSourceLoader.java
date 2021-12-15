@@ -37,11 +37,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevSort;
 import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
-import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
-import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -92,9 +88,9 @@ public class GitDataSourceLoader implements AutoCloseable {
         Map.entry(AstBodyType.FLOW, this.location.getFlowRegex())
     ).parallelStream().map(this::readFile).collect(Collectors.toList());
     
-    
+    final var files = GitFiles.builder().git(conn).build();
     final var result = new ArrayList<GitEntry>();
-    load.stream().forEach(loaded -> loaded.stream().map(this::readEntry).forEach(result::add));
+    load.stream().forEach(loaded -> loaded.stream().map(file -> files.readEntry(file, start)).forEach(result::add));
     readTags().forEach(result::add);
     
     return Collections.unmodifiableList(result);
@@ -184,67 +180,6 @@ public class GitDataSourceLoader implements AutoCloseable {
       return IOUtils.toString(entry.getInputStream(), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException("Failed to load asset content from: " + entry.getFilename() + "!" + e.getMessage(), e);
-    }
-  }
-  
-  private GitEntry readEntry(GitFile entry) {
-    try(final var revWalk = new RevWalk(repo)) {
-      
-      final TreeFilter treeFilter = AndTreeFilter.create(
-          PathFilterGroup.createFromStrings(entry.getTreeValue()), 
-          TreeFilter.ANY_DIFF);
-      
-      final var commit = revWalk.parseCommit(start);
-      
-      revWalk.reset();
-      revWalk.markStart(commit);
-      revWalk.setTreeFilter(treeFilter);
-      revWalk.sort(RevSort.COMMIT_TIME_DESC);
-      final var modTree = revWalk.next();
-      final var modified = (modTree != null ? new Timestamp(modTree.getCommitTime() * 1000L) : new Timestamp(System.currentTimeMillis()));
-
-      revWalk.reset();
-      revWalk.markStart(commit);
-      revWalk.setTreeFilter(treeFilter);
-      revWalk.sort(RevSort.COMMIT_TIME_DESC);
-      revWalk.sort(RevSort.REVERSE, true);
-      final var created = new Timestamp(revWalk.next().getCommitTime() * 1000L);
-      
-      try {
-        final var commands = conn.getSerializer().read(entry.getBlobValue());
-        final var result = ImmutableGitEntry.builder()
-            .id(entry.getId())
-            .revision(modTree.getName())
-            .bodyType(entry.getBodyType())
-            .treeValue(entry.getTreeValue())
-            .blobValue(entry.getBlobValue())
-            .created(created)
-            .modified(modified)
-            .blobHash(Sha2.blob(entry.getBlobValue()))
-            .commands(commands)
-            .build();
-
-        if(LOGGER.isDebugEnabled()) {
-          final var msg = new StringBuilder()
-              .append("Loading path: ").append(result.getTreeValue()).append(System.lineSeparator())
-              .append("  - blob murmur3_128: ").append(result.getBlobHash()).append(System.lineSeparator())
-              .append("  - body type: ").append(result.getBodyType()).append(System.lineSeparator())
-              .append("  - created: ").append(result.getCreated()).append(System.lineSeparator())
-              .append("  - modified: ").append(result.getModified()).append(System.lineSeparator())
-              .append("  - revision: ").append(result.getRevision()).append(System.lineSeparator());
-          LOGGER.debug(msg.toString());
-        }
-        
-        return result;
-      } catch(Exception e) {
-        throw new RuntimeException(
-            "Failed to create asset from file: '" + entry.getTreeValue() + "'" + System.lineSeparator() +
-            "because of: " + e.getMessage() + System.lineSeparator() +
-            "with content: " + entry.getBlobValue() 
-            , e);
-      }
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to load timestamps for: " + entry.getTreeValue() + "!" + e.getMessage(), e);
     }
   }
   

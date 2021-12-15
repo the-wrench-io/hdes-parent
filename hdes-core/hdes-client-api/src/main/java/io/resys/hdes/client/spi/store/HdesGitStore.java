@@ -1,5 +1,7 @@
 package io.resys.hdes.client.spi.store;
 
+import java.io.IOException;
+
 /*-
  * #%L
  * hdes-client-api
@@ -22,6 +24,8 @@ package io.resys.hdes.client.spi.store;
 
 import java.util.List;
 
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,8 +140,26 @@ public class HdesGitStore implements HdesStore {
     });
   }
   
-  private void cache(List<GitFileReload> reload) {
+  private void cache(List<GitFileReload> reloads) {
+    final var files = GitFiles.builder().git(conn).build();
+    final ObjectId head;
+    try {
+      final var git = conn.getClient();
+      final var repo = git.getRepository();
+      head = repo.resolve(Constants.HEAD);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to load head!" + System.lineSeparator() + e.getMessage(), e);
+    }
     
+    final var cache = conn.getCacheManager().getCache(conn.getCacheName(), String.class, GitEntry.class);
+    for(final var reload : reloads) {
+      if(reload.getFile().isEmpty()) {
+        cache.remove(reload.getId());  
+      } else {
+        final var entry = files.readEntry(reload.getFile().get(), head);
+        cache.put(entry.getId(), entry);  
+      }
+    }
   }
   
 //  

@@ -104,7 +104,8 @@ public class FlowProgramBuilder {
     if(steps.containsKey(taskId)) {
       return steps.get(taskId);
     }
-
+    steps.put(taskId, null);
+    
     final var body = visitStepBody(task);
     final var pointer = visitStepPointer(task);
     

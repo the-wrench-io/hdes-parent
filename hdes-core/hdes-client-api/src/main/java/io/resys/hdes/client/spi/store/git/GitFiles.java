@@ -22,10 +22,12 @@ package io.resys.hdes.client.spi.store.git;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,8 +45,13 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevSort;
+import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.RefSpec;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
+import org.eclipse.jgit.treewalk.filter.AndTreeFilter;
+import org.eclipse.jgit.treewalk.filter.PathFilterGroup;
+import org.eclipse.jgit.treewalk.filter.TreeFilter;
 import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +63,7 @@ import io.resys.hdes.client.api.config.GitConfig;
 import io.resys.hdes.client.api.config.GitConfig.GitEntry;
 import io.resys.hdes.client.api.config.GitConfig.GitFile;
 import io.resys.hdes.client.api.config.GitConfig.GitFileReload;
+import io.resys.hdes.client.api.config.ImmutableGitEntry;
 import io.resys.hdes.client.api.config.ImmutableGitFile;
 import io.resys.hdes.client.api.config.ImmutableGitFileReload;
 import io.resys.hdes.client.spi.staticresources.Sha2;
@@ -96,6 +104,8 @@ public class GitFiles {
       // push
       git.push().setTransportConfigCallback(callback).call();
       final var end = repo.resolve(Constants.HEAD);
+      
+      LOGGER.debug("Pushing changes...");
       return diff(start, end);
       
     } catch(CheckoutConflictException e) {
@@ -116,6 +126,80 @@ public class GitFiles {
     }
     
     return Collections.emptyList();
+  }
+  
+  public GitEntry readEntry(GitFile entry) {
+    final var git = conn.getClient();
+    final var repo = git.getRepository();
+    
+    try {
+      final var start = repo.resolve(Constants.HEAD);
+      return readEntry(entry, start);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to load timestamps for: " + entry.getTreeValue() + "!" + e.getMessage(), e);
+    }
+  }
+  
+  public GitEntry readEntry(GitFile entry, ObjectId start) {
+
+    final var git = conn.getClient();
+    final var repo = git.getRepository();
+    try(final var revWalk = new RevWalk(repo)) {
+      
+      final TreeFilter treeFilter = AndTreeFilter.create(
+          PathFilterGroup.createFromStrings(entry.getTreeValue()), 
+          TreeFilter.ANY_DIFF);
+      final var commit = revWalk.parseCommit(start);
+      
+      try {
+        revWalk.reset();
+        revWalk.markStart(commit);
+        revWalk.setTreeFilter(treeFilter);
+        revWalk.sort(RevSort.COMMIT_TIME_DESC);
+        final var modTree = revWalk.next();
+        final var modified = (modTree != null ? new Timestamp(modTree.getCommitTime() * 1000L) : new Timestamp(System.currentTimeMillis()));
+  
+        revWalk.reset();
+        revWalk.markStart(commit);
+        revWalk.setTreeFilter(treeFilter);
+        revWalk.sort(RevSort.COMMIT_TIME_DESC);
+        revWalk.sort(RevSort.REVERSE, true);
+        final var created = new Timestamp(revWalk.next().getCommitTime() * 1000L);
+        final var commands = conn.getSerializer().read(entry.getBlobValue());
+        final var result = ImmutableGitEntry.builder()
+            .id(entry.getId())
+            .revision(modTree.getName())
+            .bodyType(entry.getBodyType())
+            .treeValue(entry.getTreeValue())
+            .blobValue(entry.getBlobValue())
+            .created(created)
+            .modified(modified)
+            .blobHash(Sha2.blob(entry.getBlobValue()))
+            .commands(commands)
+            .build();
+  
+        if(LOGGER.isDebugEnabled()) {
+          final var msg = new StringBuilder()
+              .append("Loading path: ").append(result.getTreeValue()).append(System.lineSeparator())
+              .append("  - blob murmur3_128: ").append(result.getBlobHash()).append(System.lineSeparator())
+              .append("  - body type: ").append(result.getBodyType()).append(System.lineSeparator())
+              .append("  - created: ").append(result.getCreated()).append(System.lineSeparator())
+              .append("  - modified: ").append(result.getModified()).append(System.lineSeparator())
+              .append("  - revision: ").append(result.getRevision()).append(System.lineSeparator());
+          LOGGER.debug(msg.toString());
+        }
+        
+        return result;
+      } catch(Exception e) {
+        throw new RuntimeException(
+            "Failed to create asset from file: '" + entry.getTreeValue() + "'" + System.lineSeparator() +
+            "because of: " + e.getMessage() + System.lineSeparator() +
+            "with content: " + entry.getBlobValue() 
+            , e);
+      }
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to load timestamps for: " + entry.getTreeValue() + "!" + System.lineSeparator() + e.getMessage(), e);
+    }
   }
   
   public Map.Entry<String, List<GitFileReload>> tag(CreateStoreEntity entity) {
@@ -162,15 +246,77 @@ public class GitFiles {
       final List<DiffEntry> diffs = git.diff().setNewTree(newTreeIter).setOldTree(oldTreeIter).call();
       for (final DiffEntry entry : diffs) {
         // example: src/main/resources/assets/flow/2d8958a2-44eb-4020-9c17-9bb83daa7434.json
-        final var treeValue = entry.getOldPath();
-        result.add(ImmutableGitFileReload.builder().treeValue(treeValue).build());
+
+        final var oldId = getId(entry.getOldPath());
+        final var id = getId(entry.getNewPath());
+        
+        if(id.isEmpty()) {
+          final var bodyType = getBodyType(entry.getOldPath());
+          result.add(ImmutableGitFileReload.builder()
+              .id(oldId.get())
+              .treeValue(entry.getOldPath())
+              .bodyType(bodyType)
+              .build());  
+        } else {
+          final var content = getContent(entry.getNewPath());
+          final var bodyType = getBodyType(entry.getNewPath());
+          final var treeValue = conn.getAssetsPath() +  conn.getLocation().getFileName(bodyType, id.get());
+          final var gitFile = ImmutableGitFile.builder()
+            .id(id.get())
+            .treeValue(treeValue)
+            .blobValue(content)
+            .bodyType(bodyType)
+            .blobHash(Sha2.blob(content))
+            .build();
+          result.add(ImmutableGitFileReload.builder()
+              .id(id.get())
+              .treeValue(entry.getNewPath())
+              .file(gitFile)
+              .bodyType(bodyType)
+              .build());
+          
+        }        
       }
-      
       return result;
     } catch(Exception e) {
       throw new RuntimeException(e.getMessage(), e);
     }    
   }
+  
+  private Optional<String> getId(String path) {
+    if(path.indexOf(".json") < 0) {
+      return Optional.empty();
+    }
+
+    final var paths = path.split( File.separator);
+    final var fileName = paths[paths.length -1];
+    final var id = fileName.substring(0, fileName.indexOf("."));
+    
+    return Optional.of(id);
+  }
+  
+  private AstBodyType getBodyType(String path) {
+    if(path.contains(File.separator + "dt" + File.separator)) {
+      return AstBodyType.DT;
+    } else if(path.contains(File.separator + "flow" + File.separator)) {
+      return AstBodyType.FLOW;
+    } else if(path.contains(File.separator + "flowtask" + File.separator)) {
+      return AstBodyType.FLOW_TASK;
+    } else if(path.contains(File.separator + "tag" + File.separator)) {
+      return AstBodyType.TAG;
+    }
+    
+    throw new RuntimeException("Failed to load asset body type: " + path + "!");
+  }
+  
+  private String getContent(String path) {
+    try {
+      return IOUtils.toString(new FileInputStream(conn.getAbsolutePath() + File.separator + path), StandardCharsets.UTF_8);
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to load asset content from: " + path + "!" + e.getMessage(), e);
+    }
+  }
+  
   
   public GitFile create(AstBodyType bodyType, List<AstCommand> body) throws IOException {
     final var location = conn.getLocation();
