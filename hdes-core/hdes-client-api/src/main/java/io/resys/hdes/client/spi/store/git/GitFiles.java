@@ -429,7 +429,7 @@ public class GitFiles {
         final var resourceName = location.getAbsolutePath(bodyType, id);
         
         LOGGER.debug("Removing assets from git: " + resourceName + "");
-        final var file = new File(URI.create(resourceName));
+        final var file = new File(URI.create("file:" + resourceName));
         
         boolean deleted = file.delete();
         if(!deleted) {
@@ -452,6 +452,7 @@ public class GitFiles {
         git.push().setTransportConfigCallback(callback).call();
       }
     } catch(Exception e) {
+      LOGGER.error("Failed to delete asset: '" + id + "'!" + System.lineSeparator() + e.getMessage(), e);
       try {
         git.reset().setMode(ResetType.HARD).call();
       } catch (GitAPIException e1) {

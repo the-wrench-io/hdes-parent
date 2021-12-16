@@ -55,6 +55,7 @@ public interface HdesStore {
   @Value.Immutable
   interface DeleteAstType extends Serializable {
     String getId();
+    AstBodyType getBodyType();
   }
   
   @JsonSerialize(as = ImmutableUpdateStoreEntity.class)

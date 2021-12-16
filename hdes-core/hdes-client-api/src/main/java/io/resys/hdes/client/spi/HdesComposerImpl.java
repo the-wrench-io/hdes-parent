@@ -34,6 +34,7 @@ import io.resys.hdes.client.spi.composer.CopyAsEntityVisitor;
 import io.resys.hdes.client.spi.composer.CreateEntityVisitor;
 import io.resys.hdes.client.spi.composer.DataDumpVisitor;
 import io.resys.hdes.client.spi.composer.DebugVisitor;
+import io.resys.hdes.client.spi.composer.DeleteEntityVisitor;
 import io.resys.hdes.client.spi.composer.DryRunVisitor;
 import io.smallrye.mutiny.Uni;
 
@@ -65,8 +66,9 @@ public class HdesComposerImpl implements HdesComposer {
   }
   @Override
   public Uni<ComposerState> delete(String id) {
-    client.store().query().get().onItem().transform(this::state);
-    return null;
+    return client.store().query().get().onItem().transform(this::state)
+        .onItem().transformToUni(state -> client.store().delete(new DeleteEntityVisitor(state, id).visit()))
+        .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
   }
   @Override
   public Uni<ComposerEntity<?>> get(String idOrName) {
