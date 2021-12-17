@@ -22,10 +22,8 @@ package io.resys.wrench.assets.bundle.spi;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
-import org.ehcache.xml.model.ServiceType;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -41,8 +39,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
+import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -50,9 +48,8 @@ import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.Ass
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {AssetIntegrationTest.ServiceTestConfig.class})
 public class AssetIntegrationTest {
-
   @Autowired
-  private AssetServiceRepository assetServiceRepository;
+  private ProgramEnvir envir;
   @Autowired
   private ApplicationContext context;
 
@@ -66,43 +63,29 @@ public class AssetIntegrationTest {
 
   @Test
   public void services() {
-    List<AssetService> services = assetServiceRepository.createQuery().list();
+    final var services = envir.getValues();
     Assert.assertEquals(6, services.size());
   }
 
   @Test
   public void dt() throws IOException {
-    AssetService dt = assetServiceRepository.createQuery().dt("test decision table");
-    Assert.assertEquals(getContent("assets/dt/testDt.json"), dt.getSrc());
-    Assert.assertEquals("testDt.json", dt.getPointer());
-    Assert.assertEquals("test decision table", dt.getName());
-    Assert.assertEquals(ServiceType.DT, dt.getType());
+    final var dt = envir.getDecisionsByName().get("test decision table");
+    Assert.assertEquals(ProgramStatus.UP, dt.getStatus());
   }
 
   @Test
   public void flow() throws IOException {
-    AssetService flow = assetServiceRepository.createQuery().flow("evaluateRating");
-    Assert.assertEquals(getContent("assets/flow/evaluateRating.json"), flow.getSrc());
-    Assert.assertEquals("evaluateRating.json", flow.getPointer());
-    Assert.assertEquals("evaluateRating", flow.getName());
-    Assert.assertEquals(ServiceType.FLOW, flow.getType());
+    final var flow = envir.getFlowsByName().get("evaluateRating");
+    Assert.assertEquals(ProgramStatus.UP, flow.getStatus());
   }
-
 
   @Test
   public void flowTasks() {
+    var task = envir.getServicesByName().get("RuleGroup1");
+    Assert.assertEquals(ProgramStatus.UP, task.getStatus());
 
-    AssetService task = assetServiceRepository.createQuery().flowTask("RuleGroup1");
-    Assert.assertNotNull(task.getSrc());
-    Assert.assertEquals("ruleGroup1.json", task.getPointer());
-    Assert.assertEquals("RuleGroup1", task.getName());
-    Assert.assertEquals(ServiceType.FLOW_TASK, task.getType());
-
-    task = assetServiceRepository.createQuery().flowTask("RuleGroup2");
-    Assert.assertNotNull(task.getSrc());
-    Assert.assertEquals("ruleGroup2.json", task.getPointer());
-    Assert.assertEquals("RuleGroup2", task.getName());
-    Assert.assertEquals(ServiceType.FLOW_TASK, task.getType());
+    task = envir.getServicesByName().get("RuleGroup2");
+    Assert.assertEquals(ProgramStatus.UP, task.getStatus());
   }
 
   public String getContent(String location) throws IOException {

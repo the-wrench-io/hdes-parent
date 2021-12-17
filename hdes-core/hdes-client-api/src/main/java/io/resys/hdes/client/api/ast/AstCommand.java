@@ -26,11 +26,13 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @JsonSerialize(as = ImmutableAstCommand.class)
 @JsonDeserialize(as = ImmutableAstCommand.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Value.Immutable
 public interface AstCommand extends Serializable {
   @Nullable

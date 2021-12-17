@@ -38,18 +38,18 @@ import org.springframework.test.context.junit4.SpringRunner;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository;
-import io.resys.wrench.assets.bundle.api.repositories.AssetServiceRepository.AssetService;
-import io.resys.wrench.assets.bundle.spi.flow.TransientFlowExecutor;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @EnableAutoConfiguration
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {FlowTaskServiceExecutionTest.ServiceTestConfig.class})
 public class FlowTaskServiceExecutionTest {
-
   @Autowired
-  private AssetServiceRepository assetServiceRepository;
+  private ProgramEnvir envir;
+  @Autowired
+  private HdesClient client;
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -67,16 +67,12 @@ public class FlowTaskServiceExecutionTest {
    */
   @Test
   public void flowExecution() throws IOException {
-    AssetService flow = assetServiceRepository.createQuery().flow("sumFlow");
-
-    ObjectNode input = objectMapper.createObjectNode();
+    
+    final ObjectNode input = objectMapper.createObjectNode();
     input.put("val1", new BigDecimal("10"));
     input.put("val2", new BigDecimal("20"));
     
-
-    ObjectNode output = new TransientFlowExecutor(objectMapper).execute(flow, input).getValue();
-    BigDecimal sumValue = output.findValue("sum").decimalValue();
-    Assert.assertTrue(sumValue.compareTo(new BigDecimal("30")) == 0);
-
+    final var body = client.executor(envir).inputJson(input).flow("sumFlow").andGetTask("SumTask");
+    Assert.assertTrue(((BigDecimal) body.getReturns().get("sum")).compareTo(new BigDecimal("30")) == 0);
   }
 }

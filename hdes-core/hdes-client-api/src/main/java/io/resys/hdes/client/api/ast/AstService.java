@@ -22,6 +22,8 @@ package io.resys.hdes.client.api.ast;
 
 import java.io.Serializable;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -37,6 +39,12 @@ public interface AstService extends AstBody, Serializable {
   @JsonIgnore
   Class<? extends ServiceExecutorType> getBeanType();
   String getValue();
+  @Nullable
+  TypeDef getTypeDef0();
+  @Nullable
+  TypeDef getTypeDef1();
+  @Nullable
+  TypeDef getReturnDef1();
   
   AstServiceType getExecutorType();
   enum AstServiceType { TYPE_0, TYPE_1, TYPE_2 }

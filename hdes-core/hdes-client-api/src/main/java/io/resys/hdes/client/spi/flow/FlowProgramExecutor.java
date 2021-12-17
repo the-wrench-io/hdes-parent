@@ -47,6 +47,7 @@ import io.resys.hdes.client.api.programs.ImmutableFlowResultErrorLog;
 import io.resys.hdes.client.api.programs.ImmutableFlowResultLog;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
+import io.resys.hdes.client.spi.ImmutableProgramContext;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.expression.OperationFlowContext.FlowTaskExpressionContext;
 import io.resys.hdes.client.spi.groovy.ServiceProgramExecutor;
@@ -78,6 +79,7 @@ public class FlowProgramExecutor {
   public FlowResult run() {
     
     accepted.putAll(visitAcceptedDef(program, context));
+    
     FlowResultLog last;
     FlowExecutionStatus status = FlowExecutionStatus.COMPLETED;
     try {
@@ -177,7 +179,7 @@ public class FlowProgramExecutor {
     case DT: {
       final var program = context.getPrograms().getDecision(step.getBody().getRef());
       try {
-        final var result = DecisionProgramExecutor.run(program, context);
+        final var result = DecisionProgramExecutor.run(program, ImmutableProgramContext.from(context).map(inputs).build());
         final var outputs = step.getBody().getCollection() ? 
             Map.of("", (Serializable) DecisionProgramExecutor.find(result)): 
             DecisionProgramExecutor.get(result);
@@ -206,7 +208,7 @@ public class FlowProgramExecutor {
     case SERVICE: {
       final var program = context.getPrograms().getService(step.getBody().getRef());
       try {
-        final var result = ServiceProgramExecutor.run(program, context);
+        final var result = ServiceProgramExecutor.run(program, ImmutableProgramContext.from(context).map(inputs).build());
         final var outputs = factory.toMap(result.getValue());
         return visitStepLog(ImmutableFlowResultLog.builder()
             .id(this.stepLogs.size() + 1)

@@ -207,6 +207,7 @@ public class HdesInMemoryStore implements HdesStore {
         }
         
       });
+      migLog.append(System.lineSeparator());
       
       // Decision tables
       list(location.getDtRegex()).stream().forEach(r -> {

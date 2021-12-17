@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,7 @@ public class ProgramEnvirFactory {
   private final AssociationVisitor tree = new AssociationVisitor();
   private final List<String> visitedIds = new ArrayList<>();
   private final List<String> cachlessIds = new ArrayList<>();
+  private final StringBuilder treelog = new StringBuilder();
   private ProgramEnvir baseEnvir;
   
   public ProgramEnvirFactory(HdesAstTypes hdesTypes, HdesTypesMapper hdesFactory, HdesClientConfig config) {
@@ -97,6 +99,8 @@ public class ProgramEnvirFactory {
     }
     
     tree.build().forEach(e -> {
+
+      visitTreeLog(e);
       
       envir.putValues(e.getId(), e);
       
@@ -112,7 +116,30 @@ public class ProgramEnvirFactory {
       default: break;
       }
     });
+    if(LOGGER.isDebugEnabled()) {
+      LOGGER.debug(new StringBuilder()
+          .append("Envir status: ").append(System.lineSeparator())
+          .append(treelog.toString())
+          .toString());
+    }
     return envir.build();
+  }
+  
+  public void visitTreeLog(ProgramWrapper<?, ?> wrapper) {
+    if(LOGGER.isDebugEnabled()) {
+      final String name = wrapper.getAst().map(w -> w.getName()).orElseGet(() -> wrapper.getId());
+      treelog.append("  - ").append(name).append(": ").append(wrapper.getStatus()).append(System.lineSeparator());
+      if(wrapper.getStatus() != ProgramStatus.UP) {
+      
+        for(final var error : wrapper.getErrors()) {
+          treelog.append("    - ").append(error.getId()).append(": ").append(error.getMsg()).append(System.lineSeparator());
+          if(error.getException() != null) {
+            treelog.append("      ").append(ExceptionUtils.getStackTrace(error.getException())).append(System.lineSeparator());
+          }
+        }
+      }
+    }
+
   }
   
   private ProgramWrapper<?, ?> visitSource(AstSource entity) {
@@ -287,6 +314,10 @@ public class ProgramEnvirFactory {
           .collect(Collectors.toList());
         builder.addAllErrors(errors);
       if(!errors.isEmpty()) {
+        LOGGER.error(new StringBuilder()
+            .append(String.join(System.lineSeparator(), errors.stream().map(e -> e.getMsg()).collect(Collectors.toList())))
+            .append("  - service source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString());
         builder.status(ProgramStatus.AST_ERROR);
       }
     } catch(Exception e) {
@@ -319,6 +350,7 @@ public class ProgramEnvirFactory {
         builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
       }
     }
+    
     return builder.id(src.getId()).type(AstBodyType.FLOW_TASK)
         .ast(Optional.ofNullable(ast)).program(Optional.ofNullable(program))
         .source(src)

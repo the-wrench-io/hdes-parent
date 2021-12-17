@@ -51,15 +51,18 @@ public class ImmutableProgramContext implements ProgramContext {
   
   // data object that should be directly transformed to target
   private final Object serviceData;
-  
-  // generic data to transform to target
-  private Map<String, Serializable> genericData;
-  
+
   // generic data sources that will be used for init of genericData
   private final List<Supplier<Map<String, Serializable>>> suppliers;
+
+  // generic data to transform to target
+  private Map<String, Serializable> genericData;
+    
+  private final ProgramEnvir envir;
   
   public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypesMapper factory, ProgramEnvir envir) {
     super();
+    this.envir = envir;
     this.suppliers = inputs;
     this.callbackThatWillSupplyAllData = input;
     this.factory = factory;
@@ -127,6 +130,10 @@ public class ImmutableProgramContext implements ProgramContext {
   
   public static Builder builder(HdesTypesMapper factory, ProgramEnvir envir) {
     return new Builder(factory, envir);
+  }
+  public static Builder from(ProgramContext init) {
+    ImmutableProgramContext context = (ImmutableProgramContext) init;
+    return new Builder(context.factory, context.envir);
   }
   
   public static class Builder {

@@ -30,7 +30,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.apache.commons.lang3.StringUtils;
+import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +59,7 @@ import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableAstService;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
+import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.ServiceAstException;
@@ -70,6 +74,18 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
   private final List<AstCommand> src = new ArrayList<>();
   private Integer rev;
   private final GroovyClassLoader gcl;
+  
+  @Value.Immutable
+  interface ServiceDataTypes {
+    Headers getHeaders();
+    @Nullable
+    TypeDef getAcceptType0();
+    @Nullable
+    TypeDef getAcceptType1();
+    @Nullable
+    TypeDef getReturnType();
+  }
+  
   
   public static class FailSafeService implements ServiceExecutorType0<HashMap<String, String>> {
     @Override
@@ -149,12 +165,16 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
             source + System.lineSeparator()); 
       }
       
-      final Headers method = getHeaders(beanType);
+      final ServiceDataTypes method = getHeaders(beanType);
+
       
       return ImmutableAstService.builder()
           .bodyType(AstBodyType.FLOW_TASK)
           .name(beanType.getSimpleName())
-          .headers(method)
+          .headers(method.getHeaders())
+          .typeDef0(method.getAcceptType0())
+          .typeDef1(method.getAcceptType1())
+          .returnDef1(method.getReturnType())
           .beanType(beanType)
           .executorType(executorType)
           .value(source)
@@ -195,13 +215,13 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     }
   }
   
-  protected Headers getHeaders(Class<?> beanType) {
-    List<Headers> result = new ArrayList<>();
+  protected ServiceDataTypes getHeaders(Class<?> beanType) {
+    List<ServiceDataTypes> result = new ArrayList<>();
     for (Method method : beanType.getDeclaredMethods()) {
       if (method.getName().equals("execute") && Modifier.isPublic(method.getModifiers())
           && !Modifier.isVolatile(method.getModifiers())) {
 
-        Headers params = getParams(method);
+        ServiceDataTypes params = getParams(method);
         HdesAssert.isTrue(result.isEmpty(), () -> "Only one 'execute' method allowed!");
         result.add(params);
       }
@@ -210,20 +230,31 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     return result.iterator().next();
   }
 
-  protected Headers getParams(Method method) {
+  private ServiceDataTypes getParams(Method method) {
+    TypeDef acceptType0 = null;
+    TypeDef acceptType1 = null;
     final var result = ImmutableHeaders.builder();
     int index = 0;
     for (Parameter parameter : method.getParameters()) {
       Class<?> type = parameter.getType();
       boolean isData = type.isAnnotationPresent(ServiceData.class);
+      if(isData) {
+        
+        DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().id("intput-" + index).order(index++)
+            .data(isData).name(parameter.getName()).direction(Direction.IN).beanType(parameter.getType())
+            .valueType(ValueType.OBJECT);
+        getWrenchFlowParameter(dataTypeBuilder, parameter.getType(), isData, Direction.IN);
+        if(acceptType0 == null) {
+          acceptType0 = dataTypeBuilder.build();
+        } else {
+          acceptType1 = dataTypeBuilder.build();  
+        }
 
-      DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().id("intput-" + index).order(index++)
-          .data(isData).name(parameter.getName()).direction(Direction.IN).beanType(parameter.getType())
-          .valueType(ValueType.OBJECT);
-      getWrenchFlowParameter(dataTypeBuilder, parameter.getType(), isData, Direction.IN);
-      result.addAcceptDefs(dataTypeBuilder.build());
+        result.addAllAcceptDefs(getFields(parameter.getType(), Direction.IN));
+      }
     }
 
+    TypeDef returnTypeDef = null;
     Class<?> returnType = method.getReturnType();
     if (!returnType.isAnnotationPresent(ServiceData.class)) {
       throw new ServiceAstException(
@@ -232,13 +263,38 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
       DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().id("output").name(returnType.getSimpleName())
           .data(true).order(index++).direction(Direction.OUT).beanType(returnType).valueType(ValueType.OBJECT);
       getWrenchFlowParameter(dataTypeBuilder, returnType, true, Direction.OUT);
-      result.addReturnDefs(dataTypeBuilder.build());
+      returnTypeDef = dataTypeBuilder.build();
+      
+      result.addAllReturnDefs(getFields(returnType, Direction.OUT));
     }
 
-    return result.build();
+    return ImmutableServiceDataTypes.builder()
+        .headers(result.build())
+        .acceptType0(acceptType0)
+        .acceptType1(acceptType1)
+        .returnType(returnTypeDef)
+        .build();
   }
 
-  protected void getWrenchFlowParameter(DataTypeAstBuilder parentDataTypeBuilder, Class<?> type, boolean isServiceData,
+  
+  private List<TypeDef> getFields(Class<?> type, Direction direction) {
+    List<TypeDef> result = new ArrayList<>();
+    int index = 0;
+
+    HdesAssert.isTrue(Serializable.class.isAssignableFrom(type), () -> "Flow types must implement Serializable!");
+    for (Field field : type.getDeclaredFields()) {
+      int modifier = field.getModifiers();
+      if (Modifier.isFinal(modifier) || Modifier.isTransient(modifier) || Modifier.isStatic(modifier)
+          || field.getName().startsWith("$") || field.getName().startsWith("_")) {
+        continue;
+      }
+      final var typeDef = dataTypeRepository.dataType().id(field.getName()).order(index++).name(field.getName()).direction(direction).beanType(field.getType()).build();
+      result.add(typeDef);
+    }
+    return result;
+  }
+  
+  private void getWrenchFlowParameter(DataTypeAstBuilder parentDataTypeBuilder, Class<?> type, boolean isServiceData,
       Direction direction) {
     if (!isServiceData) {
       return;
