@@ -1,5 +1,25 @@
 package io.resys.wrench.assets.bundle.spi;
 
+/*-
+ * #%L
+ * hdes-spring-bundle-editor
+ * %%
+ * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -11,19 +31,6 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
-import io.resys.hdes.client.spi.flow.autocomplete.DescAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.IdAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.input.InputAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.input.InputDataTypeAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.input.InputDebugValueAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.input.InputRequiredAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.input.InputsAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.task.SwitchAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.task.SwitchBodyAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.task.TaskAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.task.TaskCollectionAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.task.TaskThenAutocomplete;
-import io.resys.hdes.client.spi.flow.autocomplete.task.TasksAutocomplete;
 import io.resys.hdes.client.spi.flow.validators.DescriptionValidator;
 import io.resys.hdes.client.spi.flow.validators.IdValidator;
 import io.resys.wrench.assets.context.config.AssetConfigBean;
@@ -49,19 +56,6 @@ public class AssetComponentConfiguration {
         .objectMapper(objectMapper)
         .serviceInit(init)
         .flowVisitors(
-          new IdAutocomplete(),
-          new DescAutocomplete(),
-          new InputsAutocomplete(),
-          new TasksAutocomplete(),
-          new TaskThenAutocomplete(),
-          new InputRequiredAutocomplete(),
-          new InputDataTypeAutocomplete(),
-          new InputAutocomplete(),
-          new TaskAutocomplete(),
-          new TaskCollectionAutocomplete(),
-          new SwitchAutocomplete(),
-          new InputDebugValueAutocomplete(),
-          new SwitchBodyAutocomplete(),
           new IdValidator(),
           new DescriptionValidator()
         )

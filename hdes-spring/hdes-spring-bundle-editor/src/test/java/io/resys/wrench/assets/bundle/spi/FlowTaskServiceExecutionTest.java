@@ -2,6 +2,7 @@ package io.resys.wrench.assets.bundle.spi;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Duration;
 
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -40,6 +41,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
+import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @EnableAutoConfiguration
@@ -58,6 +60,11 @@ public class FlowTaskServiceExecutionTest {
     @Bean
     public ObjectMapper objectMapper() {
       return new ObjectMapper();
+    }
+    @Bean
+    public ProgramEnvir staticAssets(HdesClient client) {
+      final var source = client.store().query().get().await().atMost(Duration.ofMinutes(1));
+      return ComposerEntityMapper.toEnvir(client.envir(), source).build();
     }
   }
 

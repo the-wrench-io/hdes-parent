@@ -23,6 +23,7 @@ package io.resys.hdes.client.test;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -43,6 +44,7 @@ import io.resys.hdes.client.test.config.RepositoryToStaticData;
 public class PersistencePgTest extends PgTestTemplate {
 
   @Test
+  @Disabled
   public void starter() {
     final var repo = getHdes("test1");
     
