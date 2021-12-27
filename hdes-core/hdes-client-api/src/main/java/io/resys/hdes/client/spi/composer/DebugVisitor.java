@@ -29,6 +29,7 @@ import io.resys.hdes.client.api.HdesComposer.DebugResponse;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableDebugResponse;
 import io.resys.hdes.client.api.exceptions.HdesBadRequestException;
+import io.resys.hdes.client.api.programs.Program.ProgramResult;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
@@ -44,7 +45,7 @@ public class DebugVisitor {
 
   public DebugResponse visit(DebugRequest entity, StoreState state) {
     HdesAssert.isTrueOrBadRequest(entity.getInput() != null || entity.getInputCSV() != null, () -> "input or inputCSV must be defined!");
-    HdesAssert.isTrueOrBadRequest(entity.getInput() != null && entity.getInputCSV() != null, () -> "input and inputCSV can't be both defined!");
+    HdesAssert.isTrueOrBadRequest(entity.getInput() == null || entity.getInputCSV() == null, () -> "input and inputCSV can't be both defined!");
     
     final var envir = ComposerEntityMapper.toEnvir(client.envir(), state).build();
     final var runnable = envir.getValues().get(entity.getId());
@@ -53,16 +54,16 @@ public class DebugVisitor {
     
     if(entity.getInputCSV() != null) {
       final var csv =  new DebugCSVVisitor(client, runnable, envir).visit(entity.getInputCSV());
-      return ImmutableDebugResponse.builder().body(csv).build();
+      return ImmutableDebugResponse.builder().bodyCsv(csv).build();
     }
     
     final var input = client.mapper().toMap(entity.getInput());
     final var json = visitProgram(input, runnable, envir);
-    return ImmutableDebugResponse.builder().body(json).build();
+    return ImmutableDebugResponse.builder().id(entity.getId()).body(json).build();
   }
   
   
-  private String visitProgram(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
+  private ProgramResult visitProgram(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
     switch (wrapper.getType()) {
     case FLOW: return visitFlow(input, wrapper, envir);
     case FLOW_TASK: return visitFlowTask(input, wrapper, envir);
@@ -72,18 +73,18 @@ public class DebugVisitor {
   }
   
   
-  private String visitFlow(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
+  private ProgramResult visitFlow(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
     final var body = client.executor(envir).inputMap(input).flow(wrapper.getId()).andGetBody(); 
-    return client.mapper().toJson(body);
+    return body;
   }
   
-  private String visitFlowTask(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
+  private ProgramResult visitFlowTask(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
     final var body = client.executor(envir).inputMap(input).service(wrapper.getId()).andGetBody();
-    return client.mapper().toJson(body);
+    return body;
   }
   
-  private String visitDecision(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
+  private ProgramResult visitDecision(Map<String, Serializable> input, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
     final var body = client.executor(envir).inputMap(input).decision(wrapper.getId()).andGetBody();
-    return client.mapper().toJson(body);
+    return body;
   }
 }

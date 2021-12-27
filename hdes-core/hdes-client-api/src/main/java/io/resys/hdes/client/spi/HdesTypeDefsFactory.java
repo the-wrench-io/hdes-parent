@@ -317,6 +317,10 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
   @Override
   public Map<String, Serializable> toMap(Object entity) {
     try {
+      if(entity instanceof String) {
+        return objectMapper.readValue((String) entity, Map.class);
+      }
+      
       return objectMapper.convertValue(entity, Map.class);
     } catch (Exception e) {
       throw new HdesJsonException(e.getMessage(), e);

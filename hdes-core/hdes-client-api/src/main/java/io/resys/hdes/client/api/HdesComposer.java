@@ -41,6 +41,7 @@ import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.programs.Program.ProgramResult;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
@@ -69,7 +70,9 @@ public interface HdesComposer {
   interface DebugResponse extends Serializable {
     String getId();
     @Nullable
-    String getBody();
+    ProgramResult getBody();
+    @Nullable
+    String getBodyCsv();
   }
   
   @JsonSerialize(as = ImmutableDebugRequest.class)

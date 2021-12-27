@@ -1,12 +1,11 @@
 import React from 'react';
-import { ThemeProvider } from '@material-ui/core';
+
 import { IntlProvider } from 'react-intl';
-import { StyledEngineProvider } from '@material-ui/core/styles';
+import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
+import { SnackbarProvider } from 'notistack';
+import Burger, { siteTheme } from '@the-wrench-io/react-burger';
+import Client, { messages, Main, Secondary, Toolbar, Composer } from '@the-wrench-io/hdes-ide';
 
-import { theme } from './themes';
-import messages from './intl';
-
-import { Resource, Hdes } from '@the-wrench-io/hdes-ide';
 
 declare global {
   interface Window {
@@ -17,20 +16,20 @@ declare global {
   }
 }
 
-interface Csrf { 
+interface Csrf {
   key: string, value: string
 }
 
 
 const getUrl = () => {
-  if(window._env_ && window._env_.url) {
+  if (window._env_ && window._env_.url) {
     const url = window._env_.url;
-    if(url.endsWith("/")) {
+    if (url.endsWith("/")) {
       return url.substring(0, url.length - 1)
     }
     return url;
   }
-  
+
   return "http://localhost:8081/assets";
 }
 
@@ -45,7 +44,7 @@ const init = {
 console.log("INIT", init);
 
 
-const store: Hdes.Store = {
+const store: Client.Store = {
   fetch<T>(path: string, req?: RequestInit): Promise<T> {
     if (!path) {
       throw new Error("can't fetch with undefined url")
@@ -58,8 +57,8 @@ const store: Hdes.Store = {
         "Content-Type": "application/json;charset=UTF-8"
       }
     };
-    
-    if(init.csrf) {
+
+    if (init.csrf) {
       const headers: Record<string, string> = defRef.headers as any;
       headers[init.csrf.key] = init.csrf.value;
     }
@@ -76,7 +75,7 @@ const store: Hdes.Store = {
         if (!response.ok) {
           return response.json().then(data => {
             console.error(data);
-            throw new Hdes.StoreError({
+            throw new Client.StoreError({
               text: response.statusText,
               status: response.status,
               errors: data
@@ -88,14 +87,36 @@ const store: Hdes.Store = {
   }
 };
 
+
+const CreateApps: React.FC<{}> = () => {
+  // eslint-disable-next-line 
+  const backend = React.useMemo(() => new Client.ServiceImpl(store), [store]);
+  const wrenchComposer: Burger.App<Composer.ContextType> = {
+    id: "wrench-composer",
+    components: { primary: Main, secondary: Secondary, toolbar: Toolbar },
+    state: [
+      (children: React.ReactNode, restorePoint?: Burger.AppState<Composer.ContextType>) => (<>{children}</>),
+      () => ({})
+    ]
+  };
+
+  return (
+    <Composer.Provider service={backend}>
+      <Burger.Provider children={[wrenchComposer]} secondary="toolbar.assets" drawerOpen/>
+    </Composer.Provider>
+  )
+}
+
 const NewApp = (
-  <StyledEngineProvider injectFirst>
-    <ThemeProvider theme={theme}>
-      <IntlProvider locale={init.locale} messages={messages[init.locale]}>
-        <Resource.Editor store={store} theme='dark' />
-      </IntlProvider>
-    </ThemeProvider>
-  </StyledEngineProvider>);
+  <IntlProvider locale={init.locale} messages={messages[init.locale]}>
+    <StyledEngineProvider injectFirst>
+      <ThemeProvider theme={siteTheme}>
+        <SnackbarProvider>
+          <CreateApps />
+        </SnackbarProvider>
+      </ThemeProvider>
+    </StyledEngineProvider>
+  </IntlProvider>);
 
 export default NewApp;
 

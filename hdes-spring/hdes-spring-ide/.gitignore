@@ -2,3 +2,6 @@
 /.yalc/
 /yalc.lock
 /build/
+/.pnp.cjs
+/.pnp.loader.mjs
+/.yarn/
