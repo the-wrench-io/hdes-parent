@@ -3,10 +3,10 @@ on:
     branches:
       - 3.y
 
-name: Create release
+name: Create hdes parent release from 3.y
 jobs:
   build:
-    name: Create Release
+    name: release branch 3.y
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
