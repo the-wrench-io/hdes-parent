@@ -139,7 +139,9 @@ public interface HdesComposer {
   @JsonSerialize(as = ImmutableCreateEntity.class)
   @JsonDeserialize(as = ImmutableCreateEntity.class)
   interface CreateEntity {
+    @Nullable
     String getName();
     AstBodyType getType();
+    List<AstCommand> getBody();
   }
 }

@@ -35,15 +35,17 @@ import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.programs.Program;
 
 public class HdesClientEhCache implements HdesCache {
-  private static final String CACHE_NAME = HdesCache.class.getCanonicalName();
+  private static final String CACHE_PREFIX = HdesCache.class.getCanonicalName();
   private final CacheManager cacheManager;
+  private final String cacheName;
   
-  private HdesClientEhCache(CacheManager cacheManager) {
+  private HdesClientEhCache(CacheManager cacheManager, String cacheName) {
     super();
     this.cacheManager = cacheManager;
+    this.cacheName = cacheName;
   }
   private Cache<String, CacheEntry> getCache() {
-    return cacheManager.getCache(CACHE_NAME, String.class, CacheEntry.class);
+    return cacheManager.getCache(cacheName, String.class, CacheEntry.class);
   }
   @Override
   public Optional<Program> getProgram(AstSource src) {
@@ -77,24 +79,41 @@ public class HdesClientEhCache implements HdesCache {
     return ast;
   }
   
+  @Override
+  public HdesCache withName(String name) {
+    final var cacheName = createName(name);
+    final var cacheHeap = 500;
+    final var cacheManager = CacheManagerBuilder.newCacheManagerBuilder() 
+        .withCache(cacheName,
+            CacheConfigurationBuilder.newCacheConfigurationBuilder(
+                String.class, CacheEntry.class, 
+                ResourcePoolsBuilder.heap(cacheHeap))) 
+        .build(); 
+    cacheManager.init();
+    return new HdesClientEhCache(cacheManager, cacheName);
+  }
   
   public static Builder builder() {
     return new Builder();
   }
   
   public static class Builder {
-    public HdesClientEhCache build() {    
-      
+    public HdesClientEhCache build(String name) {
+      final var cacheName = createName(name);
       final var cacheHeap = 500;
       final var cacheManager = CacheManagerBuilder.newCacheManagerBuilder() 
-          .withCache(CACHE_NAME,
+          .withCache(cacheName,
               CacheConfigurationBuilder.newCacheConfigurationBuilder(
                   String.class, CacheEntry.class, 
                   ResourcePoolsBuilder.heap(cacheHeap))) 
           .build(); 
       cacheManager.init();
       
-      return new HdesClientEhCache(cacheManager);
+      return new HdesClientEhCache(cacheManager, cacheName);
     }
+  }
+  
+  private static String createName(String name) {
+    return CACHE_PREFIX + "-" + name;
   }
 }

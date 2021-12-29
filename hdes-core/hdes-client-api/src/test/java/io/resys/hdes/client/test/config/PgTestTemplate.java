@@ -1,6 +1,5 @@
 package io.resys.hdes.client.test.config;
 
-import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,14 +34,12 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.config.ImmutableThenaConfig;
-import io.resys.hdes.client.api.config.ThenaConfig;
+import io.resys.hdes.client.api.HdesComposer;
 import io.resys.hdes.client.spi.HdesClientImpl;
+import io.resys.hdes.client.spi.HdesComposerImpl;
 import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
-import io.resys.hdes.client.spi.serializers.ZoeDeserializer;
 import io.resys.hdes.client.spi.store.HdesDocumentStore;
 import io.resys.thena.docdb.api.DocDB;
-import io.resys.thena.docdb.api.actions.RepoActions.RepoResult;
 import io.resys.thena.docdb.api.models.Repo;
 import io.resys.thena.docdb.spi.ClientCollections;
 import io.resys.thena.docdb.spi.ClientState;
@@ -50,7 +47,8 @@ import io.resys.thena.docdb.spi.DocDBPrettyPrinter;
 import io.resys.thena.docdb.spi.pgsql.DocDBFactory;
 
 public class PgTestTemplate {
-  private DocDB client;
+  private HdesDocumentStore store;
+  
   @Inject
   io.vertx.mutiny.pgclient.PgPool pgPool;
   public static ObjectMapper objectMapper = new ObjectMapper();
@@ -61,71 +59,47 @@ public class PgTestTemplate {
   }
   @BeforeEach
   public void setUp() {
-    this.client = DocDBFactory.create()
-        .db("junit")
-        .client(pgPool)
+    final AtomicInteger gid = new AtomicInteger(0);
+    this.store = HdesDocumentStore.builder()
+        .repoName("")
+        .pgPool(pgPool)
+        .objectMapper(objectMapper)
+        .gidProvider((type) -> type + "-" + gid.incrementAndGet())
         .build();
-    this.client.repo().create().name("junit").build();
   }
   
   @AfterEach
   public void tearDown() {
   }
 
-  public ClientState createState() {
-    final var ctx = ClientCollections.defaults("junit");
+  private ClientState createState(String repoName) {
+    final var ctx = ClientCollections.defaults(repoName);
     return DocDBFactory.state(ctx, pgPool);
   }
   
   public void printRepo(Repo repo) {
-    final String result = new DocDBPrettyPrinter(createState()).print(repo);
+    final String result = new DocDBPrettyPrinter(createState(repo.getName())).print(repo);
     System.out.println(result);
   }
   
   public void prettyPrint(String repoId) {
     Repo repo = getThena().repo().query().id(repoId).get()
-        .await().atMost(Duration.ofMinutes(1));
-    
+        .await().atMost(Duration.ofMinutes(1)); 
     printRepo(repo);
   }
 
-  public String toRepoExport(String repoId) {
-    Repo repo = getThena().repo().query().id(repoId).get()
+  public String toRepoExport(String repoName) {
+    Repo repo = getThena().repo().query().id(repoName).get()
         .await().atMost(Duration.ofMinutes(1));
-    final String result = new RepositoryToStaticData(createState()).print(repo);
+    final String result = new RepositoryToStaticData(createState(repo.getName())).print(repo);
     return result;
   }
 
   public DocDB getThena() {
-    return client;
+    return store.getConfig().getClient();
   }
   
-  public HdesClient getHdes(String repoId) {
-    final DocDB client = getThena();    
-    RepoResult repo = getThena().repo().create()
-        .name(repoId)
-        .build()
-        .await().atMost(Duration.ofMinutes(1));
-    final AtomicInteger gid = new AtomicInteger(0);
-    
-    ThenaConfig config = ImmutableThenaConfig.builder()
-        .client(client).repoName(repoId).headName("main")
-        .gidProvider(type -> {
-            return type + "-" + gid.incrementAndGet();
-         })
-        .serializer((entity) -> {
-          try {
-            return objectMapper.writeValueAsString(entity);
-          } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-          }
-        })
-        .deserializer(new ZoeDeserializer(objectMapper))
-        .authorProvider(()-> "test author")
-        .build();
-    
-    final var store = new HdesDocumentStore(config);
-    
+  public HdesClient getClient() {
     return HdesClientImpl.builder().objectMapper(objectMapper).store(store)
         .serviceInit(new ServiceInit() {
             @Override
@@ -138,6 +112,10 @@ public class PgTestTemplate {
             }
           })
         .build();
+  }
+  
+  public HdesComposer getComposer() {
+    return new HdesComposerImpl(getClient());
   }
   
 }

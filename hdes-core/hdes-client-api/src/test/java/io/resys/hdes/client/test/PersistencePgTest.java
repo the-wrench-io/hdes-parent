@@ -23,7 +23,6 @@ package io.resys.hdes.client.test;
 import java.time.Duration;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -44,9 +43,9 @@ import io.resys.hdes.client.test.config.RepositoryToStaticData;
 public class PersistencePgTest extends PgTestTemplate {
 
   @Test
-  @Disabled
-  public void starter() {
-    final var repo = getHdes("test1");
+  public void basicReadWriteDeleteTest() {
+    final var repo = getClient().repo().repoName("basicReadWriteDeleteTest").create()
+        .await().atMost(Duration.ofMinutes(1));
     
     StoreEntity article1 = repo.store().create(
         ImmutableCreateStoreEntity.builder().bodyType(AstBodyType.FLOW)
@@ -59,8 +58,8 @@ public class PersistencePgTest extends PgTestTemplate {
       .await().atMost(Duration.ofMinutes(1));
 
     // create state
-    var expected = RepositoryToStaticData.toString(getClass(), "create_state.txt");
-    var actual = super.toRepoExport("test1");
+    var expected = RepositoryToStaticData.toString(PersistencePgTest.class, "create_state.txt");
+    var actual = super.toRepoExport(repo.store().getRepoName());
     Assertions.assertEquals(expected, actual);
     
     repo.store().update(ImmutableUpdateStoreEntity.builder()
@@ -76,17 +75,17 @@ public class PersistencePgTest extends PgTestTemplate {
     
     // update state
     expected = RepositoryToStaticData.toString(getClass(), "update_state.txt");
-    actual = super.toRepoExport("test1");
+    actual = super.toRepoExport(repo.store().getRepoName());
     Assertions.assertEquals(expected, actual);
     
     
-    repo.store().delete(ImmutableDeleteAstType.builder().id(article1.getId()).build())
+    repo.store().delete(ImmutableDeleteAstType.builder().bodyType(AstBodyType.FLOW).id(article1.getId()).build())
       .onFailure().invoke(e -> e.printStackTrace()).onFailure().recoverWithNull()
       .await().atMost(Duration.ofMinutes(1));
     
     // delete state
     expected = RepositoryToStaticData.toString(getClass(), "delete_state.txt");
-    actual = super.toRepoExport("test1");
+    actual = super.toRepoExport(repo.store().getRepoName());
     Assertions.assertEquals(expected, actual);
     
   }

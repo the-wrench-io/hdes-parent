@@ -21,7 +21,6 @@ package io.resys.hdes.client.test;
  */
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,18 +29,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import io.resys.hdes.client.api.ast.AstBody.AstCommandMessage;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowExecutionStatus;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.spi.util.FileUtils;
+import io.resys.hdes.client.test.config.TestUtils;
 
 
 public class FlowTest {
@@ -126,18 +122,6 @@ public class FlowTest {
     Assertions.assertEquals(2, node.get("tasks").getChildren().size());
     Assertions.assertNotNull(node.get("tasks").get("first task"));
     Assertions.assertNotNull(node.get("tasks").get("second task"));
-  }
-  
-  @Test
-  public void astTrafficExample() throws IOException {
-    InputStream stream = FileUtils.toInputStream(getClass(), "flow/trafficMain.in.json");
-    String content = TestUtils.objectMapper.readValue(stream, ObjectNode.class).get("content").asText();
-
-    ArrayNode commands = TestUtils.objectMapper.readValue(content, ArrayNode.class);
-    AstFlow flowCommandModel = TestUtils.client.types().flow().src(commands).build();
-
-    String expected = FileUtils.toString(getClass(), "flow/trafficMain.out.yaml");
-    Assertions.assertEquals(expected, flowCommandModel.getSrc().getValue());
   }
   
   

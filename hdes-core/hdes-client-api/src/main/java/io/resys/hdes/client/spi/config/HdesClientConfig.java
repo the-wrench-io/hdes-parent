@@ -22,8 +22,8 @@ package io.resys.hdes.client.spi.config;
 
 import java.util.List;
 
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.HdesCache;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
 
 public interface HdesClientConfig {

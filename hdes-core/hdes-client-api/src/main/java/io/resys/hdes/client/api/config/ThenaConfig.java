@@ -24,14 +24,14 @@ import java.util.Collection;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreState;
-import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
+import io.resys.thena.docdb.api.models.Objects.Blob;
 import io.smallrye.mutiny.Uni;
-import io.resys.hdes.client.api.HdesStore.StoreEntity;
 
 @Value.Immutable
 public interface ThenaConfig {
@@ -53,8 +53,7 @@ public interface ThenaConfig {
   }
   
   interface Deserializer {
-    StoreEntity fromString(String value);
-    <T extends AstBody> StoreEntity fromString(AstBodyType type, String value);
+    StoreEntity fromString(Blob value);
   }
   Serializer getSerializer();
   Deserializer getDeserializer();

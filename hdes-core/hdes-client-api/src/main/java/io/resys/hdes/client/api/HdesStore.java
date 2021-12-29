@@ -40,7 +40,17 @@ public interface HdesStore {
   Uni<StoreEntity> delete(DeleteAstType deleteType);
   QueryBuilder query();
   HistoryQuery history();
-
+  String getRepoName();
+  String getHeadName();
+  StoreRepoBuilder repo();
+  
+  interface StoreRepoBuilder {
+    Uni<HdesStore> create();
+    StoreRepoBuilder repoName(String repoName);
+    StoreRepoBuilder headName(String headName);
+    HdesStore build();
+  }
+  
   interface HistoryQuery {
     Uni<HistoryEntity> get(String id);
   }

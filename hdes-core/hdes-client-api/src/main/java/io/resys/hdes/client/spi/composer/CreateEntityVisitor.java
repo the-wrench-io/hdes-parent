@@ -45,6 +45,9 @@ public class CreateEntityVisitor {
     this.state = state;
   }
   public CreateStoreEntity visit() {
+    if(asset.getName() == null && asset.getBody().isEmpty()) {
+      throw new ComposerException("Name can't be null if body is empty!");
+    }
     visitValidations();
     final var body = visitBody();
     return ImmutableCreateStoreEntity.builder()
@@ -104,6 +107,10 @@ public class CreateEntityVisitor {
   
 
   public List<AstCommand> initFlow(CreateEntity entity) {
+    if(!entity.getBody().isEmpty()) {
+      return entity.getBody();
+    }
+    
     final var lnr = System.lineSeparator();
     final var body = new StringBuilder()
         .append("id: ").append(entity.getName()).append(lnr)
@@ -117,6 +124,10 @@ public class CreateEntityVisitor {
   }
   
   public List<AstCommand> initFlowTask(CreateEntity entity) {
+    if(!entity.getBody().isEmpty()) {
+      return entity.getBody();
+    }
+    
     final var lnr = System.lineSeparator();
     final var body = new StringBuilder()
         .append("package io.resys.wrench.assets.bundle.groovy;").append(lnr)
@@ -140,6 +151,10 @@ public class CreateEntityVisitor {
   }
 
   private List<AstCommand> initDecision(CreateEntity entity) {
+    if(!entity.getBody().isEmpty()) {
+      return entity.getBody();
+    }
+    
     return Arrays.asList(
       ImmutableAstCommand.builder().type(AstCommandValue.ADD_HEADER_IN).build(),
       ImmutableAstCommand.builder().type(AstCommandValue.SET_HEADER_REF).id("0").value("inputColumn").build(),

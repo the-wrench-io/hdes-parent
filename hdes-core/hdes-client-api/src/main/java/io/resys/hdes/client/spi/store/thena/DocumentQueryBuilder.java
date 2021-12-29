@@ -41,6 +41,6 @@ public class DocumentQueryBuilder extends PersistenceCommands implements QueryBu
   @Override
   public Uni<StoreEntity> get(String id) {
     var result = super.getEntityState(id);
-    return result.onItem().transform(entityState->entityState.getEntity());
+    return result.onItem().transform(entityState -> entityState.getEntity());
   }
 }

@@ -74,22 +74,14 @@ public class HdesInMemoryStore implements HdesStore {
   public Uni<StoreEntity> create(CreateStoreEntity newType) {
     throw new RuntimeException("read only store!");
   }
-
   @Override
   public Uni<StoreEntity> update(UpdateStoreEntity updateType) {
     throw new RuntimeException("read only store!");
   }
-
   @Override
   public Uni<StoreEntity> delete(DeleteAstType deleteType) {
     throw new RuntimeException("read only store!");
   }
-  
-  @Override
-  public HistoryQuery history() {
-    throw new RuntimeException("read only store!");
-  }
-
   @Override
   public QueryBuilder query() {
     return new QueryBuilder() {
@@ -239,5 +231,23 @@ public class HdesInMemoryStore implements HdesStore {
       LOGGER.debug(migLog.toString());
       return new HdesInMemoryStore(entities);
     }
+  }
+  
+  @Override
+  public HistoryQuery history() {
+    throw new IllegalArgumentException("not implemented");
+  }
+  @Override
+  public StoreRepoBuilder repo() {
+    throw new IllegalArgumentException("not implemented");
+  }
+
+  @Override
+  public String getRepoName() {
+    return "in-memory";
+  }
+  @Override
+  public String getHeadName() {
+    return "in-memory";
   }
 }

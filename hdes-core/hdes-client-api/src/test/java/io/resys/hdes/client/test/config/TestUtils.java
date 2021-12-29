@@ -1,4 +1,6 @@
-package io.resys.hdes.client.test;
+package io.resys.hdes.client.test.config;
+
+import java.util.HashMap;
 
 /*-
  * #%L
@@ -25,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
+import io.resys.hdes.client.spi.store.HdesInMemoryStore;
 
 
 
@@ -33,6 +36,7 @@ public class TestUtils {
   public static ObjectMapper objectMapper = new ObjectMapper();
   public static HdesClient client = HdesClientImpl.builder()
       .objectMapper(objectMapper)
+      .store(new HdesInMemoryStore(new HashMap<>()))
       .serviceInit(new ServiceInit() {
         @Override
         public <T> T get(Class<T> type) {

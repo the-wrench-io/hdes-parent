@@ -33,6 +33,7 @@ import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.util.FileUtils;
+import io.resys.hdes.client.test.config.TestUtils;
 
 public class ServiceTest {
 

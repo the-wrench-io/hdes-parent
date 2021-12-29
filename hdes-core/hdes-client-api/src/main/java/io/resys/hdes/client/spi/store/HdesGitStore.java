@@ -56,12 +56,19 @@ public class HdesGitStore implements HdesStore {
   interface FileMarker {
     String getAbsolutePath();
   }
-  
+
   public HdesGitStore(GitConfig conn) {
     super();
     this.conn = conn;
   }
-  
+  @Override
+  public String getRepoName() {
+    return conn.getInit().getRemote();
+  }
+  @Override
+  public String getHeadName() {
+    return conn.getInit().getBranch();
+  }
   @Override
   public Uni<StoreEntity> create(CreateStoreEntity newType) {
     return Uni.createFrom().item(() -> {
@@ -358,7 +365,10 @@ public class HdesGitStore implements HdesStore {
 
   @Override
   public HistoryQuery history() {
-    // TODO Auto-generated method stub
-    return null;
+    throw new RuntimeException("not implemented");
+  }
+  @Override
+  public StoreRepoBuilder repo() {
+    throw new RuntimeException("not implemented");
   }
 }

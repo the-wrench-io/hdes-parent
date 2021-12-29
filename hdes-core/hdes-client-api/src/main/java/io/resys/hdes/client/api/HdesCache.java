@@ -30,6 +30,8 @@ import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.programs.Program;
 
 public interface HdesCache {
+  HdesCache withName(String name);
+  
   Optional<Program> getProgram(AstSource src);
   Optional<AstBody> getAst(AstSource src);
   

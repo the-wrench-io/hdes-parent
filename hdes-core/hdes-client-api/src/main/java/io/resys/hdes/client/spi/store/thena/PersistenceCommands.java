@@ -7,6 +7,7 @@ import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
+import io.resys.hdes.client.api.ImmutableStoreState;
 import io.resys.hdes.client.api.config.ImmutableEntityState;
 import io.resys.hdes.client.api.config.ThenaConfig;
 import io.resys.hdes.client.api.config.ThenaConfig.EntityState;
@@ -17,27 +18,6 @@ import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsStatus;
 import io.smallrye.mutiny.Uni;
-
-/*-
- * #%L
- * stencil-persistence
- * %%
- * Copyright (C) 2021 Copyright 2021 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
 
 
 
@@ -118,8 +98,42 @@ public class PersistenceCommands implements ThenaConfig.Commands {
 
   @Override
   public Uni<StoreState> get() {
-    // TODO Auto-generated method stub
-    return null;
+    return config.getClient()
+        .objects().refState()
+        .repo(config.getRepoName())
+        .ref(config.getHeadName())
+        .blobs()
+        .build()
+        .onItem().transform(state -> {
+          if(state.getStatus() != ObjectsStatus.OK) {
+            throw new StoreException("GET_REPO_STATE_FAIL", null, ImmutableStoreExceptionMsg.builder()
+                .id(state.getRepo().getName())
+                .value(state.getRepo().getId())
+                .addAllArgs(state.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
+                .build()); 
+          }
+          
+
+          final var builder = ImmutableStoreState.builder();
+          if(state.getObjects() == null) {
+            return builder.build(); 
+          }
+          
+          final var tree = state.getObjects().getTree();
+          for(final var entry : tree.getValues().entrySet()) {
+            final var blobId = entry.getValue().getBlob();
+            final var blob = state.getObjects().getBlobs().get(blobId);
+            final var entity = config.getDeserializer().fromString(blob);
+            switch(entity.getBodyType()) {
+             case DT: builder.putDecisions(entity.getId(), entity); break;
+             case FLOW_TASK: builder.putServices(entity.getId(), entity); break;
+             case FLOW: builder.putFlows(entity.getId(), entity); break;
+             case TAG: builder.putTags(entity.getId(), entity);  break;
+            }
+          }
+          
+          return builder.build();
+        });
   }
 
   @Override
@@ -135,14 +149,8 @@ public class PersistenceCommands implements ThenaConfig.Commands {
             // TODO
             throw new StoreException("GET_FAIL", null, convertMessages(state));
           }
-          StoreEntity start = (StoreEntity) config.getDeserializer()
-              .fromString(state.getObjects().getBlob().getValue());
-          
-          var result = ImmutableEntityState.builder()
-              .src(state)
-              .entity(start)
-              .build();
-          return result;
+          StoreEntity start = (StoreEntity) config.getDeserializer().fromString(state.getObjects().getBlob());
+          return ImmutableEntityState.builder().src(state).entity(start).build();
         });
   }
 
@@ -150,5 +158,9 @@ public class PersistenceCommands implements ThenaConfig.Commands {
     return ImmutableStoreExceptionMsg.builder()
         .addAllArgs(state.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
         .build();
+  }
+
+  public ThenaConfig getConfig() {
+    return config;
   }
 }

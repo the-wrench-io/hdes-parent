@@ -50,6 +50,7 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
+import io.smallrye.mutiny.Uni;
 
 public interface HdesClient {
   AstBuilder ast();
@@ -61,9 +62,16 @@ public interface HdesClient {
   HdesAstTypes types();
   HdesStore store();
   CSVBuilder csv();
+  ClientRepoBuilder repo();
   
+  interface ClientRepoBuilder {
+    ClientRepoBuilder repoName(String repoName);
+    ClientRepoBuilder headName(String headName);
+    Uni<HdesClient> create();
+    HdesClient build();
+  }
   
-  public interface HdesTypesMapper {
+  interface HdesTypesMapper {
     DataTypeAstBuilder dataType();
     ExpressionProgram expression(ValueType valueType, String src);
     String commandsString(List<AstCommand> commands);
