@@ -62,6 +62,7 @@ public class ExpressionProgramFactory {
       return this;
     }
 
+    @SuppressWarnings({ "rawtypes" })
     public ExpressionProgram build() {
       HdesAssert.notNull(src, () -> "src can't be null!");
       HdesAssert.notNull(valueType, () -> "valueType can't be null!");
@@ -110,7 +111,7 @@ public class ExpressionProgramFactory {
       }
     }
   }
-
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private static class ImmutableExpressionProgram implements ExpressionProgram {
     private final Operation expression;
     private final String src;
@@ -136,7 +137,6 @@ public class ExpressionProgramFactory {
     public List<String> getConstants() {
       return constants;
     }
-    @SuppressWarnings("unchecked")
     @Override
     public ExpressionResult run(Object entity) {
       return ImmutableExpressionResult.builder()

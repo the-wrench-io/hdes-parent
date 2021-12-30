@@ -1,4 +1,4 @@
-package io.resys.hdes.client.test.config;
+package io.resys.hdes.client.spi.config;
 
 import java.util.HashMap;
 

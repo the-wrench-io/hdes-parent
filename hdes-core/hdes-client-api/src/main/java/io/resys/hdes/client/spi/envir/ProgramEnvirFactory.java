@@ -118,7 +118,7 @@ public class ProgramEnvirFactory {
     });
     if(LOGGER.isDebugEnabled()) {
       LOGGER.debug(new StringBuilder()
-          .append("Envir status: ").append(System.lineSeparator())
+          .append("Envir status: " + treelog.length()).append(System.lineSeparator())
           .append(treelog.toString())
           .toString());
     }

@@ -12,9 +12,8 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>hdes-spring-bundle-editor</module>
-    <module>hdes-spring-bundle</module>    
-    <module>hdes-spring-ide</module>
+    <module>hdes-spring-composer</module>
+    <module>hdes-spring-env</module>    
   </modules>
 
 </project>

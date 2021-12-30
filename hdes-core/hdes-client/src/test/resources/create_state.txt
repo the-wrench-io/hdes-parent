@@ -1,7 +1,7 @@
 
 Repo
   - id: 1, rev: 2
-    name: test1
+    name: basicReadWriteDeleteTest
 
 Refs
   - 3: main
@@ -17,4 +17,4 @@ Trees
     5: FLOW-1
 
 Blobs
-  - 5: {"id":"FLOW-1","bodyType":"FLOW","body":[{"id":null,"value":"id: firstFlow","type":"SET_BODY"}]}
+  - 5: {"id":"FLOW-1","bodyType":"FLOW","hash":"","body":[{"id":null,"value":"id: firstFlow","type":"SET_BODY"}]}

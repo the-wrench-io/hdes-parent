@@ -45,10 +45,11 @@ public interface HdesStore {
   StoreRepoBuilder repo();
   
   interface StoreRepoBuilder {
-    Uni<HdesStore> create();
     StoreRepoBuilder repoName(String repoName);
     StoreRepoBuilder headName(String headName);
+    Uni<HdesStore> create();    
     HdesStore build();
+    Uni<Boolean> createIfNot();
   }
   
   interface HistoryQuery {

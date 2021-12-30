@@ -156,6 +156,7 @@ public class ImmutableProgramContext implements ProgramContext {
       this.suppliers.add(() -> entity);
       return this;
     }
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Builder entity(Object entity) {
       if(entity.getClass().isAnnotationPresent(ServiceData.class)) {
         serviceData = entity;

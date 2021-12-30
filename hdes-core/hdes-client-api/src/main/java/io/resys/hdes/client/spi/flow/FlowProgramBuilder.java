@@ -70,11 +70,8 @@ public class FlowProgramBuilder {
   }
 
   public FlowProgram build(AstFlow ast) {
-    final var flowId = visitFlowId(ast);
     final var firstTask = visitTasksById(ast);
     final var firstStep = firstTask == null ? END_STEP: visitTask(firstTask);
-
-    
     return ImmutableFlowProgram.builder()
         .startStepId(firstStep.getId())
         .steps(steps)
@@ -82,10 +79,6 @@ public class FlowProgramBuilder {
         .build();
   }
   
-  private String visitFlowId(AstFlow ast) {
-    final var data = ast.getSrc();
-    return AstFlowNodesFactory.getStringValue(data.getId());
-  }
 
   private AstFlowTaskNode visitTasksById(AstFlow ast) {
     AstFlowTaskNode firstTask = null;

@@ -20,14 +20,7 @@
       <groupId>org.ehcache</groupId>
       <artifactId>ehcache</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.jgit</groupId>
-      <artifactId>org.eclipse.jgit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.jgit</groupId>
-      <artifactId>org.eclipse.jgit.ssh.jsch</artifactId>
-    </dependency>
+    
     <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy-all</artifactId>
@@ -39,10 +32,6 @@
     <dependency>
       <groupId>io.resys.hdes</groupId>
       <artifactId>thena-docdb-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>io.resys.hdes</groupId>
-      <artifactId>thena-docdb-pgsql</artifactId>
     </dependency>
 
     <dependency>

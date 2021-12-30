@@ -85,3 +85,4 @@ local.properties
 *.iml
 .idea/
 .factorypath
+/_backup/

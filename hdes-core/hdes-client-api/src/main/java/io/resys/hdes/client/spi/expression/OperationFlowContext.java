@@ -91,7 +91,7 @@ public class OperationFlowContext {
     }
   }
   
-  
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   private static class MapPropertyAccessor implements PropertyAccessor {
     @Override
     public Class<?>[] getSpecificTargetClasses() {

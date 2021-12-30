@@ -314,6 +314,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     }
   }
   
+  @SuppressWarnings({ "unchecked" })
   @Override
   public Map<String, Serializable> toMap(Object entity) {
     try {
@@ -327,6 +328,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     }
   }
   
+  @SuppressWarnings({ "unchecked" })
   @Override
   public Map<String, Serializable> toMap(JsonNode entity) {
     try {

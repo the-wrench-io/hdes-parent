@@ -1,8 +1,5 @@
 package io.resys.hdes.client.spi;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /*-
  * #%L
  * hdes-client-api
@@ -38,7 +35,6 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
   private final ProgramEnvirFactory factory;
   private final HdesTypesMapper defs;
   private ProgramEnvir envir;
-  private final List<String> cachlessIds = new ArrayList<>();
   
   public HdesClientEnvirBuilder(ProgramEnvirFactory factory, HdesTypesMapper defs) {
     super();
@@ -47,7 +43,7 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
   }
   @Override
   public EnvirCommandFormatBuilder addCommand() {
-    final EnvirBuilder enviBuilder = this;;
+    final EnvirBuilder enviBuilder = this;
     return new EnvirCommandFormatBuilder() {
       private String id;
       private AstBodyType type;
