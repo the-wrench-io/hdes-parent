@@ -40,7 +40,7 @@ import io.resys.hdes.client.api.exceptions.StoreException;
 import io.resys.hdes.client.spi.ThenaConfig.EntityState;
 import io.resys.hdes.client.spi.thena.DocumentQueryBuilder;
 import io.resys.hdes.client.spi.thena.PersistenceCommands;
-import io.resys.hdes.client.spi.thena.ZoeDeserializer;
+import io.resys.hdes.client.spi.thena.BlobDeserializer;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoStatus;
@@ -316,7 +316,7 @@ public class ThenaStore extends PersistenceCommands implements HdesStore {
               throw new RuntimeException(e.getMessage(), e);
             }
           })
-          .deserializer(new ZoeDeserializer(objectMapper))
+          .deserializer(new BlobDeserializer(objectMapper))
           .authorProvider(getAuthorProvider())
           .build();
       return new ThenaStore(config);

@@ -14,6 +14,7 @@
   <modules>
     <module>hdes-client-api</module> 
     <module>hdes-client</module>
+    <module>hdes-composer-ui</module>
   </modules>
 
 </project>

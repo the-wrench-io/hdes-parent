@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>io.resys.hdes</groupId>
@@ -19,11 +18,6 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-services</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-client-api</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -34,27 +28,21 @@
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-client-git</artifactId>
+        <artifactId>hdes-composer-ui</artifactId>
         <version>${project.version}</version>
       </dependency>
 
 
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-spring-bundle</artifactId>
+        <artifactId>hdes-spring-env</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-spring-bundle-editor</artifactId>
+        <artifactId>hdes-spring-composer</artifactId>
         <version>${project.version}</version>
       </dependency>
-      <dependency>
-        <groupId>io.resys.hdes</groupId>
-        <artifactId>hdes-spring-ide</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      
     </dependencies>
   </dependencyManagement>
 </project>

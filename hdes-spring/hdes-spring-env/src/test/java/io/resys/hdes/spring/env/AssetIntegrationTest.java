@@ -1,4 +1,4 @@
-package io.resys.wrench.assets.bundle.spi;
+package io.resys.hdes.spring.env;
 
 /*-
  * #%L
@@ -22,7 +22,6 @@ package io.resys.wrench.assets.bundle.spi;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.time.Duration;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
@@ -36,25 +35,20 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
-import io.resys.hdes.client.spi.HdesInMemoryStore;
-import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @EnableAutoConfiguration
 @RunWith(SpringRunner.class)
-@TestPropertySource(properties = {"wrench.assets.ide = false"})
 @ContextConfiguration(classes = {AssetIntegrationTest.ServiceTestConfig.class})
 public class AssetIntegrationTest {
+
   @Autowired
   private ProgramEnvir envir;
   @Autowired
@@ -65,15 +59,6 @@ public class AssetIntegrationTest {
     @Bean
     public ObjectMapper objectMapper() {
       return new ObjectMapper();
-    }
-    @Bean
-    public HdesStore hdesStore(ObjectMapper objectMapper) {
-      return HdesInMemoryStore.builder().objectMapper(objectMapper).build();
-    }
-    @Bean
-    public ProgramEnvir staticAssets(HdesClient client) {
-      final var source = client.store().query().get().await().atMost(Duration.ofMinutes(1));
-      return ComposerEntityMapper.toEnvir(client.envir(), source).build();
     }
   }
 

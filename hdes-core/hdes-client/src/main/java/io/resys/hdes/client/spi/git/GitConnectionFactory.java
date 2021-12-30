@@ -59,8 +59,8 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 
+import io.resys.hdes.client.api.HdesStore.HdesCredsSupplier;
 import io.resys.hdes.client.spi.GitConfig;
-import io.resys.hdes.client.spi.GitConfig.GitCredsSupplier;
 import io.resys.hdes.client.spi.GitConfig.GitEntry;
 import io.resys.hdes.client.spi.GitConfig.GitInit;
 import io.resys.hdes.client.spi.ImmutableGitConfig;
@@ -72,7 +72,7 @@ public class GitConnectionFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitConnectionFactory.class);
 
   
-  public static GitConfig create(GitInit config, GitCredsSupplier creds, ObjectMapper objectMapper) throws IOException, 
+  public static GitConfig create(GitInit config, HdesCredsSupplier creds, ObjectMapper objectMapper) throws IOException, 
       RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
     
     final var path = StringUtils.isEmpty(config.getRemote()) ? Files.createTempDirectory("git_repo") : new File(config.getStorage()).toPath();

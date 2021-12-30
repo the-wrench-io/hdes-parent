@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.immutables.value.Value;
 
@@ -130,4 +131,14 @@ public interface HdesStore {
     String getValue();
     List<String> getArgs();
   }
+  
+
+  @FunctionalInterface
+  interface HdesCredsSupplier extends Supplier<HdesCreds> {}
+  
+  @Value.Immutable
+  interface HdesCreds {
+    String getUser();
+    String getEmail();
+  } 
 }

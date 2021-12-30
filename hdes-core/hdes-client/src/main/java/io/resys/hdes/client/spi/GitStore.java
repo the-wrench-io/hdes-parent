@@ -36,7 +36,6 @@ import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreState;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.spi.GitConfig.GitCredsSupplier;
 import io.resys.hdes.client.spi.GitConfig.GitEntry;
 import io.resys.hdes.client.spi.GitConfig.GitFileReload;
 import io.resys.hdes.client.spi.git.GitConnectionFactory;
@@ -279,7 +278,7 @@ public class GitStore implements HdesStore {
     private String storage;
     private String sshPath;
     private ObjectMapper objectMapper;
-    private GitCredsSupplier creds;
+    private HdesCredsSupplier creds;
     
     public Builder remote(String remote) {
       this.remote = remote;
@@ -301,7 +300,7 @@ public class GitStore implements HdesStore {
       this.objectMapper = objectMapper;
       return this;
     }
-    public Builder creds(GitCredsSupplier creds) {
+    public Builder creds(HdesCredsSupplier creds) {
       this.creds = creds;
       return this;
     }

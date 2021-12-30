@@ -24,13 +24,13 @@ import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.TransportConfigCallback;
 import org.ehcache.CacheManager;
 import org.immutables.value.Value;
 
+import io.resys.hdes.client.api.HdesStore.HdesCredsSupplier;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
@@ -42,7 +42,7 @@ public interface GitConfig {
   StoreEntityLocation getLocation();
   GitSerializer getSerializer();
   
-  GitCredsSupplier getCreds();
+  HdesCredsSupplier getCreds();
   CacheManager getCacheManager();
   String getCacheName();
   Integer getCacheHeap();
@@ -61,12 +61,6 @@ public interface GitConfig {
     String getSshPath();
     String getStorage();
   }
-  
-  @Value.Immutable
-  interface GitCreds {
-    String getUser();
-    String getEmail();
-  } 
 
   @Value.Immutable
   interface GitEntry {
@@ -85,7 +79,7 @@ public interface GitConfig {
     List<AstCommand> read(String commands);
     String write(List<AstCommand> commands);
   }
-  interface GitCredsSupplier extends Supplier<GitCreds> {}
+
  
   @Value.Immutable
   interface GitFileReload {
