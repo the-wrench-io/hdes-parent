@@ -48,31 +48,31 @@ public class ControllerUtil {
     }
 
     try {
-      final String path = "webjars/hdes-spring-ide/" + getVersion() + "/";
+      final String path = "webjars/hdes-composer-ui/" + getVersion() + "/";
 
       final String js = chunkJs();
       final String hash = js.substring(0, js.length() - 3);
-      final String manifest = resolveRuntimeScript("classpath*:**/hdes-spring-ide/**/manifest.json");
+      final String manifest = resolveRuntimeScript("classpath*:**/hdes-composer-ui/**/manifest.json");
 
       final List<String> css = Arrays.asList(contextPath + path + "static/css/"
-          + resolveRuntimeScript("classpath*:**/hdes-spring-ide/**/static/css/*.chunk.css"));
+          + resolveRuntimeScript("classpath*:**/hdes-composer-ui/**/static/css/*.chunk.css"));
 
       final IdeOnClasspath config = new IdeOnClasspath(hash, css, contextPath + path + manifest,
           contextPath + path + "static/js/" + js);
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("ASSETS IDE is enabled." + System.lineSeparator() + config);
+        LOGGER.debug("Hdes Ide is enabled." + System.lineSeparator() + config);
       }
 
       return config;
     } catch (Exception e) {
-      LOGGER.debug("ASSETS IDE is disabled.");
+      LOGGER.debug("Hdes Ide is disabled.");
       return new IdeOnClasspath();
     }
   }
 
   private static String getVersion() throws IOException {
-    Resource[] resources = resolver.getResources("classpath*:**/hdes-spring-ide/**/index.html");
+    Resource[] resources = resolver.getResources("classpath*:**/hdes-composer-ui/**/index.html");
     if (resources.length > 0) {
       String uri = resources[0].getURI().toString();
       String[] paths = uri.split("\\/");
@@ -90,7 +90,7 @@ public class ControllerUtil {
   }
 
   private static String chunkJs() throws IOException {
-    Resource[] resources = resolver.getResources("classpath*:**/hdes-spring-ide/**/main*.js");
+    Resource[] resources = resolver.getResources("classpath*:**/hdes-composer-ui/**/main*.js");
     for (Resource resource : resources) {
       return resource.getFilename();
     }
