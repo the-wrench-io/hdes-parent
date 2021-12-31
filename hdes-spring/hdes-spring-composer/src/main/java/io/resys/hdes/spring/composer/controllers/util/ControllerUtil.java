@@ -55,18 +55,18 @@ public class ControllerUtil {
       final String manifest = resolveRuntimeScript("classpath*:**/hdes-composer-ui/**/manifest.json");
 
       final List<String> css = Arrays.asList(contextPath + path + "static/css/"
-          + resolveRuntimeScript("classpath*:**/hdes-composer-ui/**/static/css/*.chunk.css"));
+          + resolveRuntimeScript("classpath*:**/hdes-composer-ui/**/static/css/main*.css"));
 
       final IdeOnClasspath config = new IdeOnClasspath(hash, css, contextPath + path + manifest,
           contextPath + path + "static/js/" + js);
 
       if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Hdes Ide is enabled." + System.lineSeparator() + config);
+        LOGGER.debug("Hdes IDE is enabled." + System.lineSeparator() + config);
       }
 
       return config;
     } catch (Exception e) {
-      LOGGER.debug("Hdes Ide is disabled.");
+      LOGGER.debug("Hdes IDE is disabled.");
       return new IdeOnClasspath();
     }
   }
