@@ -30,9 +30,21 @@ import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
 import io.resys.hdes.client.api.ImmutableCreateStoreEntity;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.AstFlow;
+import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.exceptions.ComposerException;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionLog;
+import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
+import io.resys.hdes.client.api.programs.FlowProgram;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
+import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.ServiceData;
+import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 
 public class CreateEntityVisitor {
 
@@ -132,9 +144,24 @@ public class CreateEntityVisitor {
     final var body = new StringBuilder()
         .append("package io.resys.wrench.assets.bundle.groovy;").append(lnr)
         .append("import java.io.Serializable;").append(lnr)
+        
+        .append("import ").append(DecisionProgram.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(FlowProgram.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(ServiceProgram.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(AstFlow.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(AstDecision.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(AstService.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(DecisionResult.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(DecisionLog.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(FlowResult.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(FlowResultLog.class.getCanonicalName()).append(";").append(lnr)
+        
+        .append("import ").append(ServiceResult.class.getCanonicalName()).append(";").append(lnr)
+        .append("import ").append(ProgramContext.class.getCanonicalName()).append(";").append(lnr)
         .append("import ").append(ServiceData.class.getCanonicalName()).append(";").append(lnr)
+        
         .append("public class ").append(entity.getName()).append(" {").append(lnr)
-        .append("  public Output execute(Input input) {").append(lnr)
+        .append("  public Output execute(Input input, ProgramContext ctx) {").append(lnr)
         .append("    return new Output();").append(lnr)
         .append("  }").append(lnr)
 

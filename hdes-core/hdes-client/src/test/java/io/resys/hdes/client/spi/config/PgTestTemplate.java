@@ -38,6 +38,7 @@ import io.resys.hdes.client.api.HdesComposer;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesComposerImpl;
 import io.resys.hdes.client.spi.ThenaStore;
+import io.resys.hdes.client.spi.config.HdesClientConfig.DependencyInjectionContext;
 import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
 import io.resys.hdes.client.spi.util.RepositoryToStaticData;
 import io.resys.thena.docdb.api.DocDB;
@@ -102,6 +103,12 @@ public class PgTestTemplate {
   
   public HdesClient getClient() {
     return HdesClientImpl.builder().objectMapper(objectMapper).store(store)
+        .dependencyInjectionContext(new DependencyInjectionContext() {
+          @Override
+          public <T> T get(Class<T> type) {
+            return null;
+          }
+        })
         .serviceInit(new ServiceInit() {
             @Override
             public <T> T get(Class<T> type) {

@@ -32,7 +32,13 @@ public interface HdesClientConfig {
   interface ServiceInit {
     <T> T get(Class<T> type);
   }
+
+  @FunctionalInterface
+  public interface DependencyInjectionContext {
+    <T> T get(Class<T> type);
+  }
   
+  DependencyInjectionContext getDependencyInjectionContext();
   ServiceInit getServiceInit();
   HdesCache getCache();
   List<AstFlowNodeVisitor> getFlowVisitors();

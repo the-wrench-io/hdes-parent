@@ -21,6 +21,7 @@ package io.resys.hdes.client.api.programs;
  */
 
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -33,22 +34,24 @@ public interface Program extends Serializable {
   interface ProgramResult extends Serializable {
   }  
   
-  interface ProgramContext {
-    ProgramContextNamedValue getValue(String typeDefName);
+  interface ProgramContext extends Serializable {
+    ProgramContextNamedValue getValueWithMeta(String typeDefName);
     Serializable getValue(TypeDef typeDef);
-    ProgramSupplier getPrograms();
-  }
-  
-  interface ProgramSupplier {
+    
+    // Throws exception if not found
+    Serializable getValue(String typeDefName);
+    Optional<Serializable> findValue(String typeDefName);
+    
+    <T> T getBean(Class<T> type);
     FlowProgram getFlow(String name);
     DecisionProgram getDecision(String name);
     ServiceProgram getService(String name);
   }
   
+  
   @Value.Immutable
   interface ProgramContextNamedValue {
     Boolean getFound();
-    
     @Nullable
     Serializable getValue();
   }

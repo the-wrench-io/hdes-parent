@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -32,21 +33,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.exceptions.ProgramException;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ImmutableProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
-import io.resys.hdes.client.api.programs.Program.ProgramSupplier;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.spi.config.HdesClientConfig.DependencyInjectionContext;
 
 public class ImmutableProgramContext implements ProgramContext {
-
+  private static final long serialVersionUID = 6910151114801874342L;
   private final HdesTypesMapper factory;
-  private final ProgramSupplier programSupplier;
-
   private final ExecutorInput callbackThatWillSupplyAllData;
   
   // data object that should be directly transformed to target
@@ -58,33 +58,62 @@ public class ImmutableProgramContext implements ProgramContext {
   // generic data to transform to target
   private Map<String, Serializable> genericData;
     
+  private final DependencyInjectionContext dependencyInjectionContext;
   private final ProgramEnvir envir;
   
-  public ImmutableProgramContext(List<Supplier<Map<String, Serializable>>> inputs, Object serviceData, ExecutorInput input, HdesTypesMapper factory, ProgramEnvir envir) {
+  public ImmutableProgramContext(
+      List<Supplier<Map<String, Serializable>>> inputs, 
+      Object serviceData, 
+      ExecutorInput input, 
+      HdesTypesMapper factory, 
+      ProgramEnvir envir,
+      DependencyInjectionContext dependencyInjectionContext) {
     super();
     this.envir = envir;
     this.suppliers = inputs;
     this.callbackThatWillSupplyAllData = input;
     this.factory = factory;
     this.serviceData = serviceData;
-    this.programSupplier = new ProgramSupplier() {
-      @Override
-      public ServiceProgram getService(String name) {
-        return (ServiceProgram) envir.getServicesByName().get(name).getProgram().get();
-      }
-      @Override
-      public FlowProgram getFlow(String name) {
-        return (FlowProgram) envir.getFlowsByName().get(name).getProgram().get();
-      }
-      @Override
-      public DecisionProgram getDecision(String name) {
-        return (DecisionProgram) envir.getDecisionsByName().get(name).getProgram().get();
-      }
-    };
+    this.dependencyInjectionContext = dependencyInjectionContext;
+  }
+
+  @Override
+  public Serializable getValue(String typeDefName) {
+    final var result = getValueWithMeta(typeDefName);
+    if(result.getValue() == null) {
+      throw new ProgramException("Can't get value with name: '" + typeDefName + "', because it's null and found in context: '" + result.getFound() + "'");
+    }
+    return result.getValue();
+  }
+  @Override
+  public Optional<Serializable> findValue(String typeDefName) {
+    final var result = getValueWithMeta(typeDefName);
+    return Optional.ofNullable(result.getValue());
+  }
+  @Override
+  public <T> T getBean(Class<T> type) {
+    return dependencyInjectionContext.get(type);
+  }
+  @Override
+  public ServiceProgram getService(String name) {
+    return (ServiceProgram) envir.getServicesByName().get(name).getProgram().get();
+  }
+  @Override
+  public FlowProgram getFlow(String name) {
+    return (FlowProgram) envir.getFlowsByName().get(name).getProgram().get();
+  }
+  @Override
+  public DecisionProgram getDecision(String name) {
+    return (DecisionProgram) envir.getDecisionsByName().get(name).getProgram().get();
   }
 
   @Override
   public Serializable getValue(TypeDef typeDef) {
+
+    if(typeDef.getBeanType() != null && typeDef.getBeanType().isAssignableFrom(this.getClass())) {
+      return this;
+    }
+    
     // data class map compatible
     if(callbackThatWillSupplyAllData != null) {
       Serializable target = (Serializable) callbackThatWillSupplyAllData.apply(typeDef);
@@ -93,7 +122,7 @@ public class ImmutableProgramContext implements ProgramContext {
       }
     }
     
-    if(typeDef.getData() && serviceData != null) {
+    if(Boolean.TRUE.equals(typeDef.getData()) && serviceData != null) {
       return (Serializable) factory.toType(serviceData, typeDef.getBeanType());
     }
     
@@ -107,7 +136,7 @@ public class ImmutableProgramContext implements ProgramContext {
   }
   
   @Override
-  public ProgramContextNamedValue getValue(String typeDefName) {
+  public ProgramContextNamedValue getValueWithMeta(String typeDefName) {
     init();
     
     if(genericData.containsKey(typeDefName)) {
@@ -123,30 +152,28 @@ public class ImmutableProgramContext implements ProgramContext {
       suppliers.forEach(e -> genericData.putAll(e.get()));
     }
   }
-  @Override
-  public ProgramSupplier getPrograms() {
-    return programSupplier;
-  }
   
-  public static Builder builder(HdesTypesMapper factory, ProgramEnvir envir) {
-    return new Builder(factory, envir);
+  public static Builder builder(HdesTypesMapper factory, ProgramEnvir envir, DependencyInjectionContext dependencyInjectionContext) {
+    return new Builder(factory, envir, dependencyInjectionContext);
   }
   public static Builder from(ProgramContext init) {
     ImmutableProgramContext context = (ImmutableProgramContext) init;
-    return new Builder(context.factory, context.envir);
+    return new Builder(context.factory, context.envir, context.dependencyInjectionContext);
   }
   
   public static class Builder {
     private final HdesTypesMapper factory;
     private final List<Supplier<Map<String, Serializable>>> suppliers = new ArrayList<>();
     private final ProgramEnvir envir;
+    private final DependencyInjectionContext dependencyInjectionContext;
     private ExecutorInput input;
     private Object serviceData;
     
-    public Builder(HdesTypesMapper factory, ProgramEnvir envir) {
+    public Builder(HdesTypesMapper factory, ProgramEnvir envir, DependencyInjectionContext dependencyInjectionContext) {
       super();
       this.factory = factory;
       this.envir = envir;
+      this.dependencyInjectionContext = dependencyInjectionContext;
     }
     public Builder callback(ExecutorInput input) {
       this.input = input;
@@ -172,8 +199,9 @@ public class ImmutableProgramContext implements ProgramContext {
       return this;
     }
     public ImmutableProgramContext build() {
-      return new ImmutableProgramContext(suppliers, serviceData, input, factory, envir);
+      return new ImmutableProgramContext(suppliers, serviceData, input, factory, envir, dependencyInjectionContext);
     }
   }
+  
 
 }

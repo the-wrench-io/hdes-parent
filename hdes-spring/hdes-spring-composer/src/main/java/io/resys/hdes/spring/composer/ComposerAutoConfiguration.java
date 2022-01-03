@@ -38,8 +38,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.spi.HdesClientImpl;
+import io.resys.hdes.client.spi.config.HdesClientConfig.DependencyInjectionContext;
 import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
-import io.resys.hdes.client.spi.flow.validators.DescriptionValidator;
 import io.resys.hdes.client.spi.flow.validators.IdValidator;
 import io.resys.hdes.spring.composer.controllers.exception.AssetExceptionMapping;
 
@@ -66,6 +66,7 @@ public class ComposerAutoConfiguration {
       ObjectMapper objectMapper, 
       ComposerConfigBean assetConfigBean, 
       HdesStore store) {
+    
     final ServiceInit init = new ServiceInit() {
       @Override
       public <T> T get(Class<T> type) {
@@ -77,10 +78,13 @@ public class ComposerAutoConfiguration {
         .store(store)
         .objectMapper(objectMapper)
         .serviceInit(init)
-        .flowVisitors(
-          new IdValidator(),
-          new DescriptionValidator()
-        )
+        .dependencyInjectionContext(new DependencyInjectionContext() {
+          @Override
+          public <T> T get(Class<T> type) {
+            return context.getBean(type);
+          }
+        })
+        .flowVisitors(new IdValidator())
         .build();
     
     return hdesClient;

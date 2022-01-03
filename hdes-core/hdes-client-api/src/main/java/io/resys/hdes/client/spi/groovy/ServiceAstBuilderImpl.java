@@ -240,7 +240,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
       boolean isData = type.isAnnotationPresent(ServiceData.class);
       if(isData) {
         
-        DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().id("intput-" + index).order(index++)
+        DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().id("input-" + index).order(index++)
             .data(isData).name(parameter.getName()).direction(Direction.IN).beanType(parameter.getType())
             .valueType(ValueType.OBJECT);
         getWrenchFlowParameter(dataTypeBuilder, parameter.getType(), isData, Direction.IN);
@@ -251,6 +251,16 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
         }
 
         result.addAllAcceptDefs(getFields(parameter.getType(), Direction.IN));
+      } else {
+        DataTypeAstBuilder dataTypeBuilder = dataTypeRepository.dataType().id("input-" + index).order(index++)
+            .data(isData).name(parameter.getName()).direction(Direction.IN).beanType(parameter.getType())
+            .valueType(ValueType.OBJECT);
+        
+        if(acceptType0 == null) {
+          acceptType0 = dataTypeBuilder.build();
+        } else {
+          acceptType1 = dataTypeBuilder.build();  
+        }
       }
     }
 

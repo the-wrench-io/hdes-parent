@@ -35,6 +35,7 @@ import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.spi.HdesClientImpl;
 import io.resys.hdes.client.spi.HdesInMemoryStore;
 import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
+import io.resys.hdes.client.spi.config.HdesClientConfig.DependencyInjectionContext;
 import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
 
 @Configuration
@@ -55,7 +56,14 @@ public class InMemoryAutoConfiguration {
       }
     };
     final var store = HdesInMemoryStore.builder().objectMapper(objectMapper).build();
-    return HdesClientImpl.builder().objectMapper(objectMapper).serviceInit(init).store(store).build();
+    return HdesClientImpl.builder().objectMapper(objectMapper)
+        .dependencyInjectionContext(new DependencyInjectionContext() {
+          @Override
+          public <T> T get(Class<T> type) {
+            return context.getBean(type);
+          }
+        })
+        .serviceInit(init).store(store).build();
     
   }
   

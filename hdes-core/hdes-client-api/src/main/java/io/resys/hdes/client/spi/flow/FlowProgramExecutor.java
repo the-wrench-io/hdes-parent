@@ -177,7 +177,7 @@ public class FlowProgramExecutor {
     
     switch (step.getBody().getRefType()) {
     case DT: {
-      final var program = context.getPrograms().getDecision(step.getBody().getRef());
+      final var program = context.getDecision(step.getBody().getRef());
       try {
         final var result = DecisionProgramExecutor.run(program, ImmutableProgramContext.from(context).map(inputs).build());
         final var outputs = step.getBody().getCollection() ? 
@@ -206,7 +206,7 @@ public class FlowProgramExecutor {
       }
     }
     case SERVICE: {
-      final var program = context.getPrograms().getService(step.getBody().getRef());
+      final var program = context.getService(step.getBody().getRef());
       try {
         final var result = ServiceProgramExecutor.run(program, ImmutableProgramContext.from(context).map(inputs).build());
         final var outputs = factory.toMap(result.getValue());
@@ -342,7 +342,7 @@ public class FlowProgramExecutor {
         }
         
         // root context
-        final ProgramContextNamedValue contextValue = context.getValue(path);
+        final ProgramContextNamedValue contextValue = context.getValueWithMeta(path);
         if(contextValue.getFound()) {
           Serializable result = contextValue.getValue();
           if(isLast) {

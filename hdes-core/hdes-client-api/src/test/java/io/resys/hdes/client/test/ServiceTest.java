@@ -65,6 +65,31 @@ public class ServiceTest {
   }
   
   
+  @Test
+  public void type2() throws IOException {
+    final String src = TestUtils.objectMapper.writeValueAsString(Arrays.asList(ImmutableAstCommand.builder()
+        .type(AstCommandValue.SET_BODY)
+        .value(FileUtils.toString(getClass(), "service/Type2Service.txt"))
+        .build()));
+    final var envir = TestUtils.client.envir().addCommand().id("Type2Service.txt").service(src).build().build();
+
+    // map conversion
+    ServiceResult result = TestUtils.client.executor(envir)
+      .inputMap(Map.of("a", 5, "b", 10))
+      .service("Type2Service")
+      .andGetBody();
+    
+    Assertions.assertEquals("{\"sum\":15}", TestUtils.objectMapper.writeValueAsString(result.getValue()));
+    
+    // data object conversion
+    result = TestUtils.client.executor(envir)
+        .inputEntity(ImmutableTestServiceInput.builder().a(5).b(10).build())
+        .service("Type2Service")
+        .andGetBody();
+    // object to object conversion
+    Assertions.assertEquals("{\"sum\":15}", TestUtils.objectMapper.writeValueAsString(result.getValue()));
+  }
+  
   @ServiceData
   @Value.Immutable
   public interface TestServiceInput {

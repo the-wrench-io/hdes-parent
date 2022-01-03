@@ -42,6 +42,7 @@ import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
+import io.resys.hdes.client.spi.config.HdesClientConfig.DependencyInjectionContext;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.flow.FlowProgramExecutor;
 import io.resys.hdes.client.spi.groovy.ServiceProgramExecutor;
@@ -51,11 +52,11 @@ public class HdesClientExecutorBuilder implements ExecutorBuilder {
   private final ProgramEnvir envir;
   private final HdesTypesMapper defs;
   private final ImmutableProgramContext.Builder data;
-  
-  public HdesClientExecutorBuilder(ProgramEnvir envir, HdesTypesMapper defs) {
+
+  public HdesClientExecutorBuilder(ProgramEnvir envir, HdesTypesMapper defs, DependencyInjectionContext dependencyInjectionContext) {
     this.envir = envir;
     this.defs = defs;
-    this.data = ImmutableProgramContext.builder(defs, envir);
+    this.data = ImmutableProgramContext.builder(defs, envir, dependencyInjectionContext);
   }
   
   @Override
