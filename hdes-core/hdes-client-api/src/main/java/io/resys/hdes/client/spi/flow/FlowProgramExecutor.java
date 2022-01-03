@@ -373,7 +373,7 @@ public class FlowProgramExecutor {
   
   
   public void visitShortHistory(FlowResultLog log) {
-    if(!shortHistory.isEmpty()) {
+    if(shortHistory.length() > 0) {
       shortHistory.append(" -> ");
     }
     
