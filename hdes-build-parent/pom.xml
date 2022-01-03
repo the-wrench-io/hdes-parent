@@ -33,13 +33,13 @@
     <hbvalidator.version>6.0.21.Final</hbvalidator.version>
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.24</slf4j.version>
-    
+
     <eirslett.version>1.12.0</eirslett.version>
     <immutables.version>2.8.2</immutables.version>
     <findbugs.version>3.0.2</findbugs.version>
     <ehcache.version>3.8.1</ehcache.version>
     <guava.version>30.0-jre</guava.version>
-    <groovy.version>2.4.20</groovy.version>
+    <groovy.version>3.0.9</groovy.version>
     <gitplugin.version>2.2.4</gitplugin.version>
     <jgit.version>5.9.0.202009080501-r</jgit.version>
 
@@ -204,11 +204,13 @@
         <artifactId>guava</artifactId>
         <version>${guava.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
+        <artifactId>groovy</artifactId>
         <version>${groovy.version}</version>
       </dependency>
+
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>

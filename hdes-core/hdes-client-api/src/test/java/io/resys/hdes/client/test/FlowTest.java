@@ -174,12 +174,19 @@ public class FlowTest {
   @Disabled
   @Test
   public void programSelfRefTest() throws IOException {
-    final var envir = TestUtils.client.envir().addCommand().id("test1").flow(FileUtils.toString(getClass(), "flow/self-ref.yaml")).build().build();
+    final var envir = TestUtils.client.envir()
+        .addCommand().id("test1")
+        .flow(
+            TestUtils.objectMapper.writeValueAsString(Arrays.asList(ImmutableAstCommand.builder()
+                .type(AstCommandValue.SET_BODY)
+                .value(FileUtils.toString(getClass(), "flow/self-ref.yaml"))
+                .build()))
+            ).build().build();
     
     
     FlowResult flow = TestUtils.client.executor(envir)
-        .inputField("whitelist", true)
-        .flow("test").andGetBody();
+        .inputField("restart", true)
+        .flow("self ref").andGetBody();
     
     Assertions.assertEquals("[Add party to investigation list, Resolve aml violation, Resolve aml violation-EXCLUSIVE, addToWhitelist, rmInvList, end]", flow.getShortHistory());
 
