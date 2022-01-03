@@ -50,6 +50,7 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
+import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.smallrye.mutiny.Uni;
 
 public interface HdesClient {
@@ -63,6 +64,7 @@ public interface HdesClient {
   HdesStore store();
   CSVBuilder csv();
   ClientRepoBuilder repo();
+  HdesClientConfig config();
   
   interface ClientRepoBuilder {
     ClientRepoBuilder repoName(String repoName);

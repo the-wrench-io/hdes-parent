@@ -38,6 +38,8 @@ public interface HdesCache {
   Program setProgram(Program program, AstSource src);
   AstBody setAst(AstBody wrapper, AstSource src);
   
+  void flush(String id);
+  
   @Value.Immutable
   interface CacheEntry extends Serializable {
     String getId();

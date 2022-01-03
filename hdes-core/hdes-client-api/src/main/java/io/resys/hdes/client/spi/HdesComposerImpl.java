@@ -54,9 +54,12 @@ public class HdesComposerImpl implements HdesComposer {
   @Override
   public Uni<ComposerState> update(UpdateEntity asset) {
     return client.store().update(ImmutableUpdateStoreEntity.builder().id(asset.getId()).body(asset.getBody()).build())
-        .onItem().transformToUni((updated) ->  
-          client.store().query().get().onItem().transform(this::state)
-        );
+        .onItem().transformToUni((updated) -> {
+          // flush cache
+          client.config().getCache().flush(asset.getId());
+        
+          return client.store().query().get().onItem().transform(this::state);
+        });
   }
   @Override
   public Uni<ComposerState> create(CreateEntity asset) {
@@ -68,7 +71,12 @@ public class HdesComposerImpl implements HdesComposer {
   public Uni<ComposerState> delete(String id) {
     return client.store().query().get().onItem().transform(this::state)
         .onItem().transformToUni(state -> client.store().delete(new DeleteEntityVisitor(state, id).visit()))
-        .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
+        .onItem().transformToUni(savedEntity -> {
+          // flush cache
+          client.config().getCache().flush(id);
+        
+          return client.store().query().get().onItem().transform(this::state);
+        });
   }
   @Override
   public Uni<ComposerEntity<?>> get(String idOrName) {

@@ -147,6 +147,7 @@ public class AssociationVisitor {
       if(!step.getBody().getCollection().equals(collection)) {
         result.add(ImmutableProgramAssociation.builder()
             .ref(step.getBody().getRef())
+            .refType(AstBodyType.DT)
             .owner(true)
             .refStatus(ProgramStatus.DEPENDENCY_ERROR)
             .build());

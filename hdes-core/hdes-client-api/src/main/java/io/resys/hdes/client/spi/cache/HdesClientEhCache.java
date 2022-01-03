@@ -116,4 +116,14 @@ public class HdesClientEhCache implements HdesCache {
   private static String createName(String name) {
     return CACHE_PREFIX + "-" + name;
   }
+  @Override
+  public void flush(String id) {
+    final var cache = getCache();
+    final var entity = cache.get(id);
+    if(entity == null) {
+      return;
+    }
+    cache.remove(entity.getId());
+    cache.remove(entity.getSource().getHash());
+  }
 }
