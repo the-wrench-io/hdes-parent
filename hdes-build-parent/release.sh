@@ -39,7 +39,7 @@ mvn versions:set -DnewVersion=${RELEASE_VERSION}
 git commit -am "Release: ${RELEASE_VERSION}"
 git tag -a ${RELEASE_VERSION} -m "release ${RELEASE_VERSION}"
 
-mvn clean deploy -q -Phdes-release --settings hdes-build-parent/ci-maven-settings.xml -Dorg.slf4j.simpleLogger.defaultLogLevel=error
+mvn --quiet clean deploy -Phdes-release --settings hdes-build-parent/ci-maven-settings.xml -Dorg.slf4j.simpleLogger.defaultLogLevel=error
 mvn versions:set -DnewVersion=${PROJECT_VERSION}
 git commit -am "Release: ${RELEASE_VERSION}"
 git push
