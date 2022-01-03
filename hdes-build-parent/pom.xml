@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-parent</artifactId>
-    <version>3.y-SNAPSHOT</version>
+    <version>3.110</version>
   </parent>
 
   <artifactId>hdes-build-parent</artifactId>
