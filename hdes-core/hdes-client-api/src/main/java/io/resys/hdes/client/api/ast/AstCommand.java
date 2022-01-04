@@ -45,6 +45,10 @@ public interface AstCommand extends Serializable {
   enum AstCommandValue {
     // flow and service related
     SET, ADD, DELETE, SET_BODY,
+    
+    // tags for asset
+    SET_TAG_DT, SET_TAG_ST, SET_TAG_FL, 
+    SET_TAG_NAME, SET_TAG_DESC, SET_TAG_CREATED,
 
     // DT related
     SET_NAME, SET_DESCRIPTION, IMPORT_CSV, IMPORT_ORDERED_CSV,

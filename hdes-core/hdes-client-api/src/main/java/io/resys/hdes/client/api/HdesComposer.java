@@ -57,6 +57,7 @@ public interface HdesComposer {
   Uni<HistoryEntity> getHistory(String id);
   Uni<ComposerState> update(UpdateEntity asset);
   Uni<ComposerState> create(CreateEntity asset);
+  Uni<ComposerState> importTag(AstTag asset);
   Uni<ComposerState> delete(String id);
   Uni<ComposerState> copyAs(CopyAs copyAs);
   Uni<DebugResponse> debug(DebugRequest entity);
@@ -141,6 +142,8 @@ public interface HdesComposer {
   interface CreateEntity {
     @Nullable
     String getName();
+    @Nullable
+    String getDesc();
     AstBodyType getType();
     List<AstCommand> getBody();
   }

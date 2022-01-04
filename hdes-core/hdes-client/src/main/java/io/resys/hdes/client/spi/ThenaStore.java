@@ -1,6 +1,8 @@
 package io.resys.hdes.client.spi;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,11 +40,13 @@ import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.exceptions.StoreException;
 import io.resys.hdes.client.spi.ThenaConfig.EntityState;
+import io.resys.hdes.client.spi.thena.BlobDeserializer;
 import io.resys.hdes.client.spi.thena.DocumentQueryBuilder;
 import io.resys.hdes.client.spi.thena.PersistenceCommands;
-import io.resys.hdes.client.spi.thena.BlobDeserializer;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.resys.thena.docdb.api.DocDB;
+import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
+import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsStatus;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoStatus;
 import io.resys.thena.docdb.spi.pgsql.DocDBFactory;
 import io.smallrye.mutiny.Uni;
@@ -148,7 +152,62 @@ public class ThenaStore extends PersistenceCommands implements HdesStore {
       return super.save(entity);
     });
   }
-
+  @Override
+  public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {
+    final var commitBuilder = config.getClient().commit().head()
+        .head(config.getRepoName(), config.getHeadName())
+        .message("Save batch with new: " + batchType.getCreate().size() + " and updated: " + batchType.getUpdate().size() + " entries")
+        .parentIsLatest()
+        .author(config.getAuthorProvider().getAuthor());
+    
+    final List<String> ids = new ArrayList<>();
+    for(final var toBeSaved : batchType.getCreate()) {
+      final var gid = gid(toBeSaved.getBodyType());
+      final var entity = (StoreEntity) ImmutableStoreEntity.builder()
+          .id(gid)
+          .hash("")
+          .body(toBeSaved.getBody())
+          .bodyType(toBeSaved.getBodyType())
+          .build();
+      commitBuilder.append(entity.getId(), config.getSerializer().toString(entity));
+      ids.add(gid);
+    }
+    for(final var toBeSaved : batchType.getUpdate()) {
+      final var entity = (StoreEntity) ImmutableStoreEntity.builder()
+          .id(toBeSaved.getId())
+          .hash("")
+          .body(toBeSaved.getBody())
+          .bodyType(toBeSaved.getBodyType())
+          .build();
+      commitBuilder.append(entity.getId(), config.getSerializer().toString(entity));
+      ids.add(entity.getId());
+    }    
+    
+    return commitBuilder.build().onItem().transformToUni(commit -> {
+          if(commit.getStatus() == CommitStatus.OK) {
+            return config.getClient()
+                .objects().blobState()
+                .repo(config.getRepoName())
+                .anyId(config.getHeadName())
+                .blobNames(ids)
+                .list().onItem()
+                .transform(states -> {
+                  if(states.getStatus() != ObjectsStatus.OK) {
+                    // TODO
+                    throw new StoreException("LIST_FAIL", null, convertMessages2(states));
+                  }
+                  List<StoreEntity> entities = new ArrayList<>(); 
+                  for(final var state : states.getObjects().getBlob()) {
+                    StoreEntity start = (StoreEntity) config.getDeserializer().fromString(state);
+                    entities.add(start);
+                  }                  
+                  return entities;
+                });
+          }
+          // TODO
+          throw new StoreException("SAVE_FAIL", null, convertMessages(commit));
+        });
+  }
   @Override
   public Uni<StoreEntity> delete(DeleteAstType deleteType) {
     final Uni<EntityState> query = getEntityState(deleteType.getId());

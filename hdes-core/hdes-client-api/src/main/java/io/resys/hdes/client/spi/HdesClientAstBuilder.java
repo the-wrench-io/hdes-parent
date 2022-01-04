@@ -68,7 +68,7 @@ public class HdesClientAstBuilder implements AstBuilder {
   }
   @Override
   public AstTag tag() {
-    throw new IllegalArgumentException("not implemented");
+    return ast.tag().src(json).src(commands).build();
   }
   @Override
   public AstBuilder commands(String src) {

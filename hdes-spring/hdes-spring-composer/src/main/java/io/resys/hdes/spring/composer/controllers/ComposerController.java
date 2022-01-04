@@ -47,6 +47,7 @@ import io.resys.hdes.client.api.HdesComposer.DebugResponse;
 import io.resys.hdes.client.api.HdesComposer.StoreDump;
 import io.resys.hdes.client.api.HdesComposer.UpdateEntity;
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
+import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.spring.composer.ComposerConfigBean;
 
 @RestController
@@ -54,7 +55,7 @@ import io.resys.hdes.spring.composer.ComposerConfigBean;
 public class ComposerController {
   private final HdesComposer composer;
   private final ObjectMapper objectMapper;
-  private static final Duration timeout = Duration.ofMillis(1000);
+  private static final Duration timeout = Duration.ofMillis(10000);
 
   public ComposerController(HdesComposer composer, ObjectMapper objectMapper) {
     super();
@@ -81,6 +82,11 @@ public class ComposerController {
   @PostMapping(path = "/debugs", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public DebugResponse debug(@RequestBody DebugRequest debug) {
     return composer.debug(debug).await().atMost(timeout);
+  }
+
+  @PostMapping(path = "/importTag", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ComposerState importTag(@RequestBody AstTag entity) {
+    return composer.importTag(entity).await().atMost(timeout);
   }
 
   @PostMapping(path = "/resources", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

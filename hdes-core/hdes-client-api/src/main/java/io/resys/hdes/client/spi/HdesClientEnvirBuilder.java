@@ -75,6 +75,18 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
         return this;
       }
       @Override
+      public EnvirCommandFormatBuilder tag(String commandJson) {
+        this.type = AstBodyType.TAG;
+        this.commandJson = commandJson;
+        return this;
+      }
+      @Override
+      public EnvirCommandFormatBuilder tag(StoreEntity entity) {
+        this.type = AstBodyType.TAG;
+        this.entity = entity;
+        return this;
+      }
+      @Override
       public EnvirCommandFormatBuilder service(StoreEntity entity) {
         this.type = AstBodyType.FLOW_TASK;
         this.entity = entity;
@@ -109,8 +121,6 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
             .hash(entity == null ? Sha2.blob(commandJson) : entity.getHash())
             .commands(entity == null ? defs.commandsList(commandJson) : entity.getBody())
             .build(), cachless);
-        
-        
         return enviBuilder;
       }
     };

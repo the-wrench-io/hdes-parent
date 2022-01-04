@@ -33,6 +33,7 @@ import io.resys.hdes.client.spi.decision.DecisionAstBuilderImpl;
 import io.resys.hdes.client.spi.flow.FlowAstBuilderImpl;
 import io.resys.hdes.client.spi.groovy.GroovyCompilationCustomizer;
 import io.resys.hdes.client.spi.groovy.ServiceAstBuilderImpl;
+import io.resys.hdes.client.spi.tag.TagAstBuilderImpl;
 
 public class HdesAstTypesImpl implements HdesAstTypes {
   private final ObjectMapper yaml = new ObjectMapper(new YAMLFactory());
@@ -65,5 +66,9 @@ public class HdesAstTypesImpl implements HdesAstTypes {
   @Override
   public DataTypeAstBuilder dataType() {
     return typeDefs.dataType();
+  }
+  @Override
+  public TagAstBuilder tag() {
+    return new TagAstBuilderImpl(typeDefs);
   }
 }

@@ -55,6 +55,9 @@ public class StoreEntityLocation implements Serializable {
   public String getDtRegex() {
     return withRegex("**/dt/**/*.json");
   }
+  public String getTagRegex() {
+    return withRegex("**/tag/**/*.json");
+  }
   public String getMigrationRegex() {
     return withRegex("**/migration/**/*.json");
   }
@@ -69,6 +72,8 @@ public class StoreEntityLocation implements Serializable {
       return "flowtask";
     case DT:
       return "dt";
+    case TAG:
+      return "tag";
     default: throw new IllegalArgumentException("Unknown asset type:" + type + "!");
     }
   }

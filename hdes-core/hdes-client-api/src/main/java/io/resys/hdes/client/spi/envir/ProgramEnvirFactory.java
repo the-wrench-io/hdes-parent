@@ -40,6 +40,7 @@ import io.resys.hdes.client.api.ast.AstBody.CommandMessageType;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ImmutableProgramEnvir;
@@ -50,10 +51,12 @@ import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
+import io.resys.hdes.client.api.programs.TagProgram;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
+import io.resys.hdes.client.spi.tag.TagProgramBuilder;
 
 public class ProgramEnvirFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgramEnvirFactory.class);
@@ -113,7 +116,9 @@ public class ProgramEnvirFactory {
       case DT: envir.putDecisionsByName(ast.getName(), (ProgramWrapper<AstDecision, DecisionProgram>) e); break;
       case FLOW_TASK: envir.putServicesByName(ast.getName(), (ProgramWrapper<AstService, ServiceProgram>) e); break;
       case FLOW: envir.putFlowsByName(ast.getName(), (ProgramWrapper<AstFlow, FlowProgram>) e); break;
+      case TAG: envir.putTagsByName(ast.getName(), (ProgramWrapper<AstTag, TagProgram>) e); break;
       default: break;
+      
       }
     });
     if(LOGGER.isDebugEnabled()) {
@@ -148,6 +153,7 @@ public class ProgramEnvirFactory {
     case DT: result = visitDecision(entity); break;
     case FLOW: result = visitFlow(entity); break;
     case FLOW_TASK: result = visitFlowTask(entity); break;
+    case TAG: result = visitTag(entity); break;
     default: throw new IllegalArgumentException("unknown command format type: '" + entity.getBodyType() + "'!");
     }
     return result;
@@ -287,6 +293,76 @@ public class ProgramEnvirFactory {
         .source(src)
         .type(AstBodyType.FLOW).build(); 
   }
+  
+  private ProgramWrapper<AstTag, TagProgram> visitTag(AstSource src) {
+    final ImmutableProgramWrapper.Builder<AstTag, TagProgram> builder = ImmutableProgramWrapper.builder();
+    builder.status(ProgramStatus.UP);
+    AstTag ast = null;
+    try {      
+      if(cachlessIds.contains(src.getId())) {
+        ast = hdesTypes.tag().src(src.getCommands()).build();
+      } else {
+        final var cached = cache.getAst(src);
+        if(cached.isPresent()) {
+          ast = (AstTag) cached.get();
+        } else {
+          ast = hdesTypes.tag().src(src.getCommands()).build();
+          cache.setAst(ast, src);
+        }
+      }
+      
+      final var errors = ast.getMessages().stream()
+          .filter(m -> m.getType() == CommandMessageType.ERROR)
+          .map(error -> ImmutableProgramMessage.builder()
+              .id("ast-error")
+              .msg("line: " + error.getLine() + ": " + error.getValue())
+              .build())
+          .collect(Collectors.toList());
+        builder.addAllErrors(errors);
+      if(!errors.isEmpty()) {
+        LOGGER.error(new StringBuilder()
+            .append(String.join(System.lineSeparator(), errors.stream().map(e -> e.getMsg()).collect(Collectors.toList())))
+            .append("  - tag source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString());
+        builder.status(ProgramStatus.AST_ERROR);
+      }
+    } catch(Exception e) {
+      LOGGER.error(new StringBuilder()
+          .append(e.getMessage()).append(System.lineSeparator())
+          .append("  - tag source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+          .toString(), e);
+      builder.status(ProgramStatus.AST_ERROR).addAllErrors(visitException(e));
+    }
+    
+    TagProgram program = null;
+    if(ast != null) {
+      try {
+        if(cachlessIds.contains(src.getId())) {
+          program = new TagProgramBuilder(config).build(ast);          
+        } else {
+          final var cached = cache.getProgram(src);
+          if(cached.isPresent()) {
+            program = (TagProgram) cached.get();
+          } else {
+            program = new TagProgramBuilder(config).build(ast);
+            cache.setProgram(program, src);
+          }
+        }
+      } catch(Exception e) {
+        LOGGER.error(new StringBuilder()
+            .append(e.getMessage()).append(System.lineSeparator())
+            .append("  - tag source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString(), e);
+        builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
+      }
+    }
+    
+    return builder.id(src.getId()).type(AstBodyType.TAG)
+        .ast(Optional.ofNullable(ast)).program(Optional.ofNullable(program))
+        .source(src)
+        .build(); 
+  }
+  
   
   private ProgramWrapper<AstService, ServiceProgram> visitFlowTask(AstSource src) {
     final ImmutableProgramWrapper.Builder<AstService, ServiceProgram> builder = ImmutableProgramWrapper.builder();

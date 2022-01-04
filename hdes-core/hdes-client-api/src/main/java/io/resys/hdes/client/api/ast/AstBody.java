@@ -38,6 +38,8 @@ public interface AstBody extends Serializable {
   AstBodyType getBodyType();
   List<AstCommandMessage> getMessages();
   
+  @JsonSerialize(as = ImmutableHeaders.class)
+  @JsonDeserialize(as = ImmutableHeaders.class)
   @Value.Immutable
   interface Headers extends Serializable {
     List<TypeDef> getAcceptDefs();
@@ -45,7 +47,7 @@ public interface AstBody extends Serializable {
   }
 
   enum AstBodyType { 
-    FLOW, FLOW_TASK, DT, TAG 
+    FLOW, FLOW_TASK, DT, TAG
   }
   
   

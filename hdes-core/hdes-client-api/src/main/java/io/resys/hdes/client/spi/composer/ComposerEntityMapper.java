@@ -37,6 +37,8 @@ public class ComposerEntityMapper {
     source.getDecisions().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).decision(v).build());
     source.getServices().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).service(v).build());
     source.getFlows().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).flow(v).build());
+    source.getTags().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).tag(v).build());
+    
     return envirBuilder;
   }
   

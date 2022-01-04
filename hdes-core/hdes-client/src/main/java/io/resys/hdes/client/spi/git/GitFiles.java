@@ -78,6 +78,60 @@ public class GitFiles {
     this.conn = connection;
   }
   
+  public List<GitFileReload> push(List<GitFile> gitFiles) {
+    final var git = conn.getClient();
+    final var repo = git.getRepository();    
+    final var callback = conn.getCallback();
+    final var creds = conn.getCreds().get();
+    try {
+      final var start = repo.resolve(Constants.HEAD);
+      
+      // pull
+      git.pull().setTransportConfigCallback(callback).call().getFetchResult();
+      
+      // add new files
+      var add = git.add();
+      for(final var gitFile : gitFiles) {
+        add = add.addFilepattern(gitFile.getTreeValue());
+      }
+      add.call();
+      
+      // commit changes
+      git.commit()
+      .setAll(true)
+      .setAllowEmpty(false)
+      .setMessage("Batch import")
+      .setAuthor(creds.getUser(), creds.getEmail())
+      .setCommitter(creds.getUser(), creds.getEmail())
+      .call();
+
+      // push
+      git.push().setTransportConfigCallback(callback).call();
+      final var end = repo.resolve(Constants.HEAD);
+      
+      LOGGER.debug("Pushing changes...");
+      return diff(start, end);
+      
+    } catch(CheckoutConflictException e) {
+      LOGGER.error("Conflict, resetting... " +  e.getMessage(), e);
+      try {
+        git.reset().setMode(ResetType.HARD).call();
+        git.pull().setTransportConfigCallback(callback).call();
+      } catch(Exception ex) {
+        LOGGER.error(e.getMessage(), e);
+        throw new RuntimeException(e.getMessage(), e);
+      }
+      throw new RuntimeException(e.getMessage(), e);
+    } catch(EmptyCommitException e) {
+      LOGGER.debug("nothing to commit");
+    } catch(Exception e) {
+      LOGGER.error(e.getMessage(), e);
+      throw new RuntimeException(e.getMessage(), e);
+    }
+    
+    return Collections.emptyList();
+  }
+  
   public List<GitFileReload> push(GitFile gitFile) {
     final var git = conn.getClient();
     final var repo = git.getRepository();    
@@ -410,8 +464,6 @@ public class GitFiles {
           LOGGER.error(msg);
           throw new RuntimeException(msg);
         }
-  
-        
         git.tagDelete().setTags(target.get().getName()).call();
     
         //delete branch 'branchToDelete' on remote 'origin'
@@ -419,38 +471,38 @@ public class GitFiles {
                 .setSource(null)
                 .setDestination(target.get().getName());
         git.push().setRefSpecs(refSpec).setRemote("origin").setTransportConfigCallback(conn.getCallback()).call();
-        
         reload.add(ImmutableGitFileReload.builder().treeValue(gitFile.getTreeValue()).build());
-      } else {
-        // pull
-        git.pull().setTransportConfigCallback(callback).call().getFetchResult();
-        
-        final var location = conn.getLocation();
-        final var resourceName = location.getAbsolutePath(bodyType, id);
-        
-        LOGGER.debug("Removing assets from git: " + resourceName + "");
-        final var file = new File(URI.create("file:" + resourceName));
-        
-        boolean deleted = file.delete();
-        if(!deleted) {
-          throw new RuntimeException("Cant delete assets from git: " + resourceName + "");
-        }
-        
-        // add new files
-        git.add().addFilepattern(gitFile.getTreeValue()).call();
-
-        // commit changes
-        git.commit()
-        .setAll(true)
-        .setAllowEmpty(false)
-        .setMessage("Delete: " + gitFile.getBodyType() + " file: " + gitFile.getTreeValue())
-        .setAuthor(creds.getUser(), creds.getEmail())
-        .setCommitter(creds.getUser(), creds.getEmail())
-        .call();
-
-        // push
-        git.push().setTransportConfigCallback(callback).call();
       }
+      
+      // pull
+      git.pull().setTransportConfigCallback(callback).call().getFetchResult();
+      
+      final var location = conn.getLocation();
+      final var resourceName = location.getAbsolutePath(bodyType, id);
+      
+      LOGGER.debug("Removing assets from git: " + resourceName + "");
+      final var file = new File(URI.create("file:" + resourceName));
+      
+      boolean deleted = file.delete();
+      if(!deleted) {
+        throw new RuntimeException("Cant delete assets from git: " + resourceName + "");
+      }
+      
+      // add new files
+      git.add().addFilepattern(gitFile.getTreeValue()).call();
+
+      // commit changes
+      git.commit()
+      .setAll(true)
+      .setAllowEmpty(false)
+      .setMessage("Delete: " + gitFile.getBodyType() + " file: " + gitFile.getTreeValue())
+      .setAuthor(creds.getUser(), creds.getEmail())
+      .setCommitter(creds.getUser(), creds.getEmail())
+      .call();
+
+      // push
+      git.push().setTransportConfigCallback(callback).call();
+    
     } catch(Exception e) {
       LOGGER.error("Failed to delete asset: '" + id + "'!" + System.lineSeparator() + e.getMessage(), e);
       try {

@@ -29,6 +29,7 @@ import io.resys.hdes.client.api.HdesStore.HistoryEntity;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableComposerState;
 import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
+import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 import io.resys.hdes.client.spi.composer.CopyAsEntityVisitor;
 import io.resys.hdes.client.spi.composer.CreateEntityVisitor;
@@ -36,6 +37,7 @@ import io.resys.hdes.client.spi.composer.DataDumpVisitor;
 import io.resys.hdes.client.spi.composer.DebugVisitor;
 import io.resys.hdes.client.spi.composer.DeleteEntityVisitor;
 import io.resys.hdes.client.spi.composer.DryRunVisitor;
+import io.resys.hdes.client.spi.composer.ImportEntityVisitor;
 import io.smallrye.mutiny.Uni;
 
 public class HdesComposerImpl implements HdesComposer {
@@ -64,7 +66,7 @@ public class HdesComposerImpl implements HdesComposer {
   @Override
   public Uni<ComposerState> create(CreateEntity asset) {
     return client.store().query().get().onItem().transform(this::state)
-        .onItem().transformToUni(state -> client.store().create(new CreateEntityVisitor(state, asset).visit()))
+        .onItem().transformToUni(state -> client.store().create(new CreateEntityVisitor(state, asset, client).visit()))
         .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
   }
   @Override
@@ -125,5 +127,13 @@ public class HdesComposerImpl implements HdesComposer {
     final var builder = ImmutableComposerState.builder();
     envir.getValues().values().forEach(v -> ComposerEntityMapper.toComposer(builder, v));
     return (ComposerState) builder.build(); 
+  }
+
+  @Override
+  public Uni<ComposerState> importTag(AstTag asset) {
+    return client.store().query().get().onItem().transform(this::state)
+        .onItem().transform(state -> new ImportEntityVisitor(state, asset, client).visit())
+        .onItem().transformToUni(newEntity -> client.store().batch(newEntity))
+        .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
   }
 }

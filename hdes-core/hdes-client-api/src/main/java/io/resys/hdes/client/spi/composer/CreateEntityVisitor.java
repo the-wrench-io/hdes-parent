@@ -1,5 +1,8 @@
 package io.resys.hdes.client.spi.composer;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+
 /*-
  * #%L
  * hdes-client-api
@@ -23,11 +26,14 @@ package io.resys.hdes.client.spi.composer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesComposer.ComposerState;
 import io.resys.hdes.client.api.HdesComposer.CreateEntity;
 import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
 import io.resys.hdes.client.api.ImmutableCreateStoreEntity;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision;
@@ -45,16 +51,22 @@ import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
+import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
+import io.resys.hdes.client.spi.staticresources.Sha2;
 
 public class CreateEntityVisitor {
 
+  private final HdesClient client;
   private final CreateEntity asset;
   private final ComposerState state;
+  private final AstCommandOptimiser optimise;
   
-  public CreateEntityVisitor(ComposerState state, CreateEntity asset) {
+  public CreateEntityVisitor(ComposerState state, CreateEntity asset, HdesClient client) {
     super();
     this.asset = asset;
     this.state = state;
+    this.client = client;
+    this.optimise = new AstCommandOptimiser(client);
   }
   public CreateStoreEntity visit() {
     if(asset.getName() == null && asset.getBody().isEmpty()) {
@@ -132,7 +144,55 @@ public class CreateEntityVisitor {
   }
 
   public List<AstCommand> initTag(CreateEntity entity) {
-    return Collections.emptyList();
+    final var decisions = state.getDecisions().values().stream()
+      .map(decision -> optimise.optimise(decision.getSource().getCommands(), AstBodyType.DT))
+      .map(decision -> client.mapper().commandsString(decision))
+      .map(decision -> (AstCommand) ImmutableAstCommand.builder()
+          .id(Sha2.blob(decision))
+          .value(decision)
+          .type(AstCommandValue.SET_TAG_DT)
+          .build())
+      .collect(Collectors.toList());
+
+    // Flow task validations
+    final var flowtasks = state.getServices().values().stream()
+        .map(flowtask -> optimise.optimise(flowtask.getSource().getCommands(), AstBodyType.FLOW_TASK))
+        .map(flowtask -> flowtask.iterator().next().getValue())
+        .map(flowtask -> (AstCommand) ImmutableAstCommand.builder()
+            .id(Sha2.blob(flowtask))
+            .value(flowtask)
+            .type(AstCommandValue.SET_TAG_ST)
+            .build())
+        .collect(Collectors.toList());
+    
+    // Flow validations
+    final var flows = state.getFlows().values().stream()
+      .map(flow -> optimise.optimise(flow.getSource().getCommands(), AstBodyType.FLOW))
+      .map(flow -> flow.iterator().next().getValue())
+      .map(flow -> (AstCommand) ImmutableAstCommand.builder()
+          .id(Sha2.blob(flow))
+          .value(flow)
+          .type(AstCommandValue.SET_TAG_FL)
+          .build())
+      .collect(Collectors.toList());
+    
+    final var result = new ArrayList<AstCommand>();
+    result.add(ImmutableAstCommand.builder()
+          .value(LocalDateTime.now().toString())
+          .type(AstCommandValue.SET_TAG_CREATED)
+          .build());
+    result.add(ImmutableAstCommand.builder()
+        .value(entity.getName())
+        .type(AstCommandValue.SET_TAG_NAME)
+        .build());
+    result.add(ImmutableAstCommand.builder()
+        .value(entity.getDesc())
+        .type(AstCommandValue.SET_TAG_DESC)
+        .build());
+    result.addAll(decisions);
+    result.addAll(flowtasks);
+    result.addAll(flows);
+    return Collections.unmodifiableList(result);
   }
   
   public List<AstCommand> initFlowTask(CreateEntity entity) {

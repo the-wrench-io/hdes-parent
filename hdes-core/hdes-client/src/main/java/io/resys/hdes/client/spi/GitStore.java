@@ -1,6 +1,7 @@
 package io.resys.hdes.client.spi;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /*-
  * #%L
@@ -23,10 +24,12 @@ import java.io.IOException;
  */
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.ehcache.Cache;
+import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +39,9 @@ import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreState;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.spi.GitConfig.GitEntry;
+import io.resys.hdes.client.spi.GitConfig.GitFile;
 import io.resys.hdes.client.spi.GitConfig.GitFileReload;
 import io.resys.hdes.client.spi.git.GitConnectionFactory;
 import io.resys.hdes.client.spi.git.GitDataSourceLoader;
@@ -53,7 +58,13 @@ public class GitStore implements HdesStore {
   interface FileMarker {
     String getAbsolutePath();
   }
-
+  
+  @Value.Immutable
+  interface BatchEntry {
+    GitFile getFile();
+    List<AstCommand> getBody();
+  }
+  
   public GitStore(GitConfig conn) {
     super();
     this.conn = conn;
@@ -67,14 +78,55 @@ public class GitStore implements HdesStore {
     return conn.getInit().getBranch();
   }
   @Override
+  public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {
+    return Uni.createFrom().item(() -> {
+      try {
+        final List<GitFile> gitFiles = new ArrayList<>();
+        final List<BatchEntry> entries = new ArrayList<>();
+        final var git = GitFiles.builder().git(conn).build();
+        
+        // create
+        for(final var create : batchType.getCreate()) {
+          final var created = git.create(create.getBodyType(), create.getBody());
+          gitFiles.add(created);
+          entries.add(ImmutableBatchEntry.builder().file(created).body(create.getBody()).build());
+        }
+        
+        // update 
+        for(final var update : batchType.getUpdate()) {
+          final var updated = git.update(update.getId(), update.getBodyType(), update.getBody());
+          gitFiles.add(updated);
+          entries.add(ImmutableBatchEntry.builder().file(updated).body(update.getBody()).build());
+        }
+        
+        final var refresh = git.push(gitFiles);
+        cache(refresh);
+        
+        return entries.stream().map(entry -> (StoreEntity) ImmutableStoreEntity.builder()
+              .id(entry.getFile().getId())
+              .hash(entry.getFile().getBlobHash())
+              .body(entry.getBody())
+              .bodyType(entry.getFile().getBodyType())
+              .build())
+            .collect(Collectors.toList());
+      } catch(Exception e) {
+        LOGGER.error(new StringBuilder()
+            .append("Failed to run batch:").append(System.lineSeparator()) 
+            .append("  - because: ").append(e.getMessage()).toString(), e);
+        throw new RuntimeException(e.getMessage(), e);
+      }      
+    });
+  }
+  @Override
   public Uni<StoreEntity> create(CreateStoreEntity newType) {
     return Uni.createFrom().item(() -> {
       try {
         final var git = GitFiles.builder().git(conn).build();
         if(newType.getBodyType() == AstBodyType.TAG) {
-          final var refresh = git.tag(newType);
-          cache(refresh.getValue());
-          return (StoreEntity) ImmutableStoreEntity.builder().id(refresh.getKey()).body(newType.getBody()).bodyType(newType.getBodyType()).build();
+          final var newTag = git.tag(newType);
+          if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Hdes git store, new tag created: '" + newTag.getKey() + "'");
+          }
         }
         final var file = git.create(newType.getBodyType(), newType.getBody());
         final var refresh = git.push(file);
@@ -94,7 +146,6 @@ public class GitStore implements HdesStore {
       }
     });
   }
-  
   @Override
   public Uni<StoreEntity> update(UpdateStoreEntity updateType) {
     return query().get(updateType.getId()).onItem().transform((oldState) -> {
@@ -118,8 +169,6 @@ public class GitStore implements HdesStore {
       }
     });
   }
-  
-
   @Override
   public Uni<StoreEntity> delete(DeleteAstType deleteType) {
     return Uni.createFrom().item(() -> {
@@ -308,7 +357,6 @@ public class GitStore implements HdesStore {
     public GitStore build() {
       HdesAssert.notNull(objectMapper, () -> "objectMapper must be defined!");
       HdesAssert.notNull(creds, () -> "creds must be defined!");
-      
       
       if(LOGGER.isDebugEnabled()) {
         final var log = new StringBuilder()

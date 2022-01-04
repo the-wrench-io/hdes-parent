@@ -21,6 +21,8 @@ package io.resys.hdes.client.api.ast;
  */
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 import org.immutables.value.Value;
 
@@ -32,5 +34,17 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 @JsonSerialize(as = ImmutableAstTag.class)
 @JsonDeserialize(as = ImmutableAstTag.class)
 public interface AstTag extends AstBody, Serializable {
+  
   String getName();
+  LocalDateTime getCreated();
+  List<AstTagValue> getValues();
+  
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableAstTagValue.class)
+  @JsonDeserialize(as = ImmutableAstTagValue.class)
+  interface AstTagValue {
+    String getHash();
+    AstBodyType getBodyType();
+    List<AstCommand> getCommands();
+  } 
 }

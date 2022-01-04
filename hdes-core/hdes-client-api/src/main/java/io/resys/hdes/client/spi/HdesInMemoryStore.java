@@ -241,7 +241,10 @@ public class HdesInMemoryStore implements HdesStore {
   public StoreRepoBuilder repo() {
     throw new IllegalArgumentException("not implemented");
   }
-
+  @Override
+  public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {
+    throw new IllegalArgumentException("not implemented");
+  }
   @Override
   public String getRepoName() {
     return "in-memory";

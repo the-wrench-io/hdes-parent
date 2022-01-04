@@ -39,6 +39,8 @@ public interface HdesStore {
   Uni<StoreEntity> create(CreateStoreEntity newType);
   Uni<StoreEntity> update(UpdateStoreEntity updateType);
   Uni<StoreEntity> delete(DeleteAstType deleteType);
+  Uni<List<StoreEntity>> batch(ImportStoreEntity batchType);
+  
   QueryBuilder query();
   HistoryQuery history();
   String getRepoName();
@@ -60,6 +62,22 @@ public interface HdesStore {
   interface QueryBuilder {
     Uni<StoreState> get();
     Uni<StoreEntity> get(String id);
+  }
+  
+
+  @Value.Immutable
+  public interface ImportStoreEntity {
+    List<CreateStoreEntity> getCreate();
+    List<UpdateStoreEntityWithBodyType> getUpdate();
+  }
+  
+  @JsonSerialize(as = ImmutableUpdateStoreEntityWithBodyType.class)
+  @JsonDeserialize(as = ImmutableUpdateStoreEntityWithBodyType.class)
+  @Value.Immutable
+  interface UpdateStoreEntityWithBodyType extends Serializable {
+    String getId();
+    AstBodyType getBodyType();
+    List<AstCommand> getBody();
   }
   
   @JsonSerialize(as = ImmutableDeleteAstType.class)

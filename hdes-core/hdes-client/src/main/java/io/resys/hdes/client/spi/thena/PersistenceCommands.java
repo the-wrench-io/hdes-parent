@@ -35,6 +35,7 @@ import io.resys.hdes.client.spi.ThenaConfig.EntityState;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitResult;
 import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
+import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObjects;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsStatus;
 import io.smallrye.mutiny.Uni;
@@ -65,17 +66,7 @@ public class PersistenceCommands implements ThenaConfig.Commands {
           throw new StoreException("DELETE_FAIL", toBeDeleted, convertMessages(commit));
         });
   }
-  
-  private StoreExceptionMsg convertMessages(CommitResult commit) {
-    return ImmutableStoreExceptionMsg.builder()
-        .id(commit.getGid())
-        .value("") //TODO
-        .addAllArgs(commit.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
-        .build();
-  }
 
-
-  
   @Override
   public Uni<StoreEntity> save(StoreEntity toBeSaved) {
     return config.getClient().commit().head()
@@ -167,14 +158,28 @@ public class PersistenceCommands implements ThenaConfig.Commands {
         .transform(state -> {
           if(state.getStatus() != ObjectsStatus.OK) {
             // TODO
-            throw new StoreException("GET_FAIL", null, convertMessages(state));
+            throw new StoreException("GET_FAIL", null, convertMessages1(state));
           }
           StoreEntity start = (StoreEntity) config.getDeserializer().fromString(state.getObjects().getBlob());
           return ImmutableEntityState.builder().src(state).entity(start).build();
         });
   }
+  
+  
+  protected StoreExceptionMsg convertMessages(CommitResult commit) {
+    return ImmutableStoreExceptionMsg.builder()
+        .id(commit.getGid())
+        .value("") //TODO
+        .addAllArgs(commit.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
+        .build();
+  }
 
-  private StoreExceptionMsg convertMessages(ObjectsResult<BlobObject> state) {
+  protected StoreExceptionMsg convertMessages1(ObjectsResult<BlobObject> state) {
+    return ImmutableStoreExceptionMsg.builder()
+        .addAllArgs(state.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
+        .build();
+  }
+  protected StoreExceptionMsg convertMessages2(ObjectsResult<BlobObjects> state) {
     return ImmutableStoreExceptionMsg.builder()
         .addAllArgs(state.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
         .build();

@@ -29,6 +29,7 @@ import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
@@ -39,7 +40,7 @@ public interface HdesAstTypes {
   FlowAstBuilder flow();
   ServiceAstBuilder service();
   DataTypeAstBuilder dataType();
-
+  TagAstBuilder tag();
   
   interface DataTypeAstBuilder {
     DataTypeAstBuilder id(String id);
@@ -58,6 +59,12 @@ public interface HdesAstTypes {
     DataTypeAstBuilder values(String values);
     DataTypeAstBuilder property();
     TypeDef build();
+  }
+
+  interface TagAstBuilder {
+    TagAstBuilder src(List<AstCommand> src);
+    TagAstBuilder src(JsonNode src);
+    AstTag build();
   }
   
   interface DecisionAstBuilder {
