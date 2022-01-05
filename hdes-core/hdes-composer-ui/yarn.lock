@@ -2606,9 +2606,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@the-wrench-io/hdes-ide@npm:^0.2.27":
-  version: 0.2.27
-  resolution: "@the-wrench-io/hdes-ide@npm:0.2.27"
+"@the-wrench-io/hdes-ide@npm:^0.2.28":
+  version: 0.2.28
+  resolution: "@the-wrench-io/hdes-ide@npm:0.2.28"
   dependencies:
     "@the-wrench-io/react-burger": ^1.0.31
     codemirror: ^5.40.0
@@ -2629,7 +2629,7 @@ __metadata:
     react: ^17.0.1
     react-dom: ^17.0.1
     react-intl: ^5.17.2
-  checksum: eb5670421017fe74220f7d1b47263ad7525a948ce3bf54b691936edc02c5a1b433e74749e368dc500e55c1f778440891c8787b87a8e849078470d639c51cae87
+  checksum: 1ec5bbd7d4c43464420bf5e6b43fa8f2e3bc2c6c48c48821562ef2113d09a87222f32a8372d65065790bdaf2fc6d369b17fc4c90ea5075b262d39095a35fc563
   languageName: node
   linkType: hard
 
@@ -6682,7 +6682,7 @@ __metadata:
     "@mui/material": ^5.0.1
     "@mui/styles": ^5.0.1
     "@mui/system": ^5.0.1
-    "@the-wrench-io/hdes-ide": ^0.2.27
+    "@the-wrench-io/hdes-ide": ^0.2.28
     "@the-wrench-io/react-burger": ^1.0.32
     "@types/node": ^12.19.9
     "@types/react": ^17.0.1
