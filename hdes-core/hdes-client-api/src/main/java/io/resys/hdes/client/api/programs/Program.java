@@ -27,6 +27,7 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import io.resys.hdes.client.api.HdesClient.ExecutorBuilder;
 import io.resys.hdes.client.api.ast.TypeDef;
 
 public interface Program extends Serializable {
@@ -46,8 +47,10 @@ public interface Program extends Serializable {
     FlowProgram getFlow(String name);
     DecisionProgram getDecision(String name);
     ServiceProgram getService(String name);
+    
+    ExecutorBuilder executor();
+    
   }
-  
   
   @Value.Immutable
   interface ProgramContextNamedValue {

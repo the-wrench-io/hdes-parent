@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import io.resys.hdes.client.api.HdesClient.ExecutorBuilder;
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.TypeDef;
@@ -75,6 +76,11 @@ public class ImmutableProgramContext implements ProgramContext {
     this.factory = factory;
     this.serviceData = serviceData;
     this.dependencyInjectionContext = dependencyInjectionContext;
+  }
+  
+  @Override
+  public ExecutorBuilder executor() {
+    return new HdesClientExecutorBuilder(envir, factory, dependencyInjectionContext);
   }
 
   @Override
@@ -202,6 +208,4 @@ public class ImmutableProgramContext implements ProgramContext {
       return new ImmutableProgramContext(suppliers, serviceData, input, factory, envir, dependencyInjectionContext);
     }
   }
-  
-
 }
