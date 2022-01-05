@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -44,6 +45,8 @@ import io.resys.hdes.client.api.ImmutableStoreState;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTag.AstTagValue;
 import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
 import io.resys.hdes.client.spi.util.HdesAssert;
@@ -133,7 +136,14 @@ public class HdesInMemoryStore implements HdesStore {
         throw new RuntimeException("Failed to load asset from: " + location + "!" + e.getMessage(), e);
       }
     }
-    
+
+    private AstTag readRelease(String json) {
+      try {
+        return objectMapper.readValue(json, AstTag.class);
+      } catch (Exception e) {
+        throw new RuntimeException("Failed to load asset from: " + location + "!" + e.getMessage(), e);
+      }
+    }
     
     private StoreDump readDump(String json) {
       try {
@@ -169,21 +179,49 @@ public class HdesInMemoryStore implements HdesStore {
       final var entities = new HashMap<String, StoreEntity>();
       
       
-      list(location.getMigrationRegex()).stream().forEach(r -> {
+      list(location.getDumpRegex()).stream().forEach(r -> {
         final Map<AstBodyType, Integer> order = Map.of(
             AstBodyType.DT, 1,
             AstBodyType.FLOW_TASK, 2,
             AstBodyType.FLOW, 3);
-        
         migLog
-          .append("Loading assets from: " + r.getFilename()).append(System.lineSeparator())
-          .append(" Migrations hash: " + r.getFilename()).append(System.lineSeparator());
+          .append("Loading assets from dump: " + r.getFilename()).append(System.lineSeparator());
+        
+        final var assets = new ArrayList<>(readRelease(readContents(r)).getValues());
+        assets.sort((AstTagValue o1, AstTagValue o2) -> 
+          Integer.compare(order.get(o1.getBodyType()), order.get(o2.getBodyType()))
+        );
+        for(final var asset : assets) {
+          migLog.append("  - ")
+            .append(asset.getHash()).append("/").append(asset.getBodyType()).append("/").append(asset.getHash())
+            .append(System.lineSeparator());
+        
+          final var id = UUID.randomUUID().toString();
+          final var entity = ImmutableStoreEntity.builder()
+              .id(id)
+              .hash(asset.getHash())
+              .body(asset.getCommands())
+              .bodyType(asset.getBodyType())
+              .build();
+          entities.put(id, entity);
+        }
+      });
+      
+
+      list(location.getMigrationRegex()).stream().forEach(r -> {
+        
+        
+        final Map<AstBodyType, Integer> order = Map.of(
+            AstBodyType.DT, 1,
+            AstBodyType.FLOW_TASK, 2,
+            AstBodyType.FLOW, 3);
+        migLog
+          .append("Loading assets from release: " + r.getFilename()).append(System.lineSeparator());
         
         final var assets = new ArrayList<>(readDump(readContents(r)).getValue());
         assets.sort((AstSource o1, AstSource o2) -> 
           Integer.compare(order.get(o1.getBodyType()), order.get(o2.getBodyType()))
         );
-        
         for(final var asset : assets) {
           migLog.append("  - ")
             .append(asset.getId()).append("/").append(asset.getBodyType()).append("/").append(asset.getHash())
@@ -198,7 +236,10 @@ public class HdesInMemoryStore implements HdesStore {
           entities.put(entity.getId(), entity);
         }
         
+        
       });
+      
+      
       migLog.append(System.lineSeparator());
       
       // Decision tables

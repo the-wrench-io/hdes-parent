@@ -61,6 +61,9 @@ public class StoreEntityLocation implements Serializable {
   public String getMigrationRegex() {
     return withRegex("**/migration/**/*.json");
   }
+  public String getDumpRegex() {
+    return withRegex("**/dump/**/*.json");
+  }
   public String getValue() {
     return value;
   }
