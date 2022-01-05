@@ -51,6 +51,7 @@
   <modules>
     <module>hdes-bom</module>
     <module>hdes-build-parent</module>
+    <module>hdes-dialect</module>
     <module>hdes-core</module>
     <module>hdes-spring</module>
   </modules>

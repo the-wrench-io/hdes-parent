@@ -11,6 +11,7 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- client -->
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-core</artifactId>
@@ -32,7 +33,40 @@
         <version>${project.version}</version>
       </dependency>
 
+      <!-- dialect -->
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-ast</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-compiler</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-executor</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-interpreter</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-runtime</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.resys.hdes</groupId>
+        <artifactId>hdes-runtime-test</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
 
+      <!-- spring -->
       <dependency>
         <groupId>io.resys.hdes</groupId>
         <artifactId>hdes-spring-env</artifactId>
