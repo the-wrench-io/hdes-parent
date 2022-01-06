@@ -56,7 +56,7 @@ public class FlowAssociationValidator {
 
   public void visitStep(FlowProgramStep step, ProgramWrapper<?, ?> wrapper) {
     final var taskModel = ast.getSrc().getTasks().values().stream()
-        .filter(t -> t.getId().getValue().equals(step.getId()))
+        .filter(t -> t.getId() != null && t.getId().getValue().equals(step.getId()))
         .findFirst().get();    
     
     for(TypeDef param : wrapper.getAst().get().getHeaders().getReturnDefs()) {

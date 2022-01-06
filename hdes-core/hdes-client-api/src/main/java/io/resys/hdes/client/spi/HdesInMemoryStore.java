@@ -179,13 +179,13 @@ public class HdesInMemoryStore implements HdesStore {
       final var entities = new HashMap<String, StoreEntity>();
       
       
-      list(location.getDumpRegex()).stream().forEach(r -> {
+      list(location.getMigrationRegex()).stream().forEach(r -> {
         final Map<AstBodyType, Integer> order = Map.of(
             AstBodyType.DT, 1,
             AstBodyType.FLOW_TASK, 2,
             AstBodyType.FLOW, 3);
         migLog
-          .append("Loading assets from dump: " + r.getFilename()).append(System.lineSeparator());
+          .append("Loading assets from release: " + r.getFilename()).append(System.lineSeparator());
         
         final var assets = new ArrayList<>(readRelease(readContents(r)).getValues());
         assets.sort((AstTagValue o1, AstTagValue o2) -> 
@@ -208,7 +208,7 @@ public class HdesInMemoryStore implements HdesStore {
       });
       
 
-      list(location.getMigrationRegex()).stream().forEach(r -> {
+      list(location.getDumpRegex()).stream().forEach(r -> {
         
         
         final Map<AstBodyType, Integer> order = Map.of(
@@ -216,7 +216,7 @@ public class HdesInMemoryStore implements HdesStore {
             AstBodyType.FLOW_TASK, 2,
             AstBodyType.FLOW, 3);
         migLog
-          .append("Loading assets from release: " + r.getFilename()).append(System.lineSeparator());
+          .append("Loading assets from dump: " + r.getFilename()).append(System.lineSeparator());
         
         final var assets = new ArrayList<>(readDump(readContents(r)).getValue());
         assets.sort((AstSource o1, AstSource o2) -> 

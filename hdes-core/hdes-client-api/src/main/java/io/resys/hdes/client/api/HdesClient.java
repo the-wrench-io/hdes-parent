@@ -120,18 +120,19 @@ public interface HdesClient {
     ServiceProgram ast(AstService ast);
   }
   
-  interface FlowExecutor {
+  interface ProgramExecutor {}
+  
+  interface FlowExecutor extends ProgramExecutor {
     @Nullable
     FlowResultLog andGetTask(String task);
     FlowResult andGetBody();
   }
-  interface DecisionExecutor {
+  interface DecisionExecutor extends ProgramExecutor {
     Map<String, Serializable> andGet();
     List<Map<String, Serializable>> andFind();
     DecisionResult andGetBody();
   }
-
-  interface ServiceExecutor {
+  interface ServiceExecutor extends ProgramExecutor {
     ServiceResult andGetBody();
   }
   

@@ -26,10 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.api.ast.AstBody.Headers;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
@@ -58,7 +59,13 @@ public class AstCommandOptimiser {
   
   private List<AstCommand> visitDt(List<AstCommand> src) {
     final var dt = new DecisionAstBuilderImpl(defs).src(src).build();
-    final var headers = dt.getHeaders();
+
+    final List<TypeDef> headers = new ArrayList<>();
+    headers.addAll(dt.getHeaders().getAcceptDefs());
+    headers.addAll(dt.getHeaders().getReturnDefs());
+    headers.sort((o1, o2) -> Integer.compare(o1.getOrder(), o2.getOrder()));
+    
+    
     final List<AstCommand> commands = createHeaderCommands(headers);
 
     createRow(headers, dt.getRows(), commands);
@@ -71,60 +78,72 @@ public class AstCommandOptimiser {
 
   private List<AstCommand> visitSt(List<AstCommand> original) {
     final var changes = AstChangesetFactory.src(original, null);
-    final var src = new StringBuilder();
-    changes.getCommands().forEach(c -> src.append(c.getValue()).append(System.lineSeparator()));
-    
+    final var value = new StringBuilder();
+    final var iterator = changes.getSrc().iterator();
+
+    while (iterator.hasNext()) {
+      final var src = iterator.next();
+      String lineContent = src.getCommands().get(src.getCommands().size() - 1).getValue();
+
+      if (!StringUtils.isEmpty(lineContent)) {
+        value.append(lineContent);
+      }
+      value.append(System.lineSeparator());
+    }
     return Arrays.asList(ImmutableAstCommand.builder()
-        .value(src.toString())
+        .value(value.toString())
         .type(AstCommandValue.SET_BODY).build());
   }
 
   private List<AstCommand> visitFl(List<AstCommand> original) {
     final var changes = AstChangesetFactory.src(original, null);
-    final var src = new StringBuilder();
-    changes.getCommands().forEach(c -> src.append(c.getValue()).append(System.lineSeparator()));
-    
+    final var value = new StringBuilder();
+    final var iterator = changes.getSrc().iterator();
+
+    while (iterator.hasNext()) {
+      final var src = iterator.next();
+      String lineContent = src.getCommands().get(src.getCommands().size() - 1).getValue();
+
+      if (!StringUtils.isEmpty(lineContent)) {
+        value.append(lineContent);
+      }
+      value.append(System.lineSeparator());
+    }
     return Arrays.asList(ImmutableAstCommand.builder()
-        .value(src.toString())
+        .value(value.toString())
         .type(AstCommandValue.SET_BODY).build());
   }
 
   
-  private void createRow(Headers headers, List<AstDecisionRow> nodes, List<AstCommand> result) {  
-    final List<TypeDef> types = new ArrayList<>();
-    types.addAll(headers.getAcceptDefs());
-    types.addAll(headers.getReturnDefs());
-    int rows = 1;
+  private void createRow(List<TypeDef> headers, List<AstDecisionRow> nodes, List<AstCommand> result) {  
     
+    int rows = 1;
     for(final var node : nodes) {
     
-      int nextId = types.size() * rows + rows;
+      int nextId = headers.size() * rows + rows;
       result.add(ImmutableAstCommand.builder().type(AstCommandValue.ADD_ROW).build());
   
-      Map<String, Object> entries = new HashMap<>();
+      Map<String, String> entries = new HashMap<>();
       node.getCells().forEach(e -> entries.put(e.getHeader(), e.getValue()));
   
-      for(final var header : types) {
-        Object value = entries.get(header.getName());
+      for(final var header : headers) {
+        String value = entries.get(header.getId());
         result.add(ImmutableAstCommand.builder()
             .id(String.valueOf(nextId++))
-            .value(value == null ? null : header.getSerializer().serialize(header, value))
+            .value(value)
             .type(AstCommandValue.SET_CELL_VALUE)
             .build());
       }
       
-      ++rows;
+      rows++;
     }
   }
 
-  private List<AstCommand> createHeaderCommands(Headers headers) {
+  private List<AstCommand> createHeaderCommands(List<TypeDef> headers) {
     final List<AstCommand> result = new ArrayList<>();
-    final List<TypeDef> types = new ArrayList<>();
     
-    types.addAll(headers.getAcceptDefs());
-    types.addAll(headers.getReturnDefs());
     int index = 0;
-    for(TypeDef dataType : types) {
+    for(TypeDef dataType : headers) {
       String id = String.valueOf(index);
       result.add(ImmutableAstCommand.builder().type(dataType.getDirection() == Direction.IN ? AstCommandValue.ADD_HEADER_IN : AstCommandValue.ADD_HEADER_OUT).build());
       result.add(ImmutableAstCommand.builder().id(id).value(dataType.getName()).type(AstCommandValue.SET_HEADER_REF).build());

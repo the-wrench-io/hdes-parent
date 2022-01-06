@@ -59,6 +59,7 @@ import org.slf4j.LoggerFactory;
 import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.spi.GitConfig;
 import io.resys.hdes.client.spi.GitConfig.GitEntry;
 import io.resys.hdes.client.spi.GitConfig.GitFile;
@@ -265,7 +266,7 @@ public class GitFiles {
     try {
       final var start = repo.resolve(Constants.HEAD);
       git.pull().setTransportConfigCallback(callback).call().getFetchResult();
-      final var name = entity.getBody().iterator().next().getValue();
+      final var name = entity.getBody().stream().filter(e -> e.getType() == AstCommandValue.SET_TAG_NAME).findFirst().get().getValue();
       
       Ref ref = git.tag().setName(name).setAnnotated(true)
           .setMessage("tag created")
@@ -275,7 +276,7 @@ public class GitFiles {
       final var end = repo.resolve(Constants.HEAD);
       
       final var result = new ArrayList<>(diff(start, end));
-      result.add(ImmutableGitFileReload.builder().treeValue(ref.getName()).build());
+      result.add(ImmutableGitFileReload.builder().treeValue(ref.getName()).id(name).bodyType(AstBodyType.TAG).build());
       return Map.entry(ref.getObjectId().getName(), result);
     } catch(Exception e) {
       LOGGER.error(e.getMessage(), e);
@@ -454,24 +455,31 @@ public class GitFiles {
 
     try {
       if(bodyType == AstBodyType.TAG) {
-        final String filter = gitFile.getTreeValue();
+        final String filter = "refs/tags/" + gitFile.getCommands().stream()
+            .filter(c -> c.getType() == AstCommandValue.SET_TAG_NAME)
+            .findFirst().get().getValue();
         final Optional<Ref> target = git.tagList().call().stream()
           .filter(ref -> ref.getName().equals(filter))
           .findFirst();
         
-        if(!target.isPresent()) {
+        if(target.isPresent()) {
+
+          git.tagDelete().setTags(target.get().getName()).call();
+          
+          //delete branch 'branchToDelete' on remote 'origin'
+          RefSpec refSpec = new RefSpec()
+                  .setSource(null)
+                  .setDestination(target.get().getName());
+          git.push().setRefSpecs(refSpec).setRemote("origin").setTransportConfigCallback(conn.getCallback()).call();
+          reload.add(
+              ImmutableGitFileReload.builder()
+              .id(id)
+              .bodyType(AstBodyType.TAG)
+              .treeValue(gitFile.getTreeValue()).build()); 
+        } else {
           final String msg = "Can't find tag: " + filter + "!";
           LOGGER.error(msg);
-          throw new RuntimeException(msg);
         }
-        git.tagDelete().setTags(target.get().getName()).call();
-    
-        //delete branch 'branchToDelete' on remote 'origin'
-        RefSpec refSpec = new RefSpec()
-                .setSource(null)
-                .setDestination(target.get().getName());
-        git.push().setRefSpecs(refSpec).setRemote("origin").setTransportConfigCallback(conn.getCallback()).call();
-        reload.add(ImmutableGitFileReload.builder().treeValue(gitFile.getTreeValue()).build());
       }
       
       // pull

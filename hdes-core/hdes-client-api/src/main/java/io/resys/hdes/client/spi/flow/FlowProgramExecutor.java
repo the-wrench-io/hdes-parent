@@ -192,6 +192,7 @@ public class FlowProgramExecutor {
             .status(FlowExecutionStatus.COMPLETED)
             .accepts(inputs)
             .returns(toNonNull(outputs))
+            .returnsValue((Serializable) outputs)
             .build());
       } catch(Exception e) {
         visitStepLog(ImmutableFlowResultLog.builder()
@@ -207,7 +208,7 @@ public class FlowProgramExecutor {
     }
     case SERVICE: {
       final var program = context.getService(step.getBody().getRef());
-      try {
+      try { 
         final var result = ServiceProgramExecutor.run(program, ImmutableProgramContext.from(context).map(inputs).build());
         final var outputs = factory.toMap(result.getValue());
         return visitStepLog(ImmutableFlowResultLog.builder()
@@ -217,6 +218,7 @@ public class FlowProgramExecutor {
             .end(LocalDateTime.now())
             .status(FlowExecutionStatus.COMPLETED)
             .accepts(inputs)
+            .returnsValue((Serializable) result.getValue())
             .returns(toNonNull(outputs))
             .build());
       } catch(Exception e) {
@@ -355,7 +357,8 @@ public class FlowProgramExecutor {
       
       
       if(prev == null) {
-        throw new ProgramException("Can't find parameter with name: '" + name + "'!");  
+        //throw new ProgramException("Can't find parameter with name: '" + name + "'!");
+        return null;
       }
       
 
@@ -364,7 +367,8 @@ public class FlowProgramExecutor {
       } else if(prev.containsKey(path) && !isLast) {
         prev = (Map<String, Serializable>) prev.get(path);
       } else {
-        throw new ProgramException("Can't find parameter with name: '" + name + "' from: '" + fullName + "'!");
+        //throw new ProgramException("Can't find parameter with name: '" + name + "' from: '" + fullName + "'!");
+        return null;
       }
     }
     

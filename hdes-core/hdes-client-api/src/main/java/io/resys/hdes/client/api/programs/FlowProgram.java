@@ -94,6 +94,8 @@ public interface FlowProgram extends Program {
     FlowExecutionStatus getStatus();
     Map<String, Serializable> getAccepts();
     Map<String, Serializable> getReturns();
+    @Nullable
+    Serializable getReturnsValue();
   }
   
   @Value.Immutable
