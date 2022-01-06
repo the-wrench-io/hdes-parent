@@ -52,20 +52,17 @@ public class ComposerIdeConfig {
   private String contextPath;
   
   @Bean
-  @ConditionalOnProperty(name = "wrench.assets.ide", havingValue = "true", matchIfMissing = true)
   public IdeController hdesIdeController(ComposerConfigBean composerConfig, Optional<SpringIdeTokenSupplier> token) {
     final var config = ControllerUtil.ideOnClasspath(contextPath);
     LOGGER.debug("Hdes IDE Controller: " + config.getMainJs());
     return new IdeController(composerConfig, config, token);
   }
   @Bean
-  @ConditionalOnProperty(name = "wrench.assets.ide-redirect", havingValue = "true", matchIfMissing = true)
   public RedirectController hdesRedirectController(ComposerConfigBean composerConfig) {
     LOGGER.debug("Hdes IDE Redirect Controller: UP");
     return new RedirectController(composerConfig);
   }
   @Bean
-  @ConditionalOnProperty(name = "wrench.assets.rest", havingValue = "true", matchIfMissing = true)
   public ComposerController hdesComposerController(HdesClient client, ObjectMapper objectMapper) {
     LOGGER.debug("Hdes IDE Composer Controller: UP");
     return new ComposerController(new HdesComposerImpl(client), objectMapper);

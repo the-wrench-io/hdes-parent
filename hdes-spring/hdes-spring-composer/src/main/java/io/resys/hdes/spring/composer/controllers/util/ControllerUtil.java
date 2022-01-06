@@ -74,7 +74,7 @@ public class ControllerUtil {
   private static String getVersion() throws IOException {
     Resource[] resources = resolver.getResources("classpath*:**/hdes-composer-ui/**/index.html");
     if (resources.length > 0) {
-      String uri = resources[0].getURI().toString();
+      String uri = resources[0].getURL().toString();
       String[] paths = uri.split("\\/");
       return paths[paths.length - 2];
     }
