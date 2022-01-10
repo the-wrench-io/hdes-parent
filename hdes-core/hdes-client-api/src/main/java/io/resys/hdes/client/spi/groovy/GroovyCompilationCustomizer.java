@@ -22,9 +22,13 @@ package io.resys.hdes.client.spi.groovy;
 
 import java.lang.reflect.Modifier;
 
+import org.codehaus.groovy.ast.AnnotationNode;
 import org.codehaus.groovy.ast.ClassHelper;
 import org.codehaus.groovy.ast.ClassNode;
 import org.codehaus.groovy.ast.GenericsType;
+import org.codehaus.groovy.ast.expr.ConstantExpression;
+import org.codehaus.groovy.ast.expr.PropertyExpression;
+import org.codehaus.groovy.ast.expr.VariableExpression;
 import org.codehaus.groovy.ast.tools.GenericsUtils;
 import org.codehaus.groovy.classgen.GeneratorContext;
 import org.codehaus.groovy.control.CompilationFailedException;
@@ -32,12 +36,20 @@ import org.codehaus.groovy.control.CompilePhase;
 import org.codehaus.groovy.control.SourceUnit;
 import org.codehaus.groovy.control.customizers.CompilationCustomizer;
 
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType0;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType1;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType2;
+import io.resys.hdes.client.api.programs.Program.ProgramContext;
+import io.resys.hdes.client.api.programs.ServiceData.ServiceRef;
 
 public class GroovyCompilationCustomizer extends CompilationCustomizer {
-
+  private final ClassNode type0Node = ClassHelper.make(ServiceExecutorType0.class);
+  private final ClassNode type1Node = ClassHelper.make(ServiceExecutorType1.class);
+  private final ClassNode type2Node = ClassHelper.make(ServiceExecutorType2.class);
+  private final ClassNode annotationNode = ClassHelper.make(ServiceRef.class);
+  private final ClassNode bodyTypeNode = ClassHelper.make(AstBodyType.class);
+  
   public GroovyCompilationCustomizer() {
     super(CompilePhase.CONVERSION);
  }
@@ -49,6 +61,7 @@ public class GroovyCompilationCustomizer extends CompilationCustomizer {
     ClassNode inputType1 = null;
     ClassNode inputType2 = null;
     ClassNode returnType = null;
+    
     for(org.codehaus.groovy.ast.MethodNode method : classNode.getMethods()) {
       final var isExecute = method.getName().equals("execute") && Modifier.isPublic(method.getModifiers()) && !Modifier.isVolatile(method.getModifiers());
       if(!isExecute) {
@@ -77,33 +90,68 @@ public class GroovyCompilationCustomizer extends CompilationCustomizer {
     
     final ClassNode type;
     final GenericsType[] types;
+    final boolean isContext;
     if(length == 0) {
-      type = ClassHelper.make(ServiceExecutorType0.class);
+      isContext = false;
+      type = type0Node;
       types = new GenericsType[] {
           new GenericsType(returnType)
-      };      
+      };
     } else if(length == 1) {
-      type = ClassHelper.make(ServiceExecutorType1.class);
+      isContext = isContext(inputType1);
+      type = type1Node;
       types = new GenericsType[] {
           new GenericsType(inputType1),
           new GenericsType(returnType)
       };
     } else {
-      type = ClassHelper.make(ServiceExecutorType2.class);
+      isContext = isContext(inputType1, inputType2);
+      type = type2Node;
       types = new GenericsType[] {
           new GenericsType(inputType1),
           new GenericsType(inputType2),
           new GenericsType(returnType)
       };
     }
+    
+    //@ServiceRef( type=AstBodyType.DT, value="s" )
+    if(isContext) {
+      final var refs = new RefsParser(classNode).visit();
+      for(final var ref : refs) {
+        AnnotationNode node = new AnnotationNode(this.annotationNode);
+        node.addMember("value", new ConstantExpression(ref.getRefValue()));
+        node.addMember("type", new PropertyExpression(
+            new VariableExpression(AstBodyType.class.getName(), bodyTypeNode), 
+            new ConstantExpression(ref.getBodyType().name())));
+        classNode.addAnnotation(node);
+      }
+      
+      if(!refs.isEmpty()) {
+        source.getAST().addImport(AstBodyType.class.getName(), bodyTypeNode);
+      }
+    }
+    
+    
     //script16332575927621894006461.groovy: 24: A transform used a generics containing ClassNode io.resys.hdes.client.api.execution.Service$ServiceExecutorType0 <Integer> 
     //for the super class io.resys.wrench.assets.bundle.groovy.businesslogic.RuleGroup2 directly. 
     //You are not supposed to do this. Please create a new ClassNode referring to the old ClassNode and use the new ClassNode instead of the old one. 
     //Otherwise the compiler will create wrong descriptors and a potential NullPointerException in TypeResolver in the OpenJDK. 
     //If this is not your own doing, please report this bug to the writer of the transform.
     
+
     classNode.addInterface(GenericsUtils.makeClassSafeWithGenerics(type, types));
   }
+  
+  
+  private boolean isContext(ClassNode ... inputTypes) {
+    for(ClassNode node : inputTypes) {
+      if(node.getName().equals(ProgramContext.class.getSimpleName())) {
+        return true;    
+      }
+    }
+    return false;
+  }
+  
 
   public static class UnknownInputTypeException extends RuntimeException {
     private static final long serialVersionUID = -5119010536538764035L;

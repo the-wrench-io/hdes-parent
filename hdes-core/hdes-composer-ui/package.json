@@ -10,7 +10,7 @@
     "@mui/material": "^5.0.1",
     "@mui/styles": "^5.0.1",
     "@mui/system": "^5.0.1",
-    "@the-wrench-io/hdes-ide": "^0.2.30",
+    "@the-wrench-io/hdes-ide": "^0.2.31",
     "@the-wrench-io/react-burger": "^1.0.32",
     "notistack": "^2.0.3",
     "prop-types": "^15.8.0",

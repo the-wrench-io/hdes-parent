@@ -21,6 +21,7 @@ package io.resys.hdes.client.api.ast;
  */
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
@@ -29,7 +30,6 @@ import org.immutables.value.Value;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAstService.class)
@@ -45,6 +45,17 @@ public interface AstService extends AstBody, Serializable {
   TypeDef getTypeDef1();
   @Nullable
   TypeDef getReturnDef1();
+  
+  List<AstServiceRef> getRefs();
+  
+
+  @Value.Immutable
+  @JsonSerialize(as = ImmutableAstServiceRef.class)
+  @JsonDeserialize(as = ImmutableAstServiceRef.class)
+  interface AstServiceRef extends Serializable {
+    AstBodyType getBodyType();
+    String getRefValue();
+  }
   
   AstServiceType getExecutorType();
   enum AstServiceType { TYPE_0, TYPE_1, TYPE_2 }

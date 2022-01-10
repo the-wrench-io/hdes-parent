@@ -1,8 +1,11 @@
 package io.resys.wrench.assets.bundle.groovy;
 
 import io.resys.hdes.client.api.programs.ServiceData;
+import io.resys.hdes.client.api.programs.ServiceData.ServiceRef;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import java.io.Serializable;
 
+@ServiceRef(value="newService", type=AstBodyType.DT)
 public class Type1Service {
 
   public Output execute(Input input) {

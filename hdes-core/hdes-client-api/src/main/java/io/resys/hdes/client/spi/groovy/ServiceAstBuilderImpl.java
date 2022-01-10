@@ -27,7 +27,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -50,6 +52,7 @@ import io.resys.hdes.client.api.ast.AstBody.Headers;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.AstService;
+import io.resys.hdes.client.api.ast.AstService.AstServiceRef;
 import io.resys.hdes.client.api.ast.AstService.AstServiceType;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType;
 import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType0;
@@ -58,14 +61,17 @@ import io.resys.hdes.client.api.ast.AstService.ServiceExecutorType2;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.ImmutableAstCommandMessage;
 import io.resys.hdes.client.api.ast.ImmutableAstService;
+import io.resys.hdes.client.api.ast.ImmutableAstServiceRef;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.ServiceAstException;
 import io.resys.hdes.client.api.programs.ServiceData;
+import io.resys.hdes.client.api.programs.ServiceData.ServiceRef;
 import io.resys.hdes.client.spi.changeset.AstChangesetFactory;
 import io.resys.hdes.client.spi.util.HdesAssert;
+
 
 public class ServiceAstBuilderImpl implements ServiceAstBuilder {
 
@@ -178,6 +184,7 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
           .beanType(beanType)
           .executorType(executorType)
           .value(source)
+          .refs(getRefs(beanType))
           .build();
     } catch (Exception e) {
       final var msg = "Failed to generate groovy service ast from: " + System.lineSeparator() + 
@@ -213,6 +220,25 @@ public class ServiceAstBuilderImpl implements ServiceAstBuilder {
     } catch(Exception e) {
       return UUID.randomUUID().toString();  
     }
+  }
+  
+  public List<AstServiceRef> getRefs(Class<ServiceExecutorType> beanType) {
+    final List<AstServiceRef> result = new ArrayList<>();
+    final Set<String> usedRefs = new HashSet<>();
+    for(ServiceRef ref : beanType.getDeclaredAnnotationsByType(ServiceRef.class)) {
+      
+      if(usedRefs.contains(ref.value())) {
+        continue;
+      }
+      
+      usedRefs.add(ref.value());
+      result.add(ImmutableAstServiceRef.builder()
+          .bodyType(ref.type())
+          .refValue(ref.value())
+          .build());
+    }
+    
+    return result;
   }
   
   protected ServiceDataTypes getHeaders(Class<?> beanType) {

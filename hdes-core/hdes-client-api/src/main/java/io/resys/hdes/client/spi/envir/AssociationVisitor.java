@@ -82,9 +82,66 @@ public class AssociationVisitor {
       .map(id -> (ProgramWrapper<AstFlow, FlowProgram>) externalIdToWrapper.get(id))
       .forEach(this::visitFlowProgramAssociation);
     
+    typeToExternalId.get(AstBodyType.FLOW_TASK).stream()
+      .map(id -> (ProgramWrapper<AstService, ServiceProgram>) externalIdToWrapper.get(id))
+      .forEach(this::visitTaskProgramAssociation);
+    
+    
     return externalIdToWrapper.values().stream()
         .map(this::visitWrapper)
         .collect(Collectors.toList());
+  }
+  
+  
+  private void visitTaskProgramAssociation(ProgramWrapper<AstService, ServiceProgram> wrapper) {
+    if(wrapper.getProgram().isEmpty()) {
+      return;
+    }
+    
+    if(!externalIdToAssoc.containsKey(wrapper.getId())) {
+      externalIdToAssoc.put(wrapper.getId(), new ArrayList<ProgramAssociation>());
+    }
+    
+    final var result = externalIdToAssoc.get(wrapper.getId());
+    for(final var entry : wrapper.getAst().get().getRefs()) {
+      final var refWrapper = externalIdToWrapper.values().stream()
+        .filter(w -> w.getSource().getBodyType() == entry.getBodyType())
+        .filter(w -> entry.getRefValue().equals(w.getAst().map(a -> a.getName()).orElseGet(null)))
+        .findFirst().orElse(null);
+
+      
+      if(refWrapper == null) {
+        continue;
+      }
+      
+
+      if(refWrapper.getStatus() != ProgramStatus.UP) {
+        externalIdToDependencyErrors.get(wrapper.getId()).add(ImmutableProgramMessage.builder()
+            .id("dependency-error")
+            .msg("Dependency for ref: '" + wrapper.getAst().get().getName() + "/" + entry.getRefValue() + "' with id: '" + refWrapper.getId() + "' has a ERROR!")
+            .build());
+        
+        result.add(ImmutableProgramAssociation.builder()
+            .id(refWrapper.getId())
+            .ref(refWrapper.getAst().get().getName())
+            .refType(entry.getBodyType())
+            .owner(true)
+            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+            .build());
+        
+
+      } else {
+        result.add(ImmutableProgramAssociation.builder()
+            .id(refWrapper.getId())
+            .ref(refWrapper.getAst().get().getName())
+            .refType(entry.getBodyType())
+            .owner(true)
+            .refStatus(refWrapper.getStatus())
+            .build());      
+      }
+      
+      
+    }
   }
     
   private void visitFlowProgramAssociation(ProgramWrapper<AstFlow, FlowProgram> wrapper) {
@@ -127,9 +184,7 @@ public class AssociationVisitor {
           final var progMsg = ImmutableProgramMessage.builder().id("dependency-warning").msg("line: " + msg.getLine() + ": " + msg.getValue()).build();          
           externalIdToDependencyWarnings.get(wrapper.getId()).add(progMsg);
         });
-      }
-      
-      
+      } 
     }
   }
   
@@ -243,6 +298,22 @@ public class AssociationVisitor {
           .refStatus(refWrapper.getStatus())
           .build());      
     }
+    
+    // Add dependency to ref
+    var refsAssocs = externalIdToAssoc.get(refWrapper.getId());
+    if(refsAssocs == null) {
+      refsAssocs = new ArrayList<>();
+      externalIdToAssoc.put(refWrapper.getId(), refsAssocs);
+    }
+    
+    refsAssocs.add(ImmutableProgramAssociation.builder()
+      .id(wrapper.getId())
+      .ref(wrapper.getAst().get().getName())
+      .refType(wrapper.getType())
+      .owner(false)
+      .refStatus(wrapper.getStatus())
+      .build());
+    
     
     return refWrapper;
   }

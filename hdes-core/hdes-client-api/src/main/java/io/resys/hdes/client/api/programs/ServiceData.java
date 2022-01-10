@@ -22,12 +22,31 @@ package io.resys.hdes.client.api.programs;
 
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ServiceData {
   String value() default "";
+
+
+  @Target(ElementType.TYPE)
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface ServiceRefs {
+    ServiceRef[] value();
+  }
+  
+  @Repeatable(ServiceRefs.class)
+  @Target(ElementType.TYPE)
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface ServiceRef {
+    String value();
+    AstBodyType type();
+  }
 }
+
