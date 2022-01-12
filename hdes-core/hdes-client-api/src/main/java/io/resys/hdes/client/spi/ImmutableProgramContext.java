@@ -208,4 +208,9 @@ public class ImmutableProgramContext implements ProgramContext {
       return new ImmutableProgramContext(suppliers, serviceData, input, factory, envir, dependencyInjectionContext);
     }
   }
+
+  @Override
+  public Map<String, Serializable> toMap(Object input) {
+    return factory.toMap(input);
+  }
 }

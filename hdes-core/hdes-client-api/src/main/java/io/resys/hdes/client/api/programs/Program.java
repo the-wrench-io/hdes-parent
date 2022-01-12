@@ -21,6 +21,7 @@ package io.resys.hdes.client.api.programs;
  */
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -39,6 +40,7 @@ public interface Program extends Serializable {
     ProgramContextNamedValue getValueWithMeta(String typeDefName);
     Serializable getValue(TypeDef typeDef);
     
+    Map<String, Serializable> toMap(Object input);
     // Throws exception if not found
     Serializable getValue(String typeDefName);
     Optional<Serializable> findValue(String typeDefName);
