@@ -108,7 +108,15 @@ public class DecisionProgramExecutor {
     
     for(DecisionRowAccepts input : node.getAccepts()) {
       Serializable contextEntity = context.getValue(input.getKey());
-      match = (Boolean) input.getExpression().run(contextEntity).getValue();
+
+      try {
+        match = (Boolean) input.getExpression().run(input.getKey().toValue(contextEntity)).getValue();
+      } catch(Exception e) {
+        throw new DecisionProgramException(
+            "Failed to evaluate expression: '" + input.getExpression().getSrc() + "'"
+            + ", because: " + e.getMessage()
+            + "!", e);    
+      }
       data.addAccepts(ImmutableDecisionLogEntry.builder()
           .match(match)
           .headerType(input.getKey())
