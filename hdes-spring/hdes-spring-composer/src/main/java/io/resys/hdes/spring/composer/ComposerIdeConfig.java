@@ -38,7 +38,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.spi.HdesComposerImpl;
 import io.resys.hdes.spring.composer.ComposerAutoConfiguration.SpringIdeTokenSupplier;
-import io.resys.hdes.spring.composer.controllers.ComposerController;
+import io.resys.hdes.spring.composer.controllers.HdesComposerRouter;
 import io.resys.hdes.spring.composer.controllers.IdeController;
 import io.resys.hdes.spring.composer.controllers.RedirectController;
 import io.resys.hdes.spring.composer.controllers.util.ControllerUtil;
@@ -59,13 +59,13 @@ public class ComposerIdeConfig {
   }
   @Bean
   public RedirectController hdesRedirectController(ComposerConfigBean composerConfig) {
-    LOGGER.debug("Hdes IDE Redirect Controller: UP");
+    LOGGER.debug("Hdes Composer Index Redirect: UP");
     return new RedirectController(composerConfig);
   }
   @Bean
-  public ComposerController hdesComposerController(HdesClient client, ObjectMapper objectMapper) {
-    LOGGER.debug("Hdes IDE Composer Controller: UP");
-    return new ComposerController(new HdesComposerImpl(client), objectMapper);
+  public HdesComposerRouter hdesComposerController(HdesClient client, ObjectMapper objectMapper) {
+    LOGGER.debug("Hdes Composer Router: UP");
+    return new HdesComposerRouter(new HdesComposerImpl(client), objectMapper);
   }
   @Bean
   public Jackson2ObjectMapperBuilderCustomizer jsonCustomizer() {

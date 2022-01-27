@@ -140,6 +140,7 @@ public class PersistenceCommands implements ThenaConfig.Commands {
              case FLOW_TASK: builder.putServices(entity.getId(), entity); break;
              case FLOW: builder.putFlows(entity.getId(), entity); break;
              case TAG: builder.putTags(entity.getId(), entity);  break;
+             default: throw new RuntimeException("Unknown type: " + entity.getBodyType() + "!");
             }
           }
           

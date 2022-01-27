@@ -22,7 +22,6 @@ package io.resys.hdes.client.spi.git;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,23 +33,16 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
-import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.api.ast.AstCommand;
-import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.spi.GitConfig;
 import io.resys.hdes.client.spi.GitConfig.GitEntry;
 import io.resys.hdes.client.spi.GitConfig.GitFile;
-import io.resys.hdes.client.spi.ImmutableGitEntry;
 import io.resys.hdes.client.spi.ImmutableGitFile;
 import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
@@ -58,7 +50,6 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class GitDataSourceLoader implements AutoCloseable {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitDataSourceLoader.class);
-  private static final String TAG_PREFIX = "refs/tags/";
   private final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
   private final GitConfig conn;
   private final Repository repo;
@@ -142,6 +133,8 @@ public class GitDataSourceLoader implements AutoCloseable {
   @Override
   public void close() throws Exception {}
   
+  /*
+  private static final String TAG_PREFIX = "refs/tags/";
   private List<GitEntry> readTags() {
     try {
       final var result = new ArrayList<GitEntry>();
@@ -184,5 +177,6 @@ public class GitDataSourceLoader implements AutoCloseable {
       throw new RuntimeException(e.getMessage(), e);
     }
   }
+  */
   
 }

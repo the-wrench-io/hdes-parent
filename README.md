@@ -2,28 +2,7 @@
 [![Build Status](https://travis-ci.com/the-wrench-io/hdes.svg?branch=master)](https://travis-ci.com/github/the-wrench-io/hdes)
 
 # HDES
+Language for defining and connecting flows, decision tables and services 
 
-# Local Development Environment
-## Prerequisites Java 11+, Maven 3.6.2+
-It's recommended to install them using [SDKMAN](https://sdkman.io/install)
-```
-curl -s "https://get.sdkman.io" | bash
-source "$HOME/.sdkman/bin/sdkman-init.sh"
-sdk version
-sdk install java 11.0.7-zulu
-sdk install maven
-```
-
-## Creating and Running Maven Project
-```
-mvn archetype:generate                                  \
-  -DarchetypeGroupId=io.resys.hdes                      \
-  -DarchetypeArtifactId=hdes-maven-archetype            \
-  -DgroupId=io.resys.test                               \
-  -DartifactId=test-project
-
-cd test-project
-
-mvn clean compile quarkus:dev
-
-```
+##
+TODO::

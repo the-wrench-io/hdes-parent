@@ -48,73 +48,70 @@ import io.resys.hdes.client.api.HdesComposer.StoreDump;
 import io.resys.hdes.client.api.HdesComposer.UpdateEntity;
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.spi.web.HdesWebConfig;
 import io.resys.hdes.spring.composer.ComposerConfigBean;
 
 @RestController
 @RequestMapping(ComposerConfigBean.REST_CTX_PATH)
-public class ComposerController {
+public class HdesComposerRouter {
   private final HdesComposer composer;
   private final ObjectMapper objectMapper;
   private static final Duration timeout = Duration.ofMillis(10000);
 
-  public ComposerController(HdesComposer composer, ObjectMapper objectMapper) {
+  public HdesComposerRouter(HdesComposer composer, ObjectMapper objectMapper) {
     super();
     this.composer = composer;
     this.objectMapper = objectMapper;
   }
 
-  @GetMapping(value="/dataModels", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(path = "/" + HdesWebConfig.MODELS, produces = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState dataModels() {
     return composer.get().await().atMost(timeout);
   }
 
-  @GetMapping(value="/exports", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(path = "/" + HdesWebConfig.EXPORTS, produces = MediaType.APPLICATION_JSON_VALUE)
   public StoreDump exports() {
     return composer.getStoreDump().await().atMost(timeout);
   }
   
-  @PostMapping(path = "/commands", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(path = "/" + HdesWebConfig.COMMANDS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerEntity<?> commands(@RequestBody String body) throws JsonMappingException, JsonProcessingException {
     final var command = objectMapper.readValue(body, UpdateEntity.class);
     return composer.dryRun(command).await().atMost(timeout);
   }
 
-  @PostMapping(path = "/debugs", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(path = "/" + HdesWebConfig.DEBUGS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public DebugResponse debug(@RequestBody DebugRequest debug) {
     return composer.debug(debug).await().atMost(timeout);
   }
 
-  @PostMapping(path = "/importTag", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(path = "/" + HdesWebConfig.IMPORTS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState importTag(@RequestBody AstTag entity) {
     return composer.importTag(entity).await().atMost(timeout);
   }
 
-  @PostMapping(path = "/resources", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(path = "/" + HdesWebConfig.RESOURCES, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState create(@RequestBody CreateEntity entity) {
     return composer.create(entity).await().atMost(timeout);
   }
-
-  @PutMapping(path = "/resources", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(path = "/" + HdesWebConfig.RESOURCES, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState update(@RequestBody UpdateEntity entity) {
     return composer.update(entity).await().atMost(timeout);
   }
-  
-  @DeleteMapping(path = "/resources/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @DeleteMapping(path = "/" + HdesWebConfig.RESOURCES + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState delete(@PathVariable String id) {
     return composer.delete(id).await().atMost(timeout);
   }
-  
-  @PostMapping(path = "/copyas", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerState copyAs(@RequestBody CopyAs entity) {
-    return composer.copyAs(entity).await().atMost(timeout);
-  }
-
-  @GetMapping(path = "/resources/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(path = "/" + HdesWebConfig.RESOURCES + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ComposerEntity<?> get(@PathVariable String id) {
     return composer.get(id).await().atMost(timeout);
   }
   
-  @GetMapping(path = "/resources/{id}/history", produces = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(path = "/" + HdesWebConfig.COPYAS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ComposerState copyAs(@RequestBody CopyAs entity) {
+    return composer.copyAs(entity).await().atMost(timeout);
+  }
+  @GetMapping(path = "/" + HdesWebConfig.HISTORY + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public HistoryEntity history(@RequestParam("id") String id) {
     return composer.getHistory(id).await().atMost(timeout);
   }
