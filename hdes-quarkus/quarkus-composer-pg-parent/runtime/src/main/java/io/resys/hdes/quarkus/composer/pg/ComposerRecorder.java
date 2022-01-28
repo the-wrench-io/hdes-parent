@@ -38,7 +38,7 @@ import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
 @Recorder
-public class IDEServicesRecorder {
+public class ComposerRecorder {
   public static final String FEATURE_BUILD_ITEM = "hdes-composer-pg";
   
   public BeanContainerListener configureBuildtimeConfig(
@@ -53,7 +53,7 @@ public class IDEServicesRecorder {
       String historyPath) {
     
     return beanContainer -> beanContainer
-        .instance(IDEServicesProducer.class)
+        .instance(ComposerBeansProducer.class)
         .setHdesWebConfig(HdesWebConfig.builder()
             .servicePath(servicePath)
             .modelsPath(modelsPath)
@@ -63,14 +63,15 @@ public class IDEServicesRecorder {
             .importsPath(importsPath)
             .copyasPath(copyasPath)
             .resourcesPath(resourcesPath)
+            .historyPath(historyPath)
             .build());
   }
   
-  public void configureRuntimeConfig(RuntimeConfig runtimeConfig) {
-    CDI.current().select(IDEServicesProducer.class).get().setRuntimeConfig(runtimeConfig);
+  public void configureRuntimeConfig(ComposerRuntimeConfig runtimeConfig) {
+    CDI.current().select(ComposerBeansProducer.class).get().setRuntimeConfig(runtimeConfig);
   }
 
-  public Handler<RoutingContext> ideServicesHandler() {
+  public Handler<RoutingContext> backendRouter() {
     final var identityAssociations = CDI.current().select(CurrentIdentityAssociation.class);
     CurrentIdentityAssociation association;
     if (identityAssociations.isResolvable()) {
@@ -81,7 +82,11 @@ public class IDEServicesRecorder {
     CurrentVertxRequest currentVertxRequest = CDI.current().select(CurrentVertxRequest.class).get();
     return new HdesComposerRouter(association, currentVertxRequest);
   }
-
+  
+  public Handler<RoutingContext> frontendRouter(String destination, String uiPath, String hash) {
+    return new FrontendRouter(destination, uiPath, hash);
+  }
+  
   public Consumer<Route> routeFunction(Handler<RoutingContext> bodyHandler) {
     return (route) -> route.handler(bodyHandler);
   }

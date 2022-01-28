@@ -2,7 +2,7 @@ package io.resys.hdes.quarkus.composer.pg.deployment;
 
 /*-
  * #%L
- * quarkus-stencil-ide-services-deployment
+ * quarkus-stencil-ide-deployment
  * %%
  * Copyright (C) 2021 Copyright 2021 ReSys OÜ
  * %%
@@ -21,18 +21,28 @@ package io.resys.hdes.quarkus.composer.pg.deployment;
  */
 
 import io.quarkus.builder.item.SimpleBuildItem;
-import io.resys.hdes.client.spi.web.HdesWebConfig;
 
-public final class IDEServicesBuildItem extends SimpleBuildItem {
-  
-  private final HdesWebConfig config;
-  
-  public IDEServicesBuildItem(HdesWebConfig config) {
+public final class ComposerFrontendBuildItem extends SimpleBuildItem {
+  private final String projectsUiFinalDestination;
+  private final String projectsUiPath;
+  private final String hash;
+
+  public ComposerFrontendBuildItem(String projectsUiFinalDestination, String projectsUiPath, String hash) {
     super();
-    this.config = config;
+    this.projectsUiFinalDestination = projectsUiFinalDestination;
+    this.projectsUiPath = projectsUiPath;
+    this.hash = hash;
   }
 
-  public HdesWebConfig getConfig() {
-    return config;
+  public String getUiFinalDestination() {
+    return projectsUiFinalDestination;
+  }
+
+  public String getUiPath() {
+    return projectsUiPath;
+  }
+
+  public String getHash() {
+    return hash;
   }
 }

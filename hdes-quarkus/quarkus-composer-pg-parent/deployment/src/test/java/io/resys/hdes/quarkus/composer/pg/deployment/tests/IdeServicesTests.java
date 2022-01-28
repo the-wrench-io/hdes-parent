@@ -37,18 +37,25 @@ public class IdeServicesTests extends PgSqlDbConfig {
     .setArchiveProducer(() -> ShrinkWrap.create(JavaArchive.class)
       .addAsResource(new StringAsset(
           "quarkus.hdes-composer-pg.repo.repo-name=test-assets\r\n" +
-          "quarkus.hdes-composer-pg.service-path=hdes-ide-services\r\n"
+          "quarkus.hdes-composer-pg.service-path=composer-services\r\n" +
+          "quarkus.hdes-composer-pg.frontend-path=composer-app\r\n"
           ), "application.properties")
     );
 
   
   @Test
-  public void getIndex() {
-
+  public void getRestApi() {
     RestAssured.given()
-    .when().get("/hdes-ide-services/")
+    .when().get("/composer-services")
     .then().statusCode(200);
     
   }
+
   
+  @Test
+  public void getComposer() {
+    final var result = RestAssured.given().when().get("/composer-app");
+    result.then().statusCode(200);
+    
+  }
 }

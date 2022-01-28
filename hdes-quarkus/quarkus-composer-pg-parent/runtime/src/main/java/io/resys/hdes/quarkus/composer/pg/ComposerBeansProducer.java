@@ -44,11 +44,11 @@ import io.vertx.mutiny.core.Vertx;
 import io.vertx.mutiny.pgclient.PgPool;
 
 @ApplicationScoped
-public class IDEServicesProducer {
+public class ComposerBeansProducer {
 
-  private RuntimeConfig runtimeConfig;
+  private ComposerRuntimeConfig runtimeConfig;
   private HdesWebConfig hdesWebConfig; // context root for the rest of services
-  public IDEServicesProducer setRuntimeConfig(RuntimeConfig runtimeConfig) {
+  public ComposerBeansProducer setRuntimeConfig(ComposerRuntimeConfig runtimeConfig) {
     this.runtimeConfig = runtimeConfig;
     return this;
   }
@@ -122,7 +122,7 @@ public class IDEServicesProducer {
     return new HdesWebContext(composer, client, hdesWebConfig);
   }
   
-  public IDEServicesProducer setHdesWebConfig(HdesWebConfig hdesWebConfig) {
+  public ComposerBeansProducer setHdesWebConfig(HdesWebConfig hdesWebConfig) {
     this.hdesWebConfig = hdesWebConfig;
     return this;
   }

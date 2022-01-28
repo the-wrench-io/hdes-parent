@@ -1,10 +1,10 @@
-package io.resys.hdes.quarkus.composer.pg;
+package io.resys.hdes.quarkus.composer.pg.deployment;
 
 /*-
  * #%L
- * quarkus-composer-pg
+ * quarkus-stencil-ide-services-deployment
  * %%
- * Copyright (C) 2020 - 2022 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2021 Copyright 2021 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,19 @@ package io.resys.hdes.quarkus.composer.pg;
  * #L%
  */
 
+import io.quarkus.builder.item.SimpleBuildItem;
+import io.resys.hdes.client.spi.web.HdesWebConfig;
 
-import io.quarkus.runtime.annotations.ConfigItem;
-import io.quarkus.runtime.annotations.ConfigPhase;
-import io.quarkus.runtime.annotations.ConfigRoot;
+public final class ComposerBuildItem extends SimpleBuildItem {
+  
+  private final HdesWebConfig config;
+  
+  public ComposerBuildItem(HdesWebConfig config) {
+    super();
+    this.config = config;
+  }
 
-@ConfigRoot(phase = ConfigPhase.RUN_TIME, name = IDEServicesRecorder.FEATURE_BUILD_ITEM)
-public class RuntimeConfig {
-
-  /**
-   * Configuration for working repository
-   */
-  @ConfigItem
-  RepoConfig repo;
+  public HdesWebConfig getConfig() {
+    return config;
+  }
 }

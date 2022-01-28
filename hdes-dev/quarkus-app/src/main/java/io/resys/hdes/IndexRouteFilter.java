@@ -1,8 +1,8 @@
-package io.resys.hdes.quarkus.composer.pg.deployment;
+package io.resys.hdes;
 
 /*-
  * #%L
- * quarkus-composer-pg-deployment
+ * quarkus-app
  * %%
  * Copyright (C) 2020 - 2022 Copyright 2020 ReSys OÜ
  * %%
@@ -20,16 +20,20 @@ package io.resys.hdes.quarkus.composer.pg.deployment;
  * #L%
  */
 
-import io.quarkus.runtime.annotations.ConfigItem;
-import io.quarkus.runtime.annotations.ConfigRoot;
-import io.resys.hdes.quarkus.composer.pg.IDEServicesRecorder;
+import javax.enterprise.context.ApplicationScoped;
 
-@ConfigRoot(name = IDEServicesRecorder.FEATURE_BUILD_ITEM)
-public class IDEServicesConfig {
-  
-  /**
-   * Static content routing path
-   */
-  @ConfigItem(defaultValue = "hdes-composer-services")
-  String servicePath;
+import io.quarkus.vertx.web.RouteFilter;
+import io.vertx.ext.web.RoutingContext;
+
+@ApplicationScoped
+public class IndexRouteFilter {
+  @RouteFilter(400)                           
+  void myRedirector(RoutingContext rc) {
+    String uri = rc.request().uri();
+    if (!uri.startsWith("/q") && !uri.startsWith("/composer-app/")) {
+      rc.reroute("/composer-app/");
+      return;
+    }
+    rc.next();
+  }
 }
