@@ -21,6 +21,7 @@ package io.resys.hdes.client.spi;
  */
 
 import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -46,6 +47,7 @@ public class HdesAstTypesImpl implements HdesAstTypes {
     CompilerConfiguration groovyConfig = new CompilerConfiguration();
     groovyConfig.setTargetBytecode(CompilerConfiguration.JDK8);
     groovyConfig.addCompilationCustomizers(new GroovyCompilationCustomizer());
+    groovyConfig.addCompilationCustomizers(new ASTTransformationCustomizer(groovy.transform.CompileStatic.class));
     
     this.config = config;
     this.gcl = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), groovyConfig);
