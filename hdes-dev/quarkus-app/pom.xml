@@ -6,7 +6,7 @@
 	<parent>
     <groupId>io.resys.hdes</groupId>
     <artifactId>hdes-dev</artifactId>
-    <version>3.127</version>
+    <version>3.y-SNAPSHOT</version>
 	</parent>
 	<artifactId>quarkus-app</artifactId>
 
