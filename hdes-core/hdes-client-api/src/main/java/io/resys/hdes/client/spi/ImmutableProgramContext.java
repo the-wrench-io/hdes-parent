@@ -38,6 +38,7 @@ import io.resys.hdes.client.api.exceptions.ProgramException;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ImmutableProgramContextNamedValue;
+import io.resys.hdes.client.api.programs.Program.ExecutionLog;
 import io.resys.hdes.client.api.programs.Program.ProgramContext;
 import io.resys.hdes.client.api.programs.Program.ProgramContextNamedValue;
 import io.resys.hdes.client.api.programs.ProgramEnvir;
@@ -62,13 +63,16 @@ public class ImmutableProgramContext implements ProgramContext {
   private final DependencyInjectionContext dependencyInjectionContext;
   private final ProgramEnvir envir;
   
+  private final ExecutionLog log;
+  
   public ImmutableProgramContext(
       List<Supplier<Map<String, Serializable>>> inputs, 
       Object serviceData, 
       ExecutorInput input, 
       HdesTypesMapper factory, 
       ProgramEnvir envir,
-      DependencyInjectionContext dependencyInjectionContext) {
+      DependencyInjectionContext dependencyInjectionContext,
+      ExecutionLog log) {
     super();
     this.envir = envir;
     this.suppliers = inputs;
@@ -76,6 +80,7 @@ public class ImmutableProgramContext implements ProgramContext {
     this.factory = factory;
     this.serviceData = serviceData;
     this.dependencyInjectionContext = dependencyInjectionContext;
+    this.log = log;
   }
   
   @Override
@@ -174,6 +179,7 @@ public class ImmutableProgramContext implements ProgramContext {
     private final DependencyInjectionContext dependencyInjectionContext;
     private ExecutorInput input;
     private Object serviceData;
+    private ExecutionLog log;
     
     public Builder(HdesTypesMapper factory, ProgramEnvir envir, DependencyInjectionContext dependencyInjectionContext) {
       super();
@@ -204,13 +210,24 @@ public class ImmutableProgramContext implements ProgramContext {
       this.suppliers.add(() -> this.factory.toMap(json));
       return this;
     }
+    public Builder log(ExecutionLog log) {
+      this.log = log;
+      return this;
+    }
     public ImmutableProgramContext build() {
-      return new ImmutableProgramContext(suppliers, serviceData, input, factory, envir, dependencyInjectionContext);
+      if(log == null) {
+        log = new ExecutionLog() {};
+      }
+      return new ImmutableProgramContext(suppliers, serviceData, input, factory, envir, dependencyInjectionContext, log);
     }
   }
 
   @Override
   public Map<String, Serializable> toMap(Object input) {
     return factory.toMap(input);
+  }
+  @Override
+  public ExecutionLog getLog() {
+    return log;
   }
 }

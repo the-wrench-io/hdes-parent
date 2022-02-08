@@ -28,8 +28,12 @@ import javax.annotation.Nullable;
 
 import org.immutables.value.Value;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import io.resys.hdes.client.api.HdesClient.ExecutorBuilder;
 import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
 
 public interface Program extends Serializable {
   
@@ -50,8 +54,19 @@ public interface Program extends Serializable {
     DecisionProgram getDecision(String name);
     ServiceProgram getService(String name);
     
+    ExecutionLog getLog();
     ExecutorBuilder executor();
     
+  }
+  
+  interface ExecutionLog {}
+  
+  @JsonSerialize(as = ImmutableFlowExecutionLog.class)
+  @JsonDeserialize(as = ImmutableFlowExecutionLog.class)
+  @Value.Immutable
+  interface FlowExecutionLog extends ExecutionLog {
+    Map<String, Serializable> getAccepts();
+    Map<String, FlowResultLog> getSteps(); 
   }
   
   @Value.Immutable

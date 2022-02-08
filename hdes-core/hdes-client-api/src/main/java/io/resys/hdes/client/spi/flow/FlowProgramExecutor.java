@@ -42,6 +42,7 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStepWhenThenPoin
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResult;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultErrorLog;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowResultLog;
+import io.resys.hdes.client.api.programs.ImmutableFlowExecutionLog;
 import io.resys.hdes.client.api.programs.ImmutableFlowResult;
 import io.resys.hdes.client.api.programs.ImmutableFlowResultErrorLog;
 import io.resys.hdes.client.api.programs.ImmutableFlowResultLog;
@@ -208,8 +209,9 @@ public class FlowProgramExecutor {
     }
     case SERVICE: {
       final var program = context.getService(step.getBody().getRef());
+      final var log = ImmutableFlowExecutionLog.builder().putAllSteps(stepLogs).putAllAccepts(inputs).build();
       try { 
-        final var result = ServiceProgramExecutor.run(program, ImmutableProgramContext.from(context).map(inputs).build());
+        final var result = ServiceProgramExecutor.run(program, ImmutableProgramContext.from(context).log(log).map(inputs).build());
         final var outputs = factory.toMap(result.getValue());
         return visitStepLog(ImmutableFlowResultLog.builder()
             .id(this.stepLogs.size() + 1)
