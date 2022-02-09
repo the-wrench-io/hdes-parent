@@ -44,6 +44,8 @@ public class ComposerConfigBean {
   // composer rest ui enabled
   @Value("${ide:true}")
   private boolean ide;
+  @Value("${ide-https:false}")
+  private boolean ideHttps;
   @Value("${ide-redirect:true}")
   private String ideRedirect;
   @Value("${ide-context-path:/ide}")
@@ -126,6 +128,14 @@ public class ComposerConfigBean {
 
   public void setHost(String host) {
     this.host = host;
+  }
+
+  public boolean isIdeHttps() {
+    return ideHttps;
+  }
+
+  public void setIdeHttps(boolean ideHttps) {
+    this.ideHttps = ideHttps;
   }
 
 }

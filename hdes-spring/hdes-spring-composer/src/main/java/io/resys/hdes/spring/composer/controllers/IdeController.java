@@ -70,6 +70,9 @@ public class IdeController {
             firstNonNull(composerConfig.getHost(), host),
             composerConfig.getRestContextPath(),
             contextPath);
+    if(composerConfig.isIdeHttps() && !restUrl.startsWith("https")) {
+      restUrl = restUrl.replaceFirst("http", "https");
+    }
     
     ThymeleafConfig config = new ThymeleafConfig()
       .setContextPath("/" + FileUtils.cleanPath(composerConfig.getIdeContextPath()))
