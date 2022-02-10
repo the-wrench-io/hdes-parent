@@ -31,15 +31,17 @@ public class ThymeleafConfig {
   
   private String contextPath;
   private String hash;
-  private String js;
   private String mainJs;
-  private String configJs;
   private List<String> css;
   private String manifest;
   @Nullable
   private IdeToken csrf;
   private String url;
-
+  @Nullable
+  private String oidc;
+  @Nullable
+  private String status;
+  
   public String getContextPath() {
     return contextPath;
   }
@@ -68,25 +70,11 @@ public class ThymeleafConfig {
     this.url = url;
     return this;
   }
-  public String getJs() {
-    return js;
-  }
-  public ThymeleafConfig setJs(String js) {
-    this.js = js;
-    return this;
-  }
   public String getMainJs() {
     return mainJs;
   }
   public ThymeleafConfig setMainJs(String mainJs) {
     this.mainJs = mainJs;
-    return this;
-  }
-  public String getConfigJs() {
-    return configJs;
-  }
-  public ThymeleafConfig setConfigJs(String configJs) {
-    this.configJs = configJs;
     return this;
   }
   public List<String> getCss() {
@@ -101,6 +89,20 @@ public class ThymeleafConfig {
   }
   public ThymeleafConfig setManifest(String manifest) {
     this.manifest = manifest;
+    return this;
+  }
+  public String getOidc() {
+    return oidc;
+  }
+  public ThymeleafConfig setOidc(String oidc) {
+    this.oidc = oidc;
+    return this;
+  }
+  public String getStatus() {
+    return status;
+  }
+  public ThymeleafConfig setStatus(String status) {
+    this.status = status;
     return this;
   }
 }

@@ -12,6 +12,8 @@ declare global {
     _env_: {
       url?: string,
       csrf?: Csrf,
+      oidc?: string,
+      status?: string,
     }
   }
 }
@@ -38,54 +40,15 @@ console.log("WINDOW CONFIG", window._env_);
 const init = {
   locale: 'en',
   url: getUrl(),
-  csrf: window._env_?.csrf
+  csrf: window._env_?.csrf,
+  oidc: window._env_?.oidc,
+  status: window._env_?.status,
 };
 
 console.log("INIT", init);
 
 
-const store: Client.Store = {
-  fetch<T>(path: string, req?: RequestInit): Promise<T> {
-    if (!path) {
-      throw new Error("can't fetch with undefined url")
-    }
-
-    const defRef: RequestInit = {
-      method: "GET",
-      credentials: 'same-origin',
-      headers: {
-        "Content-Type": "application/json;charset=UTF-8"
-      }
-    };
-
-    if (init.csrf) {
-      const headers: Record<string, string> = defRef.headers as any;
-      headers[init.csrf.key] = init.csrf.value;
-    }
-
-    const url = init.url;
-    const finalInit: RequestInit = Object.assign(defRef, req ? req : {});
-
-
-    return fetch(url + path, finalInit)
-      .then(response => {
-        if (response.status === 302) {
-          return null;
-        }
-        if (!response.ok) {
-          return response.json().then(data => {
-            console.error(data);
-            throw new Client.StoreError({
-              text: response.statusText,
-              status: response.status,
-              errors: data
-            });
-          });
-        }
-        return response.json();
-      })
-  }
-};
+const store: Client.Store = new Client.StoreImpl(init);
 
 
 const CreateApps: React.FC<{}> = () => {

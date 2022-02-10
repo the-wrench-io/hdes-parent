@@ -57,7 +57,9 @@ public class ControllerUtil {
       final List<String> css = Arrays.asList(contextPath + path + "static/css/"
           + resolveRuntimeScript("classpath*:**/hdes-composer-ui/**/static/css/main*.css"));
 
-      final IdeOnClasspath config = new IdeOnClasspath(hash, css, contextPath + path + manifest,
+      final IdeOnClasspath config = new IdeOnClasspath(
+          hash, css, 
+          contextPath + path + manifest,
           contextPath + path + "static/js/" + js);
 
       if (LOGGER.isDebugEnabled()) {

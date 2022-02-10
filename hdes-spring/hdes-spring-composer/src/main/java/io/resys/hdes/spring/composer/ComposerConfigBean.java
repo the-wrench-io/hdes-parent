@@ -1,5 +1,7 @@
 package io.resys.hdes.spring.composer;
 
+import javax.annotation.Nullable;
+
 /*-
  * #%L
  * wrench-component-context
@@ -50,21 +52,14 @@ public class ComposerConfigBean {
   private String ideRedirect;
   @Value("${ide-context-path:/ide}")
   private String ideContextPath;
-  
-  // optional, reverse proxy related
-  private String proto;
-  private String host;
-  
-  @Value("${tag-format:}")
-  private String tagFormat;
-  
-  public String getTagFormat() {
-    return tagFormat;
-  }
 
-  public void setTagFormat(String tagFormat) {
-    this.tagFormat = tagFormat;
-  }
+  @Nullable
+  @Value("${ide-oidc-path:}")
+  private String oidc;
+  @Nullable
+  @Value("${ide-status-path:}")
+  private String status;
+  
 
   public boolean isEnabled() {
     return enabled;
@@ -114,28 +109,28 @@ public class ComposerConfigBean {
     this.restContextPath = restContextPath;
   }
 
-  public String getProto() {
-    return proto;
-  }
-
-  public void setProto(String proto) {
-    this.proto = proto;
-  }
-
-  public String getHost() {
-    return host;
-  }
-
-  public void setHost(String host) {
-    this.host = host;
-  }
-
   public boolean isIdeHttps() {
     return ideHttps;
   }
 
   public void setIdeHttps(boolean ideHttps) {
     this.ideHttps = ideHttps;
+  }
+
+  public String getOidc() {
+    return oidc;
+  }
+
+  public void setOidc(String oidc) {
+    this.oidc = oidc;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public void setStatus(String status) {
+    this.status = status;
   }
 
 }

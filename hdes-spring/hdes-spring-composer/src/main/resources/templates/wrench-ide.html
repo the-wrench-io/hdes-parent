@@ -29,7 +29,7 @@
   <meta th:if="${config.csrf}" name="_csrf" th:content="${config.csrf.key}" />
   <meta th:if="${config.csrf}" name="_csrf_header" th:content="${config.csrf.value}" />
 
-  <link rel="manifest" th:href="${config.manifest}" />
+  <link rel="manifest" th:href="${config.manifest}" crossorigin="use-credentials"/>
 <th:block th:each="css : ${config.css}">
     <link rel="stylesheet" th:href="${css}" />
 </th:block>

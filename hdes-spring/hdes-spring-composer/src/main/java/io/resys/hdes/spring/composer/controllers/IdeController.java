@@ -2,9 +2,9 @@ package io.resys.hdes.spring.composer.controllers;
 
 /*-
  * #%L
- * wrench-assets-application
+ * hdes-spring-composer
  * %%
- * Copyright (C) 2016 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2022 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package io.resys.hdes.spring.composer.controllers;
  * limitations under the License.
  * #L%
  */
-
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
 
 import java.util.Optional;
 
@@ -65,11 +63,7 @@ public class IdeController {
 
     Optional<IdeToken> token = this.token.map(t -> t.get(request)).orElse(Optional.empty());
     
-    String restUrl = ControllerUtil.getRestUrl(
-            firstNonNull(composerConfig.getProto(), proto),
-            firstNonNull(composerConfig.getHost(), host),
-            composerConfig.getRestContextPath(),
-            contextPath);
+    String restUrl = ControllerUtil.getRestUrl(proto, host, composerConfig.getRestContextPath(), contextPath);
     if(composerConfig.isIdeHttps() && !restUrl.startsWith("https")) {
       restUrl = restUrl.replaceFirst("http", "https");
     }
@@ -81,6 +75,8 @@ public class IdeController {
       .setCss(ideOnClasspath.getCss())
       .setMainJs(ideOnClasspath.getMainJs())
       .setHash(ideOnClasspath.getHash())
+      .setStatus(composerConfig.getStatus())
+      .setOidc(composerConfig.getOidc())
       .setCsrf(token.orElse(null));
 
     model.addAttribute("config", config);
