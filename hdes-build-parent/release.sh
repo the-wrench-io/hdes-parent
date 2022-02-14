@@ -24,9 +24,10 @@ git config --global user.email "$BOT_EMAIL";
 # Current and next version
 LAST_RELEASE_VERSION=$(cat hdes-build-parent/release.version)
 [[ $LAST_RELEASE_VERSION =~ ([^\\.]*)$ ]]
-MINOR_VERSION=`expr ${BASH_REMATCH[1]} + 1`
+MINOR_VERSION=`expr ${BASH_REMATCH[1]}`
 MAJOR_VERSION=${LAST_RELEASE_VERSION:0:`expr ${#LAST_RELEASE_VERSION} - ${#MINOR_VERSION}`}
-RELEASE_VERSION=${MAJOR_VERSION}.${MINOR_VERSION}
+NEW_MINOR_VERSION=`expr ${MINOR_VERSION} + 1`
+RELEASE_VERSION=${MAJOR_VERSION}${NEW_MINOR_VERSION}
 
 echo ${RELEASE_VERSION} > hdes-build-parent/release.version
 
