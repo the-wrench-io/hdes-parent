@@ -92,6 +92,9 @@ public class FlowProgramExecutor {
     }
     
     final List<FlowResultLog> logs = new ArrayList<>(stepLogs.values());
+    if(last != null && status == FlowExecutionStatus.ERROR) {
+      logs.add(last);
+    }
     Collections.sort(logs, (o1, o2) -> Integer.compare(o1.getId(), o2.getId()));
     
     return ImmutableFlowResult.builder()
@@ -120,7 +123,7 @@ public class FlowProgramExecutor {
       }
     }
     
-    messages.add(ImmutableFlowResultErrorLog.builder().id("error").msg(e.getMessage()).build());
+    messages.add(ImmutableFlowResultErrorLog.builder().id("error").msg(e.getMessage() == null ? "" : e.getMessage()).build());
     messages.add(ImmutableFlowResultErrorLog.builder().id("trace").msg(traceBuilder.toString()).build());
     
     final FlowResultLog lastLog;
@@ -131,12 +134,12 @@ public class FlowProgramExecutor {
           .start(start)
           .end(LocalDateTime.now())
           .status(FlowExecutionStatus.ERROR)
-          .errors(messages)
+          .addAllErrors(messages)
           .build();        
     } else {
       lastLog = ImmutableFlowResultLog.builder()
           .from(logs.get(logs.size() - 1))
-          .errors(messages)
+          .addAllErrors(messages)
           .build();
     }
     return lastLog;
