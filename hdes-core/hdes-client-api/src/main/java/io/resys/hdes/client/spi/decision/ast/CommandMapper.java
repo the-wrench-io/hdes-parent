@@ -112,18 +112,18 @@ public class CommandMapper {
       this.typeDefs = dataTypeFactory;
     }
     
-    private String nextId() {
+    private String nextId() {      
       return String.valueOf(idGen++);
     }
-    private MutableHeader getHeader(String id) {
+    public MutableHeader getHeader(String id) {
       HdesAssert.isTrue(headers.containsKey(id), () -> "no header with id: " + id + "!");
       return headers.get(id);
     }
-    private MutableCell getCell(String id) {
+    public MutableCell getCell(String id) {
       HdesAssert.isTrue(cells.containsKey(id), () -> "no cell with id: " + id + "!");
       return cells.get(id);
     }
-    private MutableRow getRow(String id) {
+    public MutableRow getRow(String id) {
       HdesAssert.isTrue(rows.containsKey(id), () -> "no row with id: " + id + "!");
       return rows.get(id);
     }
@@ -170,6 +170,10 @@ public class CommandMapper {
     }
     public Builder changeHeaderName(String id, String value) {
       getHeader(id).setName(value);
+      return this;
+    }
+    public Builder changeHeaderExtRef(String id, String value) {
+      getHeader(id).setExtRef(value);
       return this;
     }
     public Builder changeHeaderDirection(String id, Direction value) {
@@ -257,7 +261,7 @@ public class CommandMapper {
       MutableRow row = new MutableRow(nextId(), rows.size());
       rows.put(row.getId(), row);
       
-      headers.values().forEach(h -> {
+      headers.values().stream().sorted().forEach(h -> {
         MutableCell cell = new MutableCell(nextId(), row.getId());
         h.getCells().add(cell);
         cells.put(cell.getId(), cell);
@@ -395,6 +399,7 @@ public class CommandMapper {
               .id(h.getId())
               .order(h.getOrder())
               .script(h.getScript())
+              .extRef(h.getExtRef())
               .build())
           .collect(Collectors.toList());
 
@@ -439,6 +444,7 @@ public class CommandMapper {
 
     private String script;
     private String name;
+    private String extRef;
     private ValueType value;
     private int order;
     private final List<MutableCell> cells = new ArrayList<>();
@@ -460,6 +466,13 @@ public class CommandMapper {
     }
     public MutableHeader setName(String name) {
       this.name = name;
+      return this;
+    }
+    public String getExtRef() {
+      return extRef;
+    }
+    public MutableHeader setExtRef(String extRef) {
+      this.extRef = extRef;
       return this;
     }
     public ValueType getValue() {

@@ -45,6 +45,8 @@ public abstract class TypeDef implements Serializable, Comparable<TypeDef> {
   public abstract Collection<TypeDef> getProperties();
 
   @Nullable
+  public abstract String getExtRef();
+  @Nullable
   public abstract String getScript();
   @Nullable
   public abstract Class<?> getBeanType();

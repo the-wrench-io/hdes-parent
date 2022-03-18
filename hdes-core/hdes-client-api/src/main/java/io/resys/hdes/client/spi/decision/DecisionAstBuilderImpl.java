@@ -138,6 +138,8 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
       
       case SET_HEADER_REF:
         return builder.changeHeaderName(command.getId(), command.getValue());
+      case SET_HEADER_EXTERNAL_REF:
+        return builder.changeHeaderExtRef(command.getId(), command.getValue());
       case SET_HEADER_DIRECTION:
         return builder.changeHeaderDirection(command.getId(), Direction.valueOf(command.getValue()));
       case SET_HEADER_EXPRESSION:
@@ -184,7 +186,6 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
             result.changeCell(rowId, columnIndex++, cellIterator.next());
           }
         }
-        
         return result;
       }
       case IMPORT_CSV: 

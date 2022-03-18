@@ -142,6 +142,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
   public class GenericDataTypeBuilder implements DataTypeAstBuilder {
     private Boolean required;
     private String name;
+    private String extRef;
     private ValueType valueType;
     private Direction direction;
     private Class<?> beanType;
@@ -183,6 +184,11 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     @Override
     public DataTypeAstBuilder id(String id) {
       this.id = id;
+      return this;
+    }
+    @Override
+    public DataTypeAstBuilder extRef(String extRef) {
+      this.extRef = extRef;
       return this;
     }
     @Override
@@ -246,6 +252,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
             .beanType(beanType)
             .isRequired(Boolean.TRUE.equals(required))
             .values(values)
+            .extRef(extRef)
             .properties(properties)
             .deserializer(deserializer)
             .serializer(serializer)
@@ -265,6 +272,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
           .id(id).script(script).order(order)
           .name(name)
           .ref(ref)
+          .extRef(extRef)
           .data(data)
           .description(description)
           .direction(direction)

@@ -48,6 +48,7 @@ public interface HdesAstTypes {
     DataTypeAstBuilder valueType(ValueType valueType);
     
     DataTypeAstBuilder ref(String ref, TypeDef dataType);
+    DataTypeAstBuilder extRef(String extRef);
     DataTypeAstBuilder required(boolean required);
     DataTypeAstBuilder data(boolean data);
     DataTypeAstBuilder name(String name);
