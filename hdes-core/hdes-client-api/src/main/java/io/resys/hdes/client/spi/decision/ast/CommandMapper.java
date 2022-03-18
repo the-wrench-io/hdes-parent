@@ -103,7 +103,7 @@ public class CommandMapper {
     private String description;
     private HitPolicy hitPolicy;
     
-    private final Map<String, MutableHeader> headers = new HashMap<>();
+    private final HashMap<String, MutableHeader> headers = new HashMap<>();
     private final Map<String, MutableCell> cells = new HashMap<>();
     private final Map<String, MutableRow> rows = new HashMap<>();
 
@@ -148,7 +148,7 @@ public class CommandMapper {
           .setValue(ValueType.STRING);
       
       headers.put(header.getId(), header);
-      this.rows.values().forEach(row -> {
+      this.rows.values().stream().sorted().forEach(row -> {
         MutableCell cell = new MutableCell(nextId(), row.getId());
         header.getCells().add(cell);
         cells.put(cell.getId(), cell);
