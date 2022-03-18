@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +50,6 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
-import io.resys.hdes.client.spi.util.HdesAssert;
 
 
 
@@ -98,34 +96,14 @@ public class CommandMapper {
 
   public static class Builder {
     private final HdesTypesMapper typeDefs; 
-    private long idGen = 0;
     private String name;
     private String description;
     private HitPolicy hitPolicy;
-    
-    private final HashMap<String, MutableHeader> headers = new HashMap<>();
-    private final Map<String, MutableCell> cells = new HashMap<>();
-    private final Map<String, MutableRow> rows = new HashMap<>();
+    private final IdFixer idGen = new IdFixer();
 
     public Builder(HdesTypesMapper dataTypeFactory) {
       super();
       this.typeDefs = dataTypeFactory;
-    }
-    
-    private String nextId() {      
-      return String.valueOf(idGen++);
-    }
-    public MutableHeader getHeader(String id) {
-      HdesAssert.isTrue(headers.containsKey(id), () -> "no header with id: " + id + "!");
-      return headers.get(id);
-    }
-    public MutableCell getCell(String id) {
-      HdesAssert.isTrue(cells.containsKey(id), () -> "no cell with id: " + id + "!");
-      return cells.get(id);
-    }
-    public MutableRow getRow(String id) {
-      HdesAssert.isTrue(rows.containsKey(id), () -> "no row with id: " + id + "!");
-      return rows.get(id);
     }
     private ValueType getValueType(MutableHeader header) {
       return header.getValue();
@@ -143,46 +121,40 @@ public class CommandMapper {
       return this;
     }
     public Map.Entry<String, Builder> addHeader(Direction direction, String name) {
-      MutableHeader header = new MutableHeader(nextId(), direction, headers.size())
+      MutableHeader header = idGen.addHeader()
+          .setDirection(direction)
           .setName(name)
           .setValue(ValueType.STRING);
-      
-      headers.put(header.getId(), header);
-      this.rows.values().stream().sorted().forEach(row -> {
-        MutableCell cell = new MutableCell(nextId(), row.getId());
-        header.getCells().add(cell);
-        cells.put(cell.getId(), cell);
-      });
       return new AbstractMap.SimpleImmutableEntry<String, Builder>(header.getId(), this);
     }
     public Builder changeHeaderType(String id, String value) {
       try {
-        getHeader(id).setValue(ValueType.valueOf(value));
+        idGen.getHeader(id).setValue(ValueType.valueOf(value));
       } catch(Exception e) {
-        getHeader(id).setValue(null);
+        idGen.getHeader(id).setValue(null);
       }
       
       return this;
     }
     public Builder changeHeaderScript(String id, String value) {
-      getHeader(id).setScript(value);
+      idGen.getHeader(id).setScript(value);
       return this;
     }
     public Builder changeHeaderName(String id, String value) {
-      getHeader(id).setName(value);
+      idGen.getHeader(id).setName(value);
       return this;
     }
     public Builder changeHeaderExtRef(String id, String value) {
-      getHeader(id).setExtRef(value);
+      idGen.getHeader(id).setExtRef(value);
       return this;
     }
     public Builder changeHeaderDirection(String id, Direction value) {
-      MutableHeader header = getHeader(id).setDirection(value);
+      MutableHeader header = idGen.getHeader(id).setDirection(value);
       ValueType valueType = getValueType(header);
 
       // Remove expression if cell new direction is out
       if(value == Direction.OUT && valueType != null) {
-        header.cells.stream()
+        header.getCells().stream()
         .filter(c -> !StringUtils.isEmpty(c.getValue()))
         .forEach(cell -> {
 
@@ -222,7 +194,7 @@ public class CommandMapper {
     }
 
     public Builder setHeaderExpression(String id, ColumnExpressionType value) {
-      MutableHeader header = getHeader(id);
+      MutableHeader header = idGen.getHeader(id);
       ValueType valueType = getValueType(header);
 
       if(header.getDirection() == Direction.IN && valueType != null) {
@@ -239,67 +211,42 @@ public class CommandMapper {
       return this;
     }
     public Builder changeCell(String id, String value) {
-      getCell(id).setValue(value);
+      idGen.getCell(id).setValue(value);
       return this;
     }
     public Builder changeCell(String rowId, int columnIndex, String value) {
-      MutableHeader column = headers.values().stream().filter(r -> r.order == columnIndex).findFirst().get();
+      MutableHeader column = idGen.getHeaders().values().stream().filter(r -> r.order == columnIndex).findFirst().get();
       MutableCell cell = column.getCells().stream().filter(c -> c.getRow().equals(rowId)).findFirst().get();
       cell.setValue(value);
       return this;
     }
     public Builder deleteCell(String id) {
-      getCell(id).setValue(null);
+      idGen.getCell(id).setValue(null);
       return this;
     }
     public Builder deleteHeader(String id) {
-      getHeader(id).getCells().forEach(c -> cells.remove(c.getId()));
-      headers.remove(id);
+      idGen.deleteHeader(id);
       return this;
     }
     public Map.Entry<String, Builder> addRow() {
-      MutableRow row = new MutableRow(nextId(), rows.size());
-      rows.put(row.getId(), row);
-      
-      headers.values().stream().sorted().forEach(h -> {
-        MutableCell cell = new MutableCell(nextId(), row.getId());
-        h.getCells().add(cell);
-        cells.put(cell.getId(), cell);
-      });
-      
+      final var row = idGen.addRow();
       return new AbstractMap.SimpleImmutableEntry<String, Builder>(row.getId(), this);
     }
     public Builder deleteRow(String id) {
-      MutableRow row = getRow(id);
-      rows.remove(row.getId());
-      int order = row.getOrder();
-      rows.values().stream()
-      .filter(r -> r.getOrder() > order)
-      .forEach(r -> r.setOrder(r.getOrder() - 1));
-      
-      
-      headers.values().forEach(h -> {
-        Iterator<MutableCell> cell = h.getCells().iterator();
-        while(cell.hasNext()) {
-          if(id.equals(cell.next().getRow())) {
-            cell.remove();
-          }
-        }
-      });
-      
+      idGen.deleteRow(id);
       return this;
     }
     public Builder deleteRows() {
-      new ArrayList<>(rows.keySet()).forEach(id -> deleteRow(id));
+      new ArrayList<>(idGen.getRows().keySet()).forEach(id -> deleteRow(id));
       return this;
     }
     public Builder deleteColumns() {
-      new ArrayList<>(headers.keySet()).forEach(id -> deleteHeader(id));
+      new ArrayList<>(idGen.getHeaders().keySet()).forEach(id -> deleteHeader(id));
       return this;
     }
     public Builder moveRow(String srcId, String targetId) {
-      MutableRow src = getRow(srcId);
-      MutableRow target = getRow(targetId);
+      MutableRow src = idGen.getRow(srcId);
+      MutableRow target = idGen.getRow(targetId);
 
       int targetOrder = src.getOrder();
       int srcOrder = target.getOrder();
@@ -308,15 +255,15 @@ public class CommandMapper {
       return this;
     }
     public Builder insertRow(String srcId, String targetId) {
-      MutableRow src = getRow(srcId);
-      MutableRow target = getRow(targetId);
+      MutableRow src = idGen.getRow(srcId);
+      MutableRow target = idGen.getRow(targetId);
 
       // move row from back to front
       if(src.getOrder() > target.getOrder()) {
         int start = target.getOrder();
         int end = src.getOrder();
         
-        for(MutableRow row : this.rows.values()) {
+        for(MutableRow row : this.idGen.getRows().values()) {
           if(row.getOrder() >= start && row.getOrder() < end) {
             row.setOrder(row.getOrder() + 1);
           }
@@ -327,7 +274,7 @@ public class CommandMapper {
         int start = src.getOrder();
         int end = target.getOrder();
         
-        for(MutableRow row : this.rows.values()) {
+        for(MutableRow row : this.idGen.getRows().values()) {
           if(row.getOrder() > start && row.getOrder() <= end) {
             row.setOrder(row.getOrder() - 1);
           }
@@ -339,10 +286,10 @@ public class CommandMapper {
     }
     
     public Builder copyRow(String srcId) {
-      MutableRow src = getRow(srcId);
+      MutableRow src = idGen.getRow(srcId);
       String targetId = addRow().getKey();
       
-      for(MutableHeader header : this.headers.values()) {
+      for(MutableHeader header : this.idGen.getHeaders().values()) {
         MutableCell from = header.getCells().stream().filter(c -> c.getRow().equals(src.getId())).findFirst().get();
         MutableCell to = header.getCells().stream().filter(c -> c.getRow().equals(targetId)).findFirst().get();
         to.setValue(from.getValue());
@@ -352,8 +299,8 @@ public class CommandMapper {
     }
 
     public Builder moveHeader(String srcId, String targetId) {
-      MutableHeader src = getHeader(srcId);
-      MutableHeader target = getHeader(targetId);
+      MutableHeader src = idGen.getHeader(srcId);
+      MutableHeader target = idGen.getHeader(targetId);
 
       int targetOrder = src.getOrder();
       int srcOrder = target.getOrder();
@@ -368,7 +315,7 @@ public class CommandMapper {
 
     private String resolveScriptValue(MutableHeader header, MutableCell cell) {
       Map<String, Object> context = new HashMap<>();
-      for(MutableHeader h : headers.values()) {
+      for(MutableHeader h : idGen.getHeaders().values()) {
         MutableCell value = h.getCells().stream()
             .filter(c -> c.getRow().equals(cell.getRow()))
             .findFirst().get();
@@ -387,11 +334,11 @@ public class CommandMapper {
     }
 
     public AstDecision build() {
-      this.headers.values().stream()
+      this.idGen.getHeaders().values().stream()
       .filter(h -> !StringUtils.isEmpty(h.getScript()))
       .forEach(h -> h.getCells().forEach(c -> c.setValue(resolveScriptValue(h, c))));
       
-      List<TypeDef> headers = this.headers.values().stream().sorted()
+      List<TypeDef> headers = this.idGen.getHeaders().values().stream().sorted()
           .map(h -> (TypeDef) typeDefs.dataType()
               .direction(h.getDirection())
               .name(h.getName())
@@ -404,11 +351,11 @@ public class CommandMapper {
           .collect(Collectors.toList());
 
       
-      List<AstDecisionRow> rows = this.rows.values().stream().sorted()
+      List<AstDecisionRow> rows = this.idGen.getRows().values().stream().sorted()
           .map(r -> ImmutableAstDecisionRow.builder()
             .id(r.getId())
             .order(r.getOrder())
-            .cells(this.headers.values().stream().sorted()
+            .cells(this.idGen.getHeaders().values().stream().sorted()
                 .map(h -> {
                   MutableCell c = h.getRowCell(r.getId());
                   return ImmutableAstDecisionCell.builder().id(c.getId()).value(c.getValue()).header(h.getId()).build();
@@ -437,7 +384,7 @@ public class CommandMapper {
 
   
 
-  private static class MutableHeader implements Comparable<MutableHeader> {
+  public static class MutableHeader implements Comparable<MutableHeader> {
 
     private final String id;
     private Direction direction;
@@ -518,7 +465,7 @@ public class CommandMapper {
     }
   }
 
-  private static class MutableCell {
+  public static class MutableCell {
     private final String id;
     private final String row;
     private String value;
@@ -541,7 +488,7 @@ public class CommandMapper {
       return id;
     }
   }
-  private static class MutableRow implements Comparable<MutableRow> {
+  public static class MutableRow implements Comparable<MutableRow> {
     private final String id;
     private int order;
     public MutableRow(String id, int order) {

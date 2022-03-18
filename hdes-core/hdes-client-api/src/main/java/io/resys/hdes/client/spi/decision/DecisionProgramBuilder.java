@@ -74,14 +74,16 @@ public class DecisionProgramBuilder {
             
             final var typeDef = returns.get(value.getHeader());
             try {
-            programRow.addReturns(ImmutableDecisionRowReturns.builder()
-                .key(typeDef)
-                .value(typeDef.toValue(value.getValue()))
-                .build());
+              programRow.addReturns(ImmutableDecisionRowReturns.builder()
+                  .key(typeDef)
+                  .value(typeDef.toValue(value.getValue()))
+                  .build());
             } catch(Exception e) {
+
               throw new DecisionProgramException(
                   "Failed to create expression: '" + value.getValue() + "'!" +
-                  System.lineSeparator() + e.getMessage(), e);              
+                  System.lineSeparator() + e.getMessage(), e);
+              
             }
           }
         }

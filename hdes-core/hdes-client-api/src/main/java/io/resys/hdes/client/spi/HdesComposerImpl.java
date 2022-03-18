@@ -30,6 +30,7 @@ import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableComposerState;
 import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
 import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 import io.resys.hdes.client.spi.composer.CopyAsEntityVisitor;
 import io.resys.hdes.client.spi.composer.CreateEntityVisitor;
@@ -43,10 +44,11 @@ import io.smallrye.mutiny.Uni;
 public class HdesComposerImpl implements HdesComposer {
 
   private final HdesClient client;
-
+  private final AstCommandOptimiser opt;
   public HdesComposerImpl(HdesClient client) {
     super();
     this.client = client;
+    this.opt = new AstCommandOptimiser(client);
   }
 
   @Override
@@ -55,7 +57,12 @@ public class HdesComposerImpl implements HdesComposer {
   }
   @Override
   public Uni<ComposerState> update(UpdateEntity asset) {
-    return client.store().update(ImmutableUpdateStoreEntity.builder().id(asset.getId()).body(asset.getBody()).build())
+    return get(asset.getId()).onItem().transformToUni(old -> 
+        client.store().update(
+            ImmutableUpdateStoreEntity.builder().id(asset.getId())
+            .body(opt.optimise(asset.getBody(), old.getSource().getBodyType()))
+            .build()
+        ))
         .onItem().transformToUni((updated) -> {
           // flush cache
           client.config().getCache().flush(asset.getId());
