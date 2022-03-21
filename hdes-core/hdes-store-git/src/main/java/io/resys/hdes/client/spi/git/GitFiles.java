@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -204,55 +205,64 @@ public class GitFiles {
       final TreeFilter treeFilter = AndTreeFilter.create(
           PathFilterGroup.createFromStrings(entry.getTreeValue()), 
           TreeFilter.ANY_DIFF);
-      final var commit = revWalk.parseCommit(start);
-      
+
+      String revision = start.getName();
+      Timestamp created = Timestamp.valueOf(LocalDateTime.MIN);
+      Timestamp modified = Timestamp.valueOf(LocalDateTime.MIN);
       try {
+        final var commit = revWalk.parseCommit(start);
+        
         revWalk.reset();
         revWalk.markStart(commit);
         revWalk.setTreeFilter(treeFilter);
         revWalk.sort(RevSort.COMMIT_TIME_DESC);
         final var modTree = revWalk.next();
-        final var modified = (modTree != null ? new Timestamp(modTree.getCommitTime() * 1000L) : new Timestamp(System.currentTimeMillis()));
-  
+        modified = (modTree != null ? new Timestamp(modTree.getCommitTime() * 1000L) : new Timestamp(System.currentTimeMillis()));
+        revision = modTree != null ? modTree.getName() : start.getName();
+        
         revWalk.reset();
         revWalk.markStart(commit);
         revWalk.setTreeFilter(treeFilter);
         revWalk.sort(RevSort.COMMIT_TIME_DESC);
         revWalk.sort(RevSort.REVERSE, true);
-        final var created = new Timestamp(revWalk.next().getCommitTime() * 1000L);
-        final var commands = conn.getSerializer().read(entry.getBlobValue());
-        final var result = ImmutableGitEntry.builder()
-            .id(entry.getId())
-            .revision(modTree.getName())
-            .bodyType(entry.getBodyType())
-            .treeValue(entry.getTreeValue())
-            .blobValue(entry.getBlobValue())
-            .created(created)
-            .modified(modified)
-            .blobHash(Sha2.blob(entry.getBlobValue()))
-            .commands(commands)
-            .build();
-  
-        if(LOGGER.isDebugEnabled()) {
-          final var msg = new StringBuilder()
-              .append("Loading path: ").append(result.getTreeValue()).append(System.lineSeparator())
-              .append("  - blob murmur3_128: ").append(result.getBlobHash()).append(System.lineSeparator())
-              .append("  - body type: ").append(result.getBodyType()).append(System.lineSeparator())
-              .append("  - created: ").append(result.getCreated()).append(System.lineSeparator())
-              .append("  - modified: ").append(result.getModified()).append(System.lineSeparator())
-              .append("  - revision: ").append(result.getRevision()).append(System.lineSeparator());
-          LOGGER.debug(msg.toString());
-        }
-        
-        return result;
+        created = new Timestamp(revWalk.next().getCommitTime() * 1000L);
+
       } catch(Exception e) {
-        throw new RuntimeException(
+        LOGGER.error(
             "Failed to create asset from file: '" + entry.getTreeValue() + "'" + System.lineSeparator() +
             "because of: " + e.getMessage() + System.lineSeparator() +
             "with content: " + entry.getBlobValue() 
             , e);
       }
-    } catch (IOException e) {
+      
+      
+      final var commands = conn.getSerializer().read(entry.getBlobValue());      
+      final var result = ImmutableGitEntry.builder()
+          .id(entry.getId())
+          .revision(revision)
+          .bodyType(entry.getBodyType())
+          .treeValue(entry.getTreeValue())
+          .blobValue(entry.getBlobValue())
+          .created(created)
+          .modified(modified)
+          .blobHash(Sha2.blob(entry.getBlobValue()))
+          .commands(commands)
+          .build();
+
+      if(LOGGER.isDebugEnabled()) {
+        final var msg = new StringBuilder()
+            .append("Loading path: ").append(result.getTreeValue()).append(System.lineSeparator())
+            .append("  - blob murmur3_128: ").append(result.getBlobHash()).append(System.lineSeparator())
+            .append("  - body type: ").append(result.getBodyType()).append(System.lineSeparator())
+            .append("  - created: ").append(result.getCreated()).append(System.lineSeparator())
+            .append("  - modified: ").append(result.getModified()).append(System.lineSeparator())
+            .append("  - revision: ").append(result.getRevision()).append(System.lineSeparator());
+        LOGGER.debug(msg.toString());
+      }
+      
+      return result;
+      
+    } catch (Exception e) {
       throw new RuntimeException("Failed to load timestamps for: " + entry.getTreeValue() + "!" + System.lineSeparator() + e.getMessage(), e);
     }
   }
