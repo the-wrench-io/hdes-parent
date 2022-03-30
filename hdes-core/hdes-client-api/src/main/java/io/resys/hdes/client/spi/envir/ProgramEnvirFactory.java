@@ -436,7 +436,7 @@ public class ProgramEnvirFactory {
   private List<ProgramMessage> visitException(Exception e) {
     return Arrays.asList(ImmutableProgramMessage.builder()
           .id("exception")
-          .msg(e.getMessage().replaceAll("\"", "'"))
+          .msg(e.getMessage() == null ? "no-desc-available": e.getMessage().replaceAll("\"", "'"))
           .exception(e)
           .build()
         );
