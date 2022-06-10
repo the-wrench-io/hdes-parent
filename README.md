@@ -47,7 +47,7 @@ cd spring-app
 
 3. Run the Spring Boot application
 ```
-mvn spring-boot:run
+mvn spring-boot:run 
 ```
 
 4. Navigate to <http://localhost:8081>
