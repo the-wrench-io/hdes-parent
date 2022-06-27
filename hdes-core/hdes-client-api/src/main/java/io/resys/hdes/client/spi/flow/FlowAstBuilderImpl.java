@@ -213,7 +213,7 @@ public class FlowAstBuilderImpl implements FlowAstBuilder {
             .value(message)
             .type(CommandMessageType.ERROR)
             .build());
-        return result.setEnd(lineNumber).setValue(buildSource(value));
+        continue;
       }
 
       int indentToFind = indent - 2;
