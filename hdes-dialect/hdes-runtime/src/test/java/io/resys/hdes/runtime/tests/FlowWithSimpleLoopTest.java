@@ -41,7 +41,7 @@ public class FlowWithSimpleLoopTest {
     
     yaml(output.getBody());
     
-    Assertions.assertEquals(fileYaml("loop"), yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("loop").lines(), yaml(output.getBody()).lines());
     
   }
 

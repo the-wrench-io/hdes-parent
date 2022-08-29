@@ -54,7 +54,7 @@ public class FlowWithWakeUpTest {
     HashMap<String, Serializable> promiseData = new HashMap<>();
     promiseData.put("userValue", 100);
     output = runner.wakeup().accepts(await.getDataId(), promiseData).build(output);
-    Assertions.assertEquals(fileYaml("simpleFlow"), yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("simpleFlow").lines(), yaml(output.getBody()).lines());
       
   }
   
