@@ -179,7 +179,7 @@ public class ExpressionTest {
   public static void assertNode(ContentNode node, String file) {
     String actual = DataFormatTestUtil.yaml(node);
     String expected = DataFormatTestUtil.file("ast/ExpressionTest_" + file + ".yaml");
-    Assertions.assertEquals(expected, actual);
+    Assertions.assertLinesMatch(expected.lines(), actual.lines());
   }
   
   private static class TestExpressionBuilder {
