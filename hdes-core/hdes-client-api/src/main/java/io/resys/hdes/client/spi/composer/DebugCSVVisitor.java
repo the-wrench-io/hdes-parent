@@ -9,9 +9,9 @@ package io.resys.hdes.client.spi.composer;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,26 +20,27 @@ package io.resys.hdes.client.spi.composer;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.ast.AstBody;
-import io.resys.hdes.client.api.programs.*;
+import io.resys.hdes.client.api.ast.TypeDef;
+import io.resys.hdes.client.api.ast.TypeDef.Direction;
+import io.resys.hdes.client.api.exceptions.HdesBadRequestException;
+import io.resys.hdes.client.api.programs.DecisionProgram;
+import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.Program.ProgramResult;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
+import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
+import io.resys.hdes.client.api.programs.ServiceProgram;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-
-import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.ast.TypeDef;
-import io.resys.hdes.client.api.ast.TypeDef.Direction;
-import io.resys.hdes.client.api.exceptions.HdesBadRequestException;
-import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DebugCSVVisitor {
   private final HdesClient client;
@@ -48,7 +49,7 @@ public class DebugCSVVisitor {
   private final Map<String, TypeDef> wrapperInputs;
   private final CsvMapper csvMapper = new CsvMapper();
   private final Set<String> usedFields = new HashSet<>();
-  
+
   public DebugCSVVisitor(HdesClient client, ProgramWrapper<?, ?> wrapper, ProgramEnvir envir) {
     super();
     this.client = client;
@@ -61,21 +62,21 @@ public class DebugCSVVisitor {
     try {
       final CSVParser parser = CSVParser.parse(input, CSVFormat.DEFAULT.withDelimiter(';').withIgnoreEmptyLines());
       final List<CSVRecord> records = parser.getRecords();
-      if(records.isEmpty()) {
+      if (records.isEmpty()) {
         return null;
       }
-      
+
       // records
       final Iterator<CSVRecord> iterator = records.iterator();
-      
+
       // header names
       final var headers = visitHeaders(iterator);
-    
+
       // data row
       final CSVRecord row = iterator.next();
       final var result = visitRow(row, headers);
       return result;
-    } catch(IOException e) {
+    } catch (IOException e) {
       throw new HdesBadRequestException(e.getMessage(), e);
     }
   }
@@ -84,7 +85,7 @@ public class DebugCSVVisitor {
     try {
       final CSVParser parser = CSVParser.parse(input, CSVFormat.DEFAULT.withDelimiter(';').withIgnoreEmptyLines());
       final List<CSVRecord> records = parser.getRecords();
-      if(records.isEmpty()) {
+      if (records.isEmpty()) {
         return null;
       }
 
@@ -108,11 +109,11 @@ public class DebugCSVVisitor {
       schema.addColumn("_errors");
 
       return csvMapper.writer(schema.build().withHeader()).writeValueAsString(results);
-    } catch(IOException e) {
+    } catch (IOException e) {
       throw new HdesBadRequestException(e.getMessage(), e);
     }
   }
-  
+
   private Map<Integer, String> visitHeaders(Iterator<CSVRecord> iterator) {
     final Map<Integer, String> headers = new HashMap<>();
     int headerIndex = 0;
@@ -123,13 +124,13 @@ public class DebugCSVVisitor {
   }
 
   public ProgramResult visitRow(CSVRecord row, Map<Integer, String> headers) throws IOException {
-    long transactionId = row.getRecordNumber()-1;
+    long transactionId = row.getRecordNumber() - 1;
     final var input = visitProgramInput(row, headers);
     return visitProgram(input, transactionId);
   }
 
   public List<Map<String, Serializable>> visitRowMultiple(CSVRecord row, Map<Integer, String> headers) {
-    long transactionId = row.getRecordNumber()-1;
+    long transactionId = row.getRecordNumber() - 1;
     try {
       final var input = visitProgramInput(row, headers);
       return visitProgramMultiple(input, transactionId);
@@ -140,43 +141,48 @@ public class DebugCSVVisitor {
       ));
     }
   }
-  
-  
+
   public Map<String, Serializable> visitProgramInput(CSVRecord row, Map<Integer, String> headers) {
-    final Map<String, Serializable> inputEntity = new HashMap<>();;
+    final Map<String, Serializable> inputEntity = new HashMap<>();
     int columnIndex = 0;
-    for(final var columnValue : row) {
+    for (final var columnValue : row) {
       final var columnName = headers.get(columnIndex++);
       final var typeDef = this.wrapperInputs.get(columnName);
-      if(typeDef == null) {
+      if (typeDef == null) {
         continue;
       }
       inputEntity.put(columnName, typeDef.getDeserializer().deserialize(typeDef, columnValue));
     }
     return inputEntity;
   }
-  
+
   private ProgramResult visitProgram(Map<String, Serializable> input, long transactionId) throws IOException {
-    
     switch (wrapper.getType()) {
-    case FLOW: return visitFlow(input, transactionId);
-    case FLOW_TASK: return visitFlowTask(input, transactionId);
-    case DT: return visitDecision(input, transactionId);
-    default: throw new HdesBadRequestException("Can't debug: '" + wrapper.getType() + "'!");
+      case FLOW:
+        return visitFlow(input, transactionId);
+      case FLOW_TASK:
+        return visitFlowTask(input, transactionId);
+      case DT:
+        return visitDecision(input, transactionId);
+      default:
+        throw new HdesBadRequestException("Can't debug: '" + wrapper.getType() + "'!");
     }
   }
 
   private List<Map<String, Serializable>> visitProgramMultiple(Map<String, Serializable> input, long transactionId) throws IOException {
-
     switch (wrapper.getType()) {
-      case FLOW: return visitFlowMultiple(input, transactionId);
-      case FLOW_TASK: return visitFlowTaskMultiple(input, transactionId);
-      case DT: return visitDecisionMultiple(input, transactionId);
-      default: throw new HdesBadRequestException("Can't debug: '" + wrapper.getType() + "'!");
+      case FLOW:
+        return visitFlowMultiple(input, transactionId);
+      case FLOW_TASK:
+        return visitFlowTaskMultiple(input, transactionId);
+      case DT:
+        return visitDecisionMultiple(input, transactionId);
+      default:
+        throw new HdesBadRequestException("Can't debug: '" + wrapper.getType() + "'!");
     }
   }
-  
-  
+
+
   private ProgramResult visitFlow(Map<String, Serializable> input, long transactionId) {
     final var body = client.executor(envir).inputMap(input).flow(wrapper.getId()).andGetBody();
     final var last = body.getReturns();
@@ -224,11 +230,11 @@ public class DebugCSVVisitor {
   }
 
   private List<Map<String, Serializable>> visitProgramBody(Map<String, Serializable> last, long transactionId) {
-    if(last.size() == 1) {
+    if (last.size() == 1) {
       final var firstValue = last.values().iterator().next();
-      if(firstValue instanceof Collection) {
+      if (firstValue instanceof Collection) {
         final var rows = new ArrayList<Map<String, Serializable>>();
-        for(final var entry : ((Collection<?>) firstValue)) {
+        for (final var entry : ((Collection<?>) firstValue)) {
           final var result = new HashMap<String, Serializable>();
           result.put("_id", transactionId);
           result.putAll(client.mapper().toMap(entry));
