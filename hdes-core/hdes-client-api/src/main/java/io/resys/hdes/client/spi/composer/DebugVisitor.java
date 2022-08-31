@@ -53,8 +53,14 @@ public class DebugVisitor {
     HdesAssert.isTrueOrBadRequest(runnable.getStatus() == ProgramStatus.UP, () -> "Program status: '" + runnable.getStatus() + "' is not runnable!");
     
     if(entity.getInputCSV() != null) {
-      final var csv =  new DebugCSVVisitor(client, runnable, envir).visit(entity.getInputCSV());
-      return ImmutableDebugResponse.builder().bodyCsv(csv).build();
+      final int noOfLines = entity.getInputCSV().split("\n").length;
+      if (noOfLines <= 2) {
+        final var csv =  new DebugCSVVisitor(client, runnable, envir).visit(entity.getInputCSV());
+        return ImmutableDebugResponse.builder().id(entity.getId()).body(csv).build();
+      } else {
+        final var csv =  new DebugCSVVisitor(client, runnable, envir).visitMultiple(entity.getInputCSV());
+        return ImmutableDebugResponse.builder().id(entity.getId()).bodyCsv(csv + entity.getInputCSV()).build();
+      }
     }
     
     final var input = client.mapper().toMap(entity.getInput());
