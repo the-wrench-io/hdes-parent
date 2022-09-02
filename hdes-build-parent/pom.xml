@@ -27,7 +27,7 @@
     <javapoet.version>1.12.1</javapoet.version>
     <antlr.version>4.8-1</antlr.version>
 
-    <jackson.version>2.10.5.1</jackson.version>
+    <jackson.version>2.12.6.1</jackson.version>
     <jackson.format.version>2.10.5</jackson.format.version>
 
     <jandex.version>1.0.8</jandex.version>
