@@ -83,7 +83,7 @@ public class DecisionTableTest {
   public static void assetNode(ContentNode node, String file) {
     String actual = DataFormatTestUtil.yaml(node);
     String expected = DataFormatTestUtil.file("ast/DecisionTableTest_" + file + ".yaml");
-    Assertions.assertEquals(expected, actual);
+    Assertions.assertLinesMatch(expected.lines(), actual.lines());
   }
 
   public static class ErrorListener extends BaseErrorListener {

@@ -37,7 +37,7 @@ public class FlowWithDecisionAndDtTest {
         .value("arg2", 2)
         .build();
 
-    Assertions.assertEquals(fileYaml("flowWithNoSteps"), yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("flowWithNoSteps").lines(), yaml(output.getBody()).lines());
   }
   
   @Test
@@ -49,7 +49,7 @@ public class FlowWithDecisionAndDtTest {
         .value("arg2", 2)
         .build();
     
-    Assertions.assertEquals(fileYaml("flowWithDecisionAndSplit"), yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("flowWithDecisionAndSplit").lines(), yaml(output.getBody()).lines());
   }
   
   @Test
@@ -60,7 +60,7 @@ public class FlowWithDecisionAndDtTest {
         .value("arg2", 2)
         .build();
     
-    Assertions.assertEquals(fileYaml("flowWithParalDecisionAndSplit"), yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("flowWithParalDecisionAndSplit").lines(), yaml(output.getBody()).lines());
   }
   
   private static String fileSrc(String file) {

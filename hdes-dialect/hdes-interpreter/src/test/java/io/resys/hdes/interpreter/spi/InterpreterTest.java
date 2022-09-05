@@ -53,7 +53,7 @@ public class InterpreterTest {
     String actual = yaml(execution.getBody());
     //System.out.println(yaml(execution));
     String expected = file(yaml);
-    Assertions.assertEquals(expected, actual);
+    Assertions.assertLinesMatch(expected.lines(), actual.lines());
   }
   
   public void format(TraceEnd end) {

@@ -39,7 +39,7 @@ public class DtRuntimeTest {
       .value("value1", 2)
       .build();
     
-    Assertions.assertEquals(fileYaml("dtHitPolicyAll"), TestUtil.yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("dtHitPolicyAll").lines(), TestUtil.yaml(output.getBody()).lines());
   }
   
   @Test 
@@ -50,7 +50,7 @@ public class DtRuntimeTest {
         .value("arg", 11)
         .build();
     
-    Assertions.assertEquals(fileYaml("dtHitPolicyFirstBetween"), TestUtil.yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("dtHitPolicyFirstBetween").lines(), TestUtil.yaml(output.getBody()).lines());
   }
   
   
@@ -62,7 +62,7 @@ public class DtRuntimeTest {
         .value("lastName", "blah")
         .build();
 
-    Assertions.assertEquals(fileYaml("dtHitPolicdtHitPolicyFirstyFirst"), TestUtil.yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("dtHitPolicdtHitPolicyFirstyFirst").lines(), TestUtil.yaml(output.getBody()).lines());
   }
 
   @Test 
@@ -75,7 +75,7 @@ public class DtRuntimeTest {
         .value("c", new BigDecimal(10.78).setScale(2, RoundingMode.HALF_UP))
         .build();
     
-    Assertions.assertEquals(fileYaml("dtHitPolicyFirstFormula"), TestUtil.yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("dtHitPolicyFirstFormula").lines(), TestUtil.yaml(output.getBody()).lines());
   }
   
   @Test 
@@ -86,7 +86,7 @@ public class DtRuntimeTest {
         .value("lastName", "blah")
         .build();
 
-    Assertions.assertEquals(fileYaml("dtHitPolicyMatrix"), TestUtil.yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("dtHitPolicyMatrix").lines(), TestUtil.yaml(output.getBody()).lines());
   }
   
   @Test 
@@ -98,7 +98,7 @@ public class DtRuntimeTest {
         .value("name", "BOB")
         .build();
 
-    Assertions.assertEquals(fileYaml("dtHitPolicyMatrixLambdas"), TestUtil.yaml(output.getBody()));
+    Assertions.assertLinesMatch(fileYaml("dtHitPolicyMatrixLambdas").lines(), TestUtil.yaml(output.getBody()).lines());
   }
   
   

@@ -20,14 +20,14 @@
     <surefire.plugin.version>3.0.0-M5</surefire.plugin.version>
 
     <spring.security.version>5.5.1</spring.security.version>
-    <spring.boot.version>2.5.0</spring.boot.version>
-    <spring.version>5.3.8</spring.version>
+    <spring.boot.version>2.5.12</spring.boot.version>
+    <spring.version>5.3.18</spring.version>
 
     <googlejavaformat.version>1.9</googlejavaformat.version>
     <javapoet.version>1.12.1</javapoet.version>
     <antlr.version>4.8-1</antlr.version>
 
-    <jackson.version>2.10.5.1</jackson.version>
+    <jackson.version>2.12.6.1</jackson.version>
     <jackson.format.version>2.10.5</jackson.format.version>
 
     <jandex.version>1.0.8</jandex.version>
