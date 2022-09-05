@@ -20,10 +20,13 @@ package io.resys.wrench.assets.bundle.spi;
  * #L%
  */
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.time.Duration;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.resys.hdes.client.api.HdesClient;
+import io.resys.hdes.client.api.HdesStore;
+import io.resys.hdes.client.api.programs.ProgramEnvir;
+import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
+import io.resys.hdes.client.spi.HdesInMemoryStore;
+import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
@@ -39,14 +42,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.resys.hdes.client.api.HdesClient;
-import io.resys.hdes.client.api.HdesStore;
-import io.resys.hdes.client.api.programs.ProgramEnvir;
-import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
-import io.resys.hdes.client.spi.HdesInMemoryStore;
-import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.time.Duration;
 
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -80,7 +78,7 @@ public class AssetIntegrationTest {
   @Test
   public void services() {
     final var services = envir.getValues();
-    Assert.assertEquals(6, services.size());
+    Assert.assertEquals(7, services.size());
   }
 
   @Test
