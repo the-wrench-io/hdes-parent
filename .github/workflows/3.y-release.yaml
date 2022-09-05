@@ -3,7 +3,7 @@ on:
     branches:
       - 3.y
 
-name: 3.y - java 15
+name: 3.y - java 15 - release
 jobs:
   build:
     name: release branch 3.y
