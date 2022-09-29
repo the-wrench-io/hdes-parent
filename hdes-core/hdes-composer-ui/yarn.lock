@@ -1908,12 +1908,12 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
-"@the-wrench-io/hdes-ide@^0.2.49":
-  version "0.2.49"
-  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.49.tgz#0e84f0c5982659ea7b651770f0fc88f7e7ec6ba7"
-  integrity sha512-0yNqd8i54UK+i5wjCd7inMmvAhHWbOa69/BrYzFysKHAWetZVdeRbfclJ0NXTkAe3r1KDfsKDhC9tjU2g60nkg==
+"@the-wrench-io/hdes-ide@^0.2.50":
+  version "0.2.50"
+  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.50.tgz#da6576dfc0489348f13985760b1db21fd3056f97"
+  integrity sha512-V53LK+C63OzZ2oUa0YYStImcg9tzAwD5f4XcR9CHluGpHZSuOgg2tcnoLQ8ejFznMAbdPARq1D5dr7uwHZpiAg==
   dependencies:
-    "@the-wrench-io/react-burger" "^1.0.31"
+    "@the-wrench-io/react-burger" "^1.0.36"
     codemirror "^5.40.0"
     js-file-download "^0.4.4"
     moment "^2.29.1"
@@ -1922,10 +1922,10 @@
     prop-types "^15.7.2"
     vis-react "^0.5.1"
 
-"@the-wrench-io/react-burger@^1.0.31", "@the-wrench-io/react-burger@^1.0.32":
-  version "1.0.33"
-  resolved "https://registry.yarnpkg.com/@the-wrench-io/react-burger/-/react-burger-1.0.33.tgz#63517cd398e056f99bdf5f2b7297684db2d317b9"
-  integrity sha512-ZgHZjXIH00Pn1nxMO/nFPPoGyV2cw0Bn6bArxV1rdnNMAy+7aTPF26vZwrKILJHdDqR/yRNI1yPvafTCZvkBZA==
+"@the-wrench-io/react-burger@^1.0.36":
+  version "1.0.36"
+  resolved "https://registry.yarnpkg.com/@the-wrench-io/react-burger/-/react-burger-1.0.36.tgz#889fdc37b071d318eecbabb1661ff80601670270"
+  integrity sha512-UWGHMu8QGda6VN8iPn5VXwYAaMwtA7YJZeKqYzNxK8zUUx1KSAY8VTx0oE4A0iSdOLL+HANlxUG4DGNIfsM8Yg==
 
 "@tootallnate/once@1":
   version "1.1.2"
