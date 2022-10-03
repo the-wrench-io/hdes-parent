@@ -31,7 +31,8 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.resys.thena.docdb.api.DocDB;
-import io.resys.thena.docdb.spi.pgsql.DocDBFactory;
+import io.resys.thena.docdb.spi.pgsql.PgErrors;
+import io.resys.thena.docdb.sql.DocDBFactorySql;
 
 public abstract class PgSqlDbConfig {
   @Inject
@@ -56,9 +57,10 @@ public abstract class PgSqlDbConfig {
   }
 
   private void setUp() {
-    this.client = DocDBFactory.create()
+    this.client = DocDBFactorySql.create()
         .db("junit")
         .client(pgPool)
+        .errorHandler(new PgErrors())
         .build();
   }
 
