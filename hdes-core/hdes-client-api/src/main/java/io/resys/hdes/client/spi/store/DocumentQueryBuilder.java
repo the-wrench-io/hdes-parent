@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.thena;
+package io.resys.hdes.client.spi.store;
 
 import io.resys.hdes.client.api.HdesStore.QueryBuilder;
 
@@ -24,7 +24,6 @@ import io.resys.hdes.client.api.HdesStore.QueryBuilder;
 
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreState;
-import io.resys.hdes.client.spi.ThenaConfig;
 import io.smallrye.mutiny.Uni;
 
 public class DocumentQueryBuilder extends PersistenceCommands implements QueryBuilder {

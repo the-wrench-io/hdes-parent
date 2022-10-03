@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi.thena;
+package io.resys.hdes.client.spi.store;
 
 /*-
  * #%L
@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
-import io.resys.hdes.client.spi.ThenaConfig;
 import io.resys.thena.docdb.api.models.Objects.Blob;
 
 

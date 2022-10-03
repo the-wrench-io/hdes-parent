@@ -1,4 +1,4 @@
-package io.resys.hdes.client.spi;
+package io.resys.hdes.client.spi.store;
 
 import java.util.Collection;
 
