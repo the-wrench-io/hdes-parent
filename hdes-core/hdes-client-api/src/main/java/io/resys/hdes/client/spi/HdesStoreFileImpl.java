@@ -98,7 +98,7 @@ public class HdesStoreFileImpl extends ThenaStoreTemplate implements HdesStore {
       this.headName = headName;
       return this;
     }
-    public Builder pgDb(String pgDb) {
+    public Builder db(String pgDb) {
       this.db = pgDb;
       return this;
     }
@@ -127,7 +127,8 @@ public class HdesStoreFileImpl extends ThenaStoreTemplate implements HdesStore {
     
     public HdesStoreFileImpl build() {
       HdesAssert.notNull(repoName, () -> "repoName must be defined!");
-    
+      final var objectMapper = getObjectMapper();
+      
       final var headName = this.headName == null ? "main": this.headName;
       if(LOGGER.isDebugEnabled()) {
         final var log = new StringBuilder()
@@ -145,7 +146,7 @@ public class HdesStoreFileImpl extends ThenaStoreTemplate implements HdesStore {
       
       final DocDB thena;
       if(pool == null) {
-        HdesAssert.notNull(db, () -> "db must be defined!");
+        HdesAssert.notNull(db, () -> "asset direction for db must be defined!");
         final var pgPool = new FilePoolImpl(new File(db), objectMapper);
         
         thena = DocDBFactoryFile.create().client(pgPool).db(repoName).errorHandler(new FileErrors()).build();
@@ -153,7 +154,6 @@ public class HdesStoreFileImpl extends ThenaStoreTemplate implements HdesStore {
         thena = DocDBFactoryFile.create().client(pool).db(repoName).errorHandler(new FileErrors()).build();
       }
       
-      final ObjectMapper objectMapper = getObjectMapper();
       final ImmutableThenaConfig config = ImmutableThenaConfig.builder()
           .client(thena).repoName(repoName).headName(headName)
           .gidProvider(getGidProvider())

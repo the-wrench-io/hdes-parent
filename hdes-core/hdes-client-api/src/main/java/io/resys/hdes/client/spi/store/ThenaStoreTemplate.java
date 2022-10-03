@@ -101,7 +101,7 @@ public abstract class ThenaStoreTemplate extends PersistenceCommands implements 
           if(repo == null) {
             return client.repo().create().name(config.getRepoName()).build().onItem().transform(newRepo -> true); 
           }
-          return Uni.createFrom().item(true);
+          return Uni.createFrom().item(false);
         });
       }
     };

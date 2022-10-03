@@ -46,4 +46,17 @@ public class Application {
       CorsConfigurationSource source = (req) -> config; 
       return new CorsFilter(source);
   }
+  /*
+  @Bean
+  public HdesStore fileStore(ObjectMapper om) {
+    final var store = HdesStoreFileImpl.builder()
+        .objectMapper(om)
+        .repoName("test-assets")
+        .db("/test-assets-folder")
+        .build();
+    
+    store.repo().createIfNot().await().atMost(Duration.ofMillis(200));
+    
+    return store;
+  }*/
 }

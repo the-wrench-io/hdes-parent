@@ -175,12 +175,14 @@ public class PersistenceCommands implements ThenaConfig.Commands {
 
   protected StoreExceptionMsg convertMessages1(ObjectsResult<BlobObject> state) {
     return ImmutableStoreExceptionMsg.builder()
-        .addAllArgs(state.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
+        .id("STORE_STATE_ERROR").value("")
+        .addAllArgs(state.getMessages().stream().map(message-> message.getText()).collect(Collectors.toList()))
         .build();
   }
   protected StoreExceptionMsg convertMessages2(ObjectsResult<BlobObjects> state) {
     return ImmutableStoreExceptionMsg.builder()
-        .addAllArgs(state.getMessages().stream().map(message->message.getText()).collect(Collectors.toList()))
+        .id("STORE_STATE_ERROR").value("")
+        .addAllArgs(state.getMessages().stream().map(message-> message.getText()).collect(Collectors.toList()))
         .build();
   }
 
