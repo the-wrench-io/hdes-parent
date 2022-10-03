@@ -2,10 +2,9 @@ import React from 'react';
 
 import { IntlProvider } from 'react-intl';
 import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import { SnackbarProvider } from 'notistack';
 import Burger, { siteTheme } from '@the-wrench-io/react-burger';
 import Client, { messages, Main, Secondary, Toolbar, Composer } from '@the-wrench-io/hdes-ide';
-
+import SnakbarWrapper from './SnakbarWrapper';
 
 declare global {
   interface Window {
@@ -74,9 +73,9 @@ const NewApp = (
   <IntlProvider locale={init.locale} messages={messages[init.locale]}>
     <StyledEngineProvider injectFirst>
       <ThemeProvider theme={siteTheme}>
-        <SnackbarProvider>
+        <SnakbarWrapper>
           <CreateApps />
-        </SnackbarProvider>
+        </SnakbarWrapper>
       </ThemeProvider>
     </StyledEngineProvider>
   </IntlProvider>);
