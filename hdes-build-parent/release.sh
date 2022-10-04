@@ -33,7 +33,7 @@ echo ${RELEASE_VERSION} > hdes-build-parent/release.version
 
 NEWLINE=$'\n'
 DATE=$(date +"%d/%m/%Y")
-echo "app.version='${PROJECT_VERSION}'${NEWLINE}build.timestamp='${DATE}'" > hdes-spring/hdes-spring-composer/src/main/resources/application.properties
+echo "app.version=${PROJECT_VERSION}${NEWLINE}build.timestamp=${DATE}" > hdes-spring/hdes-spring-composer/src/main/resources/application.properties
 git commit -am "Update application.properties"
 git push origin main
 
