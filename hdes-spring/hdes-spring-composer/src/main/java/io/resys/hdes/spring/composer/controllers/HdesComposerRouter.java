@@ -22,6 +22,7 @@ package io.resys.hdes.spring.composer.controllers;
 
 import java.time.Duration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -51,7 +51,8 @@ import io.resys.hdes.client.api.HdesStore.HistoryEntity;
 import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.spi.web.HdesWebConfig;
 import io.resys.hdes.spring.composer.ComposerConfigBean;
-import io.resys.hdes.spring.composer.controllers.util.VersionEntity;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 
 @RestController
@@ -133,4 +134,12 @@ public class HdesComposerRouter {
   public VersionEntity version() {
     return new VersionEntity(version, timestamp);
   }
+  
+  @Data
+  @RequiredArgsConstructor
+  public static class VersionEntity {
+    private final String version;
+    private final String built;
+  }
+
 }
