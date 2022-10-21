@@ -1,40 +1,5 @@
 package io.resys.hdes.client.spi.decision.ast;
 
-import java.math.BigDecimal;
-
-/*-
- * #%L
- * hdes-client-api
- * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstDecision;
@@ -50,8 +15,18 @@ import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
+import org.apache.commons.lang3.StringUtils;
 
-
+import java.math.BigDecimal;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class CommandMapper {
   private final static List<String> headerTypes = Collections.unmodifiableList(
@@ -313,6 +288,21 @@ public class CommandMapper {
       return this;
     }
 
+    public Builder addToValueSet(String id, String value) {
+      idGen.getHeader(id).addToValueSet(value);
+      return this;
+    }
+
+    public Builder removeFromValueSet(String id, String value) {
+      idGen.getHeader(id).removeFromValueSet(value);
+      return this;
+    }
+
+    public Builder defineValueSet(String id, List<String> values) {
+      idGen.getHeader(id).defineValueSet(values);
+      return this;
+    }
+
     private String resolveScriptValue(MutableHeader header, MutableCell cell) {
       Map<String, Object> context = new HashMap<>();
       for(MutableHeader h : idGen.getHeaders().values()) {
@@ -345,11 +335,11 @@ public class CommandMapper {
               .valueType(h.getValue())
               .id(h.getId())
               .order(h.getOrder())
+              .valueSet(h.getValueSet())
               .script(h.getScript())
               .extRef(h.getExtRef())
               .build())
           .collect(Collectors.toList());
-
       
       List<AstDecisionRow> rows = this.idGen.getRows().values().stream().sorted()
           .map(r -> ImmutableAstDecisionRow.builder()
@@ -395,6 +385,7 @@ public class CommandMapper {
     private ValueType value;
     private int order;
     private final List<MutableCell> cells = new ArrayList<>();
+    private List<String> valueSet = new ArrayList<>();
 
     public MutableHeader(String id, Direction direction, int order) {
       super();
@@ -447,6 +438,22 @@ public class CommandMapper {
     }
     public Direction getDirection() {
       return direction;
+    }
+    public List<String> getValueSet() {
+      return valueSet;
+    }
+    public MutableHeader addToValueSet(String value) {
+      this.valueSet.add(value);
+      return this;
+    }
+    public MutableHeader removeFromValueSet(String value) {
+      this.valueSet.remove(value);
+      return this;
+    }
+
+    public MutableHeader defineValueSet(List<String> values) {
+      this.valueSet = values;
+      return this;
     }
     @Override
     public int compareTo(MutableHeader o) {
