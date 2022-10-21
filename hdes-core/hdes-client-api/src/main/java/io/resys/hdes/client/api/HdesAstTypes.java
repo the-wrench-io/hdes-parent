@@ -20,8 +20,6 @@ package io.resys.hdes.client.api;
  * #L%
  */
 
-import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -33,6 +31,8 @@ import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+
+import java.util.List;
 
 public interface HdesAstTypes {
 
@@ -59,6 +59,7 @@ public interface HdesAstTypes {
     DataTypeAstBuilder beanType(Class<?> beanType);
     DataTypeAstBuilder values(String values);
     DataTypeAstBuilder property();
+    DataTypeAstBuilder valueSet(List<String> valueSet);
     TypeDef build();
   }
 
