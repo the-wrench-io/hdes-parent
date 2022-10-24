@@ -20,20 +20,19 @@ package io.resys.hdes.client.test;
  * #L%
  */
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionRow;
 import io.resys.hdes.client.spi.util.DateParser;
 import io.resys.hdes.client.spi.util.FileUtils;
 import io.resys.hdes.client.test.config.TestUtils;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DecisionTest {
 
@@ -151,6 +150,13 @@ public class DecisionTest {
     final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/dt-import.json")).decision();
     final var program = TestUtils.client.program().ast(ast);
     Assertions.assertNotNull(program);
+  }
+
+  @Test
+  public void valueSetTest() throws IOException {
+    final var ast = TestUtils.client.ast().commands(FileUtils.toString(getClass(), "decision/dtWithValueSet.json")).decision();
+    List<String> valueSet = ast.getHeaders().getAcceptDefs().get(0).getValueSet();
+    Assertions.assertEquals(3, valueSet.size());
   }
 
 }
