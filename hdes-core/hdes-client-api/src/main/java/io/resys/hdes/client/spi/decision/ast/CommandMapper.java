@@ -298,8 +298,13 @@ public class CommandMapper {
       return this;
     }
 
-    public Builder defineValueSet(String id, List<String> values) {
-      idGen.getHeader(id).defineValueSet(values);
+    public Builder defineValueSet(String id, String values) {
+      if (values.length() > 0) {
+        List<String> valueList = Arrays.asList(values.split(", "));
+        idGen.getHeader(id).defineValueSet(valueList);
+        return this;
+      }
+      idGen.getHeader(id).defineValueSet(new ArrayList<>());
       return this;
     }
 

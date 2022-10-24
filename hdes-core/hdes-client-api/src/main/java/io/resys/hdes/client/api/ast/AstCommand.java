@@ -27,7 +27,6 @@ import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
-import java.util.List;
 
 @JsonSerialize(as = ImmutableAstCommand.class)
 @JsonDeserialize(as = ImmutableAstCommand.class)
@@ -38,8 +37,6 @@ public interface AstCommand extends Serializable {
   String getId();
   @Nullable
   String getValue();
-  @Nullable
-  List<String> getValueSet();
   AstCommandValue getType();
 
   

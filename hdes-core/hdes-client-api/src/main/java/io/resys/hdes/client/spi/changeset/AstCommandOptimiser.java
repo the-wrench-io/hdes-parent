@@ -152,7 +152,7 @@ public class AstCommandOptimiser {
         result.add(ImmutableAstCommand.builder().id(id).value(dataType.getExtRef()).type(AstCommandValue.SET_HEADER_EXTERNAL_REF).build());
       }
       if(dataType.getValueSet() != null) {
-        result.add(ImmutableAstCommand.builder().id(id).valueSet(dataType.getValueSet()).type(AstCommandValue.DEFINE_VALUE_SET).build());
+        result.add(ImmutableAstCommand.builder().id(id).value(String.join(", ", dataType.getValueSet())).type(AstCommandValue.DEFINE_VALUE_SET).build());
       }
       index++;
     }

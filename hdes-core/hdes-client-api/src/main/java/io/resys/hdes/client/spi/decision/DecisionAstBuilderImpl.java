@@ -216,7 +216,7 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
       case REMOVE_FROM_VALUE_SET:
         return builder.removeFromValueSet(command.getId(), command.getValue());
       case DEFINE_VALUE_SET:
-        return builder.defineValueSet(command.getId(), command.getValueSet());
+        return builder.defineValueSet(command.getId(), command.getValue());
       default: return builder;
       }
     } catch(DecisionAstException e) {
