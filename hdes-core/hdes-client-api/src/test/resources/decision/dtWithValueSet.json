@@ -22,7 +22,7 @@
   {
     "id": "0",
     "value": "M, S, L",
-    "type": "DEFINE_VALUE_SET"
+    "type": "SET_VALUE_SET"
   },
   {
     "id": null,
@@ -47,7 +47,7 @@
   {
     "id": "1",
     "value": "",
-    "type": "DEFINE_VALUE_SET"
+    "type": "SET_VALUE_SET"
   },
   {
     "id": null,

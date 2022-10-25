@@ -213,10 +213,10 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
         return result;
       case ADD_TO_VALUE_SET:
         return builder.addToValueSet(command.getId(), command.getValue());
-      case REMOVE_FROM_VALUE_SET:
-        return builder.removeFromValueSet(command.getId(), command.getValue());
-      case DEFINE_VALUE_SET:
-        return builder.defineValueSet(command.getId(), command.getValue());
+      case DELETE_FROM_VALUE_SET:
+        return builder.deleteFromValueSet(command.getId(), command.getValue());
+      case SET_VALUE_SET:
+        return builder.setValueSet(command.getId(), command.getValue());
       default: return builder;
       }
     } catch(DecisionAstException e) {

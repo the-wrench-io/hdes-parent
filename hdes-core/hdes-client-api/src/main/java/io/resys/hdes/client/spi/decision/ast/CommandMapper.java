@@ -293,12 +293,12 @@ public class CommandMapper {
       return this;
     }
 
-    public Builder removeFromValueSet(String id, String value) {
+    public Builder deleteFromValueSet(String id, String value) {
       idGen.getHeader(id).removeFromValueSet(value);
       return this;
     }
 
-    public Builder defineValueSet(String id, String values) {
+    public Builder setValueSet(String id, String values) {
       if (values.length() > 0) {
         List<String> valueList = Arrays.asList(values.split(", "));
         idGen.getHeader(id).defineValueSet(valueList);
