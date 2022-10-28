@@ -276,16 +276,6 @@ public class CommandMapper {
       return this;
     }
 
-    public Builder addToValueSet(String id, String value) {
-      idGen.getHeader(id).addToValueSet(value);
-      return this;
-    }
-
-    public Builder deleteFromValueSet(String id, String value) {
-      idGen.getHeader(id).removeFromValueSet(value);
-      return this;
-    }
-
     public Builder setValueSet(String id, String values) {
       if (values.length() > 0) {
         List<String> valueList = Arrays.asList(values.split(", "));
@@ -435,15 +425,6 @@ public class CommandMapper {
     public List<String> getValueSet() {
       return valueSet;
     }
-    public MutableHeader addToValueSet(String value) {
-      this.valueSet.add(value);
-      return this;
-    }
-    public MutableHeader removeFromValueSet(String value) {
-      this.valueSet.remove(value);
-      return this;
-    }
-
     public MutableHeader setValueSet(List<String> values) {
       this.valueSet = values;
       return this;
