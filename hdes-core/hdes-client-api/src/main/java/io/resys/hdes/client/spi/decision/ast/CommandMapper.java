@@ -2,15 +2,10 @@ package io.resys.hdes.client.spi.decision.ast;
 
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.api.ast.AstDecision;
+import io.resys.hdes.client.api.ast.*;
 import io.resys.hdes.client.api.ast.AstDecision.AstDecisionRow;
 import io.resys.hdes.client.api.ast.AstDecision.ColumnExpressionType;
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
-import io.resys.hdes.client.api.ast.ImmutableAstDecision;
-import io.resys.hdes.client.api.ast.ImmutableAstDecisionCell;
-import io.resys.hdes.client.api.ast.ImmutableAstDecisionRow;
-import io.resys.hdes.client.api.ast.ImmutableHeaders;
-import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
@@ -18,14 +13,7 @@ import io.resys.hdes.client.api.programs.ExpressionProgram;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class CommandMapper {
@@ -301,10 +289,10 @@ public class CommandMapper {
     public Builder setValueSet(String id, String values) {
       if (values.length() > 0) {
         List<String> valueList = Arrays.asList(values.split(", "));
-        idGen.getHeader(id).defineValueSet(valueList);
+        idGen.getHeader(id).setValueSet(valueList);
         return this;
       }
-      idGen.getHeader(id).defineValueSet(new ArrayList<>());
+      idGen.getHeader(id).setValueSet(new ArrayList<>());
       return this;
     }
 
@@ -456,7 +444,7 @@ public class CommandMapper {
       return this;
     }
 
-    public MutableHeader defineValueSet(List<String> values) {
+    public MutableHeader setValueSet(List<String> values) {
       this.valueSet = values;
       return this;
     }
