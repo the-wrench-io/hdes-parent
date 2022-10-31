@@ -272,8 +272,41 @@ public class HdesInMemoryStore implements HdesStore {
       LOGGER.debug(migLog.toString());
       return new HdesInMemoryStore(entities);
     }
-  }
   
+    
+    public HdesInMemoryStore build(String json) {
+      final var migLog = new StringBuilder();
+      final var entities = new HashMap<String, StoreEntity>();
+      final Map<AstBodyType, Integer> order = Map.of(
+          AstBodyType.DT, 1,
+          AstBodyType.FLOW_TASK, 2,
+          AstBodyType.FLOW, 3);
+      migLog
+        .append("Loading assets from release").append(System.lineSeparator());
+      
+      final var assets = new ArrayList<>(readRelease(json).getValues());
+      assets.sort((AstTagValue o1, AstTagValue o2) -> 
+        Integer.compare(order.get(o1.getBodyType()), order.get(o2.getBodyType()))
+      );
+      for(final var asset : assets) {
+        migLog.append("  - ")
+          .append(asset.getHash()).append("/").append(asset.getBodyType()).append("/").append(asset.getHash())
+          .append(System.lineSeparator());
+      
+        final var id = UUID.randomUUID().toString();
+        final var entity = ImmutableStoreEntity.builder()
+            .id(id)
+            .hash(asset.getHash())
+            .body(asset.getCommands())
+            .bodyType(asset.getBodyType())
+            .build();
+        entities.put(id, entity);
+      }
+      
+      LOGGER.debug(migLog.toString());
+      return new HdesInMemoryStore(entities);
+    }
+  }
   @Override
   public HistoryQuery history() {
     throw new IllegalArgumentException("not implemented");
