@@ -20,15 +20,13 @@ package io.resys.hdes.client.api.ast;
  * #L%
  */
 
-import java.io.Serializable;
-
-import javax.annotation.Nullable;
-
-import org.immutables.value.Value;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
+
+import javax.annotation.Nullable;
+import java.io.Serializable;
 
 @JsonSerialize(as = ImmutableAstCommand.class)
 @JsonDeserialize(as = ImmutableAstCommand.class)
@@ -62,6 +60,8 @@ public interface AstCommand extends Serializable {
     DELETE_CELL, DELETE_HEADER, DELETE_ROW,
 
     ADD_LOG, ADD_HEADER_IN, ADD_HEADER_OUT, ADD_ROW,
+
+    SET_VALUE_SET
   }
 
 }

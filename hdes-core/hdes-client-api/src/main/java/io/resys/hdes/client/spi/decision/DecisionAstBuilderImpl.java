@@ -20,19 +20,7 @@ package io.resys.hdes.client.spi.decision;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.lang3.StringUtils;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.resys.hdes.client.api.HdesAstTypes.DecisionAstBuilder;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstCommand;
@@ -46,6 +34,16 @@ import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.exceptions.DecisionAstException;
 import io.resys.hdes.client.spi.decision.ast.CommandMapper;
 import io.resys.hdes.client.spi.util.HdesAssert;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DecisionAstBuilderImpl implements DecisionAstBuilder {
 
@@ -213,7 +211,8 @@ public class DecisionAstBuilderImpl implements DecisionAstBuilder {
           }
         }
         return result;
-        
+      case SET_VALUE_SET:
+        return builder.setValueSet(command.getId(), command.getValue());
       default: return builder;
       }
     } catch(DecisionAstException e) {

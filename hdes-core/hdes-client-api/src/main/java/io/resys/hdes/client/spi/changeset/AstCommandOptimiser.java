@@ -20,14 +20,6 @@ package io.resys.hdes.client.spi.changeset;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
@@ -38,6 +30,13 @@ import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.Direction;
 import io.resys.hdes.client.spi.decision.DecisionAstBuilderImpl;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AstCommandOptimiser {
   private final HdesTypesMapper defs;
@@ -152,10 +151,12 @@ public class AstCommandOptimiser {
       if(dataType.getExtRef() != null) {
         result.add(ImmutableAstCommand.builder().id(id).value(dataType.getExtRef()).type(AstCommandValue.SET_HEADER_EXTERNAL_REF).build());
       }
+      if(dataType.getValueSet() != null) {
+        result.add(ImmutableAstCommand.builder().id(id).value(String.join(", ", dataType.getValueSet())).type(AstCommandValue.SET_VALUE_SET).build());
+      }
       index++;
     }
     return result;
   }
-  
-  
+
 }

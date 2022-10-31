@@ -1,40 +1,5 @@
 package io.resys.hdes.client.spi;
 
-import java.io.IOException;
-import java.io.Serializable;
-
-/*-
- * #%L
- * wrench-assets-datatypes
- * %%
- * Copyright (C) 2016 - 2018 Copyright 2016 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,6 +26,20 @@ import io.resys.hdes.client.spi.serializers.GenericDataTypeSerializer;
 import io.resys.hdes.client.spi.serializers.JsonObjectDataTypeDeserializer;
 import io.resys.hdes.client.spi.serializers.TimeDataTypeDeserializer;
 import io.resys.hdes.client.spi.util.HdesAssert;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HdesTypeDefsFactory implements HdesTypesMapper {
   private final HdesClientConfig config;
@@ -154,6 +133,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
     private Integer order;
     private String script;
     private String id;
+    private List<String> valueSet;
     private boolean data = true;
 
     @Override
@@ -235,6 +215,11 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
       };
     }
     @Override
+    public DataTypeAstBuilder valueSet(List<String> valueSet) {
+      this.valueSet = valueSet;
+      return this;
+    }
+    @Override
     public TypeDef build() {
       HdesAssert.notNull(name, () -> "name can't be null!");
 
@@ -254,6 +239,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
             .values(values)
             .extRef(extRef)
             .properties(properties)
+            .valueSet(valueSet)
             .deserializer(deserializer)
             .serializer(serializer)
             .build();
@@ -281,6 +267,7 @@ public class HdesTypeDefsFactory implements HdesTypesMapper {
           .isRequired(Boolean.TRUE.equals(required))
           .values(values)
           .properties(properties)
+          .valueSet(valueSet)
           .deserializer(deserializer)
           .serializer(serializer)
           .build();
