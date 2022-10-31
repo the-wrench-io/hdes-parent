@@ -192,11 +192,10 @@ public class HdesInMemoryStore implements HdesStore {
           Integer.compare(order.get(o1.getBodyType()), order.get(o2.getBodyType()))
         );
         for(final var asset : assets) {
+          final var id = asset.getId() == null ? UUID.randomUUID().toString() : asset.getId();
           migLog.append("  - ")
-            .append(asset.getHash()).append("/").append(asset.getBodyType()).append("/").append(asset.getHash())
+            .append(asset.getId()).append("/").append(asset.getBodyType()).append("/").append(asset.getHash())
             .append(System.lineSeparator());
-        
-          final var id = UUID.randomUUID().toString();
           final var entity = ImmutableStoreEntity.builder()
               .id(id)
               .hash(asset.getHash())
@@ -275,6 +274,10 @@ public class HdesInMemoryStore implements HdesStore {
   
     
     public HdesInMemoryStore build(String json) {
+      return build(readRelease(json));
+    }
+    
+    public HdesInMemoryStore build(AstTag json) {
       final var migLog = new StringBuilder();
       final var entities = new HashMap<String, StoreEntity>();
       final Map<AstBodyType, Integer> order = Map.of(
@@ -284,16 +287,16 @@ public class HdesInMemoryStore implements HdesStore {
       migLog
         .append("Loading assets from release").append(System.lineSeparator());
       
-      final var assets = new ArrayList<>(readRelease(json).getValues());
+      final var assets = new ArrayList<>(json.getValues());
       assets.sort((AstTagValue o1, AstTagValue o2) -> 
         Integer.compare(order.get(o1.getBodyType()), order.get(o2.getBodyType()))
       );
       for(final var asset : assets) {
         migLog.append("  - ")
-          .append(asset.getHash()).append("/").append(asset.getBodyType()).append("/").append(asset.getHash())
+          .append(asset.getId()).append("/").append(asset.getBodyType()).append("/").append(asset.getHash())
           .append(System.lineSeparator());
       
-        final var id = UUID.randomUUID().toString();
+        final var id = asset.getId() == null ? UUID.randomUUID().toString() : asset.getId();
         final var entity = ImmutableStoreEntity.builder()
             .id(id)
             .hash(asset.getHash())
@@ -307,6 +310,7 @@ public class HdesInMemoryStore implements HdesStore {
       return new HdesInMemoryStore(entities);
     }
   }
+  
   @Override
   public HistoryQuery history() {
     throw new IllegalArgumentException("not implemented");

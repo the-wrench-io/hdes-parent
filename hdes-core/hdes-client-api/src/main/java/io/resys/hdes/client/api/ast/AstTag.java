@@ -24,6 +24,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -43,6 +45,7 @@ public interface AstTag extends AstBody, Serializable {
   @JsonSerialize(as = ImmutableAstTagValue.class)
   @JsonDeserialize(as = ImmutableAstTagValue.class)
   interface AstTagValue {
+    @Nullable String getId(); // nullable in init only
     String getHash();
     AstBodyType getBodyType();
     List<AstCommand> getCommands();

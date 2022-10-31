@@ -52,7 +52,6 @@ import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
-import io.resys.hdes.client.spi.staticresources.Sha2;
 
 public class CreateEntityVisitor {
 
@@ -145,35 +144,39 @@ public class CreateEntityVisitor {
 
   public List<AstCommand> initTag(CreateEntity entity) {
     final var decisions = state.getDecisions().values().stream()
-      .map(decision -> optimise.optimise(decision.getSource().getCommands(), AstBodyType.DT))
-      .map(decision -> client.mapper().commandsString(decision))
-      .map(decision -> (AstCommand) ImmutableAstCommand.builder()
-          .id(Sha2.blob(decision))
-          .value(decision)
-          .type(AstCommandValue.SET_TAG_DT)
-          .build())
+      .map(decision -> {
+        final var body = client.mapper().commandsString(optimise.optimise(decision.getSource().getCommands(), AstBodyType.DT));
+        return (AstCommand) ImmutableAstCommand.builder()
+            .id(decision.getId())
+            .value(body)
+            .type(AstCommandValue.SET_TAG_DT)
+            .build();
+      })
       .collect(Collectors.toList());
 
     // Flow task validations
     final var flowtasks = state.getServices().values().stream()
-        .map(flowtask -> optimise.optimise(flowtask.getSource().getCommands(), AstBodyType.FLOW_TASK))
-        .map(flowtask -> flowtask.iterator().next().getValue())
-        .map(flowtask -> (AstCommand) ImmutableAstCommand.builder()
-            .id(Sha2.blob(flowtask))
-            .value(flowtask)
-            .type(AstCommandValue.SET_TAG_ST)
-            .build())
+        .map(init -> {
+          final var body = optimise.optimise(init.getSource().getCommands(), AstBodyType.FLOW_TASK).iterator().next().getValue();
+          return (AstCommand) ImmutableAstCommand.builder()
+              .id(init.getId())
+              .value(body)
+              .type(AstCommandValue.SET_TAG_ST)
+              .build();
+        })
         .collect(Collectors.toList());
     
     // Flow validations
     final var flows = state.getFlows().values().stream()
-      .map(flow -> optimise.optimise(flow.getSource().getCommands(), AstBodyType.FLOW))
-      .map(flow -> flow.iterator().next().getValue())
-      .map(flow -> (AstCommand) ImmutableAstCommand.builder()
-          .id(Sha2.blob(flow))
-          .value(flow)
+      .map(init -> {
+        final var body = optimise.optimise(init.getSource().getCommands(), AstBodyType.FLOW).iterator().next().getValue();
+        return (AstCommand) ImmutableAstCommand.builder()
+          .id(init.getId())
+          .value(body)
           .type(AstCommandValue.SET_TAG_FL)
-          .build())
+          .build();
+      })
+
       .collect(Collectors.toList());
     
     final var result = new ArrayList<AstCommand>();

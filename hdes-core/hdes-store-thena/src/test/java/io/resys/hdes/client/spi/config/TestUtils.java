@@ -23,6 +23,9 @@ import java.util.HashMap;
  */
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.guava.GuavaModule;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.spi.HdesClientImpl;
@@ -34,7 +37,9 @@ import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
 
 public class TestUtils {
 
-  public static ObjectMapper objectMapper = new ObjectMapper();
+  public static ObjectMapper objectMapper = new ObjectMapper().registerModules(new JavaTimeModule(), new Jdk8Module(), new GuavaModule());
+  
+  
   public static HdesClient client = HdesClientImpl.builder()
       .objectMapper(objectMapper)
       .store(new HdesInMemoryStore(new HashMap<>()))

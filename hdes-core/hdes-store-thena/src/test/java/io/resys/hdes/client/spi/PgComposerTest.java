@@ -23,6 +23,7 @@ package io.resys.hdes.client.spi;
 import java.time.Duration;
 import java.util.List;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -31,6 +32,7 @@ import io.resys.hdes.client.api.ImmutableCreateEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.spi.config.PgProfile;
 import io.resys.hdes.client.spi.config.PgTestTemplate;
@@ -74,6 +76,21 @@ public class PgComposerTest extends PgTestTemplate {
     .await().atMost(Duration.ofMinutes(1));
     
     
+    
+    final var state = composer.create(ImmutableCreateEntity.builder()
+        .name("first-tag")
+        .name("first-tag-desc")
+        .type(AstBodyType.TAG)
+        .build())
+    .await().atMost(Duration.ofMinutes(1));
+    
+    final var tag = state.getTags().values().iterator().next();
+    Assertions.assertEquals(tag.getAst().getValues().size(), 3);
+    Assertions.assertNotNull(HdesInMemoryStore.builder().build(tag.getAst()));
+    
+    final var oldRelease = getRelease("release_without_id.json");
+    Assertions.assertEquals(oldRelease.getValues().size(), 3);
+    Assertions.assertNotNull(HdesInMemoryStore.builder().build(oldRelease));
   }
   
   
@@ -86,4 +103,12 @@ public class PgComposerTest extends PgTestTemplate {
     }
   }
 
+  public static AstTag getRelease(String fileName) {
+    try {
+      final var data = FileUtils.toString(PgComposerTest.class, fileName);
+      return TestUtils.objectMapper.readValue(data, AstTag.class);
+    } catch(Exception e) {
+      throw new RuntimeException(e.getMessage(), e);
+    }
+  }
 }

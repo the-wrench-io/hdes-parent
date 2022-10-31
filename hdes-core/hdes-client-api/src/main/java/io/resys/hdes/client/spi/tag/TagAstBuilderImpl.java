@@ -23,6 +23,7 @@ package io.resys.hdes.client.spi.tag;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -37,6 +38,7 @@ import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import io.resys.hdes.client.api.ast.ImmutableAstTag;
 import io.resys.hdes.client.api.ast.ImmutableAstTagValue;
 import io.resys.hdes.client.api.ast.ImmutableHeaders;
+import io.resys.hdes.client.spi.staticresources.Sha2;
 
 public class TagAstBuilderImpl implements TagAstBuilder {
   private final HdesTypesMapper typeDefs;
@@ -74,6 +76,7 @@ public class TagAstBuilderImpl implements TagAstBuilder {
     final List<AstTagValue> values = new ArrayList<>();
     
     for(AstCommand v : src) {
+      final var id = v.getId() == null ? UUID.randomUUID().toString() : v.getId();
       
       switch (v.getType()) {
       case SET_TAG_NAME: name = v.getValue(); break;
@@ -81,14 +84,16 @@ public class TagAstBuilderImpl implements TagAstBuilder {
       case SET_TAG_CREATED: created = LocalDateTime.parse(v.getValue()); break;
       case SET_TAG_DT: {
         values.add(ImmutableAstTagValue.builder()
-            .hash(v.getId())
+            .id(id)
+            .hash(Sha2.blob(v.getValue()))
             .bodyType(AstBodyType.DT).commands(typeDefs.commandsList(v.getValue()))
             .build());
         break;
       }
       case SET_TAG_FL: {
         values.add(ImmutableAstTagValue.builder()
-            .hash(v.getId())
+            .id(id)
+            .hash(Sha2.blob(v.getValue()))
             .bodyType(AstBodyType.FLOW)
             .addCommands(ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(v.getValue()).build())
             .build());
@@ -96,7 +101,8 @@ public class TagAstBuilderImpl implements TagAstBuilder {
       }
       case SET_TAG_ST: {
         values.add(ImmutableAstTagValue.builder()
-            .hash(v.getId())
+            .id(id)
+            .hash(Sha2.blob(v.getValue()))
             .bodyType(AstBodyType.FLOW_TASK)
             .addCommands(ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(v.getValue()).build())
             .build());
