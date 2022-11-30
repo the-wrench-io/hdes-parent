@@ -113,14 +113,23 @@ public abstract class ThenaStoreTemplate extends PersistenceCommands implements 
   }
   @Override
   public Uni<StoreEntity> create(CreateStoreEntity newType) {
-    final var gid = gid(newType.getBodyType());
+    final var gid = newType.getId() == null ? gid(newType.getBodyType()) : newType.getId();
+    
     final var entity = (StoreEntity) ImmutableStoreEntity.builder()
         .id(gid)
         .hash("")
         .body(newType.getBody())
         .bodyType(newType.getBodyType())
         .build();
-    return super.save(entity);
+    
+    if(newType.getId() == null) {
+      return super.save(entity);  
+    }
+    
+    return get().onItem().transformToUni(currentState -> {
+      cantHaveEntityWithId(newType.getId(), currentState);  
+      return super.save(entity);  
+    });
   }
 
   @Override
@@ -138,59 +147,76 @@ public abstract class ThenaStoreTemplate extends PersistenceCommands implements 
   }
   @Override
   public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {
-    final var commitBuilder = config.getClient().commit().head()
-        .head(config.getRepoName(), config.getHeadName())
-        .message("Save batch with new: " + batchType.getCreate().size() + " and updated: " + batchType.getUpdate().size() + " entries")
-        .parentIsLatest()
-        .author(config.getAuthorProvider().getAuthor());
+    return get().onItem().transformToUni(currentState -> {
+      final var commitBuilder = config.getClient().commit().head()
+          .head(config.getRepoName(), config.getHeadName())
+          .message("Save batch with new: " + batchType.getCreate().size() + " and updated: " + batchType.getUpdate().size() + " entries")
+          .parentIsLatest()
+          .author(config.getAuthorProvider().getAuthor());
+      
+      final List<String> ids = new ArrayList<>();
+      for(final var toBeSaved : batchType.getCreate()) {
+        final var id = toBeSaved.getId();
+        if(id != null) {
+          cantHaveEntityWithId(id, currentState);
+        }
+        
+        final var gid = toBeSaved.getId() == null ? gid(toBeSaved.getBodyType()) : toBeSaved.getId();
+        final var entity = (StoreEntity) ImmutableStoreEntity.builder()
+            .id(gid)
+            .hash("")
+            .body(toBeSaved.getBody())
+            .bodyType(toBeSaved.getBodyType())
+            .build();
+        commitBuilder.append(entity.getId(), config.getSerializer().toString(entity));
+        ids.add(gid);
+      }
+      for(final var toBeSaved : batchType.getUpdate()) {
+        final var id = toBeSaved.getId();
+        HdesAssert.isTrue(
+            currentState.getDecisions().containsKey(id) ||
+            currentState.getFlows().containsKey(id) ||
+            currentState.getServices().containsKey(id) ||
+            currentState.getTags().containsKey(id), 
+            () -> "Entity not found with id: '" + id + "'!");
+        
+        final var entity = (StoreEntity) ImmutableStoreEntity.builder()
+            .id(id)
+            .hash("")
+            .body(toBeSaved.getBody())
+            .bodyType(toBeSaved.getBodyType())
+            .build();
+        commitBuilder.append(entity.getId(), config.getSerializer().toString(entity));
+        ids.add(entity.getId());
+      }    
+      
+      return commitBuilder.build().onItem().transformToUni(commit -> {
+            if(commit.getStatus() == CommitStatus.OK) {
+              return config.getClient()
+                  .objects().blobState()
+                  .repo(config.getRepoName())
+                  .anyId(config.getHeadName())
+                  .blobNames(ids)
+                  .list().onItem()
+                  .transform(states -> {
+                    if(states.getStatus() != ObjectsStatus.OK) {
+                      // TODO
+                      throw new StoreException("LIST_FAIL", null, convertMessages2(states));
+                    }
+                    List<StoreEntity> entities = new ArrayList<>(); 
+                    for(final var state : states.getObjects().getBlob()) {
+                      StoreEntity start = (StoreEntity) config.getDeserializer().fromString(state);
+                      entities.add(start);
+                    }                  
+                    return entities;
+                  });
+            }
+            // TODO
+            throw new StoreException("SAVE_FAIL", null, convertMessages(commit));
+          });
+      
+    });
     
-    final List<String> ids = new ArrayList<>();
-    for(final var toBeSaved : batchType.getCreate()) {
-      final var gid = gid(toBeSaved.getBodyType());
-      final var entity = (StoreEntity) ImmutableStoreEntity.builder()
-          .id(gid)
-          .hash("")
-          .body(toBeSaved.getBody())
-          .bodyType(toBeSaved.getBodyType())
-          .build();
-      commitBuilder.append(entity.getId(), config.getSerializer().toString(entity));
-      ids.add(gid);
-    }
-    for(final var toBeSaved : batchType.getUpdate()) {
-      final var entity = (StoreEntity) ImmutableStoreEntity.builder()
-          .id(toBeSaved.getId())
-          .hash("")
-          .body(toBeSaved.getBody())
-          .bodyType(toBeSaved.getBodyType())
-          .build();
-      commitBuilder.append(entity.getId(), config.getSerializer().toString(entity));
-      ids.add(entity.getId());
-    }    
-    
-    return commitBuilder.build().onItem().transformToUni(commit -> {
-          if(commit.getStatus() == CommitStatus.OK) {
-            return config.getClient()
-                .objects().blobState()
-                .repo(config.getRepoName())
-                .anyId(config.getHeadName())
-                .blobNames(ids)
-                .list().onItem()
-                .transform(states -> {
-                  if(states.getStatus() != ObjectsStatus.OK) {
-                    // TODO
-                    throw new StoreException("LIST_FAIL", null, convertMessages2(states));
-                  }
-                  List<StoreEntity> entities = new ArrayList<>(); 
-                  for(final var state : states.getObjects().getBlob()) {
-                    StoreEntity start = (StoreEntity) config.getDeserializer().fromString(state);
-                    entities.add(start);
-                  }                  
-                  return entities;
-                });
-          }
-          // TODO
-          throw new StoreException("SAVE_FAIL", null, convertMessages(commit));
-        });
   }
   @Override
   public Uni<StoreEntity> delete(DeleteAstType deleteType) {
@@ -206,5 +232,12 @@ public abstract class ThenaStoreTemplate extends PersistenceCommands implements 
   public HistoryQuery history() {
     // TODO Auto-generated method stub
     return null;
+  }
+  
+  private void cantHaveEntityWithId(String id, StoreState currentState) {
+    HdesAssert.isTrue(!currentState.getDecisions().containsKey(id), () -> "Entity of type 'decision' already exists with id: '" + id + "'!");
+    HdesAssert.isTrue(!currentState.getFlows().containsKey(id), () -> "Entity of type 'flow' already exists with id: '" + id + "'!");
+    HdesAssert.isTrue(!currentState.getServices().containsKey(id), () -> "Entity of type 'service' already exists with id: '" + id + "'!");
+    HdesAssert.isTrue(!currentState.getTags().containsKey(id), () -> "Entity of type 'tag' already exists with id: '" + id + "'!");
   }
 }

@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 import org.immutables.value.Value;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -100,6 +102,7 @@ public interface HdesStore {
   @JsonDeserialize(as = ImmutableCreateStoreEntity.class)
   @Value.Immutable
   interface CreateStoreEntity extends Serializable {
+    @Nullable String getId(); // id can be predefined otherwise generated
     AstBodyType getBodyType();
     List<AstCommand> getBody();
   }
