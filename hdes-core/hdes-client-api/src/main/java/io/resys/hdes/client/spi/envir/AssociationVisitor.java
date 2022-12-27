@@ -50,7 +50,9 @@ import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.TagProgram;
 import io.resys.hdes.client.spi.flow.validators.FlowAssociationValidator;
 import io.resys.hdes.client.spi.util.HdesAssert;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class AssociationVisitor {
   private final Map<String, AstSource> externalIdToSource = new HashMap<>();
   private final Map<AstBodyType, List<String>> typeToExternalId = new HashMap<>(Map.of(
@@ -155,36 +157,40 @@ public class AssociationVisitor {
     externalIdToAssoc.put(wrapper.getId(), new ArrayList<ProgramAssociation>());
     
     final var program = wrapper.getProgram().get();
-    final var validator = new FlowAssociationValidator(wrapper.getAst().get());
-    program.getSteps().values().forEach(step -> visitFlowStep(wrapper, step, validator));
-    
-    for(final var entry : validator.build()) {
-      if(entry.getMessages().isEmpty()) {
-        continue;
-      }
+    try {
+      final var validator = new FlowAssociationValidator(wrapper.getAst().get());
+      program.getSteps().values().forEach(step -> visitFlowStep(wrapper, step, validator));
       
-      final var step = entry.getStep();
-      if(step != null) {
-        final var ref = entry.getStep().getBody().getRef();
+      for(final var entry : validator.build()) {
+        if(entry.getMessages().isEmpty()) {
+          continue;
+        }
         
-        entry.getMessages().forEach(msg -> {
-          final var progMsg = ImmutableProgramMessage.builder().id("dependency-error").msg("line: " + msg.getLine() + ": " + msg.getValue()).build();          
-          externalIdToDependencyErrors.get(wrapper.getId()).add(progMsg);
-        });
-        
-        final var allAssoc = externalIdToAssoc.get(wrapper.getId());          
-        final var assoc = allAssoc.stream().filter(a -> a.getRef().equals(ref)).findFirst();
-        allAssoc.remove(assoc.get());
-        allAssoc.add(ImmutableProgramAssociation.builder()
-            .from(assoc.get())
-            .refStatus(ProgramStatus.DEPENDENCY_ERROR)
-            .build());
-      } else {
-        entry.getMessages().forEach(msg -> {
-          final var progMsg = ImmutableProgramMessage.builder().id("dependency-warning").msg("line: " + msg.getLine() + ": " + msg.getValue()).build();          
-          externalIdToDependencyWarnings.get(wrapper.getId()).add(progMsg);
-        });
-      } 
+        final var step = entry.getStep();
+        if(step != null) {
+          final var ref = entry.getStep().getBody().getRef();
+          
+          entry.getMessages().forEach(msg -> {
+            final var progMsg = ImmutableProgramMessage.builder().id("dependency-error").msg("line: " + msg.getLine() + ": " + msg.getValue()).build();          
+            externalIdToDependencyErrors.get(wrapper.getId()).add(progMsg);
+          });
+          
+          final var allAssoc = externalIdToAssoc.get(wrapper.getId());          
+          final var assoc = allAssoc.stream().filter(a -> a.getRef().equals(ref)).findFirst();
+          allAssoc.remove(assoc.get());
+          allAssoc.add(ImmutableProgramAssociation.builder()
+              .from(assoc.get())
+              .refStatus(ProgramStatus.DEPENDENCY_ERROR)
+              .build());
+        } else {
+          entry.getMessages().forEach(msg -> {
+            final var progMsg = ImmutableProgramMessage.builder().id("dependency-warning").msg("line: " + msg.getLine() + ": " + msg.getValue()).build();          
+            externalIdToDependencyWarnings.get(wrapper.getId()).add(progMsg);
+          });
+        } 
+      }
+    } catch(Exception e) {
+      log.error("Failed to validate FLOW: " + wrapper.getId() + ", " + e.getMessage(), e);
     }
   }
   

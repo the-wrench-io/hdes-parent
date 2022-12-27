@@ -100,8 +100,8 @@ public class FlowAssociationValidator {
           unusedInputs.remove(taskInput.getDataType().getName());
         } else {
           error(entry, 
-              taskModel.getRef().getInputsNode().getStart(),
-              taskModel.getRef().getInputsNode().getSource().getValue().length(),
+              taskModel.getRef().getInputsNode() == null ? taskModel.getRef().getStart() : taskModel.getRef().getInputsNode().getStart(),
+              taskModel.getRef().getInputsNode() == null ? taskModel.getRef().getStart() : taskModel.getRef().getInputsNode().getSource().getValue().length(),
               "Task: " + taskModel.getKeyword() + ", is missing input: '" + input.getName() + "'!");
         }
 
