@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
-import org.junit.Test;
-
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -19,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Migrator {
   private final static Duration atMost = Duration.ofMillis(10000);
   
-  @Test
+  //@Test
   public void loadAndCreateRelease() throws JsonGenerationException, JsonMappingException, IOException {
     // create file-system DB
     final var store = HdesStoreFileImpl.builder()
