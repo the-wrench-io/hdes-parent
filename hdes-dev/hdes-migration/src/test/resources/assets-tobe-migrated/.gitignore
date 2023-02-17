@@ -1,3 +1,5 @@
 # Directories #
-/*/*
+/**/*.json
+/**/*.groovy
+/**/*.yaml
 
