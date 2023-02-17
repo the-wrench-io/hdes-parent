@@ -15,7 +15,8 @@
 
   <modules>
     <module>spring-app</module>
-    <module>quarkus-app</module>    
+    <module>quarkus-app</module>
+    <module>hdes-migration</module>    
   </modules>
 
 

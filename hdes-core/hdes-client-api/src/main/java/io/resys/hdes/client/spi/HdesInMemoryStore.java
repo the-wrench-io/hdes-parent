@@ -106,10 +106,15 @@ public class HdesInMemoryStore implements HdesStore {
   
   public static class Builder {
     private ObjectMapper objectMapper;
+    private StoreEntityLocation location = new StoreEntityLocation("classpath*:assets/");
     private final ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
-    private final StoreEntityLocation location = new StoreEntityLocation("classpath*:assets/");
     private final TypeReference<List<AstCommand>> ref = new TypeReference<List<AstCommand>>() {};
 
+    
+    public Builder location(StoreEntityLocation location) {
+      this.location = location;
+      return this;
+    }
     private List<AstCommand> readCommands(String commands) {
       try {
         if(commands.startsWith("{")) {
