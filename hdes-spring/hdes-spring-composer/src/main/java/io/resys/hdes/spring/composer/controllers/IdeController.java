@@ -28,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import io.resys.hdes.client.spi.util.FileUtils;
@@ -57,13 +56,13 @@ public class IdeController {
   @RequestMapping(value = ComposerConfigBean.IDE_CTX_PATH, produces = MediaType.TEXT_HTML_VALUE)
   public String wrench(
       HttpServletRequest request,
-      Model model,
-      @RequestHeader(value = "Host", required = false) String host,
-      @RequestHeader(value = "X-Forwarded-Proto", required = false, defaultValue = "") String proto) {
+      Model model) {
 
     Optional<IdeToken> token = this.token.map(t -> t.get(request)).orElse(Optional.empty());
-    
-    String restUrl = ControllerUtil.getRestUrl(proto, host, composerConfig.getRestContextPath(), contextPath);
+    String scheme = request.getScheme();
+    String serverName = request.getServerName();
+    int serverPort = request.getServerPort();
+    String restUrl = ControllerUtil.getRestUrl(scheme, serverName + ":" + serverPort, composerConfig.getRestContextPath(), contextPath);
     if(composerConfig.isIdeHttps() && !restUrl.startsWith("https")) {
       restUrl = restUrl.replaceFirst("http", "https");
     }
