@@ -62,10 +62,11 @@ public class IdeController {
     String scheme = request.getScheme();
     String serverName = request.getServerName();
     int serverPort = request.getServerPort();
-    String restUrl = ControllerUtil.getRestUrl(scheme, serverName + ":" + serverPort, composerConfig.getRestContextPath(), contextPath);
-    if(composerConfig.isIdeHttps() && !restUrl.startsWith("https")) {
-      restUrl = restUrl.replaceFirst("http", "https");
+    if(composerConfig.isIdeHttps()) {
+      serverPort = 443;
+      scheme = "https";
     }
+    String restUrl = ControllerUtil.getRestUrl(scheme, serverName + ":" + serverPort, composerConfig.getRestContextPath(), contextPath);
     
     ThymeleafConfig config = new ThymeleafConfig()
       .setContextPath("/" + FileUtils.cleanPath(composerConfig.getIdeContextPath()))
