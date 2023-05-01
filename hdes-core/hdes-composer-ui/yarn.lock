@@ -2031,10 +2031,10 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
-"@the-wrench-io/hdes-ide@^0.2.59":
-  version "0.2.59"
-  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.59.tgz#06d965e02d47b55aa0dbdac27340ab343a040856"
-  integrity sha512-+9dtiZH4gP2GX8IJSspm1fzqwxJuzkzILC/vky1zLv9AXPpMiLSNdwKbmjzfv67W7+0iW2qzwyfwJyP2b2gvDg==
+"@the-wrench-io/hdes-ide@^0.2.60":
+  version "0.2.60"
+  resolved "https://registry.yarnpkg.com/@the-wrench-io/hdes-ide/-/hdes-ide-0.2.60.tgz#59fad18c033e25f9907275153f84fa091fa39be5"
+  integrity sha512-67VgkuyE9CwAe7yF12833jb2/r+qX6x+e6+JGAMZtaSdX64w3wvokW4wYuQ079G56BgpUpkn/liu6onL42jYQw==
   dependencies:
     "@the-wrench-io/react-burger" "^1.0.41"
     codemirror "^5.40.0"
