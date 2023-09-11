@@ -20,9 +20,6 @@ package io.resys.hdes.client.spi;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesComposer;
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
@@ -40,6 +37,9 @@ import io.resys.hdes.client.spi.composer.DeleteEntityVisitor;
 import io.resys.hdes.client.spi.composer.DryRunVisitor;
 import io.resys.hdes.client.spi.composer.ImportEntityVisitor;
 import io.smallrye.mutiny.Uni;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class HdesComposerImpl implements HdesComposer {
 
@@ -125,7 +125,12 @@ public class HdesComposerImpl implements HdesComposer {
   public Uni<StoreDump> getStoreDump() {
     return client.store().query().get().onItem().transform(state -> new DataDumpVisitor(client).visit(state));
   }
-  
+
+  @Override
+  public HdesComposer withBranch(String branchName) {
+    return new HdesComposerImpl(client.withBranch(branchName));
+  }
+
   private ComposerState state(StoreState source) {
     // create envir
     final var envir = ComposerEntityMapper.toEnvir(client.envir(), source).build();

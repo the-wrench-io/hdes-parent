@@ -1,40 +1,6 @@
 package io.resys.hdes.client.spi;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-/*-
- * #%L
- * hdes-client-api
- * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.eclipse.jgit.lib.Constants;
-import org.eclipse.jgit.lib.ObjectId;
-import org.ehcache.Cache;
-import org.immutables.value.Value;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreState;
@@ -48,12 +14,26 @@ import io.resys.hdes.client.spi.git.GitDataSourceLoader;
 import io.resys.hdes.client.spi.git.GitFiles;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
+import org.eclipse.jgit.lib.Constants;
+import org.eclipse.jgit.lib.ObjectId;
+import org.ehcache.Cache;
+import org.immutables.value.Value;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 public class GitStore implements HdesStore {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitStore.class);
 
   private final GitConfig conn;
+  private final Optional<String> branchName;
   
   interface FileMarker {
     String getAbsolutePath();
@@ -68,7 +48,14 @@ public class GitStore implements HdesStore {
   public GitStore(GitConfig conn) {
     super();
     this.conn = conn;
+    this.branchName = Optional.empty();
   }
+
+  public GitStore(GitConfig conn, String branchName) {
+    this.conn = conn;
+    this.branchName = Optional.ofNullable(branchName);
+  }
+
   @Override
   public String getRepoName() {
     return conn.getInit().getRemote();
@@ -76,6 +63,15 @@ public class GitStore implements HdesStore {
   @Override
   public String getHeadName() {
     return conn.getInit().getBranch();
+  }
+  @Override
+  public Optional<String> getBranchName() {
+    return branchName;
+  }
+  @Override
+  public HdesStore withBranch(String branchName) {
+    Objects.requireNonNull(branchName, () -> "branchName can't be null!");
+    return this; // TODO
   }
   @Override
   public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {

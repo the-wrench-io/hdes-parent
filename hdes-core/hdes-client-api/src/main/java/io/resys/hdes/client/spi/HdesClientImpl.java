@@ -1,32 +1,6 @@
 package io.resys.hdes.client.spi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-/*-
- * #%L
- * hdes-client-api
- * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import java.util.List;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesCache;
 import io.resys.hdes.client.api.HdesClient;
@@ -51,6 +25,12 @@ import io.resys.hdes.client.spi.flow.validators.IdValidator;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class HdesClientImpl implements HdesClient {
 
@@ -121,7 +101,14 @@ public class HdesClientImpl implements HdesClient {
   public HdesClientConfig config() {
     return this.config;
   }
-  
+
+  @Override
+  public HdesClient withBranch(String branchName) {
+    final var newStore = store.withBranch(branchName);
+    final var newConfig = config.withBranch(branchName);
+    return new HdesClientImpl(defs, newStore, ast, newConfig);
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -182,12 +169,23 @@ public class HdesClientImpl implements HdesClient {
     private final HdesCache cache;
     private final ServiceInit serviceInit;
     private final DependencyInjectionContext dependencyInjectionContext;
+
+    private final Optional<String> branchName;
     
     public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors, HdesCache cache, ServiceInit serviceInit, DependencyInjectionContext dependencyInjectionContext) {
       this.flowVisitors.addAll(flowVisitors);
       this.cache = cache;
       this.serviceInit = serviceInit;
       this.dependencyInjectionContext = dependencyInjectionContext;
+      this.branchName = Optional.empty();
+    }
+
+    public HdesClientConfigImpl(List<AstFlowNodeVisitor> flowVisitors, HdesCache cache, ServiceInit serviceInit, DependencyInjectionContext dependencyInjectionContext, String branchName) {
+      this.flowVisitors.addAll(flowVisitors);
+      this.cache = cache;
+      this.serviceInit = serviceInit;
+      this.dependencyInjectionContext = dependencyInjectionContext;
+      this.branchName = Optional.ofNullable(branchName);
     }
     @Override
     public ServiceInit getServiceInit() {
@@ -206,6 +204,16 @@ public class HdesClientImpl implements HdesClient {
       this.flowVisitors.addAll(Arrays.asList(changes));
       return this;
     }
+    @Override
+    public Optional<String> getBranchName() {
+      return branchName;
+    }
+    @Override
+    public HdesClientConfig withBranch(String branchName) {
+      Objects.requireNonNull(branchName, () -> "branchName can't be null!");
+      return new HdesClientConfigImpl(flowVisitors, cache.withName(branchName), serviceInit, dependencyInjectionContext, branchName);
+    }
+
     @Override
     public DependencyInjectionContext getDependencyInjectionContext() {
       return dependencyInjectionContext;

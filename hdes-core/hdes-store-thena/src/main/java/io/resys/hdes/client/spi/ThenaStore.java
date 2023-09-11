@@ -1,36 +1,9 @@
 package io.resys.hdes.client.spi;
 
-import java.io.IOException;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
-/*-
- * #%L
- * hdes-client-api
- * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.spi.store.BlobDeserializer;
@@ -43,19 +16,45 @@ import io.resys.thena.docdb.spi.pgsql.PgErrors;
 import io.resys.thena.docdb.sql.DocDBFactorySql;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.sqlclient.PoolOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public class ThenaStore extends ThenaStoreTemplate implements HdesStore {
   private static final Logger LOGGER = LoggerFactory.getLogger(ThenaStore.class);
+  private final Optional<String> branchName;
 
   public ThenaStore(ThenaConfig config) {
     super(config);
+    this.branchName = Optional.empty();
   }
+
+  public ThenaStore(ThenaConfig config, String branchName) {
+    super(config);
+    this.branchName = Optional.ofNullable(branchName);
+  }
+
   @Override
   protected HdesStore createWithNewConfig(ThenaConfig config) {
     return new ThenaStore(config);
   }
   public static Builder builder() {
     return new Builder();
+  }
+
+  @Override
+  public Optional<String> getBranchName() {
+    return branchName;
+  }
+
+  @Override
+  public HdesStore withBranch(String branchName) {
+    Objects.requireNonNull(branchName, () -> "branchName can't be null!");
+    return this; // TODO
   }
 
   public static class Builder {

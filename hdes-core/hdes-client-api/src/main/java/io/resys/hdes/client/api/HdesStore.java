@@ -20,22 +20,20 @@ package io.resys.hdes.client.api;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.smallrye.mutiny.Uni;
+import org.immutables.value.Value;
+
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
-
-import org.immutables.value.Value;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.api.ast.AstCommand;
-import io.smallrye.mutiny.Uni;
 
 public interface HdesStore {
   Uni<StoreEntity> create(CreateStoreEntity newType);
@@ -48,7 +46,10 @@ public interface HdesStore {
   String getRepoName();
   String getHeadName();
   StoreRepoBuilder repo();
-  
+
+  Optional<String> getBranchName();
+  HdesStore withBranch(String branchName);
+
   interface StoreRepoBuilder {
     StoreRepoBuilder repoName(String repoName);
     StoreRepoBuilder headName(String headName);
