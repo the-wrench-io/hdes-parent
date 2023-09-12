@@ -75,9 +75,6 @@ public class HdesComposerRouter {
 
   @GetMapping(path = "/" + HdesWebConfig.MODELS, produces = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState dataModels(@RequestHeader(value = "Branch-Name", required = false) String branchName) {
-    if (branchName.isBlank()) {
-      return composer.get().await().atMost(timeout);
-    }
     return composer.withBranch(branchName).get().await().atMost(timeout);
   }
 
@@ -89,17 +86,11 @@ public class HdesComposerRouter {
   @PostMapping(path = "/" + HdesWebConfig.COMMANDS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerEntity<?> commands(@RequestBody String body, @RequestHeader(value = "Branch-Name", required = false) String branchName) throws JsonMappingException, JsonProcessingException {
     final var command = objectMapper.readValue(body, UpdateEntity.class);
-    if (branchName.isBlank()) {
-      return composer.dryRun(command).await().atMost(timeout);
-    }
     return composer.withBranch(branchName).dryRun(command).await().atMost(timeout);
   }
 
   @PostMapping(path = "/" + HdesWebConfig.DEBUGS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public DebugResponse debug(@RequestBody DebugRequest debug, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
-    if (branchName.isBlank()) {
-      return composer.debug(debug).await().atMost(timeout);
-    }
     return composer.withBranch(branchName).debug(debug).await().atMost(timeout);
   }
 
@@ -110,41 +101,26 @@ public class HdesComposerRouter {
 
   @PostMapping(path = "/" + HdesWebConfig.RESOURCES, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState create(@RequestBody CreateEntity entity, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
-    if (branchName.isBlank()) {
-      return composer.create(entity).await().atMost(timeout);
-    }
     return composer.withBranch(branchName).create(entity).await().atMost(timeout);
   }
 
   @PutMapping(path = "/" + HdesWebConfig.RESOURCES, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState update(@RequestBody UpdateEntity entity, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
-    if (branchName.isBlank()) {
-      return composer.update(entity).await().atMost(timeout);
-    }
     return composer.withBranch(branchName).update(entity).await().atMost(timeout);
   }
 
   @DeleteMapping(path = "/" + HdesWebConfig.RESOURCES + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState delete(@PathVariable String id, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
-    if (branchName.isBlank()) {
-      return composer.delete(id).await().atMost(timeout);
-    }
     return composer.withBranch(branchName).delete(id).await().atMost(timeout);
   }
 
   @GetMapping(path = "/" + HdesWebConfig.RESOURCES + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public ComposerEntity<?> get(@PathVariable String id, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
-    if (branchName.isBlank()) {
-      return composer.get(id).await().atMost(timeout);
-    }
     return composer.withBranch(branchName).get(id).await().atMost(timeout);
   }
 
   @PostMapping(path = "/" + HdesWebConfig.COPYAS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ComposerState copyAs(@RequestBody CopyAs entity, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
-    if (branchName.isBlank()) {
-      return composer.copyAs(entity).await().atMost(timeout);
-    }
     return composer.withBranch(branchName).copyAs(entity).await().atMost(timeout);
   }
 

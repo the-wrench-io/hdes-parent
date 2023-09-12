@@ -6,6 +6,7 @@ import io.resys.hdes.client.api.HdesStore.HistoryEntity;
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
+import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -89,6 +90,7 @@ public interface HdesComposer {
     Map<String, ComposerEntity<AstFlow>> getFlows();
     Map<String, ComposerEntity<AstService>> getServices();
     Map<String, ComposerEntity<AstDecision>> getDecisions();
+    Map<String, ComposerEntity<AstBranch>> getBranches();
   }
 
   @Value.Immutable

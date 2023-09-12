@@ -1,33 +1,5 @@
 package io.resys.hdes.client.spi.composer;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-
-/*-
- * #%L
- * hdes-client-api
- * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesComposer.ComposerState;
 import io.resys.hdes.client.api.HdesComposer.CreateEntity;
@@ -52,6 +24,13 @@ import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreateEntityVisitor {
 
@@ -85,10 +64,11 @@ public class CreateEntityVisitor {
     case FLOW: return initFlow(asset);
     case FLOW_TASK: return initFlowTask(asset);
     case TAG: return initTag(asset);
+    case BRANCH: return initBranch(asset);
     default: throw new ComposerException("Unknown asset: '" + asset.getType() + "'!"); 
     }
   }
-  
+
   private void visitValidations() {
     
     // DT validations
@@ -126,8 +106,20 @@ public class CreateEntityVisitor {
     if(tag.isPresent()) {
       throw new ComposerException(flow.get().getSource().getBodyType() + " asset with name: '" + asset.getName() + "' exists already!");
     }
+
+    // Branch validations
+    final var branch = state.getBranches().values().stream()
+        .filter(e -> e.getAst() != null)
+        .filter(e -> e.getAst().getName().equals(asset.getName()))
+        .findFirst();
+    if(branch.isPresent()) {
+      throw new ComposerException(branch.get().getSource().getBodyType() + " asset with name: '" + asset.getName() + "' exists already!");
+    }
   }
-  
+
+  public List<AstCommand> initBranch(CreateEntity entity) {
+    return new CreateBranchVisitor(state).visitCommands(entity.getBody());
+  }
 
   public List<AstCommand> initFlow(CreateEntity entity) {
     if(!entity.getBody().isEmpty()) {

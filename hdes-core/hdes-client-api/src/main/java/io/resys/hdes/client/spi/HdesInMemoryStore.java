@@ -351,7 +351,7 @@ public class HdesInMemoryStore implements HdesStore {
   @Override
   public HdesStore withBranch(String branchName) {
     Objects.requireNonNull(branchName, () -> "branchName can't be null!");
-    return this; // TODO
+    return new HdesInMemoryStore(entities, branchName);
   }
 
   @Override

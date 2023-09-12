@@ -54,7 +54,7 @@ public class ThenaStore extends ThenaStoreTemplate implements HdesStore {
   @Override
   public HdesStore withBranch(String branchName) {
     Objects.requireNonNull(branchName, () -> "branchName can't be null!");
-    return this; // TODO
+    return new ThenaStore(config, branchName);
   }
 
   public static class Builder {

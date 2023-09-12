@@ -20,15 +20,14 @@ package io.resys.hdes.client.spi.git;
  * #L%
  */
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.spi.GitConfig;
+import io.resys.hdes.client.spi.GitConfig.GitEntry;
+import io.resys.hdes.client.spi.GitConfig.GitFile;
+import io.resys.hdes.client.spi.ImmutableGitFile;
+import io.resys.hdes.client.spi.staticresources.Sha2;
+import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
@@ -39,14 +38,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.spi.GitConfig;
-import io.resys.hdes.client.spi.GitConfig.GitEntry;
-import io.resys.hdes.client.spi.GitConfig.GitFile;
-import io.resys.hdes.client.spi.ImmutableGitFile;
-import io.resys.hdes.client.spi.staticresources.Sha2;
-import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
-import io.resys.hdes.client.spi.util.HdesAssert;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GitDataSourceLoader implements AutoCloseable {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitDataSourceLoader.class);
@@ -112,8 +111,8 @@ public class GitDataSourceLoader implements AutoCloseable {
           .blobHash(Sha2.blob(content))
           .build();
         files.add(gitFile);
-        
-        HdesAssert.isTrue(resource.getFile().getAbsolutePath().endsWith(gitFile.getTreeValue()), () -> "Failed to create correct treeValue for: " + fileName);
+
+        HdesAssert.isTrue(resource.getFile().getAbsolutePath().replace('\\', '/').endsWith(gitFile.getTreeValue()), () -> "Failed to create correct treeValue for: " + fileName);
       }
       
       return files;

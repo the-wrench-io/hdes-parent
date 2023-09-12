@@ -71,7 +71,7 @@ public class GitStore implements HdesStore {
   @Override
   public HdesStore withBranch(String branchName) {
     Objects.requireNonNull(branchName, () -> "branchName can't be null!");
-    return this; // TODO
+    return new GitStore(conn, branchName);
   }
   @Override
   public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {
