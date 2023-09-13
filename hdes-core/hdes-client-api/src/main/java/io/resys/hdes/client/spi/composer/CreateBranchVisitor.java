@@ -40,7 +40,7 @@ public class CreateBranchVisitor {
     final var tagComposerEntity= Objects.requireNonNull(state.getTags().get(tagId), () -> "Tag '" + tagId + "' not found!");
     final var tag = Objects.requireNonNull(tagComposerEntity.getAst(), () -> "AstTag '" + tagId + "' not found!");
 
-    result.add(ImmutableAstCommand.builder().type(AstCommandValue.CREATE_BRANCH).value(tagId + "_dev").build());
+    result.add(ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_NAME).value(tagId + "_dev").build());
 
     final var decisions = tag.getValues().stream().filter(astTagValue -> astTagValue.getBodyType().equals(AstBodyType.DT)).collect(Collectors.toList());
     final var flows = tag.getValues().stream().filter(astTagValue -> astTagValue.getBodyType().equals(AstBodyType.FLOW)).collect(Collectors.toList());
