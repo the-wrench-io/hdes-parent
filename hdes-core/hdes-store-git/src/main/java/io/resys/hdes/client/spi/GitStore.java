@@ -12,6 +12,7 @@ import io.resys.hdes.client.spi.GitConfig.GitFileReload;
 import io.resys.hdes.client.spi.git.GitConnectionFactory;
 import io.resys.hdes.client.spi.git.GitDataSourceLoader;
 import io.resys.hdes.client.spi.git.GitFiles;
+import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.jgit.lib.Constants;
@@ -71,7 +72,9 @@ public class GitStore implements HdesStore {
   @Override
   public HdesStore withBranch(String branchName) {
     Objects.requireNonNull(branchName, () -> "branchName can't be null!");
-    return new GitStore(conn, branchName);
+    return new GitStore(ImmutableGitConfig.builder().from(conn)
+        .location(new StoreEntityLocation(conn.getAbsolutePath(), branchName))
+        .build(), branchName);
   }
   @Override
   public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {
@@ -82,35 +85,35 @@ public class GitStore implements HdesStore {
         final var git = GitFiles.builder().git(conn).build();
         
         // create
-        for(final var create : batchType.getCreate()) {
+        for (final var create : batchType.getCreate()) {
           final var created = git.create(create.getBodyType(), create.getBody());
           gitFiles.add(created);
           entries.add(ImmutableBatchEntry.builder().file(created).body(create.getBody()).build());
         }
-        
+
         // update 
-        for(final var update : batchType.getUpdate()) {
+        for (final var update : batchType.getUpdate()) {
           final var updated = git.update(update.getId(), update.getBodyType(), update.getBody());
           gitFiles.add(updated);
           entries.add(ImmutableBatchEntry.builder().file(updated).body(update.getBody()).build());
         }
-        
+
         final var refresh = git.push(gitFiles);
         cache(refresh);
-        
+
         return entries.stream().map(entry -> (StoreEntity) ImmutableStoreEntity.builder()
-              .id(entry.getFile().getId())
-              .hash(entry.getFile().getBlobHash())
-              .body(entry.getBody())
-              .bodyType(entry.getFile().getBodyType())
-              .build())
+                .id(entry.getFile().getId())
+                .hash(entry.getFile().getBlobHash())
+                .body(entry.getBody())
+                .bodyType(entry.getFile().getBodyType())
+                .build())
             .collect(Collectors.toList());
-      } catch(Exception e) {
+      } catch (Exception e) {
         LOGGER.error(new StringBuilder()
-            .append("Failed to run batch:").append(System.lineSeparator()) 
+            .append("Failed to run batch:").append(System.lineSeparator())
             .append("  - because: ").append(e.getMessage()).toString(), e);
         throw new RuntimeException(e.getMessage(), e);
-      }      
+      }
     });
   }
   @Override

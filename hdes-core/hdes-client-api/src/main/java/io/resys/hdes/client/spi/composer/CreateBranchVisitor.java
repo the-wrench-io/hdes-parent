@@ -1,12 +1,15 @@
 package io.resys.hdes.client.spi.composer;
 
 import io.resys.hdes.client.api.HdesComposer.ComposerState;
+import io.resys.hdes.client.api.HdesStore;
+import io.resys.hdes.client.api.ImmutableCreateStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
 import lombok.RequiredArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,9 +19,9 @@ import java.util.stream.Collectors;
 public class CreateBranchVisitor {
 
   private final ComposerState state;
-  private final List<AstCommand> result = new ArrayList<>();
+  private final List<HdesStore.CreateStoreEntity> result = new ArrayList<>();
 
-  public List<AstCommand> visitCommands(List<AstCommand> commands) {
+  public List<HdesStore.CreateStoreEntity> visitCommands(List<AstCommand> commands) {
     for (final var command : commands) {
       visitCommand(command);
     }
@@ -40,20 +43,36 @@ public class CreateBranchVisitor {
     final var tagComposerEntity= Objects.requireNonNull(state.getTags().get(tagId), () -> "Tag '" + tagId + "' not found!");
     final var tag = Objects.requireNonNull(tagComposerEntity.getAst(), () -> "AstTag '" + tagId + "' not found!");
 
-    result.add(ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_NAME).value(tagId + "_dev").build());
+    result.add(ImmutableCreateStoreEntity.builder()
+        .bodyType(AstBodyType.BRANCH)
+        .addBody(
+          ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_NAME).value(tagId + "_dev").build(),
+          ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_CREATED).value(String.valueOf(LocalDateTime.now())).build(),
+          ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_TAG).value(tagId).build()
+        )
+        .build());
 
     final var decisions = tag.getValues().stream().filter(astTagValue -> astTagValue.getBodyType().equals(AstBodyType.DT)).collect(Collectors.toList());
     final var flows = tag.getValues().stream().filter(astTagValue -> astTagValue.getBodyType().equals(AstBodyType.FLOW)).collect(Collectors.toList());
     final var flowTasks = tag.getValues().stream().filter(astTagValue -> astTagValue.getBodyType().equals(AstBodyType.FLOW_TASK)).collect(Collectors.toList());
 
     for (final var decision : decisions) {
-      result.add(ImmutableAstCommand.builder().type(AstCommandValue.CREATE_BRANCH_DT).nestedCommands(decision.getCommands()).build());
+      result.add(ImmutableCreateStoreEntity.builder()
+          .bodyType(AstBodyType.DT)
+          .body(decision.getCommands())
+          .build());
     }
     for (final var flow : flows) {
-      result.add(ImmutableAstCommand.builder().type(AstCommandValue.CREATE_BRANCH_FLOW).nestedCommands(flow.getCommands()).build());
+      result.add(ImmutableCreateStoreEntity.builder()
+          .bodyType(AstBodyType.FLOW)
+          .body(flow.getCommands())
+          .build());
     }
     for (final var flowTask : flowTasks) {
-      result.add(ImmutableAstCommand.builder().type(AstCommandValue.CREATE_BRANCH_FLOWTASK).nestedCommands(flowTask.getCommands()).build());
+      result.add(ImmutableCreateStoreEntity.builder()
+          .bodyType(AstBodyType.FLOW_TASK)
+          .body(flowTask.getCommands())
+          .build());
     }
   }
 }

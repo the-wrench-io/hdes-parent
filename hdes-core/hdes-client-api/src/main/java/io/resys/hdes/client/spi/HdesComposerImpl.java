@@ -72,9 +72,8 @@ public class HdesComposerImpl implements HdesComposer {
   }
   @Override
   public Uni<ComposerState> create(CreateEntity asset) {
-    // TODO: handle batch create
     return client.store().query().get().onItem().transform(this::state)
-        .onItem().transformToUni(state -> client.store().create(new CreateEntityVisitor(state, asset, client).visit()))
+        .onItem().transformToUni(state -> client.store().batch(new CreateEntityVisitor(state, asset, client).visit()))
         .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
   }
   @Override

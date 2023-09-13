@@ -33,6 +33,11 @@ public class StoreEntityLocation implements Serializable {
     super();
     this.value = value;
   }
+
+  public StoreEntityLocation(String value, String branchName) {
+    super();
+    this.value = value + "/branch/" + branchName;
+  }
   
   //getResourceFullName
   public String getAbsolutePath(AstBodyType type, String pointer) {

@@ -27,7 +27,6 @@ import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
 import java.io.Serializable;
-import java.util.List;
 
 @JsonSerialize(as = ImmutableAstCommand.class)
 @JsonDeserialize(as = ImmutableAstCommand.class)
@@ -38,7 +37,6 @@ public interface AstCommand extends Serializable {
   String getId();
   @Nullable
   String getValue();
-  List<AstCommand> getNestedCommands();
   AstCommandValue getType();
 
   
@@ -66,7 +64,8 @@ public interface AstCommand extends Serializable {
     SET_VALUE_SET,
 
     // branch related
-    CREATE_BRANCH, SET_BRANCH_NAME, CREATE_BRANCH_DT, CREATE_BRANCH_FLOWTASK, CREATE_BRANCH_FLOW
+    CREATE_BRANCH, SET_BRANCH_NAME, SET_BRANCH_CREATED, SET_BRANCH_TAG,
+    CREATE_BRANCH_DT, CREATE_BRANCH_FLOWTASK, CREATE_BRANCH_FLOW
   }
 
 }

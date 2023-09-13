@@ -4,7 +4,9 @@ import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesComposer.ComposerState;
 import io.resys.hdes.client.api.HdesComposer.CreateEntity;
 import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
+import io.resys.hdes.client.api.HdesStore.ImportStoreEntity;
 import io.resys.hdes.client.api.ImmutableCreateStoreEntity;
+import io.resys.hdes.client.api.ImmutableImportStoreEntity;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
@@ -38,6 +40,7 @@ public class CreateEntityVisitor {
   private final CreateEntity asset;
   private final ComposerState state;
   private final AstCommandOptimiser optimise;
+  private final List<CreateStoreEntity> result = new ArrayList<>();
   
   public CreateEntityVisitor(ComposerState state, CreateEntity asset, HdesClient client) {
     super();
@@ -46,25 +49,24 @@ public class CreateEntityVisitor {
     this.client = client;
     this.optimise = new AstCommandOptimiser(client);
   }
-  public CreateStoreEntity visit() {
+  public ImportStoreEntity visit() {
     if(asset.getName() == null && asset.getBody().isEmpty()) {
       throw new ComposerException("Name can't be null if body is empty!");
     }
     visitValidations();
-    final var body = visitBody();
-    return ImmutableCreateStoreEntity.builder()
-        .bodyType(asset.getType())
-        .body(body)
+    visitBody();
+    return ImmutableImportStoreEntity.builder()
+        .addAllCreate(result)
         .build();
   }
   
-  private List<AstCommand> visitBody() {
+  private void visitBody() {
     switch (asset.getType()) {
-    case DT: return initDecision(asset);
-    case FLOW: return initFlow(asset);
-    case FLOW_TASK: return initFlowTask(asset);
-    case TAG: return initTag(asset);
-    case BRANCH: return initBranch(asset);
+    case DT: initDecision(asset); break;
+    case FLOW: initFlow(asset); break;
+    case FLOW_TASK: initFlowTask(asset); break;
+    case TAG: initTag(asset); break;
+    case BRANCH: initBranch(asset); break;
     default: throw new ComposerException("Unknown asset: '" + asset.getType() + "'!"); 
     }
   }
@@ -117,13 +119,17 @@ public class CreateEntityVisitor {
     }
   }
 
-  public List<AstCommand> initBranch(CreateEntity entity) {
-    return new CreateBranchVisitor(state).visitCommands(entity.getBody());
+  public void initBranch(CreateEntity entity) {
+    final List<CreateStoreEntity> createEntities = new CreateBranchVisitor(state).visitCommands(entity.getBody());
+    result.addAll(createEntities);
   }
 
-  public List<AstCommand> initFlow(CreateEntity entity) {
+  public void initFlow(CreateEntity entity) {
     if(!entity.getBody().isEmpty()) {
-      return entity.getBody();
+      result.add(ImmutableCreateStoreEntity.builder()
+          .bodyType(asset.getType())
+          .body(entity.getBody())
+          .build());
     }
     
     final var lnr = System.lineSeparator();
@@ -131,10 +137,14 @@ public class CreateEntityVisitor {
         .append("id: ").append(entity.getName()).append(lnr)
         .toString();
     
-    return Arrays.asList(ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(body).build());
+    final var commands = Arrays.asList(ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(body).build());
+    result.add(ImmutableCreateStoreEntity.builder()
+        .bodyType(asset.getType())
+        .body(commands)
+        .build());
   }
 
-  public List<AstCommand> initTag(CreateEntity entity) {
+  public void initTag(CreateEntity entity) {
     final var decisions = state.getDecisions().values().stream()
       .map(decision -> {
         final var body = client.mapper().commandsString(optimise.optimise(decision.getSource().getCommands(), AstBodyType.DT));
@@ -171,28 +181,35 @@ public class CreateEntityVisitor {
 
       .collect(Collectors.toList());
     
-    final var result = new ArrayList<AstCommand>();
-    result.add(ImmutableAstCommand.builder()
+    final var commands = new ArrayList<AstCommand>();
+    commands.add(ImmutableAstCommand.builder()
           .value(LocalDateTime.now().toString())
           .type(AstCommandValue.SET_TAG_CREATED)
           .build());
-    result.add(ImmutableAstCommand.builder()
+    commands.add(ImmutableAstCommand.builder()
         .value(entity.getName())
         .type(AstCommandValue.SET_TAG_NAME)
         .build());
-    result.add(ImmutableAstCommand.builder()
+    commands.add(ImmutableAstCommand.builder()
         .value(entity.getDesc())
         .type(AstCommandValue.SET_TAG_DESC)
         .build());
-    result.addAll(decisions);
-    result.addAll(flowtasks);
-    result.addAll(flows);
-    return Collections.unmodifiableList(result);
+    commands.addAll(decisions);
+    commands.addAll(flowtasks);
+    commands.addAll(flows);
+
+    result.add(ImmutableCreateStoreEntity.builder()
+        .bodyType(asset.getType())
+        .body(Collections.unmodifiableList(commands))
+        .build());
   }
   
-  public List<AstCommand> initFlowTask(CreateEntity entity) {
+  public void initFlowTask(CreateEntity entity) {
     if(!entity.getBody().isEmpty()) {
-      return entity.getBody();
+      result.add(ImmutableCreateStoreEntity.builder()
+          .bodyType(asset.getType())
+          .body(entity.getBody())
+          .build());
     }
     
     final var lnr = System.lineSeparator();
@@ -228,16 +245,23 @@ public class CreateEntityVisitor {
         .append("  }").append(lnr)
         .append("}").append(lnr)
         .toString();
-    
-    return Arrays.asList(ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(body).build());
+
+    final var commands = Arrays.asList(ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(body).build());
+    result.add(ImmutableCreateStoreEntity.builder()
+        .bodyType(asset.getType())
+        .body(commands)
+        .build());
   }
 
-  private List<AstCommand> initDecision(CreateEntity entity) {
+  private void initDecision(CreateEntity entity) {
     if(!entity.getBody().isEmpty()) {
-      return entity.getBody();
+      result.add(ImmutableCreateStoreEntity.builder()
+          .bodyType(asset.getType())
+          .body(entity.getBody())
+          .build());
     }
     
-    return Arrays.asList(
+    final var commands = Arrays.asList(
       ImmutableAstCommand.builder().type(AstCommandValue.ADD_HEADER_IN).build(),
       ImmutableAstCommand.builder().type(AstCommandValue.SET_HEADER_REF).id("0").value("inputColumn").build(),
       ImmutableAstCommand.builder().type(AstCommandValue.SET_HEADER_TYPE).id("0").value("STRING").build(),
@@ -246,5 +270,10 @@ public class CreateEntityVisitor {
       ImmutableAstCommand.builder().type(AstCommandValue.SET_HEADER_TYPE).id("1").value("STRING").build(),
       ImmutableAstCommand.builder().type(AstCommandValue.SET_NAME).value(entity.getName()).build()
     );
+
+    result.add(ImmutableCreateStoreEntity.builder()
+        .bodyType(asset.getType())
+        .body(commands)
+        .build());
   }
 }
