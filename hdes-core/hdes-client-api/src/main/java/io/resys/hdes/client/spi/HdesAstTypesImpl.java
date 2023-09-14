@@ -20,21 +20,20 @@ package io.resys.hdes.client.spi;
  * #L%
  */
 
-import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-
 import groovy.lang.GroovyClassLoader;
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
+import io.resys.hdes.client.spi.branch.BranchAstBuilderImpl;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.decision.DecisionAstBuilderImpl;
 import io.resys.hdes.client.spi.flow.FlowAstBuilderImpl;
 import io.resys.hdes.client.spi.groovy.GroovyCompilationCustomizer;
 import io.resys.hdes.client.spi.groovy.ServiceAstBuilderImpl;
 import io.resys.hdes.client.spi.tag.TagAstBuilderImpl;
+import org.codehaus.groovy.control.CompilerConfiguration;
+import org.codehaus.groovy.control.customizers.ASTTransformationCustomizer;
 
 public class HdesAstTypesImpl implements HdesAstTypes {
   private final ObjectMapper yaml = new ObjectMapper(new YAMLFactory());
@@ -72,5 +71,9 @@ public class HdesAstTypesImpl implements HdesAstTypes {
   @Override
   public TagAstBuilder tag() {
     return new TagAstBuilderImpl(typeDefs);
+  }
+  @Override
+  public BranchAstBuilder branch() {
+    return new BranchAstBuilderImpl(typeDefs);
   }
 }

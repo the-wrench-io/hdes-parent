@@ -76,8 +76,9 @@ public class GitDataSourceLoader implements AutoCloseable {
         Map.entry(AstBodyType.DT, this.location.getDtRegex()),
         Map.entry(AstBodyType.FLOW_TASK, this.location.getFlowTaskRegex()),
         Map.entry(AstBodyType.FLOW, this.location.getFlowRegex()),
-        Map.entry(AstBodyType.TAG, this.location.getTagRegex())
-    ).parallelStream().map(this::readFile).collect(Collectors.toList());
+        Map.entry(AstBodyType.TAG, this.location.getTagRegex()),
+        Map.entry(AstBodyType.BRANCH, this.location.getBranchRegex())
+    ).stream().map(this::readFile).collect(Collectors.toList());
     
     final var files = GitFiles.builder().git(conn).build();
     final var result = new ArrayList<GitEntry>();
@@ -131,51 +132,5 @@ public class GitDataSourceLoader implements AutoCloseable {
   
   @Override
   public void close() throws Exception {}
-  
-  /*
-  private static final String TAG_PREFIX = "refs/tags/";
-  private List<GitEntry> readTags() {
-    try {
-      final var result = new ArrayList<GitEntry>();
-      for(Ref ref : conn.getClient().tagList().call()) {        
-        final String name = ref.getName().startsWith(TAG_PREFIX) ? 
-            ref.getName().substring(TAG_PREFIX.length()) : 
-            ref.getName();
-        
-        final var commands = Arrays.asList((AstCommand) ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(name).build());
-        final var blobValue = conn.getSerializer().write(commands);
-        final var id = ref.getObjectId().getName();
-        
-        RevWalk revWalk = new RevWalk(repo);
-        try {
-          final RevCommit commit = revWalk.parseCommit(ref.getObjectId());      
-          final var created = new Timestamp(commit.getCommitTime() * 1000L);
-          final var entry = ImmutableGitEntry.builder()
-              .id(id)
-              .revision(id)
-              .bodyType(AstBodyType.TAG)
-              .treeValue(ref.getName())
-              .blobValue(blobValue)
-              .created(created)
-              .modified(created)
-              .blobHash(Sha2.blob(blobValue))
-              .commands(commands)
-              .build();
-          result.add(entry);
-        } catch (Exception e) {
-          LOGGER.error("Can't resolve timestamps for tag: " + name + System.lineSeparator() + e.getMessage(), e);
-          throw new RuntimeException(e.getMessage(), e);
-        } finally {
-          revWalk.close();
-        }
-      }
-      
-      return result;
-    } catch (GitAPIException e) {
-      LOGGER.error("Can't read tags for repository! " + System.lineSeparator() + e.getMessage(), e);
-      throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-  */
   
 }

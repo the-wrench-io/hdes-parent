@@ -20,24 +20,22 @@ package io.resys.hdes.client.api.programs;
  * #L%
  */
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
-import org.immutables.value.Value;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
+import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
 import io.resys.hdes.client.api.ast.TypeDef;
+import org.immutables.value.Value;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Value.Immutable
 public interface ProgramEnvir {  
@@ -46,6 +44,7 @@ public interface ProgramEnvir {
   Map<String, ProgramWrapper<AstFlow, FlowProgram>> getFlowsByName();
   Map<String, ProgramWrapper<AstDecision, DecisionProgram>> getDecisionsByName();
   Map<String, ProgramWrapper<AstService, ServiceProgram>> getServicesByName();
+  Map<String, ProgramWrapper<AstBranch, BranchProgram>> getBranchesByName();
 
   @Value.Immutable
   interface ProgramWrapper<A extends AstBody, P extends Program> {

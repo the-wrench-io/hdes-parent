@@ -1,46 +1,17 @@
 package io.resys.hdes.client.spi.envir;
 
-import java.util.ArrayList;
-
-/*-
- * #%L
- * hdes-client-api
- * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesCache;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
 import io.resys.hdes.client.api.ast.AstBody.CommandMessageType;
+import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.programs.BranchProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.ImmutableProgramEnvir;
@@ -52,11 +23,21 @@ import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.api.programs.TagProgram;
+import io.resys.hdes.client.spi.branch.BranchProgramBuilder;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
 import io.resys.hdes.client.spi.tag.TagProgramBuilder;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ProgramEnvirFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(ProgramEnvirFactory.class);
@@ -117,6 +98,7 @@ public class ProgramEnvirFactory {
       case FLOW_TASK: envir.putServicesByName(ast.getName(), (ProgramWrapper<AstService, ServiceProgram>) e); break;
       case FLOW: envir.putFlowsByName(ast.getName(), (ProgramWrapper<AstFlow, FlowProgram>) e); break;
       case TAG: envir.putTagsByName(ast.getName(), (ProgramWrapper<AstTag, TagProgram>) e); break;
+      case BRANCH: envir.putBranchesByName(ast.getName(), (ProgramWrapper<AstBranch, BranchProgram>) e); break;
       default: break;
       
       }
@@ -154,6 +136,7 @@ public class ProgramEnvirFactory {
     case FLOW: result = visitFlow(entity); break;
     case FLOW_TASK: result = visitFlowTask(entity); break;
     case TAG: result = visitTag(entity); break;
+    case BRANCH: result = visitBranch(entity); break;
     default: throw new IllegalArgumentException("unknown command format type: '" + entity.getBodyType() + "'!");
     }
     return result;
@@ -361,6 +344,75 @@ public class ProgramEnvirFactory {
         .ast(Optional.ofNullable(ast)).program(Optional.ofNullable(program))
         .source(src)
         .build(); 
+  }
+
+  private ProgramWrapper<AstBranch, BranchProgram> visitBranch(AstSource src) {
+    final ImmutableProgramWrapper.Builder<AstBranch, BranchProgram> builder = ImmutableProgramWrapper.builder();
+    builder.status(ProgramStatus.UP);
+    AstBranch ast = null;
+    try {
+      if(cachlessIds.contains(src.getId())) {
+        ast = hdesTypes.branch().src(src.getCommands()).build();
+      } else {
+        final var cached = cache.getAst(src);
+        if(cached.isPresent()) {
+          ast = (AstBranch) cached.get();
+        } else {
+          ast = hdesTypes.branch().src(src.getCommands()).build();
+          cache.setAst(ast, src);
+        }
+      }
+
+      final var errors = ast.getMessages().stream()
+          .filter(m -> m.getType() == CommandMessageType.ERROR)
+          .map(error -> ImmutableProgramMessage.builder()
+              .id("ast-error")
+              .msg("line: " + error.getLine() + ": " + error.getValue())
+              .build())
+          .collect(Collectors.toList());
+      builder.addAllErrors(errors);
+      if(!errors.isEmpty()) {
+        LOGGER.error(new StringBuilder()
+            .append(String.join(System.lineSeparator(), errors.stream().map(e -> e.getMsg()).collect(Collectors.toList())))
+            .append("  - branch source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString());
+        builder.status(ProgramStatus.AST_ERROR);
+      }
+    } catch(Exception e) {
+      LOGGER.error(new StringBuilder()
+          .append(e.getMessage()).append(System.lineSeparator())
+          .append("  - branch source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+          .toString(), e);
+      builder.status(ProgramStatus.AST_ERROR).addAllErrors(visitException(e));
+    }
+
+    BranchProgram program = null;
+    if(ast != null) {
+      try {
+        if(cachlessIds.contains(src.getId())) {
+          program = new BranchProgramBuilder(config).build(ast);
+        } else {
+          final var cached = cache.getProgram(src);
+          if(cached.isPresent()) {
+            program = (BranchProgram) cached.get();
+          } else {
+            program = new BranchProgramBuilder(config).build(ast);
+            cache.setProgram(program, src);
+          }
+        }
+      } catch(Exception e) {
+        LOGGER.error(new StringBuilder()
+            .append(e.getMessage()).append(System.lineSeparator())
+            .append("  - branch source: ").append(this.hdesFactory.commandsString(src.getCommands()))
+            .toString(), e);
+        builder.status(ProgramStatus.PROGRAM_ERROR).addAllErrors(visitException(e));
+      }
+    }
+
+    return builder.id(src.getId()).type(AstBodyType.BRANCH)
+        .ast(Optional.ofNullable(ast)).program(Optional.ofNullable(program))
+        .source(src)
+        .build();
   }
   
   

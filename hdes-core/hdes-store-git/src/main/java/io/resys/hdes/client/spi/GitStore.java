@@ -328,6 +328,7 @@ public class GitStore implements HdesStore {
             case FLOW_TASK: state.putServices(entry.getKey(), map(entry.getValue())); break;
             case DT: state.putDecisions(entry.getKey(), map(entry.getValue())); break;
             case TAG: state.putTags(entry.getKey(), map(entry.getValue())); break;
+            case BRANCH: state.putBranches(entry.getKey(), map(entry.getValue())); break;
             default: throw new RuntimeException("Unknown body type: '" + mapped.getBodyType() + "'!");
             }
           }

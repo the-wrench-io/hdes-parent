@@ -100,11 +100,13 @@ public interface HdesClient {
     EnvirCommandFormatBuilder tag(String commandJson);
     EnvirCommandFormatBuilder flow(String commandJson);
     EnvirCommandFormatBuilder decision(String commandJson);
+    EnvirCommandFormatBuilder branch(String commandJson);
     EnvirCommandFormatBuilder service(String commandJson);
-    
+
     EnvirCommandFormatBuilder tag(StoreEntity entity);
     EnvirCommandFormatBuilder flow(StoreEntity entity);
     EnvirCommandFormatBuilder decision(StoreEntity entity);
+    EnvirCommandFormatBuilder branch(StoreEntity entity);
     EnvirCommandFormatBuilder service(StoreEntity entity);
     
     EnvirBuilder build();

@@ -24,6 +24,7 @@ import io.resys.hdes.client.api.HdesClient.EnvirBuilder;
 import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableComposerEntity;
 import io.resys.hdes.client.api.ImmutableComposerState;
+import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
@@ -38,6 +39,7 @@ public class ComposerEntityMapper {
     source.getServices().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).service(v).build());
     source.getFlows().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).flow(v).build());
     source.getTags().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).tag(v).build());
+    source.getBranches().values().forEach(v -> envirBuilder.addCommand().id(v.getId()).branch(v).build());
     
     return envirBuilder;
   }
@@ -92,7 +94,18 @@ public class ComposerEntityMapper {
         .build();
       builder.putTags(tag.getId(), tag);
       break;
-    
+    case BRANCH:
+      final var branch = ImmutableComposerEntity.<AstBranch>builder()
+        .id(wrapper.getId())
+        .ast((AstBranch) wrapper.getAst().orElse(null))
+        .status(wrapper.getStatus())
+        .errors(wrapper.getErrors())
+        .warnings(wrapper.getWarnings())
+        .associations(wrapper.getAssociations())
+        .source(wrapper.getSource())
+        .build();
+      builder.putBranches(branch.getId(), branch);
+      break;
     default:
       break;
     }
