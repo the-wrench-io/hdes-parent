@@ -33,6 +33,7 @@ import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.api.programs.Program.ProgramResult;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
@@ -61,8 +62,17 @@ public interface HdesComposer {
   Uni<DebugResponse> debug(DebugRequest entity);
   Uni<ComposerEntity<?>> dryRun(UpdateEntity entity);
   Uni<StoreDump> getStoreDump();
+  Uni<TagDiff> diff(DiffRequest request);
 
   HdesComposer withBranch(String branchName);
+
+  @JsonSerialize(as = ImmutableDiffRequest.class)
+  @JsonDeserialize(as = ImmutableDiffRequest.class)
+  @Value.Immutable
+  interface DiffRequest extends Serializable {
+    String getBaseId();
+    String getTargetId();
+  }
 
   @JsonSerialize(as = ImmutableDebugResponse.class)
   @JsonDeserialize(as = ImmutableDebugResponse.class)

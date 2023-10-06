@@ -27,6 +27,7 @@ import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableComposerState;
 import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
 import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 import io.resys.hdes.client.spi.composer.CopyAsEntityVisitor;
@@ -124,6 +125,15 @@ public class HdesComposerImpl implements HdesComposer {
   @Override
   public Uni<StoreDump> getStoreDump() {
     return client.store().query().get().onItem().transform(state -> new DataDumpVisitor(client).visit(state));
+  }
+
+  @Override
+  public Uni<TagDiff> diff(DiffRequest request) {
+    return client.store().query().get().onItem().transform(state -> client.diff()
+        .state(state)
+        .baseId(request.getBaseId())
+        .targetId(request.getTargetId())
+        .build());
   }
 
   @Override

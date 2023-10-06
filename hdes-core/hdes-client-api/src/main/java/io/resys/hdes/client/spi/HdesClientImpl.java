@@ -40,6 +40,7 @@ import io.resys.hdes.client.spi.config.HdesClientConfig.DependencyInjectionConte
 import io.resys.hdes.client.spi.config.HdesClientConfig.ServiceInit;
 import io.resys.hdes.client.spi.decision.DecisionCSVBuilder;
 import io.resys.hdes.client.spi.decision.DecisionProgramBuilder;
+import io.resys.hdes.client.spi.diff.HdesClientDiffBuilder;
 import io.resys.hdes.client.spi.envir.ProgramEnvirFactory;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.flow.validators.IdValidator;
@@ -75,6 +76,10 @@ public class HdesClientImpl implements HdesClient {
   public EnvirBuilder envir() {
     ProgramEnvirFactory factory = new ProgramEnvirFactory(ast, defs, config);
     return new HdesClientEnvirBuilder(factory, defs);
+  }
+  @Override
+  public DiffBuilder diff() {
+    return new HdesClientDiffBuilder();
   }
   @Override
   public AstBuilder ast() {
