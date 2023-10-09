@@ -3,7 +3,6 @@ package io.resys.hdes.client.spi.diff;
 import com.github.difflib.DiffUtils;
 import io.resys.hdes.client.api.HdesClient.DiffBuilder;
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
-import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.diff.ImmutableTagDiff;
@@ -39,11 +38,12 @@ public class HdesClientDiffBuilder implements DiffBuilder {
 
   private String baseId;
   private String targetId;
-  private StoreState state;
+  private Collection<StoreEntity> tags;
+  private LocalDateTime targetDate;
 
 
-  public HdesClientDiffBuilder state(StoreState state) {
-    this.state = state;
+  public HdesClientDiffBuilder tags(Collection<StoreEntity> tags) {
+    this.tags = tags;
     return this;
   }
 
@@ -57,13 +57,17 @@ public class HdesClientDiffBuilder implements DiffBuilder {
     return this;
   }
 
+  public HdesClientDiffBuilder targetDate(LocalDateTime targetDate) {
+    this.targetDate = targetDate;
+    return this;
+  }
+
   @Override
   public TagDiff build() {
-    HdesAssert.notNull(state, () -> "state must be defined!");
+    HdesAssert.notNull(tags, () -> "tags must be defined!");
     HdesAssert.notEmpty(baseId, () -> "baseId must be defined!");
     HdesAssert.notEmpty(targetId, () -> "targetId must be defined!");
-
-    final var tags = state.getTags().values();
+    HdesAssert.notNull(targetDate, () -> "targetDate must be defined!");
 
     final var baseTag = getTagById(tags, baseId);
     final var targetTag = getTagById(tags, targetId);
@@ -102,7 +106,7 @@ public class HdesClientDiffBuilder implements DiffBuilder {
     return ImmutableTagDiff.builder()
         .baseId(baseId)
         .targetId(targetId)
-        .created(LocalDateTime.now())
+        .created(targetDate)
         .baseName(getNameFromTag(baseTag))
         .targetName(getNameFromTag(targetTag))
         .body(diffBody.toString())

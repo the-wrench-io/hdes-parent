@@ -130,7 +130,7 @@ public class HdesComposerImpl implements HdesComposer {
   @Override
   public Uni<TagDiff> diff(DiffRequest request) {
     return client.store().query().get().onItem().transform(state -> client.diff()
-        .state(state)
+        .tags(state.getTags().values())
         .baseId(request.getBaseId())
         .targetId(request.getTargetId())
         .build());

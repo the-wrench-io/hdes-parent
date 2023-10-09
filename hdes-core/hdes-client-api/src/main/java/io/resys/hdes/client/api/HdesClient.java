@@ -48,6 +48,8 @@ import io.smallrye.mutiny.Uni;
 import javax.annotation.Nullable;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -68,9 +70,10 @@ public interface HdesClient {
   HdesClient withBranch(String branchName);
 
   interface DiffBuilder {
-    DiffBuilder state(HdesStore.StoreState state);
+    DiffBuilder tags(Collection<StoreEntity> tags);
     DiffBuilder baseId(String baseId);
     DiffBuilder targetId(String targetId);
+    DiffBuilder targetDate(LocalDateTime targetDate);
     TagDiff build();
   }
   
