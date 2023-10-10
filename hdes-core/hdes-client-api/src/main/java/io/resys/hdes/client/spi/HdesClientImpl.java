@@ -45,6 +45,7 @@ import io.resys.hdes.client.spi.envir.ProgramEnvirFactory;
 import io.resys.hdes.client.spi.flow.FlowProgramBuilder;
 import io.resys.hdes.client.spi.flow.validators.IdValidator;
 import io.resys.hdes.client.spi.groovy.ServiceProgramBuilder;
+import io.resys.hdes.client.spi.summary.HdesClientSummaryBuilder;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
 
@@ -81,6 +82,12 @@ public class HdesClientImpl implements HdesClient {
   public DiffBuilder diff() {
     return new HdesClientDiffBuilder();
   }
+
+  @Override
+  public SummaryBuilder summary() {
+    return new HdesClientSummaryBuilder();
+  }
+
   @Override
   public AstBuilder ast() {
     return new HdesClientAstBuilder(defs, ast);

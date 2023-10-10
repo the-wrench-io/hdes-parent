@@ -27,6 +27,7 @@ import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableComposerState;
 import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
 import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
 import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
@@ -39,6 +40,7 @@ import io.resys.hdes.client.spi.composer.DryRunVisitor;
 import io.resys.hdes.client.spi.composer.ImportEntityVisitor;
 import io.smallrye.mutiny.Uni;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,6 +135,15 @@ public class HdesComposerImpl implements HdesComposer {
         .tags(state.getTags().values())
         .baseId(request.getBaseId())
         .targetId(request.getTargetId())
+        .targetDate(LocalDateTime.now())
+        .build());
+  }
+
+  @Override
+  public Uni<AstTagSummary> summary(String tagId) {
+    return client.store().query().get().onItem().transform(state -> client.summary()
+        .tags(state.getTags().values())
+        .tagId(tagId)
         .build());
   }
 

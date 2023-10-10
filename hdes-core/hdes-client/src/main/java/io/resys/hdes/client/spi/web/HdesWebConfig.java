@@ -30,6 +30,7 @@ public class HdesWebConfig {
   public final static String RESOURCES = "resources";
   public final static String HISTORY = "history";
   public final static String DIFF = "diff";
+  public static final String SUMMARY = "summary";
   public final static String VERSION = "version";
 
   private final String servicePath; // context root for the rest of services

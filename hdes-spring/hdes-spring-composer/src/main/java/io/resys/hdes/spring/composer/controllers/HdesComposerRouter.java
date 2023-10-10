@@ -35,6 +35,7 @@ import io.resys.hdes.client.api.HdesComposer.UpdateEntity;
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
 import io.resys.hdes.client.api.ImmutableDiffRequest;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
 import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.spi.web.HdesWebConfig;
 import io.resys.hdes.spring.composer.ComposerConfigBean;
@@ -135,6 +136,11 @@ public class HdesComposerRouter {
   public TagDiff diff(@RequestParam("baseId") String baseId, @RequestParam("targetId") String targetId) {
     final var request = ImmutableDiffRequest.builder().baseId(baseId).targetId(targetId).build();
     return composer.diff(request).await().atMost(timeout);
+  }
+
+  @GetMapping(path = "/" + HdesWebConfig.SUMMARY + "/{tagId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public AstTagSummary summary(@PathVariable("tagId") String tagId) {
+    return composer.summary(tagId).await().atMost(timeout);
   }
 
   @GetMapping(path = "/" + HdesWebConfig.VERSION, produces = MediaType.APPLICATION_JSON_VALUE)

@@ -33,6 +33,7 @@ import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
 import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.api.programs.Program.ProgramResult;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
@@ -63,6 +64,7 @@ public interface HdesComposer {
   Uni<ComposerEntity<?>> dryRun(UpdateEntity entity);
   Uni<StoreDump> getStoreDump();
   Uni<TagDiff> diff(DiffRequest request);
+  Uni<AstTagSummary> summary(String tagId);
 
   HdesComposer withBranch(String branchName);
 

@@ -30,6 +30,7 @@ import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.diff.TagDiff;
@@ -60,6 +61,7 @@ public interface HdesClient {
   ExecutorBuilder executor(ProgramEnvir envir);
   EnvirBuilder envir();
   DiffBuilder diff();
+  SummaryBuilder summary();
   HdesTypesMapper mapper();
   HdesAstTypes types();
   HdesStore store();
@@ -68,6 +70,12 @@ public interface HdesClient {
   HdesClientConfig config();
 
   HdesClient withBranch(String branchName);
+
+  interface SummaryBuilder {
+    SummaryBuilder tags(Collection<StoreEntity> tags);
+    SummaryBuilder tagId(String tagId);
+    AstTagSummary build();
+  }
 
   interface DiffBuilder {
     DiffBuilder tags(Collection<StoreEntity> tags);
