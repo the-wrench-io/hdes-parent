@@ -36,7 +36,7 @@ public class StoreEntityLocation implements Serializable {
 
   public StoreEntityLocation(String value, String branchName) {
     super();
-    this.value = value + "/branch/" + branchName;
+    this.value = value + "branch/" + branchName + "/";
   }
   
   //getResourceFullName

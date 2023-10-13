@@ -24,11 +24,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.resys.hdes.client.api.HdesAstTypes;
 import io.resys.hdes.client.api.HdesAstTypes.BranchAstBuilder;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
+import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
 import io.resys.hdes.client.api.ast.ImmutableAstBranch;
 import io.resys.hdes.client.api.ast.ImmutableAstCommand;
+import io.resys.hdes.client.api.ast.ImmutableHeaders;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -82,6 +84,8 @@ public class BranchAstBuilderImpl implements HdesAstTypes.BranchAstBuilder {
         .name(name)
         .created(created)
         .tagId(tagId)
+        .bodyType(AstBody.AstBodyType.BRANCH)
+        .headers(ImmutableHeaders.builder().build())
         .build();
   }
 

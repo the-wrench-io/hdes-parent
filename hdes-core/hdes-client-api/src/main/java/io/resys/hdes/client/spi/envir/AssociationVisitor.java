@@ -20,21 +20,15 @@ package io.resys.hdes.client.spi.envir;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
+import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstDecision.HitPolicy;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.programs.BranchProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.FlowProgram;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
@@ -52,6 +46,14 @@ import io.resys.hdes.client.spi.flow.validators.FlowAssociationValidator;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Slf4j
 public class AssociationVisitor {
   private final Map<String, AstSource> externalIdToSource = new HashMap<>();
@@ -59,7 +61,8 @@ public class AssociationVisitor {
         AstBodyType.DT, new ArrayList<String>(),
         AstBodyType.FLOW_TASK, new ArrayList<String>(),
         AstBodyType.FLOW, new ArrayList<String>(),
-        AstBodyType.TAG, new ArrayList<String>()
+        AstBodyType.TAG, new ArrayList<String>(),
+        AstBodyType.BRANCH, new ArrayList<String>()
       ));
   private final Map<String, List<ProgramMessage>> externalIdToDependencyErrors = new HashMap<>();
   private final Map<String, List<ProgramMessage>> externalIdToDependencyWarnings = new HashMap<>();
@@ -381,6 +384,20 @@ public class AssociationVisitor {
           .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
           .build();
     }
+      case BRANCH: {
+        final ImmutableProgramWrapper.Builder<AstBranch, BranchProgram> builder = ImmutableProgramWrapper.builder();
+        final var assoc = externalIdToAssoc.get(wrapper.getId());
+        final var errors = externalIdToDependencyErrors.get(wrapper.getId());
+
+        return builder
+            .from((ProgramWrapper<AstBranch, BranchProgram>) wrapper)
+            .associations(assoc == null ? Collections.emptyList() : assoc)
+            .status(errors.isEmpty() ? wrapper.getStatus() : ProgramStatus.DEPENDENCY_ERROR)
+            .addAllErrors(externalIdToDependencyErrors.get(wrapper.getId()))
+            .addAllErrors(errors)
+            .addAllWarnings(externalIdToDependencyWarnings.get(wrapper.getId()))
+            .build();
+      }
     default: throw new IllegalArgumentException("unknown command format type: '" + wrapper.getType() + "'!");
     }
   }

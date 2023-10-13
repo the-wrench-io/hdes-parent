@@ -20,22 +20,19 @@ package io.resys.hdes.client.spi.git;
  * #L%
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
+import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.spi.GitConfig;
+import io.resys.hdes.client.spi.GitConfig.GitEntry;
+import io.resys.hdes.client.spi.GitConfig.GitFile;
+import io.resys.hdes.client.spi.GitConfig.GitFileReload;
+import io.resys.hdes.client.spi.ImmutableGitEntry;
+import io.resys.hdes.client.spi.ImmutableGitFile;
+import io.resys.hdes.client.spi.ImmutableGitFileReload;
+import io.resys.hdes.client.spi.staticresources.Sha2;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
@@ -57,22 +54,25 @@ import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
-import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.api.ast.AstCommand;
-import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.spi.GitConfig;
-import io.resys.hdes.client.spi.GitConfig.GitEntry;
-import io.resys.hdes.client.spi.GitConfig.GitFile;
-import io.resys.hdes.client.spi.GitConfig.GitFileReload;
-import io.resys.hdes.client.spi.ImmutableGitEntry;
-import io.resys.hdes.client.spi.ImmutableGitFile;
-import io.resys.hdes.client.spi.ImmutableGitFileReload;
-import io.resys.hdes.client.spi.staticresources.Sha2;
-import io.resys.hdes.client.spi.util.HdesAssert;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 public class GitFiles {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitFiles.class);
+  private static final String SEPARATOR = "/";
   private final GitConfig conn;
   
   public GitFiles(GitConfig connection) {
@@ -353,7 +353,7 @@ public class GitFiles {
       return Optional.empty();
     }
 
-    final var paths = path.split( File.separator);
+    final var paths = path.split(SEPARATOR);
     final var fileName = paths[paths.length -1];
     final var id = fileName.substring(0, fileName.indexOf("."));
     
@@ -361,14 +361,16 @@ public class GitFiles {
   }
   
   private AstBodyType getBodyType(String path) {
-    if(path.contains(File.separator + "dt" + File.separator)) {
+    if(path.contains(SEPARATOR + "dt" + SEPARATOR)) {
       return AstBodyType.DT;
-    } else if(path.contains(File.separator + "flow" + File.separator)) {
+    } else if(path.contains(SEPARATOR + "flow" + SEPARATOR)) {
       return AstBodyType.FLOW;
-    } else if(path.contains(File.separator + "flowtask" + File.separator)) {
+    } else if(path.contains(SEPARATOR + "flowtask" + SEPARATOR)) {
       return AstBodyType.FLOW_TASK;
-    } else if(path.contains(File.separator + "tag" + File.separator)) {
+    } else if(path.contains(SEPARATOR + "tag" + SEPARATOR)) {
       return AstBodyType.TAG;
+    } else if(path.contains(SEPARATOR + "branch" + SEPARATOR)) {
+      return AstBodyType.BRANCH;
     }
     
     throw new RuntimeException("Failed to load asset body type: " + path + "!");
@@ -376,7 +378,7 @@ public class GitFiles {
   
   private String getContent(String path) {
     try {
-      return IOUtils.toString(new FileInputStream(conn.getAbsolutePath() + File.separator + path), StandardCharsets.UTF_8);
+      return IOUtils.toString(new FileInputStream(conn.getAbsolutePath() + SEPARATOR + path), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException("Failed to load asset content from: " + path + "!" + e.getMessage(), e);
     }
@@ -411,10 +413,15 @@ public class GitFiles {
     } finally {
       fileOutputStream.close();          
     }
+
+    final var locationPathItems = location.getValue().split("/");
+    final var endPath = locationPathItems[locationPathItems.length - 1];
+    final var branchPath = endPath.endsWith("_dev") ? "branch/" + endPath + "/" : "";
+    final var treeValue = conn.getAssetsPath() + branchPath + location.getFileName(bodyType, id);
     
     return ImmutableGitFile.builder()
         .id(id)
-        .treeValue(conn.getAssetsPath() +  location.getFileName(bodyType, id))
+        .treeValue(treeValue)
         .blobValue(blob)
         .blobHash(Sha2.blob(blob))
         .bodyType(bodyType)

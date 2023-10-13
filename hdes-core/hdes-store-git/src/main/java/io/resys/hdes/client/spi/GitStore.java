@@ -94,7 +94,7 @@ public class GitStore implements HdesStore {
   public HdesStore withBranch(String branchName) {
     Objects.requireNonNull(branchName, () -> "branchName can't be null!");
     return new GitStore(ImmutableGitConfig.builder().from(conn)
-        .location(new StoreEntityLocation(conn.getAbsolutePath(), branchName))
+        .location(new StoreEntityLocation(conn.getAbsoluteAssetsPath(), branchName))
         .build(), branchName);
   }
   @Override
