@@ -90,6 +90,12 @@ public class StoreEntityLocation implements Serializable {
     default: throw new IllegalArgumentException("Unknown asset type:" + type + "!");
     }
   }
+  public String resolveTreeValue(String assetsPath, AstBodyType bodyType, String id) {
+    final var locationPathItems = this.getValue().split("/");
+    final var endPath = locationPathItems[locationPathItems.length - 1];
+    final var branchPath = endPath.endsWith("_dev") ? "branch/" + endPath + "/" : "";
+    return assetsPath + branchPath + this.getFileName(bodyType, id);
+  }
   private String withRegex(String exp) {
     return value + exp;
   }

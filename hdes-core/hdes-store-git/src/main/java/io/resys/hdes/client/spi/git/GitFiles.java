@@ -225,7 +225,7 @@ public class GitFiles {
         revWalk.setTreeFilter(treeFilter);
         revWalk.sort(RevSort.COMMIT_TIME_DESC);
         revWalk.sort(RevSort.REVERSE, true);
-        created = new Timestamp(revWalk.next().getCommitTime() * 1000L);
+        created = new Timestamp(System.currentTimeMillis());
 
       } catch(Exception e) {
         LOGGER.error(
@@ -325,7 +325,7 @@ public class GitFiles {
         } else {
           final var content = getContent(entry.getNewPath());
           final var bodyType = getBodyType(entry.getNewPath());
-          final var treeValue = conn.getAssetsPath() +  conn.getLocation().getFileName(bodyType, id.get());
+          final var treeValue = conn.getLocation().resolveTreeValue(conn.getAssetsPath(), bodyType, id.get());
           final var gitFile = ImmutableGitFile.builder()
             .id(id.get())
             .treeValue(treeValue)
@@ -414,10 +414,7 @@ public class GitFiles {
       fileOutputStream.close();          
     }
 
-    final var locationPathItems = location.getValue().split("/");
-    final var endPath = locationPathItems[locationPathItems.length - 1];
-    final var branchPath = endPath.endsWith("_dev") ? "branch/" + endPath + "/" : "";
-    final var treeValue = conn.getAssetsPath() + branchPath + location.getFileName(bodyType, id);
+    final var treeValue = location.resolveTreeValue(conn.getAssetsPath(), bodyType, id);
     
     return ImmutableGitFile.builder()
         .id(id)
@@ -447,10 +444,12 @@ public class GitFiles {
     } finally {
       fileOutputStream.close();          
     }
+
+    final var treeValue = location.resolveTreeValue(conn.getAssetsPath(), bodyType, id);
     
     return ImmutableGitFile.builder()
         .id(id)
-        .treeValue(conn.getAssetsPath() +  location.getFileName(bodyType, id))
+        .treeValue(treeValue)
         .blobValue(blob)
         .bodyType(bodyType)
         .blobHash(Sha2.blob(blob))

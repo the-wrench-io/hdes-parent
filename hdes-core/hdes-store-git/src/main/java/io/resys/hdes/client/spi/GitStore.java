@@ -323,10 +323,28 @@ public class GitStore implements HdesStore {
           while(iterator.hasNext()) {
             final var entry = iterator.next();
             final var mapped = map(entry.getValue());
+            final var treeValue = entry.getValue().getTreeValue();
+            final var isBranchSpecified = branchName.isPresent();
+            final var isAssetBranched = treeValue.contains("_dev");
+            final var assetOnDefaultBranch = !isBranchSpecified && !isAssetBranched;
+            final var assetBelongsToBranch = isBranchSpecified && treeValue.contains(branchName.get());
+
             switch (mapped.getBodyType()) {
-            case FLOW: state.putFlows(entry.getKey(), map(entry.getValue())); break;
-            case FLOW_TASK: state.putServices(entry.getKey(), map(entry.getValue())); break;
-            case DT: state.putDecisions(entry.getKey(), map(entry.getValue())); break;
+            case FLOW:
+              if (assetOnDefaultBranch || assetBelongsToBranch) {
+                state.putFlows(entry.getKey(), map(entry.getValue()));
+              }
+              break;
+            case FLOW_TASK:
+              if (assetOnDefaultBranch || assetBelongsToBranch) {
+                state.putServices(entry.getKey(), map(entry.getValue()));
+              }
+              break;
+            case DT:
+              if (assetOnDefaultBranch || assetBelongsToBranch) {
+                state.putDecisions(entry.getKey(), map(entry.getValue()));
+              }
+              break;
             case TAG: state.putTags(entry.getKey(), map(entry.getValue())); break;
             case BRANCH: state.putBranches(entry.getKey(), map(entry.getValue())); break;
             default: throw new RuntimeException("Unknown body type: '" + mapped.getBodyType() + "'!");
@@ -349,6 +367,7 @@ public class GitStore implements HdesStore {
     private String sshPath;
     private ObjectMapper objectMapper;
     private HdesCredsSupplier creds;
+    private String branchName;
     
     public Builder remote(String remote) {
       this.remote = remote;
@@ -372,6 +391,10 @@ public class GitStore implements HdesStore {
     }
     public Builder creds(HdesCredsSupplier creds) {
       this.creds = creds;
+      return this;
+    }
+    public Builder withBranch(String branchName) {
+      this.branchName = branchName;
       return this;
     }
     
@@ -398,7 +421,11 @@ public class GitStore implements HdesStore {
       final var init = ImmutableGitInit.builder().branch(branch).remote(remote).storage(storage).sshPath(sshPath).build();
       final GitConfig conn;
       try {
-        conn = GitConnectionFactory.create(init, creds, objectMapper);
+        if (branchName != null) {
+          conn = GitConnectionFactory.create(init, creds, objectMapper, Optional.ofNullable(branchName));
+        } else {
+          conn = GitConnectionFactory.create(init, creds, objectMapper, Optional.empty());
+        }
       } catch(Exception e) {
         throw new RuntimeException(e.getMessage(), e);
       }

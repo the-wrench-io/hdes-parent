@@ -65,12 +65,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 
 public class GitConnectionFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitConnectionFactory.class);
 
   
-  public static GitConfig create(GitInit config, HdesCredsSupplier creds, ObjectMapper objectMapper) throws IOException, 
+  public static GitConfig create(GitInit config, HdesCredsSupplier creds, ObjectMapper objectMapper, Optional<String> branchName) throws IOException,
       RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
     
     final var path = StringUtils.isEmpty(config.getRemote()) ? Files.createTempDirectory("git_repo") : new File(config.getStorage()).toPath();
@@ -122,12 +123,16 @@ public class GitConnectionFactory {
                 ResourcePoolsBuilder.heap(cacheHeap))) 
         .build(); 
     cacheManager.init();
+
+    final var location = branchName.isPresent() ?
+        new StoreEntityLocation(cleanedAbsoluteAssetPath, branchName.get()) :
+        new StoreEntityLocation(cleanedAbsoluteAssetPath);
     
     return ImmutableGitConfig.builder()
         .init(config)
         .serializer(new GitSerializerImpl(objectMapper))
         .client(git)
-        .location(new StoreEntityLocation(cleanedAbsoluteAssetPath))
+        .location(location)
         .cacheManager(cacheManager)
         .cacheName(cacheName)
         .cacheHeap(cacheHeap)
