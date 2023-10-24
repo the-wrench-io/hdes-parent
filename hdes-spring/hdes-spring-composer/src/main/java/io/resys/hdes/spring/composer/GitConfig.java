@@ -51,7 +51,6 @@ public class GitConfig {
         .branch(gitConfigBean.getBranchSpecifier())
         .sshPath(gitConfigBean.getPrivateKey())
         .storage(gitConfigBean.getRepositoryPath())
-        .withBranch("v2_dev")
         .objectMapper(objectMapper)
         .creds(creds)
         .build();

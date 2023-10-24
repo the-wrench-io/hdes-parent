@@ -52,25 +52,25 @@ public class StoreEntityLocation implements Serializable {
     return filename.substring(0, filename.lastIndexOf("."));
   }
   public String getFlowRegex() {
-    return withRegex("flow/*.json");
+    return withRegex("**/flow/*.json");
   }
   public String getFlowTaskRegex() {
-    return withRegex("flowtask/*.json");
+    return withRegex("**/flowtask/*.json");
   }
   public String getDtRegex() {
-    return withRegex("dt/*.json");
+    return withRegex("**/dt/*.json");
   }
   public String getTagRegex() {
-    return withRegex("tag/*.json");
+    return withRegex("**/tag/*.json");
   }
   public String getMigrationRegex() {
-    return withRegex("migration/*.json");
+    return withRegex("**/migration/*.json");
   }
   public String getDumpRegex() {
-    return withRegex("dump/*.json");
+    return withRegex("**/dump/*.json");
   }
   public String getBranchRegex() {
-    return withRegex("branch/*.json");
+    return withRegex("**/branch/*.json");
   }
   public String getValue() {
     return value;
@@ -93,7 +93,7 @@ public class StoreEntityLocation implements Serializable {
   public String resolveTreeValue(String assetsPath, AstBodyType bodyType, String id) {
     final var locationPathItems = this.getValue().split("/");
     final var endPath = locationPathItems[locationPathItems.length - 1];
-    final var branchPath = endPath.endsWith("_dev") ? "branch/" + endPath + "/" : "";
+    final var branchPath = endPath.contains("_dev") ? "branch/" + endPath + "/" : "";
     return assetsPath + branchPath + this.getFileName(bodyType, id);
   }
   private String withRegex(String exp) {

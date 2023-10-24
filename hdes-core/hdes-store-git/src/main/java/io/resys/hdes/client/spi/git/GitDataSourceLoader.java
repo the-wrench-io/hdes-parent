@@ -102,7 +102,9 @@ public class GitDataSourceLoader implements AutoCloseable {
         final var fileName = resource.getFilename();
         final var id = fileName.substring(0, fileName.indexOf("."));
 
-        final var treeValue = this.location.resolveTreeValue(conn.getAssetsPath(), bodyType, id);
+        final var treeValue = resource.getFile().getPath()
+            .replace("\\", "/")
+            .replace(this.conn.getAbsolutePath(), "");
 
         final var gitFile = ImmutableGitFile.builder()
           .id(id)

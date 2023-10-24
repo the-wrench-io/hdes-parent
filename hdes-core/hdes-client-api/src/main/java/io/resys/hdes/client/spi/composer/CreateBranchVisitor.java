@@ -61,14 +61,14 @@ public class CreateBranchVisitor {
 
   private void visitCreateBranch(AstCommand command) {
     final var tagId = command.getId();
-    final var tagName = command.getValue();
+    final var branchName = command.getValue();
     final var tagComposerEntity= Objects.requireNonNull(state.getTags().get(tagId), () -> "Tag '" + tagId + "' not found!");
     final var tag = Objects.requireNonNull(tagComposerEntity.getAst(), () -> "AstTag '" + tagId + "' not found!");
 
     result.add(ImmutableCreateStoreEntity.builder()
         .bodyType(AstBodyType.BRANCH)
         .addBody(
-          ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_NAME).value(tagName + "_dev").build(),
+          ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_NAME).value(branchName).build(),
           ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_CREATED).value(String.valueOf(LocalDateTime.now())).build(),
           ImmutableAstCommand.builder().type(AstCommandValue.SET_BRANCH_TAG).value(tagId).build()
         )

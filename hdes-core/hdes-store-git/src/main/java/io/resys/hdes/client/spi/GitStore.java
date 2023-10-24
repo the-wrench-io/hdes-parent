@@ -367,7 +367,6 @@ public class GitStore implements HdesStore {
     private String sshPath;
     private ObjectMapper objectMapper;
     private HdesCredsSupplier creds;
-    private String branchName;
     
     public Builder remote(String remote) {
       this.remote = remote;
@@ -391,10 +390,6 @@ public class GitStore implements HdesStore {
     }
     public Builder creds(HdesCredsSupplier creds) {
       this.creds = creds;
-      return this;
-    }
-    public Builder withBranch(String branchName) {
-      this.branchName = branchName;
       return this;
     }
     
@@ -421,11 +416,7 @@ public class GitStore implements HdesStore {
       final var init = ImmutableGitInit.builder().branch(branch).remote(remote).storage(storage).sshPath(sshPath).build();
       final GitConfig conn;
       try {
-        if (branchName != null) {
-          conn = GitConnectionFactory.create(init, creds, objectMapper, Optional.ofNullable(branchName));
-        } else {
-          conn = GitConnectionFactory.create(init, creds, objectMapper, Optional.empty());
-        }
+        conn = GitConnectionFactory.create(init, creds, objectMapper);
       } catch(Exception e) {
         throw new RuntimeException(e.getMessage(), e);
       }
