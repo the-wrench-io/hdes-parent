@@ -1,29 +1,5 @@
 package io.resys.hdes.client.spi.store;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
-/*-
- * #%L
- * hdes-client-api
- * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
- */
-
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
 import io.resys.hdes.client.api.ImmutableStoreExceptionMsg;
@@ -35,6 +11,10 @@ import io.resys.thena.docdb.api.actions.CommitActions.CommitStatus;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsStatus;
 import io.resys.thena.docdb.api.actions.RepoActions.RepoStatus;
 import io.smallrye.mutiny.Uni;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class ThenaStoreTemplate extends PersistenceCommands implements HdesStore {
   public ThenaStoreTemplate(ThenaConfig config) {
@@ -219,7 +199,7 @@ public abstract class ThenaStoreTemplate extends PersistenceCommands implements 
     
   }
   @Override
-  public Uni<StoreEntity> delete(DeleteAstType deleteType) {
+  public Uni<List<StoreEntity>> delete(DeleteAstType deleteType) {
     final Uni<EntityState> query = getEntityState(deleteType.getId());
     return query.onItem().transformToUni(state -> delete(state.getEntity()));
   }

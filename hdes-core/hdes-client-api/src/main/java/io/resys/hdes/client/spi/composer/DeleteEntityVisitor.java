@@ -52,6 +52,7 @@ public class DeleteEntityVisitor {
     case FLOW: return visitFlow(asset);
     case FLOW_TASK: return visitFlowTask(asset);
     case TAG: return visitTag(asset);
+    case BRANCH: return AstBodyType.BRANCH;
     default: throw new ComposerException("Unknown asset of type: '" + bodyType + "'!"); 
     }
   }
@@ -68,6 +69,8 @@ public class DeleteEntityVisitor {
       
     } else if(state.getTags().containsKey(assetId)) {
       return state.getTags().get(assetId);
+    } else if(state.getBranches().containsKey(assetId)) {
+      return state.getBranches().get(assetId);
     }
     
     throw new ComposerException("No entity with id: '" + assetId + "'");

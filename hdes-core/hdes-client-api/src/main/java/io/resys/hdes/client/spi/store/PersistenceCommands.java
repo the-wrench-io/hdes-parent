@@ -20,9 +20,6 @@ package io.resys.hdes.client.spi.store;
  * #L%
  */
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreExceptionMsg;
 import io.resys.hdes.client.api.HdesStore.StoreState;
@@ -38,6 +35,10 @@ import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsStatus;
 import io.smallrye.mutiny.Uni;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 
 public class PersistenceCommands implements ThenaConfig.Commands {
@@ -49,7 +50,7 @@ public class PersistenceCommands implements ThenaConfig.Commands {
   }
   
   @Override
-  public Uni<StoreEntity> delete(StoreEntity toBeDeleted) {
+  public Uni<List<StoreEntity>> delete(StoreEntity toBeDeleted) {
     return config.getClient().commit().head()
         .head(config.getRepoName(), config.getHeadName())
         .message("Delete type: '" + toBeDeleted.getBodyType() + "', with id: '" + toBeDeleted.getId() + "'")
@@ -58,7 +59,7 @@ public class PersistenceCommands implements ThenaConfig.Commands {
         .remove(toBeDeleted.getId())
         .build().onItem().transform(commit -> {
           if(commit.getStatus() == CommitStatus.OK) {
-            return toBeDeleted;
+            return List.of(toBeDeleted);
           }
           // TODO
           throw new StoreException("DELETE_FAIL", toBeDeleted, convertMessages(commit));

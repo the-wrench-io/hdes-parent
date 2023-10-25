@@ -455,6 +455,18 @@ public class GitFiles {
         .blobHash(Sha2.blob(blob))
         .build();
   }
+
+  public List<GitFileReload> delete(List<String> ids) {
+    final var result = new ArrayList<GitFileReload>();
+    for (String id : ids) {
+      try {
+        result.addAll(delete(id));
+      } catch (IOException e) {
+        throw new RuntimeException(e.getMessage(), e);
+      }
+    }
+    return result;
+  }
   
   public List<GitFileReload> delete(String id) throws IOException {
     
@@ -500,16 +512,17 @@ public class GitFiles {
       
       // pull
       git.pull().setTransportConfigCallback(callback).call().getFetchResult();
+
+      final var treeValue = gitFile.getTreeValue().startsWith("/") ? gitFile.getTreeValue() : "/" + gitFile.getTreeValue();
+      final var resourceName = conn.getAbsolutePath() + treeValue;
+      final var fullPath = resourceName.startsWith("/") ? resourceName : "/" + resourceName;
       
-      final var location = conn.getLocation();
-      final var resourceName = location.getAbsolutePath(bodyType, id);
-      
-      LOGGER.debug("Removing assets from git: " + resourceName + "");
-      final var file = new File(URI.create("file:" + resourceName));
+      LOGGER.debug("Removing assets from git: " + fullPath + "");
+      final var file = new File(URI.create("file:" + fullPath));
       
       boolean deleted = file.delete();
       if(!deleted) {
-        throw new RuntimeException("Cant delete assets from git: " + resourceName + "");
+        throw new RuntimeException("Cant delete assets from git: " + fullPath + "");
       }
       
       // add new files

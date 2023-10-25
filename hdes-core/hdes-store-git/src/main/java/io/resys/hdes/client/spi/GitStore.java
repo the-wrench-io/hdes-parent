@@ -38,7 +38,6 @@ import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
-import org.ehcache.Cache;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,29 +189,46 @@ public class GitStore implements HdesStore {
     });
   }
   @Override
-  public Uni<StoreEntity> delete(DeleteAstType deleteType) {
+  public Uni<List<StoreEntity>> delete(DeleteAstType deleteType) {
     return Uni.createFrom().item(() -> {
-      final Cache<String, GitEntry> cache = conn.getCacheManager().getCache(conn.getCacheName(), String.class, GitEntry.class);
-      final GitEntry gitFile = cache.get(deleteType.getId());
+      final var cache = conn.getCacheManager().getCache(conn.getCacheName(), String.class, GitEntry.class);
+      final var gitFiles = new ArrayList<GitEntry>();
+      final var deleteEntry = cache.get(deleteType.getId());
+      if (deleteType.getBodyType().equals(AstBodyType.BRANCH)) {
+        final var branchName = deleteEntry.getCommands().stream().
+            filter(c -> c.getType().equals(AstCommand.AstCommandValue.SET_BRANCH_NAME))
+            .collect(Collectors.toList())
+            .get(0).getValue();
+        final var iterator = cache.iterator();
+        while(iterator.hasNext()) {
+          final var entry = iterator.next();
+          final var treeValue = entry.getValue().getTreeValue();
+          if (treeValue.contains(branchName)) {
+            gitFiles.add(entry.getValue());
+          }
+        }
+      } else {
+        gitFiles.add(cache.get(deleteType.getId()));
+      }
       try {
         final var git = GitFiles.builder().git(conn).build();
-        final var refresh = git.delete(deleteType.getId());
+        final var refresh = git.delete(gitFiles.stream().map(GitEntry::getId).collect(Collectors.toList()));
         cache(refresh);
-        return (StoreEntity) ImmutableStoreEntity.builder().id(deleteType.getId())
+        return gitFiles.stream().map(gitFile -> (StoreEntity) ImmutableStoreEntity.builder().id(gitFile.getId())
             .body(gitFile.getCommands())
             .bodyType(gitFile.getBodyType())
             .hash(gitFile.getBlobHash())
-            .build();        
+            .build()).collect(Collectors.toList());
       } catch(Exception e) {
         LOGGER.error(new StringBuilder()
-            .append("Failed to delete store entity: '").append(gitFile.getBodyType()).append("'").append(System.lineSeparator())
-            .append("  - with commands: ").append(gitFile.getBlobValue()).append(System.lineSeparator()) 
+            .append("Failed to delete store entity: '").append(gitFiles.stream().map(GitEntry::getBodyType).collect(Collectors.toList())).append("'").append(System.lineSeparator())
+            .append("  - with commands: ").append(gitFiles.stream().map(GitEntry::getBlobValue).collect(Collectors.toList())).append(System.lineSeparator())
             .append("  - because: ").append(e.getMessage()).toString(), e);
         throw new RuntimeException(e.getMessage(), e);
       }
     });
   }
-  
+
   private void cache(List<GitFileReload> reloads) {
     final var files = GitFiles.builder().git(conn).build();
     final ObjectId head;

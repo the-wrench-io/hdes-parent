@@ -100,7 +100,7 @@ public class HdesInMemoryStore implements HdesStore {
     throw new RuntimeException("read only store!");
   }
   @Override
-  public Uni<StoreEntity> delete(DeleteAstType deleteType) {
+  public Uni<List<StoreEntity>> delete(DeleteAstType deleteType) {
     throw new RuntimeException("read only store!");
   }
   @Override

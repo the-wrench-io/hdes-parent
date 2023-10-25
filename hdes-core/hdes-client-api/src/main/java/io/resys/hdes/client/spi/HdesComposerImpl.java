@@ -83,10 +83,11 @@ public class HdesComposerImpl implements HdesComposer {
   public Uni<ComposerState> delete(String id) {
     return client.store().query().get().onItem().transform(this::state)
         .onItem().transformToUni(state -> client.store().delete(new DeleteEntityVisitor(state, id).visit()))
-        .onItem().transformToUni(savedEntity -> {
+        .onItem().transformToUni(savedEntities -> {
           // flush cache
-          client.config().getCache().flush(id);
-        
+          for (var entity : savedEntities) {
+            client.config().getCache().flush(entity.getId());
+          }
           return client.store().query().get().onItem().transform(this::state);
         });
   }

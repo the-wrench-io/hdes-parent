@@ -38,7 +38,7 @@ import java.util.function.Supplier;
 public interface HdesStore {
   Uni<StoreEntity> create(CreateStoreEntity newType);
   Uni<StoreEntity> update(UpdateStoreEntity updateType);
-  Uni<StoreEntity> delete(DeleteAstType deleteType);
+  Uni<List<StoreEntity>> delete(DeleteAstType deleteType);
   Uni<List<StoreEntity>> batch(ImportStoreEntity batchType);
   
   QueryBuilder query();
