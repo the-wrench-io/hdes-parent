@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -343,7 +344,7 @@ public class GitStore implements HdesStore {
             final var isBranchSpecified = branchName.isPresent();
             final var isAssetBranched = treeValue.contains("_dev");
             final var assetOnDefaultBranch = !isBranchSpecified && !isAssetBranched;
-            final var assetBelongsToBranch = isBranchSpecified && treeValue.contains(branchName.get());
+            final var assetBelongsToBranch = isBranchSpecified && Arrays.asList(treeValue.split("/")).contains(branchName.get());
 
             switch (mapped.getBodyType()) {
             case FLOW:
