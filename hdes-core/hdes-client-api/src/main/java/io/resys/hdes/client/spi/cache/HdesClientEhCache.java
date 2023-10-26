@@ -111,8 +111,7 @@ public class HdesClientEhCache implements HdesCache {
       return new HdesClientEhCache(cacheManager, cacheName);
     }
   }
-  // /C:/Users/Admir/Documents/wrench-assets-for-testing/clone/src/main/resources/assets/flow/29e74d4c-5b1a-4c9e-b41a-786914e75c2f.json
-  // /C:/Users/Admir/Documents/wrench-assets-for-testing/clone/src/main/resources/assets/flow/29e74d4c-5b1a-4c9e-b41a-786914e75c2f.json
+
   private static String createName(String name) {
     return CACHE_PREFIX + "-" + name;
   }

@@ -115,7 +115,8 @@ public class GitDataSourceLoader implements AutoCloseable {
           .build();
         files.add(gitFile);
 
-        HdesAssert.isTrue(resource.getFile().getAbsolutePath().replace('\\', '/').endsWith(gitFile.getTreeValue()), () -> "Failed to create correct treeValue for: " + fileName);
+        HdesAssert.isTrue(resource.getFile().getAbsolutePath().replace('\\', '/').endsWith(gitFile.getTreeValue()),
+            () -> "Failed to create correct treeValue for: " + fileName);
       }
       
       return files;

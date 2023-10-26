@@ -340,25 +340,26 @@ public class GitStore implements HdesStore {
           while(iterator.hasNext()) {
             final var entry = iterator.next();
             final var mapped = map(entry.getValue());
+
             final var treeValue = entry.getValue().getTreeValue();
             final var isBranchSpecified = branchName.isPresent();
-            final var isAssetBranched = treeValue.contains("_dev");
-            final var assetOnDefaultBranch = !isBranchSpecified && !isAssetBranched;
-            final var assetBelongsToBranch = isBranchSpecified && Arrays.asList(treeValue.split("/")).contains(branchName.get());
+            final var assetBelongsToABranch = treeValue.contains("_dev");
+            final var assetOnDefaultBranch = !isBranchSpecified && !assetBelongsToABranch;
+            final var assetOnCurrentBranch = isBranchSpecified && Arrays.asList(treeValue.split("/")).contains(branchName.get());
 
             switch (mapped.getBodyType()) {
             case FLOW:
-              if (assetOnDefaultBranch || assetBelongsToBranch) {
+              if (assetOnDefaultBranch || assetOnCurrentBranch) {
                 state.putFlows(entry.getKey(), map(entry.getValue()));
               }
               break;
             case FLOW_TASK:
-              if (assetOnDefaultBranch || assetBelongsToBranch) {
+              if (assetOnDefaultBranch || assetOnCurrentBranch) {
                 state.putServices(entry.getKey(), map(entry.getValue()));
               }
               break;
             case DT:
-              if (assetOnDefaultBranch || assetBelongsToBranch) {
+              if (assetOnDefaultBranch || assetOnCurrentBranch) {
                 state.putDecisions(entry.getKey(), map(entry.getValue()));
               }
               break;

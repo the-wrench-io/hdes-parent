@@ -325,7 +325,7 @@ public class GitFiles {
         } else {
           final var content = getContent(entry.getNewPath());
           final var bodyType = getBodyType(entry.getNewPath());
-          final var treeValue = conn.getLocation().resolveTreeValue(conn.getAssetsPath(), bodyType, id.get());
+          final var treeValue = entry.getNewPath();
           final var gitFile = ImmutableGitFile.builder()
             .id(id.get())
             .treeValue(treeValue)
@@ -335,7 +335,7 @@ public class GitFiles {
             .build();
           result.add(ImmutableGitFileReload.builder()
               .id(id.get())
-              .treeValue(entry.getNewPath())
+              .treeValue(treeValue)
               .file(gitFile)
               .bodyType(bodyType)
               .build());
@@ -413,12 +413,10 @@ public class GitFiles {
     } finally {
       fileOutputStream.close();          
     }
-
-    final var treeValue = location.resolveTreeValue(conn.getAssetsPath(), bodyType, id);
     
     return ImmutableGitFile.builder()
         .id(id)
-        .treeValue(treeValue)
+        .treeValue(location.resolveTreeValue(conn.getAssetsPath(), bodyType, id))
         .blobValue(blob)
         .blobHash(Sha2.blob(blob))
         .bodyType(bodyType)
@@ -444,12 +442,10 @@ public class GitFiles {
     } finally {
       fileOutputStream.close();          
     }
-
-    final var treeValue = location.resolveTreeValue(conn.getAssetsPath(), bodyType, id);
     
     return ImmutableGitFile.builder()
         .id(id)
-        .treeValue(treeValue)
+        .treeValue(location.resolveTreeValue(conn.getAssetsPath(), bodyType, id))
         .blobValue(blob)
         .bodyType(bodyType)
         .blobHash(Sha2.blob(blob))
@@ -514,8 +510,8 @@ public class GitFiles {
       git.pull().setTransportConfigCallback(callback).call().getFetchResult();
 
       final var treeValue = gitFile.getTreeValue().startsWith("/") ? gitFile.getTreeValue() : "/" + gitFile.getTreeValue();
-      final var resourceName = conn.getAbsolutePath() + treeValue;
-      final var fullPath = resourceName.startsWith("/") ? resourceName : "/" + resourceName;
+      final var absolutePath = conn.getAbsolutePath().startsWith("/") ? conn.getAbsolutePath() :  "/" + conn.getAbsolutePath();
+      final var fullPath = absolutePath + treeValue;
       
       LOGGER.debug("Removing assets from git: " + fullPath + "");
       final var file = new File(URI.create("file:" + fullPath));

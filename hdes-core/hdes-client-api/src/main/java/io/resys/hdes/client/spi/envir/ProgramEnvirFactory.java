@@ -114,7 +114,6 @@ public class ProgramEnvirFactory {
         return;
       }
 
-      // TODO: handle entries not unique
       switch (ast.getBodyType()) {
       case DT: envir.putDecisionsByName(ast.getName(), (ProgramWrapper<AstDecision, DecisionProgram>) e); break;
       case FLOW_TASK: envir.putServicesByName(ast.getName(), (ProgramWrapper<AstService, ServiceProgram>) e); break;

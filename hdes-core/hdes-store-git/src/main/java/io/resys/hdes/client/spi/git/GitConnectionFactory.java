@@ -122,14 +122,12 @@ public class GitConnectionFactory {
                 ResourcePoolsBuilder.heap(cacheHeap))) 
         .build(); 
     cacheManager.init();
-
-    final var location = new StoreEntityLocation(cleanedAbsoluteAssetPath);
     
     return ImmutableGitConfig.builder()
         .init(config)
         .serializer(new GitSerializerImpl(objectMapper))
         .client(git)
-        .location(location)
+        .location(new StoreEntityLocation(cleanedAbsoluteAssetPath))
         .cacheManager(cacheManager)
         .cacheName(cacheName)
         .cacheHeap(cacheHeap)
