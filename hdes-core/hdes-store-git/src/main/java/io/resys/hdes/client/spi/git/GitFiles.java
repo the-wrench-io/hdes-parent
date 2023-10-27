@@ -69,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class GitFiles {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitFiles.class);
@@ -452,102 +453,102 @@ public class GitFiles {
         .build();
   }
 
-  public List<GitFileReload> delete(List<String> ids) {
-    final var result = new ArrayList<GitFileReload>();
-    for (String id : ids) {
-      try {
-        result.addAll(delete(id));
-      } catch (IOException e) {
-        throw new RuntimeException(e.getMessage(), e);
-      }
+  private String getCommitMessage(List<GitEntry> gitFiles) {
+    final var branchFile = gitFiles.stream().filter(f -> f.getBodyType().equals(AstBodyType.BRANCH)).findFirst();
+    if (gitFiles.size() == 1 && branchFile.isEmpty()) {
+      return "Delete: " + gitFiles.get(0).getBodyType() + " file: " + gitFiles.get(0).getTreeValue();
+    } else {
+      final var branchName = branchFile.get().getCommands().stream().
+          filter(c -> c.getType().equals(AstCommand.AstCommandValue.SET_BRANCH_NAME))
+          .collect(Collectors.toList())
+          .get(0).getValue();
+      return "Delete: BRANCH " + branchName + " and its assets";
     }
-    return result;
   }
-  
-  public List<GitFileReload> delete(String id) throws IOException {
-    
+
+  public List<GitFileReload> delete(List<GitEntry> gitFiles) throws IOException {
     final Cache<String, GitEntry> cache = conn.getCacheManager().getCache(conn.getCacheName(), String.class, GitEntry.class);
-    final GitEntry gitFile = cache.get(id);
-    final var bodyType = gitFile.getBodyType();
-    
     final var git = conn.getClient();
     final var callback = conn.getCallback();
     final var creds = conn.getCreds().get();
     final var repo = git.getRepository();
     final var start = repo.resolve(Constants.HEAD);
-    final List<GitFileReload> reload = new ArrayList<>();
+    final var result = new ArrayList<GitFileReload>();
 
     try {
-      if(bodyType == AstBodyType.TAG) {
-        final String filter = "refs/tags/" + gitFile.getCommands().stream()
-            .filter(c -> c.getType() == AstCommandValue.SET_TAG_NAME)
-            .findFirst().get().getValue();
-        final Optional<Ref> target = git.tagList().call().stream()
-          .filter(ref -> ref.getName().equals(filter))
-          .findFirst();
-        
-        if(target.isPresent()) {
+      for (final var gitFile : gitFiles) {
+        if (gitFile.getBodyType() == AstBodyType.TAG) {
+          final String filter = "refs/tags/" + gitFile.getCommands().stream()
+              .filter(c -> c.getType() == AstCommandValue.SET_TAG_NAME)
+              .findFirst().get().getValue();
+          final Optional<Ref> target = git.tagList().call().stream()
+              .filter(ref -> ref.getName().equals(filter))
+              .findFirst();
 
-          git.tagDelete().setTags(target.get().getName()).call();
-          
-          //delete branch 'branchToDelete' on remote 'origin'
-          RefSpec refSpec = new RefSpec()
-                  .setSource(null)
-                  .setDestination(target.get().getName());
-          git.push().setRefSpecs(refSpec).setRemote("origin").setTransportConfigCallback(conn.getCallback()).call();
-          reload.add(
-              ImmutableGitFileReload.builder()
-              .id(id)
-              .bodyType(AstBodyType.TAG)
-              .treeValue(gitFile.getTreeValue()).build()); 
-        } else {
-          final String msg = "Can't find tag: " + filter + "!";
-          LOGGER.error(msg);
+          if (target.isPresent()) {
+
+            git.tagDelete().setTags(target.get().getName()).call();
+
+            //delete branch 'branchToDelete' on remote 'origin'
+            RefSpec refSpec = new RefSpec()
+                .setSource(null)
+                .setDestination(target.get().getName());
+            git.push().setRefSpecs(refSpec).setRemote("origin").setTransportConfigCallback(conn.getCallback()).call();
+            result.add(
+                ImmutableGitFileReload.builder()
+                    .id(gitFile.getId())
+                    .bodyType(AstBodyType.TAG)
+                    .treeValue(gitFile.getTreeValue()).build());
+          } else {
+            final String msg = "Can't find tag: " + filter + "!";
+            LOGGER.error(msg);
+          }
         }
-      }
-      
-      // pull
-      git.pull().setTransportConfigCallback(callback).call().getFetchResult();
 
-      final var treeValue = gitFile.getTreeValue().startsWith("/") ? gitFile.getTreeValue() : "/" + gitFile.getTreeValue();
-      final var absolutePath = conn.getAbsolutePath().startsWith("/") ? conn.getAbsolutePath() :  "/" + conn.getAbsolutePath();
-      final var fullPath = absolutePath + treeValue;
-      
-      LOGGER.debug("Removing assets from git: " + fullPath + "");
-      final var file = new File(URI.create("file:" + fullPath));
-      
-      boolean deleted = file.delete();
-      if(!deleted) {
-        throw new RuntimeException("Cant delete assets from git: " + fullPath + "");
+        // pull
+        git.pull().setTransportConfigCallback(callback).call().getFetchResult();
+
+        final var treeValue = gitFile.getTreeValue().startsWith("/") ? gitFile.getTreeValue() : "/" + gitFile.getTreeValue();
+        final var absolutePath = conn.getAbsolutePath().startsWith("/") ? conn.getAbsolutePath() : "/" + conn.getAbsolutePath();
+        final var fullPath = absolutePath + treeValue;
+
+        LOGGER.debug("Removing assets from git: " + fullPath + "");
+        final var file = new File(URI.create("file:" + fullPath));
+
+        boolean deleted = file.delete();
+        if (!deleted) {
+          throw new RuntimeException("Cant delete assets from git: " + fullPath + "");
+        }
+
+        // add new files
+        git.add().addFilepattern(gitFile.getTreeValue()).call();
       }
-      
-      // add new files
-      git.add().addFilepattern(gitFile.getTreeValue()).call();
 
       // commit changes
       git.commit()
-      .setAll(true)
-      .setAllowEmpty(false)
-      .setMessage("Delete: " + gitFile.getBodyType() + " file: " + gitFile.getTreeValue())
-      .setAuthor(creds.getUser(), creds.getEmail())
-      .setCommitter(creds.getUser(), creds.getEmail())
-      .call();
+          .setAll(true)
+          .setAllowEmpty(false)
+          .setMessage(getCommitMessage(gitFiles))
+          .setAuthor(creds.getUser(), creds.getEmail())
+          .setCommitter(creds.getUser(), creds.getEmail())
+          .call();
 
       // push
       git.push().setTransportConfigCallback(callback).call();
-    
-    } catch(Exception e) {
-      LOGGER.error("Failed to delete asset: '" + id + "'!" + System.lineSeparator() + e.getMessage(), e);
+
+    } catch (Exception e) {
+      LOGGER.error("Failed to delete assets: '" + gitFiles.stream().map(GitEntry::getId).reduce((a, b) -> a + "," + b).get() + "'!" + System.lineSeparator() + e.getMessage(), e);
       try {
         git.reset().setMode(ResetType.HARD).call();
       } catch (GitAPIException e1) {
         throw new RuntimeException(e.getMessage(), e);
       }
     }
-    
+
     final var end = repo.resolve(Constants.HEAD);
-    reload.addAll(diff(start, end));
-    return reload;
+    result.addAll(diff(start, end));
+
+    return result;
   }
   
   public static Builder builder() {

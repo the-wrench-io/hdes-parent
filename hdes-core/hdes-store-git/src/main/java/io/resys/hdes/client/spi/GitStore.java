@@ -213,7 +213,7 @@ public class GitStore implements HdesStore {
       }
       try {
         final var git = GitFiles.builder().git(conn).build();
-        final var refresh = git.delete(gitFiles.stream().map(GitEntry::getId).collect(Collectors.toList()));
+        final var refresh = git.delete(gitFiles);
         cache(refresh);
         return gitFiles.stream().map(gitFile -> (StoreEntity) ImmutableStoreEntity.builder().id(gitFile.getId())
             .body(gitFile.getCommands())
