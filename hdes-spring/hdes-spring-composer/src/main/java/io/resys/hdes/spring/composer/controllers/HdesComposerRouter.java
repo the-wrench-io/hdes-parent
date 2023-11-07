@@ -20,24 +20,9 @@ package io.resys.hdes.spring.composer.controllers;
  * #L%
  */
 
-import java.time.Duration;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.resys.hdes.client.api.HdesComposer;
 import io.resys.hdes.client.api.HdesComposer.ComposerEntity;
 import io.resys.hdes.client.api.HdesComposer.ComposerState;
@@ -48,11 +33,28 @@ import io.resys.hdes.client.api.HdesComposer.DebugResponse;
 import io.resys.hdes.client.api.HdesComposer.StoreDump;
 import io.resys.hdes.client.api.HdesComposer.UpdateEntity;
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
+import io.resys.hdes.client.api.ImmutableDiffRequest;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
+import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.spi.web.HdesWebConfig;
 import io.resys.hdes.spring.composer.ComposerConfigBean;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 
 @RestController
@@ -75,8 +77,8 @@ public class HdesComposerRouter {
   }
 
   @GetMapping(path = "/" + HdesWebConfig.MODELS, produces = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerState dataModels() {
-    return composer.get().await().atMost(timeout);
+  public ComposerState dataModels(@RequestHeader(value = "Branch-Name", required = false) String branchName) {
+    return composer.withBranch(branchName).get().await().atMost(timeout);
   }
 
   @GetMapping(path = "/" + HdesWebConfig.EXPORTS, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,14 +87,14 @@ public class HdesComposerRouter {
   }
 
   @PostMapping(path = "/" + HdesWebConfig.COMMANDS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerEntity<?> commands(@RequestBody String body) throws JsonMappingException, JsonProcessingException {
+  public ComposerEntity<?> commands(@RequestBody String body, @RequestHeader(value = "Branch-Name", required = false) String branchName) throws JsonMappingException, JsonProcessingException {
     final var command = objectMapper.readValue(body, UpdateEntity.class);
-    return composer.dryRun(command).await().atMost(timeout);
+    return composer.withBranch(branchName).dryRun(command).await().atMost(timeout);
   }
 
   @PostMapping(path = "/" + HdesWebConfig.DEBUGS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public DebugResponse debug(@RequestBody DebugRequest debug) {
-    return composer.debug(debug).await().atMost(timeout);
+  public DebugResponse debug(@RequestBody DebugRequest debug, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
+    return composer.withBranch(branchName).debug(debug).await().atMost(timeout);
   }
 
   @PostMapping(path = "/" + HdesWebConfig.IMPORTS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -101,33 +103,44 @@ public class HdesComposerRouter {
   }
 
   @PostMapping(path = "/" + HdesWebConfig.RESOURCES, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerState create(@RequestBody CreateEntity entity) {
-    return composer.create(entity).await().atMost(timeout);
+  public ComposerState create(@RequestBody CreateEntity entity, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
+    return composer.withBranch(branchName).create(entity).await().atMost(timeout);
   }
 
   @PutMapping(path = "/" + HdesWebConfig.RESOURCES, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerState update(@RequestBody UpdateEntity entity) {
-    return composer.update(entity).await().atMost(timeout);
+  public ComposerState update(@RequestBody UpdateEntity entity, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
+    return composer.withBranch(branchName).update(entity).await().atMost(timeout);
   }
 
   @DeleteMapping(path = "/" + HdesWebConfig.RESOURCES + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerState delete(@PathVariable String id) {
-    return composer.delete(id).await().atMost(timeout);
+  public ComposerState delete(@PathVariable String id, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
+    return composer.withBranch(branchName).delete(id).await().atMost(timeout);
   }
 
   @GetMapping(path = "/" + HdesWebConfig.RESOURCES + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerEntity<?> get(@PathVariable String id) {
-    return composer.get(id).await().atMost(timeout);
+  public ComposerEntity<?> get(@PathVariable String id, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
+    return composer.withBranch(branchName).get(id).await().atMost(timeout);
   }
 
   @PostMapping(path = "/" + HdesWebConfig.COPYAS, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-  public ComposerState copyAs(@RequestBody CopyAs entity) {
-    return composer.copyAs(entity).await().atMost(timeout);
+  public ComposerState copyAs(@RequestBody CopyAs entity, @RequestHeader(value = "Branch-Name", required = false) String branchName) {
+    return composer.withBranch(branchName).copyAs(entity).await().atMost(timeout);
   }
 
   @GetMapping(path = "/" + HdesWebConfig.HISTORY + "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public HistoryEntity history(@RequestParam("id") String id) {
     return composer.getHistory(id).await().atMost(timeout);
+  }
+
+  @GetMapping(path = "/" + HdesWebConfig.DIFF, produces = MediaType.APPLICATION_JSON_VALUE)
+  public TagDiff diff(@RequestParam("baseId") String baseId, @RequestParam("targetId") String targetId) {
+    final var request = ImmutableDiffRequest.builder().baseId(baseId).targetId(targetId).build();
+    return composer.diff(request).await().atMost(timeout);
+  }
+
+  @GetMapping(path = "/" + HdesWebConfig.SUMMARY + "/{tagId}", produces = MediaType.APPLICATION_JSON_VALUE)
+  public AstTagSummary summary(@PathVariable("tagId") String tagId) {
+    return composer.summary(tagId).await().atMost(timeout);
   }
 
   @GetMapping(path = "/" + HdesWebConfig.VERSION, produces = MediaType.APPLICATION_JSON_VALUE)

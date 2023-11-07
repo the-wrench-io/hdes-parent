@@ -87,6 +87,18 @@ public class HdesClientEnvirBuilder implements EnvirBuilder {
         return this;
       }
       @Override
+      public EnvirCommandFormatBuilder branch(String commandJson) {
+        this.type = AstBodyType.BRANCH;
+        this.commandJson = commandJson;
+        return this;
+      }
+      @Override
+      public EnvirCommandFormatBuilder branch(StoreEntity entity) {
+        this.type = AstBodyType.BRANCH;
+        this.entity = entity;
+        return this;
+      }
+      @Override
       public EnvirCommandFormatBuilder service(StoreEntity entity) {
         this.type = AstBodyType.FLOW_TASK;
         this.entity = entity;

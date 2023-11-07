@@ -20,15 +20,14 @@ package io.resys.hdes.client.spi.git;
  * #L%
  */
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.spi.GitConfig;
+import io.resys.hdes.client.spi.GitConfig.GitEntry;
+import io.resys.hdes.client.spi.GitConfig.GitFile;
+import io.resys.hdes.client.spi.ImmutableGitFile;
+import io.resys.hdes.client.spi.staticresources.Sha2;
+import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Constants;
@@ -39,14 +38,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.spi.GitConfig;
-import io.resys.hdes.client.spi.GitConfig.GitEntry;
-import io.resys.hdes.client.spi.GitConfig.GitFile;
-import io.resys.hdes.client.spi.ImmutableGitFile;
-import io.resys.hdes.client.spi.staticresources.Sha2;
-import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
-import io.resys.hdes.client.spi.util.HdesAssert;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class GitDataSourceLoader implements AutoCloseable {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitDataSourceLoader.class);
@@ -77,8 +76,9 @@ public class GitDataSourceLoader implements AutoCloseable {
         Map.entry(AstBodyType.DT, this.location.getDtRegex()),
         Map.entry(AstBodyType.FLOW_TASK, this.location.getFlowTaskRegex()),
         Map.entry(AstBodyType.FLOW, this.location.getFlowRegex()),
-        Map.entry(AstBodyType.TAG, this.location.getTagRegex())
-    ).parallelStream().map(this::readFile).collect(Collectors.toList());
+        Map.entry(AstBodyType.TAG, this.location.getTagRegex()),
+        Map.entry(AstBodyType.BRANCH, this.location.getBranchRegex())
+    ).stream().map(this::readFile).collect(Collectors.toList());
     
     final var files = GitFiles.builder().git(conn).build();
     final var result = new ArrayList<GitEntry>();
@@ -101,9 +101,11 @@ public class GitDataSourceLoader implements AutoCloseable {
         final var content = getContent(resource);
         final var fileName = resource.getFilename();
         final var id = fileName.substring(0, fileName.indexOf("."));
-        
-        // src/main/resources/assets/flow/06311dd7-b895-4f94-b43d-6903de74fcf5.json
-        final var treeValue = conn.getAssetsPath() +  this.location.getFileName(bodyType, id);
+
+        final var treeValue = resource.getFile().getPath()
+            .replace("\\", "/")
+            .replace(this.conn.getAbsolutePath(), "");
+
         final var gitFile = ImmutableGitFile.builder()
           .id(id)
           .treeValue(treeValue)
@@ -112,8 +114,9 @@ public class GitDataSourceLoader implements AutoCloseable {
           .blobHash(Sha2.blob(content))
           .build();
         files.add(gitFile);
-        
-        HdesAssert.isTrue(resource.getFile().getAbsolutePath().endsWith(gitFile.getTreeValue()), () -> "Failed to create correct treeValue for: " + fileName);
+
+        HdesAssert.isTrue(resource.getFile().getAbsolutePath().replace('\\', '/').endsWith(gitFile.getTreeValue()),
+            () -> "Failed to create correct treeValue for: " + fileName);
       }
       
       return files;
@@ -132,51 +135,5 @@ public class GitDataSourceLoader implements AutoCloseable {
   
   @Override
   public void close() throws Exception {}
-  
-  /*
-  private static final String TAG_PREFIX = "refs/tags/";
-  private List<GitEntry> readTags() {
-    try {
-      final var result = new ArrayList<GitEntry>();
-      for(Ref ref : conn.getClient().tagList().call()) {        
-        final String name = ref.getName().startsWith(TAG_PREFIX) ? 
-            ref.getName().substring(TAG_PREFIX.length()) : 
-            ref.getName();
-        
-        final var commands = Arrays.asList((AstCommand) ImmutableAstCommand.builder().type(AstCommandValue.SET_BODY).value(name).build());
-        final var blobValue = conn.getSerializer().write(commands);
-        final var id = ref.getObjectId().getName();
-        
-        RevWalk revWalk = new RevWalk(repo);
-        try {
-          final RevCommit commit = revWalk.parseCommit(ref.getObjectId());      
-          final var created = new Timestamp(commit.getCommitTime() * 1000L);
-          final var entry = ImmutableGitEntry.builder()
-              .id(id)
-              .revision(id)
-              .bodyType(AstBodyType.TAG)
-              .treeValue(ref.getName())
-              .blobValue(blobValue)
-              .created(created)
-              .modified(created)
-              .blobHash(Sha2.blob(blobValue))
-              .commands(commands)
-              .build();
-          result.add(entry);
-        } catch (Exception e) {
-          LOGGER.error("Can't resolve timestamps for tag: " + name + System.lineSeparator() + e.getMessage(), e);
-          throw new RuntimeException(e.getMessage(), e);
-        } finally {
-          revWalk.close();
-        }
-      }
-      
-      return result;
-    } catch (GitAPIException e) {
-      LOGGER.error("Can't read tags for repository! " + System.lineSeparator() + e.getMessage(), e);
-      throw new RuntimeException(e.getMessage(), e);
-    }
-  }
-  */
   
 }

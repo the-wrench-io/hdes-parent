@@ -20,9 +20,9 @@ package io.resys.hdes.client.spi.staticresources;
  * #L%
  */
 
-import java.io.Serializable;
-
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+
+import java.io.Serializable;
 
 public class StoreEntityLocation implements Serializable {
   private static final long serialVersionUID = -5312216893265396576L;
@@ -32,6 +32,11 @@ public class StoreEntityLocation implements Serializable {
   public StoreEntityLocation(String value) {
     super();
     this.value = value;
+  }
+
+  public StoreEntityLocation(String value, String branchName) {
+    super();
+    this.value = value + "branch/" + branchName + "/";
   }
   
   //getResourceFullName
@@ -47,22 +52,25 @@ public class StoreEntityLocation implements Serializable {
     return filename.substring(0, filename.lastIndexOf("."));
   }
   public String getFlowRegex() {
-    return withRegex("**/flow/**/*.json");
+    return withRegex("**/flow/*.json");
   }
   public String getFlowTaskRegex() {
-    return withRegex("**/flowtask/**/*.json");
+    return withRegex("**/flowtask/*.json");
   }
   public String getDtRegex() {
-    return withRegex("**/dt/**/*.json");
+    return withRegex("**/dt/*.json");
   }
   public String getTagRegex() {
-    return withRegex("**/tag/**/*.json");
+    return withRegex("**/tag/*.json");
   }
   public String getMigrationRegex() {
-    return withRegex("**/migration/**/*.json");
+    return withRegex("**/migration/*.json");
   }
   public String getDumpRegex() {
-    return withRegex("**/dump/**/*.json");
+    return withRegex("**/dump/*.json");
+  }
+  public String getBranchRegex() {
+    return withRegex("**/branch/*.json");
   }
   public String getValue() {
     return value;
@@ -77,8 +85,16 @@ public class StoreEntityLocation implements Serializable {
       return "dt";
     case TAG:
       return "tag";
+    case BRANCH:
+      return "branch";
     default: throw new IllegalArgumentException("Unknown asset type:" + type + "!");
     }
+  }
+  public String resolveTreeValue(String assetsPath, AstBodyType bodyType, String id) {
+    final var locationPathItems = this.getValue().split("/");
+    final var endPath = locationPathItems[locationPathItems.length - 1];
+    final var branchPath = endPath.contains("_dev") ? "branch/" + endPath + "/" : "";
+    return assetsPath + branchPath + this.getFileName(bodyType, id);
   }
   private String withRegex(String exp) {
     return value + exp;

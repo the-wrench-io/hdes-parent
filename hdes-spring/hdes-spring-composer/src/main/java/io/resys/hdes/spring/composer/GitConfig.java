@@ -20,17 +20,15 @@ package io.resys.hdes.spring.composer;
  * #L%
  */
 
-import java.util.Optional;
-
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.annotation.Bean;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.HdesStore.HdesCredsSupplier;
 import io.resys.hdes.client.api.ImmutableHdesCreds;
 import io.resys.hdes.client.spi.GitStore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
+
+import java.util.Optional;
 
 @ConditionalOnProperty(name = "wrench.assets.git.enabled", havingValue = "true")
 public class GitConfig {

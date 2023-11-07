@@ -20,11 +20,12 @@ package io.resys.hdes.client.spi.config;
  * #L%
  */
 
-import java.util.List;
-
 import io.resys.hdes.client.api.HdesCache;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.ImmutableAstFlow;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface HdesClientConfig {
 
@@ -43,6 +44,8 @@ public interface HdesClientConfig {
   HdesCache getCache();
   List<AstFlowNodeVisitor> getFlowVisitors();
   HdesClientConfig config(AstFlowNodeVisitor ... changes);
+  HdesClientConfig withBranch(String branchName);
+  Optional<String> getBranchName();
   
   interface AstFlowNodeVisitor {
     void visit(AstFlowRoot node, ImmutableAstFlow.Builder nodesBuilder);

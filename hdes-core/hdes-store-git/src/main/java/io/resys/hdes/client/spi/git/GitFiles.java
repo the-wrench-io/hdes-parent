@@ -20,22 +20,19 @@ package io.resys.hdes.client.spi.git;
  * #L%
  */
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-
+import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
+import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
+import io.resys.hdes.client.api.ast.AstCommand;
+import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
+import io.resys.hdes.client.spi.GitConfig;
+import io.resys.hdes.client.spi.GitConfig.GitEntry;
+import io.resys.hdes.client.spi.GitConfig.GitFile;
+import io.resys.hdes.client.spi.GitConfig.GitFileReload;
+import io.resys.hdes.client.spi.ImmutableGitEntry;
+import io.resys.hdes.client.spi.ImmutableGitFile;
+import io.resys.hdes.client.spi.ImmutableGitFileReload;
+import io.resys.hdes.client.spi.staticresources.Sha2;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jgit.api.ResetCommand.ResetType;
 import org.eclipse.jgit.api.errors.CheckoutConflictException;
@@ -57,22 +54,26 @@ import org.ehcache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.resys.hdes.client.api.HdesStore.CreateStoreEntity;
-import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
-import io.resys.hdes.client.api.ast.AstCommand;
-import io.resys.hdes.client.api.ast.AstCommand.AstCommandValue;
-import io.resys.hdes.client.spi.GitConfig;
-import io.resys.hdes.client.spi.GitConfig.GitEntry;
-import io.resys.hdes.client.spi.GitConfig.GitFile;
-import io.resys.hdes.client.spi.GitConfig.GitFileReload;
-import io.resys.hdes.client.spi.ImmutableGitEntry;
-import io.resys.hdes.client.spi.ImmutableGitFile;
-import io.resys.hdes.client.spi.ImmutableGitFileReload;
-import io.resys.hdes.client.spi.staticresources.Sha2;
-import io.resys.hdes.client.spi.util.HdesAssert;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class GitFiles {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitFiles.class);
+  private static final String SEPARATOR = "/";
   private final GitConfig conn;
   
   public GitFiles(GitConfig connection) {
@@ -225,7 +226,7 @@ public class GitFiles {
         revWalk.setTreeFilter(treeFilter);
         revWalk.sort(RevSort.COMMIT_TIME_DESC);
         revWalk.sort(RevSort.REVERSE, true);
-        created = new Timestamp(revWalk.next().getCommitTime() * 1000L);
+        created = new Timestamp(System.currentTimeMillis());
 
       } catch(Exception e) {
         LOGGER.error(
@@ -325,7 +326,7 @@ public class GitFiles {
         } else {
           final var content = getContent(entry.getNewPath());
           final var bodyType = getBodyType(entry.getNewPath());
-          final var treeValue = conn.getAssetsPath() +  conn.getLocation().getFileName(bodyType, id.get());
+          final var treeValue = entry.getNewPath();
           final var gitFile = ImmutableGitFile.builder()
             .id(id.get())
             .treeValue(treeValue)
@@ -335,7 +336,7 @@ public class GitFiles {
             .build();
           result.add(ImmutableGitFileReload.builder()
               .id(id.get())
-              .treeValue(entry.getNewPath())
+              .treeValue(treeValue)
               .file(gitFile)
               .bodyType(bodyType)
               .build());
@@ -353,7 +354,7 @@ public class GitFiles {
       return Optional.empty();
     }
 
-    final var paths = path.split( File.separator);
+    final var paths = path.split(SEPARATOR);
     final var fileName = paths[paths.length -1];
     final var id = fileName.substring(0, fileName.indexOf("."));
     
@@ -361,14 +362,16 @@ public class GitFiles {
   }
   
   private AstBodyType getBodyType(String path) {
-    if(path.contains(File.separator + "dt" + File.separator)) {
+    if(path.contains(SEPARATOR + "dt" + SEPARATOR)) {
       return AstBodyType.DT;
-    } else if(path.contains(File.separator + "flow" + File.separator)) {
+    } else if(path.contains(SEPARATOR + "flow" + SEPARATOR)) {
       return AstBodyType.FLOW;
-    } else if(path.contains(File.separator + "flowtask" + File.separator)) {
+    } else if(path.contains(SEPARATOR + "flowtask" + SEPARATOR)) {
       return AstBodyType.FLOW_TASK;
-    } else if(path.contains(File.separator + "tag" + File.separator)) {
+    } else if(path.contains(SEPARATOR + "tag" + SEPARATOR)) {
       return AstBodyType.TAG;
+    } else if(path.contains(SEPARATOR + "branch" + SEPARATOR)) {
+      return AstBodyType.BRANCH;
     }
     
     throw new RuntimeException("Failed to load asset body type: " + path + "!");
@@ -376,7 +379,7 @@ public class GitFiles {
   
   private String getContent(String path) {
     try {
-      return IOUtils.toString(new FileInputStream(conn.getAbsolutePath() + File.separator + path), StandardCharsets.UTF_8);
+      return IOUtils.toString(new FileInputStream(conn.getAbsolutePath() + SEPARATOR + path), StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new RuntimeException("Failed to load asset content from: " + path + "!" + e.getMessage(), e);
     }
@@ -414,7 +417,7 @@ public class GitFiles {
     
     return ImmutableGitFile.builder()
         .id(id)
-        .treeValue(conn.getAssetsPath() +  location.getFileName(bodyType, id))
+        .treeValue(location.resolveTreeValue(conn.getAssetsPath(), bodyType, id))
         .blobValue(blob)
         .blobHash(Sha2.blob(blob))
         .bodyType(bodyType)
@@ -443,96 +446,109 @@ public class GitFiles {
     
     return ImmutableGitFile.builder()
         .id(id)
-        .treeValue(conn.getAssetsPath() +  location.getFileName(bodyType, id))
+        .treeValue(location.resolveTreeValue(conn.getAssetsPath(), bodyType, id))
         .blobValue(blob)
         .bodyType(bodyType)
         .blobHash(Sha2.blob(blob))
         .build();
   }
-  
-  public List<GitFileReload> delete(String id) throws IOException {
-    
+
+  private String getCommitMessage(List<GitEntry> gitFiles) {
+    final var branchFile = gitFiles.stream().filter(f -> f.getBodyType().equals(AstBodyType.BRANCH)).findFirst();
+    if (gitFiles.size() == 1 && branchFile.isEmpty()) {
+      return "Delete: " + gitFiles.get(0).getBodyType() + " file: " + gitFiles.get(0).getTreeValue();
+    } else {
+      final var branchName = branchFile.get().getCommands().stream().
+          filter(c -> c.getType().equals(AstCommand.AstCommandValue.SET_BRANCH_NAME))
+          .collect(Collectors.toList())
+          .get(0).getValue();
+      return "Delete: BRANCH " + branchName + " and its assets";
+    }
+  }
+
+  public List<GitFileReload> delete(List<GitEntry> gitFiles) throws IOException {
     final Cache<String, GitEntry> cache = conn.getCacheManager().getCache(conn.getCacheName(), String.class, GitEntry.class);
-    final GitEntry gitFile = cache.get(id);
-    final var bodyType = gitFile.getBodyType();
-    
     final var git = conn.getClient();
     final var callback = conn.getCallback();
     final var creds = conn.getCreds().get();
     final var repo = git.getRepository();
     final var start = repo.resolve(Constants.HEAD);
-    final List<GitFileReload> reload = new ArrayList<>();
+    final var result = new ArrayList<GitFileReload>();
 
     try {
-      if(bodyType == AstBodyType.TAG) {
-        final String filter = "refs/tags/" + gitFile.getCommands().stream()
-            .filter(c -> c.getType() == AstCommandValue.SET_TAG_NAME)
-            .findFirst().get().getValue();
-        final Optional<Ref> target = git.tagList().call().stream()
-          .filter(ref -> ref.getName().equals(filter))
-          .findFirst();
-        
-        if(target.isPresent()) {
+      for (final var gitFile : gitFiles) {
+        if (gitFile.getBodyType() == AstBodyType.TAG) {
+          final String filter = "refs/tags/" + gitFile.getCommands().stream()
+              .filter(c -> c.getType() == AstCommandValue.SET_TAG_NAME)
+              .findFirst().get().getValue();
+          final Optional<Ref> target = git.tagList().call().stream()
+              .filter(ref -> ref.getName().equals(filter))
+              .findFirst();
 
-          git.tagDelete().setTags(target.get().getName()).call();
-          
-          //delete branch 'branchToDelete' on remote 'origin'
-          RefSpec refSpec = new RefSpec()
-                  .setSource(null)
-                  .setDestination(target.get().getName());
-          git.push().setRefSpecs(refSpec).setRemote("origin").setTransportConfigCallback(conn.getCallback()).call();
-          reload.add(
-              ImmutableGitFileReload.builder()
-              .id(id)
-              .bodyType(AstBodyType.TAG)
-              .treeValue(gitFile.getTreeValue()).build()); 
-        } else {
-          final String msg = "Can't find tag: " + filter + "!";
-          LOGGER.error(msg);
+          if (target.isPresent()) {
+
+            git.tagDelete().setTags(target.get().getName()).call();
+
+            //delete branch 'branchToDelete' on remote 'origin'
+            RefSpec refSpec = new RefSpec()
+                .setSource(null)
+                .setDestination(target.get().getName());
+            git.push().setRefSpecs(refSpec).setRemote("origin").setTransportConfigCallback(conn.getCallback()).call();
+            result.add(
+                ImmutableGitFileReload.builder()
+                    .id(gitFile.getId())
+                    .bodyType(AstBodyType.TAG)
+                    .treeValue(gitFile.getTreeValue()).build());
+          } else {
+            final String msg = "Can't find tag: " + filter + "!";
+            LOGGER.error(msg);
+          }
         }
+
+        // pull
+        git.pull().setTransportConfigCallback(callback).call().getFetchResult();
+
+        final var treeValue = gitFile.getTreeValue().startsWith("/") ? gitFile.getTreeValue() : "/" + gitFile.getTreeValue();
+        final var absolutePath = conn.getAbsolutePath().startsWith("/") ? conn.getAbsolutePath() : "/" + conn.getAbsolutePath();
+        final var fullPath = absolutePath + treeValue;
+
+        LOGGER.debug("Removing assets from git: " + fullPath + "");
+        final var file = new File(URI.create("file:" + fullPath));
+
+        boolean deleted = file.delete();
+        if (!deleted) {
+          throw new RuntimeException("Cant delete assets from git: " + fullPath + "");
+        }
+
+        // add new files
+        git.add().addFilepattern(gitFile.getTreeValue()).call();
       }
-      
-      // pull
-      git.pull().setTransportConfigCallback(callback).call().getFetchResult();
-      
-      final var location = conn.getLocation();
-      final var resourceName = location.getAbsolutePath(bodyType, id);
-      
-      LOGGER.debug("Removing assets from git: " + resourceName + "");
-      final var file = new File(URI.create("file:" + resourceName));
-      
-      boolean deleted = file.delete();
-      if(!deleted) {
-        throw new RuntimeException("Cant delete assets from git: " + resourceName + "");
-      }
-      
-      // add new files
-      git.add().addFilepattern(gitFile.getTreeValue()).call();
 
       // commit changes
       git.commit()
-      .setAll(true)
-      .setAllowEmpty(false)
-      .setMessage("Delete: " + gitFile.getBodyType() + " file: " + gitFile.getTreeValue())
-      .setAuthor(creds.getUser(), creds.getEmail())
-      .setCommitter(creds.getUser(), creds.getEmail())
-      .call();
+          .setAll(true)
+          .setAllowEmpty(false)
+          .setMessage(getCommitMessage(gitFiles))
+          .setAuthor(creds.getUser(), creds.getEmail())
+          .setCommitter(creds.getUser(), creds.getEmail())
+          .call();
 
       // push
       git.push().setTransportConfigCallback(callback).call();
-    
-    } catch(Exception e) {
-      LOGGER.error("Failed to delete asset: '" + id + "'!" + System.lineSeparator() + e.getMessage(), e);
+
+    } catch (Exception e) {
+      LOGGER.error("Failed to delete assets: '" + gitFiles.stream().map(GitEntry::getId).reduce((a, b) -> a + "," + b).get() + "'!" + System.lineSeparator() + e.getMessage(), e);
       try {
         git.reset().setMode(ResetType.HARD).call();
       } catch (GitAPIException e1) {
         throw new RuntimeException(e.getMessage(), e);
       }
     }
-    
+
     final var end = repo.resolve(Constants.HEAD);
-    reload.addAll(diff(start, end));
-    return reload;
+    result.addAll(diff(start, end));
+
+    return result;
   }
   
   public static Builder builder() {

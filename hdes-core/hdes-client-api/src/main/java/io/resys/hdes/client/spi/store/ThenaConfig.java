@@ -1,12 +1,10 @@
 package io.resys.hdes.client.spi.store;
 
-import java.util.Collection;
-
 /*-
  * #%L
- * stencil-persistence
+ * hdes-client-api
  * %%
- * Copyright (C) 2021 Copyright 2021 ReSys OÜ
+ * Copyright (C) 2020 - 2023 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +20,6 @@ import java.util.Collection;
  * #L%
  */
 
-import org.immutables.value.Value;
 
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.HdesStore.StoreState;
@@ -32,6 +29,10 @@ import io.resys.thena.docdb.api.actions.ObjectsActions.BlobObject;
 import io.resys.thena.docdb.api.actions.ObjectsActions.ObjectsResult;
 import io.resys.thena.docdb.api.models.Objects.Blob;
 import io.smallrye.mutiny.Uni;
+import org.immutables.value.Value;
+
+import java.util.Collection;
+import java.util.List;
 
 @Value.Immutable
 public interface ThenaConfig {
@@ -70,7 +71,7 @@ public interface ThenaConfig {
   }
   
   interface Commands {
-    Uni<StoreEntity> delete(StoreEntity toBeDeleted);
+    Uni<List<StoreEntity>> delete(StoreEntity toBeDeleted);
     Uni<StoreState> get();
     Uni<EntityState> getEntityState(String id);
     Uni<StoreEntity> save(StoreEntity toBeSaved);

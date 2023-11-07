@@ -22,7 +22,7 @@ package io.resys.hdes.client.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
+import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -41,7 +41,8 @@ public interface HdesAstTypes {
   ServiceAstBuilder service();
   DataTypeAstBuilder dataType();
   TagAstBuilder tag();
-  
+  BranchAstBuilder branch();
+
   interface DataTypeAstBuilder {
     DataTypeAstBuilder id(String id);
     DataTypeAstBuilder order(Integer order);
@@ -67,6 +68,12 @@ public interface HdesAstTypes {
     TagAstBuilder src(List<AstCommand> src);
     TagAstBuilder src(JsonNode src);
     AstTag build();
+  }
+
+  interface BranchAstBuilder {
+    BranchAstBuilder src(List<AstCommand> src);
+    BranchAstBuilder src(JsonNode src);
+    AstBranch build();
   }
   
   interface DecisionAstBuilder {

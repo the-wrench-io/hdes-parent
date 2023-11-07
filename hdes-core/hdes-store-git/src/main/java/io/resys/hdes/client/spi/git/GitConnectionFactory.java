@@ -20,15 +20,18 @@ package io.resys.hdes.client.spi.git;
  * #L%
  */
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import io.resys.hdes.client.api.HdesStore.HdesCredsSupplier;
+import io.resys.hdes.client.spi.GitConfig;
+import io.resys.hdes.client.spi.GitConfig.GitEntry;
+import io.resys.hdes.client.spi.GitConfig.GitInit;
+import io.resys.hdes.client.spi.ImmutableGitConfig;
+import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
+import io.resys.hdes.client.spi.util.FileUtils;
+import io.resys.hdes.client.spi.util.HdesAssert;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.Git;
@@ -54,25 +57,20 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-
-import io.resys.hdes.client.api.HdesStore.HdesCredsSupplier;
-import io.resys.hdes.client.spi.GitConfig;
-import io.resys.hdes.client.spi.GitConfig.GitEntry;
-import io.resys.hdes.client.spi.GitConfig.GitInit;
-import io.resys.hdes.client.spi.ImmutableGitConfig;
-import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
-import io.resys.hdes.client.spi.util.FileUtils;
-import io.resys.hdes.client.spi.util.HdesAssert;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class GitConnectionFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(GitConnectionFactory.class);
 
   
-  public static GitConfig create(GitInit config, HdesCredsSupplier creds, ObjectMapper objectMapper) throws IOException, 
+  public static GitConfig create(GitInit config, HdesCredsSupplier creds, ObjectMapper objectMapper) throws IOException,
       RefAlreadyExistsException, RefNotFoundException, InvalidRefNameException, CheckoutConflictException, GitAPIException {
     
     final var path = StringUtils.isEmpty(config.getRemote()) ? Files.createTempDirectory("git_repo") : new File(config.getStorage()).toPath();
@@ -110,6 +108,9 @@ public class GitConnectionFactory {
     final var assetPath = "src/main/resources/assets/";
     final var absolutePath = git.getRepository().getWorkTree().getAbsolutePath();
     final var absoluteAssetPath = "/" + FileUtils.cleanPath(absolutePath) + "/" + assetPath;
+
+    final var cleanedAbsolutePath = absolutePath.replace("\\", "/");
+    final var cleanedAbsoluteAssetPath = absoluteAssetPath.replace("\\", "/");
     
     // init cache
     final var cacheName = GitConnectionFactory.class.getCanonicalName();
@@ -126,14 +127,14 @@ public class GitConnectionFactory {
         .init(config)
         .serializer(new GitSerializerImpl(objectMapper))
         .client(git)
-        .location(new StoreEntityLocation(absoluteAssetPath))
+        .location(new StoreEntityLocation(cleanedAbsoluteAssetPath))
         .cacheManager(cacheManager)
         .cacheName(cacheName)
         .cacheHeap(cacheHeap)
         .parentPath(path)
         .callback(callback)
-        .absolutePath(absolutePath)
-        .absoluteAssetsPath(absoluteAssetPath)
+        .absolutePath(cleanedAbsolutePath)
+        .absoluteAssetsPath(cleanedAbsoluteAssetPath)
         .assetsPath(assetPath)
         .creds(creds)
         .build();

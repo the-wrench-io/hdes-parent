@@ -20,19 +20,18 @@ package io.resys.hdes.client.spi.cache;
  * #L%
  */
 
-import java.util.Optional;
-
+import io.resys.hdes.client.api.HdesCache;
+import io.resys.hdes.client.api.ImmutableCacheEntry;
+import io.resys.hdes.client.api.ast.AstBody;
+import io.resys.hdes.client.api.ast.AstBody.AstSource;
+import io.resys.hdes.client.api.programs.Program;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.config.builders.ResourcePoolsBuilder;
 
-import io.resys.hdes.client.api.HdesCache;
-import io.resys.hdes.client.api.ImmutableCacheEntry;
-import io.resys.hdes.client.api.ast.AstBody;
-import io.resys.hdes.client.api.ast.AstBody.AstSource;
-import io.resys.hdes.client.api.programs.Program;
+import java.util.Optional;
 
 public class HdesClientEhCache implements HdesCache {
   private static final String CACHE_PREFIX = HdesCache.class.getCanonicalName();
@@ -112,7 +111,7 @@ public class HdesClientEhCache implements HdesCache {
       return new HdesClientEhCache(cacheManager, cacheName);
     }
   }
-  
+
   private static String createName(String name) {
     return CACHE_PREFIX + "-" + name;
   }

@@ -29,7 +29,8 @@ public class HdesWebConfig {
   public final static String COPYAS = "copyas";
   public final static String RESOURCES = "resources";
   public final static String HISTORY = "history";
-
+  public final static String DIFF = "diff";
+  public static final String SUMMARY = "summary";
   public final static String VERSION = "version";
 
   private final String servicePath; // context root for the rest of services
@@ -41,9 +42,10 @@ public class HdesWebConfig {
   private final String copyasPath;
   private final String resourcesPath;
   private final String historyPath;
+  private final String diffPath;
 
   public HdesWebConfig(String servicePath, String modelsPath, String exportsPath, String commandsPath,
-      String debugsPath, String importsPath, String copyasPath, String resourcesPath, String historyPath) {
+      String debugsPath, String importsPath, String copyasPath, String resourcesPath, String historyPath, String diffPath) {
     super();
     this.servicePath = servicePath;
     this.modelsPath = modelsPath;
@@ -54,6 +56,7 @@ public class HdesWebConfig {
     this.copyasPath = copyasPath;
     this.resourcesPath = resourcesPath;
     this.historyPath = historyPath;
+    this.diffPath = diffPath;
   }
 
   public String getServicePath() {
@@ -92,6 +95,10 @@ public class HdesWebConfig {
     return historyPath;
   }
 
+  public String getDiffPath() {
+    return diffPath;
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -106,10 +113,11 @@ public class HdesWebConfig {
     private String copyasPath;
     private String resourcesPath;
     private String historyPath;
+    private String diffPath;
 
     public HdesWebConfig build() {
       return new HdesWebConfig(servicePath, modelsPath, exportsPath, commandsPath, debugsPath, importsPath,
-          copyasPath, resourcesPath, historyPath);
+          copyasPath, resourcesPath, historyPath, diffPath);
     }
 
     public Builder servicePath(String servicePath) {
@@ -154,6 +162,11 @@ public class HdesWebConfig {
 
     public Builder historyPath(String historyPath) {
       this.historyPath = historyPath;
+      return this;
+    }
+
+    public Builder diffPath(String diffPath) {
+      this.diffPath = diffPath;
       return this;
     }
   }

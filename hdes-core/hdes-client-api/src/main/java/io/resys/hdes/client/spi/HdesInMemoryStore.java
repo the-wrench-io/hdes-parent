@@ -20,24 +20,8 @@ package io.resys.hdes.client.spi;
  * #L%
  */
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import io.resys.hdes.client.api.HdesComposer.StoreDump;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
@@ -51,11 +35,28 @@ import io.resys.hdes.client.spi.staticresources.Sha2;
 import io.resys.hdes.client.spi.staticresources.StoreEntityLocation;
 import io.resys.hdes.client.spi.util.HdesAssert;
 import io.smallrye.mutiny.Uni;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public class HdesInMemoryStore implements HdesStore {
   private static final Logger LOGGER = LoggerFactory.getLogger(HdesInMemoryStore.class);
   private final Map<String, StoreEntity> entities;
   private final StoreState state;
+  private final Optional<String> branchName;
   
   
   public HdesInMemoryStore(Map<String, StoreEntity> entities) {
@@ -71,6 +72,23 @@ public class HdesInMemoryStore implements HdesStore {
       }
     }
     this.state = builder.build();
+    this.branchName = Optional.empty();
+  }
+
+  public HdesInMemoryStore(Map<String, StoreEntity> entities, String branchName) {
+    super();
+    this.entities = entities;
+    final var builder = ImmutableStoreState.builder();
+    for(final var entity : entities.values()) {
+      switch (entity.getBodyType()) {
+        case DT: builder.putDecisions(entity.getId(), entity); break;
+        case FLOW: builder.putFlows(entity.getId(), entity); break;
+        case FLOW_TASK: builder.putServices(entity.getId(), entity); break;
+        default: continue;
+      }
+    }
+    this.state = builder.build();
+    this.branchName = Optional.ofNullable(branchName);
   }
 
   @Override
@@ -82,7 +100,7 @@ public class HdesInMemoryStore implements HdesStore {
     throw new RuntimeException("read only store!");
   }
   @Override
-  public Uni<StoreEntity> delete(DeleteAstType deleteType) {
+  public Uni<List<StoreEntity>> delete(DeleteAstType deleteType) {
     throw new RuntimeException("read only store!");
   }
   @Override
@@ -324,6 +342,18 @@ public class HdesInMemoryStore implements HdesStore {
   public StoreRepoBuilder repo() {
     throw new IllegalArgumentException("not implemented");
   }
+
+  @Override
+  public Optional<String> getBranchName() {
+    return branchName;
+  }
+
+  @Override
+  public HdesStore withBranch(String branchName) {
+    Objects.requireNonNull(branchName, () -> "branchName can't be null!");
+    return new HdesInMemoryStore(entities, branchName);
+  }
+
   @Override
   public Uni<List<StoreEntity>> batch(ImportStoreEntity batchType) {
     throw new IllegalArgumentException("not implemented");

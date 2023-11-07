@@ -20,18 +20,10 @@ package io.resys.hdes.client.spi;
  * #L%
  */
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import groovy.util.logging.Slf4j;
 import io.resys.hdes.client.api.HdesStore;
 import io.resys.hdes.client.api.ImmutableStoreEntity;
@@ -47,6 +39,13 @@ import io.resys.thena.docdb.file.DocDBFactoryFile;
 import io.resys.thena.docdb.file.FileErrors;
 import io.resys.thena.docdb.file.spi.FilePoolImpl;
 import io.resys.thena.docdb.file.tables.Table.FilePool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Optional;
+import java.util.UUID;
 
 public class HdesStoreFileImpl extends ThenaStoreTemplate implements HdesStore {
   private static final Logger LOGGER = LoggerFactory.getLogger(HdesStoreFileImpl.class);
@@ -62,6 +61,16 @@ public class HdesStoreFileImpl extends ThenaStoreTemplate implements HdesStore {
   
   public static Builder builder() {
     return new Builder();
+  }
+
+  @Override
+  public Optional<String> getBranchName() {
+    return Optional.empty();
+  }
+
+  @Override
+  public HdesStore withBranch(String branchName) {
+    return this;
   }
 
   @Slf4j

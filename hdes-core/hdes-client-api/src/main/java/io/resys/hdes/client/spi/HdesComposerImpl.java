@@ -20,9 +20,6 @@ package io.resys.hdes.client.spi;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import io.resys.hdes.client.api.HdesClient;
 import io.resys.hdes.client.api.HdesComposer;
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
@@ -30,6 +27,8 @@ import io.resys.hdes.client.api.HdesStore.StoreState;
 import io.resys.hdes.client.api.ImmutableComposerState;
 import io.resys.hdes.client.api.ImmutableUpdateStoreEntity;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
+import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.spi.changeset.AstCommandOptimiser;
 import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 import io.resys.hdes.client.spi.composer.CopyAsEntityVisitor;
@@ -40,6 +39,10 @@ import io.resys.hdes.client.spi.composer.DeleteEntityVisitor;
 import io.resys.hdes.client.spi.composer.DryRunVisitor;
 import io.resys.hdes.client.spi.composer.ImportEntityVisitor;
 import io.smallrye.mutiny.Uni;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class HdesComposerImpl implements HdesComposer {
 
@@ -73,17 +76,18 @@ public class HdesComposerImpl implements HdesComposer {
   @Override
   public Uni<ComposerState> create(CreateEntity asset) {
     return client.store().query().get().onItem().transform(this::state)
-        .onItem().transformToUni(state -> client.store().create(new CreateEntityVisitor(state, asset, client).visit()))
+        .onItem().transformToUni(state -> client.store().batch(new CreateEntityVisitor(state, asset, client).visit()))
         .onItem().transformToUni(savedEntity -> client.store().query().get().onItem().transform(this::state));
   }
   @Override
   public Uni<ComposerState> delete(String id) {
     return client.store().query().get().onItem().transform(this::state)
         .onItem().transformToUni(state -> client.store().delete(new DeleteEntityVisitor(state, id).visit()))
-        .onItem().transformToUni(savedEntity -> {
+        .onItem().transformToUni(savedEntities -> {
           // flush cache
-          client.config().getCache().flush(id);
-        
+          for (var entity : savedEntities) {
+            client.config().getCache().flush(entity.getId());
+          }
           return client.store().query().get().onItem().transform(this::state);
         });
   }
@@ -125,7 +129,33 @@ public class HdesComposerImpl implements HdesComposer {
   public Uni<StoreDump> getStoreDump() {
     return client.store().query().get().onItem().transform(state -> new DataDumpVisitor(client).visit(state));
   }
-  
+
+  @Override
+  public Uni<TagDiff> diff(DiffRequest request) {
+    return client.store().query().get().onItem().transform(state -> client.diff()
+        .tags(state.getTags().values())
+        .baseId(request.getBaseId())
+        .targetId(request.getTargetId())
+        .targetDate(LocalDateTime.now())
+        .build());
+  }
+
+  @Override
+  public Uni<AstTagSummary> summary(String tagId) {
+    return client.store().query().get().onItem().transform(state -> client.summary()
+        .tags(state.getTags().values())
+        .tagId(tagId)
+        .build());
+  }
+
+  @Override
+  public HdesComposer withBranch(String branchName) {
+    if (branchName == null || branchName.isBlank()) {
+      return this;
+    }
+    return new HdesComposerImpl(client.withBranch(branchName));
+  }
+
   private ComposerState state(StoreState source) {
     // create envir
     final var envir = ComposerEntityMapper.toEnvir(client.envir(), source).build();

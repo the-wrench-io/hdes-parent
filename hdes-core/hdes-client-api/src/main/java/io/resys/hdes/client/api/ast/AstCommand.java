@@ -61,7 +61,10 @@ public interface AstCommand extends Serializable {
 
     ADD_LOG, ADD_HEADER_IN, ADD_HEADER_OUT, ADD_ROW,
 
-    SET_VALUE_SET
+    SET_VALUE_SET,
+
+    // branch related
+    CREATE_BRANCH, SET_BRANCH_NAME, SET_BRANCH_CREATED, SET_BRANCH_TAG
   }
 
 }

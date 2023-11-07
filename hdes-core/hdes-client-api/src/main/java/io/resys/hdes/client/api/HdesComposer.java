@@ -1,12 +1,10 @@
 package io.resys.hdes.client.api;
 
-import java.io.Serializable;
-
 /*-
  * #%L
  * hdes-client-api
  * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2023 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,30 +20,32 @@ import java.io.Serializable;
  * #L%
  */
 
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import org.immutables.value.Value;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
 import io.resys.hdes.client.api.HdesStore.HistoryEntity;
 import io.resys.hdes.client.api.ast.AstBody;
 import io.resys.hdes.client.api.ast.AstBody.AstBodyType;
 import io.resys.hdes.client.api.ast.AstBody.AstSource;
+import io.resys.hdes.client.api.ast.AstBranch;
 import io.resys.hdes.client.api.ast.AstCommand;
 import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
+import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.api.programs.Program.ProgramResult;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramAssociation;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramMessage;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramStatus;
 import io.smallrye.mutiny.Uni;
+import org.immutables.value.Value;
+
+import javax.annotation.Nullable;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Backend for composer related service. 
@@ -63,7 +63,18 @@ public interface HdesComposer {
   Uni<DebugResponse> debug(DebugRequest entity);
   Uni<ComposerEntity<?>> dryRun(UpdateEntity entity);
   Uni<StoreDump> getStoreDump();
-  
+  Uni<TagDiff> diff(DiffRequest request);
+  Uni<AstTagSummary> summary(String tagId);
+
+  HdesComposer withBranch(String branchName);
+
+  @JsonSerialize(as = ImmutableDiffRequest.class)
+  @JsonDeserialize(as = ImmutableDiffRequest.class)
+  @Value.Immutable
+  interface DiffRequest extends Serializable {
+    String getBaseId();
+    String getTargetId();
+  }
 
   @JsonSerialize(as = ImmutableDebugResponse.class)
   @JsonDeserialize(as = ImmutableDebugResponse.class)
@@ -112,6 +123,7 @@ public interface HdesComposer {
     Map<String, ComposerEntity<AstFlow>> getFlows();
     Map<String, ComposerEntity<AstService>> getServices();
     Map<String, ComposerEntity<AstDecision>> getDecisions();
+    Map<String, ComposerEntity<AstBranch>> getBranches();
   }
 
   @Value.Immutable

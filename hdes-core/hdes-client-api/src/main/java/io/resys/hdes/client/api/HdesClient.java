@@ -1,12 +1,10 @@
 package io.resys.hdes.client.api;
 
-import java.io.InputStream;
-
 /*-
  * #%L
  * hdes-client-api
  * %%
- * Copyright (C) 2020 - 2021 Copyright 2020 ReSys OÜ
+ * Copyright (C) 2020 - 2023 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,16 +20,9 @@ import java.io.InputStream;
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-import javax.annotation.Nullable;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import io.resys.hdes.client.api.HdesAstTypes.DataTypeAstBuilder;
 import io.resys.hdes.client.api.HdesStore.StoreEntity;
 import io.resys.hdes.client.api.ast.AstCommand;
@@ -39,8 +30,10 @@ import io.resys.hdes.client.api.ast.AstDecision;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstService;
 import io.resys.hdes.client.api.ast.AstTag;
+import io.resys.hdes.client.api.ast.AstTagSummary;
 import io.resys.hdes.client.api.ast.TypeDef;
 import io.resys.hdes.client.api.ast.TypeDef.ValueType;
+import io.resys.hdes.client.api.diff.TagDiff;
 import io.resys.hdes.client.api.programs.DecisionProgram;
 import io.resys.hdes.client.api.programs.DecisionProgram.DecisionResult;
 import io.resys.hdes.client.api.programs.ExpressionProgram;
@@ -53,18 +46,44 @@ import io.resys.hdes.client.api.programs.ServiceProgram.ServiceResult;
 import io.resys.hdes.client.spi.config.HdesClientConfig;
 import io.smallrye.mutiny.Uni;
 
+import javax.annotation.Nullable;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
 public interface HdesClient {
   AstBuilder ast();
   ProgramBuilder program();
   ExecutorBuilder executor(ProgramEnvir envir);
   EnvirBuilder envir();
-  
+  DiffBuilder diff();
+  SummaryBuilder summary();
   HdesTypesMapper mapper();
   HdesAstTypes types();
   HdesStore store();
   CSVBuilder csv();
   ClientRepoBuilder repo();
   HdesClientConfig config();
+
+  HdesClient withBranch(String branchName);
+
+  interface SummaryBuilder {
+    SummaryBuilder tags(Collection<StoreEntity> tags);
+    SummaryBuilder tagId(String tagId);
+    AstTagSummary build();
+  }
+
+  interface DiffBuilder {
+    DiffBuilder tags(Collection<StoreEntity> tags);
+    DiffBuilder baseId(String baseId);
+    DiffBuilder targetId(String targetId);
+    DiffBuilder targetDate(LocalDateTime targetDate);
+    TagDiff build();
+  }
   
   interface ClientRepoBuilder {
     ClientRepoBuilder repoName(String repoName);
@@ -100,11 +119,13 @@ public interface HdesClient {
     EnvirCommandFormatBuilder tag(String commandJson);
     EnvirCommandFormatBuilder flow(String commandJson);
     EnvirCommandFormatBuilder decision(String commandJson);
+    EnvirCommandFormatBuilder branch(String commandJson);
     EnvirCommandFormatBuilder service(String commandJson);
-    
+
     EnvirCommandFormatBuilder tag(StoreEntity entity);
     EnvirCommandFormatBuilder flow(StoreEntity entity);
     EnvirCommandFormatBuilder decision(StoreEntity entity);
+    EnvirCommandFormatBuilder branch(StoreEntity entity);
     EnvirCommandFormatBuilder service(StoreEntity entity);
     
     EnvirBuilder build();
