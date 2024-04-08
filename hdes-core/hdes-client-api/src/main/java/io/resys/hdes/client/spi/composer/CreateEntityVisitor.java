@@ -118,7 +118,7 @@ public class CreateEntityVisitor {
         .filter(e -> e.getAst().getName().equals(asset.getName()))
         .findFirst();
     if(flowtask.isPresent()) {
-      throw new ComposerException(flow.get().getSource().getBodyType() + " asset with name: '" + asset.getName() + "' exists already!");
+      throw new ComposerException(flowtask.get().getSource().getBodyType() + " asset with name: '" + asset.getName() + "' exists already!");
     }
     
     // Tag validations
@@ -127,7 +127,7 @@ public class CreateEntityVisitor {
         .filter(e -> e.getAst().getName().equals(asset.getName()))
         .findFirst();
     if(tag.isPresent()) {
-      throw new ComposerException(flow.get().getSource().getBodyType() + " asset with name: '" + asset.getName() + "' exists already!");
+      throw new ComposerException(tag.get().getSource().getBodyType() + " asset with name: '" + asset.getName() + "' exists already!");
     }
 
     // Branch validations
