@@ -362,8 +362,8 @@ public class FlowProgramExecutor {
       
       
       if(prev == null) {
-        //throw new ProgramException("Can't find parameter with name: '" + name + "'!");
-        return null;
+        // if parameter isn't found, return the provided value
+        return path;
       }
       
 
