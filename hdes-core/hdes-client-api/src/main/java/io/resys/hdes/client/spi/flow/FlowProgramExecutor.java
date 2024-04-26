@@ -362,7 +362,10 @@ public class FlowProgramExecutor {
       
       
       if(prev == null) {
-        // if parameter isn't found, return the provided value
+        // if parameter isn't found, return the provided value, or null if the value is null
+        if (path == null || path.equals("null")) {
+          return null;
+        }
         return path;
       }
       

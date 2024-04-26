@@ -109,6 +109,12 @@ public class FlowTaskServiceExecutionTest {
   }
 
   @Test
+  public void testHardcodedFlowInputNull() {
+    final var body = client.executor(envir).inputField("myInputParam", "").flow("hardcodedInputNull").andGetBody();
+    Assert.assertEquals(0, body.getReturns().size());
+  }
+
+  @Test
   public void flowCsvDebugSingle() {
     ImmutableDebugRequest entity = ImmutableDebugRequest.builder()
             .id("sumFlow.json")
