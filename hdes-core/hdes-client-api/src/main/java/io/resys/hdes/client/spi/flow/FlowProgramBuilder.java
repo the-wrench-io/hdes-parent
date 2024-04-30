@@ -20,6 +20,12 @@ package io.resys.hdes.client.spi.flow;
  * #L%
  */
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
@@ -46,12 +52,6 @@ import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepEndPointer;
 import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepThenPointer;
 import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepWhenThenPointer;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class FlowProgramBuilder {
   private static final FlowProgramStepEndPointer END_STEP_POINTER = ImmutableFlowProgramStepEndPointer.builder().type(FlowProgramStepPointerType.END).build();

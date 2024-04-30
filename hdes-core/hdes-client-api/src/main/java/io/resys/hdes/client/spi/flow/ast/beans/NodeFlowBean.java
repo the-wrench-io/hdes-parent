@@ -21,20 +21,20 @@ package io.resys.hdes.client.spi.flow.ast.beans;
  */
 
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.resys.hdes.client.api.ast.AstChangeset;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRefNode;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowSwitchNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 public class NodeFlowBean extends NodeBean implements AstFlowRoot {
   public static final long serialVersionUID = 8492235102091866790L;

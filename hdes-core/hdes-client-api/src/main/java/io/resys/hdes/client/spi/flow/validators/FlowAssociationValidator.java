@@ -21,6 +21,15 @@ package io.resys.hdes.client.spi.flow.validators;
  */
 
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+
 import io.resys.hdes.client.api.ast.AstBody.AstCommandMessage;
 import io.resys.hdes.client.api.ast.AstBody.CommandMessageType;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -35,14 +44,6 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.util.HdesAssert;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class FlowAssociationValidator {
 
