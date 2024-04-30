@@ -1,19 +1,17 @@
 package io.resys.hdes.client.spi.flow.ast.beans;
 
-import java.util.Collection;
-
 /*-
  * #%L
- * wrench-assets-flow
+ * hdes-client-api
  * %%
- * Copyright (C) 2016 - 2019 Copyright 2016 ReSys OÜ
+ * Copyright (C) 2020 - 2024 Copyright 2020 ReSys OÜ
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,19 +20,21 @@ import java.util.Collection;
  * #L%
  */
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import io.resys.hdes.client.api.ast.AstChangeset;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputType;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowRefNode;
+import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowSwitchNode;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowTaskNode;
-import io.resys.hdes.client.api.ast.AstFlow.AstFlowRoot;
 import io.resys.hdes.client.api.exceptions.FlowAstException;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NodeFlowBean extends NodeBean implements AstFlowRoot {
   public static final long serialVersionUID = 8492235102091866790L;
@@ -325,6 +325,20 @@ public class NodeFlowBean extends NodeBean implements AstFlowRoot {
         return Collections.emptyMap();
       }
       return inputs.getChildren();
+    }
+    @Override
+    public String getObjectInput() {
+      AstFlowNode inputs = getInputsNode();
+      if(inputs == null) {
+        return null;
+      }
+      if (inputs.getValue() == null) {
+        return null;
+      }
+      if(inputs.getValue().isBlank() || inputs.getValue().equals("null")) {
+        return null;
+      }
+      return inputs.getValue();
     }
     @Override
     public AstFlowNode getInputsNode() {

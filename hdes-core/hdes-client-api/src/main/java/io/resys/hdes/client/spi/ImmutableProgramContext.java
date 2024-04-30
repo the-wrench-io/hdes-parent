@@ -20,16 +20,7 @@ package io.resys.hdes.client.spi;
  * #L%
  */
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Supplier;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import io.resys.hdes.client.api.HdesClient.ExecutorBuilder;
 import io.resys.hdes.client.api.HdesClient.ExecutorInput;
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
@@ -45,6 +36,14 @@ import io.resys.hdes.client.api.programs.ProgramEnvir;
 import io.resys.hdes.client.api.programs.ServiceData;
 import io.resys.hdes.client.api.programs.ServiceProgram;
 import io.resys.hdes.client.spi.config.HdesClientConfig.DependencyInjectionContext;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public class ImmutableProgramContext implements ProgramContext {
   private static final long serialVersionUID = 6910151114801874342L;
@@ -141,6 +140,10 @@ public class ImmutableProgramContext implements ProgramContext {
     
     if(typeDef.getData() && typeDef.getBeanType() != null) {
       return (Serializable) factory.toType(genericData, typeDef.getBeanType());
+    }
+
+    if(typeDef.getValueType().equals(TypeDef.ValueType.OBJECT)) {
+      return (Serializable) genericData;
     }
     
     return (Serializable) genericData.get(typeDef.getName());

@@ -22,6 +22,7 @@ package io.resys.wrench.assets.bundle.spi;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.resys.hdes.client.api.HdesClient;
@@ -100,6 +101,15 @@ public class FlowTaskServiceExecutionTest {
 
     final var body = client.executor(envir).inputJson(input).flow("sumFlow").andGetTask("SumTask");
     Assert.assertTrue(((BigDecimal) body.getReturns().get("sum")).compareTo(new BigDecimal("30")) == 0);
+  }
+
+  @Test
+  public void passObjectToDT() throws JsonProcessingException {
+
+    final JsonNode input = objectMapper.readTree("{\"fundQuestionA\": \"selectionA\", \"fundQuestionB\": \"selectionA\"}");
+
+    final var result = client.executor(envir).inputJson(input).flow("objects").andGetBody().getReturns().get("result");
+    Assert.assertEquals("1", result);
   }
 
   @Test

@@ -20,18 +20,6 @@ package io.resys.hdes.client.spi.flow;
  * #L%
  */
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.exceptions.ProgramException;
 import io.resys.hdes.client.api.programs.FlowProgram;
@@ -52,6 +40,18 @@ import io.resys.hdes.client.spi.ImmutableProgramContext;
 import io.resys.hdes.client.spi.decision.DecisionProgramExecutor;
 import io.resys.hdes.client.spi.expression.OperationFlowContext.FlowTaskExpressionContext;
 import io.resys.hdes.client.spi.groovy.ServiceProgramExecutor;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class FlowProgramExecutor {
   private static final Logger LOGGER = LoggerFactory.getLogger(FlowProgramExecutor.class);
@@ -245,7 +245,12 @@ public class FlowProgramExecutor {
   
   private Map<String, Serializable> visitInputMapping(FlowProgramStep step) {
     final Map<String, Serializable> result = new HashMap<>();
-    for(final var entry : step.getBody().getInputMapping().entrySet()) {
+    final var inputMapping = Objects.requireNonNull(step.getBody()).getInputMapping();
+    if (inputMapping.containsKey(FlowProgramBuilder.OBJECT_INPUT_FLAG)) {
+      Map<String, Serializable> objectInputs = (Map<String, Serializable>) accepted.get(inputMapping.get(FlowProgramBuilder.OBJECT_INPUT_FLAG));
+      return objectInputs;
+    }
+    for(final var entry : inputMapping.entrySet()) {
       String nameOnService = entry.getKey();
       
       try {
@@ -306,6 +311,10 @@ public class FlowProgramExecutor {
 
   @SuppressWarnings("unchecked")
   private Serializable visitVariableOnPath(String name) {
+    if (name.equals(FlowProgramBuilder.OBJECT_INPUT_FLAG)) {
+      return "test";
+    }
+
     String[] paths = name.split("\\.");
     if(paths.length == 0) {
       return null;

@@ -20,17 +20,15 @@ package io.resys.hdes.client.api.ast;
  * #L%
  */
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
+
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
-
-import org.immutables.value.Value;
-
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 
 @Value.Immutable
@@ -84,6 +82,7 @@ public interface AstFlow extends AstBody, Serializable {
     AstFlowNode getCollection();
     AstFlowNode getInputsNode();
     Map<String, AstFlowNode> getInputs();
+    String getObjectInput();
   }
 
   interface AstFlowSwitchNode extends AstFlowNode {

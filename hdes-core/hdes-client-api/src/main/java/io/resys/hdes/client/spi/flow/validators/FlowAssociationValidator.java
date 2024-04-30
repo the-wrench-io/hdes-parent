@@ -21,14 +21,6 @@ package io.resys.hdes.client.spi.flow.validators;
  */
 
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import io.resys.hdes.client.api.ast.AstBody.AstCommandMessage;
 import io.resys.hdes.client.api.ast.AstBody.CommandMessageType;
 import io.resys.hdes.client.api.ast.AstFlow;
@@ -43,6 +35,14 @@ import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 import io.resys.hdes.client.spi.util.HdesAssert;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class FlowAssociationValidator {
 
@@ -57,7 +57,7 @@ public class FlowAssociationValidator {
   public void visitStep(FlowProgramStep step, ProgramWrapper<?, ?> wrapper) {
     final var taskModel = ast.getSrc().getTasks().values().stream()
         .filter(t -> t.getId() != null && t.getId().getValue().equals(step.getId()))
-        .findFirst().get();    
+        .findFirst().get();
     
     for(TypeDef param : wrapper.getAst().get().getHeaders().getReturnDefs()) {
       if(param.getDirection() == Direction.OUT) {
@@ -77,35 +77,48 @@ public class FlowAssociationValidator {
       // Validate inputs
       final var taskInputs = getTaskServiceInput(entry);
       final var taskModel = entry.getTaskNode();
-      
-      for(final var input : entry.getWrapper().getAst().get().getHeaders().getAcceptDefs()) {
 
-        if(taskInputs.containsKey(input.getName())) {
-          TaskInput taskInput = taskInputs.get(input.getName());
-          if(taskInput.getDataType() == null) {
-            error(entry, 
-                taskInput.getNode().getStart(),
-                taskInput.getNode().getSource().getValue().length(),
-                "Task: " + taskModel.getKeyword() + ", input: '" + input.getName() + "', type has unknown mapping:'" + taskInput.getNode().getValue() + "'!");
-            continue;
-          }
-          ValueType ref = taskInput.getDataType().getValueType();
-          if(input.getValueType() != ref) {            
-            error(entry, 
-                taskInput.getNode().getStart(),
-                taskInput.getNode().getSource().getValue().length(),
-                "Task: " + taskModel.getKeyword() + ", input: '" + input.getName() + "', type has wrong type, expecting:'" + input.getValueType() + "' but was: '" + ref + "'!");
-          }
-          taskInputs.remove(input.getName());
-          unusedInputs.remove(taskInput.getDataType().getName());
-        } else {
-          error(entry, 
-              taskModel.getRef().getInputsNode() == null ? taskModel.getRef().getStart() : taskModel.getRef().getInputsNode().getStart(),
-              taskModel.getRef().getInputsNode() == null ? taskModel.getRef().getStart() : taskModel.getRef().getInputsNode().getSource().getValue().length(),
-              "Task: " + taskModel.getKeyword() + ", is missing input: '" + input.getName() + "'!");
+      if (taskInputs.values().size() == 1 && taskInputs.values().stream().findFirst().get().getNode().getValue() != null) {
+        TaskInput taskInput = taskInputs.values().stream().findFirst().get();
+
+        ValueType ref = taskInput.getDataType().getValueType();
+        if (!taskInput.getDataType().getValueType().equals(ValueType.OBJECT)) {
+          error(entry,
+              taskInput.getNode().getStart(),
+              taskInput.getNode().getSource().getValue().length(),
+              "Task: " + taskModel.getKeyword() + ", input: '" + taskInput.getNode().getValue() + "', type has wrong type, expecting: 'OBJECT' but was: '" + ref + "'!");
         }
+        taskInputs.remove(taskInput.getNode().getValue());
+        unusedInputs.remove(taskInput.getNode().getValue());
 
+      } else {
+        for (final var input : entry.getWrapper().getAst().get().getHeaders().getAcceptDefs()) {
 
+          if (taskInputs.containsKey(input.getName())) {
+            TaskInput taskInput = taskInputs.get(input.getName());
+            if (taskInput.getDataType() == null) {
+              error(entry,
+                  taskInput.getNode().getStart(),
+                  taskInput.getNode().getSource().getValue().length(),
+                  "Task: " + taskModel.getKeyword() + ", input: '" + input.getName() + "', type has unknown mapping:'" + taskInput.getNode().getValue() + "'!");
+              continue;
+            }
+            ValueType ref = taskInput.getDataType().getValueType();
+            if (input.getValueType() != ref) {
+              error(entry,
+                  taskInput.getNode().getStart(),
+                  taskInput.getNode().getSource().getValue().length(),
+                  "Task: " + taskModel.getKeyword() + ", input: '" + input.getName() + "', type has wrong type, expecting:'" + input.getValueType() + "' but was: '" + ref + "'!");
+            }
+            taskInputs.remove(input.getName());
+            unusedInputs.remove(taskInput.getDataType().getName());
+          } else {
+            error(entry,
+                taskModel.getRef().getInputsNode() == null ? taskModel.getRef().getStart() : taskModel.getRef().getInputsNode().getStart(),
+                taskModel.getRef().getInputsNode() == null ? taskModel.getRef().getStart() : taskModel.getRef().getInputsNode().getSource().getValue().length(),
+                "Task: " + taskModel.getKeyword() + ", is missing input: '" + input.getName() + "'!");
+          }
+        }
       }
 
       // Unused inputs on task
@@ -144,24 +157,38 @@ public class FlowAssociationValidator {
         .collect(Collectors.toMap(p -> p.getName(), p -> p));
 
     Map<String, TaskInput> result = new HashMap<>();
-    for(Map.Entry<String, AstFlowNode> entry : taskModel.getRef().getInputs().entrySet()) {
+    final var objectInput = taskModel.getRef().getObjectInput();
 
-      AstFlowNode node = entry.getValue();
-      String mappingName = AstFlowNodesFactory.getStringValue(node);
-      if(StringUtils.isEmpty(mappingName)) {
-        error(toValidate,
-          node.getStart(),
-          node.getSource().getValue().length(),
-          "Task: " + taskModel.getKeyword() + " mapping: '" + entry.getKey() + "' is missing value!");
-      } else if(!serviceTypes.containsKey(entry.getKey())) {
-        error(toValidate,
-          node.getStart(),
-          node.getSource().getValue().length(),
-          "Task: " + taskModel.getKeyword() + ", has unknown input: '" + entry.getKey() + "'!");
-      } else if(allParams.containsKey(mappingName)) {
-        result.put(entry.getKey(), new TaskInput(node, allParams.get(mappingName)));
+    if (objectInput != null) {
+      // see if object input matches any of the flow inputs
+      Optional<TypeDef> matchedInput = ast.getHeaders().getAcceptDefs().stream().filter(typeDef -> typeDef.getName().equals(objectInput)).findFirst();
+      if (matchedInput.isPresent()) {
+        result.put(objectInput, new TaskInput(taskModel.getRef().getInputsNode(), matchedInput.get()));
       } else {
-        result.put(entry.getKey(), new TaskInput(node, serviceTypes.get(entry.getKey())));
+        error(toValidate,
+          taskModel.getRef().getRef().getStart(),
+          taskModel.getRef().getRef().getSource().getValue().length(),
+          "Task: " + taskModel.getKeyword() + ", has unknown object input: '" + objectInput + "'!");
+      }
+    } else {
+      for (Map.Entry<String, AstFlowNode> entry : taskModel.getRef().getInputs().entrySet()) {
+        AstFlowNode node = entry.getValue();
+        String mappingName = AstFlowNodesFactory.getStringValue(node);
+        if (StringUtils.isEmpty(mappingName)) {
+          error(toValidate,
+              node.getStart(),
+              node.getSource().getValue().length(),
+              "Task: " + taskModel.getKeyword() + " mapping: '" + entry.getKey() + "' is missing value!");
+        } else if (!serviceTypes.containsKey(entry.getKey())) {
+          error(toValidate,
+              node.getStart(),
+              node.getSource().getValue().length(),
+              "Task: " + taskModel.getKeyword() + ", has unknown input: '" + entry.getKey() + "'!");
+        } else if (allParams.containsKey(mappingName)) {
+          result.put(entry.getKey(), new TaskInput(node, allParams.get(mappingName)));
+        } else {
+          result.put(entry.getKey(), new TaskInput(node, serviceTypes.get(entry.getKey())));
+        }
       }
     }
     return result;

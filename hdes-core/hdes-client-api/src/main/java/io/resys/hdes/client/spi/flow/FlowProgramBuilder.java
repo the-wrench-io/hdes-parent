@@ -20,12 +20,6 @@ package io.resys.hdes.client.spi.flow;
  * #L%
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import io.resys.hdes.client.api.HdesClient.HdesTypesMapper;
 import io.resys.hdes.client.api.ast.AstFlow;
 import io.resys.hdes.client.api.ast.AstFlow.AstFlowInputNode;
@@ -53,12 +47,19 @@ import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepThenPointer;
 import io.resys.hdes.client.api.programs.ImmutableFlowProgramStepWhenThenPointer;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 public class FlowProgramBuilder {
   private static final FlowProgramStepEndPointer END_STEP_POINTER = ImmutableFlowProgramStepEndPointer.builder().type(FlowProgramStepPointerType.END).build();
   private static final FlowProgramStep END_STEP = ImmutableFlowProgramStep.builder()
       .id("end")
       .pointer(END_STEP_POINTER)
       .build();
+  public static final String OBJECT_INPUT_FLAG = "OBJECT_INPUT";
 
   private final HdesTypesMapper typesFactory;
   private final Map<String, FlowProgramStep> steps = new HashMap<>();
@@ -120,8 +121,12 @@ public class FlowProgramBuilder {
     final var collection = AstFlowNodesFactory.getBooleanValue(task.getRef().getCollection());
     final var ref = AstFlowNodesFactory.getStringValue(task.getRef().getRef());
     final var inputs = new HashMap<String, String>();
-    for(Map.Entry<String, AstFlowNode> entry : task.getRef().getInputs().entrySet()) {
-      inputs.put(entry.getKey(), AstFlowNodesFactory.getStringValue(entry.getValue()));
+    if (task.getRef().getObjectInput() != null) {
+      inputs.put(OBJECT_INPUT_FLAG, task.getRef().getObjectInput());
+    } else {
+      for (Map.Entry<String, AstFlowNode> entry : task.getRef().getInputs().entrySet()) {
+        inputs.put(entry.getKey(), AstFlowNodesFactory.getStringValue(entry.getValue()));
+      }
     }
     
     final var refType = task.getDecisionTable() != null ? FlowProgramStepRefType.DT : FlowProgramStepRefType.SERVICE;
