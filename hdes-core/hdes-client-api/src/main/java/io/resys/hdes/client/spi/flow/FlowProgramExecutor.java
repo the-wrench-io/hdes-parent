@@ -248,8 +248,7 @@ public class FlowProgramExecutor {
     final Map<String, Serializable> result = new HashMap<>();
     final var inputMapping = Objects.requireNonNull(step.getBody()).getInputMapping();
     if (inputMapping.containsKey(FlowProgramBuilder.OBJECT_INPUT_FLAG)) {
-      Map<String, Serializable> objectInputs = (Map<String, Serializable>) accepted.get(inputMapping.get(FlowProgramBuilder.OBJECT_INPUT_FLAG));
-      return objectInputs;
+      return factory.toMap(accepted.get(inputMapping.get(FlowProgramBuilder.OBJECT_INPUT_FLAG)));
     }
     for(final var entry : inputMapping.entrySet()) {
       String nameOnService = entry.getKey();

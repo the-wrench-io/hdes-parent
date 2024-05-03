@@ -43,6 +43,7 @@ import io.resys.hdes.client.api.ast.TypeDef.ValueType;
 import io.resys.hdes.client.api.programs.FlowProgram.FlowProgramStep;
 import io.resys.hdes.client.api.programs.ProgramEnvir.ProgramWrapper;
 import io.resys.hdes.client.spi.flow.ast.AstFlowNodesFactory;
+import io.resys.hdes.client.spi.flow.ast.beans.NodeFlowBean;
 import io.resys.hdes.client.spi.util.HdesAssert;
 
 public class FlowAssociationValidator {
@@ -79,7 +80,7 @@ public class FlowAssociationValidator {
       final var taskInputs = getTaskServiceInput(entry);
       final var taskModel = entry.getTaskNode();
 
-      if (taskInputs.values().size() == 1 && taskInputs.values().stream().findFirst().get().getNode().getValue() != null) {
+      if (taskInputs.size() == 1 && taskInputs.values().stream().findFirst().get().getNode().getKeyword().equals(NodeFlowBean.KEY_INPUTS)) {
         TaskInput taskInput = taskInputs.values().stream().findFirst().get();
 
         ValueType ref = taskInput.getDataType().getValueType();

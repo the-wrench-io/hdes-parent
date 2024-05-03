@@ -106,7 +106,7 @@ public class FlowTaskServiceExecutionTest {
   @Test
   public void passObjectToDT() throws JsonProcessingException {
 
-    final JsonNode input = objectMapper.readTree("{\"fundQuestionA\": \"selectionA\", \"fundQuestionB\": \"selectionA\"}");
+    final JsonNode input = objectMapper.readTree("{\"fundAnswers\": {\"fundQuestionA\": \"selectionA\", \"fundQuestionB\": \"selectionA\"}}");
 
     final var result = client.executor(envir).inputJson(input).flow("objects").andGetBody().getReturns().get("result");
     Assert.assertEquals("1", result);

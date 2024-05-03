@@ -142,10 +142,6 @@ public class ImmutableProgramContext implements ProgramContext {
     if(typeDef.getData() && typeDef.getBeanType() != null) {
       return (Serializable) factory.toType(genericData, typeDef.getBeanType());
     }
-
-    if(typeDef.getValueType().equals(TypeDef.ValueType.OBJECT)) {
-      return (Serializable) genericData;
-    }
     
     return (Serializable) genericData.get(typeDef.getName());
   }
