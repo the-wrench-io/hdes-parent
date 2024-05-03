@@ -311,9 +311,6 @@ public class FlowProgramExecutor {
 
   @SuppressWarnings("unchecked")
   private Serializable visitVariableOnPath(String name) {
-    if (name.equals(FlowProgramBuilder.OBJECT_INPUT_FLAG)) {
-      return "test";
-    }
 
     String[] paths = name.split("\\.");
     if(paths.length == 0) {
