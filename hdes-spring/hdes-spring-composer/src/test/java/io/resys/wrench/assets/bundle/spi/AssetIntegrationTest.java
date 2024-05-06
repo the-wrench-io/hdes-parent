@@ -78,7 +78,7 @@ public class AssetIntegrationTest {
   @Test
   public void services() {
     final var services = envir.getValues();
-    Assert.assertEquals(9, services.size());
+    Assert.assertEquals(12, services.size());
   }
 
   @Test
