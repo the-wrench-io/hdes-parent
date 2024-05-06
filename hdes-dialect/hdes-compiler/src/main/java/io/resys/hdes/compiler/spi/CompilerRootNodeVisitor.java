@@ -199,7 +199,7 @@ public class CompilerRootNodeVisitor implements RootNodeVisitor<List<Resource>, 
       JavaFile file = JavaFile.builder(pkg, spec).build();
       file.writeTo(appendable);
       String result = appendable.toString();
-      return new Formatter().formatSource(result);
+      return result;//new Formatter().formatSource(result);
     } catch (Exception e) {
       
       StringBuilder appendable = new StringBuilder();
