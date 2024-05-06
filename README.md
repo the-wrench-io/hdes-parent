@@ -49,5 +49,4 @@ cd spring-app
 ```
 mvn spring-boot:run
 ```
-
 4. Navigate to <http://localhost:8081>
