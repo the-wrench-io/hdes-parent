@@ -14,6 +14,7 @@ If you are running a Windows machine, carriage returns that do not appear in UNI
 mvn clean install -DskipTests=true
 ```
 
+
 ## Running the project as a Spring Boot application
 1. Open a terminal and navigate into the [spring-app](https://github.com/the-wrench-io/hdes-parent/tree/3.y/hdes-dev/spring-app) folder
 ``` 
