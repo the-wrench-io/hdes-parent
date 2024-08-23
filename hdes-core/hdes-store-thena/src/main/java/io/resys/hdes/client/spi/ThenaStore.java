@@ -36,6 +36,7 @@ import io.resys.thena.docdb.api.DocDB;
 import io.resys.thena.docdb.spi.pgsql.PgErrors;
 import io.resys.thena.docdb.sql.DocDBFactorySql;
 import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.pgclient.SslMode;
 import io.vertx.sqlclient.PoolOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,6 +92,8 @@ public class ThenaStore extends ThenaStoreTemplate implements HdesStore {
     private String pgUser;
     private String pgPass;
     private Integer pgPoolSize;
+    // value from io.vertx.pgclient.SslMode
+    private String pgSslMode;
     
     public Builder repoName(String repoName) {
       this.repoName = repoName;
@@ -140,6 +143,10 @@ public class ThenaStore extends ThenaStoreTemplate implements HdesStore {
       this.pgPoolSize = pgPoolSize;
       return this;
     }
+    public Builder pgSslMode(String pgSslMode) {
+      this.pgSslMode = pgSslMode;
+      return this;
+    }
     
     
     private ThenaConfig.GidProvider getGidProvider() {
@@ -169,22 +176,24 @@ public class ThenaStore extends ThenaStoreTemplate implements HdesStore {
     
       final var headName = this.headName == null ? "main": this.headName;
       if(LOGGER.isDebugEnabled()) {
+        final String ls = System.lineSeparator();
         final var log = new StringBuilder()
-          .append(System.lineSeparator())
-          .append("Configuring Thena: ").append(System.lineSeparator())
-          .append("  repoName: '").append(this.repoName).append("'").append(System.lineSeparator())
-          .append("  headName: '").append(headName).append("'").append(System.lineSeparator())
-          .append("  objectMapper: '").append(this.objectMapper == null ? "configuring" : "provided").append("'").append(System.lineSeparator())
-          .append("  gidProvider: '").append(this.gidProvider == null ? "configuring" : "provided").append("'").append(System.lineSeparator())
-          .append("  authorProvider: '").append(this.authorProvider == null ? "configuring" : "provided").append("'").append(System.lineSeparator())
+          .append(ls)
+          .append("Configuring Thena: ").append(ls)
+          .append("  repoName: '").append(this.repoName).append("'").append(ls)
+          .append("  headName: '").append(headName).append("'").append(ls)
+          .append("  objectMapper: '").append(this.objectMapper == null ? "configuring" : "provided").append("'").append(ls)
+          .append("  gidProvider: '").append(this.gidProvider == null ? "configuring" : "provided").append("'").append(ls)
+          .append("  authorProvider: '").append(this.authorProvider == null ? "configuring" : "provided").append("'").append(ls)
           
-          .append("  pgPool: '").append(this.pgPool == null ? "configuring" : "provided").append("'").append(System.lineSeparator())
-          .append("  pgPoolSize: '").append(this.pgPoolSize).append("'").append(System.lineSeparator())
-          .append("  pgHost: '").append(this.pgHost).append("'").append(System.lineSeparator())
-          .append("  pgPort: '").append(this.pgPort).append("'").append(System.lineSeparator())
-          .append("  pgDb: '").append(this.pgDb).append("'").append(System.lineSeparator())
-          .append("  pgUser: '").append(this.pgUser == null ? "null" : "***").append("'").append(System.lineSeparator())
-          .append("  pgPass: '").append(this.pgPass == null ? "null" : "***").append("'").append(System.lineSeparator());
+          .append("  pgPool: '").append(this.pgPool == null ? "configuring" : "provided").append("'").append(ls)
+          .append("  pgPoolSize: '").append(this.pgPoolSize).append("'").append(ls)
+          .append("  sslMode: '").append(this.pgSslMode).append("'").append(ls)
+          .append("  pgHost: '").append(this.pgHost).append("'").append(ls)
+          .append("  pgPort: '").append(this.pgPort).append("'").append(ls)
+          .append("  pgDb: '").append(this.pgDb).append("'").append(ls)
+          .append("  pgUser: '").append(this.pgUser == null ? "null" : "***").append("'").append(ls)
+          .append("  pgPass: '").append(this.pgPass == null ? "null" : "***").append("'").append(ls);
           
         LOGGER.debug(log.toString());
       }
@@ -198,12 +207,23 @@ public class ThenaStore extends ThenaStoreTemplate implements HdesStore {
         HdesAssert.notNull(pgPass, () -> "pgPass must be defined!");
         HdesAssert.notNull(pgPoolSize, () -> "pgPoolSize must be defined!");
         
+        SslMode sslMode = SslMode.DISABLE;
+        try {
+          if (pgSslMode != null) {
+            sslMode = SslMode.valueOf(pgSslMode);
+          }
+        }
+        catch (IllegalArgumentException e){
+          LOGGER.warn("Ssl mode parsing exception, disabling ssl", e);
+        }
+        
         final PgConnectOptions connectOptions = new PgConnectOptions()
             .setHost(pgHost)
             .setPort(pgPort)
             .setDatabase(pgDb)
             .setUser(pgUser)
-            .setPassword(pgPass);
+            .setPassword(pgPass)
+            .setSslMode(sslMode);
         final PoolOptions poolOptions = new PoolOptions()
             .setMaxSize(pgPoolSize);
         
