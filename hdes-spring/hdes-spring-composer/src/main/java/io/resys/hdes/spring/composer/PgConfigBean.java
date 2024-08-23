@@ -39,6 +39,9 @@ public class PgConfigBean {
   private Integer pgPort;
   @Value("${pgPoolSize:3}")
   private Integer pgPoolSize;
+  // Value from io.vertx.pgclient.SslMode
+  @Value("${sslMode:disable}")
+  private String pgSslMode;
   
   private String pgDb;
   private String pgUser;
@@ -92,6 +95,14 @@ public class PgConfigBean {
 
   public void setPgPoolSize(Integer pgPoolSize) {
     this.pgPoolSize = pgPoolSize;
+  }
+
+  public String getPgSslMode() {
+    return pgSslMode;
+  }
+
+  public void setPgSslMode(String pgSslMode) {
+    this.pgSslMode = pgSslMode;
   }
 
   public String getPgDb() {

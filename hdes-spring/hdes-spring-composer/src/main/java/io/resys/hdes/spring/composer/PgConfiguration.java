@@ -58,6 +58,7 @@ public class PgConfiguration {
         .pgPoolSize(config.getPgPoolSize())
         .pgUser(config.getPgUser())
         .pgPass(config.getPgPass())
+        .pgSslMode(config.getPgSslMode())
         .objectMapper(objectMapper)
         .repoName(config.getRepositoryName())
         .headName(config.getBranchSpecifier())
