@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import org.apache.commons.codec.binary.Hex;
 
@@ -45,7 +45,7 @@ import io.quarkus.deployment.builditem.LiveReloadBuildItem;
 import io.quarkus.deployment.builditem.ShutdownContextBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.NativeImageResourceBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
-import io.quarkus.deployment.configuration.ConfigurationError;
+import io.quarkus.runtime.configuration.ConfigurationException;
 import io.quarkus.deployment.pkg.builditem.CurateOutcomeBuildItem;
 import io.quarkus.deployment.util.WebJarUtil;
 import io.quarkus.vertx.http.deployment.BodyHandlerBuildItem;
@@ -260,7 +260,7 @@ public class ComposerProcessor {
     }
 
     final String hash = Hex.encodeHexString(LocalDateTime.now().toString().getBytes(StandardCharsets.UTF_8), true);    
-    final AppArtifact artifact = WebJarUtil.getAppArtifact(curateOutcomeBuildItem, WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID);    
+    final var artifact = WebJarUtil.getAppArtifact(curateOutcomeBuildItem, WEBJAR_GROUP_ID, WEBJAR_ARTIFACT_ID);
     if (launch.getLaunchMode().isDevOrTest()) {
       
       final var tempPath = WebJarUtil
@@ -311,11 +311,10 @@ public class ComposerProcessor {
       }
       
       if(!indexReplaced) {
-        throw new ConfigurationError(new StringBuilder("Failed to create composer frontend index.html, ")
-            .append("artifact = ").append(artifact).append(System.lineSeparator()).append(",")
-            .append("path = ").append(frontendPath).append("!")
-            .append("final destination = ").append(FINAL_DESTINATION).append("!")
-            .toString());
+        throw new ConfigurationException("Failed to create composer frontend index.html, " +
+                "artifact = " + artifact + System.lineSeparator() + "," +
+                "path = " + frontendPath + "!" +
+                "final destination = " + FINAL_DESTINATION + "!");
       }
       
       buildProducer.produce(new ComposerFrontendBuildItem(FINAL_DESTINATION, frontendPath, hash));

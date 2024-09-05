@@ -26,13 +26,13 @@
 
     <googlejavaformat.version>1.9</googlejavaformat.version>
     <javapoet.version>1.12.1</javapoet.version>
-    <antlr.version>4.8-1</antlr.version>
+    <antlr.version>4.13.2</antlr.version>
 
     <jackson.version>2.12.6.1</jackson.version>
     <jackson.format.version>2.10.5</jackson.format.version>
 
-    <jandex.version>1.0.8</jandex.version>
-    <quarkus.version>2.1.3.Final</quarkus.version>
+    <jandex.version>3.1.5</jandex.version>
+    <quarkus.version>3.8.6</quarkus.version>
     <thena.version>1.1.24</thena.version>
     <lombok.version>1.18.22</lombok.version>
 
@@ -184,7 +184,7 @@
         </plugin>
         <plugin>
           <groupId>io.quarkus</groupId>
-          <artifactId>quarkus-bootstrap-maven-plugin</artifactId>
+          <artifactId>quarkus-extension-maven-plugin</artifactId>
           <version>${quarkus.version}</version>
           <executions>
             <execution>
@@ -200,7 +200,7 @@
           </executions>
         </plugin>
         <plugin>
-          <groupId>org.jboss.jandex</groupId>
+          <groupId>io.smallrye</groupId>
           <artifactId>jandex-maven-plugin</artifactId>
           <version>${jandex.version}</version>
         </plugin>
@@ -307,34 +307,11 @@
 
       <!-- jackson -->
       <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-databind</artifactId>
-        <version>${jackson.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.datatype</groupId>
-        <artifactId>jackson-datatype-jdk8</artifactId>
-        <version>${jackson.format.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.dataformat</groupId>
-        <artifactId>jackson-dataformat-yaml</artifactId>
-        <version>${jackson.format.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.dataformat</groupId>
-        <artifactId>jackson-dataformat-csv</artifactId>
-        <version>${jackson.format.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.datatype</groupId>
-        <artifactId>jackson-datatype-guava</artifactId>
-        <version>${jackson.format.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.jackson.datatype</groupId>
-        <artifactId>jackson-datatype-jsr310</artifactId>
-        <version>${jackson.format.version}</version>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>2.17.2</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
 
       <!-- JGIT -->
