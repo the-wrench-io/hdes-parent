@@ -16,9 +16,9 @@
     <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 
 
-    <resource.plugin.version>3.1.0</resource.plugin.version>
-    <compiler.plugin.version>3.8.1</compiler.plugin.version>
-    <surefire.plugin.version>3.0.0-M5</surefire.plugin.version>
+    <resource.plugin.version>3.3.1</resource.plugin.version>
+    <compiler.plugin.version>3.13.0</compiler.plugin.version>
+    <surefire.plugin.version>3.3.1</surefire.plugin.version>
 
     <spring.security.version>5.5.1</spring.security.version>
     <spring.boot.version>2.5.12</spring.boot.version>
@@ -28,8 +28,7 @@
     <javapoet.version>1.12.1</javapoet.version>
     <antlr.version>4.13.2</antlr.version>
 
-    <jackson.version>2.12.6.1</jackson.version>
-    <jackson.format.version>2.10.5</jackson.format.version>
+    <jackson.version>2.17.2</jackson.version>
 
     <jandex.version>3.1.5</jandex.version>
     <quarkus.version>3.8.6</quarkus.version>
@@ -309,7 +308,7 @@
       <dependency>
         <groupId>com.fasterxml.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
-        <version>2.17.2</version>
+        <version>${jackson.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -423,6 +422,12 @@
         <artifactId>spring-boot-starter-actuator</artifactId>
         <version>${spring.boot.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <version>${spring.boot.version}</version>
+      </dependency>
+
 
       <!-- Test dependencies -->
       <dependency>
@@ -435,12 +440,6 @@
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
         <version>${spring.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
