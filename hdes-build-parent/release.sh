@@ -1,5 +1,13 @@
 #!/usr/bin/env bash
 set -e
+run_build () {
+  ./mvnw -B -Phdes-release \
+    -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+    clean deploy
+}
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
 
 # No changes, skip release
 readonly local last_release_commit_hash=$(git log --author="$BOT_NAME" --pretty=format:"%H" -1)
@@ -10,45 +18,41 @@ if [[ "${last_release_commit_hash}" = "${GITHUB_SHA}" ]]; then
      #exit 0
 fi
 
-echo "Import GPG key"
-echo "$GPG_KEY" > private.key
-gpg --batch --import ./private.key 
-rm ./private.key
-echo "JAVA_HOME '$JAVA_HOME'"
-
 # Config GIT
 echo "Setup git user name to '$BOT_NAME' and email to '$BOT_EMAIL' GPG key ID $GPG_KEY_ID"
 git config --global user.name "$BOT_NAME";
 git config --global user.email "$BOT_EMAIL";
 
+echo "Git checkout branch: '${GITHUB_REF_NAME}' commit: '${GITHUB_SHA}'"
+
 # Current and next version
-LAST_RELEASE_VERSION=$(cat hdes-build-parent/release.version)
-[[ $LAST_RELEASE_VERSION =~ ([^\\.]*)$ ]]
-MINOR_VERSION=`expr ${BASH_REMATCH[1]}`
-MAJOR_VERSION=${LAST_RELEASE_VERSION:0:`expr ${#LAST_RELEASE_VERSION} - ${#MINOR_VERSION}`}
-NEW_MINOR_VERSION=`expr ${MINOR_VERSION} + 1`
-RELEASE_VERSION=${MAJOR_VERSION}${NEW_MINOR_VERSION}
+RELEASE_VERSION=$(cat $SCRIPT_DIR/next-next-release.version | xargs)
+if [[ $RELEASE_VERSION =~ ([0-9]+)$ ]]; then
+  MINOR_VERSION=${BASH_REMATCH[1]}
+  echo "Releasing   : '${RELEASE_VERSION}'"
+  MAJOR_VERSION=${RELEASE_VERSION:0:`expr ${#RELEASE_VERSION} - ${#MINOR_VERSION}`}
+  NEW_MINOR_VERSION=`expr ${MINOR_VERSION} + 1`
+  NEXT_RELEASE_VERSION=${MAJOR_VERSION}${NEW_MINOR_VERSION}
+  echo "Next version: '${NEXT_RELEASE_VERSION}'"
+else
+  echo "Could not parse version : '$RELEASE_VERSION'"
+  exit 1
+fi
 
-echo ${RELEASE_VERSION} > hdes-build-parent/release.version
+echo -n ${NEXT_RELEASE_VERSION} > $SCRIPT_DIR/next-next-release.version
 
-NEWLINE=$'\n'
-DATE=$(date +"%d/%m/%Y")
-echo "app.version=${RELEASE_VERSION}${NEWLINE}build.timestamp=${DATE}" > hdes-spring/hdes-spring-composer/src/main/resources/application.properties
+PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
+echo "Dev version: '${PROJECT_VERSION}'"
 
-PROJECT_VERSION=$(mvn -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
-
-echo "Git checkout refname: '${refname}' branch: '${branch}' commit: '${GITHUB_SHA}'"
-echo "Dev version: '${PROJECT_VERSION}' release version: '${RELEASE_VERSION}'"
-echo "Releasing: '${RELEASE_VERSION}', previous: '${LAST_RELEASE_VERSION}'"
-
-mvn versions:set -DnewVersion=${RELEASE_VERSION}
-git commit -am "release: ${RELEASE_VERSION}"
+./mvnw versions:set -DnewVersion=${RELEASE_VERSION}
+git commit -am "Release ${RELEASE_VERSION}"
 git tag -a ${RELEASE_VERSION} -m "release ${RELEASE_VERSION}"
 
-mvn clean deploy -Phdes-release --settings hdes-build-parent/ci-maven-settings.xml -B -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn
-mvn versions:set -DnewVersion=${PROJECT_VERSION}
-git commit -am "release: ${RELEASE_VERSION}"
+run_build
+
+./mvnw versions:set -DnewVersion=${PROJECT_VERSION}
+git commit -am "Prepare ${NEXT_RELEASE_VERSION} development"
 git push
 git push origin ${RELEASE_VERSION}
 
-
+echo "### Version ${RELEASE_VERSION} release build" >> $GITHUB_STEP_SUMMARY
