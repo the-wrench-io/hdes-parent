@@ -26,7 +26,7 @@ git config --global user.email "$BOT_EMAIL";
 echo "Git checkout branch: '${GITHUB_REF_NAME}' commit: '${GITHUB_SHA}'"
 
 # Current and next version
-RELEASE_VERSION=$(cat $SCRIPT_DIR/next-next-release.version | xargs)
+RELEASE_VERSION=$(cat $SCRIPT_DIR/next-release.version | xargs)
 if [[ $RELEASE_VERSION =~ ([0-9]+)$ ]]; then
   MINOR_VERSION=${BASH_REMATCH[1]}
   echo "Releasing   : '${RELEASE_VERSION}'"
@@ -39,7 +39,7 @@ else
   exit 1
 fi
 
-echo -n ${NEXT_RELEASE_VERSION} > $SCRIPT_DIR/next-next-release.version
+echo -n ${NEXT_RELEASE_VERSION} > $SCRIPT_DIR/next-release.version
 
 PROJECT_VERSION=$(./mvnw -q -Dexec.executable=echo -Dexec.args='${project.version}' --non-recursive exec:exec)
 echo "Dev version: '${PROJECT_VERSION}'"
