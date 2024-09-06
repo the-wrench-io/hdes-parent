@@ -36,28 +36,27 @@ import io.resys.hdes.client.spi.HdesInMemoryStore;
 import io.resys.hdes.client.spi.composer.ComposerEntityMapper;
 import io.resys.hdes.client.spi.composer.DebugVisitor;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 @EnableAutoConfiguration
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @TestPropertySource(properties = {"wrench.assets.ide = false"})
 @ContextConfiguration(classes = {FlowTaskServiceExecutionTest.ServiceTestConfig.class})
 public class FlowTaskServiceExecutionTest {
@@ -100,7 +99,7 @@ public class FlowTaskServiceExecutionTest {
     input.put("val2", new BigDecimal("20"));
 
     final var body = client.executor(envir).inputJson(input).flow("sumFlow").andGetTask("SumTask");
-    Assert.assertTrue(((BigDecimal) body.getReturns().get("sum")).compareTo(new BigDecimal("30")) == 0);
+    Assertions.assertEquals(0, ((BigDecimal) body.getReturns().get("sum")).compareTo(new BigDecimal("30")));
   }
 
   @Test
@@ -109,19 +108,19 @@ public class FlowTaskServiceExecutionTest {
     final JsonNode input = objectMapper.readTree("{\"fundAnswers\": {\"fundQuestionA\": \"selectionA\", \"fundQuestionB\": \"selectionA\"}}");
 
     final var result = client.executor(envir).inputJson(input).flow("objects").andGetBody().getReturns().get("result");
-    Assert.assertEquals("1", result);
+    Assertions.assertEquals("1", result);
   }
 
   @Test
   public void testHardcodedFlowInput() {
     final var body = client.executor(envir).inputField("myInputParam", "").flow("hardcodedInput").andGetBody();
-    Assert.assertEquals("test", body.getReturns().get("res"));
+    Assertions.assertEquals("test", body.getReturns().get("res"));
   }
 
   @Test
   public void testHardcodedFlowInputNull() {
     final var body = client.executor(envir).inputField("myInputParam", "").flow("hardcodedInputNull").andGetBody();
-    Assert.assertEquals(0, body.getReturns().size());
+    Assertions.assertEquals(0, body.getReturns().size());
   }
 
   @Test
@@ -136,7 +135,7 @@ public class FlowTaskServiceExecutionTest {
 
     FlowProgram.FlowResult flowResult = (FlowProgram.FlowResult) response.getBody();
 
-    Assert.assertEquals(new BigDecimal("30"), flowResult.getReturns().get("sum"));
+    Assertions.assertEquals(new BigDecimal("30"), flowResult.getReturns().get("sum"));
   }
 
   @Test
@@ -164,7 +163,7 @@ public class FlowTaskServiceExecutionTest {
 
     DecisionProgram.DecisionResult decisionResult = (DecisionProgram.DecisionResult) response.getBody();
 
-    Assert.assertEquals(new BigDecimal("3.4"), decisionResult.getMatches().get(0).getReturns().get(0).getUsedValue());
+    Assertions.assertEquals(new BigDecimal("3.4"), decisionResult.getMatches().get(0).getReturns().get(0).getUsedValue());
   }
 
   @Test
@@ -192,7 +191,7 @@ public class FlowTaskServiceExecutionTest {
 
     ServiceProgram.ServiceResult serviceResult = (ServiceProgram.ServiceResult) response.getBody();
 
-    Assert.assertEquals("{\"sum\":30}", objectMapper.writeValueAsString(serviceResult.getValue()));
+    Assertions.assertEquals("{\"sum\":30}", objectMapper.writeValueAsString(serviceResult.getValue()));
   }
 
   @Test

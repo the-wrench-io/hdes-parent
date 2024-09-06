@@ -24,6 +24,10 @@
       <groupId>io.resys.hdes</groupId>
       <artifactId>thena-docdb-pgsql</artifactId>
     </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-mutiny-reactive-streams-operators</artifactId>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>

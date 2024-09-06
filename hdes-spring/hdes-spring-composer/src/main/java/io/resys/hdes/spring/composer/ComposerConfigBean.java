@@ -1,6 +1,6 @@
 package io.resys.hdes.spring.composer;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 /*-
  * #%L

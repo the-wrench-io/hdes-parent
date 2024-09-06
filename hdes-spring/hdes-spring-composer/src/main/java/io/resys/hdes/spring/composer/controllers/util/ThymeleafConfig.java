@@ -22,7 +22,7 @@ package io.resys.hdes.spring.composer.controllers.util;
 
 import java.util.List;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 import io.resys.hdes.spring.composer.ComposerAutoConfiguration.IdeToken;
 
