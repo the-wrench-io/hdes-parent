@@ -1,6 +1,7 @@
-[![License](https://img.shields.io/badge/License-Apache%202.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Build Status](https://travis-ci.com/the-wrench-io/hdes.svg?branch=master)](https://travis-ci.com/github/the-wrench-io/hdes)
- 
+![Apache License, Version 2.0, January 2004](https://img.shields.io/github/license/apache/maven.svg?label=License&style=for-the-badge)
+[![Maven Central](https://img.shields.io/maven-central/v/io.resys.hdes/hdes-bom.svg?label=Maven%20Central&style=for-the-badge)](https://search.maven.org/artifact/io.resys.hdes/hdes-bom)
+![Build Status](https://img.shields.io/github/actions/workflow/status/the-wrench-io/hdes-parent/3.y-pre-commit.yaml?style=for-the-badge)
+
 # HDES
 Language for defining and connecting flows, decision tables and services
 
