@@ -2,6 +2,9 @@
 [![Maven Central](https://img.shields.io/maven-central/v/io.resys.hdes/hdes-bom.svg?label=Maven%20Central&style=for-the-badge)](https://search.maven.org/artifact/io.resys.hdes/hdes-bom)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/the-wrench-io/hdes-parent/3.y-pre-commit.yaml?style=for-the-badge)
 
+# This repository has been deprecated and is no longer maintained. 
+Codebase has been moved and is now maintained in https://github.com/digiexpress-io/digiexpress-parent
+
 # HDES
 Language for defining and connecting flows, decision tables and services
 
